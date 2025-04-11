@@ -58,7 +58,7 @@
                                 <th>
                                     <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
                                 </th>
-                                <th>{% translate "Object" %}</th>
+                                <th>{{ table_columns.object }}</th>
                                 <th scope="col"
                                     class="sortable"
                                     {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
@@ -66,7 +66,7 @@
                                             name="order_by"
                                             value="object_type"
                                             class="sort">
-                                        {% translate "Type" %}
+                                        {{ table_columns.object_type }}
                                         <span aria-hidden="true"
                                               class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                     </button>
@@ -78,12 +78,12 @@
                                             name="order_by"
                                             value="scan_level"
                                             lass="sort">
-                                        {% translate "Clearance level" %}
+                                        {{ table_columns.clearance_level }}
                                         <span aria-hidden="true"
                                               class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                     </button>
                                 </th>
-                                <th>{% translate "Clearance type" %}</th>
+                                <th>{{ table_columns.clearance_type }}</th>
                             </thead>
                             <tbody>
                                 {% for object in ooi_list %}

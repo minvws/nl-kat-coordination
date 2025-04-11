@@ -314,14 +314,13 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
         return context
 
 
-class AddDashboardItemView(OrganizationView, TemplateView, FormView):
+class AddDashboardItemView(OrganizationView, FormView):
     """This is the Crisis Room for a single organization."""
 
     form_class = ObjectListSettingsForm
+    template_name = "oois/ooi_list.html"
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Add dashboard item and redirect to the selected dashboard."""
-
         form = self.get_form()
         if form.is_valid():
             form_data = form.cleaned_data

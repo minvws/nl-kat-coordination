@@ -36,10 +36,6 @@ class ObjectListSettingsForm(BaseRockyForm):
         initial="20",
     )
 
-    columns = forms.MultipleChoiceField(
-        label=_("Show table columns"), required=True, widget=forms.CheckboxSelectMultiple, choices=[("test", "Test")]
-    )
-
     size = forms.ChoiceField(
         label=_("Dashboard item size"),
         required=True,
