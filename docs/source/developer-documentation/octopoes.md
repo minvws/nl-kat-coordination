@@ -385,6 +385,7 @@ $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
 ```
 
 #### Examples
+
 In these examples we supply the Dockerized calls, expecting the server to be avialable on localhost:3000 and we use an organization or `node` that's called 'test'
 
 ```
