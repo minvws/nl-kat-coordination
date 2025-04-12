@@ -32,7 +32,7 @@ class Network(OOI):
         return reference.tokenized.name
 
 
-class IPAddress(OOI):
+cls IPAddress(OOI):
     """Represents IPv4 or IPv6 address objects."""
 
     address: IPv4Address | IPv6Address
@@ -41,12 +41,12 @@ class IPAddress(OOI):
     _natural_key_attrs = ["network", "address"]
     _information_value = ["address"]
 
-    @classmethod
+    @clsmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.address
 
 
-class IPAddressV4(IPAddress):
+cls IPAddressV4(IPAddress):
     """Represents IPv4 address objects.
 
     Example value
@@ -64,7 +64,7 @@ class IPAddressV4(IPAddress):
     _reverse_relation_names = {"network": "ip_v4_addresses", "netblock": "ip_v4_addresses"}
 
 
-class IPAddressV6(IPAddress):
+cls IPAddressV6(IPAddress):
     """Represents IPv6 address objects.
 
     Example value
@@ -82,7 +82,7 @@ class IPAddressV6(IPAddress):
     _reverse_relation_names = {"network": "ip_v6_addresses", "netblock": "ip_v6_addresses"}
 
 
-class Protocol(Enum):
+cls Protocol(Enum):
     """Represents the protocol used for ports.
 
     Possible value
@@ -98,10 +98,10 @@ class Protocol(Enum):
     UDP = "udp"
 
 
-class PortState(Enum):
+cls PortState(Enum):
     """Represents the state of the identified ports.
 
-    This is deprecated. OpenKAT assumes that all ports are always open.
+    This is deprecated. OpenKAT sumes that all ports are always open.
 
     Possible value
     --------------
@@ -120,7 +120,7 @@ class PortState(Enum):
     CLOSED_FILTERED = "closed|filtered"
 
 
-class IPPort(OOI):
+cls IPPort(OOI):
     """Represents the IP-Port combination.
 
     Possible value
@@ -143,13 +143,13 @@ class IPPort(OOI):
     _reverse_relation_names = {"address": "ports"}
     _information_value = ["protocol", "port"]
 
-    @classmethod
+    @clsmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         tokenized = reference.tokenized
         return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
 
 
-class AutonomousSystem(OOI):
+cls AutonomousSystem(OOI):
     """Represents the Autonomous System number object.
 
     Possible value
@@ -164,7 +164,7 @@ class AutonomousSystem(OOI):
     object_type: Literal["AutonomousSystem"] = "AutonomousSystem"
 
     number: str
-    name: str 
+    name: str | None
     _natural_key_attrs = ["number"]
 
 
