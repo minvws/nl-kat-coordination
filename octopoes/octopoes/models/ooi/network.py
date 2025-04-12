@@ -4,7 +4,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
