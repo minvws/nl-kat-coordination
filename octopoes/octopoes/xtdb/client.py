@@ -153,7 +153,7 @@ class XTDBHTTPClient:
             res = self._session.post("/create-node", json={"node": self.client})
             self._verify_response(res)
         except HTTPError as e:
-            logger.exception("Failed creating node")
+            logger.exception("Failed creating node %s", self._session.base_url)
             raise XTDBException("Could not create node") from e
 
     def delete_node(self) -> None:
