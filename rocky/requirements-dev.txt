@@ -311,8 +311,9 @@ coverage[toml]==7.8.0 ; python_version >= "3.10" and python_version < "4.0" \
 cron-descriptor==1.4.5 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:736b3ae9d1a99bc3dbfc5b55b5e6e7c12031e7ba5de716625772f8b02dcd6013 \
     --hash=sha256:f51ce4ffc1d1f2816939add8524f206c376a42c87a5fca3091ce26725b3b1bca
-cssbeautifier==1.15.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:9f7064362aedd559c55eeecf6b6bed65e05f33488dcbe39044f0403c26e1c006
+cssbeautifier==1.15.4 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
+    --hash=sha256:9bb08dc3f64c101a01677f128acf01905914cf406baf87434dcde05b74c0acf5
 cssselect2==0.8.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:46fc70ebc41ced7a32cd42d58b1884d72ade23d21e5a4eaaf022401c13f0e76e \
     --hash=sha256:7674ffb954a3b46162392aee2a3a0aedb2e14ecf99fcc28644900f4e6e3e9d3a
