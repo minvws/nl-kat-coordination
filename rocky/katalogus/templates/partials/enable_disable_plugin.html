@@ -19,8 +19,13 @@
     </form>
 {% else %}
     <span class="de-emphasized">
+        {% if not plugin.enabled %}
+            {% translate "This plugin is enabled." %}
+        {% else %}
+            {% translate "This plugin is disabled." %}
+        {% endif %}
         {% blocktranslate trimmed with plugin=plugin.type %}
-            You don't have permission to enable this {{ plugin }}
+            You don't have permission to enable or disable this {{ plugin }}
         {% endblocktranslate %}
     </span>
 {% endif %}
