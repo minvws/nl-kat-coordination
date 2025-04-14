@@ -186,7 +186,6 @@ class DashboardService:
 
     def get_ooi_list(self, dashboard_data):
         query = json.loads(dashboard_data.query)
-        list_limit = 20
         ooi_list = []
 
         all_oois = {
@@ -216,7 +215,7 @@ class DashboardService:
         ooi_list = octopoes_client.list_objects(
             ooi_types,
             valid_time=datetime.now(timezone.utc),
-            limit=list_limit,
+            limit=query["limit"],
             scan_level=scan_level,
             scan_profile_type=scan_profile_type,
             search_string=query["search_string"],

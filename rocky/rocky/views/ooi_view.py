@@ -112,6 +112,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
+        context["search_string"] = self.search_string
         context["ooi_types_selection"] = self.filtered_ooi_types
         context["clearance_levels_selection"] = self.clearance_levels
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
