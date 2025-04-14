@@ -20,7 +20,10 @@ if (process.env.CA_PATH) {
   try {
     customCA = readFileSync(process.env.CA_PATH);
   } catch (err) {
-    console.error(`Failed to read custom CA file at ${process.env.CA_PATH}:`, err.message);
+    console.error(
+      `Failed to read custom CA file at ${process.env.CA_PATH}:`,
+      err.message
+    );
     process.exit(1);
   }
 }
