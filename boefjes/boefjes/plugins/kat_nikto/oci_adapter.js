@@ -17,9 +17,9 @@ function b64encode(inp) {
  * @returns {string}
  */
 function sanitizeLog(inp) {
-  return String(inp).
-    replace(/[\r\n]+/g, ' ').
-    replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, '');
+  return String(inp)
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, '');
 }
 
 /**
@@ -118,7 +118,7 @@ async function main() {
     boefje_input = await fetchJson(input_url);
   } catch (error) {
     console.error(
-      `Getting boefje input went wrong with URL: ${sanitizeLog(input_url)}`
+      `Getting boefje input went wrong with URL: ${sanitizeLog(input_url)}`,
     );
     throw error;
   }
@@ -152,7 +152,7 @@ async function main() {
     await postJson(output_url, out);
   } catch (error) {
     console.error(
-      `Failed to POST output to ${sanitizeLog(output_url)}:`, 
+      `Failed to POST output to ${sanitizeLog(output_url)}:`,
       error,
     );
     throw error;
