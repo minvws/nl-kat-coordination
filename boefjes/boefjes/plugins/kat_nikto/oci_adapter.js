@@ -18,8 +18,9 @@ function b64encode(inp) {
  */
 function sanitizeLog(inp) {
   return String(inp)
-    .replace(/[\r\n]+/g, " ")
-    .replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, "");
+    .replace(/[\r\n]+/g, " ") // Remove newlines
+    .replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, "") // Remove ANSI escape codes
+    .replace(/[^\x20-\x7E]+/g, ""); // Remove non-printable characters
 }
 
 /**
