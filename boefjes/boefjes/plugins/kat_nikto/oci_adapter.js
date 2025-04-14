@@ -1,4 +1,7 @@
-import { execSync } from "node:child_process";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
+import { readFileSync } from "node:fs";
+import { URL } from "node:url";
 import run from "./main.js";
 
 /**
@@ -9,25 +12,107 @@ function b64encode(inp) {
   return Buffer.from(inp).toString("base64");
 }
 
-function main() {
+/**
+ * Optional custom CA, if provided via env
+ */
+let customCA = undefined;
+if (process.env.CA_PATH) {
+  try {
+    customCA = readFileSync(process.env.CA_PATH);
+  } catch (err) {
+    console.error(`Failed to read custom CA file at ${process.env.CA_PATH}:`, err.message);
+    process.exit(1);
+  }
+}
+
+/**
+ * Make an HTTP(S) GET request and return the parsed JSON response.
+ * @param {string} urlStr
+ * @returns {Promise<any>}
+ */
+function fetchJson(urlStr) {
+  const url = new URL(urlStr);
+  const isHttps = url.protocol === "https:";
+  const client = isHttps ? httpsRequest : httpRequest;
+
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    port: url.port || (isHttps ? 443 : 80),
+    method: "GET",
+    ...(isHttps && customCA ? { ca: customCA } : {}),
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = client(options, (res) => {
+      let data = "";
+      res.on("data", (chunk) => (data += chunk));
+      res.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (err) {
+          reject(new Error("Invalid JSON response: " + err.message));
+        }
+      });
+    });
+
+    req.on("error", (err) => reject(err));
+    req.end();
+  });
+}
+
+/**
+ * Send a POST request with JSON data
+ * @param {string} urlStr
+ * @param {any} jsonData
+ * @returns {Promise<void>}
+ */
+function postJson(urlStr, jsonData) {
+  const url = new URL(urlStr);
+  const isHttps = url.protocol === "https:";
+  const client = isHttps ? httpsRequest : httpRequest;
+  const data = JSON.stringify(jsonData);
+
+  const options = {
+    hostname: url.hostname,
+    path: url.pathname + url.search,
+    port: url.port || (isHttps ? 443 : 80),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(data),
+    },
+    ...(isHttps && customCA ? { ca: customCA } : {}),
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = client(options, (res) => {
+      res.on("data", () => {}); // optional: consume response
+      res.on("end", resolve);
+    });
+
+    req.on("error", (err) => reject(err));
+    req.write(data);
+    req.end();
+  });
+}
+
+async function main() {
   const input_url = process.argv[process.argv.length - 1];
 
-  // Getting the boefje input
+  let boefje_input;
   try {
-    var boefje_input = JSON.parse(
-      execSync(`curl --request GET --url ${input_url}`).toString(),
-    );
+    boefje_input = await fetchJson(input_url);
   } catch (error) {
     console.error(`Getting boefje input went wrong with URL: ${input_url}`);
-    throw new Error(error);
+    throw error;
   }
 
   Object.assign(process.env, boefje_input["boefje_meta"]["environment"]);
 
-  let out = undefined;
-  let output_url = boefje_input.output_url;
+  let out;
+  const output_url = boefje_input.output_url;
   try {
-    // Getting the raw files
     const raws = run(boefje_input.boefje_meta);
     out = {
       status: "COMPLETED",
@@ -48,17 +133,12 @@ function main() {
     };
   }
 
-  // Example command
-  /*
-    curl --request POST \
-      --url http://boefje:8000/api/v0/tasks/7342e8dd-b945-4185-aaec-787205b7b664 \
-      --header 'Content-Type: application/json' \
-      --data '{"status":"COMPLETED","files":[{"content":"BASE_64_ENCODED_CONTENT","tags":[]}]}'
-  */
-  const out_json = JSON.stringify(out);
-  const cmd = `curl --request POST --url ${output_url} --header "Content-Type: application/json" --data '${out_json}'`;
-
-  execSync(cmd);
+  try {
+    await postJson(output_url, out);
+  } catch (error) {
+    console.error(`Failed to POST output to ${output_url}:`, error);
+    throw error;
+  }
 }
 
 main();
