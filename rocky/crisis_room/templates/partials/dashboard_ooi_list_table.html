@@ -1,0 +1,70 @@
+{% load i18n %}
+{% load static %}
+
+<table>
+    <caption class="visually-hidden">
+        {% translate "Objects " %}
+        <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
+    </caption>
+    <thead>
+        {% if "object" in dashboard_item.settings %}
+            <th>{% translate "Object" %}</th>
+        {% endif %}
+        {% if "object_type" in dashboard_item.settings %}
+            <th scope="col"
+                class="sortable"
+                {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                <button form="ooi_list_settings"
+                        name="order_by"
+                        value="object_type"
+                        class="sort">
+                    {% translate "Type" %}
+                    <span aria-hidden="true"
+                          class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                </button>
+            </th>
+        {% endif %}
+        {% if "clearance_level" in dashboard_item.settings %}
+            <th scope="col"
+                class="sortable"
+                {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                <button form="ooi_list_settings"
+                        name="order_by"
+                        value="scan_level"
+                        lass="sort">
+                    {% translate "Clearance level" %}
+                    <span aria-hidden="true"
+                          class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                </button>
+            </th>
+        {% endif %}
+        {% if "clearance_type" in dashboard_item.settings %}
+            <th>{% translate "Clearance type" %}</th>
+        {% endif %}
+    </thead>
+    <tbody>
+        {% for object in data %}
+            <tr>
+                {% if "object" in dashboard_item.settings %}
+                    <td>
+                        <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
+                    </td>
+                {% endif %}
+                {% if "object_type" in dashboard_item.settings %}
+                    <td>
+                        <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
+                    </td>
+                {% endif %}
+                {% if "clearance_level" in dashboard_item.settings %}
+                    <td>
+                        {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                    </td>
+                {% endif %}
+                {% if "clearance_type" in dashboard_item.settings %}
+                    <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
