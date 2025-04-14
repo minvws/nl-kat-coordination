@@ -89,12 +89,14 @@ def test_fail_on_wrong_plugin_ids(migration_6f99834a4a5a):
     session.close()
 
     config_storage = SQLConfigStorage(session, encrypter)
-    assert config_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
-    assert config_storage.get_all_settings("dev1", "nmap-udp") == {}
-    assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
 
-    assert config_storage.is_enabled_by_id("dns-records", "dev1")
-    assert config_storage.is_enabled_by_id("nmap-udp", "dev1")
+    with config_storage:
+        assert config_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
+        assert config_storage.get_all_settings("dev1", "nmap-udp") == {}
+        assert config_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
+
+        assert config_storage.is_enabled_by_id("dns-records", "dev1")
+        assert config_storage.is_enabled_by_id("nmap-udp", "dev1")
 
     session.commit()
     session.close()
