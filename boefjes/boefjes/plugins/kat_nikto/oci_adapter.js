@@ -13,6 +13,14 @@ function b64encode(inp) {
 }
 
 /**
+ * @param {string} inp The string input to cleaned for Logging usage
+ * @returns {string}
+ */
+function sanitizeLog(inp) {
+  return String(inp).replace(/[\r\n]+/g, ' ').replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, '');
+}
+
+/**
  * Optional custom CA, if provided via env
  */
 let customCA = undefined;
@@ -21,7 +29,7 @@ if (process.env.CA_PATH) {
     customCA = readFileSync(process.env.CA_PATH);
   } catch (err) {
     console.error(
-      `Failed to read custom CA file at ${process.env.CA_PATH}:`,
+      `Failed to read custom CA file at ${sanitizeLog(process.env.CA_PATH)}:`,
       err.message
     );
     process.exit(1);
@@ -107,7 +115,7 @@ async function main() {
   try {
     boefje_input = await fetchJson(input_url);
   } catch (error) {
-    console.error(`Getting boefje input went wrong with URL: ${input_url}`);
+    console.error(`Getting boefje input went wrong with URL: ${sanitizeLog(input_url)}`);
     throw error;
   }
 
@@ -139,7 +147,7 @@ async function main() {
   try {
     await postJson(output_url, out);
   } catch (error) {
-    console.error(`Failed to POST output to ${output_url}:`, error);
+    console.error(`Failed to POST output to ${sanitizeLog(output_url)}:`, error);
     throw error;
   }
 }
