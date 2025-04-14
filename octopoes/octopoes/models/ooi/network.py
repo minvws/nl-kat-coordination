@@ -32,7 +32,7 @@ class Network(OOI):
         return reference.tokenized.name
 
 
-cls IPAddress(OOI):
+class IPAddress(OOI):
     """Represents IPv4 or IPv6 address objects."""
 
     address: IPv4Address | IPv6Address
@@ -46,7 +46,7 @@ cls IPAddress(OOI):
         return reference.tokenized.address
 
 
-cls IPAddressV4(IPAddress):
+class IPAddressV4(IPAddress):
     """Represents IPv4 address objects.
 
     Example value
@@ -64,7 +64,7 @@ cls IPAddressV4(IPAddress):
     _reverse_relation_names = {"network": "ip_v4_addresses", "netblock": "ip_v4_addresses"}
 
 
-cls IPAddressV6(IPAddress):
+class IPAddressV6(IPAddress):
     """Represents IPv6 address objects.
 
     Example value
@@ -82,7 +82,7 @@ cls IPAddressV6(IPAddress):
     _reverse_relation_names = {"network": "ip_v6_addresses", "netblock": "ip_v6_addresses"}
 
 
-cls Protocol(Enum):
+class Protocol(Enum):
     """Represents the protocol used for ports.
 
     Possible value
@@ -98,7 +98,7 @@ cls Protocol(Enum):
     UDP = "udp"
 
 
-cls PortState(Enum):
+class PortState(Enum):
     """Represents the state of the identified ports.
 
     This is deprecated. OpenKAT sumes that all ports are always open.
@@ -120,7 +120,7 @@ cls PortState(Enum):
     CLOSED_FILTERED = "closed|filtered"
 
 
-cls IPPort(OOI):
+class IPPort(OOI):
     """Represents the IP-Port combination.
 
     Possible value
@@ -149,7 +149,7 @@ cls IPPort(OOI):
         return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
 
 
-cls AutonomousSystem(OOI):
+class AutonomousSystem(OOI):
     """Represents the Autonomous System number object.
 
     Possible value
