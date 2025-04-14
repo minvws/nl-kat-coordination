@@ -101,7 +101,7 @@ class Protocol(Enum):
 class PortState(Enum):
     """Represents the state of the identified ports.
 
-    This is deprecated. OpenKAT sumes that all ports are always open.
+    This is deprecated. OpenKAT assumes that all ports are always open.
 
     Possible value
     --------------
