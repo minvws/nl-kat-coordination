@@ -4,7 +4,7 @@
 <section>
     <div class="fifty-fifty">
         <div>
-            <h3>{% translate "Object list" %}</h3>
+            <h3>{{ dashboard_item.name }}</h3>
             <p>
                 {% blocktranslate trimmed with organization.name as organization_name %}
                     An overview of objects found for organization <strong>{{ organization_name }}</strong>.

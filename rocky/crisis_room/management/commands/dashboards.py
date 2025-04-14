@@ -52,10 +52,12 @@ def get_or_create_dashboard(dashboard_name: str, organization: Organization) -> 
 def get_or_create_dashboard_data(
     dashboard_name: str,
     organization: Organization,
+    name: str,
     recipe_id: str,
     query_from: str,
     query: dict[str, Any] | None,
     template: str,
+    settings: dict[str, Any],
 ) -> tuple[DashboardData | None, bool]:
     dashboard, _ = get_or_create_dashboard(dashboard_name, organization)
 
@@ -63,7 +65,13 @@ def get_or_create_dashboard_data(
     created = False
     if recipe_id or query_from:
         dashboard_data, created = DashboardData.objects.get_or_create(
-            dashboard=dashboard, recipe=recipe_id, query_from=query_from, query=json.dumps(query), template=template
+            dashboard=dashboard,
+            name=name,
+            recipe=recipe_id,
+            query_from=query_from,
+            query=json.dumps(query),
+            template=template,
+            settings=settings,
         )
         dashboard_data.display_in_dashboard = True
         dashboard_data.save()

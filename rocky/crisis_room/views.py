@@ -324,30 +324,32 @@ class AddDashboardItemView(OrganizationView, FormView):
         form = self.get_form()
         if form.is_valid():
             form_data = form.cleaned_data
-            dashboard_name = form_data["dashboard"]
-            recipe_id = request.POST.get("recipe_id")
             query_from = request.POST.get("query_from")
-            query = None
-            template = request.POST.get("template")
 
             if query_from == "object_list":
                 template = "partials/dashboard_ooi_list.html"
                 sort_by = form_data["order_by"].split("-")
-                order_by = sort_by[0]
-                asc_desc = sort_by[1]
                 query = {
                     "ooi_types": request.POST.getlist("ooi_type"),
                     "scan_level": request.POST.getlist("clearance_level"),
                     "scan_profile_type": request.POST.getlist("clearance_type"),
                     "search_string": request.POST.get("search_string"),
-                    "order_by": order_by,
-                    "asc_desc": asc_desc,
-                    "limit": form_data["limit"],
+                    "order_by": sort_by[0],
+                    "asc_desc": sort_by[1],
+                    "limit": int(form_data["limit"]),
                 }
+            else:
+                template = request.POST.get("template")
+                query = None
 
             try:
+                dashboard_name = form_data["dashboard"]
+                name = form_data["title"]
+                recipe_id = request.POST.get("recipe_id")
+                settings = {"columns": request.POST.getlist("columns"), "size": form_data["size"]}
+
                 self.dashboard_data, created = get_or_create_dashboard_data(
-                    dashboard_name, self.organization, recipe_id, query_from, query, template
+                    dashboard_name, self.organization, name, recipe_id, query_from, query, template, settings
                 )
                 if created:
                     messages.success(request, "Dashboard item has been created.")
