@@ -6,7 +6,7 @@
         <h2>{{ dashboard.name }}</h2>
         {% if dashboard_items %}
             {% for dashboard_item in dashboard_items %}
-                {% include dashboard_item.item.template with data=dashboard_item.data is_dashboard=dashboard_item.item.display_in_dashboard %}
+                {% include dashboard_item.item.template with data=dashboard_item.data is_dashboard="yes" %}
 
             {% endfor %}
         {% else %}

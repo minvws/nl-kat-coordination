@@ -19,7 +19,7 @@ class Dashboard(models.Model):
 
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
-    recipe = models.UUIDField(blank=False, null=True)
+    recipe = models.UUIDField(blank=True, null=True)
     query_from = models.CharField(blank=True, max_length=32, null=True)
     query = models.CharField(blank=True, null=True)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")

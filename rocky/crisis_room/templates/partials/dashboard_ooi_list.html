@@ -23,7 +23,7 @@
     </div>
     <div class="horizontal-scroll">
         <p class="de-emphasized">
-            {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
+            {% blocktranslate with length=data|length trimmed %}
                 Showing {{ length }} objects
             {% endblocktranslate %}
         </p>
@@ -61,7 +61,7 @@
                 <th>{% translate "Clearance type" %}</th>
             </thead>
             <tbody>
-                {% for object in ooi_list %}
+                {% for object in data %}
                     <tr>
                         <td>
                             <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
