@@ -41,7 +41,7 @@ class IPAddress(OOI):
     _natural_key_attrs = ["network", "address"]
     _information_value = ["address"]
 
-    @clsmethod
+    @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.address
 
@@ -143,7 +143,7 @@ class IPPort(OOI):
     _reverse_relation_names = {"address": "ports"}
     _information_value = ["protocol", "port"]
 
-    @clsmethod
+    @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         tokenized = reference.tokenized
         return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
