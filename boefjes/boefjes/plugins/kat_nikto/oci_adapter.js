@@ -18,8 +18,8 @@ function b64encode(inp) {
  */
 function sanitizeLog(inp) {
   return String(inp)
-    .replace(/[\r\n]+/g, ' ')
-    .replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, '');
+    .replace(/[\r\n]+/g, " ")
+    .replace(/[\x1B\x9B][[()#;?]*[0-9]{1,4}[0-9;]*[A-Za-z]/g, "");
 }
 
 /**
@@ -32,7 +32,7 @@ if (process.env.CA_PATH) {
   } catch (error) {
     console.error(
       `Failed to read custom CA file at ${sanitizeLog(process.env.CA_PATH)}:`,
-      sanitizeLog(error.message)
+      sanitizeLog(error.message),
     );
     process.exit(1);
   }
