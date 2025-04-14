@@ -6,8 +6,15 @@
         <h2>{{ dashboard.name }}</h2>
         {% if dashboard_items %}
             {% for dashboard_item in dashboard_items %}
-                {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+                {% if dashboard.name == "Crisis Room Findings Dashboard" %}
+                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
 
+                {% else %}
+                    <div class="tiles">
+                        {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+
+                    </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             <p>
