@@ -29,10 +29,10 @@ let customCA = undefined;
 if (process.env.CA_PATH) {
   try {
     customCA = readFileSync(process.env.CA_PATH);
-  } catch (err) {
+  } catch (error) {
     console.error(
       `Failed to read custom CA file at ${sanitizeLog(process.env.CA_PATH)}:`,
-      err.message,
+      sanitizeLog(error.message)
     );
     process.exit(1);
   }
@@ -153,7 +153,7 @@ async function main() {
   } catch (error) {
     console.error(
       `Failed to POST output to ${sanitizeLog(output_url)}:`,
-      error,
+      sanitizeLog(error.nessage(,
     );
     throw error;
   }
