@@ -62,9 +62,9 @@ bcrypt==4.3.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:f1e3ffa1365e8702dc48c8b360fef8d7afeca482809c5e45e653af82ccd088c1 \
     --hash=sha256:f6746e6fec103fcd509b96bacdfdaa2fbde9a553245dbada284435173a6f1aef \
     --hash=sha256:f81b0ed2639568bf14749112298f9e4e2b28853dab50a8b357e31798686a036d
-boto3==1.37.29 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:5702e38356b93c56ed2a27e17f7664d791f1fe2eafd58ae6ab3853b2804cadd2 \
-    --hash=sha256:869979050e2cf6f5461503e0f1c8f226e47ec02802e88a2210f085ec22485945
+boto3==1.37.33 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:4390317a1578af73f1514651bd180ba25802dcbe0a23deafa13851d54d3c3203 \
+    --hash=sha256:7b1b1bc69762975824e5a5d570880abebf634f7594f88b3dc175e8800f35be1a
 botocore==1.37.29 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:092c41e346df37a8d7cf60a799791f8225ad3a5ba7cda749047eb31d1440b9c5 \
     --hash=sha256:728c1ef3b66a0f79bc08008a59f6fd6bef2a0a0195e5b3b9e9bef255df519890
