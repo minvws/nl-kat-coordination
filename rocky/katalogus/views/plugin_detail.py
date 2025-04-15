@@ -88,7 +88,7 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = self.plugin.model_dump()
-        if self.plugin.type != self.task_type == "boefje":
+        if self.plugin.type != self.task_type:
             return redirect(
                 reverse(
                     f"{self.plugin.type}_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
