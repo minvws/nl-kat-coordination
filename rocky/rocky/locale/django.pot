@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-01 12:56+0000\n"
+"POT-Creation-Date: 2025-04-15 13:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -601,37 +601,24 @@ msgstr ""
 msgid "List sorting by"
 msgstr ""
 
-#: crisis_room/forms.py crisis_room/templates/partials/dashboard_ooi_list.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Type"
+#: crisis_room/forms.py
+msgid "Type (A-Z)"
 msgstr ""
 
-#: crisis_room/forms.py crisis_room/templates/partials/dashboard_ooi_list.html
-#: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_list.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html
-msgid "Clearance level"
+#: crisis_room/forms.py
+msgid "Type (Z-A)"
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "Clearance level (High-Low)"
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "Clearance level (Low-High)"
 msgstr ""
 
 #: crisis_room/forms.py
 msgid "Number of objects in list"
-msgstr ""
-
-#: crisis_room/forms.py
-msgid "Show table columns"
 msgstr ""
 
 #: crisis_room/forms.py
@@ -662,6 +649,24 @@ msgstr ""
 
 #: crisis_room/models.py
 msgid "Will be displayed on the findings dashboard for all organizations"
+msgstr ""
+
+#: crisis_room/models.py
+msgid ""
+"DashboardData must contain at least a 'recipe' or a 'query_from' with a "
+"'query'."
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Empty field 'query_from'. Value should be 'object_list'."
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Empty field 'query'."
+msgstr ""
+
+#: crisis_room/models.py
+msgid "The maximum of 16 dashboard items has been reached."
 msgstr ""
 
 #: crisis_room/templates/crisis_room.html rocky/templates/403.html
@@ -732,6 +737,7 @@ msgid ""
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
+#: reports/report_types/findings_report/report.html
 msgid ""
 "\n"
 "                    No findings have been identified yet. As soon as they "
@@ -743,9 +749,10 @@ msgstr ""
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "\n"
-"            There are no organizations yet. After creating an organization,\n"
-"            the identified findings will be shown here.\n"
-"        "
+"                There are no organizations yet. After creating an "
+"organization,\n"
+"                the identified findings will be shown here.\n"
+"            "
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
@@ -805,14 +812,6 @@ msgid "Add dashboard"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_ooi_list.html
-#: katalogus/templates/partials/objects_to_scan.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-#: rocky/templates/oois/ooi_list.html
-msgid "Object list"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list.html
 #: rocky/templates/oois/ooi_list.html
 #, python-format
 msgid ""
@@ -826,29 +825,51 @@ msgstr ""
 msgid "Showing %(length)s objects"
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list.html
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Objects "
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list.html
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "column headers with buttons are sortable"
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list.html
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/summary/ooi_selection.html
-#: rocky/templates/oois/ooi_list.html
+#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
 msgid "Object"
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list.html
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html
-#: rocky/templates/oois/ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/views/ooi_view.py
+msgid "Type"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
+#: katalogus/templates/change_clearance_level.html onboarding/forms.py
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/explanations.html rocky/views/ooi_view.py
+msgid "Clearance level"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_ooi_list_table.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
 msgid "Clearance type"
 msgstr ""
 
@@ -861,19 +882,27 @@ msgid ""
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "Select dashboard"
+#, python-format
+msgid ""
+"\n"
+"        Add these %(item_type)s with the selected filters\n"
+"        to the dashboard of your choice.\n"
+"    "
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "Select a dashboard to add this object list to."
+msgid "Show table columns"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "List settings"
-msgstr ""
-
-#: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "These can be edited at any time once your dashboard item is added."
+#: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/form/field_input.html
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
@@ -1290,6 +1319,13 @@ msgstr ""
 
 #: katalogus/templates/partials/modal_report_types.html
 msgid "Report types for "
+msgstr ""
+
+#: katalogus/templates/partials/objects_to_scan.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_list.html
+msgid "Object list"
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
@@ -4023,16 +4059,6 @@ msgstr ""
 
 #: reports/templates/partials/report_names_form.html
 msgid "Report names:"
-msgstr ""
-
-#: reports/templates/partials/report_names_form.html
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_multiselect.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "Required"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
