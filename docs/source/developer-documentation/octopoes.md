@@ -393,7 +393,7 @@ $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
 In these examples we supply the Dockerized calls, expecting the server to be available on localhost:3000 and we use an organization or `node` that's called 'test'
 
 ```
-# list all network ooi's.
+# list all network OOIs
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test query '{:query {:find [ ?var ] :where [[?var :object_type "Network" ]]}}'
 # list all  IpAddressv4's
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test query '{:query {:find [ ?var ] :where [[?var :object_type "IPAddressV4" ]]}}'
