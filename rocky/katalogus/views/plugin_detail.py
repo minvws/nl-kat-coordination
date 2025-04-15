@@ -102,7 +102,7 @@ class NormalizerDetailView(PluginDetailView):
         if self.plugin.type != "normalizer":
             return redirect(
                 reverse(
-                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 )
             )
         context["breadcrumbs"] = [
