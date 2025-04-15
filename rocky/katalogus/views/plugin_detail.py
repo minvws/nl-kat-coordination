@@ -91,9 +91,10 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
         if self.plugin.type != self.task_type:
             return redirect(
                 reverse(
-                    f"{self.plugin.type}_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
+                    f"{self.plugin.type}_detail",
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 )
-            )    
+            )
         context["plugin_settings"] = self.get_plugin_settings()
         return context
 
