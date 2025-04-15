@@ -395,7 +395,7 @@ In these examples we supply the Dockerized calls, expecting the server to be ava
 ```
 # list all network OOIs
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test query '{:query {:find [ ?var ] :where [[?var :object_type "Network" ]]}}'
-# list all  IpAddressv4's
+# list all  IPAddressV4 objects
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test query '{:query {:find [ ?var ] :where [[?var :object_type "IPAddressV4" ]]}}'
 # show the transaction (or TxId's and their timestamps) of a single OOI (A findingType in this case)
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test history 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
