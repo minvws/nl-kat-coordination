@@ -12,6 +12,7 @@ from reports.views.base import ReportsLandingView, ViewReportPDFView, ViewReport
 from reports.views.generate_report import (
     ExportSetupGenerateReportView,
     LandingGenerateReportView,
+    LocationReportView,
     OOISelectionGenerateReportView,
     ReportTypesSelectionGenerateReportView,
     SaveGenerateReportView,
@@ -49,6 +50,7 @@ urlpatterns = [
 urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
     path("view/pdf/", ViewReportPDFView.as_view(), name="view_report_pdf"),
+    path("view/location-report/", LocationReportView.as_view(), name="location_report"),
     path("view/json/", ViewReportView.as_view(), name="view_report_json"),
 ]
 
