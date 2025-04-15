@@ -219,7 +219,7 @@ def test_input_output(plugin_id, test_input, expected_output, input_object_file,
     assert isinstance(expected_output_data,
                       list), f"Expected output data to be a list, got {type(expected_output_data)}"
 
-    # todo: fix and generalize
+    # todo: fix and generalize (probably better to use a different test method for each strategy)
     # todo: make OOI comparable with dict (using a custom __eq__ method or a wrapped ooi object suitable for comparison)
     if strategy == "matches":
         assert len(test_output) == len(expected_output_data)
