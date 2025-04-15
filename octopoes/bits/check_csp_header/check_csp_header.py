@@ -44,10 +44,10 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
 
     # checks for a wildcard in domains in the header
     # 1 \*\. - literal wildcard and dot (*.)
-    # 2 [a-z0-9.-]+ - domain parts (e.g., example, cdn.example)
+    # 2 [a-z0-9.-]+ - domain parts (e.g., example, cdn.example), including the invalid _, no need to skip those
     # 3 \.[a-z]{2,} - final TLD, like .com, .org, .co.uk (optional to tweak further)
     # 4 (?:\s+|$|;|:\d+) - Delimiter
-    if re.search(r"\*\.[a-z0-9.-]+\.[a-z]{2,}(?:\s+|$|;|:\d+)", csp_header):
+    if re.search(r"\*\.[a-z0-9.-_]+\.[a-z]{2,}(?:\s+|$|;|:\d+)", csp_header):
         findings.append("The wildcard * for the scheme and host part of any URL should never be used in CSP settings.")
 
     if "unsafe-inline" in csp_header or "unsafe-eval" in csp_header or "unsafe-hashes" in csp_header:
@@ -152,10 +152,10 @@ def _source_valid(policy: list[str]) -> bool:
     for value in policy:
         #1 (?:\*\.|\.)? - optional wildcard *. or dot prefix.
         #2 [a-z0-9-]+ - (sub)domain
-        #3 (?:\.[a-z0-9-]+)+ - Optionally one or more hostnames (e.g., .nl, .co.uk)
+        #3 (?:\.[a-z0-9-_]+)+ - Optionally one or more hostnames (e.g., .nl, .co.uk) including the invalid _
         #4 (?:\s+|$|;) - Optional port number
         if not (
-            re.search(r"(?:\*\.|\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?::\d+)?(?:\s+|$|;)", value)
+            re.search(r"(?:\*\.|\.)?[a-z0-9-]+(?:\.[a-z0-9-_]+)+(?::\d+)?(?:\s+|$|;)", value)
             or value in ["'none'", "'self'", "data:", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "report-sample"]
         ):
             return False
