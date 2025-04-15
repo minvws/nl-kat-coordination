@@ -3,7 +3,7 @@ from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -88,15 +88,21 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = self.plugin.model_dump()
+        self.check_plugin_type()
+        context["plugin_settings"] = self.get_plugin_settings()
+        return context
+
+    def check_plugin_type(self):
         if self.plugin.type != self.task_type:
+            raise Http404('Plugin type does not match url.')
+            
+            # it would be nicer if we could redirect.
             return redirect(
                 reverse(
                     f"{self.plugin.type}_detail",
                     kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 )
             )
-        context["plugin_settings"] = self.get_plugin_settings()
-        return context
 
 
 class NormalizerDetailView(PluginDetailView):
