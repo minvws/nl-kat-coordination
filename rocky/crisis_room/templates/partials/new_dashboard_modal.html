@@ -5,7 +5,9 @@
 {% translate "Add dashboard" %}
 {% endfill %}
 {% fill "content" %}
-<form id="new-dashboard-form" method="post">
+<form id="new-dashboard-form"
+      method="post"
+      action="{% url "add_dashboard" organization_code=organization.code %}">
     {% csrf_token %}
     {% include "partials/form/fieldset.html" with fields=add_dashboard_form %}
 

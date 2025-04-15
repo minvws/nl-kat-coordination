@@ -242,7 +242,6 @@ class CrisisRoomView(TemplateView):
         )
 
         self.organizations_findings = dashboard_service.get_dashboard_items(dashboards_data)
-
         self.organizations_findings_summary = dashboard_service.get_organizations_findings_summary(
             self.organizations_findings
         )
@@ -269,12 +268,27 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 
         # Default is the findings dashboard
         dashboard_name = self.request.GET.get("dashboard", FINDINGS_DASHBOARD_NAME)
-
         self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-
         dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard, display_in_dashboard=True)
-
         self.dashboard_items = self.dashboard_service.get_dashboard_items(dashboards_data)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["all_dashboard_names"] = self.dashboard_service.get_dashboard_navigation(self.organization)
+        context["dashboard"] = self.dashboard
+        context["dashboard_items"] = self.dashboard_items
+        context["add_dashboard_form"] = AddDashboardForm
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "text": "Crisis Room",
+            }
+        ]
+        return context
+
+
+class AddDashboardView(OrganizationView, FormView):
+    """Add a new dashboard tab to the organization."""
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
@@ -298,23 +312,9 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
             + query_params
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["all_dashboard_names"] = self.dashboard_service.get_dashboard_navigation(self.organization)
-        context["dashboard"] = self.dashboard
-        context["dashboard_items"] = self.dashboard_items
-        context["add_dashboard_form"] = AddDashboardForm
-        context["breadcrumbs"] = [
-            {
-                "url": reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
-                "text": "Crisis Room",
-            }
-        ]
-        return context
-
 
 class AddDashboardItemView(OrganizationView, FormView):
-    """This is the Crisis Room for a single organization."""
+    """Add a new dashboard item to the selected dashboard."""
 
     form_class = ObjectListSettingsForm
     template_name = "oois/ooi_list.html"
