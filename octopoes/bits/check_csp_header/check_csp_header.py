@@ -150,10 +150,10 @@ def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Ite
 
 def _source_valid(policy: list[str]) -> bool:
     for value in policy:
-        #1 (?:\*\.|\.)? - optional wildcard *. or dot prefix.
-        #2 [a-z0-9-]+ - (sub)domain
-        #3 (?:\.[a-z0-9-_]+)+ - Optionally one or more hostnames (e.g., .nl, .co.uk) including the invalid _
-        #4 (?:\s+|$|;) - Optional port number
+        # 1 (?:\*\.|\.)? - optional wildcard *. or dot prefix.
+        # 2 [a-z0-9-]+ - (sub)domain
+        # 3 (?:\.[a-z0-9-_]+)+ - Optionally one or more hostnames (e.g., .nl, .co.uk) including the invalid _
+        # 4 (?:\s+|$|;) - Optional port number
         if not (
             re.search(r"(?:\*\.|\.)?[a-z0-9-]+(?:\.[a-z0-9-_]+)+(?::\d+)?(?:\s+|$|;)", value)
             or value in ["'none'", "'self'", "data:", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "report-sample"]
