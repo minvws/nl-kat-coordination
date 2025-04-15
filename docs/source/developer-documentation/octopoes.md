@@ -311,11 +311,15 @@ It is recommended to create a virtual environment and install the developer-requ
 
 The XTDB-cli tool can be queried as shown below.
 
+From the environment:
 ```
-# from an env:
 $ ./xtdb-cli.py -h
-# Or from outside the container, using a new otopoes_api container instance:
+```
+
+Or from inside the container, using a new `octopoes_api` container instance:
+```
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py -h
+```
 Usage: xtdb-cli.py [OPTIONS] COMMAND [ARGS]...
 
 This help functionality explains how to query XTDB using the xtdb-cli tool. The help functionality for all default XTDB commands was copied from the official XTDB docs for the HTTP implementation. Not all optional parameters as available on the HTTP docs may be implemented.
