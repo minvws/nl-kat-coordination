@@ -399,7 +399,7 @@ $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test query '{:query {:find [ ?var ] :where [[?var :object_type "IPAddressV4" ]]}}'
 # show the transaction (or TxId's and their timestamps) of a single OOI (A findingType in this case)
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test history 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
-# show the Contents of a single OOI (A findingType in this case)
+# show the Contents of a single OOI (A FindingType in this case)
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test entity 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
 # the same, but now return the most recent) metadata for that object
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test entity-tx 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
