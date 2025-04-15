@@ -307,7 +307,7 @@ The XTDB-cli tool can be found in the following folder:
 https://github.com/minvws/nl-kat-coordination/tree/main/octopoes/tools
 ```
 
-It is recommended to create a virtual environment and install the developer-requirements (in the octopoes folder) within this virtual environment. You could also execute the xtdb-cli commands from within the Octopoes_api container if you are using a Dockerized setup.
+It is recommended to create a virtual environment and install the developer-requirements (in the octopoes folder) within this virtual environment. You could also execute the xtdb-cli commands from within the `octopoes_api` container if you are using a Dockerized setup.
 
 The XTDB-cli tool can be queried as shown below.
 
