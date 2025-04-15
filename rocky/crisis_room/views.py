@@ -290,27 +290,34 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 class AddDashboardView(OrganizationView, FormView):
     """Add a new dashboard tab to the organization."""
 
+    template_name = "organization_crisis_room.html"
+    form_class = AddDashboardForm
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
-        dashboard_name = request.POST.get("dashboard_name")
-        query_params = ""
-        try:
-            dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
-            if created:
-                query_params = "?" + urlencode({"dashboard": dashboard.name})
-                messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
-            else:
-                messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
+        form = self.get_form()
+        if form.is_valid():
+            dashboard_name = request.POST.get("dashboard_name")
+            query_params = ""
+            try:
+                dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
+                if created:
+                    query_params = "?" + urlencode({"dashboard": dashboard.name})
+                    messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
+                else:
+                    messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
 
-        except IntegrityError:
-            messages.error(request, "Dashboard could not be created.")
+            except IntegrityError:
+                messages.error(request, "Dashboard could not be created.")
 
-        query_params = urlencode({"dashboard": dashboard.name})
-        return redirect(
-            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + query_params
-        )
+            query_params = urlencode({"dashboard": dashboard.name})
+            return redirect(
+                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + query_params
+            )
+        else:
+            return self.form_invalid(form)
 
 
 class AddDashboardItemView(OrganizationView, FormView):
