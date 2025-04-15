@@ -154,7 +154,7 @@ async function main() {
   } catch (error) {
     console.error(
       `Failed to POST output to ${sanitizeLog(output_url)}:`,
-      sanitizeLog(error.nessage),
+      sanitizeLog(error.message),
     );
     throw error;
   }
