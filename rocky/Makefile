@@ -14,6 +14,9 @@ build-rocky:
 # Set DATABASE_MIGRATION=false to prevent entrypoint from running migration
 	docker compose run --rm -e DATABASE_MIGRATION=false rocky make build-rocky-native
 
+dashboards:
+	docker compose run --rm rocky python3 manage.py dashboards
+
 build-rocky-native:
 	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
 	python3 manage.py migrate
