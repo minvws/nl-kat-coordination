@@ -94,15 +94,15 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
 
     def check_plugin_type(self):
         if self.plugin.type != self.task_type:
-            raise Http404('Plugin type does not match url.')
-            
+            raise Http404("Plugin type does not match url.")
+
             # it would be nicer if we could redirect.
-            return redirect(
-                reverse(
-                    f"{self.plugin.type}_detail",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
-                )
-            )
+            #return redirect(
+            #    reverse(
+            #        f"{self.plugin.type}_detail",
+            #        kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
+            #    )
+            #)
 
 
 class NormalizerDetailView(PluginDetailView):
