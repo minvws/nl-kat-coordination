@@ -401,7 +401,7 @@ $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test history 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
 # show the Contents of a single OOI (A findingType in this case)
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test entity 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
-# the same, but now return the 9most recent) metadata for that object
+# the same, but now return the most recent) metadata for that object
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test entity-tx 'KATFindingType|KAT-WEBSERVER-NO-IPV6'
 ```
 
