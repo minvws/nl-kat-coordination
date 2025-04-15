@@ -38,7 +38,7 @@ opentelemetry-semantic-conventions = "^0.49b2"
 opentelemetry-util-http = "^0.49b2"
 pyjwt = "^2.8.0"
 fastapi-slim = "^0.115.2"
-structlog = "^24.2.0"
+structlog = "^25.2.0"
 cryptography = "^44.0.1"
 boto3 = "^1.35.15"
 
@@ -50,6 +50,9 @@ pytest-cov = "^5.0.0"
 [build-system]
 requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.coverage.run]
+relative_files = true
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered"

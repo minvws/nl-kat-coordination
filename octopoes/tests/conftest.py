@@ -230,7 +230,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
-    connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
+    connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client.client)
 
     return connector
 
