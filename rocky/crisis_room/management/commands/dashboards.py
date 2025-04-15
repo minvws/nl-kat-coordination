@@ -8,6 +8,8 @@ from uuid import uuid4
 from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.core.management import BaseCommand
+from httpx import HTTPStatusError
+from pydantic import ValidationError
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -32,14 +34,19 @@ def get_or_create_default_dashboard(
     dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
 
     dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
-    if created:
+
+    try:
         recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
-        dashboard_data.recipe = recipe.recipe_id
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
+    except (ValueError, ValidationError, HTTPStatusError, ConnectionError):
+        return created
+
+    dashboard_data.recipe = recipe.recipe_id
     dashboard_data.findings_dashboard = True
     dashboard_data.save()
+
     return created
 
 
