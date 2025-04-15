@@ -80,7 +80,6 @@ sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 echo "Migrate databases"
 sudo -u kat rocky-cli migrate
 sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
-sudo -u kat rocky-cli setup_dev_account
 sudo -u kat update-bytes-db
 sudo -u kat update-katalogus-db
 sudo -u kat update-mula-db
