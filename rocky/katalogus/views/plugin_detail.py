@@ -88,6 +88,12 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = self.plugin.model_dump()
+        if self.plugin.type != self.task_type == "boefje":
+            return redirect(
+                reverse(
+                    f"{self.plugin.type}_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
+                )
+            )    
         context["plugin_settings"] = self.get_plugin_settings()
         return context
 
@@ -99,12 +105,6 @@ class NormalizerDetailView(PluginDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.plugin.type != "normalizer":
-            return redirect(
-                reverse(
-                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
-                )
-            )
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -132,13 +132,6 @@ class BoefjeDetailView(PluginDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.plugin.type != "boefje":
-            return redirect(
-                reverse(
-                    "normalizer_detail",
-                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
-                )
-            )
         context["new_variant"] = self.request.GET.get("new_variant")
         context["variants"] = self.get_katalogus().get_plugins(oci_image=self.plugin.oci_image)
 
