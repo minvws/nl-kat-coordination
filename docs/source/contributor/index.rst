@@ -1,5 +1,5 @@
 Contributing
-#################
+############
 
 Feel like making OpenKAT better? You can (hopefully) find all the content you need here. Do you miss something? Nice! You just found a way to contribute ;).
 
