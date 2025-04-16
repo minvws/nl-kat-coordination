@@ -25,6 +25,7 @@ def test_default_findingtype_risk_simple(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -60,6 +61,7 @@ def test_default_findingtype_risk_should_not_go_back_to_pending(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
