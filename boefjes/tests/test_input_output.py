@@ -10,9 +10,6 @@ import pytest
 from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.network import IPAddressV4, Network
 
-# PLUGINS_PATH = "boefjes/plugins/*"
-# NORMALIZERS_PATH = "**/normalize.py"
-# TESTS_PATH = "tests/*-input*"
 PLUGINS_PATH = Path("boefjes/plugins")
 TESTS_INPUTS_PATH = Path("tests/inputs")
 TESTS_OUTPUTS_PATH = Path("tests/outputs")
@@ -97,36 +94,6 @@ def _map_plugin_id_to_normalizer_function(plugins_path: Path) -> dict[str, Calla
     return plugins
 
 
-# def get_test_files(pluginspath, normalizerspath, testspath):
-#     """Finds all files with the test-input filename and the related output files"""
-#     tests = []
-#
-#     for plugin in Path().glob(pluginspath):
-#         for normalizer in Path(plugin).glob(normalizerspath):
-#             for input_filename in Path(normalizer.parent).glob(testspath):
-#                 input_data = get_dummy_data(input_filename)
-#                 output_filename = str(input_filename).replace("input", "output")
-#
-#                 if Path(output_filename).with_suffix(".json").is_file():
-#                     output_data = json.loads(get_dummy_data(output_filename))
-#                 elif Path(output_filename).with_suffix(".txt").is_file():
-#                     output_data = get_dummy_data(Path(output_filename).with_suffix(".txt")).decode('UTF-8')
-#                 elif Path(output_filename).with_suffix(".py").is_file():
-#                     output_module = import_module(str(Path(output_filename).with_suffix("")).replace("/", "."))
-#                     output_data = getattr(output_module, "output")
-#                 else:
-#                     raise NoOutputFileException(f"no output file located for {input_filename}")
-#
-#                 ooi_data_filename = str(input_filename).replace("input", "ooi")
-#                 if Path(ooi_data_filename).is_file():
-#                     input_ooi_data = json.loads(get_dummy_data(ooi_data_filename))
-#                 else:
-#                     input_ooi_data = DEFAULT_INPUT_OOI
-#                 tests.append((get_run_method(normalizer), input_data, output_data, input_ooi_data))
-#     return tests
-
-
-# todo: add input_ooi_data to the test files
 def get_test_files(plugins_path: Path, inputs_path: Path, outputs_path: Path) -> list[
     tuple[str, Path, Path, Path | None, str]]:
     """Finds all files with the test-input filename and the related output files"""
@@ -177,16 +144,23 @@ def get_test_files(plugins_path: Path, inputs_path: Path, outputs_path: Path) ->
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     test_files = get_test_files(PLUGINS_PATH, TESTS_INPUTS_PATH, TESTS_OUTPUTS_PATH)
 
-    if metafunc.definition.name == "test_input_output":
+    # group by strategy
+    strategies = {}
+    for plugin_id, test_input, expected_output, input_object_file, strategy in test_files:
+        if strategy not in strategies:
+            strategies[strategy] = []
+        strategies[strategy].append((plugin_id, test_input, expected_output, input_object_file))
+
+    if metafunc.definition.name == 'test_input_contains':
         # Generate test cases based on the test_data list
-        metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file,strategy", test_files)
+        metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["contains"])
+    elif metafunc.definition.name == 'test_input_matches':
+        # Generate test cases based on the test_data list
+        metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["matches"])
 
-
-# def pytest_generate_tests(metafunc):
-#     test_files = get_test_files(PLUGINS_PATH, NORMALIZERS_PATH, TESTS_PATH)
-#     if metafunc.definition.name == 'test_input_output':
-#         # Generate test cases based on the test_data list
-#         metafunc.parametrize("method,test_input,expected_output,input_ooi_data", test_files)
+    # if metafunc.definition.name == "test_input_output":
+    #     # Generate test cases based on the test_data list
+    #     metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file,strategy", test_files)
 
 
 # def field_filter(filters, objectlist):
@@ -200,7 +174,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 #     return objectlist
 
 
-def test_input_output(plugin_id, test_input, expected_output, input_object_file, strategy):
+def test_input_contains(plugin_id, test_input, expected_output, input_object_file):
     run_method = plugin_map[plugin_id]
 
     if input_object_file is None:
@@ -215,47 +189,43 @@ def test_input_output(plugin_id, test_input, expected_output, input_object_file,
     with expected_output.open("rb") as output_file:
         expected_output_data = json.load(output_file)
 
-    # todo: allow list[dict | str]; str for references/ primary key comparison
-    assert isinstance(expected_output_data,
-                      list), f"Expected output data to be a list, got {type(expected_output_data)}"
+    missing = []
+    for i, obj in enumerate(expected_output_data):
+        found = False
+        for actual_output_object in test_output:
+            try:
+                # Check if the object is in the test output
+                _compare_objects(obj, actual_output_object)
+                found = True
+                break
+            except AssertionError:
+                pass
 
-    # todo: fix and generalize (probably better to use a different test method for each strategy)
-    # todo: make OOI comparable with dict (using a custom __eq__ method or a wrapped ooi object suitable for comparison)
-    if strategy == "matches":
-        assert len(test_output) == len(expected_output_data)
-        for i, obj in enumerate(test_output):
-            _compare_objects(expected_output_data[i], obj)
+        if not found:
+            missing.append(obj)
 
-    elif strategy == "contains":
-        missing = []
-        for i, obj in enumerate(expected_output_data):
-            found = False
-            for actual_output_object in test_output:
-                try:
-                    # Check if the object is in the test output
-                    _compare_objects(obj, actual_output_object)
-                    found = True
-                    break
-                except AssertionError:
-                    pass
+    if missing:
+        pytest.fail(f"Expected objects not found in test output: {missing}")
 
-            if not found:
-                missing.append(obj)
 
-        if missing:
-            pytest.fail(f"Expected objects not found in test output: {missing}")
+def test_input_matches(plugin_id, test_input, expected_output, input_object_file):
+    run_method = plugin_map[plugin_id]
 
+    if input_object_file is None:
+        input_object = DEFAULT_INPUT_OOI
     else:
-        pytest.fail(f"Unknown strategy: {strategy}")
+        with input_object_file.open("rb") as input_file:
+            input_object = json.load(input_file)
 
-    # if isinstance(expected_output, str):
-    #     assert expected_output == str(test_output)
-    # else:
-    #     results = set(list(test_output))
-    #     extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
-    #     extra_in_expected = expected_output - results
-    #     assert not extra_in_given
-    #     assert not extra_in_expected
+    input_data = get_dummy_data(test_input)
+    test_output = _serialize_output(run_method(input_object, input_data))
+
+    with expected_output.open("rb") as output_file:
+        expected_output_data = json.load(output_file)
+
+    assert len(test_output) == len(expected_output_data)
+    for i, obj in enumerate(test_output):
+        _compare_objects(expected_output_data[i], obj)
 
 
 plugin_map: dict[str, Callable[[dict, bytes], Iterable[NormalizerOutput]]] = _map_plugin_id_to_normalizer_function(
