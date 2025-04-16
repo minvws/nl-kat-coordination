@@ -25,6 +25,7 @@ from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
     delete_dashboard,
+    delete_dashboard_item,
     get_or_create_dashboard,
     get_or_create_dashboard_data,
 )
@@ -297,11 +298,28 @@ class DeleteDashboardView(OrganizationView):
         deleted, _ = delete_dashboard(dashboard)
 
         if deleted:
-            query_params = "?" + urlencode({"dashboard": dashboard_name})
             messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
         else:
             messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
 
+        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+
+
+class DeleteDashboardItemView(OrganizationView):
+    """Delete the selected dashboard item."""
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_item_id = request.GET.get("dashboard_item")
+
+        dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+        deleted = delete_dashboard_item(dashboard_data)
+
+        if deleted:
+            messages.success(request, f"Dashboard item '{dashboard_data.name}' has been deleted.")
+        else:
+            messages.error(request, f"Dashboard item '{dashboard_data.name}' could not be deleted.")
+
+        query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
         return redirect(
             reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
             + "?"

@@ -1,33 +1,26 @@
 {% load i18n %}
 {% load static %}
 
-<section>
-    <div class="fifty-fifty">
-        <div>
-            <h3>{{ dashboard_item.name }}</h3>
-            <p>
-                {% blocktranslate trimmed with organization.name as organization_name %}
-                    An overview of objects found for organization <strong>{{ organization_name }}</strong>.
-                    Objects can be added manually or by running Boefjes.
-                    Click an object for additional information.
-                {% endblocktranslate %}
-            </p>
-        </div>
-        <div class="toolbar">
-            <a class="button ghost"
-               href="{% url "ooi_list" organization_code=organization.code %}">
-                {% translate "Go to objects" %}
-                <span class="icon ti-chevron-right" aria-hidden="true"></span>
-            </a>
-        </div>
-    </div>
-    <div class="horizontal-scroll">
-        <p class="de-emphasized">
-            {% blocktranslate with length=data|length trimmed %}
-                Showing {{ length }} objects
-            {% endblocktranslate %}
-        </p>
-        {% include "partials/dashboard_ooi_list_table.html" %}
+<p>
+    {% blocktranslate trimmed with organization.name as organization_name %}
+        An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+        Objects can be added manually or by running Boefjes.
+        Click an object for additional information.
+    {% endblocktranslate %}
+</p>
+<div class="horizontal-scroll">
+    <p class="de-emphasized">
+        {% blocktranslate with length=data|length trimmed %}
+            Showing {{ length }} objects
+        {% endblocktranslate %}
+    </p>
+    {% include "partials/dashboard_ooi_list_table.html" %}
 
+    <div class="toolbar">
+        <a class="button ghost"
+           href="{% url "ooi_list" organization_code=organization.code %}">
+            {% translate "Go to objects" %}
+            <span class="icon ti-chevron-right" aria-hidden="true"></span>
+        </a>
     </div>
-</section>
+</div>

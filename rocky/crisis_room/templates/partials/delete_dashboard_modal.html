@@ -1,0 +1,21 @@
+{% load i18n %}
+
+{% component "modal" modal_id="delete-dashboard-modal" size="dialog-small" %}
+{% fill "header" %}
+{% translate "Delete dashboard" %}
+{% endfill %}
+{% fill "content" %}
+<p>
+    {% blocktranslate trimmed with dashboard=dashboard.name %}
+        Are you sure you want to delete dashboard "{{ dashboard }}"?
+        All the items on the dashboard will be deleted as well.
+    {% endblocktranslate %}
+</p>
+{% endfill %}
+{% fill "footer_buttons" %}
+<a class="button destructive"
+   href="{% url "delete_dashboard" organization_code=organization.code %}?dashboard={{ dashboard.name }}">{% translate "Delete" %}</a>
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

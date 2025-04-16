@@ -89,10 +89,14 @@ def get_or_create_dashboard_data(
 
 def delete_dashboard(dashboard: Dashboard):
     try:
-        return Dashboard.delete(dashboard)
+        return dashboard.delete()
     except ValueError as e:
         logger.error(e)
         return False, {}
+
+
+def delete_dashboard_item(dashboard_data: DashboardData):
+    return dashboard_data.delete()
 
 
 def schedule_recipe(

@@ -79,5 +79,24 @@ class DashboardData(models.Model):
         except ValidationError as e:
             logger.error("ValidationError: %s", e)
 
+    def delete(self, *args, **kwargs):
+        try:
+            current_position = self.position
+            dashboard_id = self.dashboard.pk
+
+            super().delete(*args, **kwargs)
+
+            DashboardData.objects.raw(
+                "UPDATE crisis_room_dashboarddata "
+                "SET position = position - 1 "
+                "WHERE position > %s "
+                "AND dashboard_id = %s ",
+                [current_position, dashboard_id],
+            )
+            return True
+        except ValidationError as e:
+            logger.error("ValidationError: %s", e)
+            return False
+
     def max_position(self):
         return max(DashboardData.objects.filter(dashboard=self.dashboard).values_list("position", flat=True), default=0)

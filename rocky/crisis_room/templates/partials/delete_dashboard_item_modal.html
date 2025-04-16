@@ -1,0 +1,22 @@
+{% load i18n %}
+
+{% with modal_id=dashboard_item.name|slugify|add:"-delete-item-modal" %}
+    {% component "modal" modal_id=modal_id size="dialog-small" %}
+    {% fill "header" %}
+    {% translate "Delete item" %}
+{% endfill %}
+{% fill "content" %}
+<p>
+    {% blocktranslate trimmed with name=dashboard_item.name %}
+        Are you sure you want to delete "{{ name }}" from this dashboard?
+    {% endblocktranslate %}
+</p>
+{% endfill %}
+{% fill "footer_buttons" %}
+<a class="button destructive"
+   href="{% url "delete_dashboard_item" organization_code=organization.code %}?dashboard_item={{ dashboard_item.id }}">{% translate "Delete" %}</a>
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}
+{% endwith %}
