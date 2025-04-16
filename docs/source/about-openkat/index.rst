@@ -9,4 +9,4 @@ Contains an broad introduction into OpenKAT and all project related content.
 
    intro
    faq
-   release-notes
+   release-notes/index
