@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from math import isclose
 from unittest.mock import Mock
 
 import pytest
@@ -51,7 +52,7 @@ def test_default_findingtype_risk_simple(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_finding_type = xtdb_octopoes_service.ooi_repository.get("KATFindingType|KAT-DUMMY-FINDING", valid_time)
-    assert xtdb_finding_type.risk_score == 0.0
+    assert isclose(xtdb_finding_type.risk_score, 0.0)
 
 
 def test_default_findingtype_risk_should_not_go_back_to_pending(
@@ -89,7 +90,7 @@ def test_default_findingtype_risk_should_not_go_back_to_pending(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_finding_type = xtdb_octopoes_service.ooi_repository.get("KATFindingType|KAT-NO-SPF", valid_time)
-    assert xtdb_finding_type.risk_score == 0.0
+    assert isclose(xtdb_finding_type.risk_score, 0.0)
 
     # default risk score should be given by default_findingtype_risk_nibble
 
@@ -101,7 +102,7 @@ def test_default_findingtype_risk_should_not_go_back_to_pending(
 
     # check that save is successful
     xtdb_finding_type = xtdb_octopoes_service.ooi_repository.get("KATFindingType|KAT-NO-SPF", valid_time)
-    assert xtdb_finding_type.risk_score == 5.0
+    assert isclose(xtdb_finding_type.risk_score, 5.0)
 
     # another hostname is made with same finding type
     hostname2 = Hostname(name="example2.com", network=network.reference)
@@ -119,4 +120,4 @@ def test_default_findingtype_risk_should_not_go_back_to_pending(
 
     # make sure that the risk score is not reset to 0
     xtdb_finding_type = xtdb_octopoes_service.ooi_repository.get("KATFindingType|KAT-NO-SPF", valid_time)
-    assert xtdb_finding_type.risk_score == 5.0
+    assert isclose(xtdb_finding_type.risk_score, 5.0)
