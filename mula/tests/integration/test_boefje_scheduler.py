@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -81,6 +81,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         self.mock_get_plugin = mock.patch(
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
+        ).start()
+
+        self.mock_get_organisations_by_ooi = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_organisations_by_ooi"
         ).start()
 
         self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
@@ -714,6 +718,28 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
+
+    def test_push_boefje_task_ooi_in_other_orgs(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        self.mock_get_organisations_by_ooi.return_value = [OrganisationFactory(), OrganisationFactory()]
+        self.mock_get_object.return_value = ooi
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
