@@ -17,3 +17,4 @@ If you are stuck, or believe the docs are incorrect, you can make a ticket on `o
    installation-and-deployment/index
    developer-documentation/index
    contributor/index
+   glossary/index
