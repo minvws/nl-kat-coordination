@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+import structlog
 from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -18,6 +19,8 @@ from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 
 FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
 FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
+
+logger = structlog.get_logger(__name__)
 
 
 def get_or_create_default_dashboard(
@@ -77,6 +80,14 @@ def get_or_create_dashboard_data(
         dashboard_data.save()
 
     return dashboard_data, created
+
+
+def delete_dashboard(dashboard: Dashboard):
+    try:
+        return Dashboard.delete(dashboard)
+    except ValueError as e:
+        logger.error(e)
+        return False, {}
 
 
 def schedule_recipe(

@@ -24,6 +24,7 @@ from tools.models import Organization, OrganizationMember
 from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
+    delete_dashboard,
     get_or_create_dashboard,
     get_or_create_dashboard_data,
 )
@@ -287,6 +288,27 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
         return context
 
 
+class DeleteDashboardView(OrganizationView):
+    """Delete the selected dashboard."""
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_name = request.GET.get("dashboard")
+        dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
+        deleted, _ = delete_dashboard(dashboard)
+
+        if deleted:
+            query_params = "?" + urlencode({"dashboard": dashboard_name})
+            messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
+        else:
+            messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
+
+        return redirect(
+            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + query_params
+        )
+
+
 class AddDashboardView(OrganizationView, FormView):
     """Add a new dashboard tab to the organization."""
 
@@ -298,11 +320,9 @@ class AddDashboardView(OrganizationView, FormView):
         form = self.get_form()
         if form.is_valid():
             dashboard_name = request.POST.get("dashboard_name")
-            query_params = ""
             try:
                 dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
                 if created:
-                    query_params = "?" + urlencode({"dashboard": dashboard.name})
                     messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
                 else:
                     messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
