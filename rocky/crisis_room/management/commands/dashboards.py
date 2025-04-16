@@ -3,12 +3,13 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from uuid import uuid4
 
 import structlog
 from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.core.management import BaseCommand
+from httpx import HTTPStatusError
+from pydantic import ValidationError
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
@@ -26,6 +27,7 @@ logger = structlog.get_logger(__name__)
 def get_or_create_default_dashboard(
     organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
 ) -> bool:
+    valid_time = datetime.now(timezone.utc)
     created = False
     path = Path(__file__).parent / "recipe_seeder.json"
 
@@ -33,17 +35,20 @@ def get_or_create_default_dashboard(
         recipe_default = json.load(recipe_seeder)
 
     dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
-    dashboard_data, created = DashboardData.objects.get_or_create(
-        dashboard=dashboard, template=FINDINGS_DASHBOARD_TEMPLATE
-    )
+    dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
 
-    if created:
-        report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_default)
-        schedule_recipe(dashboard_data, organization, octopoes_client, report_recipe)
+    try:
+        recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
+        schedule_request = create_schedule_request(valid_time, organization, recipe)
+        scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
+    except (ValueError, ValidationError, HTTPStatusError, ConnectionError):
+        return created
+
+    dashboard_data.recipe = recipe.recipe_id
     dashboard_data.findings_dashboard = True
-    dashboard_data.display_in_dashboard = True
     dashboard_data.save()
+
     return created
 
 

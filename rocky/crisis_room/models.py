@@ -30,6 +30,7 @@ class DashboardData(models.Model):
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.PositiveSmallIntegerField(
         blank=True,
+        default=1,
         validators=[MinValueValidator(1), MaxValueValidator(16)],
         help_text=_(
             "Where on the dashboard do you want to show the data? "
@@ -48,7 +49,7 @@ class DashboardData(models.Model):
     )
 
     class Meta:
-        unique_together = [["dashboard", "position"]]
+        unique_together = [["dashboard", "position"], ["dashboard", "findings_dashboard"]]
 
     def __str__(self) -> str:
         try:
