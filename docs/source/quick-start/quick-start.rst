@@ -1,11 +1,10 @@
-===========
-Quick start
-===========
-
+============
 Installation
 ============
+
 Coming soon!
 
+=============
 My first scan
 =============
 
