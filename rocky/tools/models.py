@@ -11,7 +11,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from tools.add_ooi_information import SEPARATOR, get_info, InformationUpdateError
+from tools.add_ooi_information import SEPARATOR, InformationUpdateError, get_info
 from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
