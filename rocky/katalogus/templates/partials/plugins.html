@@ -20,7 +20,7 @@
                 {% for plugin in object_list %}
                     <tr id="plugin_{{ plugin.id|slugify }}">
                         <td scope="row">
-                            {% if plugin.scan_level != None %}
+                            {% if plugin.type == "boefje" %}
                                 <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{{ plugin.name }}</a>
                             {% else %}
                                 <a href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{{ plugin.name }}</a>
