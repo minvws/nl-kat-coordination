@@ -37,7 +37,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
             return self.indemnification_error()
         else:
             try:
-                clearance_level = int(self.request.POST.get("level"), "")
+                clearance_level = int(self.request.POST.get("level", ""))
                 self.raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
             except (ValueError, TypeError):
                 messages.error(self.request, _("There was an error setting this clearance level, not a number."))
