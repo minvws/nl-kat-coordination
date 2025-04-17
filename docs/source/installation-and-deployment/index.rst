@@ -8,14 +8,15 @@ Contains documentation for developers and contributors.
    :caption: Contents
 
    install
-   containers
-   debian-install
+   production-docker-environment
+   production-debian-environment
+   developer-environment
    scripts
    hardening
    local-install
    windows-install
    gitpod
-   nginx
+   adding-proxy-to-openkat
    s3-buckets
    debugging-troubleshooting
    environment-settings/index
