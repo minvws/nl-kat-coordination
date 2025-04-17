@@ -3,6 +3,7 @@
 import datetime
 import json
 import logging
+import re
 
 import click
 from xtdb_client import XTDBClient
@@ -274,7 +275,7 @@ def slowest_queries(ctx: click.Context):
 @click.pass_context
 def evict_all_of_type(ctx: click.Context, ooitype: str):
     client: XTDBClient = ctx.obj["client"]
-    ooitype = re.sub(r'[^a-zA-Z]', '', ooitype) # sanitize the object type.
+    ooitype = re.sub(r"[^a-zA-Z]", "", ooitype)  # sanitize the object type.
     if not ooitype:
         return
     oois = client.query('{:query {:find [ ?var ] :where [[?var :object_type "%s" ]]}}' % ooitype)
@@ -291,7 +292,7 @@ def evict_all_of_type(ctx: click.Context, ooitype: str):
 @cli.command(help="Deletes all reports with an evict.")
 @click.pass_context
 def evict_all_reports(ctx: click.Context):
-    self.evict_all_of_type("Report")
+    ctx.invoke(evict_all_of_type, ooitype="Report")
 
 
 if __name__ == "__main__":
