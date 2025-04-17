@@ -600,9 +600,9 @@ rjsmin = "1.2.1"
 
 [package.source]
 type = "git"
-url = "https://github.com/dekkers/django-compressor"
-reference = "620bc0ab86590f8981dd24456a70951c9bdbf91f"
-resolved_reference = "620bc0ab86590f8981dd24456a70951c9bdbf91f"
+url = "https://github.com/dekkers/django-compressor.git"
+reference = "csp-nonce"
+resolved_reference = "fefae9d412018432f3b73b8c77109e1873dc88e0"
 
 [[package]]
 name = "django-csp"
@@ -3441,4 +3441,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9f30721c6a32535f9f77e7d3e7a9fcf0c4f77298f516f909b6bbf3d05dc02caa"
+content-hash = "f9d4c148e67611b62d05374393a1fc460fc40f1d47c8835e238c352fe5d3001f"
