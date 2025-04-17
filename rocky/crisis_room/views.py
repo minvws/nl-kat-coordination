@@ -364,6 +364,11 @@ class AddDashboardItemView(OrganizationView, FormView):
     form_class = ObjectListSettingsForm
     template_name = "oois/ooi_list.html"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = self.organization
+        return kwargs
+
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = self.get_form()
         if form.is_valid():
