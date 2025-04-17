@@ -24,8 +24,6 @@ from tools.models import Organization, OrganizationMember
 from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
-    delete_dashboard,
-    delete_dashboard_item,
     get_or_create_dashboard,
     get_or_create_dashboard_data,
 )
@@ -303,12 +301,14 @@ class DeleteDashboardView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard."""
 
     def get(self, request, *args, **kwargs) -> HttpResponse:
-        deleted, _ = delete_dashboard(self.dashboard)
+        if self.dashboard:
+            dashboard_name = self.dashboard.name
+            deleted, _ = self.dashboard.delete()
 
-        if deleted:
-            messages.success(request, f"Dashboard '{self.dashboard.name}' has been deleted.")
-        else:
-            messages.error(request, f"Dashboard '{self.dashboard.name}' could not be deleted.")
+            if deleted == 1:
+                messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
+            else:
+                messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
 
         return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
 
@@ -319,12 +319,14 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
     def get(self, request, *args, **kwargs) -> HttpResponse:
         dashboard_item_id = self.request.GET.get("dashboard_item")
         dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
-        deleted = delete_dashboard_item(dashboard_data)
 
-        if deleted:
-            messages.success(request, f"Dashboard item '{dashboard_data.name}' has been deleted.")
+        dashboard_data_name = dashboard_data.name
+        deleted, _ = dashboard_data.delete()
+
+        if deleted == 1:
+            messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
         else:
-            messages.error(request, f"Dashboard item '{dashboard_data.name}' could not be deleted.")
+            messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
 
         query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
         return redirect(self.get_success_url() + "?" + query_params)
@@ -390,31 +392,25 @@ class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
                 template = request.POST.get("template")
                 query = None
 
-            try:
                 dashboard_name = form_data["dashboard"]
                 name = form_data["title"]
                 recipe_id = request.POST.get("recipe_id")
-                settings = {"columns": request.POST.getlist("columns"), "size": form_data["size"]}
+
+                column_values = request.POST.getlist("column_values")
+                column_names = request.POST.getlist("column-names")
+
+                columns = {index: column_names[index] for index, column_value in enumerate(column_values)}
+
+                settings = {"size": form_data["size"], "columns": columns}
 
                 self.dashboard_data, created = get_or_create_dashboard_data(
                     dashboard_name, self.organization, name, recipe_id, query_from, query, template, settings
                 )
                 if created:
                     messages.success(request, "Dashboard item has been created.")
-                else:
-                    messages.warning(
-                        request,
-                        "The dashboard item that you were trying to add already exists on the selected dashboard."
-                        "If it was hidden on the dashboard, it is now visible.",
-                    )
 
                 query_params = urlencode({"dashboard": dashboard_name})
                 return redirect(self.get_success_url() + "?" + query_params)
-            except IntegrityError:
-                messages.error(
-                    request,
-                    "Dashboard item could not be created, because this dashboard has reached the maximum of 16 items.",
-                )
 
             return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
         else:

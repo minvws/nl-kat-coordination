@@ -1,3 +1,5 @@
+from typing import Any
+
 import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -27,8 +29,8 @@ MIN_POSITION = 1
 MAX_POSITION = 16
 
 
-def get_default_dashboard_data_settings() -> dict[str, str]:
-    return {"column": "1"}
+def get_default_dashboard_data_settings() -> dict[str, Any]:
+    return {"size": "1", "columns": {}}
 
 
 class DashboardData(models.Model):

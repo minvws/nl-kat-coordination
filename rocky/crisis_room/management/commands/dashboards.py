@@ -111,7 +111,7 @@ def schedule_recipe(
 ):
     valid_time = datetime.now(timezone.utc)
     recipe = create_organization_recipe(octopoes_client, valid_time, organization, report_recipe)
-    dashboard_data.recipe = recipe.recipe_id
+
     schedule_request = create_schedule_request(valid_time, organization, recipe)
     scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
