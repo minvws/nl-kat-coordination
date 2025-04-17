@@ -27,7 +27,7 @@ class _PortInfo:
     description: str
 
 
-class InformationUpdateError(Exception)
+class InformationUpdateError(Exception):
     """Could not update information due to various reasons"""
 
 
