@@ -278,8 +278,8 @@ def evict_all_of_type(ctx: click.Context, ooitype: str):
     ooitype = re.sub(r"[^a-zA-Z0-9]", "", ooitype)  # sanitize the object type.
     if not ooitype:
         return
-    oois = client.query(f'{:query {:find [ ?var ] :where [[?var :object_type "{ooitype}" ]]}}')
-
+    oois = client.query(f'{{:query {{:find [ ?var ] :where [[?var :object_type "{ooitype}" ]]}}}}') 
+    # the query has double brackets due to fstring parsing
     transactions = []
 
     for ooi in oois:
