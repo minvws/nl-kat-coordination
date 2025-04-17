@@ -275,10 +275,10 @@ def slowest_queries(ctx: click.Context):
 @click.pass_context
 def evict_all_of_type(ctx: click.Context, ooitype: str):
     client: XTDBClient = ctx.obj["client"]
-    ooitype = re.sub(r"[^a-zA-Z]", "", ooitype)  # sanitize the object type.
+    ooitype = re.sub(r"[^a-zA-Z0-9]", "", ooitype)  # sanitize the object type.
     if not ooitype:
         return
-    oois = client.query('{:query {:find [ ?var ] :where [[?var :object_type "%s" ]]}}' % ooitype)
+    oois = client.query(f'{:query {:find [ ?var ] :where [[?var :object_type "{ooitype}" ]]}}')
 
     transactions = []
 
@@ -286,7 +286,7 @@ def evict_all_of_type(ctx: click.Context, ooitype: str):
         transactions.append(("evict", ooi[0], datetime.datetime.now(tz=datetime.timezone.utc).isoformat()))
 
     client.submit_tx(transactions)
-    click.echo("Evicted all OOIs of type %s" % ooitype)
+    click.echo(f"Evicted all OOIs of type {ooitype}")
 
 
 @cli.command(help="Deletes all reports with an evict.")
