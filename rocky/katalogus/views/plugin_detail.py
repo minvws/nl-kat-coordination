@@ -94,15 +94,8 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
 
     def check_plugin_type(self):
         if self.plugin.type != self.task_type:
+            # It would be nicer if we could redirect, but Django doesn't have an easy way to do that.
             raise Http404("Plugin type does not match url.")
-
-            # it would be nicer if we could redirect.
-            #return redirect(
-            #    reverse(
-            #        f"{self.plugin.type}_detail",
-            #        kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
-            #    )
-            #)
 
 
 class NormalizerDetailView(PluginDetailView):
