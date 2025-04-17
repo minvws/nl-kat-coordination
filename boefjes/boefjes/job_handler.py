@@ -98,8 +98,9 @@ class BoefjeHandler(Handler):
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-        # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
-        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
+        with self.plugin_service as service:
+            # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
+            plugin = service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
 
         if plugin.type != "boefje":
             raise ValueError("Plugin id does not belong to a boefje")
