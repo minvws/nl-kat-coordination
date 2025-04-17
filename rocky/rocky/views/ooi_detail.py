@@ -26,9 +26,9 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
     def post(self, request, *args, **kwargs):
         if self.action == self.CHANGE_CLEARANCE_LEVEL:
             self.set_clearance_level()
-        if self.action == self.SUBMIT_ANSWER:
+        elif self.action == self.SUBMIT_ANSWER:
             self.answer_ooi_questions()
-        if self.action == self.START_SCAN:
+        elif self.action == self.START_SCAN:
             self.start_boefje_scan()
         return super().post(request, *args, **kwargs)
 
@@ -36,8 +36,11 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         if not self.indemnification_present:
             return self.indemnification_error()
         else:
-            clearance_level = int(self.request.POST.get("level"))
-            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+            try:
+                clearance_level = int(self.request.POST.get("level"), "")
+                self.raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+            except (ValueError, TypeError):
+                messages.error(self.request, _("There was an error setting this clearance level, not a number."))
 
     def answer_ooi_questions(self) -> None:
         if not isinstance(self.ooi, Question):
