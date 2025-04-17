@@ -217,7 +217,6 @@ jobs:
       - name: Setup accounts in Rocky
         run: |
           DJANGO_SUPERUSER_PASSWORD=robotpassword sudo -E -u kat rocky-cli createsuperuser --noinput --email robot@localhost --full_name "Mr. Robot"
-          sudo -u kat rocky-cli setup_dev_account
 
       - name: Check Bytes API health or print response and logs
         run: |

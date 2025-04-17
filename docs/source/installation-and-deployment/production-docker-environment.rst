@@ -70,18 +70,6 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
 ```
 
-We also need to create an organisation, this command will create a development organisation:
-
-```shell
-python3 manage.py setup_dev_account
-```
-
-With docker compose you would run this as:
-
-```shell
-docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
-```
-
 IPv6 support
 ============
 

@@ -232,7 +232,6 @@ sudo -u kat update-mula-db
 if [[ ${2} != "no_super_user" ]]; then
     echo "Step 5 - Create Superuser & dev account"
     sudo -u kat rocky-cli createsuperuser
-    sudo -u kat rocky-cli setup_dev_account
 else
     echo "Step 5 - Option no_super_user passed; skipping creating superuser & dev account"
 fi
