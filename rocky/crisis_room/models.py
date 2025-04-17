@@ -2,6 +2,8 @@ import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_delete, pre_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from tools.models import Organization
 
@@ -21,23 +23,30 @@ class Dashboard(models.Model):
         return super().__str__()
 
 
+MIN_POSITION = 1
+MAX_POSITION = 16
+
+
+def get_default_dashboard_data_settings() -> dict[str, str]:
+    return {"column": "1"}
+
+
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
     name = models.CharField(blank=True, null=True, max_length=126)
     recipe = models.UUIDField(blank=True, null=True)
     query_from = models.CharField(blank=True, max_length=32, null=True)
-    query = models.CharField(blank=True, null=True)  # TODO: change to JSON
+    query = models.CharField(blank=True, null=True)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.PositiveSmallIntegerField(
         blank=True,
-        default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(16)],
+        validators=[MinValueValidator(MIN_POSITION), MaxValueValidator(MAX_POSITION)],
         help_text=_(
             "Where on the dashboard do you want to show the data? "
-            "Position 1 is the most top level and the max position is 16."
-        ),
+            "Position {} is the most top level and the max position is {}."
+        ).format(MIN_POSITION, MAX_POSITION),
     )
-    settings = models.CharField(blank=True, null=True)  # TODO: change to JSON
+    settings = models.JSONField(blank=True, null=True, default=get_default_dashboard_data_settings)
     display_in_crisis_room = models.BooleanField(
         default=False, help_text=_("Will be displayed on the general crisis room, for all organizations.")
     )
@@ -45,11 +54,11 @@ class DashboardData(models.Model):
         default=False, help_text=_("Will be displayed on a single organization dashboard")
     )
     findings_dashboard = models.BooleanField(
-        default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
+        unique=True, default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
     class Meta:
-        unique_together = [["dashboard", "position"], ["dashboard", "findings_dashboard"]]
+        unique_together = [["dashboard", "position"], ["dashboard", "name"]]
 
     def __str__(self) -> str:
         try:
@@ -57,27 +66,49 @@ class DashboardData(models.Model):
         except Dashboard.DoesNotExist:
             return super().__str__()
 
-    def save(self, *args, **kwargs):
-        try:
-            if not self.recipe:
-                if not self.query_from and not self.query:
-                    raise ValidationError(
-                        _("DashboardData must contain at least a 'recipe' or a 'query_from' with a 'query'.")
-                    )
-                if self.query_from != "object_list":
-                    raise ValidationError(_("Empty field 'query_from'. Value should be 'object_list'."))
-                elif not self.query:
-                    raise ValidationError(_("Empty field 'query'."))
+    def clean(self) -> None:
+        if self.recipe and self.query:
+            raise ValidationError(_("You have to choose between a recipe or a query, but not both."))
+        if self.query and not self.query_from:
+            raise ValidationError(_("You have set a query and not where it is from. Also set the query_from."))
+        if not self.recipe and not self.query_from and not self.query:
+            raise ValidationError(_("DashboardData must contain at least a 'recipe' or a 'query_from' with a 'query'."))
+        return super().clean()
 
-            if not self.position:
-                max_position = self.max_position()
-                if max_position <= 16:
-                    self.position = max_position + 1
-                else:
-                    raise ValidationError(_("The maximum of 16 dashboard items has been reached."))
-            super().save(*args, **kwargs)
-        except ValidationError as e:
-            logger.error("ValidationError: %s", e)
 
-    def max_position(self):
-        return max(DashboardData.objects.filter(dashboard=self.dashboard).values_list("position", flat=True), default=0)
+def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
+    return list(DashboardData.objects.filter(dashboard=instance.dashboard).values_list("position", flat=True))
+
+
+@receiver(pre_save, sender=DashboardData)
+def dashboard_data_pre_save(sender, instance, *args, **kwargs):
+    if instance._state.adding:  # not when updating
+        positions = get_dashboard_data_positions(instance)
+        position = max(positions, default=0) + 1
+        if position <= MAX_POSITION:
+            instance.position = position
+        else:
+            raise ValidationError(_("Max dashboard items reached."))
+
+
+@receiver(post_delete, sender=DashboardData)
+def dashboard_data_post_delete(sender, instance, *args, **kwargs):
+    """
+    After deleting this instance we need to reposition the other Dashboard items.
+    """
+
+    try:
+        instance.dashboard
+    except Dashboard.DoesNotExist:
+        return
+
+    dashboard_datas = DashboardData.objects.filter(dashboard=instance.dashboard).order_by("id")
+
+    if len(dashboard_datas) == 1:
+        dashboard_datas[0].position = 1
+        dashboard_datas[0].save()
+        return
+
+    for pos, dashboard_data in enumerate(dashboard_datas, start=1):
+        dashboard_data.position = pos
+        dashboard_data.save()

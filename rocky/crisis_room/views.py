@@ -183,9 +183,10 @@ class DashboardService:
         dashboards = Dashboard.objects.filter(organization=organization)
         for dashboard in dashboards:
             dashboard_names.append(dashboard.name)
+
         return list(set(dashboard_names))
 
-    def get_ooi_list(self, dashboard_data):
+    def get_ooi_list(self, dashboard_data) -> dict[str, Any]:
         query = json.loads(dashboard_data.query)
         ooi_list = []
 
@@ -224,7 +225,7 @@ class DashboardService:
             asc_desc=query["asc_desc"],
         ).items
 
-        return ooi_list
+        return {"object_list": ooi_list}
 
 
 class CrisisRoomView(TemplateView):
@@ -269,9 +270,16 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 
         # Default is the findings dashboard
         dashboard_name = self.request.GET.get("dashboard", FINDINGS_DASHBOARD_NAME)
-        self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-        dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard, display_in_dashboard=True)
-        self.dashboard_items = self.dashboard_service.get_dashboard_items(dashboards_data)
+
+        try:
+            self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
+            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard, display_in_dashboard=True)
+            self.dashboard_items: list[DashboardItem] | None = self.dashboard_service.get_dashboard_items(
+                dashboards_data
+            )
+        except Dashboard.DoesNotExist:
+            self.dashboard = None
+            self.dashboard_items = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -3,11 +3,13 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import structlog
 from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.core.management import BaseCommand
+from django.db.utils import IntegrityError
 from httpx import HTTPStatusError
 from pydantic import ValidationError
 from tools.models import Organization
@@ -26,30 +28,32 @@ logger = structlog.get_logger(__name__)
 
 def get_or_create_default_dashboard(
     organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
-) -> bool:
+) -> bool | None:
     valid_time = datetime.now(timezone.utc)
-    created = False
     path = Path(__file__).parent / "recipe_seeder.json"
 
     with path.open("r") as recipe_seeder:
         recipe_default = json.load(recipe_seeder)
 
-    dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
-    dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
-
     try:
+        dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
+        dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
+
         recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
-    except (ValueError, ValidationError, HTTPStatusError, ConnectionError):
+        dashboard_data.recipe = recipe.recipe_id
+
+        if created:
+            dashboard_data.findings_dashboard = True
+
+        dashboard_data.save()
         return created
 
-    dashboard_data.recipe = recipe.recipe_id
-    dashboard_data.findings_dashboard = True
-    dashboard_data.save()
-
-    return created
+    except (IntegrityError, ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
+        logging.error("An error occurred: %s", error)
+    return None
 
 
 def get_or_create_dashboard(dashboard_name: str, organization: Organization) -> tuple[Dashboard, bool]:
@@ -95,29 +99,18 @@ def delete_dashboard(dashboard: Dashboard):
         return False, {}
 
 
-def schedule_recipe(
-    dashboard_data: DashboardData,
-    organization: Organization,
-    octopoes_client: OctopoesAPIConnector,
-    report_recipe: ReportRecipe,
-):
-    valid_time = datetime.now(timezone.utc)
-    recipe = create_organization_recipe(octopoes_client, valid_time, organization, report_recipe)
-    dashboard_data.recipe = recipe.recipe_id
-    schedule_request = create_schedule_request(valid_time, organization, recipe)
-    scheduler_client(organization.code).post_schedule(schedule=schedule_request)
-
-
 def create_organization_recipe(
     octopoes_client: OctopoesAPIConnector | None,
     valid_time: datetime,
     organization: Organization,
-    report_recipe: ReportRecipe,
+    recipe_params: dict[str, Any],
 ) -> ReportRecipe:
     if octopoes_client is None:
         octopoes_client = OctopoesAPIConnector(
             settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
         )
+
+    report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_params)
 
     bytes_client = get_bytes_client(organization.code)
 
@@ -148,3 +141,5 @@ class Command(BaseCommand):
             created = get_or_create_default_dashboard(organization)
             if created:
                 logging.info("Dashboard created for organization %s", organization.name)
+            elif created is not None:
+                logging.info("Dashboard updated for organization %s", organization.name)
