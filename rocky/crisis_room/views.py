@@ -25,6 +25,7 @@ from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
 from crisis_room.management.commands.dashboards import (
     FINDINGS_DASHBOARD_NAME,
     delete_dashboard,
+    delete_dashboard_item,
     get_or_create_dashboard,
     get_or_create_dashboard_data,
 )
@@ -281,6 +282,9 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
             self.dashboard = None
             self.dashboard_items = None
 
+    def get_success_url(self):
+        return reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["all_dashboard_names"] = self.dashboard_service.get_dashboard_navigation(self.organization)
@@ -296,28 +300,38 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
         return context
 
 
-class DeleteDashboardView(OrganizationView):
+class DeleteDashboardView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard."""
 
     def get(self, request, *args, **kwargs) -> HttpResponse:
-        dashboard_name = request.GET.get("dashboard")
-        dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-        deleted, _ = delete_dashboard(dashboard)
+        deleted, _ = delete_dashboard(self.dashboard)
 
         if deleted:
-            query_params = "?" + urlencode({"dashboard": dashboard_name})
-            messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
+            messages.success(request, f"Dashboard '{self.dashboard.name}' has been deleted.")
         else:
-            messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
+            messages.error(request, f"Dashboard '{self.dashboard.name}' could not be deleted.")
 
-        return redirect(
-            reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-            + "?"
-            + query_params
-        )
+        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
 
 
-class AddDashboardView(OrganizationView, FormView):
+class DeleteDashboardItemView(OrganizationsCrisisRoomView):
+    """Delete the selected dashboard item."""
+
+    def get(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_item_id = self.request.GET.get("dashboard_item")
+        dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+        deleted = delete_dashboard_item(dashboard_data)
+
+        if deleted:
+            messages.success(request, f"Dashboard item '{dashboard_data.name}' has been deleted.")
+        else:
+            messages.error(request, f"Dashboard item '{dashboard_data.name}' could not be deleted.")
+
+        query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
+        return redirect(self.get_success_url() + "?" + query_params)
+
+
+class AddDashboardView(OrganizationsCrisisRoomView, FormView):
     """Add a new dashboard tab to the organization."""
 
     template_name = "organization_crisis_room.html"
@@ -339,20 +353,21 @@ class AddDashboardView(OrganizationView, FormView):
                 messages.error(request, "Dashboard could not be created.")
 
             query_params = urlencode({"dashboard": dashboard.name})
-            return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
-            )
+            return redirect(self.get_success_url() + "?" + query_params)
         else:
             return self.form_invalid(form)
 
 
-class AddDashboardItemView(OrganizationView, FormView):
+class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
     """Add a new dashboard item to the selected dashboard."""
 
     form_class = ObjectListSettingsForm
     template_name = "oois/ooi_list.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = self.organization
+        return kwargs
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = self.get_form()
@@ -395,11 +410,7 @@ class AddDashboardItemView(OrganizationView, FormView):
                     )
 
                 query_params = urlencode({"dashboard": dashboard_name})
-                return redirect(
-                    reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                    + "?"
-                    + query_params
-                )
+                return redirect(self.get_success_url() + "?" + query_params)
             except IntegrityError:
                 messages.error(
                     request,

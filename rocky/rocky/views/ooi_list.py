@@ -43,7 +43,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["object_list_settings_form"] = ObjectListSettingsForm
+        context["object_list_settings_form"] = ObjectListSettingsForm(organization=self.organization)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]

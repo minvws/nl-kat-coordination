@@ -11,32 +11,10 @@
             <th>{% translate "Object" %}</th>
         {% endif %}
         {% if "object_type" in dashboard_item.settings %}
-            <th scope="col"
-                class="sortable"
-                {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
-                <button form="ooi_list_settings"
-                        name="order_by"
-                        value="object_type"
-                        class="sort">
-                    {% translate "Type" %}
-                    <span aria-hidden="true"
-                          class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
-                </button>
-            </th>
+            <th>{% translate "Type" %}</th>
         {% endif %}
         {% if "clearance_level" in dashboard_item.settings %}
-            <th scope="col"
-                class="sortable"
-                {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
-                <button form="ooi_list_settings"
-                        name="order_by"
-                        value="scan_level"
-                        lass="sort">
-                    {% translate "Clearance level" %}
-                    <span aria-hidden="true"
-                          class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
-                </button>
-            </th>
+            <th>{% translate "Clearance level" %}</th>
         {% endif %}
         {% if "clearance_type" in dashboard_item.settings %}
             <th>{% translate "Clearance type" %}</th>

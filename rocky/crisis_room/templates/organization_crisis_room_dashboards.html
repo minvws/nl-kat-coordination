@@ -19,8 +19,7 @@
                      aria-labelledby="action-dropdown-button">
                     <ul role="presentation">
                         <li>
-                            <a href="{% url "delete_dashboard" organization_code=organization.code %}?dashboard={{ dashboard.name }}"
-                               class="plain destructive">
+                            <a href="#delete-dashboard-modal" class="plain destructive">
                                 <i class="icon ti-trash"></i>{% translate "Delete dashboard" %}
                             </a>
                         </li>
@@ -28,18 +27,58 @@
                 </div>
             </div>
         </div>
+        {% include "partials/delete_dashboard_modal.html" %}
+
         {% if dashboard_items %}
-            {% for dashboard_item in dashboard_items %}
-                {% if dashboard.name == "Crisis Room Findings Dashboard" %}
-                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+            {% if dashboard.name == "Crisis Room Findings Dashboard" %}
+                {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
-                {% else %}
-                    <div class="tiles">
-                        {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+            {% else %}
+                <div class="tiles">
+                    {% for dashboard_item in dashboard_items %}
+                        <section>
+                            {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
-                    </div>
-                {% endif %}
-            {% endfor %}
+                            <div class="horizontal-view">
+                                <h3>{{ dashboard_item.item.name }}</h3>
+                                <div class="dropdown">
+                                    <button aria-label="{% translate "Options for dashboard items" %}"
+                                            aria-haspopup="menu"
+                                            aria-controls="action-dropdown"
+                                            aria-expanded="false"
+                                            class="icon-only ti-dots-vertical dropdown-button"></button>
+                                    <div id="action-dropdown"
+                                         class="dropdown-list"
+                                         role="menu"
+                                         aria-labelledby="action-dropdown-button">
+                                        <ul role="presentation">
+                                            <li>
+                                                <a href="#" class="plain">
+                                                    <i class="icon ti-arrow-left"></i>{% translate "Move left in tab order" %}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#" class="plain">
+                                                    <i class="icon ti-arrow-right"></i>{% translate "Move right in tab order" %}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#{{ dashboard_item.item.name|slugify }}-delete-item-modal"
+                                                   data-modal-id="{{ dashboard_item.item.name|slugify }}-delete-item-modal"
+                                                   class="plain destructive">
+                                                    <i class="icon ti-trash"></i>{% translate "Delete item" %}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+
+                        </section>
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% else %}
             <p>
                 {% blocktranslate trimmed %}
@@ -62,3 +101,6 @@
         {% endblocktranslate %}
     </p>
 {% endif %}
+{% block html_at_end_body %}
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+{% endblock html_at_end_body %}

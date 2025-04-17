@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import Dashboard
 
 
@@ -44,9 +45,15 @@ class ObjectListSettingsForm(BaseRockyForm):
         initial="1",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        self.organization = organization
         self.fields["dashboard"].choices = self.get_dashboard_selection()
 
     def get_dashboard_selection(self):
-        return [(dashboard.name, dashboard.name) for dashboard in Dashboard.objects.all()]
+        return [
+            (dashboard.name, dashboard.name)
+            for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
+                name=FINDINGS_DASHBOARD_NAME
+            )
+        ]

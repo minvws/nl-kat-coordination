@@ -39,7 +39,7 @@ def get_or_create_default_dashboard(
         dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
         dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
 
-        recipe = create_organization_recipe(octopoes_client, valid_time, organization, recipe_default)
+        recipe = create_default_crisis_room_recipe(octopoes_client, valid_time, organization, recipe_default)
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
@@ -93,13 +93,47 @@ def get_or_create_dashboard_data(
 
 def delete_dashboard(dashboard: Dashboard):
     try:
-        return Dashboard.delete(dashboard)
+        return dashboard.delete()
     except ValueError as e:
         logger.error(e)
         return False, {}
 
 
+def delete_dashboard_item(dashboard_data: DashboardData):
+    return dashboard_data.delete()
+
+
+def schedule_recipe(
+    dashboard_data: DashboardData,
+    organization: Organization,
+    octopoes_client: OctopoesAPIConnector,
+    report_recipe: ReportRecipe,
+):
+    valid_time = datetime.now(timezone.utc)
+    recipe = create_organization_recipe(octopoes_client, valid_time, organization, report_recipe)
+    dashboard_data.recipe = recipe.recipe_id
+    schedule_request = create_schedule_request(valid_time, organization, recipe)
+    scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+
+
 def create_organization_recipe(
+    octopoes_client: OctopoesAPIConnector | None,
+    valid_time: datetime,
+    organization: Organization,
+    report_recipe: ReportRecipe,
+) -> ReportRecipe:
+    if octopoes_client is None:
+        octopoes_client = OctopoesAPIConnector(
+            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+        )
+
+    bytes_client = get_bytes_client(organization.code)
+
+    create_ooi(api_connector=octopoes_client, bytes_client=bytes_client, ooi=report_recipe, observed_at=valid_time)
+    return report_recipe
+
+
+def create_default_crisis_room_recipe(
     octopoes_client: OctopoesAPIConnector | None,
     valid_time: datetime,
     organization: Organization,
