@@ -34,7 +34,7 @@ class InformationUpdateError(Exception):
 def iana_service_table(source: str, search_query: str) -> list[_Service]:
     services = []
 
-    response = httpx.get(source, params={"search": search_query},timeout=SOURCE_TIMEOUT)
+    response = httpx.get(source, params={"search": search_query}, timeout=SOURCE_TIMEOUT)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -175,7 +175,7 @@ def wiki_port_tables(source: str) -> list[_PortInfo]:
 def port_info(number: str, protocol: str) -> tuple[str, str]:
     """Provides possible or common protocols for operation of network applications behind TCP and UDP ports"""
     source = "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers"
-    items = wiki_port_tables(source)    
+    items = wiki_port_tables(source)
     descriptions = []
     if not items:
         return (f"No description found in wiki table for port {number} with protocol {protocol}", source)
