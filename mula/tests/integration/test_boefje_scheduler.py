@@ -731,15 +731,31 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
+
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        self.mock_get_organisations_by_ooi.return_value = [OrganisationFactory(), OrganisationFactory()]
+        self.mock_get_organisations_by_ooi.return_value = [second_organisation, third_organisation]
         self.mock_get_object.return_value = ooi
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
+
+        # Assert: there should be 3 tasks in the queue
+        self.assertEqual(3, self.scheduler.queue.qsize())
+
+        items = [
+            self.scheduler.queue.peek(0).organisation,
+            self.scheduler.queue.peek(1).organisation,
+            self.scheduler.queue.peek(2).organisation,
+        ]
+
+        self.assertIn(third_organisation.id, items)
+        self.assertIn(second_organisation.id, items)
+        self.assertIn(self.organisation.id, items)
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""

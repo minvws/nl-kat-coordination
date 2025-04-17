@@ -404,6 +404,8 @@ class BoefjeScheduler(Scheduler):
 
         # Is the ooi in other organisations? When the ooi is in other
         # organisations we need to create tasks for those organisations as well.
+        # We allow for boefje tasks without an ooi, something we can't deduplicate
+        # Since we call the method itself, to reissue the checks we need to make sure that we don't endlessly call it
         if boefje_task.input_ooi is not None and caller != self.push_boefje_task.__name__:
             orgs = self.is_ooi_in_other_organisations(boefje_task.input_ooi)
             if orgs is None:
@@ -448,51 +450,21 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                boefje_task = models.BoefjeTask(
+                # if not self.has_boefje_permission_to_run(plugin, ooi):
+
+                new_boefje_task = models.BoefjeTask(
                     boefje=models.Boefje.model_validate(boefje.model_dump()),
                     input_ooi=boefje_task.input_ooi,
                     organization=org.id,
                     env_hash=boefje.env_hash,
                 )
 
-                # TODO
                 self.push_boefje_task(
-                    boefje_task=boefje_task,
+                    boefje_task=new_boefje_task,
                     organisation_id=org.id,
                     create_schedule=self.create_schedule,
                     caller=self.push_boefje_task.__name__,
                 )
-
-                # # Is the boefje allowed to run on the ooi?
-                # if not self.has_boefje_permission_to_run(boefje, ooi):  # fixme: input_ooi
-                #     self.logger.debug(
-                #         "Boefje not allowed to run on ooi",
-                #         boefje_id=boefje_task.boefje.id,
-                #         organisation_id=org,
-                #         scheduler_id=self.scheduler_id,
-                #     )
-                #     continue
-                #
-                # boefje_task = models.BoefjeTask(
-                #     boefje=models.Boefje.model_validate(boefje.model_dump()),
-                #     input_ooi=boefje_task.input_ooi,
-                #     organization=org.id,
-                #     env_hash=boefje.env_hash,
-                # )
-                #
-                # task = models.Task(
-                #     id=boefje_task.id,
-                #     scheduler_id=self.scheduler_id,
-                #     organisation=org.id,
-                #     type=self.ITEM_TYPE.type,
-                #     hash=boefje_task.hash,
-                #     data=boefje_task.model_dump(),
-                # )
-                # task.priority = self.ranker.rank(task)
-                #
-                # self.push_item_to_queue_with_timeout(
-                #     item=task, max_tries=self.max_tries, create_schedule=create_schedule
-                # )
 
         task = models.Task(
             id=boefje_task.id,
