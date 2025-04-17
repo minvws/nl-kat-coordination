@@ -326,7 +326,7 @@ django-appconf==1.0.6 ; python_version >= "3.10" and python_version < "4.0" \
 django-components==0.88 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:19641759bcbdafeaf48d4363c11639201fc893946745799b12b77cd7996da8fc \
     --hash=sha256:a796077706423b491234625d95bb8084761211ae022df159ead8472a1a256c7a
-django-compressor @ git+https://github.com/dekkers/django-compressor@620bc0ab86590f8981dd24456a70951c9bdbf91f ; python_version >= "3.10" and python_version < "4.0"
+django-compressor @ git+https://github.com/dekkers/django-compressor.git@fefae9d412018432f3b73b8c77109e1873dc88e0 ; python_version >= "3.10" and python_version < "4.0"
 django-csp==3.8 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:19b2978b03fcd73517d7d67acbc04fbbcaec0facc3e83baa502965892d1e0719 \
     --hash=sha256:ef0f1a9f7d8da68ae6e169c02e9ac661c0ecf04db70e0d1d85640512a68471c0
