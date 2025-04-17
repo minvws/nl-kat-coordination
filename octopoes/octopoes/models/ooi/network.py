@@ -4,7 +4,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -22,7 +22,7 @@ class Network(OOI):
 
     object_type: Literal["Network"] = "Network"
 
-    name: str
+    name: Annotated[str, StringConstraints(to_lower=True)]
 
     _natural_key_attrs = ["name"]
     _traversable = False
@@ -158,7 +158,7 @@ class AutonomousSystem(OOI):
 
     Example value
     -------------
-    AS1000
+    AS1000, Organisation Y
     """
 
     object_type: Literal["AutonomousSystem"] = "AutonomousSystem"
