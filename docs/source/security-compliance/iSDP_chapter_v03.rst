@@ -27,12 +27,12 @@ It helps you use the best methods to identify users and verify that they are who
 |todo| 3.1.1 Verify the application never reveals session tokens in URL parameters
 ----------------------------------------------------------------------------------
 
-Pentest?
+Discuss with team, is a finding done in Pentest or do we know a case?
 
 |compliant| 3.2.1 Verify the application generates a new session token on user authentication
 ---------------------------------------------------------------------------------------------
 
-As can be dedecuced from the entropy a new session token is generated on authentication.
+As can be deduced from the entropy a new session token is generated on authentication.
 
 To extra verify this a login was performed twice resulting in two different session tokens. yf6qycnuy4jauyd0dpwrjqarplr9t3w4 and huz609obui44zwwlxqkdkiq0ha35qab7
 
@@ -57,15 +57,16 @@ False       csrftoken  CSRF protection         DOMAIN     \/       1 day    Fals
 
 It can be deduced from these settings that HTTP cookies are appropriately secured.
 
-|todo| 3.3.1 Verify that logout and expiration invalidate the session token, such that the back button or a downstream relying party does not resume an authenticated session, including across relying parties
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|compliant| 3.3.1 Verify that logout and expiration invalidate the session token, such that the back button or a downstream relying party does not resume an authenticated session, including across relying parties
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-TODO test
+On logout a request is performed to ``/en/logout/`` which invalidates the session token. This is confirmed by checking the sessionid cookie in BurpSuite.
 
 |todo| 3.3.2 If authenticators permit users to remain logged in, verify that re-authentication occurs periodically both when actively used or after an idle period
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-TODO test
+Discuss
+
 
 |compliant| 3.4.1 Verify that cookie-based session tokens have the 'Secure' attribute set
 -----------------------------------------------------------------------------------------
@@ -120,7 +121,9 @@ Cookies are not published under a domain name with other applications.
 |todo| 3.7.1 Verify the application ensures a full, valid login session or requires re-authentication or secondary verification before allowing any sensitive transactions or account modifications
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-TODO test
+The only allowed account modification is blocking or unblocking an account. No re-authentication is required for this.
+
+Will be discussed in: TDODO
 
 .. |compliant| image:: img/compliant.svg
 .. |non_compliant| image:: img/non_compliant.svg
