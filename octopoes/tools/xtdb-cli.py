@@ -269,20 +269,29 @@ def slowest_queries(ctx: click.Context):
     click.echo(json.dumps(client.slowest_queries()))
 
 
-@cli.command(help="Deletes all reports with an evict.")
+@cli.command(help="Deletes all OOI's of the given type with an evict. (OOITypes are Case sensitive).")
+@click.option("--ooitype", help="The type of OOI to evict")
 @click.pass_context
-def evict_all_reports(ctx: click.Context):
+def evict_all_of_type(ctx: click.Context, ooitype: str):
     client: XTDBClient = ctx.obj["client"]
-
-    reports = client.query('{:query {:find [ ?var ] :where [[?var :object_type "Report" ]]}}')
+    ooitype = re.sub(r'[^a-zA-Z]', '', ooitype) # sanitize the object type.
+    if not ooitype:
+        return
+    oois = client.query('{:query {:find [ ?var ] :where [[?var :object_type "%s" ]]}}' % ooitype)
 
     transactions = []
 
-    for report in reports:
-        transactions.append(("evict", report[0], datetime.datetime.now(tz=datetime.timezone.utc).isoformat()))
+    for ooi in oois:
+        transactions.append(("evict", ooi[0], datetime.datetime.now(tz=datetime.timezone.utc).isoformat()))
 
     client.submit_tx(transactions)
-    click.echo("Evicted reports")
+    click.echo("Evicted all OOIs of type %s" % ooitype)
+
+
+@cli.command(help="Deletes all reports with an evict.")
+@click.pass_context
+def evict_all_reports(ctx: click.Context):
+    self.evict_all_of_type("Report")
 
 
 if __name__ == "__main__":
