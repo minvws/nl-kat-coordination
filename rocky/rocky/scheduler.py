@@ -460,9 +460,16 @@ class SchedulerClient:
             return res.content
         return res.json()
 
-    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
+    def get_scheduled_reports(self) -> list[dict[str, Any]]:
         try:
-            response = self._client.get("/schedules", params=params)
+            filters: dict[str, list[dict[str, Any]]] = {
+                "filters": [
+                    {"column": "scheduler_id", "operator": "eq", "value": "report"},
+                    {"column": "organisation", "operator": "eq", "value": self.organization_code},
+                ]
+            }
+
+            response = self._client.post("/schedules/search", json=filters)
             response.raise_for_status()
         except HTTPStatusError:
             logger.error("A HTTPStatusError occurred. Check logs for more info.")
