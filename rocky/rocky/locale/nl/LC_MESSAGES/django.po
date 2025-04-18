@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-20 09:42+0000\n"
-"PO-Revision-Date: 2025-04-02 22:08+0000\n"
+"PO-Revision-Date: 2025-04-03 11:03+0000\n"
 "Last-Translator: paulvandenbraken <paul.vandenbraken@ezzenz.nl>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
@@ -1015,8 +1015,9 @@ msgid "Disable"
 msgstr "Uitschakelen"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
+#, fuzzy
 msgid "You don't have permission to enable"
-msgstr "U hebt geen toestemming om in te schakelen"
+msgstr "Toestemming is nodig voor inschakeling van"
 
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
