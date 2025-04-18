@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"POT-Creation-Date: 2025-04-17 09:05+0000\n"
 "PO-Revision-Date: 2024-12-20 18:00+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -378,7 +378,7 @@ msgid "Member type"
 msgstr "Soarte fan lid"
 
 #: account/templates/account_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: reports/report_types/findings_report/report.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr "Organisaasje"
@@ -554,8 +554,10 @@ msgid "Verify OpenKAT account on %(site_name)s"
 msgstr "Ferifiearje OpenKAT-account op %(site_name)s"
 
 #: account/validators.py
-msgid "Your password must contain at least the following:"
-msgstr "Jo wachtwurd moat op syn minst it folgjende befetsje:"
+msgid ""
+"Your password must contain at least the following but longer passwords are "
+"recommended:"
+msgstr ""
 
 #: account/validators.py
 msgid " characters"
@@ -570,8 +572,9 @@ msgid " letters"
 msgstr " letters"
 
 #: account/validators.py
-msgid " special characters such as: "
-msgstr " spesjale tekens, lykas: "
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
+msgstr ""
 
 #: account/validators.py
 msgid " lower case letters"
@@ -628,13 +631,135 @@ msgstr "Modal slute"
 msgid "Cancel"
 msgstr "Annulearje"
 
-#: crisis_room/views.py
+#: crisis_room/models.py
 msgid ""
-"Failed to get list of findings for organization {}, check server logs for "
-"more details."
+"Where on the dashboard do you want to show the data? Position 1 is the most "
+"top level and the max position is 16."
 msgstr ""
-"Koe list mei befiningen foar organisaasje {} net ophelje, kontrolearje "
-"serverlochboeken foar mear details."
+
+#: crisis_room/models.py
+msgid "Will be displayed on the general crisis room, for all organizations."
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Will be displayed on a single organization dashboard"
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Will be displayed on the findings dashboard for all organizations"
+msgstr ""
+
+#: crisis_room/templates/crisis_room.html rocky/templates/403.html
+#: rocky/templates/404.html
+msgid "Crisis Room"
+msgstr ""
+
+#: crisis_room/templates/crisis_room.html
+msgid "Crisis Room overview for all organizations"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "Dashboards"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid ""
+"\n"
+"                        On this page you can see an overview of the "
+"dashboards for all organizations.\n"
+"                        **More context can be written here**\n"
+"                    "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "dashboards"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "There are no dashboards to display."
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Findings overview"
+msgstr "Befiningenoersjoch"
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                            This overview shows the total number of findings "
+"per\n"
+"                            severity that have been identified for all "
+"organizations.\n"
+"                            This data is based on the latest Crisis Room "
+"Findings Report\n"
+"                            of each organization.\n"
+"                        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid "Findings per organization"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                            This table shows the findings that have been "
+"identiefied for each organization,\n"
+"                            sorted by the finding types and grouped by "
+"organizations.\n"
+"                            This data is based on the latest Crisis Room "
+"Findings Report\n"
+"                            of each organization.\n"
+"                        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                No findings have been identified yet. As soon as they have "
+"been\n"
+"                identified, they will be shown on this page.\n"
+"            "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"            There are no organizations yet. After creating an organization,\n"
+"            the identified findings will be shown here.\n"
+"        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_header.html
+msgid "Crisis Room Navigation"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_header.html
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/multi_organization_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Befiningen"
 
 #: katalogus/client.py
 msgid ""
@@ -962,8 +1087,8 @@ msgstr "Wearde"
 #: katalogus/templates/normalizer_detail.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
 #: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail.html
@@ -1004,8 +1129,17 @@ msgid "Disable"
 msgstr "Utskeakelje"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
-msgid "You don't have permission to enable"
-msgstr "Jo hawwe gjin tastimming om yn te skeakeljen"
+msgid "This plugin is enabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
+msgid "This plugin is disabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
+#, python-format
+msgid "You don't have permission to enable or disable %(plugin)ss."
+msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
@@ -1308,9 +1442,9 @@ msgstr "Standert systeemscanfrekwinsje"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -1323,9 +1457,9 @@ msgstr "Details slute"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -2881,6 +3015,15 @@ msgstr "Fûne kwetsberheden binne per systeem groepearre."
 msgid "No CVEs have been found."
 msgstr "Der binne gjin CVE’s fûn."
 
+#: reports/report_types/aggregate_organisation_report/report.html
+msgid ""
+"\n"
+"                                This chapter contains information about the "
+"findings that have been identified\n"
+"                                for this organization.\n"
+"                            "
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
 msgstr "Organisaasjerapport gearstalle"
@@ -2973,27 +3116,6 @@ msgid "Host:"
 msgstr "Host:"
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Befiningen"
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
@@ -3003,13 +3125,13 @@ msgid "Compliance issue"
 msgstr "Complianceprobleem"
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3044,7 +3166,7 @@ msgstr ""
 msgid ""
 "Multiple hostnames that resolve to one IP address where at least one of the "
 "hostnames or the IP address has a declared scan level that is at least L1. "
-"Type systemen zijn webservers, mailservers, en nameservers (DNS)."
+"Type systems are web servers, mail servers and name servers (DNS)."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3146,7 +3268,7 @@ msgid "No"
 msgstr "Nee"
 
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
 msgid "Other findings found"
 msgstr "Oare befiningen fûn"
 
@@ -3160,7 +3282,7 @@ msgid "Severity"
 msgstr "Earnst"
 
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -3171,9 +3293,9 @@ msgstr "Befining"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -3190,6 +3312,7 @@ msgstr "Befiningenynformaasje"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -3207,42 +3330,63 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The Findings Report provides an overview of the identified findings on the "
-"scanned systems. For each finding it shows the risk level and the number of "
-"occurrences of the finding. Under the 'Details' section a description, "
-"impact, recommendation and location of the finding can be found. The risk "
-"level may be different for your specific environment."
+"The Findings Report contains information about the findings that have been "
+"identified for the selected asset and organization."
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.py
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_origins_inference.html
-#: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Source"
-msgstr "Boarne"
+msgid "Findings per organization overview"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: rocky/templates/findings/finding_list.html
-msgid "Impact"
-msgstr "Ympakt"
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: tools/forms/finding_type.py
+msgid "Finding types"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/multi_organization_report/recommendations.html
-#: rocky/templates/findings/finding_list.html
-msgid "Recommendation"
-msgstr "Oanrekommandaasje"
+msgid "Highest risk level"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
-msgstr "Earst sjoen"
+msgid "Critical finding types"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "No findings have been identified yet."
-msgstr "Der binne noch gjin befiningen identifisearre."
+msgid ""
+"This overview shows the total number of findings per severity that have been "
+"identified for this organization."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "Critical and high findings"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid ""
+"\n"
+"                                                This table shows the top 25 "
+"critical and high findings that have\n"
+"                                                been identified for this "
+"organization, grouped by finding types.\n"
+"                                                A table with all the "
+"identified findings can be found in the Findings Report.\n"
+"                                            "
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been identified. Check report for more details."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "View findings report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Edit report recipe"
+msgstr "Rapportresept bewurkje"
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -3422,9 +3566,20 @@ msgid "Overview of recommendations"
 msgstr "Oersjoch fan oanrekommandaasjes"
 
 #: reports/report_types/multi_organization_report/recommendations.html
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+msgid "Recommendation"
+msgstr "Oanrekommandaasje"
+
+#: reports/report_types/multi_organization_report/recommendations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
 msgstr "Foarfal"
+
+#: reports/report_types/multi_organization_report/report.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
+msgstr "Der binne noch gjin befiningen identifisearre."
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
@@ -3729,6 +3884,19 @@ msgid "Vulnerabilities found are grouped for each system."
 msgstr "De fûne kwetsberheden binne per systeem groepearre."
 
 #: reports/report_types/vulnerability_report/report.py
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_origins_inference.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Source"
+msgstr "Boarne"
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr "Earst sjoen"
+
+#: reports/report_types/vulnerability_report/report.py
 msgid "Last seen"
 msgstr "Lêst sjoen"
 
@@ -3881,6 +4049,44 @@ msgstr "Aksje fereaske"
 msgid "Ready"
 msgstr "Dien"
 
+#: reports/templates/partials/report_findings_table.html
+msgid ""
+"\n"
+"            This table provides an overview of the identified findings on "
+"the scanned\n"
+"            systems. For each finding type it shows the risk level, the "
+"number of occurrences\n"
+"            and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment.\n"
+"            The details can be seen when expanding a row. A description, the "
+"source, impact and recommendation of the finding\n"
+"            can be found here. It also shows in which findings the finding "
+"type occurred.\n"
+"        "
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "First known occurrence"
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "Open in report"
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+msgid "Impact"
+msgstr "Ympakt"
+
+#: reports/templates/partials/report_findings_table.html
+msgid ""
+"No critical and high findings have been identified for this organization."
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "No findings have been identified for this organization."
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
@@ -3953,9 +4159,14 @@ msgid "Report names:"
 msgstr "Rapportnammen:"
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
-msgstr "(Fereaske)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr "Ferplichte"
 
 #: reports/templates/partials/report_names_form.html
 msgid "Add reference date"
@@ -3992,6 +4203,7 @@ msgid "Report Navigation"
 msgstr "Rapportnavigaasje"
 
 #: reports/templates/partials/report_navigation.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Report"
 msgstr "Rapport generearje"
 
@@ -4196,10 +4408,13 @@ msgstr "Der binne gjin opsjonele ynstekkers."
 msgid "Enable selected plugins and continue"
 msgstr ""
 
-#: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
-msgid "Findings overview"
-msgstr "Befiningenoersjoch"
+msgid ""
+"\n"
+"            This overview shows the total number of findings per\n"
+"            severity that have been identified for this organization.\n"
+"        "
+msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -4477,10 +4692,6 @@ msgstr "Rapportdetails toane"
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "objects"
 msgstr "objekten"
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Edit report recipe"
-msgstr "Rapportresept bewurkje"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enable schedule"
@@ -4861,10 +5072,6 @@ msgstr ""
 
 #: tools/forms/finding_type.py
 msgid "Click to select one of the available options"
-msgstr ""
-
-#: tools/forms/finding_type.py
-msgid "Finding types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5399,11 +5606,6 @@ msgstr "Nim kontakt op mei jo systeembehearder."
 msgid "You may want to go back to the"
 msgstr ""
 
-#: rocky/templates/403.html rocky/templates/404.html
-#: rocky/templates/crisis_room/crisis_room.html
-msgid "Crisis Room"
-msgstr ""
-
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
 msgstr ""
@@ -5536,41 +5738,6 @@ msgstr ""
 
 #: rocky/templates/admin/popup_response.html
 msgid "Popup closing…"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room.html
-msgid ""
-"An overview of all (critical) findings OpenKAT found. Check the detail "
-"section for additional severity information."
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Total findings"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Total Findings"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid " Finding Details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/organizations/organization_list.html
-msgid "There were no organizations found for your user account"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Top critical organizations"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Critical findings"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Critical Findings"
 msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -5765,10 +5932,6 @@ msgstr "Filters wiskje"
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
 msgstr ""
-
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
-msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -6349,6 +6512,10 @@ msgid "Tags"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
+msgid "There were no organizations found for your user account"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
 msgid "Actions to perform for all of your organizations."
 msgstr ""
 
@@ -6576,11 +6743,6 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
-msgstr "Dit fjild is ferplichte"
-
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
@@ -6678,10 +6840,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Findings Report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -7614,6 +7772,31 @@ msgstr "Raw-bestân kin net nei Bytes oplaad wurde: %s"
 msgid "Raw file successfully added."
 msgstr "Raw-bestân mei sukses tafoege."
 
+#~ msgid "Your password must contain at least the following:"
+#~ msgstr "Jo wachtwurd moat op syn minst it folgjende befetsje:"
+
+#~ msgid " special characters such as: "
+#~ msgstr " spesjale tekens, lykas: "
+
+#~ msgid ""
+#~ "Failed to get list of findings for organization {}, check server logs for "
+#~ "more details."
+#~ msgstr ""
+#~ "Koe list mei befiningen foar organisaasje {} net ophelje, kontrolearje "
+#~ "serverlochboeken foar mear details."
+
+#~ msgid "You don't have permission to enable"
+#~ msgstr "Jo hawwe gjin tastimming om yn te skeakeljen"
+
+#~ msgid "(Required)"
+#~ msgstr "(Fereaske)"
+
+#~ msgid "this field is required"
+#~ msgstr "Dit fjild is ferplichte"
+
+#~ msgid "This field is required"
+#~ msgstr "Dit fjild is ferplichte"
+
 #~ msgid "Enable plugins and continue"
 #~ msgstr "Ynstekkers ynskeakelje en trochgean"
 
@@ -7964,9 +8147,6 @@ msgstr "Raw-bestân mei sukses tafoege."
 
 #~ msgid " Details"
 #~ msgstr " Details"
-
-#~ msgid "Required"
-#~ msgstr "Ferplichte"
 
 #~ msgid "Action"
 #~ msgstr "Aksje"
