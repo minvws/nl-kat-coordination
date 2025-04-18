@@ -43,7 +43,7 @@ To fix this:
 
   For example, for release 1.18.2 this is migration `0008`.
 
-  Be advised, not all migrations are ful backwards compatible, there might be data-loss if a newer version has columns or tables that the older version does not.
+  Be advised, not all migrations are fully backwards compatible, there may be data loss if a newer version has columns or tables that the older version does not.
 
   For the scheduler, you can find the available and migrtions for any release or branch in the folder `mula/scheduler/storage/migrations/versions`
   The following command executes the rollback migration to (in this example) revision `0008`.
