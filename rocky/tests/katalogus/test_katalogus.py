@@ -174,7 +174,7 @@ def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
-    assertContains(response, "KAT-alogus Settings")
+    assertContains(response, "KAT-alogus settings")
     assertContains(response, "Plugin")
     assertContains(response, "Name")
     assertContains(response, "Value")
@@ -197,7 +197,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
     response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
-    assertContains(response, "KAT-alogus Settings")
+    assertContains(response, "KAT-alogus settings")
     assertContains(response, "Plugin")
     assertContains(response, "Name")
     assertContains(response, "Value")

@@ -10,18 +10,22 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
-                <p>
-                    {% blocktranslate trimmed with organization.name as organization_name %}
-                        An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
-                        Each finding relates to an object. Click a finding for additional information.
-                    {% endblocktranslate %}
-                </p>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
+                    <p>
+                        {% blocktranslate trimmed with organization.name as organization_name %}
+                            An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
+                            Each finding relates to an object. Click a finding for additional information.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 {% include "partials/findings_list_toolbar.html" %}
+
+            </div>
+            <div>
                 {% include "findings/findings_filter.html" %}
 
-                {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
                     <form method="post"
                           id="finding-list-form"
@@ -29,9 +33,13 @@
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
                     {% endif %}
-                    <p class="de-emphasized">
-                        {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
-                    </p>
+                    <div class="toolbar">
+                        <p class="de-emphasized">
+                            {% blocktranslate trimmed with length=object_list|length total=paginator.count %}
+                                Showing {{ length }} of {{ total }} findings
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
                     <div class="horizontal-scroll sticky-column">
                         <table class="action-buttons nowrap">
                             <caption class="visually-hidden">
@@ -183,6 +191,8 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% include "partials/list_paginator.html" %}
+
                     </div>
                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
                         {% if not only_muted %}
@@ -210,8 +220,6 @@
                         </div>
                     </form>
                 {% endif %}
-                {% include "partials/list_paginator.html" %}
-
             </div>
         </section>
     </main>

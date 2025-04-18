@@ -6,70 +6,72 @@
 {% load compress %}
 
 {% if reports %}
-    <div class="horizontal-view toolbar">
-        <div class="dropdown">
-            {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
-            <button id="action-dropdown-button"
-                    type="button"
-                    aria-label="{{ aria_label_current_language }}"
-                    aria-haspopup="menu"
-                    aria-controls="action-dropdown"
-                    aria-expanded="false"
-                    class="dropdown-button ghost">
-                {% translate "Actions" %}
-                <span class="icon ti-chevron-down"></span>
-            </button>
-            <div id="action-dropdown"
-                 class="dropdown-list"
-                 role="menu"
-                 aria-labelledby="action-dropdown-button">
-                <ul role="presentation">
-                    <li>
-                        <a href="#rerun-modal" role="menuitem" data-value="test">
-                            <i class="icon ti-refresh"></i>{% translate "Rerun" %}
+    <div class="fifty-fifty">
+        <p class="de-emphasized">
+            {% blocktranslate with length=reports|length total=total_reports trimmed %}
+                Showing {{ length }} of {{ total }} reports
+            {% endblocktranslate %}
+        </p>
+        <div class="horizontal-view toolbar">
+            <div class="dropdown">
+                {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
+                <button id="action-dropdown-button"
+                        type="button"
+                        aria-label="{{ aria_label_current_language }}"
+                        aria-haspopup="menu"
+                        aria-controls="action-dropdown"
+                        aria-expanded="false"
+                        class="dropdown-button ghost">
+                    {% translate "Actions" %}
+                    <span class="icon ti-chevron-down"></span>
+                </button>
+                <div id="action-dropdown"
+                     class="dropdown-list"
+                     role="menu"
+                     aria-labelledby="action-dropdown-button">
+                    <ul role="presentation">
+                        <li>
+                            <a href="#rerun-modal" role="menuitem" data-value="test">
+                                <i class="icon ti-refresh"></i>{% translate "Rerun" %}
+                            </a>
+                        </li>
+                        {% comment %} <li>
+                        <a href="#" role="option" data-value="test">
+                            <i class="icon ti-calendar-event"></i>{% translate "Reschedule" %}
                         </a>
-                    </li>
-                    {% comment %} <li>
+                        </li> {% endcomment %}
+                        {% comment %} <li>
+                        <a href="#" role="option" data-value="test">
+                            <i class="icon ti-share"></i>{% translate "Share" %}
+                        </a>
+                        </li> {% endcomment %}
+                        {% comment %} <li>
                     <a href="#" role="option" data-value="test">
-                        <i class="icon ti-calendar-event"></i>{% translate "Reschedule" %}
+                        <i class="icon ti-layers-difference"></i>{% translate "Concatenate" %}
                     </a>
-                    </li> {% endcomment %}
-                    {% comment %} <li>
-                    <a href="#" role="option" data-value="test">
-                        <i class="icon ti-share"></i>{% translate "Share" %}
-                    </a>
-                    </li> {% endcomment %}
-                    {% comment %} <li>
-                  <a href="#" role="option" data-value="test">
-                    <i class="icon ti-layers-difference"></i>{% translate "Concatenate" %}
-                  </a>
-                    </li> {% endcomment %}
-                    <li>
-                        <a href="#rename-modal" role="menuitem" data-value="test">
-                            <i class="icon ti-edit"></i>{% translate "Rename" %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#delete-modal"
-                           class="plain destructive"
-                           role="menuitem"
-                           data-value="test">
-                            <i class="icon ti-trash"></i>{% translate "Delete" %}
-                        </a>
-                    </li>
-                </ul>
+                        </li> {% endcomment %}
+                        <li>
+                            <a href="#rename-modal" role="menuitem" data-value="test">
+                                <i class="icon ti-edit"></i>{% translate "Rename" %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#delete-modal"
+                               class="plain destructive"
+                               role="menuitem"
+                               data-value="test">
+                                <i class="icon ti-trash"></i>{% translate "Delete" %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        {% include "report_overview/modal_partials/rerun_modal.html" %}
-        {% include "report_overview/modal_partials/rename_modal.html" %}
-        {% include "report_overview/modal_partials/delete_modal.html" %}
+            {% include "report_overview/modal_partials/rerun_modal.html" %}
+            {% include "report_overview/modal_partials/rename_modal.html" %}
+            {% include "report_overview/modal_partials/delete_modal.html" %}
 
+        </div>
     </div>
-    <p class="de-emphasized">
-        {% blocktranslate with length=reports|length total=total_reports trimmed %}
-            Showing {{ length }} of {{ total }} reports
-        {% endblocktranslate %}
-    </p>
     <div class="horizontal-scroll sticky-column">
         <form class="inline layout-wide">
             <table class="nowrap">
@@ -238,6 +240,8 @@
 {% block html_at_end_body %}
     <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
     <script src="{% static "js/grabSelectionOnModalOpen.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
     <script src="{% static "js/renameReports.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}
