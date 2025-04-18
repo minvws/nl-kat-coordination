@@ -15,7 +15,7 @@ Example:
 
 .. code-block:: sh
 
-  # docker log -f nl-kat-coordination-scheduler-1
+  # docker compose logs -f scheduler
   INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
   INFO  [alembic.runtime.migration] Will assume transactional DDL.
   ERROR [alembic.util.messaging] Can't locate revision identified by '0010'
