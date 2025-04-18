@@ -5,7 +5,7 @@ Downgrading an OpenKAT install
 Downgrading is not officially supported, however if you do need to downgrade these tips might help.
 Please also be advised that running mixed versions of the OpenKAT parts can lead to unspecified behaviour.
 
-Make Backups of your `postgresql` database before attempting rollbacks if you value your data.
+Make backups of your `postgresql` database before attempting rollbacks if you value your data.
 
 Downgrading the scheduler / Mula:
 =================================
