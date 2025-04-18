@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 09:42+0000\n"
+"POT-Creation-Date: 2025-04-17 09:05+0000\n"
 "PO-Revision-Date: 2025-02-04 17:02+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -369,7 +369,7 @@ msgid "Member type"
 msgstr "உறுப்பினர் வகை"
 
 #: account/templates/account_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: reports/report_types/findings_report/report.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr "அமைப்பு"
@@ -544,8 +544,10 @@ msgid "Verify OpenKAT account on %(site_name)s"
 msgstr "OpenKAT கணக்கை %(site_name)s இல் சரிபார்க்கவும்"
 
 #: account/validators.py
-msgid "Your password must contain at least the following:"
-msgstr "உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் பின்வருவனவற்றைக் கொண்டிருக்க வேண்டும்:"
+msgid ""
+"Your password must contain at least the following but longer passwords are "
+"recommended:"
+msgstr ""
 
 #: account/validators.py
 msgid " characters"
@@ -560,8 +562,9 @@ msgid " letters"
 msgstr " கடிதங்கள்"
 
 #: account/validators.py
-msgid " special characters such as: "
-msgstr " போன்ற சிறப்பு எழுத்துக்கள்: "
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
+msgstr ""
 
 #: account/validators.py
 msgid " lower case letters"
@@ -618,13 +621,135 @@ msgstr "மோடல் மூடு"
 msgid "Cancel"
 msgstr "ரத்துசெய்"
 
-#: crisis_room/views.py
+#: crisis_room/models.py
 msgid ""
-"Failed to get list of findings for organization {}, check server logs for "
-"more details."
+"Where on the dashboard do you want to show the data? Position 1 is the most "
+"top level and the max position is 16."
 msgstr ""
-"நிறுவனத்திற்கான கண்டுபிடிப்புகளின் பட்டியலைப் பெறுவதில் தோல்வி {}, மேலும் விவரங்களுக்கு "
-"சேவையக பதிவுகளை சரிபார்க்கவும்."
+
+#: crisis_room/models.py
+msgid "Will be displayed on the general crisis room, for all organizations."
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Will be displayed on a single organization dashboard"
+msgstr ""
+
+#: crisis_room/models.py
+msgid "Will be displayed on the findings dashboard for all organizations"
+msgstr ""
+
+#: crisis_room/templates/crisis_room.html rocky/templates/403.html
+#: rocky/templates/404.html
+msgid "Crisis Room"
+msgstr "நெருக்கடி அறை"
+
+#: crisis_room/templates/crisis_room.html
+msgid "Crisis Room overview for all organizations"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "Dashboards"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid ""
+"\n"
+"                        On this page you can see an overview of the "
+"dashboards for all organizations.\n"
+"                        **More context can be written here**\n"
+"                    "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "dashboards"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_dashboards.html
+msgid "There are no dashboards to display."
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Findings overview"
+msgstr "கண்டுபிடிப்புகள் கண்ணோட்டம்"
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                            This overview shows the total number of findings "
+"per\n"
+"                            severity that have been identified for all "
+"organizations.\n"
+"                            This data is based on the latest Crisis Room "
+"Findings Report\n"
+"                            of each organization.\n"
+"                        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid "Findings per organization"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                            This table shows the findings that have been "
+"identiefied for each organization,\n"
+"                            sorted by the finding types and grouped by "
+"organizations.\n"
+"                            This data is based on the latest Crisis Room "
+"Findings Report\n"
+"                            of each organization.\n"
+"                        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"                No findings have been identified yet. As soon as they have "
+"been\n"
+"                identified, they will be shown on this page.\n"
+"            "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_findings.html
+msgid ""
+"\n"
+"            There are no organizations yet. After creating an organization,\n"
+"            the identified findings will be shown here.\n"
+"        "
+msgstr ""
+
+#: crisis_room/templates/crisis_room_header.html
+msgid "Crisis Room Navigation"
+msgstr ""
+
+#: crisis_room/templates/crisis_room_header.html
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/multi_organization_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "கண்டுபிடிப்புகள்"
 
 #: katalogus/client.py
 msgid ""
@@ -949,8 +1074,8 @@ msgstr "மதிப்பு"
 #: katalogus/templates/normalizer_detail.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/summary/report_asset_overview.html tools/forms/boefje.py
 #: tools/forms/finding_type.py rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail.html
@@ -991,8 +1116,17 @@ msgid "Disable"
 msgstr "முடக்கு"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
-msgid "You don't have permission to enable"
-msgstr "இயக்க உங்களுக்கு இசைவு இல்லை"
+msgid "This plugin is enabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
+msgid "This plugin is disabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
+#, python-format
+msgid "You don't have permission to enable or disable %(plugin)ss."
+msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
@@ -1293,9 +1427,9 @@ msgstr "இயல்புநிலை கணினி ச்கேன் அத
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -1308,9 +1442,9 @@ msgstr "விவரங்களை மூடு"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -2897,6 +3031,15 @@ msgstr "காணப்படும் பாதிப்புகள் ஒர�
 msgid "No CVEs have been found."
 msgstr "சி.வி.இக்கள் எதுவும் கண்டுபிடிக்கப்படவில்லை."
 
+#: reports/report_types/aggregate_organisation_report/report.html
+msgid ""
+"\n"
+"                                This chapter contains information about the "
+"findings that have been identified\n"
+"                                for this organization.\n"
+"                            "
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
 msgstr "மொத்த அமைப்பு அறிக்கை"
@@ -2989,27 +3132,6 @@ msgid "Host:"
 msgstr "புரவலன்:"
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "கண்டுபிடிப்புகள்"
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
@@ -3019,13 +3141,13 @@ msgid "Compliance issue"
 msgstr "இணக்க சிக்கல்"
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -3069,11 +3191,8 @@ msgstr ""
 msgid ""
 "Multiple hostnames that resolve to one IP address where at least one of the "
 "hostnames or the IP address has a declared scan level that is at least L1. "
-"Type systemen zijn webservers, mailservers, en nameservers (DNS)."
+"Type systems are web servers, mail servers and name servers (DNS)."
 msgstr ""
-"ஒரு ஐபி முகவரியைத் தீர்க்கும் பல ஓச்ட்பெயர்கள், அங்கு ஓச்ட்பெயர்கள் அல்லது ஐபி முகவரியில் "
-"குறைந்தபட்சம் ஒன்று அறிவிக்கப்பட்ட ச்கேன் அளவைக் கொண்டுள்ளது, இது குறைந்தபட்சம் எல் 1 ஆகும். "
-"Systemen zijn வெப்சர்வர்ச், மெயில்சர்வர்கள், என் பெயர்செர்வர்ச் (டிஎன்எச்) என தட்டச்சு செய்க."
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 msgid ""
@@ -3202,7 +3321,7 @@ msgid "No"
 msgstr "இல்லை"
 
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
 msgid "Other findings found"
 msgstr "பிற கண்டுபிடிப்புகள் காணப்படுகின்றன"
 
@@ -3216,7 +3335,7 @@ msgid "Severity"
 msgstr "தீவிரம்"
 
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -3227,9 +3346,9 @@ msgstr "கண்டுபிடிப்பு"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -3246,6 +3365,7 @@ msgstr "கண்டுபிடிப்புகள் செய்தி"
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -3263,47 +3383,63 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The Findings Report provides an overview of the identified findings on the "
-"scanned systems. For each finding it shows the risk level and the number of "
-"occurrences of the finding. Under the 'Details' section a description, "
-"impact, recommendation and location of the finding can be found. The risk "
-"level may be different for your specific environment."
+"The Findings Report contains information about the findings that have been "
+"identified for the selected asset and organization."
 msgstr ""
-"கண்டுபிடிப்புகள் அறிக்கை ச்கேன் செய்யப்பட்ட அமைப்புகளில் அடையாளம் காணப்பட்ட "
-"கண்டுபிடிப்புகளின் கண்ணோட்டத்தை வழங்குகிறது. ஒவ்வொரு கண்டுபிடிப்பிற்கும் இது இடர் நிலை "
-"மற்றும் கண்டுபிடிப்பின் நிகழ்வுகளின் எண்ணிக்கையைக் காட்டுகிறது. 'விவரங்கள்' பிரிவின் கீழ் "
-"ஒரு விளக்கம், தாக்கம், பரிந்துரை மற்றும் கண்டுபிடிப்பின் இருப்பிடம் ஆகியவற்றைக் காணலாம். "
-"உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை வேறுபட்டிருக்கலாம்."
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.py
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_origins_inference.html
-#: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Source"
-msgstr "மூலம்"
+msgid "Findings per organization overview"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: rocky/templates/findings/finding_list.html
-msgid "Impact"
-msgstr "தாக்கம்"
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: tools/forms/finding_type.py
+msgid "Finding types"
+msgstr "வகைகளைக் கண்டறிதல்"
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/multi_organization_report/recommendations.html
-#: rocky/templates/findings/finding_list.html
-msgid "Recommendation"
-msgstr "பரிந்துரை"
+msgid "Highest risk level"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
-msgstr "முதலில் பார்த்தேன்"
+msgid "Critical finding types"
+msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "No findings have been identified yet."
-msgstr "கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை."
+msgid ""
+"This overview shows the total number of findings per severity that have been "
+"identified for this organization."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "Critical and high findings"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid ""
+"\n"
+"                                                This table shows the top 25 "
+"critical and high findings that have\n"
+"                                                been identified for this "
+"organization, grouped by finding types.\n"
+"                                                A table with all the "
+"identified findings can be found in the Findings Report.\n"
+"                                            "
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been identified. Check report for more details."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "View findings report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Edit report recipe"
+msgstr "அறிக்கை செய்முறையைத் திருத்து"
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -3498,9 +3634,20 @@ msgid "Overview of recommendations"
 msgstr "பரிந்துரைகளின் கண்ணோட்டம்"
 
 #: reports/report_types/multi_organization_report/recommendations.html
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+msgid "Recommendation"
+msgstr "பரிந்துரை"
+
+#: reports/report_types/multi_organization_report/recommendations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
 msgstr "நிகழ்வு"
+
+#: reports/report_types/multi_organization_report/report.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "No findings have been identified yet."
+msgstr "கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை."
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
@@ -3834,6 +3981,19 @@ msgid "Vulnerabilities found are grouped for each system."
 msgstr "காணப்படும் பாதிப்புகள் ஒவ்வொரு அமைப்பிற்கும் தொகுக்கப்பட்டுள்ளன."
 
 #: reports/report_types/vulnerability_report/report.py
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_origins_inference.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Source"
+msgstr "மூலம்"
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr "முதலில் பார்த்தேன்"
+
+#: reports/report_types/vulnerability_report/report.py
 msgid "Last seen"
 msgstr "கடைசியாக பார்த்தேன்"
 
@@ -3995,6 +4155,44 @@ msgstr "நடவடிக்கை தேவை"
 msgid "Ready"
 msgstr "ஆயத்தம்"
 
+#: reports/templates/partials/report_findings_table.html
+msgid ""
+"\n"
+"            This table provides an overview of the identified findings on "
+"the scanned\n"
+"            systems. For each finding type it shows the risk level, the "
+"number of occurrences\n"
+"            and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment.\n"
+"            The details can be seen when expanding a row. A description, the "
+"source, impact and recommendation of the finding\n"
+"            can be found here. It also shows in which findings the finding "
+"type occurred.\n"
+"        "
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "First known occurrence"
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "Open in report"
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_list.html
+msgid "Impact"
+msgstr "தாக்கம்"
+
+#: reports/templates/partials/report_findings_table.html
+msgid ""
+"No critical and high findings have been identified for this organization."
+msgstr ""
+
+#: reports/templates/partials/report_findings_table.html
+msgid "No findings have been identified for this organization."
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
@@ -4071,9 +4269,14 @@ msgid "Report names:"
 msgstr "பெயர்களைப் புகாரளிக்கவும்:"
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/form/field_input.html
-msgid "(Required)"
-msgstr "(தேவை)"
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr ""
 
 #: reports/templates/partials/report_names_form.html
 msgid "Add reference date"
@@ -4110,6 +4313,7 @@ msgid "Report Navigation"
 msgstr "வழிசெலுத்தலைப் புகாரளிக்கவும்"
 
 #: reports/templates/partials/report_navigation.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Report"
 msgstr "அறிக்கையை உருவாக்குங்கள்"
 
@@ -4325,10 +4529,13 @@ msgstr "விருப்ப செருகுநிரல்கள் எத�
 msgid "Enable selected plugins and continue"
 msgstr ""
 
-#: reports/templates/partials/report_severity_totals.html
 #: reports/templates/partials/report_severity_totals_table.html
-msgid "Findings overview"
-msgstr "கண்டுபிடிப்புகள் கண்ணோட்டம்"
+msgid ""
+"\n"
+"            This overview shows the total number of findings per\n"
+"            severity that have been identified for this organization.\n"
+"        "
+msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -4615,10 +4822,6 @@ msgstr "அறிக்கை விவரங்களைக் காட்ட�
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "objects"
 msgstr "பொருள்கள்"
-
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Edit report recipe"
-msgstr "அறிக்கை செய்முறையைத் திருத்து"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enable schedule"
@@ -5012,10 +5215,6 @@ msgstr "வகை ஏற்கனவே உள்ளது"
 #: tools/forms/finding_type.py
 msgid "Click to select one of the available options"
 msgstr "கிடைக்கக்கூடிய விருப்பங்களில் ஒன்றைத் தேர்ந்தெடுக்க சொடுக்கு செய்க"
-
-#: tools/forms/finding_type.py
-msgid "Finding types"
-msgstr "வகைகளைக் கண்டறிதல்"
 
 #: tools/forms/finding_type.py
 #: rocky/templates/partials/finding_occurrence_definition_list.html
@@ -5595,11 +5794,6 @@ msgstr "உங்கள் கணினி நிர்வாகியை தொ
 msgid "You may want to go back to the"
 msgstr "நீங்கள் மீண்டும் செல்ல விரும்பலாம்"
 
-#: rocky/templates/403.html rocky/templates/404.html
-#: rocky/templates/crisis_room/crisis_room.html
-msgid "Crisis Room"
-msgstr "நெருக்கடி அறை"
-
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
 msgstr "பிழைக் குறியீடு 404: பக்கம் கிடைக்கவில்லை"
@@ -5745,43 +5939,6 @@ msgstr ""
 #: rocky/templates/admin/popup_response.html
 msgid "Popup closing…"
 msgstr "பாப்அப் நிறைவு…"
-
-#: rocky/templates/crisis_room/crisis_room.html
-msgid ""
-"An overview of all (critical) findings OpenKAT found. Check the detail "
-"section for additional severity information."
-msgstr ""
-"அனைத்து (விமர்சன) கண்டுபிடிப்புகளின் கண்ணோட்டம் OpenKAT கண்டறியப்பட்டது. கூடுதல் "
-"தீவிரத்தன்மை தகவலுக்கு விவரம் பகுதியைச் சரிபார்க்கவும்."
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Total findings"
-msgstr "மொத்த கண்டுபிடிப்புகள்"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Total Findings"
-msgstr "மொத்த கண்டுபிடிப்புகள்"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid " Finding Details"
-msgstr " விவரங்களைக் கண்டறிதல்"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/organizations/organization_list.html
-msgid "There were no organizations found for your user account"
-msgstr "உங்கள் பயனர் கணக்கிற்கு எந்த நிறுவனங்களும் கிடைக்கவில்லை"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Top critical organizations"
-msgstr "சிறந்த முக்கியமான நிறுவனங்கள்"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Critical findings"
-msgstr "சிக்கலான கண்டுபிடிப்புகள்"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Critical Findings"
-msgstr "சிக்கலான கண்டுபிடிப்புகள்"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
@@ -5978,10 +6135,6 @@ msgstr "தெளிவான வடிப்பான்கள்"
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
 msgstr "தனியுரிமை அறிக்கை"
-
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-msgid "this field is required"
-msgstr "இந்த புலம் தேவை"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -6598,6 +6751,10 @@ msgid "Tags"
 msgstr "குறிச்சொற்கள்"
 
 #: rocky/templates/organizations/organization_list.html
+msgid "There were no organizations found for your user account"
+msgstr "உங்கள் பயனர் கணக்கிற்கு எந்த நிறுவனங்களும் கிடைக்கவில்லை"
+
+#: rocky/templates/organizations/organization_list.html
 msgid "Actions to perform for all of your organizations."
 msgstr "உங்கள் அனைத்து நிறுவனங்களுக்கும் செய்ய நடவடிக்கைகள்."
 
@@ -6826,11 +6983,6 @@ msgstr "மின்னஞ்சல் மறந்துவிட்டேன�
 msgid "Forgot password"
 msgstr "கடவுச்சொல்லை மறந்துவிட்டேன்"
 
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "This field is required"
-msgstr "இந்தப் புலம் தேவை"
-
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
@@ -6932,10 +7084,6 @@ msgstr "தொடர்புடைய பொருள்கள்"
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
 msgstr "தொடர்புடைய எந்தப் பொருளும் அறியப்படவில்லை"
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Findings Report"
-msgstr "கண்டுபிடிப்புகள் அறிக்கையை உருவாக்குங்கள்"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
@@ -7929,6 +8077,83 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#~ msgid "Your password must contain at least the following:"
+#~ msgstr "உங்கள் கடவுச்சொல்லில் குறைந்தபட்சம் பின்வருவனவற்றைக் கொண்டிருக்க வேண்டும்:"
+
+#~ msgid " special characters such as: "
+#~ msgstr " போன்ற சிறப்பு எழுத்துக்கள்: "
+
+#~ msgid ""
+#~ "Failed to get list of findings for organization {}, check server logs for "
+#~ "more details."
+#~ msgstr ""
+#~ "நிறுவனத்திற்கான கண்டுபிடிப்புகளின் பட்டியலைப் பெறுவதில் தோல்வி {}, மேலும் "
+#~ "விவரங்களுக்கு சேவையக பதிவுகளை சரிபார்க்கவும்."
+
+#~ msgid "You don't have permission to enable"
+#~ msgstr "இயக்க உங்களுக்கு இசைவு இல்லை"
+
+#~ msgid ""
+#~ "Multiple hostnames that resolve to one IP address where at least one of "
+#~ "the hostnames or the IP address has a declared scan level that is at "
+#~ "least L1. Type systemen zijn webservers, mailservers, en nameservers "
+#~ "(DNS)."
+#~ msgstr ""
+#~ "ஒரு ஐபி முகவரியைத் தீர்க்கும் பல ஓச்ட்பெயர்கள், அங்கு ஓச்ட்பெயர்கள் அல்லது ஐபி முகவரியில் "
+#~ "குறைந்தபட்சம் ஒன்று அறிவிக்கப்பட்ட ச்கேன் அளவைக் கொண்டுள்ளது, இது குறைந்தபட்சம் எல் 1 "
+#~ "ஆகும். Systemen zijn வெப்சர்வர்ச், மெயில்சர்வர்கள், என் பெயர்செர்வர்ச் (டிஎன்எச்) என "
+#~ "தட்டச்சு செய்க."
+
+#~ msgid ""
+#~ "The Findings Report provides an overview of the identified findings on "
+#~ "the scanned systems. For each finding it shows the risk level and the "
+#~ "number of occurrences of the finding. Under the 'Details' section a "
+#~ "description, impact, recommendation and location of the finding can be "
+#~ "found. The risk level may be different for your specific environment."
+#~ msgstr ""
+#~ "கண்டுபிடிப்புகள் அறிக்கை ச்கேன் செய்யப்பட்ட அமைப்புகளில் அடையாளம் காணப்பட்ட "
+#~ "கண்டுபிடிப்புகளின் கண்ணோட்டத்தை வழங்குகிறது. ஒவ்வொரு கண்டுபிடிப்பிற்கும் இது இடர் நிலை "
+#~ "மற்றும் கண்டுபிடிப்பின் நிகழ்வுகளின் எண்ணிக்கையைக் காட்டுகிறது. 'விவரங்கள்' பிரிவின் கீழ் "
+#~ "ஒரு விளக்கம், தாக்கம், பரிந்துரை மற்றும் கண்டுபிடிப்பின் இருப்பிடம் ஆகியவற்றைக் காணலாம். "
+#~ "உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை வேறுபட்டிருக்கலாம்."
+
+#~ msgid "(Required)"
+#~ msgstr "(தேவை)"
+
+#~ msgid ""
+#~ "An overview of all (critical) findings OpenKAT found. Check the detail "
+#~ "section for additional severity information."
+#~ msgstr ""
+#~ "அனைத்து (விமர்சன) கண்டுபிடிப்புகளின் கண்ணோட்டம் OpenKAT கண்டறியப்பட்டது. கூடுதல் "
+#~ "தீவிரத்தன்மை தகவலுக்கு விவரம் பகுதியைச் சரிபார்க்கவும்."
+
+#~ msgid "Total findings"
+#~ msgstr "மொத்த கண்டுபிடிப்புகள்"
+
+#~ msgid "Total Findings"
+#~ msgstr "மொத்த கண்டுபிடிப்புகள்"
+
+#~ msgid " Finding Details"
+#~ msgstr " விவரங்களைக் கண்டறிதல்"
+
+#~ msgid "Top critical organizations"
+#~ msgstr "சிறந்த முக்கியமான நிறுவனங்கள்"
+
+#~ msgid "Critical findings"
+#~ msgstr "சிக்கலான கண்டுபிடிப்புகள்"
+
+#~ msgid "Critical Findings"
+#~ msgstr "சிக்கலான கண்டுபிடிப்புகள்"
+
+#~ msgid "this field is required"
+#~ msgstr "இந்த புலம் தேவை"
+
+#~ msgid "This field is required"
+#~ msgstr "இந்தப் புலம் தேவை"
+
+#~ msgid "Generate Findings Report"
+#~ msgstr "கண்டுபிடிப்புகள் அறிக்கையை உருவாக்குங்கள்"
 
 #~ msgid "Enable plugins and continue"
 #~ msgstr "செருகுநிரல்களை இயக்கி தொடரவும்"
