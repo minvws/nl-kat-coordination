@@ -35,8 +35,8 @@ To fix this:
 
 .. code-block:: sh
 
-  docker exec -it <container_id> /bin/bash
-  docker exec -it nl-kat-coordination-scheduler-1 /bin/bash
+  docker compose exec <service> /bin/bash
+  docker compose exec scheduler /bin/bash
 
 
 3. Now, inside the container we are going to use `alembic` to migrate back to highest the version that is available in your wanted (older) release.
