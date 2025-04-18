@@ -2,7 +2,7 @@
 Downgrading an OpenKAT install
 ==============================
 
-Downgrading is not officially supported, however if you do need to downgrade these tips might help. 
+Downgrading is not officially supported, however if you do need to downgrade these tips might help.
 Please also be advised that running mixed versions of the OpenKAT parts can lead to unspecified behaviour.
 
 Make Backups of your `postgresql` database before attempting rollbacks if you value your data.
@@ -31,7 +31,7 @@ To fix this:
    If you ran a specific branch, checkout that branch, or some other similar branch that contains the same revision file.
    `alembic` needs this file to know how to migrate back to a lower version.
 
-2. Obtain an interactive shell in the scheduler container. The `docker` command woudl be:
+2. Obtain an interactive shell in the scheduler container. The `docker` command would be:
 
 .. code-block:: sh
 
@@ -41,21 +41,22 @@ To fix this:
 
 3. Now, inside the container we are going to use `alembic` to migrate back to highest the version that is available in your wanted (older) release.
 
-  For example, for release 1.18.2 this is migration `0008`. 
+  For example, for release 1.18.2 this is migration `0008`.
 
-  Be advised, not all migations are ful backwards compatible, there might be data-loss if a newer version has columns or tables that the older version does not.
+  Be advised, not all migrations are ful backwards compatible, there might be data-loss if a newer version has columns or tables that the older version does not.
 
   For the scheduler, you can find the available and migrtions for any release or branch in the folder `mula/scheduler/storage/migrations/versions`
-  The following command executes the rollback migration to (in this example) revision  `0008`. 
+  The following command executes the rollback migration to (in this example) revision `0008`.
 
 .. code-block:: sh
 
   python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini downgrade 0008
 
 
-4. Check if the rollback was complted:
+4. Check if the rollback was completed:
 
 .. code-block:: sh
+
   python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini current
 
 
