@@ -240,7 +240,7 @@ class OOIInformation(models.Model):
             for key, value in get_info(ooi_type=self.type, natural_key=self.value).items():
                 self.data[key] = value
         except InformationUpdateError:
-            # we keep the old data if we already have some and cant update
+            # we keep the old data if we already have some and can't update
             if not self.data["description"]:
                 self.data["description"] = ""
                 self.save()
