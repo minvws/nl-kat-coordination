@@ -10,7 +10,7 @@ from reports.runner.report_runner import aggregate_reports
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
-from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.reports import ReportData
 from tests.integration.conftest import seed_system
 
@@ -23,7 +23,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
-    assert len(data["finding_types"]) == 1
+    assert len(data["finding_types"]) == 0
     assert len(data["web_checks"]) == 1
 
     assert asdict(data["web_checks"].checks[0]) == {
@@ -189,12 +189,6 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
-    security_txt_finding_type = KATFindingType(
-        id="KAT-NO-SECURITY-TXT",
-        description="This hostname does not have a Security.txt file.",
-        recommendation="Make sure there is a security.txt available.",
-        risk_severity=RiskLevelSeverity.RECOMMENDATION,
-    )
     assert data["basic_security"]["summary"]["Web"] == {
         "rpki": {"number_of_compliant": 2, "total": 2},
         "system_specific": {
@@ -211,10 +205,7 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
                 "Certificate is not expired": 2,
                 "Certificate is not expiring soon": 2,
             },
-            "ips": {
-                "IPAddressV4|test|192.0.2.3": [security_txt_finding_type],
-                "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": [security_txt_finding_type],
-            },
+            "ips": {"IPAddressV4|test|192.0.2.3": [], "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": []},
         },
         "safe_connections": {"number_of_compliant": 2, "total": 2},
     }
@@ -386,4 +377,3 @@ def test_multi_report(
         "Other": {"total": 2, "enabled": 2},
         "Web": {"total": 2, "enabled": 2},
     }
-    assert multi_data["recommendation_counts"] == {"Make sure there is a security.txt available.": 2}
