@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 10:27+0000\n"
+"POT-Creation-Date: 2025-04-17 09:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1068,8 +1068,16 @@ msgid "Disable"
 msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
+msgid "This plugin is enabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
+msgid "This plugin is disabled."
+msgstr ""
+
+#: katalogus/templates/partials/enable_disable_plugin.html
 #, python-format
-msgid "You don't have permission to enable this %(plugin)s"
+msgid "You don't have permission to enable or disable %(plugin)ss."
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
