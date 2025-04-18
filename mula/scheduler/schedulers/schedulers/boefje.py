@@ -402,6 +402,70 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
+        # Is the ooi in other organisations? When the ooi is in other
+        # organisations we need to create tasks for those organisations as well.
+        # We allow for boefje tasks without an ooi, something we can't deduplicate
+        # Since we call the method itself, to reissue the checks we need to make sure that we don't endlessly call it
+        if boefje_task.input_ooi is not None and caller != self.push_boefje_task.__name__:
+            orgs = self.is_ooi_in_other_organisations(boefje_task.input_ooi)
+            if orgs is None:
+                self.logger.debug(
+                    "No organisations found for ooi: %s",
+                    boefje_task.input_ooi,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    scheduler_id=self.scheduler_id,
+                )
+                return  # fixme
+
+            # FIXME: we probly need the ooi in that org as well since the
+            # scan profile might be different
+            # Might be better to get all oois back and a attribute with
+            # the organisation id
+
+            # ooi = self.ctx.services.octopoes.get_object(organisation_id, boefje_task.input_ooi)
+
+            for org in orgs:
+                # Check if we have the same boefje in the other organisations
+                boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(boefje_task.boefje.id, org)
+                if boefje is None:
+                    self.logger.debug(
+                        "Boefje not found in other organisation",
+                        boefje_id=boefje_task.boefje.id,
+                        organisation_id=org,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
+                # Is boefje enabled
+                if boefje.enabled is False:
+                    continue
+
+                # Does the env_hash match?
+                if boefje_task.env_hash is not None and boefje_task.env_hash != boefje.env_hash:
+                    self.logger.debug(
+                        "Boefje env_hash does not match",
+                        boefje_id=boefje_task.boefje.id,
+                        organisation_id=org,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
+                # if not self.has_boefje_permission_to_run(plugin, ooi):
+
+                new_boefje_task = models.BoefjeTask(
+                    boefje=models.Boefje.model_validate(boefje.model_dump()),
+                    input_ooi=boefje_task.input_ooi,
+                    organization=org.id,
+                    env_hash=boefje.env_hash,
+                )
+
+                self.push_boefje_task(
+                    boefje_task=new_boefje_task,
+                    organisation_id=org.id,
+                    create_schedule=self.create_schedule,
+                    caller=self.push_boefje_task.__name__,
+                )
+
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -684,6 +748,25 @@ class BoefjeScheduler(Scheduler):
             oois.append(ooi)
 
         return oois
+
+    def is_ooi_in_other_organisations(self, ooi: models.OOI) -> list[models.Organisation]:
+        """Check if the OOI is in other organisations.
+
+        Args:
+            ooi: The OOI to check.
+
+        Returns:
+            A list of organisations that have the same OOI.
+        """
+        try:
+            return self.ctx.services.octopoes.get_organisations_by_ooi(ooi)
+        except ExternalServiceError:
+            self.logger.exception(
+                "Error occurred while checking if OOI is in other organisations",
+                ooi_primary_key=ooi.primary_key,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline

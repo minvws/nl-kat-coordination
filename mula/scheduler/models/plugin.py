@@ -24,3 +24,4 @@ class Plugin(BaseModel):
     run_on: list[RunOn] | None = None
     oci_image: str | None = None
     oci_arguments: list[str] | None = None
+    env_hash: str | None = None

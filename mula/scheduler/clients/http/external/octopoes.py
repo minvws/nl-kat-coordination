@@ -98,6 +98,10 @@ class Octopoes(HTTPService):
                 return None
             raise
 
+    @exception_handler
+    def get_organisations_by_ooi(self, reference: str) -> list[Organisation]:
+        raise NotImplementedError("Not implemented")
+
     def is_healthy(self) -> bool:
         healthy = True
         for org in self.orgs:
