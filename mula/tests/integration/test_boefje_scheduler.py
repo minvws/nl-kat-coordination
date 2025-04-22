@@ -723,21 +723,24 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje = BoefjeFactory()
 
         boefje_task = models.BoefjeTask(
             boefje=models.Boefje.model_validate(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
+            env_hash=plugin.env_hash,
         )
 
+        first_organisation = self.organisation
         second_organisation = OrganisationFactory()
         third_organisation = OrganisationFactory()
 
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.return_value = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        self.mock_get_plugin.return_value = plugin
         self.mock_get_organisations_by_ooi.return_value = [second_organisation, third_organisation]
         self.mock_get_object.return_value = ooi
 
@@ -747,15 +750,37 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: there should be 3 tasks in the queue
         self.assertEqual(3, self.scheduler.queue.qsize())
 
-        items = [
-            self.scheduler.queue.peek(0).organisation,
-            self.scheduler.queue.peek(1).organisation,
-            self.scheduler.queue.peek(2).organisation,
-        ]
+        # Assert: the tasks should be on the queue
+        items = [self.scheduler.queue.peek(0), self.scheduler.queue.peek(1), self.scheduler.queue.peek(2)]
+        orgs = [item.organisation for item in items]
 
-        self.assertIn(third_organisation.id, items)
-        self.assertIn(second_organisation.id, items)
-        self.assertIn(self.organisation.id, items)
+        self.assertIn(first_organisation.id, orgs)
+        self.assertIn(second_organisation.id, orgs)
+        self.assertIn(third_organisation.id, orgs)
+
+        for item in items:
+            self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
+
+    def test_push_boefje_task_ooi_in_other_orgs_one_org(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_no_orgs(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_no_ooi(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_no_boefje(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_env_hash_mismatch(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_no_permission(self):
+        pass
+
+    def test_push_boefje_task_ooi_in_other_orgs_validate_boefje(self):
+        pass
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""

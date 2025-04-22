@@ -162,6 +162,7 @@ class BoefjeScheduler(Scheduler):
                     boefje=models.Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=mutation.client_id,
+                    env_hash=boefje.env_hash,
                 )
             )
 
@@ -402,69 +403,13 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        # Is the ooi in other organisations? When the ooi is in other
-        # organisations we need to create tasks for those organisations as well.
-        # We allow for boefje tasks without an ooi, something we can't deduplicate
-        # Since we call the method itself, to reissue the checks we need to make sure that we don't endlessly call it
-        if boefje_task.input_ooi is not None and caller != self.push_boefje_task.__name__:
-            orgs = self.is_ooi_in_other_organisations(boefje_task.input_ooi)
-            if orgs is None:
-                self.logger.debug(
-                    "No organisations found for ooi: %s",
-                    boefje_task.input_ooi,
-                    ooi_primary_key=boefje_task.input_ooi,
-                    scheduler_id=self.scheduler_id,
-                )
-                return  # fixme
-
-            # FIXME: we probly need the ooi in that org as well since the
-            # scan profile might be different
-            # Might be better to get all oois back and a attribute with
-            # the organisation id
-
-            # ooi = self.ctx.services.octopoes.get_object(organisation_id, boefje_task.input_ooi)
-
-            for org in orgs:
-                # Check if we have the same boefje in the other organisations
-                boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(boefje_task.boefje.id, org)
-                if boefje is None:
-                    self.logger.debug(
-                        "Boefje not found in other organisation",
-                        boefje_id=boefje_task.boefje.id,
-                        organisation_id=org,
-                        scheduler_id=self.scheduler_id,
-                    )
-                    continue
-
-                # Is boefje enabled
-                if boefje.enabled is False:
-                    continue
-
-                # Does the env_hash match?
-                if boefje_task.env_hash is not None and boefje_task.env_hash != boefje.env_hash:
-                    self.logger.debug(
-                        "Boefje env_hash does not match",
-                        boefje_id=boefje_task.boefje.id,
-                        organisation_id=org,
-                        scheduler_id=self.scheduler_id,
-                    )
-                    continue
-
-                # if not self.has_boefje_permission_to_run(plugin, ooi):
-
-                new_boefje_task = models.BoefjeTask(
-                    boefje=models.Boefje.model_validate(boefje.model_dump()),
-                    input_ooi=boefje_task.input_ooi,
-                    organization=org.id,
-                    env_hash=boefje.env_hash,
-                )
-
-                self.push_boefje_task(
-                    boefje_task=new_boefje_task,
-                    organisation_id=org.id,
-                    create_schedule=self.create_schedule,
-                    caller=self.push_boefje_task.__name__,
-                )
+        # We check on input_ooi because we allow for boefje tasks without an
+        # ooi, something we can't deduplicate. Additionally, because we
+        # potentially call the method itself from `is_ooi_in_other_organisations`,
+        # we need to make sure that we don't endlessly call it, by checking the
+        # caller.
+        if boefje_task.input_ooi is not None and caller != self.is_ooi_in_other_organisations.__name__:
+            self.is_ooi_in_other_organisations(boefje_task)
 
         task = models.Task(
             id=boefje_task.id,
@@ -749,24 +694,81 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    def is_ooi_in_other_organisations(self, ooi: models.OOI) -> list[models.Organisation]:
-        """Check if the OOI is in other organisations.
-
-        Args:
-            ooi: The OOI to check.
-
-        Returns:
-            A list of organisations that have the same OOI.
+    def is_ooi_in_other_organisations(self, boefje_task: models.BoefjeTask):
+        """Is the ooi in other organisations? When the ooi is in other
+        organisations we don't want to scan those as well, we still create
+        tasks for those organisations but they will be batched together.
         """
         try:
-            return self.ctx.services.octopoes.get_organisations_by_ooi(ooi)
+            orgs = self.ctx.services.octopoes.get_organisations_by_ooi(boefje_task.input_ooi)
         except ExternalServiceError:
-            self.logger.exception(
-                "Error occurred while checking if OOI is in other organisations",
-                ooi_primary_key=ooi.primary_key,
+            # TODO
+            return
+
+        if len(orgs) < 2:
+            self.logger.debug(
+                "No other organisations found for ooi",
+                ooi_primary_key=boefje_task.input_ooi,
+                organisation_id=boefje_task.organization,
                 scheduler_id=self.scheduler_id,
             )
-            return []
+            return
+
+        for org in orgs:
+            if org.id == boefje_task.organization:
+                # Skip the organisation we are currently in
+                continue
+
+            ooi = self.ctx.services.octopoes.get_object(org.id, boefje_task.input_ooi)
+
+            # Check if we have the same boefje in the other organisations
+            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(boefje_task.boefje.id, org)
+            if boefje is None:
+                self.logger.debug(
+                    "Boefje not found in other organisation",
+                    boefje_id=boefje_task.boefje.id,
+                    organisation_id=org,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            # Is boefje enabled
+            if boefje.enabled is False:
+                continue
+
+            # Does the env_hash match?
+            if boefje_task.env_hash is not None and boefje_task.env_hash != boefje.env_hash:
+                self.logger.debug(
+                    "Boefje env_hash does not match",
+                    boefje_id=boefje_task.boefje.id,
+                    organisation_id=org,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            if not self.has_boefje_permission_to_run(boefje, ooi):
+                self.logger.debug(
+                    "Boefje not allowed to run on ooi",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=ooi.primary_key,
+                    organisation_id=org,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            new_boefje_task = models.BoefjeTask(
+                boefje=models.Boefje.model_validate(boefje.model_dump()),
+                input_ooi=ooi.primary_key,
+                organization=org.id,
+                env_hash=boefje.env_hash,  # TODO: this need to be added elsewhere as well!!!
+            )
+
+            self.push_boefje_task(
+                boefje_task=new_boefje_task,
+                organisation_id=org.id,
+                create_schedule=self.create_schedule,
+                caller=self.is_ooi_in_other_organisations.__name__,
+            )
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
