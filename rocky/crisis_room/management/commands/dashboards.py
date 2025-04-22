@@ -91,18 +91,6 @@ def get_or_create_dashboard_data(
     return dashboard_data, created
 
 
-def delete_dashboard(dashboard: Dashboard):
-    try:
-        return dashboard.delete()
-    except ValueError as e:
-        logger.error(e)
-        return False, {}
-
-
-def delete_dashboard_item(dashboard_data: DashboardData):
-    return dashboard_data.delete()
-
-
 def schedule_recipe(
     dashboard_data: DashboardData,
     organization: Organization,

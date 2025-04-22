@@ -56,7 +56,7 @@ class DashboardData(models.Model):
         default=False, help_text=_("Will be displayed on a single organization dashboard")
     )
     findings_dashboard = models.BooleanField(
-        unique=True, default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
+        default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
     class Meta:
@@ -86,7 +86,7 @@ def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
 def dashboard_data_pre_save(sender, instance, *args, **kwargs):
     if instance._state.adding:  # not when updating
         positions = get_dashboard_data_positions(instance)
-        position = max(positions, default=0) + 1
+        position = max(positions) + 1
         if position <= MAX_POSITION:
             instance.position = position
         else:
@@ -95,22 +95,10 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
-    """
-    After deleting this instance we need to reposition the other Dashboard items.
-    """
-
-    try:
-        instance.dashboard
-    except Dashboard.DoesNotExist:
-        return
-
-    dashboard_datas = DashboardData.objects.filter(dashboard=instance.dashboard).order_by("id")
-
-    if len(dashboard_datas) == 1:
-        dashboard_datas[0].position = 1
-        dashboard_datas[0].save()
-        return
-
-    for pos, dashboard_data in enumerate(dashboard_datas, start=1):
-        dashboard_data.position = pos
-        dashboard_data.save()
+    DashboardData.objects.raw(
+        "UPDATE crisis_room_dashboarddata "
+        "SET position = position - 1 "
+        "WHERE position > %s "
+        "AND dashboard_id = %s ",
+        [instance.position, instance.dashboard.id],
+    )
