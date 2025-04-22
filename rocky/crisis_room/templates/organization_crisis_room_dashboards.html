@@ -41,6 +41,9 @@
 
                             <div class="horizontal-view">
                                 <h3>{{ dashboard_item.item.name }}</h3>
+                                {% if dashboard_item.item.query_from == "object_list" %}
+                                    <span class="label system-tag color-grey">{% translate "Object list" %}</span>
+                                {% endif %}
                                 <div class="dropdown">
                                     <button aria-label="{% translate "Options for dashboard items" %}"
                                             aria-haspopup="menu"
@@ -54,12 +57,12 @@
                                         <ul role="presentation">
                                             <li>
                                                 <a href="#" class="plain">
-                                                    <i class="icon ti-arrow-left"></i>{% translate "Move left in tab order" %}
+                                                    <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
                                                 </a>
                                             </li>
                                             <li>
                                                 <a href="#" class="plain">
-                                                    <i class="icon ti-arrow-right"></i>{% translate "Move right in tab order" %}
+                                                    <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
                                                 </a>
                                             </li>
                                             <li>

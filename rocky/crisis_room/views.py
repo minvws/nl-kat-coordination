@@ -184,8 +184,7 @@ class DashboardService:
         dashboards = Dashboard.objects.filter(organization=organization)
         for dashboard in dashboards:
             dashboard_names.append(dashboard.name)
-
-        return list(set(dashboard_names))
+        return sorted(set(dashboard_names))
 
     def get_ooi_list(self, dashboard_data) -> dict[str, Any]:
         query = json.loads(dashboard_data.query)
