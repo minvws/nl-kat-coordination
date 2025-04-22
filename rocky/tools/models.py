@@ -233,17 +233,16 @@ class OOIInformation(models.Model):
     def description(self):
         if not self.data["description"]:
             self.get_internet_description()
+            self.save()
         return self.data["description"]
 
     def get_internet_description(self):
         try:
-            for key, value in get_info(ooi_type=self.type, natural_key=self.value).items():
-                self.data[key] = value
+            self.data.update(get_info(ooi_type=self.type, natural_key=self.value))
         except InformationUpdateError:
             # we keep the old data if we already have some and can't update
             if not self.data["description"]:
-                self.data["description"] = ""
-                self.save()
+                self.data = {"description": ""}
 
     def __str__(self) -> str:
         return self.id
