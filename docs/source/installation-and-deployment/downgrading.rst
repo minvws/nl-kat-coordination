@@ -44,7 +44,7 @@ In this example migration `0010` used to be available, we want to downgrade to `
      docker compose exec <service> /bin/bash
      docker compose exec scheduler /bin/bash
 
-#. Perform the rollback migation
+#. Perform the rollback migration
 
    Now, inside the container we are going to use `alembic` to migrate back to highest the version that is available in your wanted (older) release.
 
