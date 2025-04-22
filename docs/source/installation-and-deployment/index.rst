@@ -22,3 +22,4 @@ Contains documentation for developers and contributors.
    environment-settings/index
    external-authentication
    cveapi
+   downgrading
