@@ -114,7 +114,6 @@ class DashboardService:
             if dashboard_data.recipe:
                 report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
                 recipes_data[dashboard_data] = dashboard_data.recipe
-
         if recipes_data:
             # Returns for each recipe id its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
@@ -271,7 +270,7 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 
         try:
             self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard, display_in_dashboard=True)
+            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard)
             self.dashboard_items: list[DashboardItem] | None = self.dashboard_service.get_dashboard_items(
                 dashboards_data
             )
