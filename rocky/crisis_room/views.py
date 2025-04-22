@@ -16,7 +16,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, ReadTimeout
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
@@ -77,7 +77,8 @@ class DashboardService:
             )
             try:
                 return connector.bulk_list_reports(valid_time, report_filters)
-            except (HTTPStatusError, ObjectNotFoundException):
+            except (HTTPStatusError, ObjectNotFoundException, ReadTimeout) as error:
+                logger.error("An error occurred: %s", error)
                 return {}
         return {}
 
@@ -91,7 +92,8 @@ class DashboardService:
         bytes_client.login()
         try:
             return bytes_client.get_raws_all(raw_ids)
-        except (HTTPStatusError, ObjectNotFoundException):
+        except (HTTPStatusError, ObjectNotFoundException, ReadTimeout) as error:
+            logger.error("An error occurred: %s", error)
             return {}
 
     def get_dashboard_items(self, dashboards_data: BaseManager[DashboardData]) -> list[DashboardItem]:
@@ -115,7 +117,7 @@ class DashboardService:
                 report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
                 recipes_data[dashboard_data] = dashboard_data.recipe
         if recipes_data:
-            # Returns for each recipe id its Hydrated report.
+            # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
 
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
@@ -130,7 +132,7 @@ class DashboardService:
             # Get report data from bytes, per data raw id its report data
             report_data_from_bytes: dict[str, dict[str, Any]] = self.get_report_bytes_data(raw_ids)
 
-            # Finally merge all data necessary to show dashboard data
+            # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_data, hydrated_report in reports_data.items():
                 dashboard_item = DashboardItem()
                 dashboard_item.item = dashboard_data
@@ -373,11 +375,27 @@ class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
         form = self.get_form()
         if form.is_valid():
             form_data = form.cleaned_data
+
+            dashboard_name = form_data["dashboard"]
+            name = form_data["title"]
+            sort_by = form_data["order_by"].split("-")
+            recipe_id = request.POST.get("recipe_id")
+
+            column_values = request.POST.getlist("column_values")
+            column_names = request.POST.getlist("column_names")
+
+            columns = {column_value: column_names[index] for index, column_value in enumerate(column_values)}
+
+            settings = {"size": form_data["size"], "columns": columns}
+
             query_from = request.POST.get("query_from")
+            template = (
+                "partials/dashboard_ooi_list.html" if query_from == "object_list" else request.POST.get("template")
+            )
+
+            query = None
 
             if query_from == "object_list":
-                template = "partials/dashboard_ooi_list.html"
-                sort_by = form_data["order_by"].split("-")
                 query = {
                     "ooi_types": request.POST.getlist("ooi_type"),
                     "scan_level": request.POST.getlist("clearance_level"),
@@ -387,30 +405,15 @@ class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
                     "asc_desc": sort_by[1],
                     "limit": int(form_data["limit"]),
                 }
-            else:
-                template = request.POST.get("template")
-                query = None
 
-                dashboard_name = form_data["dashboard"]
-                name = form_data["title"]
-                recipe_id = request.POST.get("recipe_id")
+            self.dashboard_data, created = get_or_create_dashboard_data(
+                dashboard_name, self.organization, name, recipe_id, query_from, query, template, settings
+            )
 
-                column_values = request.POST.getlist("column_values")
-                column_names = request.POST.getlist("column-names")
+            if created:
+                messages.success(request, "Dashboard item has been created.")
 
-                columns = {index: column_names[index] for index, column_value in enumerate(column_values)}
+            query_params = urlencode({"dashboard": dashboard_name})
+            return redirect(self.get_success_url() + "?" + query_params)
 
-                settings = {"size": form_data["size"], "columns": columns}
-
-                self.dashboard_data, created = get_or_create_dashboard_data(
-                    dashboard_name, self.organization, name, recipe_id, query_from, query, template, settings
-                )
-                if created:
-                    messages.success(request, "Dashboard item has been created.")
-
-                query_params = urlencode({"dashboard": dashboard_name})
-                return redirect(self.get_success_url() + "?" + query_params)
-
-            return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
-        else:
-            return self.form_invalid(form)
+        return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
