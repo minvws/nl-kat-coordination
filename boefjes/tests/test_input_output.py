@@ -1,11 +1,10 @@
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from functools import cache
 from importlib import import_module
 from itertools import groupby
 from operator import itemgetter
 from pathlib import Path
-from typing import Iterable
 
 import pytest
 
@@ -98,13 +97,11 @@ def _map_plugin_id_to_normalizer_function(plugins_path: Path) -> dict[str, Calla
     return plugins
 
 
-def get_test_files(inputs_path: Path, outputs_path: Path) -> list[
-    tuple[str, Path, Path, Path | None, str]]:
+def get_test_files(inputs_path: Path, outputs_path: Path) -> list[tuple[str, Path, Path, str]]:
     """Finds all files with the test-input filename and the related output files"""
     tests = []
 
     inputs_map: dict[tuple[str, str], Path] = {}  # Maps (plugin_id, input name) to input files
-    inputs_object_map: dict[tuple[str, str], Path] = {}  # Maps (plugin_id, input name) to input object
     outputs_map: dict[tuple[str, str, str], Path] = {}  # Maps (plugin_id, input name, strategy) to output files
 
     # Populate inputs_map
@@ -116,9 +113,6 @@ def get_test_files(inputs_path: Path, outputs_path: Path) -> list[
 
         inputs_map[(plugin_id, input_file_name)] = input_file
 
-        if (input_object_file := input_file.with_suffix(".json")).is_file():
-            inputs_object_map[(plugin_id, input_file_name)] = input_object_file
-
     # Populate outputs_map
     for output_file in get_test_output_files(outputs_path):
         # extract the plugin id from the output file path
@@ -127,18 +121,16 @@ def get_test_files(inputs_path: Path, outputs_path: Path) -> list[
         # derive the strategy and input file name from the output file name format ('test-<strategy>-<input file>.json')
         match output_file.stem.split("-"):
             case ["test", strategy, *input_file_name]:
-                pass
+                outputs_map[(plugin_id, "-".join(input_file_name), strategy)] = output_file
+
             case _:
                 raise ValueError(f"Invalid output file name format: {output_file.stem}")
-
-        outputs_map[(plugin_id, "-".join(input_file_name), strategy)] = output_file
 
     # Combine inputs and outputs into tests
     for (plugin_id, input_name), input_file in inputs_map.items():
         for (out_plugin_id, out_name, strategy), output_file in outputs_map.items():
             if plugin_id == out_plugin_id and input_name == out_name:
-                input_object_file = inputs_object_map.get((plugin_id, input_name), None)
-                tests.append((plugin_id, input_file, output_file, input_object_file, strategy))
+                tests.append((plugin_id, input_file, output_file, strategy))
 
     return tests
 
@@ -146,28 +138,30 @@ def get_test_files(inputs_path: Path, outputs_path: Path) -> list[
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     test_files = get_test_files(TESTS_INPUTS_PATH, TESTS_OUTPUTS_PATH)
 
+    get_by_strategy = itemgetter(3)
+
     # Group by strategy
-    strategies = {}
-    for strategy, group in groupby(test_files, key=itemgetter(4)):
-        strategies.setdefault(strategy, [])
+    for strategy, group in groupby(sorted(test_files, key=get_by_strategy), key=get_by_strategy):
+        parameters = [(plugin_id, input_file.name, output_file.name) for plugin_id, input_file, output_file, _ in group]
 
-        for plugin_id, input_file, output_file, input_object_file, _ in group:
-            strategies[strategy].append((plugin_id, input_file.name, output_file.name, input_object_file.name))
-
-    # Generate test cases based on the test_data list
-    if metafunc.definition.name == 'test_input_contains':
-        metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["contains"])
-    elif metafunc.definition.name == 'test_input_matches':
-        metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["matches"])
+        # Parametrize the test functions based on the strategy
+        if metafunc.definition.name == f"test_input_{strategy}":
+            metafunc.parametrize("plugin_id,test_input,expected_output", parameters)
 
 
-def test_input_contains(plugin_id, test_input, expected_output, input_object_file):
+@pytest.fixture
+def input_object(plugin_id, test_input) -> dict:
+    # Extract the input object file name from the test input
+    input_object_file = TESTS_INPUTS_PATH.joinpath(plugin_id, test_input).with_suffix(".json")
+    if input_object_file.is_file():
+        with input_object_file.open("rb") as input_file:
+            return json.load(input_file)
+
+    return DEFAULT_INPUT_OOI
+
+
+def test_input_contains(plugin_id, test_input, expected_output, input_object):
     run_method = plugin_map[plugin_id]
-
-    input_object = DEFAULT_INPUT_OOI
-    if input_object_file is not None:
-        with TESTS_INPUTS_PATH.joinpath(plugin_id, input_object_file).open("rb") as input_file:
-            input_object = json.load(input_file)
 
     input_data = get_dummy_data(TESTS_INPUTS_PATH.joinpath(plugin_id, test_input).as_posix())
     test_output = _serialize_output(run_method(input_object, input_data))
@@ -194,13 +188,8 @@ def test_input_contains(plugin_id, test_input, expected_output, input_object_fil
         pytest.fail(f"Expected objects not found in test output: {missing}")
 
 
-def test_input_matches(plugin_id, test_input, expected_output, input_object_file):
+def test_input_matches(plugin_id, test_input, expected_output, input_object):
     run_method = plugin_map[plugin_id]
-
-    input_object = DEFAULT_INPUT_OOI
-    if input_object_file is not None:
-        with TESTS_INPUTS_PATH.joinpath(plugin_id, input_object_file).open("rb") as input_file:
-            input_object = json.load(input_file)
 
     input_data = get_dummy_data(TESTS_INPUTS_PATH.joinpath(plugin_id, test_input).as_posix())
     test_output = _serialize_output(run_method(input_object, input_data))
@@ -214,7 +203,8 @@ def test_input_matches(plugin_id, test_input, expected_output, input_object_file
 
 
 plugin_map: dict[str, Callable[[dict, bytes], Iterable[NormalizerOutput]]] = _map_plugin_id_to_normalizer_function(
-    PLUGINS_PATH)
+    PLUGINS_PATH
+)
 
 
 def _serialize_output(objects: Iterable[NormalizerOutput]) -> list[dict]:
@@ -229,10 +219,11 @@ def _compare_objects(expected: dict | str, actual: dict) -> None:
         assert expected == actual["primary_key"], f"Expected {expected}, got {actual['primary_key']}"
     else:
         # Compare the object types
-        assert expected["object_type"] == actual[
-            "object_type"], f"Expected {expected['object_type']}, got {actual['object_type']}"
+        assert (
+            expected["object_type"] == actual["object_type"]
+        ), f"Expected {expected['object_type']}, got {actual['object_type']}"
 
         # Compare the object data
-        for key in expected.keys():
+        for key, value in expected.items():
             assert key in actual, f"Key {key} not found in actual object"
-            assert expected[key] == actual[key], f"Expected {expected[key]}, got {actual[key]} for key {key}"
+            assert value == actual[key], f"Expected {value}, got {actual[key]} for key {key}"
