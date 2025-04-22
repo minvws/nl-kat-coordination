@@ -10,26 +10,33 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>
-                    {% translate "Object list" %} @
-                    {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
-                </h1>
-                <p>
-                    {% blocktranslate trimmed with organization.name as organization_name %}
-                        An overview of objects found for organization <strong>{{ organization_name }}</strong>.
-                        Objects can be added manually or by running Boefjes.
-                        Click an object for additional information.
-                    {% endblocktranslate %}
-                </p>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>
+                        {% translate "Object list" %} @
+                        {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
+                    </h1>
+                    <p>
+                        {% blocktranslate trimmed with organization.name as organization_name %}
+                            An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+                            Objects can be added manually or by running Boefjes.
+                            Click an object for additional information.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 {% include "partials/ooi_list_toolbar.html" %}
+
+            </div>
+            <div>
                 {% include "partials/ooi_list_filters.html" %}
 
-                <p class="de-emphasized">
-                    {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
-                        Showing {{ length }} of {{ total }} objects
-                    {% endblocktranslate %}
-                </p>
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
+                            Showing {{ length }} of {{ total }} objects
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 <form method="post"
                       id="ooi_list_form"
                       class="inline layout-wide checkboxes_required">
