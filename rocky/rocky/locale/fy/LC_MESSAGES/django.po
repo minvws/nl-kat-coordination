@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-17 09:05+0000\n"
+"POT-Creation-Date: 2025-04-17 12:03+0000\n"
 "PO-Revision-Date: 2024-12-20 18:00+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -953,13 +953,14 @@ msgstr "Nij Boefje meitsje"
 msgid "Discard new Boefje"
 msgstr "Nij Boefje ferwerpe"
 
-#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
-msgid "available"
-msgstr "beskikber"
-
 #: katalogus/templates/boefjes.html
 msgid "Add Boefje"
 msgstr "Boefje tafoegje"
+
+#: katalogus/templates/boefjes.html katalogus/templates/katalogus.html
+#: katalogus/templates/normalizers.html
+msgid "available"
+msgstr "beskikber"
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
@@ -1030,9 +1031,10 @@ msgstr "Ynstellingen klone"
 #: katalogus/templates/clone_settings.html
 #, python-format
 msgid ""
-"Use the form below to clone the settings from <i>%(current_organization)s</"
-"i> to the selected organization. This includes both the KAT-alogus settings "
-"as well as enabled and disabled plugins."
+"Use the form below to clone the settings from "
+"<strong>%(current_organization)s</strong> to the selected organization. This "
+"includes both the KAT-alogus settings as well as enabled and disabled "
+"plugins."
 msgstr ""
 
 #: katalogus/templates/confirmation_clone_settings.html
@@ -1043,22 +1045,15 @@ msgstr "Klone"
 msgid "All plugins"
 msgstr "Alle ynstekkers"
 
-#: katalogus/templates/katalogus.html
-msgid "Plugin available"
-msgid_plural "Plugins available"
-msgstr[0] ""
-msgstr[1] ""
-
 #: katalogus/templates/katalogus_settings.html
-msgid "KAT-alogus Settings"
-msgstr "KAT-alogus-ynstellingen"
+msgid "KAT-alogus settings"
+msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
-"There are currently no settings defined. Add settings at plugin detail page."
+"There are currently no settings defined. Add settings at the plugin detail "
+"page."
 msgstr ""
-"Der binne op dit stuit gjin ynstellingen. Foegje ynstellingen ta by de "
-"ynstekkerdetailside."
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/two_factor/core/otp_required.html
@@ -1192,6 +1187,7 @@ msgstr "In oersjoch fan alle beskikbere ynstekkers."
 #: katalogus/views/katalogus_settings.py tools/view_helpers.py
 #: rocky/templates/header.html
 #: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr "Ynstellingen"
 
@@ -1216,7 +1212,6 @@ msgid "Report types for "
 msgstr "Rapporttypen foar "
 
 #: katalogus/templates/partials/objects_to_scan.html
-#: rocky/templates/findings/finding_list.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1983,37 +1978,6 @@ msgstr "Brûkersdetails"
 msgid "Finish organization setup"
 msgstr "Organisaasje ynstelle foltôgje"
 
-#: onboarding/templates/dns_report.html
-#: onboarding/templates/step_2a_choose_report_info.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
-msgid "OpenKAT introduction"
-msgstr "Yntroduksje OpenKAT"
-
-#: onboarding/templates/dns_report.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: reports/report_types/dns_report/report.py
-msgid "DNS Report"
-msgstr "DNS-rapport"
-
-#: onboarding/templates/dns_report.html
-#, python-format
-msgid ""
-"These are the findings of a OpenKAT-analysis (%(observed_at)s). Click a "
-"finding for more detailed information about the issue, its origin, severity "
-"and possible solutions."
-msgstr ""
-"Dit binne de befiningen fan in OpenKAT-analyze (%(observed_at)s). Klik op in "
-"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
-"earnst en mooglike oplossingen."
-
-#: onboarding/templates/dns_report.html
-msgid "DNS Tree"
-msgstr "DNS-beam"
-
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
@@ -2079,6 +2043,15 @@ msgstr "Dizze yntroduksje leit út hoe’t jo in rapport meitsje."
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr "Onboarding oerslaan"
+
+#: onboarding/templates/step_2a_choose_report_info.html
+#: onboarding/templates/step_2b_choose_report_type.html
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
+msgid "OpenKAT introduction"
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
@@ -2204,6 +2177,11 @@ msgid ""
 msgstr ""
 "Wannear’t jo begjinne mei it generearjen fan dit rapport, sil OpenKAT jo "
 "troch de nedige stappen liede."
+
+#: onboarding/templates/step_2b_choose_report_type.html
+#: reports/report_types/dns_report/report.py
+msgid "DNS Report"
+msgstr "DNS-rapport"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
@@ -3039,7 +3017,6 @@ msgstr "Oanmakke troch:"
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
 msgstr "Gearfetting"
@@ -3277,7 +3254,6 @@ msgstr "Oare befiningen fûn"
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Severity"
 msgstr "Earnst"
 
@@ -3567,6 +3543,7 @@ msgstr "Oersjoch fan oanrekommandaasjes"
 
 #: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/findings/finding_list.html
 msgid "Recommendation"
 msgstr "Oanrekommandaasje"
@@ -4417,9 +4394,37 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview"
 msgstr "Oersjoch totalen per earnst"
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Critical"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "High"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Medium"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Low"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+msgid "Pending"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Unknown"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Total"
+msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
@@ -4634,8 +4639,8 @@ msgid "No reports have been generated yet."
 msgstr "Der binne noch gjin rapporten generearre."
 
 #: reports/templates/report_overview/report_overview_header.html
-msgid "Overview of reports"
-msgstr "Oersjocht fan rapporten"
+msgid "An overview of reports that are scheduled or have been generated."
+msgstr ""
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
@@ -5199,10 +5204,6 @@ msgstr ""
 
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
 msgid "Failed"
-msgstr ""
-
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
-msgid "Pending"
 msgstr ""
 
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
@@ -5815,19 +5816,8 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Showing "
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/pagination.html
-msgid "of"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "findings"
+#, python-format
+msgid "Showing %(length)s of %(total)s findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -6283,7 +6273,7 @@ msgid "See finding details"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
-msgid "Total findings:"
+msgid "Total findings"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_object.html
@@ -6475,6 +6465,19 @@ msgid "Top 10 most severe Findings"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Showing "
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/pagination.html
+msgid "of"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "findings"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "Findings table"
 msgstr ""
 
@@ -6499,7 +6502,19 @@ msgid "Save organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
+msgid "An overview of all organizations you are a member of."
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
+msgstr ""
+
+#: rocky/templates/organizations/organization_list.html
+#, python-format
+msgid ""
+"\n"
+"                            Showing %(total)s organizations\n"
+"                        "
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
@@ -6554,13 +6569,8 @@ msgid "Save member"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Organization:"
-msgstr "Organisaasje:"
-
-#: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of \"%(organization_name)s\" its members."
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6573,6 +6583,14 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Upload a CSV"
+msgstr ""
+
+#: rocky/templates/organizations/organization_member_list.html
+#, python-format
+msgid ""
+"\n"
+"                        Showing %(total)s members\n"
+"                    "
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6627,8 +6645,8 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #, python-format
 msgid ""
-"An overview of \"%(organization_name)s\". This shows general information and "
-"its settings."
+"An overview of general information and settings for "
+"<strong>%(organization_name)s</strong>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_settings.html
@@ -6852,17 +6870,11 @@ msgid "Edit %(display_type)s"
 msgstr ""
 
 #: rocky/templates/partials/ooi_head.html
-msgid "An overview of"
-msgstr ""
-
-#: rocky/templates/partials/ooi_head.html
-msgid "object type"
-msgstr ""
-
-#: rocky/templates/partials/ooi_head.html
+#, python-format
 msgid ""
-"This shows general information and its related objects. It also gives the "
-"possibility to add additional related objects, or to scan for them."
+"An overview of \"%(ooi)s\", object type \"%(type)s\". This shows general "
+"information and its related objects. It also gives the possibility to add "
+"additional related objects, or to scan for them."
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -6908,16 +6920,7 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_severity_totals.html
-msgid "See:"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Unique"
 msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
@@ -7066,11 +7069,11 @@ msgid "Input object"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
-msgid "There are no tasks for boefjes"
+msgid "There are no tasks for boefjes."
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
-msgid "List of tasks for boefjes"
+msgid "List of tasks for boefjes."
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html
@@ -7084,11 +7087,11 @@ msgid "Created date"
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
-msgid "There are no tasks for normalizers"
+msgid "There are no tasks for normalizers."
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
-msgid "List of tasks for normalizers"
+msgid "List of tasks for normalizers."
 msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
@@ -7100,7 +7103,7 @@ msgid "Manually added"
 msgstr ""
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
-msgid "There have been no tasks"
+msgid "There have been no tasks."
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
@@ -7138,10 +7141,11 @@ msgstr ""
 #: rocky/templates/tasks/partials/tasks_overview_header.html
 #, python-format
 msgid ""
-"An overview of the tasks for %(organization)s. Tasks are divided in Boefjes, "
-"Normalizers and Reports. Boefjes scan objects and Normalizers dispatch on "
-"the output mime-type. Additionally, there is a Report tasks. This task "
-"aggregates and presents findings from both Boefjes and Normalizers."
+"An overview of the tasks for <strong>%(organization)s</strong>. Tasks are "
+"divided in Boefjes, Normalizers and Reports. Boefjes scan objects and "
+"Normalizers dispatch on the output mime-type. Additionally, there is a "
+"Report tasks. This task aggregates and presents findings from both Boefjes "
+"and Normalizers."
 msgstr ""
 
 #: rocky/templates/tasks/plugin_detail_task_list.html
@@ -7153,11 +7157,11 @@ msgid "List of tasks for"
 msgstr ""
 
 #: rocky/templates/tasks/report_tasks.html
-msgid "There are no tasks for reports"
+msgid "There are no tasks for reports."
 msgstr ""
 
 #: rocky/templates/tasks/report_tasks.html
-msgid "List of tasks for reports"
+msgid "List of tasks for reports."
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -7771,6 +7775,35 @@ msgstr "Raw-bestân kin net nei Bytes oplaad wurde: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestân mei sukses tafoege."
+
+#~ msgid "KAT-alogus Settings"
+#~ msgstr "KAT-alogus-ynstellingen"
+
+#~ msgid ""
+#~ "There are currently no settings defined. Add settings at plugin detail "
+#~ "page."
+#~ msgstr ""
+#~ "Der binne op dit stuit gjin ynstellingen. Foegje ynstellingen ta by de "
+#~ "ynstekkerdetailside."
+
+#, python-format
+#~ msgid ""
+#~ "These are the findings of a OpenKAT-analysis (%(observed_at)s). Click a "
+#~ "finding for more detailed information about the issue, its origin, "
+#~ "severity and possible solutions."
+#~ msgstr ""
+#~ "Dit binne de befiningen fan in OpenKAT-analyze (%(observed_at)s). Klik op "
+#~ "in befining foar mear detaillearre ynformaasje oer it probleem, de "
+#~ "oarsprong, earnst en mooglike oplossingen."
+
+#~ msgid "DNS Tree"
+#~ msgstr "DNS-beam"
+
+#~ msgid "Overview of reports"
+#~ msgstr "Oersjocht fan rapporten"
+
+#~ msgid "Organization:"
+#~ msgstr "Organisaasje:"
 
 #~ msgid "Your password must contain at least the following:"
 #~ msgstr "Jo wachtwurd moat op syn minst it folgjende befetsje:"
