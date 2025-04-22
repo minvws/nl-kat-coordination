@@ -197,9 +197,13 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse:
+    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse | None:
         try:
-            return self.scheduler_client.post_schedule_search(filters).results[0]
+            schedule = self.scheduler_client.post_schedule_search(filters)
+            if schedule.results:
+                return schedule.results[0]
+            else:
+                return None
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 

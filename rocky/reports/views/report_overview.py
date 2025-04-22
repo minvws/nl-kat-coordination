@@ -224,14 +224,19 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
                     ),
                 )
             else:
-                self.rerun_report(report_ooi)
+                updated = self.rerun_report(report_ooi)
 
                 for asset_report in report_ooi.input_oois:
-                    self.rerun_report(asset_report)
-
-        messages.success(
-            self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
-        )
+                    if not self.rerun_report(asset_report):
+                        updated = False
+        if updated:
+            messages.success(
+                self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
+            )
+        else:
+            messages.error(
+                self.request, _("Rerun was not successful, because the recipe for this report has been deleted.")
+            )
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
@@ -253,15 +258,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
         ]
 
-    def rerun_report(self, report_ooi: Report | AssetReport):
+    def rerun_report(self, report_ooi: Report | AssetReport) -> bool:
         """Rerun an existing Report and its AssetReports."""
         deadline_at = datetime.now(timezone.utc).isoformat()
         report_recipe_id = str(report_ooi.report_recipe.tokenized.recipe_id)
         filters = {
             "filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": report_recipe_id}]
         }
-        schedule_id = str(self.get_schedule_with_filters(filters).id)
-        self.scheduler_client.patch_schedule(schedule_id=schedule_id, params={"deadline_at": deadline_at})
+        schedule = self.get_schedule_with_filters(filters)
+        if schedule:
+            self.scheduler_client.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
+            return True
+        return False
 
     def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])
