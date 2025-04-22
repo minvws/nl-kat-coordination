@@ -211,6 +211,8 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
+        updated_all = False
+        not_updated_reports = []
         for report_id in report_references:
             report_ooi = self.get_report_ooi(report_id)
 
@@ -224,18 +226,25 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
                     ),
                 )
             else:
-                updated = self.rerun_report(report_ooi)
+                updated_all = self.rerun_report(report_ooi)
 
-                for asset_report in report_ooi.input_oois:
-                    if not self.rerun_report(asset_report):
-                        updated = False
-        if updated:
+                if updated_all:
+                    for asset_report in report_ooi.input_oois:
+                        if not self.rerun_report(asset_report):
+                            updated_all = False
+                if not updated_all:
+                    not_updated_reports.append(report_ooi.name)
+        if updated_all:
             messages.success(
                 self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
             )
         else:
-            messages.error(
-                self.request, _("Rerun was not successful, because the recipe for this report has been deleted.")
+            messages.warning(
+                self.request,
+                _(
+                    f"Couldn't rerun { ', '.join(not_updated_reports) }, since the recipe for this "
+                    "report has been deleted."
+                ),
             )
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
