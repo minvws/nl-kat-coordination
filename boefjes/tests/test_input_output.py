@@ -2,13 +2,14 @@ import json
 from collections.abc import Callable
 from functools import cache
 from importlib import import_module
+from itertools import groupby
+from operator import itemgetter
 from pathlib import Path
 from typing import Iterable
 
 import pytest
 
 from boefjes.job_models import NormalizerOutput
-from octopoes.models.ooi.network import IPAddressV4, Network
 
 PLUGINS_PATH = Path("boefjes/plugins")
 TESTS_INPUTS_PATH = Path("tests/inputs")
@@ -50,6 +51,7 @@ def get_run_method(normalizer_id: str, plugins_path: Path = None) -> Callable:
     return getattr(normalizer, "run")
 
 
+# todo: perhaps this is not needed anymore and we can use the `normalizer_runner` fixture
 def get_normalizer_modules(plugins_path: Path) -> list[Path]:
     """Finds all normalizer modules in the plugins directory"""
     normalizer_modules = []
@@ -64,7 +66,8 @@ def get_normalizer_modules(plugins_path: Path) -> list[Path]:
 def get_test_input_files(test_inputs_path: Path) -> list[Path]:
     """Finds all files with the test-input filename and the related output files"""
     test_inputs = []
-    for input_filename in Path(test_inputs_path).rglob("*.raw"):
+
+    for input_filename in Path(test_inputs_path).rglob("*/*.raw"):
         if input_filename.is_file():
             test_inputs.append(input_filename)
 
@@ -74,7 +77,8 @@ def get_test_input_files(test_inputs_path: Path) -> list[Path]:
 def get_test_output_files(test_outputs_path: Path) -> list[Path]:
     """Finds all files with the test-input filename and the related output files"""
     test_outputs = []
-    for output_filename in Path(test_outputs_path).rglob("test-*.json"):
+
+    for output_filename in Path(test_outputs_path).rglob("*/test-*.json"):
         if output_filename.is_file():
             test_outputs.append(output_filename)
 
@@ -94,13 +98,11 @@ def _map_plugin_id_to_normalizer_function(plugins_path: Path) -> dict[str, Calla
     return plugins
 
 
-def get_test_files(plugins_path: Path, inputs_path: Path, outputs_path: Path) -> list[
+def get_test_files(inputs_path: Path, outputs_path: Path) -> list[
     tuple[str, Path, Path, Path | None, str]]:
     """Finds all files with the test-input filename and the related output files"""
     tests = []
 
-    # todo: perhaps we don't need a plugins map?
-    plugins_map: dict[str, Callable] = {}  # Maps plugin IDs to run methods
     inputs_map: dict[tuple[str, str], Path] = {}  # Maps (plugin_id, input name) to input files
     inputs_object_map: dict[tuple[str, str], Path] = {}  # Maps (plugin_id, input name) to input object
     outputs_map: dict[tuple[str, str, str], Path] = {}  # Maps (plugin_id, input name, strategy) to output files
@@ -142,51 +144,35 @@ def get_test_files(plugins_path: Path, inputs_path: Path, outputs_path: Path) ->
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
-    test_files = get_test_files(PLUGINS_PATH, TESTS_INPUTS_PATH, TESTS_OUTPUTS_PATH)
+    test_files = get_test_files(TESTS_INPUTS_PATH, TESTS_OUTPUTS_PATH)
 
-    # group by strategy
+    # Group by strategy
     strategies = {}
-    for plugin_id, test_input, expected_output, input_object_file, strategy in test_files:
-        if strategy not in strategies:
-            strategies[strategy] = []
-        strategies[strategy].append((plugin_id, test_input, expected_output, input_object_file))
+    for strategy, group in groupby(test_files, key=itemgetter(4)):
+        strategies.setdefault(strategy, [])
 
+        for plugin_id, input_file, output_file, input_object_file, _ in group:
+            strategies[strategy].append((plugin_id, input_file.name, output_file.name, input_object_file.name))
+
+    # Generate test cases based on the test_data list
     if metafunc.definition.name == 'test_input_contains':
-        # Generate test cases based on the test_data list
         metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["contains"])
     elif metafunc.definition.name == 'test_input_matches':
-        # Generate test cases based on the test_data list
         metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file", strategies["matches"])
-
-    # if metafunc.definition.name == "test_input_output":
-    #     # Generate test cases based on the test_data list
-    #     metafunc.parametrize("plugin_id,test_input,expected_output,input_object_file,strategy", test_files)
-
-
-# def field_filter(filters, objectlist):
-#     """Walks over a list of objects and removes unknown fields by checking the field keys for
-#     each object against the filters allow list for that object type."""
-#     for ooi in objectlist:
-#         if filters[ooi["type"]]:
-#             for objectfield in list(ooi.keys()):
-#                 if objectfield not in filters[ooi["type"]]:
-#                     del ooi[objectfield]
-#     return objectlist
 
 
 def test_input_contains(plugin_id, test_input, expected_output, input_object_file):
     run_method = plugin_map[plugin_id]
 
-    if input_object_file is None:
-        input_object = DEFAULT_INPUT_OOI
-    else:
-        with input_object_file.open("rb") as input_file:
+    input_object = DEFAULT_INPUT_OOI
+    if input_object_file is not None:
+        with TESTS_INPUTS_PATH.joinpath(plugin_id, input_object_file).open("rb") as input_file:
             input_object = json.load(input_file)
 
-    input_data = get_dummy_data(test_input)
+    input_data = get_dummy_data(TESTS_INPUTS_PATH.joinpath(plugin_id, test_input).as_posix())
     test_output = _serialize_output(run_method(input_object, input_data))
 
-    with expected_output.open("rb") as output_file:
+    with TESTS_OUTPUTS_PATH.joinpath(plugin_id, expected_output).open("rb") as output_file:
         expected_output_data = json.load(output_file)
 
     missing = []
@@ -211,16 +197,15 @@ def test_input_contains(plugin_id, test_input, expected_output, input_object_fil
 def test_input_matches(plugin_id, test_input, expected_output, input_object_file):
     run_method = plugin_map[plugin_id]
 
-    if input_object_file is None:
-        input_object = DEFAULT_INPUT_OOI
-    else:
-        with input_object_file.open("rb") as input_file:
+    input_object = DEFAULT_INPUT_OOI
+    if input_object_file is not None:
+        with TESTS_INPUTS_PATH.joinpath(plugin_id, input_object_file).open("rb") as input_file:
             input_object = json.load(input_file)
 
-    input_data = get_dummy_data(test_input)
+    input_data = get_dummy_data(TESTS_INPUTS_PATH.joinpath(plugin_id, test_input).as_posix())
     test_output = _serialize_output(run_method(input_object, input_data))
 
-    with expected_output.open("rb") as output_file:
+    with TESTS_OUTPUTS_PATH.joinpath(plugin_id, expected_output).open("rb") as output_file:
         expected_output_data = json.load(output_file)
 
     assert len(test_output) == len(expected_output_data)
