@@ -16,5 +16,6 @@ If you are stuck, or believe the docs are incorrect, you can make a ticket on `o
    user-interface/index
    installation-and-deployment/index
    developer-documentation/index
+   security-compliance/index
    contributor/index
    glossary/index
