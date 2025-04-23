@@ -137,7 +137,7 @@
                                                     <div>
                                                         <dt>{% translate "OOI type" %}</dt>
                                                         <dd>
-                                                            <a href="{% url "ooi_list" organization_code=organization.code ooi_type=hydrated_finding.ooi.object_type observed_at=observed_at %}"
+                                                            <a href="{% url "ooi_list" organization_code=organization.code %}?observed_at={{ observed_at }}&ooi_type={{ hydrated_finding.ooi.object_type }}"
                                                                title="{% blocktranslate trimmed with ooi_type=hydrated_finding.ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ hydrated_finding.ooi.object_type }}</a>
                                                         </dd>
                                                     </div>
