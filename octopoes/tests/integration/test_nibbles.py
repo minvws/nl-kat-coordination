@@ -422,6 +422,14 @@ dnszone_dummy_nibble._payload = getattr(sys.modules[__name__], "dnszone_dummy")
 
 
 def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    def new_scan_level_by_type(ooi_types: set[type[OOI]], scan_level: ScanLevel):
+        for ooi in xtdb_octopoes_service.ooi_repository.list_oois_by_object_types(ooi_types, valid_time):
+            sp = xtdb_octopoes_service.scan_profile_repository.get(ooi.reference, valid_time)
+            spnew = sp.model_copy()
+            spnew.level = scan_level
+            xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
+            event_manager.complete_process_events(xtdb_octopoes_service)
+
     xtdb_octopoes_service.nibbler.nibbles = {dnszone_dummy_nibble.id: dnszone_dummy_nibble}
     xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].signature[0].min_scan_level = ScanLevel.L1
     network = Network(name="internet")
@@ -431,13 +439,12 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
     xtdb_octopoes_service.ooi_repository.save(dnszone, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
-
     assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 1
 
-    sp = xtdb_octopoes_service.scan_profile_repository.get(dnszone.reference, valid_time)
-    spnew = sp.model_copy()
-    spnew.level = ScanLevel.L2
-    xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
+    new_scan_level_by_type({DNSZone}, ScanLevel.L2)
     event_manager.complete_process_events(xtdb_octopoes_service)
-
     assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 2
+
+    new_scan_level_by_type({DNSZone}, ScanLevel.L2)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 3
