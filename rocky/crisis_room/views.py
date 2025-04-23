@@ -268,7 +268,7 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 
         try:
             self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard)
+            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard).order_by("position")
             self.dashboard_items: list[DashboardItem] | None = self.dashboard_service.get_dashboard_items(
                 dashboards_data
             )
@@ -297,10 +297,11 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 class DeleteDashboardView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard."""
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        if self.dashboard:
-            dashboard_name = self.dashboard.name
-            deleted, _ = self.dashboard.delete()
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_name = request.POST.get("dashboard")
+        dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
+        if dashboard:
+            deleted, _ = dashboard.delete()
 
             if deleted == 1:
                 messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
@@ -313,9 +314,9 @@ class DeleteDashboardView(OrganizationsCrisisRoomView):
 class DeleteDashboardItemView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard item."""
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        dashboard_item_id = self.request.GET.get("dashboard_item")
-        dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_item_name = request.POST.get("dashboard_item")
+        dashboard_data = DashboardData.objects.get(name=dashboard_item_name, dashboard__organization=self.organization)
 
         dashboard_data_name = dashboard_data.name
         deleted, _ = dashboard_data.delete()
@@ -324,6 +325,20 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
             messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
         else:
             messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
+
+        query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
+        return redirect(self.get_success_url() + "?" + query_params)
+
+
+class UpdateDashboardItemView(OrganizationsCrisisRoomView):
+    """Update the selected dashboard item, change the position up or down."""
+
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_item_id = request.POST.get("dashboard_item")
+        update_position = request.POST.get("move")
+        dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+
+        dashboard_data.update_position(update_position)
 
         query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
         return redirect(self.get_success_url() + "?" + query_params)

@@ -13,8 +13,12 @@
 </p>
 {% endfill %}
 {% fill "footer_buttons" %}
-<a class="button destructive"
-   href="{% url "delete_dashboard" organization_code=organization.code %}?dashboard={{ dashboard.name }}">{% translate "Delete" %}</a>
+<form method="post"
+      action="{% url "delete_dashboard" organization_code=organization.code %}">
+    {% csrf_token %}
+    <input type="hidden" name="dashboard" value="{{ dashboard.name }}">
+    <button type="submit" class="destructive">{% translate "Delete" %}</button>
+</form>
 <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
 {% endfill %}
 {% endcomponent %}
