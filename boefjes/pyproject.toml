@@ -56,12 +56,12 @@ wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
 sectxt = "0.9.0"
 # required by kat_rpki
-netaddr = "0.9.0"
+netaddr = "^1.3.0"
 # required by kat_burpsuite, kat_cwe_finding_types and kat_ssl_scan
 defusedxml = "^0.7.1"
 # required by kat_webpage_analysis/check_images normalizer
 pillow = "^10.3.0"
-httpx = "^0.27.0"
+httpx = "^0.28.1"
 opentelemetry-api = "^1.29.0"
 opentelemetry-exporter-otlp-proto-common = "^1.29.0"
 opentelemetry-instrumentation-asgi = "^0.50b0"

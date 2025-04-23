@@ -1,7 +1,7 @@
-User interface of OpenKAT
-#########################
+User manual
+###########
 
-Contains references to the documentations of the Basics of OpenKAT
+This page contains all the data on how to navigate around in the OpenKAT user interface.
 
 .. toctree::
    :maxdepth: 4
