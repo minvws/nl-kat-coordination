@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # jan klopper <jan@underdark.nl>, 2023.
-# Wim Benes <fryskefirefox@gmail.com>, 2024.
+# Wim Benes <fryskefirefox@gmail.com>, 2024, 2025.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2024.
 #: reports/forms.py
 msgid ""
@@ -10,16 +10,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-17 12:03+0000\n"
-"PO-Revision-Date: 2024-12-20 18:00+0000\n"
+"PO-Revision-Date: 2025-04-23 15:01+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/fy/>\n"
+"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/fy/>\n"
 "Language: fy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.9.2-dev\n"
+"X-Generator: Weblate 5.11.1-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -94,15 +94,15 @@ msgstr "Selektearje in accounttype om troch te gean."
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr "Fertroud frijwaringsnivo"
+msgstr "Fertroud frijwarringsnivo"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
-msgstr "Selektearje in frijwaringsnivo dat jo oan dit lid tafertrouwe."
+msgstr "Selektearje in frijwarringsnivo dat jo oan dit lid tafertrouwe."
 
 #: account/forms/account_setup.py onboarding/forms.py tools/forms/ooi.py
 msgid "Please select a clearance level to proceed."
-msgstr "Kies in frijwaringsnivo om troch te gean."
+msgstr "Kies in frijwarringsnivo om troch te gean."
 
 #: account/forms/account_setup.py
 msgid "The name of the organization."
@@ -439,7 +439,7 @@ msgstr ""
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid "Accept level L%(tcl)s clearance and responsibility"
-msgstr ""
+msgstr "Frijwarringsnivo L%(tcl)s en ferantwurdlikheid akseptearje"
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
@@ -652,15 +652,15 @@ msgstr ""
 #: crisis_room/templates/crisis_room.html rocky/templates/403.html
 #: rocky/templates/404.html
 msgid "Crisis Room"
-msgstr ""
+msgstr "Krisissintrum"
 
 #: crisis_room/templates/crisis_room.html
 msgid "Crisis Room overview for all organizations"
-msgstr ""
+msgstr "Krisissinntrumoersjoch foar alle organisaasjes"
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "Dashboards"
-msgstr ""
+msgstr "Dashboerden"
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid ""
@@ -670,14 +670,19 @@ msgid ""
 "                        **More context can be written here**\n"
 "                    "
 msgstr ""
+"\n"
+"                        Op dizze side sjogge jo in oersjoch fan de "
+"dashboerden foar alle organisaasjes.\n"
+"                        **Mear kontekst kin hjir skreaun wurde**\n"
+"                    "
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "dashboards"
-msgstr ""
+msgstr "dashboerden"
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "There are no dashboards to display."
-msgstr ""
+msgstr "Der binne gjin dashboerden om te toanen."
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
@@ -701,7 +706,7 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid "Findings per organization"
-msgstr ""
+msgstr "Befiningen per organisaasje"
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
@@ -735,7 +740,7 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
 msgid "Crisis Room Navigation"
-msgstr ""
+msgstr "Navigaasje krisissintrum"
 
 #: crisis_room/templates/crisis_room_header.html
 #: reports/report_types/aggregate_organisation_report/report.html
@@ -777,6 +782,7 @@ msgstr ""
 #: katalogus/client.py
 msgid "An HTTP error occurred. Check logs for more info."
 msgstr ""
+"Der is in HTTP-flater bard. Kontrolearje de lochboeken foar mear ynformaasje."
 
 #: katalogus/client.py
 msgid "Boefje with this name already exists."
@@ -1047,13 +1053,15 @@ msgstr "Alle ynstekkers"
 
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus settings"
-msgstr ""
+msgstr "KAT-alogus-ynstellingen"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
 "There are currently no settings defined. Add settings at the plugin detail "
 "page."
 msgstr ""
+"Der binne op dit stuit gjin ynstellingen konfigurearre. Foegje ynstellingen "
+"ta op de detailside fan de ynstekker."
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/two_factor/core/otp_required.html
@@ -1125,16 +1133,16 @@ msgstr "Utskeakelje"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "This plugin is enabled."
-msgstr ""
+msgstr "Dizze ynstekker is ynskeakele."
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "This plugin is disabled."
-msgstr ""
+msgstr "Dizze ynstekker is útskeakele."
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 #, python-format
 msgid "You don't have permission to enable or disable %(plugin)ss."
-msgstr ""
+msgstr "Jo hawwe gjin tastimming om %(plugin)s yn of út te skeakeljen."
 
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
@@ -1374,6 +1382,8 @@ msgid ""
 "Boefje variants that use the same container image. For more information "
 "about Boefje variants you can read the documentation."
 msgstr ""
+"Boefke-farianten dy’t deselde kontener-image brûke. Foar mear ynformaasje "
+"oer Boefke-farianten kinne jo de dokumintaasje lêze."
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Add variant"
@@ -1414,11 +1424,11 @@ msgstr "Leeftiid"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Scan interval"
-msgstr ""
+msgstr "Scanynterval"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "Run on"
-msgstr ""
+msgstr "Draaie op"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "current"
@@ -1514,20 +1524,20 @@ msgstr ""
 #: katalogus/templates/plugin_settings_add.html
 msgid "Add setting"
 msgid_plural "Add settings"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ynstelling tafoegje"
+msgstr[1] "Ynstellingen tafoegje"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid "Setting"
 msgid_plural "Settings"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ynstelling"
+msgstr[1] "Ynstellingen"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid "Add setting and enable boefje"
 msgid_plural "Add settings and enable boefje"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ynstelling tafoegje en Boefke ynskeakelje"
+msgstr[1] "Ynstellingen tafoegje en Boefke ynskeakelje"
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
@@ -2691,7 +2701,7 @@ msgstr "Werhelling"
 
 #: reports/forms.py
 msgid "No recurrence, just once"
-msgstr ""
+msgstr "Gjin werhelling, mar ien kear"
 
 #: reports/forms.py
 msgid "Daily"
@@ -3312,22 +3322,22 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid "Findings per organization overview"
-msgstr ""
+msgstr "Oersjoch befiningen per organisaasje"
 
 #: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_severity_totals_table.html
 #: tools/forms/finding_type.py
 msgid "Finding types"
-msgstr ""
+msgstr "Befiningstypen"
 
 #: reports/report_types/findings_report/report.html
 msgid "Highest risk level"
-msgstr ""
+msgstr "Heechste risikonivo"
 
 #: reports/report_types/findings_report/report.html
 msgid "Critical finding types"
-msgstr ""
+msgstr "Krityske befiningstypen"
 
 #: reports/report_types/findings_report/report.html
 msgid ""
@@ -3337,7 +3347,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid "Critical and high findings"
-msgstr ""
+msgstr "Krityske en hege befiningen"
 
 #: reports/report_types/findings_report/report.html
 msgid ""
@@ -3357,7 +3367,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid "View findings report"
-msgstr ""
+msgstr "Befiningenrapport besjen"
 
 #: reports/report_types/findings_report/report.html
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -4044,11 +4054,11 @@ msgstr ""
 
 #: reports/templates/partials/report_findings_table.html
 msgid "First known occurrence"
-msgstr ""
+msgstr "Earst bekende barren"
 
 #: reports/templates/partials/report_findings_table.html
 msgid "Open in report"
-msgstr ""
+msgstr "Yn rapport iepenje"
 
 #: reports/templates/partials/report_findings_table.html
 #: rocky/templates/findings/finding_list.html
@@ -4059,10 +4069,12 @@ msgstr "Ympakt"
 msgid ""
 "No critical and high findings have been identified for this organization."
 msgstr ""
+"Der binne foar dizze organisaasje gjin krityske en hege befiningen "
+"identifisearre."
 
 #: reports/templates/partials/report_findings_table.html
 msgid "No findings have been identified for this organization."
-msgstr ""
+msgstr "Der binne foar dizze organisaasje gjin befiningen identifisearre."
 
 #: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -4095,16 +4107,16 @@ msgstr "Makke op:"
 
 #: reports/templates/partials/report_header.html
 msgid "Created from recipe:"
-msgstr ""
+msgstr "Makke út resept:"
 
 #: reports/templates/partials/report_header.html
 msgid "Recipe created by:"
-msgstr ""
+msgstr "Resept makke troch:"
 
 #: reports/templates/partials/report_header.html
 #, python-format
 msgid "This sector contains %(length)s scanned organizations."
-msgstr ""
+msgstr "Dizze sektor befettet %(length)s scande organisaasjes."
 
 #: reports/templates/partials/report_header.html
 msgid "Of these organizations"
@@ -4121,7 +4133,7 @@ msgstr "De basisbefeiligingsskoares binne ûngefear "
 #: reports/templates/partials/report_header.html
 #, python-format
 msgid "A total of %(total)s critical vulnerabilities have been identified."
-msgstr ""
+msgstr "In totaal fan %(total)s kritike kwetsberheden binne identifisearre."
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
@@ -4194,7 +4206,7 @@ msgstr "Multi-rapport"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
-msgstr ""
+msgstr "Objektseleksje"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4217,13 +4229,15 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/partials/report_types_selection.html
 msgid "Applied filters:"
-msgstr ""
+msgstr "Aktive filters:"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
 "Based on the current dataset, your selected filters result in the following "
 "objects."
 msgstr ""
+"Basearre op de aktuele gegevensset, resultearje jo selektearre filters yn de "
+"folgjende objekten."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "objects selected"
@@ -4259,7 +4273,7 @@ msgstr "Objekten"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object name"
-msgstr ""
+msgstr "Objektnamme"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
@@ -4270,6 +4284,8 @@ msgstr "Frijwarringstype"
 #: reports/templates/partials/report_ooi_list.html
 msgid "Report(s) may be empty due to no objects in the selected filters."
 msgstr ""
+"Rapportaazje(s) kin(ne) leech wêze as der gjin objekten út selektearre "
+"filter(s) komme."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4347,7 +4363,7 @@ msgstr "Dit rapport fereasket dat de folgjende ynstekkers ynskeakele binne:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Toggle all required plugins"
-msgstr ""
+msgstr "Alle fereaske ynstekkers yn-/útskeakelje"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Show enabled plugins"
@@ -4367,7 +4383,7 @@ msgstr "De folgjende ynstekkers binne opsjoneel om it rapport te generearjen:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Toggle all optional plugins"
-msgstr ""
+msgstr "Alle opsjonele ynstekkers yn-/útskeakelje"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Hide suggested plugins"
@@ -4383,7 +4399,7 @@ msgstr "Der binne gjin opsjonele ynstekkers."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Enable selected plugins and continue"
-msgstr ""
+msgstr "Selektearre ynstekkers ynskeakelje en trochgean"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid ""
@@ -4399,32 +4415,32 @@ msgstr "Oersjoch totalen per earnst"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Critical"
-msgstr ""
+msgstr "Kritysk"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "High"
-msgstr ""
+msgstr "Heech"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Medium"
-msgstr ""
+msgstr "Gemiddeld"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Low"
-msgstr ""
+msgstr "Leech"
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
 msgid "Pending"
-msgstr ""
+msgstr "Yn behanneling"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekend"
 
 #: reports/templates/partials/report_severity_totals_table.html
 msgid "Total"
-msgstr ""
+msgstr "Totaal"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
@@ -4468,7 +4484,7 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "No filters applied"
-msgstr ""
+msgstr "Gjin filters tapast"
 
 #: reports/templates/partials/report_types_selection.html
 #, python-format
@@ -4599,15 +4615,15 @@ msgstr "Boppelizzende rapportdetails toane"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Close asset report object details"
-msgstr ""
+msgstr "Objektdetails fan assetrapport slute"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Open asset report object details"
-msgstr ""
+msgstr "Objektdetails fan assetrapport iepenje"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Asset reports details:"
-msgstr ""
+msgstr "Assetrapportdetails:"
 
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
@@ -4624,15 +4640,15 @@ msgstr[1] ""
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
 msgid "Asset reports"
-msgstr ""
+msgstr "Assetrapporten"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Shows asset report details"
-msgstr ""
+msgstr "Toant assetrapportdetails"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "View all asset reports"
-msgstr ""
+msgstr "Alle assetrapporten toane"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "No reports have been generated yet."
@@ -4640,7 +4656,7 @@ msgstr "Der binne noch gjin rapporten generearre."
 
 #: reports/templates/report_overview/report_overview_header.html
 msgid "An overview of reports that are scheduled or have been generated."
-msgstr ""
+msgstr "In oersjoch fan rapporten dy’t ynpland binne of generearre binne."
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
@@ -4660,11 +4676,14 @@ msgid ""
 "schedule a report, select a start date and recurrence while generating a "
 "report."
 msgstr ""
+"Op dizze side sjogge jo alle rapporten dy’t ynpland binne of wiene. Om in "
+"rapport yn te plannen, selektearje in startdatum en werhellingspatroan wylst "
+"it generearjen fan in rapport."
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 #, python-format
 msgid "Showing %(length)s of %(total)s schedules"
-msgstr ""
+msgstr "%(length)s fan %(total)s skema’s toand"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled reports:"
@@ -4680,11 +4699,11 @@ msgstr "Skemastatus"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Once"
-msgstr ""
+msgstr "Ien kear"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Recent reports"
-msgstr ""
+msgstr "Resinte rapporten"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
@@ -4721,7 +4740,7 @@ msgstr "Rapportdetails toane"
 
 #: reports/templates/report_overview/subreports_table.html
 msgid "Asset reports:"
-msgstr ""
+msgstr "Assetrapporten:"
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
@@ -4731,7 +4750,7 @@ msgstr "Inputobjekt"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
 msgid "Delete report recipe"
-msgstr ""
+msgstr "Rapportresept fuortsmite"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
 msgid ""
@@ -4770,23 +4789,23 @@ msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Required and optional plugins"
-msgstr ""
+msgstr "Fereaske en opsjonele ynstekkers"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin enabled"
-msgstr ""
+msgstr "Ynstekker ynskeakele"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin options"
-msgstr ""
+msgstr "Ynstekkeropsjes"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
-msgstr ""
+msgstr "Ynstekkerscannivo"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Enabled."
-msgstr ""
+msgstr "Ynskeakele."
 
 #: reports/templates/summary/selected_plugins.html
 msgid "required"
@@ -4794,26 +4813,28 @@ msgstr "fereaske"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "optional"
-msgstr ""
+msgstr "opsjoneel"
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin extra info"
-msgstr ""
+msgstr "Ekstra ynstekkerynformaasje"
 
 #: reports/templates/summary/selected_plugins.html
 msgid ""
 "There are no required or optional plugins needed for the selected report "
 "types."
 msgstr ""
+"Der binne gjin fereaske of opsjonele ynstekkers nedich foar de selektearre "
+"rapporttypen."
 
 #: reports/templates/tasks/report_tasks_list.html
 msgid "Recipe ID"
-msgstr ""
+msgstr "Resept-ID"
 
 #: reports/templates/tasks/report_tasks_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Modified date"
-msgstr ""
+msgstr "Bewurke datum"
 
 #: reports/views/aggregate_report.py
 msgid "Aggregate report"
@@ -4832,7 +4853,7 @@ msgstr "Selektearje rapporttypen"
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Export setup"
-msgstr ""
+msgstr "Ynstellingen eksportearje"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "Save report"
@@ -4840,7 +4861,7 @@ msgstr "Rapport bewarje"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "You do not have the required permissions to enable plugins."
-msgstr ""
+msgstr "Jo hawwe net de nedige rjochten om ynstekkers yn te skeakeljen."
 
 #: reports/views/base.py
 msgid "Select at least one OOI to proceed."
@@ -4848,7 +4869,7 @@ msgstr "Selektearje op syn minst ien OOI om troch te gean."
 
 #: reports/views/base.py
 msgid "Select at least one report type to proceed."
-msgstr ""
+msgstr "Selektearje op syn minst ien rapporttype om troch te gean."
 
 #: reports/views/mixins.py
 msgid ""
@@ -4858,27 +4879,27 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "Multi report"
-msgstr ""
+msgstr "Multi-rapport"
 
 #: reports/views/multi_report.py
 msgid "View report"
-msgstr ""
+msgstr "Rapport toane"
 
 #: reports/views/report_overview.py
 msgid "Recipe '{}' deleted successfully"
-msgstr ""
+msgstr "Resept ‘{}’ mei sukses fuortsmiten"
 
 #: reports/views/report_overview.py
 msgid "Recipe not found."
-msgstr ""
+msgstr "Resept net fûn."
 
 #: reports/views/report_overview.py
 msgid "No schedule or recipe selected"
-msgstr ""
+msgstr "Gjin skema of resept selektearre"
 
 #: reports/views/report_overview.py
 msgid "Schedule {}"
-msgstr ""
+msgstr "Skema {}"
 
 #: reports/views/report_overview.py
 msgid ""
@@ -4897,7 +4918,7 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "Deletion successful."
-msgstr ""
+msgstr "Mei sukses fuortsmiten."
 
 #: reports/views/report_overview.py
 msgid ""
