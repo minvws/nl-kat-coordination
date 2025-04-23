@@ -119,9 +119,9 @@ def get_test_files(inputs_path: Path, outputs_path: Path) -> list[tuple[str, Pat
         plugin_id = _extract_plugin_id_from_path(output_file, outputs_path)
 
         # derive the strategy and input file name from the output file name format ('test-<strategy>-<input file>.json')
-        match output_file.stem.split("-"):
-            case ["test", strategy, *input_file_name]:
-                outputs_map[(plugin_id, "-".join(input_file_name), strategy)] = output_file
+        match output_file.stem.split("-", maxsplit=2):
+            case ["test", strategy, input_file_name]:
+                outputs_map[(plugin_id, input_file_name, strategy)] = output_file
 
             case _:
                 raise ValueError(f"Invalid output file name format: {output_file.stem}")
@@ -216,12 +216,12 @@ def _compare_objects(expected: dict | str, actual: dict) -> None:
 
     if isinstance(expected, str):
         # If expected is a string, compare it with the actual object's primary key
-        assert expected == actual["primary_key"], f"Expected {expected}, got {actual['primary_key']}"
+        assert expected == actual["primary_key"], f'Expected "{expected}", got "{actual["primary_key"]}"'
     else:
         # Compare the object types
         assert (
             expected["object_type"] == actual["object_type"]
-        ), f"Expected {expected['object_type']}, got {actual['object_type']}"
+        ), f'Expected object type "{expected["object_type"]}", got "{actual["object_type"]}"'
 
         # Compare the object data
         for key, value in expected.items():
