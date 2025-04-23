@@ -1,32 +1,34 @@
 import json
-import logging
 from collections.abc import Iterable
-from ipaddress import ip_address
+from typing import Any
+
+import structlog
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord
-from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.ooi.network import Network
+
+REPORT_CATEGORIES_PATH = "boefjes/plugins/kat_abuseipdb/abuseipdb_report_categories.json"
+
+with open(REPORT_CATEGORIES_PATH) as json_file:
+    report_categories = json.load(json_file)
+
+logger = structlog.get_logger(__name__)
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
     """Normalize AbuseIPDB output."""
     result = json.loads(raw)
     input_ooi_reference = Reference.from_str(input_ooi["primary_key"])
-    address = input_ooi_reference.tokenized.address
-
-    internet = Network(name="internet")
 
     if not result:
-        logging.info("No AbuseIPDB results available for normalization.")
+        logger.info("No AbuseIPDB results available for normalization.")
     elif "data" in result:
-        data = result["data"]
+        data: dict[str, Any] = result["data"]
         reportcount = int(data.get("totalReports", 0))
         if reportcount > 0:
             confidence = str(data.get("abuseConfidenceScore", "Unknown"))
             reportdate = str(data.get("lastReportedAt", "Unknown"))
-            ft = KATFindingType("KAT-ABUSE-REPORTS-DETECTED")
+            ft = KATFindingType(id="KAT-ABUSE-REPORTS-DETECTED")
             finding = Finding(
                 finding_type=ft.reference,
                 ooi=input_ooi_reference,
@@ -38,14 +40,22 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
             )
             yield ft
             yield finding
-        # should we add these? Its not relevant unless there's security risks involved in shared hosting
-        related_hostnames = data.get("hostnames", False)
-        if related_hostnames:
-            for hostname in related_hostnames:
-                hostname_ooi = Hostname(network=internet.reference, name=hostname.rstrip("."))
-                default_args = {"hostname": hostname_ooi.reference}
-                # should we add these? We did not 'observe' them
-                if ip_address(address).version == 4:
-                    yield DNSARecord(address=input_ooi_reference, **default_args)
-                else:
-                    yield DNSAAAARecord(address=input_ooi_reference, **default_args)
+
+            # Get more detailed findings using the report categories
+            # Each report has a list of categories that the report reports see @ammar92
+            for report in data.get("reports", []):
+                for category in report.get("categories", []):
+                    report_info = report_categories.get(str(category), None)
+                    if report_info:
+                        ft = KATFindingType(
+                            id="AbuseIPDB-REPORT",
+                            recommendation="Make sure to check out https://www.abuseipdb.com/categories",
+                            source="https://www.abuseipdb.com",
+                        )
+                        finding = Finding(
+                            finding_type=ft.reference,
+                            ooi=input_ooi_reference,
+                            description=f"{report_info['title']} — {report_info['description']}",
+                        )
+                        yield ft
+                        yield finding

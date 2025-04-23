@@ -1,7 +1,7 @@
 {
   "id": "abuseipdb",
   "name": "abuseIPDB lookup",
-  "description": "Use abuseIPDB.com to se if any abuse report exist for a given Ip address.",
+  "description": "Use abuseIPDB.com to see if any abuse report exist for a given IP address.",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
