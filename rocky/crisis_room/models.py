@@ -86,7 +86,7 @@ def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
 def dashboard_data_pre_save(sender, instance, *args, **kwargs):
     if instance._state.adding:  # not when updating
         positions = get_dashboard_data_positions(instance)
-        position = max(positions) + 1
+        position = max(positions, default=0) + 1
         if position <= MAX_POSITION:
             instance.position = position
         else:
@@ -95,10 +95,13 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
-    DashboardData.objects.raw(
-        "UPDATE crisis_room_dashboarddata "
-        "SET position = position - 1 "
-        "WHERE position > %s "
-        "AND dashboard_id = %s ",
-        [instance.position, instance.dashboard.id],
-    )
+    if not instance.DoesNotExist:
+        position = instance.position
+        dashboard = instance.dashboard.id
+        DashboardData.objects.raw(
+            "UPDATE crisis_room_dashboarddata "
+            "SET position = position - 1 "
+            "WHERE position > %s "
+            "AND dashboard_id = %s ",
+            [position, dashboard],
+        )

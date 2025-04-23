@@ -1,4 +1,3 @@
-<input type="hidden" name="query_from" value="object_list">
 <input type="hidden"
        name="observed_at"
        value="{{ observed_at|date:"Y-m-d" }}">
@@ -10,3 +9,6 @@
     <input type="hidden" name="clearance_type" value="{{ clearance_type }}">
 {% endfor %}
 <input type="hidden" name="search_string" value="{{ search_string }}">
+<input type="hidden" name="template" value="{{ template }}">
+<input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+<input type="hidden" name="query_from" value="{{ query_from }}">

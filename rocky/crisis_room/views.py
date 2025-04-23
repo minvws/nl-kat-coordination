@@ -21,12 +21,8 @@ from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
-from crisis_room.forms import AddDashboardForm, ObjectListSettingsForm
-from crisis_room.management.commands.dashboards import (
-    FINDINGS_DASHBOARD_NAME,
-    get_or_create_dashboard,
-    get_or_create_dashboard_data,
-)
+from crisis_room.forms import AddDashboardForm
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard
 from crisis_room.models import Dashboard, DashboardData
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -361,59 +357,4 @@ class AddDashboardView(OrganizationsCrisisRoomView, FormView):
 
 
 class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
-    """Add a new dashboard item to the selected dashboard."""
-
-    form_class = ObjectListSettingsForm
-    template_name = "oois/ooi_list.html"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["organization"] = self.organization
-        return kwargs
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        form = self.get_form()
-        if form.is_valid():
-            form_data = form.cleaned_data
-
-            dashboard_name = form_data["dashboard"]
-            name = form_data["title"]
-            sort_by = form_data["order_by"].split("-")
-            recipe_id = request.POST.get("recipe_id")
-
-            column_values = request.POST.getlist("column_values")
-            column_names = request.POST.getlist("column_names")
-
-            columns = {column_value: column_names[index] for index, column_value in enumerate(column_values)}
-
-            settings = {"size": form_data["size"], "columns": columns}
-
-            query_from = request.POST.get("query_from")
-            template = (
-                "partials/dashboard_ooi_list.html" if query_from == "object_list" else request.POST.get("template")
-            )
-
-            query = None
-
-            if query_from == "object_list":
-                query = {
-                    "ooi_types": request.POST.getlist("ooi_type"),
-                    "scan_level": request.POST.getlist("clearance_level"),
-                    "scan_profile_type": request.POST.getlist("clearance_type"),
-                    "search_string": request.POST.get("search_string"),
-                    "order_by": sort_by[0],
-                    "asc_desc": sort_by[1],
-                    "limit": int(form_data["limit"]),
-                }
-
-            self.dashboard_data, created = get_or_create_dashboard_data(
-                dashboard_name, self.organization, name, recipe_id, query_from, query, template, settings
-            )
-
-            if created:
-                messages.success(request, "Dashboard item has been created.")
-
-            query_params = urlencode({"dashboard": dashboard_name})
-            return redirect(self.get_success_url() + "?" + query_params)
-
-        return redirect(reverse("ooi_list", kwargs={"organization_code": self.organization.code}))
+    pass
