@@ -1,7 +1,6 @@
 import uuid
 
 from factory import Factory, LazyFunction, Sequence, fuzzy
-
 from scheduler.models import Plugin
 from scheduler.models.ooi import RunOn
 
@@ -18,4 +17,4 @@ class PluginFactory(Factory):
     cron: str | None = None
     interval: int | None = None
     run_on: RunOn | None = None
-    env_hash: str | None = uuid.uuid4().hex  # fixme
+    env_hash: str = uuid.uuid4().hex
