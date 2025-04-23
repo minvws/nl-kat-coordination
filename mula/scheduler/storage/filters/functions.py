@@ -111,6 +111,55 @@ def apply_filter(entity: DeclarativeBase, query: Query, filter_request: FilterRe
     return query
 
 
+def apply_grouping(entity: DeclarativeBase, query: Query, group_by: str) -> Query:
+    """Apply grouping to a SQLAlchemy query.
+
+    This function takes a SQLAlchemy entity (model), an existing query, and a
+    group_by string, then applies the grouping to create a refined query.
+
+    Args:
+        entity: The SQLAlchemy entity (model class) to apply the grouping to.
+        query: The existing SQLAlchemy query to refine with grouping.
+        group_by: The field name to group by.
+
+    Returns:
+        A grouped SQLAlchemy query with the specified grouping applied.
+
+    Raises:
+        FilterError: When the group_by specification is invalid (wrong type, field not found, etc.)
+    """
+    # Ensure the group_by attribute is a string
+    if not isinstance(group_by, str):
+        raise FilterError("Group by must be a string")
+
+    # Verify the column exists on the entity
+    if not hasattr(entity, group_by):
+        raise FilterError(f"Invalid group by field: {group_by} (error: not found)")
+
+    # Get the attribute object from the entity
+    entity_attr = getattr(entity, group_by)
+
+    if len(group_by.split("__")) > 1:
+        # Handle nested fields using the "__" notation (e.g., "address__city")
+        # This allows drilling down into relationships or JSON fields
+        for nested_field in group_by.split("__"):
+            if is_relationship_property(entity_attr):
+                # For relationships, get the attribute from the related class
+                entity_attr = getattr(entity_attr.property.mapper.class_, nested_field)
+            else:
+                # For JSON fields, use indexing to access nested keys
+                entity_attr = entity_attr[nested_field]
+    else:
+        # Handle relationships - if the column is a relationship, we need to join
+        # the related entity to the query
+        if is_relationship_property(entity_attr):
+            related_entity = entity_attr.property.mapper.class_
+            query = query.join(related_entity)
+
+    # Apply grouping to the query
+    return query.group_by(entity_attr)
+
+
 def is_relationship_property(attr) -> bool:
     """Check if an attribute is a relationship property.
 

@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import exc
+from sqlalchemy.orm.query import Query
 
 from scheduler import models
 from scheduler.storage import DBConn
@@ -15,13 +16,26 @@ class PriorityQueueStore:
     def __init__(self, dbconn: DBConn) -> None:
         self.dbconn = dbconn
 
+    def build_pop_query(
+        self, session, scheduler_id: str | None = None, limit: int = 1, filters: FilterRequest | None = None
+    ) -> Query:
+        query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+
+        if scheduler_id is not None:
+            query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+        if filters is not None:
+            query = apply_filter(models.TaskDB, query, filters)
+
+        return query
+
     @retry()
     @exception_handler
     def pop(
         self, scheduler_id: str | None = None, limit: int = 1, filters: FilterRequest | None = None
     ) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+            query = self.build_pop_query(session, scheduler_id, limit, filters)
 
             if scheduler_id is not None:
                 query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
@@ -42,6 +56,12 @@ class PriorityQueueStore:
             items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
 
             return items
+
+    def pop_boefje(
+        self, scheduler_id: str | None = None, limit: int = 1, filters: FilterRequest | None = None
+    ) -> list[models.Task]:
+        with self.dbconn.session.begin() as session:
+            query = self.build_pop_query(session, scheduler_id, limit, filters)
 
     @retry()
     @exception_handler
