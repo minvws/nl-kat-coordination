@@ -3,7 +3,7 @@ from typing import Any
 import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -77,6 +77,28 @@ class DashboardData(models.Model):
             raise ValidationError(_("DashboardData must contain at least a 'recipe' or a 'query_from' with a 'query'."))
         return super().clean()
 
+    def update_position(self, move: str):
+        if move not in ("up", "down"):
+            return
+
+        old_position = self.position
+        new_position = self.position + (-1 if move == "up" else 1)
+
+        if 1 <= new_position <= 16:
+            try:
+                swap_item = DashboardData.objects.get(dashboard=self.dashboard, position=new_position)
+
+                # Swap positions and temporarily change position to 0 to avoid conflicts
+                with transaction.atomic():
+                    self.position = 0
+                    self.save(update_fields=["position"])
+                    swap_item.position = old_position
+                    swap_item.save(update_fields=["position"])
+                    self.position = new_position
+                    self.save(update_fields=["position"])
+            except DashboardData.DoesNotExist:
+                raise
+
 
 def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
     return list(DashboardData.objects.filter(dashboard=instance.dashboard).values_list("position", flat=True))
@@ -86,7 +108,7 @@ def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
 def dashboard_data_pre_save(sender, instance, *args, **kwargs):
     if instance._state.adding:  # not when updating
         positions = get_dashboard_data_positions(instance)
-        position = max(positions) + 1
+        position = max(positions, default=0) + 1
         if position <= MAX_POSITION:
             instance.position = position
         else:
