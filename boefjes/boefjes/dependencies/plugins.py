@@ -19,7 +19,6 @@ from boefjes.storage.interfaces import (
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
-    UniqueViolation,
 )
 
 logger = structlog.get_logger(__name__)
@@ -115,17 +114,9 @@ class PluginService:
                 if plugin.type == "boefje":
                     raise DuplicatePlugin("name")
                 else:
-                    try:
-                        with self.plugin_storage as storage:
-                            storage.create_boefje(boefje)
-                    except UniqueViolation as error:
-                        raise DuplicatePlugin(error.field)
+                    self.plugin_storage.create_boefje(boefje)
             except KeyError:
-                try:
-                    with self.plugin_storage as storage:
-                        storage.create_boefje(boefje)
-                except UniqueViolation as error:
-                    raise DuplicatePlugin(error.field)
+                self.plugin_storage.create_boefje(boefje)
 
     def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
