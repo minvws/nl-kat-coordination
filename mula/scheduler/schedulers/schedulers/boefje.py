@@ -205,6 +205,7 @@ class BoefjeScheduler(Scheduler):
                             boefje=models.Boefje.model_validate(boefje.dict()),
                             input_ooi=ooi.primary_key,
                             organization=org.id,
+                            env_hash=boefje.env_hash,
                         )
 
                         boefje_tasks.append((boefje_task, org.id))
@@ -340,6 +341,7 @@ class BoefjeScheduler(Scheduler):
                         boefje=models.Boefje.model_validate(plugin.dict()),
                         input_ooi=ooi.primary_key if ooi else None,
                         organization=schedule.organisation,
+                        env_hash=plugin.env_hash,
                     )
                 except (StorageError, ValidationError, ExternalServiceError):
                     self.logger.exception(
@@ -702,7 +704,12 @@ class BoefjeScheduler(Scheduler):
         try:
             orgs = self.ctx.services.octopoes.get_organisations_by_ooi(boefje_task.input_ooi)
         except ExternalServiceError:
-            # TODO
+            self.logger.exception(
+                "Error occurred while checking if ooi is in other organisations",
+                ooi_primary_key=boefje_task.input_ooi,
+                organisation_id=boefje_task.organization,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         if len(orgs) < 2:
@@ -760,7 +767,7 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
                 organization=org.id,
-                env_hash=boefje.env_hash,  # TODO: this need to be added elsewhere as well!!!
+                env_hash=boefje.env_hash,
             )
 
             self.push_boefje_task(
