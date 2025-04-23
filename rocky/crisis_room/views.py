@@ -301,10 +301,11 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
 class DeleteDashboardView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard."""
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        if self.dashboard:
-            dashboard_name = self.dashboard.name
-            deleted, _ = self.dashboard.delete()
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_name = request.POST.get("dashboard")
+        dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
+        if dashboard:
+            deleted, _ = dashboard.delete()
 
             if deleted == 1:
                 messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
@@ -317,9 +318,9 @@ class DeleteDashboardView(OrganizationsCrisisRoomView):
 class DeleteDashboardItemView(OrganizationsCrisisRoomView):
     """Delete the selected dashboard item."""
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        dashboard_item_id = self.request.GET.get("dashboard_item")
-        dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        dashboard_item_name = request.POST.get("dashboard_item")
+        dashboard_data = DashboardData.objects.get(name=dashboard_item_name, dashboard__organization=self.organization)
 
         dashboard_data_name = dashboard_data.name
         deleted, _ = dashboard_data.delete()
