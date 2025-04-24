@@ -84,7 +84,11 @@ class ObjectListSettingsForm(BaseRockyForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
-        self.create_dashboard_item(**cleaned_data)
+        # Title is the only thing user really sets, the other values are prefilled which already contains data.
+        title = self.cleaned_data.get("title", "")
+
+        if title:
+            self.create_dashboard_item(**cleaned_data)
         return cleaned_data
 
     def create_dashboard_item(self, **cleaned_data) -> None:
@@ -112,6 +116,9 @@ class ObjectListSettingsForm(BaseRockyForm):
             }
 
         columns = {column_value: self.column_names[index] for index, column_value in enumerate(self.column_values)}
+
+        if not columns:
+            raise ValidationError("Please choose at least one column.")
 
         settings = {"size": size, "columns": columns}
 
