@@ -73,6 +73,10 @@ class FindingType(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.id
+    
+    @classmethod
+    def type_from_raw(cls, raw_input:dict):
+        return KATFindingType
 
 
 class ADRFindingType(FindingType):
