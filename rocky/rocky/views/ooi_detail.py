@@ -34,13 +34,13 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
     def set_clearance_level(self) -> None:
         if not self.indemnification_present:
-            return self.indemnification_error()
-        else:
-            try:
-                clearance_level = int(self.request.POST["level"])
-                self.raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
-            except (ValueError, KeyError):
-                messages.error(self.request, _("Cannot set clearance level. It must be provided and must be a valid number."))
+            self.indemnification_error()
+            return
+        try:
+            clearance_level = int(self.request.POST["level"])
+            self.raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+        except (ValueError, KeyError):
+            messages.error(self.request, _("Cannot set clearance level. It must be provided and must be a valid number."))
 
     def answer_ooi_questions(self) -> None:
         if not isinstance(self.ooi, Question):
