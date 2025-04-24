@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-17 12:03+0000\n"
+"POT-Creation-Date: 2025-04-03 10:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4611,6 +4611,10 @@ msgid "View report"
 msgstr ""
 
 #: reports/views/report_overview.py
+msgid "Not enough permissions"
+msgstr ""
+
+#: reports/views/report_overview.py
 msgid "Recipe '{}' deleted successfully"
 msgstr ""
 
@@ -4639,6 +4643,10 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Other OOI type selected than Report"
 msgstr ""
 
 #: reports/views/report_overview.py
