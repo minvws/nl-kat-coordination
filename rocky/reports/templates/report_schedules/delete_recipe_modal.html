@@ -19,7 +19,6 @@
     <form id={{ form_id }} class="inline" method="post">
         {% csrf_token %}
         <input type="hidden" name="schedule_id" value="{{ schedule_id }}" />
-        <input type="hidden" name="report_recipe" value="{{ recipe.primary_key }}" />
     </form>
 {% endfill %}
 {% fill "footer_buttons" %}

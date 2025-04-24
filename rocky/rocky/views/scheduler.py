@@ -199,6 +199,7 @@ class SchedulerView(OctopoesView):
 
     def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse | None:
         try:
+            filters["filters"].append({"column": "organisation", "operator": "eq", "value": self.organization.code})
             schedule = self.scheduler_client.post_schedule_search(filters)
             if schedule.results:
                 return schedule.results[0]
