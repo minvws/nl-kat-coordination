@@ -38,7 +38,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
             return
         try:
             clearance_level = int(self.request.POST["level"])
-            self.raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
         except (ValueError, KeyError):
             messages.error(
                 self.request, _("Cannot set clearance level. It must be provided and must be a valid number.")
