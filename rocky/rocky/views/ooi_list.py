@@ -97,10 +97,10 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
     def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
         form = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
-        dashboard_name = form.cleaned_data.get("dashboard")
 
         if form.is_valid():
-            messages.success(self.request, _("Dashboard item has been added to %s.").format(dashboard_name))
+            dashboard_name = form.cleaned_data.get("dashboard")
+            messages.success(self.request, _("Dashboard item has been added to {}.").format(dashboard_name))
             query_params = "?" + urlencode({"dashboard": dashboard_name})
 
             return redirect(
