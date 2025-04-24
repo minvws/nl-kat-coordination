@@ -214,7 +214,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
-        updated_all = False
         not_updated_reports = []
         for report_id in report_references:
             report_ooi = self.get_report_ooi(report_id)
@@ -237,7 +236,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
                             updated_all = False
                 if not updated_all:
                     not_updated_reports.append(report_ooi.name)
-        if updated_all:
+        if not not_updated_reports:
             messages.success(
                 self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
             )
