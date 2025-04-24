@@ -199,14 +199,14 @@ class SchedulerView(OctopoesView):
 
     def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse | None:
         try:
-            filters["filters"].append({"column": "organisation", "operator": "eq", "value": self.organization.code})
             schedule = self.scheduler_client.post_schedule_search(filters)
             if schedule.results:
                 return schedule.results[0]
             else:
                 return None
         except SchedulerError as error:
-            return messages.error(self.request, error.message)
+            messages.error(self.request, error.message)
+            return None
 
     def schedule_task(self, task: TaskPush) -> None:
         if not self.indemnification_present:
