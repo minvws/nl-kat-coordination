@@ -166,6 +166,7 @@ repos:
           - stylelint@15.10.1
           - stylelint-config-standard-scss@10.0.0
         files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
+        exclude: "^docs/source/themes/"
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
@@ -192,5 +193,6 @@ repos:
           \.min\.js$ |
           ^rocky/assets/css/themes/soft/fonts |
           ^rocky/assets/vendors |
-          ^docs/source/_static
+          ^docs/source/_static |
+          ^docs/source/themes
           )
