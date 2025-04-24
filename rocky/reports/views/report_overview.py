@@ -221,7 +221,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
 
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         logger.info("Reports deleted", event_code=800073, reports=report_references)
-        return messages.success(self.request, _("Deletion successful."))
+        messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
         for report_id in report_references:
