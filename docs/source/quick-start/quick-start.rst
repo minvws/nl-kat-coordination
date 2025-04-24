@@ -8,6 +8,7 @@ This quick start guides will help you to get OpenKAT started on Ubuntu using the
 
 Do *not* install Docker directly from the default Ubuntu repositories. This version is older and OpenKAT generally uses newer features. Using the Ubuntu repository version will likely break your OpenKAT install (at some point).
 
+
 #. Follow the Docker installation steps as mentioned here: `Docker Ubuntu Installation steps <https://docs.docker.com/engine/install/ubuntu/#installation-methods>`_. This tutorial followed the installation steps using the `apt` repository. Make sure that you can run the `hello-world` Docker image.
 
 #. Follow the Post-installations steps as described here: `Docker Post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user>`_. Make sure that the Docker `hello-world` image can run as a normal (non-root) user.

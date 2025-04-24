@@ -344,7 +344,7 @@ Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--no
 
 .. code-block:: sh
 
-    docker compose run --rm octopoes_api python -m tools.xtdb-cli --url http://crux:3000 --node test evict-all-reports
+    docker compose run --rm octopoes_api tools/xtdb-cli.py --url http://crux:3000 --node test evict-all-reports
 
 Note that you should repeat the process for all organizations that face this issue.
 To find all your organisation codes, consider checking in Rocky or calling the KATalogus API:
@@ -367,7 +367,7 @@ Check the `--url` (the XTDB_URI environment variable in a usual setup) and `--no
     source /opt/venvs/kat-octopoes/bin/activate
     export $(cat /usr/lib/kat/octopoes.defaults | grep -v "#") && export $(cat /etc/kat/octopoes.conf | grep -v "#")
     cd /opt/venvs/kat-octopoes/lib/python3.11/site-packages
-    /opt/venvs/kat-octopoes/bin/python -m tools.xtdb-cli --url $XTDB_URI --node test evict-all-reports
+    /opt/venvs/kat-octopoes/bin/python tools/xtdb-cli.py --url $XTDB_URI --node test evict-all-reports
 
 To find all your organisation codes to apply this to multiple organisations,
 consider checking your organisations in Rocky or call the KATalogus API:
