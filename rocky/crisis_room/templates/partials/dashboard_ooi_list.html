@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load ooi_extra %}
 
 <p>
     {% blocktranslate trimmed with organization.name as organization_name %}
@@ -17,10 +18,12 @@
     {% include "partials/dashboard_ooi_list_table.html" %}
 
     <div class="toolbar">
-        <a class="button ghost"
-           href="{% url "ooi_list" organization_code=organization.code %}">
-            {% translate "Go to objects" %}
-            <span class="icon ti-chevron-right" aria-hidden="true"></span>
-        </a>
+        {% with params=dashboard_item.query|url_encode_query %}
+            <a class="button ghost"
+               href="{% url "ooi_list" organization_code=organization.code %}?{{ params }}">
+                {% translate "Go to objects" %}
+                <span class="icon ti-chevron-right" aria-hidden="true"></span>
+            </a>
+        {% endwith %}
     </div>
 </div>
