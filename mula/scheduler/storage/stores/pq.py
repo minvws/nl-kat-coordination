@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exc, func, select
+from sqlalchemy import exc, func
 from sqlalchemy.orm.query import Query
 
 from scheduler import models

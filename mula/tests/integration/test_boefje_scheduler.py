@@ -1008,6 +1008,14 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # set to 1500 minutes (25 hours) to at least the next day
         self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc) + timedelta(days=1))
 
+    # TODO: Implement this test
+    def test_pop(self):
+        pass
+
+    # TODO: Implement this test
+    def test_pop_batched(self):
+        pass
+
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange

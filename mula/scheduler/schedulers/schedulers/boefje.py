@@ -21,7 +21,6 @@ tracer = trace.get_tracer(__name__)
 class BoefjePQ(queue.PriorityQueue):
     @queue.pq.with_lock
     def pop(self, limit: int = 1, filters: filters.FilterRequest | None = None) -> list[models.Task]:
-        breakpoint()
         items = self.pq_store.pop_boefje(self.pq_id, limit, filters)
         if not items:
             return []
