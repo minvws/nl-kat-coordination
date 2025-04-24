@@ -211,11 +211,13 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
 
     def delete_reports(self, report_references: list[Reference]) -> None:
         if not self.organization_member.has_perm("tools.can_delete_oois"):
-            return messages.error(self.request, _("Not enough permissions"))
+            messages.error(self.request, _("Not enough permissions"))
+            return
 
         for report_reference in report_references:
             if not issubclass(Reference.from_str(report_reference).class_type, BaseReport):
-                return messages.error(self.request, _("Other OOI type selected than Report"))
+                messages.error(self.request, _("Other OOI type selected than Report"))
+                return
 
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         logger.info("Reports deleted", event_code=800073, reports=report_references)
