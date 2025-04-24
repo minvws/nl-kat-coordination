@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exc
+from sqlalchemy import exc, func, select
 from sqlalchemy.orm.query import Query
 
 from scheduler import models
@@ -37,12 +37,6 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             query = self.build_pop_query(session, scheduler_id, limit, filters)
 
-            if scheduler_id is not None:
-                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
-
-            if filters is not None:
-                query = apply_filter(models.TaskDB, query, filters)
-
             try:
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
@@ -62,6 +56,28 @@ class PriorityQueueStore:
     ) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
             query = self.build_pop_query(session, scheduler_id, limit, filters)
+
+            try:
+                top_env_hash = (
+                    session.query(models.TaskDB.data["env_hash"].astext.label("env_hash"))
+                    .group_by(models.TaskDB.data["env_hash"].astext)
+                    .order_by(func.count().desc())
+                    .limit(1)
+                ).subquery()
+
+                item_orm = (
+                    query.order_by(models.TaskDB.priority.asc())
+                    .filter(models.TaskDB.data["env_hash"].astext == top_env_hash.c.env_hash)
+                    .order_by(models.TaskDB.created_at.asc())
+                    .limit(limit)
+                    .all()
+                )
+            except exc.ProgrammingError as e:
+                raise StorageError(f"Invalid filter: {e}") from e
+
+            items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
+
+            return items
 
     @retry()
     @exception_handler

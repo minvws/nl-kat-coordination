@@ -10,12 +10,25 @@ from scheduler import clients, context, models
 from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
-from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers import Scheduler, queue, rankers
 from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
 from scheduler.storage.errors import StorageError
 
 tracer = trace.get_tracer(__name__)
+
+
+class BoefjePQ(queue.PriorityQueue):
+    @queue.pq.with_lock
+    def pop(self, limit: int = 1, filters: filters.FilterRequest | None = None) -> list[models.Task]:
+        breakpoint()
+        items = self.pq_store.pop_boefje(self.pq_id, limit, filters)
+        if not items:
+            return []
+
+        self.pq_store.bulk_update_status(self.pq_id, [item.id for item in items], models.TaskStatus.DISPATCHED)
+
+        return items
 
 
 class BoefjeScheduler(Scheduler):
@@ -36,7 +49,11 @@ class BoefjeScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
+        pq = BoefjePQ(
+            pq_id=self.ID, maxsize=ctx.config.pq_maxsize, item_type=self.ITEM_TYPE, pq_store=ctx.datastores.pq_store
+        )
+
+        super().__init__(ctx=ctx, scheduler_id=self.ID, queue=pq, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
 
     def run(self) -> None:
