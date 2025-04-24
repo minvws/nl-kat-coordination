@@ -40,11 +40,13 @@
                 </div>
                 {% include "partials/ooi_list_filters.html" %}
 
-                <p class="de-emphasized">
-                    {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
-                        Showing {{ length }} of {{ total }} objects
-                    {% endblocktranslate %}
-                </p>
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
+                            Showing {{ length }} of {{ total }} objects
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 <form method="post"
                       id="ooi_list_form"
                       class="inline layout-wide checkboxes_required">
