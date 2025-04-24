@@ -12,6 +12,8 @@ NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 XSS_CAPABLE_TYPES = ["text/html", "application/xhtml+xml", "application/xml", "text/xml", "image/svg+xml"]
 
+DEPRECATED_DIRECTIVES = ["block-all-mixed-content", "prefetch-src"]
+
 
 def is_xss_capable(content_type: str) -> bool:
     """Determine if the content type indicates XSS capability."""
@@ -68,6 +70,14 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
 
     if "default-src" not in csp_header:
         findings.append("default-src has not been defined.")
+
+    for deprecated_directive in DEPRECATED_DIRECTIVES:
+        if deprecated_directive in csp_header:
+            findings.append(f"Deprecated CSP directive found: {deprecated_directive}")
+
+    if "report-uri" in csp_header:
+        findings.append("""Deprecated CSP directive found. report-uri is superseded by report-to:
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri""")
 
     policies = [policy.strip().split(" ") for policy in csp_header.split(";")]
     for policy in policies:

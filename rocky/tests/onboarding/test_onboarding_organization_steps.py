@@ -305,12 +305,11 @@ def test_onboarding_ooi_detail_scan(
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def test_onboarding_ooi_detail_scan_create_report_schedule(
-    request, mocker, member, mock_bytes_client, rf, mock_organization_view_octopoes, url
+    request, mocker, member, mock_scheduler, mock_bytes_client, rf, mock_organization_view_octopoes, url
 ):
     member = request.getfixturevalue(member)
 
     mocker.patch("account.mixins.OrganizationView.get_katalogus")
-    mocker.patch("onboarding.views.scheduler_client")
     mock_organization_view_octopoes().get.return_value = url
     mock_bytes_client().upload_raw.return_value = "raw_id"
 

@@ -17,7 +17,9 @@ on:
 
 jobs:
   rtest:
-    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +34,7 @@ jobs:
         working-directory: ./octopoes
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
         id: buildx
 
       - name: Run robot tests

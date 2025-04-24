@@ -4,7 +4,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import FindingType, RiskLevelSeverity
 
 
-def nibble(input_ooi: FindingType) -> Iterator[OOI]:
+def nibble(input_ooi: FindingType, _dummy: int) -> Iterator[OOI]:
     value_set = False
     if not input_ooi.risk_severity:
         input_ooi.risk_severity = RiskLevelSeverity.PENDING

@@ -9,19 +9,15 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Organization:" %} {{ organization.name }}</h1>
-                {% blocktranslate with organization_name=organization.name %}
-                    An overview of "{{ organization_name }}" its members.
-                {% endblocktranslate %}
-                <h2>
-                    {% translate "Members" %}
-                    {% if members.count %}
-                        ({{ members.count }})
-                    {% else %}
-                        (0)
-                    {% endif %}
-                </h2>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Members" %}</h1>
+                    <p>
+                        {% blocktranslate with organization_name=organization.name trimmed %}
+                            An overview of members of <strong>{{ organization_name }}</strong>.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
                         <div class="dropdown">
@@ -40,12 +36,21 @@
                             </div>
                         </div>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
+            <div>
                 {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
 
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with total=members.count %}
+                        Showing {{ total }} members
+                    {% endblocktranslate %}
+                    </p>
+                </div>
                 <div class="horizontal-scroll">
                     <table class="nowrap">
-                        <caption>{% translate "Member overview:" %}</caption>
+                        <caption class="visually-hidden">{% translate "Member overview:" %}</caption>
                         <thead>
                             <tr>
                                 <th>{% translate "E-mail" %}</th>

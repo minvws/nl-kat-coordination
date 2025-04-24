@@ -35,7 +35,7 @@ def test_ooi_tree(rf, client_member, mock_organization_view_octopoes):
     assert response.status_code == 200
     mock_organization_view_octopoes().get_tree.assert_has_calls(
         [
-            call(Reference("Network|testnetwork"), valid_time=ANY, depth=1),
+            call(Reference("Network|testnetwork"), valid_time=ANY, depth=2),
             call(Reference("Network|testnetwork"), valid_time=ANY, depth=9),
         ]
     )

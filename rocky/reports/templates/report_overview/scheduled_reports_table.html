@@ -7,7 +7,9 @@
 
 {% if scheduled_reports %}
     <p class="de-emphasized">
-        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules %}Showing {{ length }} of {{ total }} schedules{% endblocktranslate %}
+        {% blocktranslate with length=scheduled_reports|length total=total_report_schedules trimmed %}
+            Showing {{ length }} of {{ total }} schedules
+        {% endblocktranslate %}
     </p>
     <div class="horizontal-scroll sticky-column">
         <table>
@@ -127,6 +129,9 @@
                                             <a class="button ghost"
                                                href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
                                         {% endif %}
+                                        {% include "report_schedules/delete_recipe_modal.html" with schedule_id=schedule.schedule_id recipe_id=schedule.recipe.primary_key %}
+
+                                        <a class="button ghost destructive" href="#delete-recipe-modal">{% translate "Delete" %}</a>
                                     </div>
                                 </div>
                             </td>
@@ -140,7 +145,5 @@
     <p>{% translate "No scheduled reports have been generated yet." %}</p>
 {% endif %}
 {% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

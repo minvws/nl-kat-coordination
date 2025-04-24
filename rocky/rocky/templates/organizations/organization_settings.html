@@ -10,23 +10,25 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Organization:" %} {{ organization.name }}</h1>
+                <h1>{% translate "Settings" %}</h1>
                 <p>
-                    {% blocktranslate with organization_name=organization.name %}
-            An overview of "{{ organization_name }}". This shows general information and its settings.
-          {% endblocktranslate %}
+                    {% blocktranslate with organization_name=organization.name trimmed %}
+                        An overview of general information and settings for <strong>{{ organization_name }}</strong>.
+                    {% endblocktranslate %}
                 </p>
                 {% if not indemnification_present %}
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "indemnification warning" %}">
                         {% url "organization_settings" organization.code as organization_settings %}
-                        {% blocktranslate %}
-              <strong>Warning:</strong>
-              Indemnification is not set for this organization.
-            {% endblocktranslate %}
+                        {% blocktranslate trimmed %}
+                            <strong>Warning:</strong>
+                            Indemnification is not set for this organization.
+                        {% endblocktranslate %}
                     </p>
                 {% endif %}
+            </div>
+            <div>
                 <h2>{% translate "Organization details" %}</h2>
                 <div class="horizontal-scroll">
                     <table>
@@ -62,6 +64,8 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div>
                 <h2>{% translate "Actions" %}</h2>
                 <div class="button-container">
                     {% if perms.tools.add_indemnification %}
