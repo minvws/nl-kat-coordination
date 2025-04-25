@@ -30,10 +30,6 @@ class Network(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
-    
-    @classmethod
-    def type_from_raw(cls, raw_input: dict):
-        return IPAddressV4 if isinstance(ip_network(raw_input['address']), IPv4Network) else IPAddressV6
 
 
 class IPAddress(OOI):
@@ -49,6 +45,9 @@ class IPAddress(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.address
 
+    @classmethod
+    def type_from_raw(cls, raw_input: dict):
+        return IPAddressV4 if isinstance(ip_network(raw_input['address']), IPv4Network) else IPAddressV6
 
 class IPAddressV4(IPAddress):
     """Represents IPv4 address objects.

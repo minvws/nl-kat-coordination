@@ -1,10 +1,10 @@
 import yaml
 import io
 from datetime import datetime, timezone
-from typing import Any, ClassVar, TypedDict, Literal
+from typing import Any, ClassVar, TypedDict
 from uuid import uuid4
-from functools import reduce
-from ipaddress import IPv4Network, ip_network
+
+import yaml.composer
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
@@ -46,7 +46,7 @@ from octopoes.models.ooi.certificate import SubjectAlternativeName, SubjectAlter
 from rocky.bytes_client import get_bytes_client
 
 class OOICandidate(TypedDict):
-    type: str
+    ooi_type: str
 
 class YamlSchape(TypedDict):
     references: dict[str, dict]
@@ -210,7 +210,11 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             task_id, yml_raw_data, manual_mime_types={"manual/yml"}
         )
         yml_data = io.StringIO(yml_raw_data.decode("UTF-8"))
-        refs_and_oois: YamlSchape = yaml.safe_load(yml_data)
+        refs_and_oois: YamlSchape
+        try:
+            refs_and_oois: YamlSchape = yaml.safe_load(yml_data)
+        except yaml.composer.ComposerError as err:
+            return self.add_error_notification(f"Corrupted yaml file imported. Error: {err}")
         oois_from_yaml = refs_and_oois["oois"]
 
         # Controlling Shape of Data
@@ -220,7 +224,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             return self.add_error_notification("All elements of oois list should object to create OOI.")
         if len(list(filter(lambda ooi_c: len(ooi_c.keys()) < 1, oois_from_yaml))):
             return self.add_error_notification("There are unsupported objects in the file.")
-        if len(list(filter(lambda ooi_c: ooi_c.get("type") not in self.ooi_types.keys(), oois_from_yaml))):
+        if len(list(filter(lambda ooi_c: ooi_c.get("ooi_type") not in self.ooi_types.keys(), oois_from_yaml))):
             return self.add_error_notification("Unsupported OOI type in the file. All OOI types are case sensitive")
 
         rows_with_error = []
@@ -250,7 +254,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         
     def create_ooi(self, ooi_dict: dict):
-        ooi_type = self.ooi_types[ooi_dict["type"]]
+        ooi_type = self.ooi_types[ooi_dict["ooi_type"]]["type"]
         # Special Cases
         if hasattr(ooi_type, 'type_from_raw'): ooi_type = ooi_type.type_from_raw(ooi_dict)
         # check for cache
