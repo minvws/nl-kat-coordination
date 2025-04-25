@@ -1,17 +1,10 @@
 {
   "id": "abuseipdb",
-  "name": "abuseIPDB lookup",
+  "name": "AbuseIPDB lookup",
   "description": "Use abuseIPDB.com to see if any abuse report exist for a given IP address.",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
   ],
-  "scan_level": 1,
-  "rate_limits": [
-    {
-        "domain": "abuseapi.com",
-        "count": 1000,
-        "interval": "24 hours"
-    }
-  ]
+  "scan_level": 0
 }
