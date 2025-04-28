@@ -18,8 +18,9 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 
 def merge_results(
-    d1: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]], d2: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]
-) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+    d1: dict[OOI, dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]],
+    d2: dict[OOI, dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]],
+) -> dict[OOI, dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]]:
     """
     Merge new runner results with old runner results
     d1: runner_results
@@ -29,8 +30,12 @@ def merge_results(
     return {
         key: {
             nibble_id: {
-                arg: set(d1.get(key, {}).get(nibble_id, {}).get(arg, set()))
-                | set(d2.get(key, {}).get(nibble_id, {}).get(arg, set()))
+                arg: (
+                    set(d1.get(key, {}).get(nibble_id, {}).get(arg, (set(), False))[0])
+                    | set(d2.get(key, {}).get(nibble_id, {}).get(arg, (set(), False))[0]),
+                    d1.get(key, {}).get(nibble_id, {}).get(arg, (set(), False))[1]
+                    or d2.get(key, {}).get(nibble_id, {}).get(arg, (set(), False))[1],
+                )
                 for arg in set(d1.get(key, {}).get(nibble_id, {}).keys())
                 | set(d2.get(key, {}).get(nibble_id, {}).keys())
             }
@@ -102,7 +107,7 @@ class NibblesRunner:
         self.origin_repository = origin_repository
         self.scan_profile_repository = scan_profile_repository
         self.nibble_repository = nibble_repository
-        self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
+        self.cache: dict[OOI, dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]] = {}
         self.nibbles: dict[str, NibbleDefinition] = get_nibble_definitions()
         self.federated: bool = False
 
@@ -178,8 +183,18 @@ class NibblesRunner:
             for nibble_id in (nibble_ids if nibble_ids is not None else self.nibbles)
         }
 
-    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], set[OOI]]]:
-        return_value: dict[str, dict[tuple[Any, ...], set[OOI]]] = {}
+    def _check_arg_scan_level(self, nibble: NibbleDefinition, arg: Iterable, valid_time: datetime) -> bool:
+        return nibble.check_scan_levels(
+            [
+                sp.level
+                for sp in self.scan_profile_repository.get_bulk(
+                    {a.reference for a in arg if isinstance(a, OOI)}, valid_time
+                )
+            ]
+        )
+
+    def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]:
+        return_value: dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]] = {}
         nibblets = self.origin_repository.list_origins(
             valid_time, origin_type=OriginType.NIBBLET, parameters_references=[ooi.reference]
         )
@@ -195,7 +210,7 @@ class NibblesRunner:
                     else None,
                 )
                 results = {
-                    tuple(arg): set(flatten([nibble(arg)]))
+                    tuple(arg): (set(flatten([nibble(arg)])), self._check_arg_scan_level(nibble, arg, valid_time))
                     for arg in args
                     if nibblet.parameters_hash != nibble_hasher(arg, nibble._checksum)
                 }
@@ -208,8 +223,10 @@ class NibblesRunner:
         ):
             if len(nibble.signature) > 1:
                 self._write(valid_time)
-            args = self.ooi_repository.nibble_query(ooi, nibble, valid_time)
-            results = {tuple(arg): set(flatten([nibble(arg)])) for arg in args}
+            results = {
+                tuple(arg): (set(flatten([nibble(arg)])), self._check_arg_scan_level(nibble, arg, valid_time))
+                for arg in self.ooi_repository.nibble_query(ooi, nibble, valid_time)
+            }
             return_value |= {nibble.id: results}
         self.cache = merge_results(self.cache, {ooi: return_value})
         return return_value
@@ -218,10 +235,8 @@ class NibblesRunner:
         for source_ooi, results in self.cache.items():
             self.ooi_repository.save(source_ooi, valid_time)
             for nibble_id, run_result in results.items():
-                for arg, result in run_result.items():
-                    arg_references = {a.reference for a in arg if isinstance(a, OOI)}
-                    scan_profiles_of_args = self.scan_profile_repository.get_bulk(arg_references, valid_time)
-                    if self.nibbles[nibble_id].check_scan_levels([sp.level for sp in scan_profiles_of_args]):
+                for arg, (result, materialize) in run_result.items():
+                    if materialize:
                         result_references = [ooi.reference for ooi in result]
                         phantom_result = []
                     else:
@@ -249,9 +264,22 @@ class NibblesRunner:
             ooi = stack.pop()
             results = self._run(ooi, valid_time)
             if results:
-                blocks = set.union(set(), *[ooiset for result in results.values() for _, ooiset in result.items()])
+                blocks = set.union(
+                    set(),
+                    *[
+                        ooiset
+                        for result in results.values()
+                        for _, (ooiset, materialize) in result.items()
+                        if materialize
+                    ],
+                )
                 stack += [o for o in blocks if o not in blockset]
                 blockset |= blocks
-                inferences |= {ooi: results}
+                inferences |= {
+                    ooi: {
+                        nibble: {arg: ooiset for arg, (ooiset, _) in result.items()}
+                        for nibble, result in results.items()
+                    }
+                }
         self._write(valid_time)
         return inferences
