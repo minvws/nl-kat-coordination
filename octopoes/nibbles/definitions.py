@@ -72,10 +72,13 @@ class NibbleDefinition(BaseModel):
         return set.union(*[sgn.triggers for sgn in self.signature]) | self.additional
 
     def check_scan_levels(self, scan_levels: list[ScanLevel]) -> bool:
-        for param, level in zip(self.signature, scan_levels):
-            if param.min_scan_level is not None and level <= param.min_scan_level:
-                return False
-        return True
+        if scan_levels:
+            return all(
+                param.min_scan_level is None or level > param.min_scan_level
+                for param, level in zip(self.signature, scan_levels)
+            )
+        else:
+            return all(param.min_scan_level is not None for param in self.signature)
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:

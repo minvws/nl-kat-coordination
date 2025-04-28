@@ -432,6 +432,9 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
 
     xtdb_octopoes_service.nibbler.nibbles = {dnszone_dummy_nibble.id: dnszone_dummy_nibble}
     xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].signature[0].min_scan_level = ScanLevel.L1
+    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([])
+    assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L1])
+    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L2])
     network = Network(name="internet")
     hostname = Hostname(network=network.reference, name="openkat.nl")
     dnszone = DNSZone(hostname=hostname.reference)
