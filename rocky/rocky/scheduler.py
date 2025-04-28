@@ -440,9 +440,12 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
+    def get_task_stats_for_all_organizations(self, scheduler_id: str) -> dict:
+        return self._get_task_stats(scheduler_id)
+
     def get_combined_schedulers_stats(self, scheduler_id: str, organization_codes: list[str]) -> dict:
         """Return merged stats for a set of scheduler ids."""
-        return SchedulerClient._merge_stat_dicts(
+        return self._merge_stat_dicts(
             dicts=[self._get_task_stats(scheduler_id, org_code) for org_code in organization_codes]
         )
 
