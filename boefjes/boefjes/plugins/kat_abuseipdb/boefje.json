@@ -2,6 +2,7 @@
   "id": "abuseipdb",
   "name": "AbuseIPDB lookup",
   "description": "Use abuseIPDB.com to see if any abuse report exist for a given IP address.",
+  "oci_image": "openkat/abuseipdb",
   "consumes": [
     "IPAddressV4",
     "IPAddressV6"
