@@ -423,9 +423,9 @@ class SchedulerClient:
     def _get_task_stats(self, scheduler_id: str, organisation_id: str | None = None) -> dict:
         """Return task stats for specific scheduler."""
         if organisation_id is None:
-            return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}")  # type: ignore
+            return self._get(f"/tasks/stats?scheduler_id={scheduler_id}")  # type: ignore
 
-        return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
+        return self._get(f"/tasks/stats?scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
         """Return task stats for specific task type."""
