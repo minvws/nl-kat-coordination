@@ -15,7 +15,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -63,7 +63,6 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
-
         if not report_schedules:
             return []
 
@@ -100,12 +99,18 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         schedule_id = request.POST.get("schedule_id", "")
         schedule = self.get_schedule_details(schedule_id)
         recipe_id = schedule.data["report_recipe_id"]
+        
+        if not self.organization_member.has_perm("tools.can_delete_oois"):
+            messages.error(self.request, _("Not enough permissions"))
+            return self.get(request, *args, **kwargs)
 
         if recipe_id and schedule_id:
             self.delete_report_schedule(schedule_id)
             try:
                 self.octopoes_api_connector.delete(
                     Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
+                logger.info(
+                    "Schedule and ReportRecipe deleted", event_code="0800083", schedule_id=schedule_id, recipe=recipe_pk
                 )
                 messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_id))
             except ObjectNotFoundException:
@@ -209,6 +214,15 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             return self.rerun_reports(report_references)
 
     def delete_reports(self, report_references: list[Reference]) -> None:
+        if not self.organization_member.has_perm("tools.can_delete_oois"):
+            messages.error(self.request, _("Not enough permissions"))
+            return
+
+        for report_reference in report_references:
+            if not issubclass(Reference.from_str(report_reference).class_type, BaseReport):
+                messages.error(self.request, _("Other OOI type selected than Report"))
+                return
+
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         logger.info("Reports deleted", event_code=800073, reports=report_references)
         messages.success(self.request, _("Deletion successful."))

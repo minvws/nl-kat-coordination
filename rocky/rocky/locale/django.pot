@@ -4616,6 +4616,10 @@ msgid "View report"
 msgstr ""
 
 #: reports/views/report_overview.py
+msgid "Not enough permissions"
+msgstr ""
+
+#: reports/views/report_overview.py
 msgid "Recipe '{}' deleted successfully"
 msgstr ""
 
@@ -4644,6 +4648,10 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Other OOI type selected than Report"
 msgstr ""
 
 #: reports/views/report_overview.py
