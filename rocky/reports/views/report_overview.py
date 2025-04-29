@@ -134,39 +134,33 @@ class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, Scheduler
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        schedule_id = request.GET.get("schedule_id")
-        schedule = self.get_schedule_details(schedule_id)
-        is_schedule_enabled = schedule.enabled
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        recipe_id = request.POST.get("recipe_id")
+        report_name_format = request.POST.get("report_name_format")
 
-        self.edit_report_schedule(schedule_id, {"enabled": not is_schedule_enabled})
+        filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": recipe_id}]}
+        schedule = self.get_schedule_with_filters(filters) if recipe_id else None
 
-        logger.info(
-            _("Schedule {}").format("disabled" if is_schedule_enabled else "enabled"),
-            event_code="0800081" if is_schedule_enabled else "0800082",
-            schedule_id=schedule_id,
-        )
+        if schedule:
+            is_schedule_enabled = schedule.enabled
 
-        report_recipe_id = schedule.data["report_recipe_id"]
-        report_recipe = self.octopoes_api_connector.get(
-            Reference.from_str(f"ReportRecipe|{report_recipe_id}"), valid_time=datetime.now(timezone.utc)
-        )
+            self.edit_report_schedule(str(schedule.id), {"enabled": not is_schedule_enabled})
 
-        if is_schedule_enabled:
-            messages.success(
-                self.request,
-                _(
-                    "Schedule disabled successfully. '{}' will not be generated "
-                    "automatically until the schedule is enabled again."
-                ).format(report_recipe.report_name_format),
-            )
-        else:
-            messages.success(
-                self.request,
-                _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
-                    report_recipe.report_name_format
-                ),
-            )
+            if is_schedule_enabled:
+                messages.success(
+                    self.request,
+                    _(
+                        "Schedule disabled successfully. '{}' will not be generated "
+                        "automatically until the schedule is enabled again."
+                    ).format(report_name_format),
+                )
+            else:
+                messages.success(
+                    self.request,
+                    _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
+                        report_name_format
+                    ),
+                )
 
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
