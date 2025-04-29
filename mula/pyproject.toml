@@ -21,6 +21,7 @@ sqlalchemy = "^2.0.23"
 structlog = "^25.2.0"
 uvicorn = "^0.29.0"
 httpx = "^0.28.1"
+fastapi-slim = "^0.115.12"
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.31.1"
