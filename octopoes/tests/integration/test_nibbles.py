@@ -424,17 +424,24 @@ dnszone_dummy_nibble._payload = getattr(sys.modules[__name__], "dnszone_dummy")
 def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
     def new_scan_level_by_type(ooi_types: set[type[OOI]], scan_level: ScanLevel):
         for ooi in xtdb_octopoes_service.ooi_repository.list_oois_by_object_types(ooi_types, valid_time):
-            sp = xtdb_octopoes_service.scan_profile_repository.get(ooi.reference, valid_time)
-            spnew = sp.model_copy()
-            spnew.level = scan_level
-            xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
-            event_manager.complete_process_events(xtdb_octopoes_service)
+            try:
+                sp = xtdb_octopoes_service.scan_profile_repository.get(ooi.reference, valid_time)
+            except Exception:
+                sp = None
+            if sp:
+                spnew = sp.model_copy()
+                spnew.level = scan_level
+                xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
+                event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_octopoes_service.nibbler.nibbles = {dnszone_dummy_nibble.id: dnszone_dummy_nibble}
     xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].signature[0].min_scan_level = ScanLevel.L1
-    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([])
+    assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([])
+    assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L0])
     assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L1])
     assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L2])
+    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L3])
+    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L4])
     network = Network(name="internet")
     hostname = Hostname(network=network.reference, name="openkat.nl")
     dnszone = DNSZone(hostname=hostname.reference)
@@ -444,10 +451,13 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     event_manager.complete_process_events(xtdb_octopoes_service)
     assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 1
 
-    new_scan_level_by_type({DNSZone}, ScanLevel.L2)
-    event_manager.complete_process_events(xtdb_octopoes_service)
-    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 2
-
-    new_scan_level_by_type({DNSZone}, ScanLevel.L2)
-    event_manager.complete_process_events(xtdb_octopoes_service)
-    assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 3
+    for scan_level, count in [
+        (ScanLevel.L2, 2),
+        (ScanLevel.L2, 3),
+        (ScanLevel.L1, 1),
+        (ScanLevel.L3, 2),
+        (ScanLevel.L3, 3),
+        (ScanLevel.L2, 4),
+    ]:
+        new_scan_level_by_type({DNSZone}, scan_level)
+        assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == count

@@ -251,7 +251,7 @@ class NibblesRunner:
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
                         parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
                     )
-                    for ooi in result:
+                    for ooi in filter(lambda ooi: ooi.reference in result_references, result):
                         self.ooi_repository.save(ooi, valid_time=valid_time)
                     self.origin_repository.save(nibble_origin, valid_time=valid_time)
         self.cache = {}

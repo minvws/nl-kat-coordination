@@ -78,7 +78,7 @@ class NibbleDefinition(BaseModel):
                 for param, level in zip(self.signature, scan_levels)
             )
         else:
-            return all(param.min_scan_level is not None for param in self.signature)
+            return all(param.min_scan_level is None for param in self.signature)
 
 
 def get_nibble_definitions() -> dict[str, NibbleDefinition]:
