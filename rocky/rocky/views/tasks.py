@@ -81,12 +81,12 @@ class NormalizersTaskListView(TaskListView):
 
         # Search for the corresponding Normalizer names and add those to the task_list
         task_list = context.get("task_list", [])
-        ids = [
+        ids = {
             task.data.raw_data.boefje_meta.boefje.id
             for task in task_list
             if task.data.raw_data.boefje_meta.boefje.id != "manual"
-        ]
-        plugins = self.get_katalogus().get_plugins(ids=set(ids))
+        }
+        plugins = self.get_katalogus().get_plugins(ids=ids)
         plugin_dict = {p.id: p.name for p in plugins}
 
         for task in task_list:
