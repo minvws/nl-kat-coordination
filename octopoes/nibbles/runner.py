@@ -277,7 +277,7 @@ class NibblesRunner:
                 blockset |= blocks
                 inferences |= {
                     ooi: {
-                        nibble: {arg: ooiset for arg, (ooiset, _) in result.items()}
+                        nibble: {arg: ooiset for arg, (ooiset, materialize) in result.items() if materialize}
                         for nibble, result in results.items()
                     }
                 }
