@@ -721,22 +721,18 @@ phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
 name = "django-rest-knox"
-version = "4.2.0"
+version = "5.0.2"
 description = "Authentication for django rest framework"
 optional = false
-python-versions = ">=3.6"
-files = []
-develop = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_rest_knox-5.0.2-py3-none-any.whl", hash = "sha256:694da5d0ad6eb3edbfd7cdc8d69c089fc074e6b0e548e00ff2750bf2fdfadb6f"},
+    {file = "django_rest_knox-5.0.2.tar.gz", hash = "sha256:f283622bcf5d28a6a0203845c065d06c7432efa54399ae32070c61ac03af2d6f"},
+]
 
 [package.dependencies]
-django = ">=3.2"
+django = ">=4.2"
 djangorestframework = "*"
-
-[package.source]
-type = "git"
-url = "https://github.com/jazzband/django-rest-knox"
-reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
-resolved_reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
 
 [[package]]
 name = "django-structlog"
@@ -3441,4 +3437,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "920a772c8545c2a71976767a9e3ed07d7d7691108e2a6c58418ca04e39eda735"
+content-hash = "21a1717cc8f558a40bf2e2183eb0a818eecea3681c1e5f29670c24f6d26e3926"
