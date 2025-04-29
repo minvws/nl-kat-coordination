@@ -12,7 +12,7 @@ Django = "5.0.14"
 django-two-factor-auth = "^1.14.0"
 django-environ = "^0.11.2"
 jsonschema = "^4.17.0"
-phonenumbers = "^8.13.33"
+phonenumbers = "^9.0.4"
 psycopg2 = "^2.9.6"
 pydantic = "^2.7.1"
 python-dotenv = "^1.0.0"
@@ -24,7 +24,7 @@ drf-standardized-errors = "^0.12.5"
 django-compressor = {git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce"}
 django-weasyprint = "^2.4.0"
 strenum = "^0.4.15"
-django-rest-knox = { git = "https://github.com/jazzband/django-rest-knox", rev = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9" }
+django-rest-knox = "^5.0.2"
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.29.0"
