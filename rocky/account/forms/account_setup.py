@@ -155,7 +155,7 @@ class OrganizationForm(BaseRockyModelForm):
             ),
             "code": forms.TextInput(
                 attrs={
-                    "placeholder": _("A unique code of {code_length} characters.").format(
+                    "placeholder": _("A unique code of maximum {code_length} characters in length.").format(
                         code_length=ORGANIZATION_CODE_LENGTH
                     ),
                     "autocomplete": "off",
