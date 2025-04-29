@@ -74,7 +74,7 @@ class NibbleDefinition(BaseModel):
     def check_scan_levels(self, scan_levels: list[ScanLevel]) -> bool:
         if scan_levels:
             return all(
-                param.min_scan_level is None or level > param.min_scan_level
+                param.min_scan_level is None or level >= param.min_scan_level
                 for param, level in zip(self.signature, scan_levels)
             )
         else:

@@ -432,13 +432,13 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
                 spnew = sp.model_copy()
                 spnew.level = scan_level
                 xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
-                event_manager.complete_process_events(xtdb_octopoes_service)
+        event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_octopoes_service.nibbler.nibbles = {dnszone_dummy_nibble.id: dnszone_dummy_nibble}
     xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].signature[0].min_scan_level = ScanLevel.L1
     assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([])
     assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L0])
-    assert not xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L1])
+    assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L1])
     assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L2])
     assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L3])
     assert xtdb_octopoes_service.nibbler.nibbles[dnszone_dummy_nibble.id].check_scan_levels([ScanLevel.L4])
@@ -452,12 +452,12 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == 1
 
     for scan_level, count in [
+        (ScanLevel.L1, 2),
+        (ScanLevel.L1, 3),
+        (ScanLevel.L0, 1),
         (ScanLevel.L2, 2),
         (ScanLevel.L2, 3),
-        (ScanLevel.L1, 1),
-        (ScanLevel.L3, 2),
-        (ScanLevel.L3, 3),
-        (ScanLevel.L2, 4),
+        (ScanLevel.L1, 4),
     ]:
         new_scan_level_by_type({DNSZone}, scan_level)
         assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == count
