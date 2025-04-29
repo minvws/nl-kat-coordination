@@ -142,9 +142,9 @@ class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, Scheduler
         schedule = self.get_schedule_with_filters(filters) if recipe_id else None
 
         if schedule:
-            is_schedule_enabled = schedule.enabled
+            is_schedule_enabled = not schedule.enabled
 
-            self.edit_report_schedule(str(schedule.id), {"enabled": not is_schedule_enabled})
+            self.edit_report_schedule(str(schedule.id), {"enabled": is_schedule_enabled})
 
             if is_schedule_enabled:
                 messages.success(
