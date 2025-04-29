@@ -523,13 +523,13 @@ dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "sphinx (<2)", "tox"]
 
 [[package]]
 name = "django"
-version = "5.0.13"
+version = "5.0.14"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "Django-5.0.13-py3-none-any.whl", hash = "sha256:b983238dfa2eb2e6b27ebb815e14f0741cf186606eb7bcd857e740174017c50e"},
-    {file = "Django-5.0.13.tar.gz", hash = "sha256:f9d4b7b87a9dae248d5f20cec940cf7290e07d508d6d8432e3c2cabf09b3b0ff"},
+    {file = "Django-5.0.14-py3-none-any.whl", hash = "sha256:e762bef8629ee704de215ebbd32062b84f4e56327eed412e5544f6f6eb1dfd74"},
+    {file = "Django-5.0.14.tar.gz", hash = "sha256:29019a5763dbd48da1720d687c3522ef40d1c61be6fb2fad27ed79e9f655bc11"},
 ]
 
 [package.dependencies]
@@ -668,17 +668,17 @@ python-ipware = ">=2.0.3"
 
 [[package]]
 name = "django-otp"
-version = "1.5.1"
+version = "1.6.0"
 description = "A pluggable framework for adding two-factor authentication to Django using one-time passwords."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "django_otp-1.5.1-py3-none-any.whl", hash = "sha256:48d0a1943cbeb610f0bca51a0da42cc7eefcff387b101c69d3ed432cd75a0fd4"},
-    {file = "django_otp-1.5.1.tar.gz", hash = "sha256:d0c60a3c20dd16e9f2c7c3d8669306c34a83c20fd021565adbf782f4ba911b13"},
+    {file = "django_otp-1.6.0-py3-none-any.whl", hash = "sha256:34d9c478ced2d8c8d952428066565c7a9a96722b7f4ec8e041d161e82a85528f"},
+    {file = "django_otp-1.6.0.tar.gz", hash = "sha256:13762d5d0ce52f68a9250ab186d36d9971d67271c05f15f533d73b09f2014667"},
 ]
 
 [package.dependencies]
-django = ">=3.2"
+django = ">=4.2"
 
 [package.extras]
 qrcode = ["qrcode"]
@@ -721,22 +721,18 @@ phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
 name = "django-rest-knox"
-version = "4.2.0"
+version = "5.0.2"
 description = "Authentication for django rest framework"
 optional = false
-python-versions = ">=3.6"
-files = []
-develop = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_rest_knox-5.0.2-py3-none-any.whl", hash = "sha256:694da5d0ad6eb3edbfd7cdc8d69c089fc074e6b0e548e00ff2750bf2fdfadb6f"},
+    {file = "django_rest_knox-5.0.2.tar.gz", hash = "sha256:f283622bcf5d28a6a0203845c065d06c7432efa54399ae32070c61ac03af2d6f"},
+]
 
 [package.dependencies]
-django = ">=3.2"
+django = ">=4.2"
 djangorestframework = "*"
-
-[package.source]
-type = "git"
-url = "https://github.com/jazzband/django-rest-knox"
-reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
-resolved_reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
 
 [[package]]
 name = "django-structlog"
@@ -889,13 +885,13 @@ files = [
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.0"
+version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
-    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
+    {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
+    {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
 ]
 
 [package.extras]
@@ -1791,13 +1787,13 @@ files = [
 
 [[package]]
 name = "phonenumbers"
-version = "8.13.42"
+version = "9.0.4"
 description = "Python version of Google's common library for parsing, formatting, storing and validating international phone numbers."
 optional = false
 python-versions = "*"
 files = [
-    {file = "phonenumbers-8.13.42-py2.py3-none-any.whl", hash = "sha256:18acc22ee03116d27b26e990f53806a1770a3e05f05e1620bc09ad187f889456"},
-    {file = "phonenumbers-8.13.42.tar.gz", hash = "sha256:7137904f2db3b991701e853174ce8e1cb8f540b8bfdf27617540de04c0b7bed5"},
+    {file = "phonenumbers-9.0.4-py2.py3-none-any.whl", hash = "sha256:ac8aa9d4679da5078547aeb159d78c2b60f8d0fb4eafdc7cf464069039b30ccd"},
+    {file = "phonenumbers-9.0.4.tar.gz", hash = "sha256:b1530fc2a7b67e4c37c63e8e736c7e6efe2fed283c1bbb5c08c4511ec0c160ed"},
 ]
 
 [[package]]
@@ -3441,4 +3437,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f9d4c148e67611b62d05374393a1fc460fc40f1d47c8835e238c352fe5d3001f"
+content-hash = "21a1717cc8f558a40bf2e2183eb0a818eecea3681c1e5f29670c24f6d26e3926"
