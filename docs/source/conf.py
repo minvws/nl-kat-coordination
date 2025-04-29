@@ -41,7 +41,7 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx-rijkshuisstijl-2008"
+html_theme = "sphinx-icore-open"
 html_theme_path = ["themes/"]
 
 html_logo = "_static/keiko-hero.jpg"
