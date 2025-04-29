@@ -221,7 +221,7 @@ def _start_working(
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
-        p_item = task_queue.get()
+        p_item = task_queue.get()  # blocks until tasks are pushed in the main process
         status = TaskStatus.FAILED
         handling_tasks[os.getpid()] = str(p_item.id)
 
@@ -247,7 +247,7 @@ def _start_working(
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
 
-    session = sessionmaker(bind=get_engine())()
+    session = sessionmaker(bind=get_engine())
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler

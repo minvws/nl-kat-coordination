@@ -1,7 +1,7 @@
 Katalogus
 =========
 
-The KAT catalog (katalogus) is the place where you can see which tools are available, enabled and/or disabled. Tools can be common security scanning tools, like nmap (checks which ports are open), or specific tools that check for a CVE vulnerability. The KAT catalog also contains all the normalizers, which parse the data from the tools. Each boefje and normalizer contains more information on how it works and what is required, including the objects it can search for, and which are required for the boefje to work.
+The Katalogus (KAT catalog) is the place where you can see which plugins are available, enabled and/or disabled. Plugins can be common security scanning tools, like nmap (checks which ports are open), or specific tools that check for a CVE vulnerability. The Katalogus also contains all the Normalizers, which parse the data from the tools. Each Boefje and Normalizer contains more information on how it works and what is required, including the Objects it can search for, and which Objects are required for the Boefje to work.
 
 Before a boefje or normalizer can run the following two conditions must be met:
 - The boefje and corresponding normalizer are enabled. Note: all normalizers are enabled by default.

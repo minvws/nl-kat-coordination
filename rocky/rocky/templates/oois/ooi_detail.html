@@ -26,14 +26,12 @@
 
                 {% endif %}
             </div>
-            <div>
-                {% include "oois/ooi_detail_origins_declarations.html" %}
-                {% include "oois/ooi_detail_origins_observations.html" %}
-                {% include "oois/ooi_detail_origins_inference.html" %}
-                {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
-                {% include "tasks/ooi_detail_task_list.html" %}
+            {% include "oois/ooi_detail_origins_declarations.html" %}
+            {% include "oois/ooi_detail_origins_observations.html" %}
+            {% include "oois/ooi_detail_origins_inference.html" %}
+            {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
+            {% include "tasks/ooi_detail_task_list.html" %}
 
-            </div>
             {% if not ooi|is_finding and not ooi|is_finding_type %}
                 <div>
                     {% include "oois/ooi_detail_findings_overview.html" with severity_summary=findings_severity_summary severity_summary_totals=severity_summary_totals %}

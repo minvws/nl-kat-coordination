@@ -1,5 +1,5 @@
-Quick start of OpenKAT
-######################
+Quick start
+###########
 
 Contains references to the documentations of the Quick start of OpenKAT
 

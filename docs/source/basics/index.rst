@@ -1,5 +1,5 @@
-Basics of OpenKAT
-#################
+Basics
+######
 
 Contains references to the documentations of the Basics of OpenKAT
 

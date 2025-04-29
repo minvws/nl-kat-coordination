@@ -1,7 +1,7 @@
-How does it work?
+About OpenKAT
 #################
 
-Contains introduction into OpenKAT
+Contains an broad introduction into OpenKAT and all project related content.
 
 .. toctree::
    :maxdepth: 4
@@ -9,7 +9,4 @@ Contains introduction into OpenKAT
 
    intro
    faq
-   ux-design/index
    release-notes/index
-   guidelines/index
-   templates/index
