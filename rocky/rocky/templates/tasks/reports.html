@@ -31,6 +31,9 @@
                             <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                             <thead>
                                 <tr>
+                                    {% if not organization.code %}
+                                        <th scope="col">{% translate "Organization Code" %}</th>
+                                    {% endif %}
                                     <th scope="col" class="nowrap">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Recipe ID" %}</th>
                                     <th scope="col" class="nowrap">{% translate "Creation date" %}</th>
@@ -41,6 +44,11 @@
                                 {% for report_task in task_list %}
                                     {% with recipe_pk="ReportRecipe|"|add:report_task.data.report_recipe_id %}
                                         <tr>
+                                            {% if not organization.code %}
+                                                <td>
+                                                    <a href="{% url "organization_crisis_room" report_task.data.organisation_id %}">{{ report_task.data.organisation_id }}</a>
+                                                </td>
+                                            {% endif %}
                                             <td>
                                                 <i class="icon {{ report_task.status.value }}"></i>{{ report_task.status.value|capfirst }}
                                             </td>
