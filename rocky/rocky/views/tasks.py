@@ -115,7 +115,7 @@ class ReportsTaskListView(TaskListView):
 
 class AllTaskListView(SchedulerListView, PageActionsView):
     paginator_class = RockyPaginator
-    paginate_by = 20
+    paginate_by = 150
     context_object_name = "task_list"
     client = scheduler_client(None)
     task_filter_form = TaskFilterForm
