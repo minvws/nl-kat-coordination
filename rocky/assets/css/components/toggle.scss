@@ -1,6 +1,4 @@
-/* Toggle */
-
-.toggle-switch {
+[role="tablist"] {
   display: flex;
   flex-direction: row;
   padding: var(--spacing-grid-050);
@@ -14,51 +12,64 @@
   max-width: 100%;
   overflow: auto;
 
-  li {
-    padding: var(--spacing-grid-050) var(--spacing-grid-100);
-    border-radius: var(--border-radius-s);
-    background-color: transparent;
-    cursor: pointer;
-    list-style: none;
-    box-sizing: border-box;
-    position: relative;
-    white-space: nowrap;
 
-    a {
-      color: var(--colors-grey-900);
-      text-decoration: none;
+    [role="tab"] {
+        padding: var(--spacing-grid-050) var(--spacing-grid-100);
+        border-radius: var(--border-radius-s);
+        background-color: transparent;
+        cursor: pointer;
+        list-style: none;
+        box-sizing: border-box;
+        position: relative;
+        white-space: nowrap;
+
+        span {
+          color: var(--colors-grey-900);
+        }
+
+        &[aria-selected="true"] {
+          background-color: var(--colors-purrple-200);
+
+            span {
+                font-weight: bold;
+            }
+            
+            &:hover {
+                background-color: var(--colors-purrple-300);
+            }
+        }
+
+        &:hover {
+          background-color: var(--colors-purrple-50);
+        }
+    
+        &::after {
+          content: "";
+          border-right: 1px solid var(--colors-purrple-300);
+          margin-left: var(--spacing-grid-100);
+          display: block;
+          position: absolute;
+          height: 60%;
+          top: 20%;
+          right: calc((1px + var(--spacing-grid-050)) * -1);
+          width: 1px;
+        }
+    
+        &:last-child::after {
+          content: none;
+        }
+    }
+  
+    [role="tabpanel"] {
+      padding: 5px;
+      border: 2px solid var(--colors-purrple-300);
     }
 
-    &[aria-current="true"] {
-      background-color: var(--colors-purrple-200);
-
-      a {
-        font-weight: bold;
-      }
-
-      &:hover {
-        background-color: var(--colors-purrple-300);
-      }
+    [role="tabpanel"].is-hidden {
+      display: none;
     }
 
-    &:hover {
-      background-color: var(--colors-purrple-50);
+    [role="tabpanel"] > * {
+      margin: 0;
     }
-
-    &::after {
-      content: "";
-      border-right: 1px solid var(--colors-purrple-300);
-      margin-left: var(--spacing-grid-100);
-      display: block;
-      position: absolute;
-      height: 60%;
-      top: 20%;
-      right: calc((1px + var(--spacing-grid-050)) * -1);
-      width: 1px;
-    }
-
-    &:last-child::after {
-      content: none;
-    }
-  }
 }
