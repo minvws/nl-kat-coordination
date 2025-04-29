@@ -95,23 +95,23 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
     def post(self, request, *args, **kwargs):
         """Delete report recipe"""
+        recipe_id = request.POST.get("recipe_id")
 
-        schedule_id = request.POST.get("schedule_id", "")
-        schedule = self.get_schedule_details(schedule_id)
-        recipe_id = schedule.data["report_recipe_id"]
+        filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": recipe_id}]}
+        schedule = self.get_schedule_with_filters(filters) if recipe_id else None
 
         if not self.organization_member.has_perm("tools.can_delete_oois"):
             messages.error(self.request, _("Not enough permissions"))
             return self.get(request, *args, **kwargs)
 
-        if recipe_id and schedule_id:
+        if schedule:
             self.delete_report_schedule(str(schedule.id))
             try:
                 self.octopoes_api_connector.delete(
                     Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
                 )
                 logger.info(
-                    "Schedule and ReportRecipe deleted", event_code="0800083", schedule_id=schedule_id, recipe=recipe_id
+                    "Schedule and ReportRecipe deleted", event_code="0800083", schedule_id=schedule.id, recipe=recipe_id
                 )
                 messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_id))
             except ObjectNotFoundException:

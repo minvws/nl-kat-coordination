@@ -12,12 +12,9 @@ def test_delete_schedule(
     mock_scheduler.get_scheduled_reports.return_value = scheduled_reports_list
     mock_organization_view_octopoes().get.return_value = scheduled_report_recipe
 
-    schedule_id = scheduled_reports_list[0].id
-    recipe_id = scheduled_reports_list[0].data["report_recipe_id"]
+    recipe_id = "ReportRecipe|" + scheduled_reports_list[0].data["report_recipe_id"]
 
-    request = setup_request(
-        rf.post("scheduled_reports", {"report_recipe": recipe_id, "schedule_id": schedule_id}), redteam_member.user
-    )
+    request = setup_request(rf.post("scheduled_reports", {"recipe_id": recipe_id}), redteam_member.user)
 
     response = ScheduledReportsView.as_view()(request, organization_code=redteam_member.organization.code)
 
@@ -45,10 +42,7 @@ def test_delete_schedule_object_not_found(
     mock_organization_view_octopoes().get.return_value = scheduled_report_recipe
     mock_organization_view_octopoes().delete.side_effect = ObjectNotFoundException("Not found")
 
-    request = setup_request(
-        rf.post("scheduled_reports", {"report_recipe": "ReportRecipe|recipeNone", "schedule_id": "ScheduleNone"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("scheduled_reports", {"recipe_id": "ReportRecipe|recipeNone"}), redteam_member.user)
 
     response = ScheduledReportsView.as_view()(request, organization_code=redteam_member.organization.code)
 
@@ -63,10 +57,7 @@ def test_delete_schedule_schedule_not_found(
     mock_organization_view_octopoes().get.return_value = scheduled_report_recipe
     mock_scheduler.delete_schedule.side_effect = SchedulerError
 
-    request = setup_request(
-        rf.post("scheduled_reports", {"report_recipe": "ReportRecipe|recipeNone", "schedule_id": "ScheduleNone"}),
-        redteam_member.user,
-    )
+    request = setup_request(rf.post("scheduled_reports", {"recipe_id": "ReportRecipe|recipeNone"}), redteam_member.user)
 
     response = ScheduledReportsView.as_view()(request, organization_code=redteam_member.organization.code)
 

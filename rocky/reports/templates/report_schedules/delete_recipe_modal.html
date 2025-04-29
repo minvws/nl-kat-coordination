@@ -1,11 +1,11 @@
 {% load i18n %}
 
-{% with form_id="delete-form-"|add:schedule_id %}
-    {% component "modal" size="dialog-small" modal_id="delete-recipe-modal-"|add:schedule_id %}
+{% with form_id="delete-form-"|add:recipe_id %}
+    {% component "modal" size="dialog-small" modal_id="delete-recipe-modal-"|add:recipe_id %}
     {% fill "header" %}{% translate "Delete report recipe" %}{% endfill %}
     {% fill "content" %}
     <p>
-        {% blocktranslate trimmed with name=report_name %}
+        {% blocktranslate trimmed with name=recipe_name %}
             Are you sure you want to delete report recipe "{{ name }}"?
         {% endblocktranslate %}
     </p>
@@ -18,7 +18,7 @@
     </p>
     <form id={{ form_id }} class="inline" method="post">
         {% csrf_token %}
-        <input type="hidden" name="schedule_id" value="{{ schedule_id }}" />
+        <input type="hidden" name="recipe_id" value="{{ recipe_id }}" />
     </form>
 {% endfill %}
 {% fill "footer_buttons" %}
