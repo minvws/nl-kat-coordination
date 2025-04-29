@@ -19,9 +19,15 @@ tracer = trace.get_tracer(__name__)
 
 
 class BoefjePQ(queue.PriorityQueue):
+    """A custom priority queue for the BoefjeScheduler. Since we have specific
+    requirements for popping tasks from the queue. We override the
+    pop method to call the `pop_boefje()` to retrieve batched tasks based on
+    their environment hash.
+    """
+
     @queue.pq.with_lock
     def pop(self, limit: int = 1, filters: filters.FilterRequest | None = None) -> list[models.Task]:
-        items = self.pq_store.pop_boefje(self.pq_id, limit, filters)
+        items = self.pq_store.pop_boefje(self.pq_id, limit=None, filters=filters)
         if not items:
             return []
 

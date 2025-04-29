@@ -1,4 +1,5 @@
 import unittest
+import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
@@ -1008,13 +1009,53 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # set to 1500 minutes (25 hours) to at least the next day
         self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc) + timedelta(days=1))
 
-    # TODO: Implement this test
-    def test_pop(self):
-        pass
-
-    # TODO: Implement this test
     def test_pop_batched(self):
-        pass
+        # Arrange: create boefje tasks with the same env_hash
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        env_hash = uuid.uuid4().hex
+
+        tasks = [
+            models.BoefjeTask(
+                boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=env_hash
+            ),
+            models.BoefjeTask(
+                boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=env_hash
+            ),
+            models.BoefjeTask(
+                boefje=BoefjeFactory(),
+                input_ooi=ooi.primary_key,
+                organization=self.organisation.id,
+                env_hash="other_hash",
+            ),
+        ]
+
+        # Mocks
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], interval=1500)
+        self.mock_get_plugin.return_value = plugin
+
+        # Act: push the tasks to the queue
+        for task in tasks:
+            task_db = models.Task(
+                scheduler_id=self.scheduler.scheduler_id,
+                organisation=self.organisation.id,
+                priority=1,
+                type=models.BoefjeTask.type,
+                hash=task.hash,
+                data=task.model_dump(),
+                created_at=datetime.now(timezone.utc),
+                modified_at=datetime.now(timezone.utc),
+            )
+
+            self.scheduler.push_item_to_queue(task_db)
+
+        # Assert: tasks should be on priority queue
+        self.assertEqual(3, self.scheduler.queue.qsize())
+
+        # Act: pop the tasks from the queue
+        tasks = self.scheduler.pop_item_from_queue()
+        self.assertEqual(2, len(tasks))
+        self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
