@@ -15,6 +15,8 @@ logger = structlog.get_logger(__name__)
 class Dashboard(models.Model):
     name = models.CharField(blank=False, max_length=126)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ["name", "organization"]
@@ -34,6 +36,8 @@ def get_default_dashboard_data_settings() -> dict[str, Any]:
 
 
 class DashboardData(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
     name = models.CharField(blank=True, null=True, max_length=126)
     recipe = models.UUIDField(blank=True, null=True)
@@ -117,8 +121,9 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
+    """Change the position of the other items on the dashboard after deleting one object."""
     position = instance.position
-    dashboard = instance.dashboard.id
+    dashboard = instance.dashboard_id
     with connection.cursor() as cursor:
         cursor.execute(
             "UPDATE crisis_room_dashboarddata "

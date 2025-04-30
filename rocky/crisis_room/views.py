@@ -303,7 +303,7 @@ class DeleteDashboardView(OrganizationsCrisisRoomView):
         if dashboard:
             deleted, _ = dashboard.delete()
 
-            if deleted == 1:
+            if deleted >= 1:
                 messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
             else:
                 messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
@@ -321,7 +321,7 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
         dashboard_data_name = dashboard_data.name
         deleted, _ = dashboard_data.delete()
 
-        if deleted == 1:
+        if deleted >= 1:
             messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
         else:
             messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
