@@ -39,7 +39,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Install Octopoes
-        run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
+        run: pip install wheel setuptools && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
 
       - name: Generate the .pot file if source strings changed
         run: make lang

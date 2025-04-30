@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/root/.cache \
 FROM dev
 
 COPY octopoes/ /tmp/octopoes
-RUN cd /tmp/octopoes && python setup.py bdist_wheel
+RUN pip install setuptools && cd /tmp/octopoes && python setup.py bdist_wheel
 RUN pip install /tmp/octopoes/dist/octopoes*.whl
 
 COPY rocky .
