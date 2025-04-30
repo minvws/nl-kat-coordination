@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import Boefje
+from reports.report_types.helpers import get_report_types_for_ooi
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.forms.scheduler import OOIDetailTaskFilterForm
 from tools.ooi_helpers import format_display
@@ -147,6 +148,10 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
         context["possible_boefjes_filter_form"] = self.get_boefjes_filter_form()
         context["organization_indemnification"] = self.indemnification_present
+
+        context["possible_reports"] = [
+            report.class_attributes() for report in get_report_types_for_ooi(self.ooi.primary_key)
+        ]
 
         if self.request.GET.get("show_clearance_level_inheritance"):
             clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
