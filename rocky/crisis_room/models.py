@@ -36,10 +36,10 @@ def get_default_dashboard_data_settings() -> dict[str, Any]:
 
 
 class DashboardData(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
     name = models.CharField(blank=True, null=True, max_length=126)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
     query_from = models.CharField(blank=True, max_length=32, null=True)
     query = models.CharField(blank=True, null=True)
