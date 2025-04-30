@@ -87,6 +87,7 @@ find_network_url_params = [
 find_network_url_nibble = NibbleDefinition(
     id="find_network_url",
     signature=find_network_url_params,
+    # This Nibble's query is not endorsed for production (but nice for testing)
     query="""
     {
         :query {
@@ -461,3 +462,126 @@ def test_min_scan_level_dummy_nibble(xtdb_octopoes_service: OctopoesService, eve
     ]:
         new_scan_level_by_type({DNSZone}, scan_level)
         assert xtdb_octopoes_service.ooi_repository.list_oois({DNSZone}, valid_time).count == count
+
+
+def find_network_url_fixed(network: Network, url: URL) -> Iterator[OOI]:
+    if len(network.name) == len(str(url.raw)):
+        yield Finding(
+            finding_type=KATFindingType(id="Network and URL have same name length").reference,
+            ooi=network.reference,
+            proof=url.reference,
+        )
+
+
+def find_network_url_nibble_fixed_query(targets: list[Reference | None]) -> str:
+    sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
+    if sgn == "10":
+        return f"""
+        {{
+            :query {{
+                :find [(pull ?network [*]) (pull ?url [*])]
+                :where [
+                    [?network :object_type "Network" ] [?network :Network/primary_key "{str(targets[0])}"]
+                    [?url :object_type "URL" ]
+                    [?url :URL/network ?network]
+                ]
+            }}
+        }}
+        """
+    elif sgn == "01":
+        return f"""
+        {{
+            :query {{
+                :find [(pull ?network [*]) (pull ?url [*])]
+                :where [
+                    [?network :object_type "Network" ]
+                    [?url :object_type "URL" ] [?url :URL/primary_key "{str(targets[1])}"]
+                    [?url :URL/network ?network]
+                ]
+            }}
+        }}
+        """
+    elif sgn == "11":
+        return f"""
+        {{
+            :query {{
+                :find [(pull ?network [*]) (pull ?url [*])]
+                :where [
+                    [?network :object_type "Network" ] [?network :Network/primary_key "{str(targets[0])}"]
+                    [?url :object_type "URL" ] [?url :URL/primary_key "{str(targets[1])}"]
+                ]
+            }}
+        }}
+        """
+    else:
+        return """
+        {{
+            :query {{
+                :find [(pull ?network [*]) (pull ?url [*])]
+                :where [
+                    [?network :object_type "Network" ]
+                    [?url :object_type "URL" ]
+                    [?url :URL/network ?network]
+                ]
+            }}
+        }}
+        """
+
+
+find_network_url_fixed_params = [
+    NibbleParameter(object_type=Network, parser="[*][?object_type == 'Network'][]"),
+    NibbleParameter(object_type=URL, parser="[*][?object_type == 'URL'][]"),
+]
+find_network_url_nibble_fixed = NibbleDefinition(
+    id="find_network_url_fixed", signature=find_network_url_params, query=find_network_url_nibble_fixed_query
+)
+find_network_url_nibble_fixed._payload = getattr(sys.modules[__name__], "find_network_url")
+
+
+def test_nibbles_update_with_scan_level(
+    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
+):
+    def new_scan_level_by_reference(reference: Reference, scan_level: ScanLevel):
+        sp = xtdb_octopoes_service.scan_profile_repository.get(reference, valid_time)
+        spnew = sp.model_copy()
+        spnew.level = scan_level
+        xtdb_octopoes_service.scan_profile_repository.save(sp, spnew, valid_time)
+        event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_octopoes_service.nibbler.nibbles = {find_network_url_nibble_fixed.id: find_network_url_nibble_fixed}
+    xtdb_octopoes_service.nibbler.nibbles[find_network_url_nibble_fixed.id].signature[0].min_scan_level = ScanLevel.L1
+    xtdb_octopoes_service.nibbler.nibbles[find_network_url_nibble_fixed.id].signature[1].min_scan_level = ScanLevel.L2
+
+    network1 = Network(name="internetverbinding")
+    xtdb_octopoes_service.ooi_repository.save(network1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    network2 = Network(name="internet")
+    xtdb_octopoes_service.ooi_repository.save(network2, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    url1 = URL(network=network1.reference, raw="https://potato.ls/")
+    xtdb_octopoes_service.ooi_repository.save(url1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+    url2 = URL(network=network2.reference, raw="https://mispo.es/")
+    xtdb_octopoes_service.ooi_repository.save(url2, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_url1 = xtdb_octopoes_service.ooi_repository.get(url1.reference, valid_time)
+    xtdb_url2 = xtdb_octopoes_service.ooi_repository.get(url2.reference, valid_time)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
+
+    new_scan_level_by_reference(network1.reference, ScanLevel.L1)
+    new_scan_level_by_reference(network2.reference, ScanLevel.L1)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
+
+    new_scan_level_by_reference(xtdb_url1.reference, ScanLevel.L1)
+    new_scan_level_by_reference(xtdb_url2.reference, ScanLevel.L1)
+
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
+
+    new_scan_level_by_reference(xtdb_url1.reference, ScanLevel.L2)
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
+
+    new_scan_level_by_reference(xtdb_url2.reference, ScanLevel.L2)
+    assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
