@@ -54,10 +54,16 @@ class PriorityQueueStore:
     def pop_boefje(
         self, scheduler_id: str | None = None, limit: int | None = 1, filters: FilterRequest | None = None
     ) -> list[models.Task]:
+        """Custom pop method for the `BoefjeScheduler`"""
         with self.dbconn.session.begin() as session:
             query = self.build_pop_query(session, scheduler_id, limit, filters)
 
             try:
+                # Create a subquery to find the most common `env_hash` value
+                # from the `data` JSON field in TaskDB. This extracts the
+                # "env_hash" key from the JSON column, groups tasks by it,
+                # orders them by descending count, and limits to the top
+                # result.
                 top_env_hash = (
                     session.query(models.TaskDB.data["env_hash"].astext.label("env_hash"))
                     .group_by(models.TaskDB.data["env_hash"].astext)
