@@ -9,15 +9,20 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
+from octopoes.models.types import Finding, KATFindingType
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
     website_original = Reference.from_str(input_ooi["primary_key"])
+    valid_results = {}
 
     for path, details in results.items():
-        if details["content"] is None:
+        # remove any nonsense locations from our validresults.
+        if details["content"] is None or details.get("status", 200) != 200:
             continue
+        valid_results[path] = details
+
         url_original = URL(
             raw=f'{input_ooi["ip_service"]["service"]["name"]}://{input_ooi["hostname"]["name"]}/{path}',
             network=Network(name=input_ooi["hostname"]["network"]["name"]).reference,
@@ -25,6 +30,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         yield url_original
         url = URL(raw=details["url"], network=Network(name=input_ooi["hostname"]["network"]["name"]).reference)
         yield url
+
         url_parts = urlparse(details["url"])
         # we need to check if the website of the response is the same as the input website
         if (
@@ -82,3 +88,11 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                 security_txt=None,
             )
             yield security_txt_original
+
+    # Check for legacy url https://www.rfc-editor.org/rfc/rfc9116#section-3-1
+    if "security.txt" in valid_results and ".well-known/security.txt" not in valid_results:
+        ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
+        yield ft
+        yield Finding(
+            description="Only legacy /security.txt location found.", finding_type=ft.reference, ooi=website_original
+        )

@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
@@ -133,9 +133,10 @@ class WebSystemReport(Report):
         no_certificate_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-CERTIFICATE"]
         )
-        query = "Hostname.<hostname[is Website].<website[is SecurityTXT]"
-        has_security_txt_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames)
+        query = "Hostname.<hostname[is Website].<ooi[is Finding].finding_type"
+        security_txt_finding_types = self.group_finding_types_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            ["KAT-NO-SECURITY-TXT", "KAT-LEGACY-SECURITY-LOCATION"],
         )
         query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
         port_finding_types = self.group_finding_types_by_source(
@@ -162,16 +163,7 @@ class WebSystemReport(Report):
                 )
                 check.redirects_http_https = not any(url_finding_types.get(hostname, []))
                 check.offers_https = not any(no_certificate_finding_types.get(hostname, []))
-                check.has_security_txt = bool(has_security_txt_finding_types.get(hostname, []))
-                security_txt_finding_types = [
-                    KATFindingType(
-                        id="KAT-NO-SECURITY-TXT",
-                        description="This hostname does not have a Security.txt file.",
-                        risk_severity=RiskLevelSeverity.RECOMMENDATION,
-                        recommendation="Make sure there is a security.txt available.",
-                    )
-                ]
-
+                check.has_security_txt = not any(security_txt_finding_types.get(hostname, []))
                 check.no_uncommon_ports = not any(port_finding_types.get(hostname, []))
                 check.has_certificates = check.offers_https
                 check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
@@ -191,7 +183,7 @@ class WebSystemReport(Report):
                     + no_certificate_finding_types.get(hostname, [])
                     + port_finding_types.get(hostname, [])
                     + certificate_finding_types.get(hostname, [])
-                    + security_txt_finding_types
+                    + security_txt_finding_types.get(hostname, [])
                 )
 
                 for finding_type in new_types:
