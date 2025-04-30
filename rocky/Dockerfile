@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.13
 FROM node:20-bookworm AS node_builder
 
 WORKDIR /app
