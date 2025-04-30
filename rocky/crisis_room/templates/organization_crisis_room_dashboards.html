@@ -34,9 +34,9 @@
                 {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
             {% else %}
-                <div class="tiles">
+                <div class="tiles column-2">
                     {% for dashboard_item in dashboard_items %}
-                        <section>
+                        <section class="width-{{ dashboard_item.item.settings.size }}">
                             {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
                             <div class="horizontal-view">

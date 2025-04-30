@@ -3,7 +3,7 @@ from typing import Any
 import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models, transaction
+from django.db import connection, models, transaction
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +15,8 @@ logger = structlog.get_logger(__name__)
 class Dashboard(models.Model):
     name = models.CharField(blank=False, max_length=126)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ["name", "organization"]
@@ -36,6 +38,8 @@ def get_default_dashboard_data_settings() -> dict[str, Any]:
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
     name = models.CharField(blank=True, null=True, max_length=126)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
     query_from = models.CharField(blank=True, max_length=32, null=True)
     query = models.CharField(blank=True, null=True)
@@ -117,10 +121,11 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
-    if not instance.DoesNotExist:
-        position = instance.position
-        dashboard = instance.dashboard.id
-        DashboardData.objects.raw(
+    """Change the position of the other items on the dashboard after deleting one object."""
+    position = instance.position
+    dashboard = instance.dashboard_id
+    with connection.cursor() as cursor:
+        cursor.execute(
             "UPDATE crisis_room_dashboarddata "
             "SET position = position - 1 "
             "WHERE position > %s "
