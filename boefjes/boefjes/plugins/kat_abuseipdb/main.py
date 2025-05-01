@@ -3,18 +3,16 @@ from os import getenv
 
 import httpx
 
-from boefjes.job_models import BoefjeMeta
-
 REQUEST_TIMEOUT = 60
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """Make request to AbuseIPDB."""
 
-    if boefje_meta.arguments["input"]["network"]["name"] != "internet":
+    if boefje_meta["arguments"]["input"]["network"]["name"] != "internet":
         return [({"info/boefje"}, "Skipping non-internet network")]
 
-    ip_raw = str(boefje_meta.arguments["input"]["address"])
+    ip_raw = str(boefje_meta["arguments"]["input"]["address"])
     ip = ip_address(ip_raw)
 
     # Skip private, multicast, or reserved IP addresses
