@@ -131,6 +131,8 @@ class HTTPService(Connector):
                 delay = min(2**i, 60)  # Exponential backoff with a max delay of 60 seconds
                 time.sleep(delay)
 
+        raise RuntimeError("Request failed after maximum retries")
+
     @property
     def headers(self) -> MutableMapping[str, str]:
         return self.session.headers
