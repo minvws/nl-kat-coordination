@@ -249,28 +249,3 @@ class NormalizerScheduler(Scheduler):
             True if the raw data contains errors, False otherwise.
         """
         return any(mime_type.get("value", "").startswith("error/") for mime_type in raw_data.mime_types)
-
-    def get_normalizers_for_mime_type(self, mime_type: str, organisation: str) -> list[models.Plugin]:
-        """Get available normalizers for a given mime type.
-
-        Args:
-            mime_type : The mime type to get normalizers for.
-
-        Returns:
-            A list of Plugins of type normalizer for the given mime type.
-        """
-        try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(organisation, mime_type)
-        except ExternalServiceError:
-            self.logger.error(
-                "Failed to get normalizers for mime type %s",
-                mime_type,
-                mime_type=mime_type,
-                scheduler_id=self.scheduler_id,
-            )
-            return []
-
-        if normalizers is None:
-            return []
-
-        return normalizers

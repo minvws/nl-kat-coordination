@@ -1,8 +1,11 @@
 import time
 from functools import wraps
 
+import psycopg2
 import sqlalchemy
 import structlog
+
+from scheduler.storage.errors import StorageError
 
 logger = structlog.getLogger(__name__)
 
@@ -14,7 +17,7 @@ def retry(max_retries: int = 3, retry_delay: float = 5.0):
             for i in range(max_retries):
                 try:
                     return func(*args, **kwargs)
-                except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InternalError) as e:
+                except (StorageError, sqlalchemy.exc.OperationalError, sqlalchemy.exc.InternalError) as e:
                     if i == max_retries - 1:
                         raise e
 

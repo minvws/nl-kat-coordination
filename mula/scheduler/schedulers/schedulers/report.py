@@ -44,29 +44,21 @@ class ReportScheduler(Scheduler):
 
     @tracer.start_as_current_span(name="ReportScheduler.process_rescheduling")
     def process_rescheduling(self):
-        try:
-            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
-                filters=filters.FilterRequest(
-                    filters=[
-                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
-                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
-                        filters.Filter(column="enabled", operator="eq", value=True),
-                    ]
-                )
+        schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
+            filters=filters.FilterRequest(
+                filters=[
+                    filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                    filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                    filters.Filter(column="enabled", operator="eq", value=True),
+                ]
             )
+        )
 
-            # Create report tasks for the schedules
-            report_tasks = []
-            for schedule in schedules:
-                report_task = models.ReportTask.model_validate(schedule.data)
-                report_tasks.append(report_task)
-        except (StorageError, ValidationError, ExternalServiceError):
-            self.logger.exception(
-                "Failed to get schedules for rescheduling",
-                scheduler_id=self.scheduler_id,
-                item_type=self.queue.item_type.__name__,
-            )
-            return
+        # Create report tasks for the schedules
+        report_tasks = []
+        for schedule in schedules:
+            report_task = models.ReportTask.model_validate(schedule.data)
+            report_tasks.append(report_task)
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-rescheduling") as executor:
             for report_task in report_tasks:
