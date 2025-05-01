@@ -98,3 +98,70 @@ Event code Model              Routing key            Description                
 ========== ================== ====================== =========================================== ===== =======
 
 \* differentiates from the suggested event code.
+
+Proposition
+-----------
+
+The proposition is to use the event code with ``PCCCEE``, where:
+- P = Project
+- CCC = Category
+- EE = Event
+
+Projects (Root Folder)
+----------------------
+
+- Boefjes - scanners and normalizers = 5
+- Bytes (raw data storage) = 6
+- Mula (scheduler) = 7
+- Octopies (datamodel) = 8
+- Rocky (Front-End) = 9
+
+Category (Action / Sub Folder)
+------------------------------
+
+- login_event = 000
+- account = 001
+- organization = 002
+- crisis_room = 003
+- katalogus = 004
+
+========== ================== ====================== =========================================== =====
+Event code Model              Category               Description                                 CRUDE
+========== ================== ====================== =========================================== =====
+900001     User               login_event            A user logged in.                           E    
+900002     User               login_event            A user logged out.                          E 
+900003     AuthToken          login_event            A user MFA succeeded.                       E
+900004     AuthToken          login_event            A user MFA failed.                          E
+900005     User               login_event            A user login failed.                        E
+900101     User               account                A user is created.                          C    
+900102     User               account                User data changed.                          U    
+900103     User               account                A user is removed.                          D    
+900104     KATUser            account                Account status changed (Enabled/Disabled).  U
+900105     KATUser            account                User credential reset is performed.         E
+900106     OrganizationMember account                User organization membership changed.       U
+900107     AuthToken          account                2FA reset is performed                      E
+900108     Indemnification    account                Set max allowed indemnification for user.   U
+900109     Indemnification    account                Set max accepted indemnification for user.  U
+900110     AuthToken          account                2FA is created.                             C
+900111     AuthToken          account                2FA is updated.                             U
+900112     AuthToken          account                2FA is removed.                             D
+900113     KATUser            account                An user account type changed.               U
+900201     Organization       organization           A new organization is created.              C
+900202     Organization       organization           Organization information changed.           U
+900203     Organization       organization           Organization is removed.                    D
+900211     OrganizationMember organization           User organization membership created.       C
+900212     OrganizationMember organization           User organization membership changed.       U
+900213     OrganizationMember organization           User organization membership removed.       D
+900301     Dashboard          crisis_room            A dashboard was created.                    C
+900302     Dashboard          crisis_room            A dashboard was updated.                    U
+900303     Dashboard          crisis_room            A dashboard was deleted.                    D
+900304     ReportRecipe       crisis_room            A report recipe was created.                C
+900305     ReportRecipe       crisis_room            A report recipe was updated.                U
+900306     ReportRecipe       crisis_room            A report recipe was deleted.                D
+900304     ScheduleRequest    crisis_room            A scheduled task was created.               C
+900305     ScheduleRequest    crisis_room            A scheduled task was updated.               U
+900306     ScheduleRequest    crisis_room            A scheduled task was deleted.               D
+900401     Boefje             katalogus              A boefje was created.                       C        
+900402     Boefje             katalogus              A boefje was updated.                       U
+900403     Boefje             katalogus              A boefje was deleted.                       D
+900404     Boefje             katalogus              A KATalogus error occured                   E
