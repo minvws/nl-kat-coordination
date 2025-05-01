@@ -2,7 +2,7 @@ import yaml
 import io
 import logging
 from collections.abc import Iterable
-from typing import Any, TypedDict
+from typing import Any, TypedDict, NotRequired
 
 from pydantic import ValidationError
 
@@ -34,102 +34,102 @@ from octopoes.models.ooi.certificate import SubjectAlternativeName, SubjectAlter
 
 class OOITypeEntry(TypedDict):
     type: Any
-    distinctive_fields: list[str]
+    distinctive_fields: NotRequired[list[str]]
 
 OOI_TYPES: dict[str, OOITypeEntry] = {
     # Records
-    "DNSARecord": {"type": DNSARecord, "distinctive_fields": DNSARecord._natural_key_attrs},
-    "DNSAAAARecord": {"type": DNSAAAARecord, "distinctive_fields": DNSAAAARecord._natural_key_attrs},
-    "DNSMXRecord": {"type": DNSMXRecord, "distinctive_fields": DNSMXRecord._natural_key_attrs},
-    "DNSTXTRecord": {"type": DNSTXTRecord, "distinctive_fields": DNSTXTRecord._natural_key_attrs},
-    "DNSNSRecord": {"type": DNSNSRecord, "distinctive_fields": DNSNSRecord._natural_key_attrs},
-    "DNSCNAMERecord": {"type": DNSCNAMERecord, "distinctive_fields": DNSCNAMERecord._natural_key_attrs},
-    "DNSSOARecord": {"type": DNSSOARecord, "distinctive_fields": DNSSOARecord._natural_key_attrs},
-    "NXDOMAIN": {"type": NXDOMAIN, "distinctive_fields": NXDOMAIN._natural_key_attrs},
-    "DNSPTRRecord": {"type": DNSPTRRecord, "distinctive_fields": DNSPTRRecord._natural_key_attrs},
-    "DNSCAARecord": {"type": DNSCAARecord, "distinctive_fields": DNSCAARecord._natural_key_attrs},
+    "DNSARecord": {"type": DNSARecord },
+    "DNSAAAARecord": {"type": DNSAAAARecord },
+    "DNSMXRecord": {"type": DNSMXRecord },
+    "DNSTXTRecord": {"type": DNSTXTRecord },
+    "DNSNSRecord": {"type": DNSNSRecord },
+    "DNSCNAMERecord": {"type": DNSCNAMERecord },
+    "DNSSOARecord": {"type": DNSSOARecord },
+    "NXDOMAIN": {"type": NXDOMAIN },
+    "DNSPTRRecord": {"type": DNSPTRRecord },
+    "DNSCAARecord": {"type": DNSCAARecord },
     # Zone
-    "DNSZone": {"type": DNSZone, "distinctive_fields": DNSZone._natural_key_attrs},
-    "Hostname": {"type": Hostname, "distinctive_fields": Hostname._natural_key_attrs},
-    "ResolvedHostname": {"type": ResolvedHostname, "distinctive_fields": ResolvedHostname._natural_key_attrs},
+    "DNSZone": {"type": DNSZone },
+    "Hostname": {"type": Hostname },
+    "ResolvedHostname": {"type": ResolvedHostname },
     # Certificate
-    "X509Certificate": {"type": X509Certificate, "distinctive_fields": X509Certificate._natural_key_attrs},
-    "SubjectAlternativeNameHostname": {"type": SubjectAlternativeNameHostname, "distinctive_fields": SubjectAlternativeNameHostname._natural_key_attrs},
-    "SubjectAlternativeNameIP": {"type": SubjectAlternativeNameIP, "distinctive_fields": SubjectAlternativeNameIP._natural_key_attrs},
-    "SubjectAlternativeNameQualifier": {"type": SubjectAlternativeNameQualifier, "distinctive_fields": SubjectAlternativeNameQualifier._natural_key_attrs},
+    "X509Certificate": {"type": X509Certificate },
+    "SubjectAlternativeNameHostname": {"type": SubjectAlternativeNameHostname },
+    "SubjectAlternativeNameIP": {"type": SubjectAlternativeNameIP },
+    "SubjectAlternativeNameQualifier": {"type": SubjectAlternativeNameQualifier },
     # Config
-    "Config": {"type": Config, "distinctive_fields": Config._natural_key_attrs},
+    "Config": {"type": Config },
     # Email Security
-    "DNSSPFRecord": {"type": DNSSPFRecord, "distinctive_fields": DNSSPFRecord._natural_key_attrs},
-    "DNSSPFMechanismIP": {"type": DNSSPFMechanismIP, "distinctive_fields": DNSSPFMechanismIP._natural_key_attrs},
-    "DNSSPFMechanismHostname": {"type": DNSSPFMechanismHostname, "distinctive_fields": DNSSPFMechanismHostname._natural_key_attrs},
-    "DNSSPFMechanismNetBlock": {"type": DNSSPFMechanismNetBlock, "distinctive_fields": DNSSPFMechanismNetBlock._natural_key_attrs},
-    "DMARCTXTRecord": {"type": DMARCTXTRecord, "distinctive_fields": DMARCTXTRecord._natural_key_attrs},
-    "DKIMExists": {"type": DKIMExists, "distinctive_fields": DKIMExists._natural_key_attrs},
-    "DKIMSelector": {"type": DKIMSelector, "distinctive_fields": DKIMSelector._natural_key_attrs},
-    "DKIMKey": {"type": DKIMKey, "distinctive_fields": DKIMKey._natural_key_attrs},
+    "DNSSPFRecord": {"type": DNSSPFRecord },
+    "DNSSPFMechanismIP": {"type": DNSSPFMechanismIP },
+    "DNSSPFMechanismHostname": {"type": DNSSPFMechanismHostname },
+    "DNSSPFMechanismNetBlock": {"type": DNSSPFMechanismNetBlock },
+    "DMARCTXTRecord": {"type": DMARCTXTRecord },
+    "DKIMExists": {"type": DKIMExists },
+    "DKIMSelector": {"type": DKIMSelector },
+    "DKIMKey": {"type": DKIMKey },
     # Findings
-    # ?baseclass :: referenced at Finding :: TypeFromRaw added
-    "FindingType": {"type": FindingType, "distinctive_fields": FindingType._natural_key_attrs},
-    "ADRFindingType": {"type": ADRFindingType, "distinctive_fields": ADRFindingType._natural_key_attrs},
-    "CVEFindingType": {"type": CVEFindingType, "distinctive_fields": CVEFindingType._natural_key_attrs},
-    "CWEFindingType": {"type": CWEFindingType, "distinctive_fields": CWEFindingType._natural_key_attrs},
-    "CAPECFindingType": {"type": CAPECFindingType, "distinctive_fields": CAPECFindingType._natural_key_attrs},
-    "RetireJSFindingType": {"type": RetireJSFindingType, "distinctive_fields": RetireJSFindingType._natural_key_attrs},
-    "SnykFindingType": {"type": SnykFindingType, "distinctive_fields": SnykFindingType._natural_key_attrs},
-    "KATFindingType": {"type": KATFindingType, "distinctive_fields": KATFindingType._natural_key_attrs},
+    # ?baseclass
+    "FindingType": {"type": FindingType },
+    "ADRFindingType": {"type": ADRFindingType },
+    "CVEFindingType": {"type": CVEFindingType },
+    "CWEFindingType": {"type": CWEFindingType },
+    "CAPECFindingType": {"type": CAPECFindingType },
+    "RetireJSFindingType": {"type": RetireJSFindingType },
+    "SnykFindingType": {"type": SnykFindingType },
+    "KATFindingType": {"type": KATFindingType },
     "Finding": {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]},
-    "MutedFinding": {"type": MutedFinding, "distinctive_fields": MutedFinding._natural_key_attrs},
+    "MutedFinding": {"type": MutedFinding },
     # Geography
     "GeographicPoint": {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]},
     # Monitoring
-    "Application": {"type": Application, "distinctive_fields": Application._natural_key_attrs},
-    "Incident": {"type": Incident, "distinctive_fields": Incident._natural_key_attrs},
+    "Application": {"type": Application },
+    "Incident": {"type": Incident },
     # Network
-    "Network": {"type": Network, "distinctive_fields": Network._natural_key_attrs},
-    # ?baseclass :: referenced at IPPort, ResolvedHostname ... :: TypeFromRaw added
-    "IPAddress": {"type": IPAddress, "distinctive_fields": IPAddress._natural_key_attrs},
-    "IPAddressV4": {"type": IPAddressV4, "distinctive_fields": IPAddressV4._natural_key_attrs},
-    "IPAddressV6": {"type": IPAddressV6, "distinctive_fields": IPAddressV6._natural_key_attrs},
-    "IPPort": {"type": IPPort, "distinctive_fields": IPPort._natural_key_attrs},
-    "AutonomousSystem": {"type": AutonomousSystem, "distinctive_fields": AutonomousSystem._natural_key_attrs},
-    # ?baseclass :: referenced at DNSSPFMechanismNetBlock :: TypeFromRaw added
-    "NetBlock": {"type": NetBlock, "distinctive_fields": NetBlock._natural_key_attrs},
-    "IPV6NetBlock": {"type": IPV6NetBlock, "distinctive_fields": IPV6NetBlock._natural_key_attrs},
-    "IPV4NetBlock": {"type": IPV4NetBlock, "distinctive_fields": IPV4NetBlock._natural_key_attrs},
+    "Network": {"type": Network },
+    # ?baseclass
+    "IPAddress": {"type": IPAddress },
+    "IPAddressV4": {"type": IPAddressV4 },
+    "IPAddressV6": {"type": IPAddressV6 },
+    "IPPort": {"type": IPPort },
+    "AutonomousSystem": {"type": AutonomousSystem },
+    # ?baseclass
+    "NetBlock": {"type": NetBlock },
+    "IPV6NetBlock": {"type": IPV6NetBlock },
+    "IPV4NetBlock": {"type": IPV4NetBlock },
     # Question
-    "Question": {"type": Question, "distinctive_fields": Question._natural_key_attrs},
+    "Question": {"type": Question },
     # Reports
-    "ReportData": {"type": ReportData, "distinctive_fields": ReportData._natural_key_attrs},
-    "AssetReport": {"type": AssetReport, "distinctive_fields": AssetReport._natural_key_attrs},
-    "Report": {"type": Report, "distinctive_fields": Report._natural_key_attrs},
-    "HydratedReport": {"type": HydratedReport, "distinctive_fields": HydratedReport._natural_key_attrs},
-    "ReportRecipe": {"type": ReportRecipe, "distinctive_fields": ReportRecipe._natural_key_attrs},
+    "ReportData": {"type": ReportData },
+    "AssetReport": {"type": AssetReport },
+    "Report": {"type": Report },
+    "HydratedReport": {"type": HydratedReport },
+    "ReportRecipe": {"type": ReportRecipe },
     # Scans
-    "ExternalScan": {"type": ExternalScan, "distinctive_fields": ExternalScan._natural_key_attrs},
+    "ExternalScan": {"type": ExternalScan },
     # Service
-    "Service": {"type": Service, "distinctive_fields": Service._natural_key_attrs},
-    "IPService": {"type": IPService, "distinctive_fields": IPService._natural_key_attrs},
-    "TLSCipher": {"type": TLSCipher, "distinctive_fields": TLSCipher._natural_key_attrs},
+    "Service": {"type": Service },
+    "IPService": {"type": IPService },
+    "TLSCipher": {"type": TLSCipher },
     # Software
-    "Software": {"type": Software, "distinctive_fields": Software._natural_key_attrs},
-    "SoftwareInstance": {"type": SoftwareInstance, "distinctive_fields": SoftwareInstance._natural_key_attrs},
+    "Software": {"type": Software },
+    "SoftwareInstance": {"type": SoftwareInstance },
     # Web
-    "Website": {"type": Website, "distinctive_fields": Website._natural_key_attrs},
-    # ?baseclass :: referenced at URL, RESTAPI ... :: need to initialize with proper class
+    "Website": {"type": Website },
+    # ?baseclass
     "WebURL": {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]},
-    "HostnameHTTPURL": {"type": HostnameHTTPURL, "distinctive_fields": HostnameHTTPURL._natural_key_attrs},
-    "IPAddressHTTPURL": {"type": IPAddressHTTPURL, "distinctive_fields": IPAddressHTTPURL._natural_key_attrs},
-    "HTTPResource": {"type": HTTPResource, "distinctive_fields": HTTPResource._natural_key_attrs},
-    "HTTPHeader": {"type": HTTPHeader, "distinctive_fields": HTTPHeader._natural_key_attrs},
-    "URL": {"type": URL, "distinctive_fields": URL._natural_key_attrs},
-    "HTTPHeaderURL": {"type": HTTPHeaderURL, "distinctive_fields": HTTPHeaderURL._natural_key_attrs},
-    "HTTPHeaderHostname": {"type": HTTPHeaderHostname, "distinctive_fields": HTTPHeaderHostname._natural_key_attrs},
-    "ImageMetadata": {"type": ImageMetadata, "distinctive_fields": ImageMetadata._natural_key_attrs},
-    "RESTAPI": {"type": RESTAPI, "distinctive_fields": RESTAPI._natural_key_attrs},
-    "APIDesignRule": {"type": APIDesignRule, "distinctive_fields": APIDesignRule._natural_key_attrs},
-    "APIDesignRuleResult": {"type": APIDesignRuleResult, "distinctive_fields": APIDesignRuleResult._natural_key_attrs},
-    "SecurityTXT": {"type": SecurityTXT, "distinctive_fields": SecurityTXT._natural_key_attrs},
+    "HostnameHTTPURL": {"type": HostnameHTTPURL },
+    "IPAddressHTTPURL": {"type": IPAddressHTTPURL },
+    "HTTPResource": {"type": HTTPResource },
+    "HTTPHeader": {"type": HTTPHeader },
+    "URL": {"type": URL },
+    "HTTPHeaderURL": {"type": HTTPHeaderURL },
+    "HTTPHeaderHostname": {"type": HTTPHeaderHostname },
+    "ImageMetadata": {"type": ImageMetadata },
+    "RESTAPI": {"type": RESTAPI },
+    "APIDesignRule": {"type": APIDesignRule },
+    "APIDesignRuleResult": {"type": APIDesignRuleResult },
+    "SecurityTXT": {"type": SecurityTXT },
 }
 
 logger = logging.getLogger(__name__)
@@ -153,6 +153,9 @@ def process_yml(yml_raw_data: bytes, reference_cache: dict) -> Iterable[Normaliz
             logger.exception(f"with error: {str(err)}")
     return oois
 
+def get_distinctive_fields(ooi_type):
+    return OOI_TYPES[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
+
 def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     # constants
     skip_properties = ("object_type", "scan_profile", "primary_key", "user_id")
@@ -161,12 +164,8 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     # Special Cases
     if hasattr(ooi_type, 'type_from_raw'): ooi_type = ooi_type.type_from_raw(ooi_dict)
     # check for cache
-    dins_fields = OOI_TYPES[ooi_type.__name__].get('distinctive_fields')
-    if dins_fields:
-        field_name = get_cache_name(ooi_dict, OOI_TYPES[ooi_type.__name__].get('distinctive_fields'))
-        cache = reference_cache.setdefault(ooi_type.__name__, {})
-        if ooi_dict[field_name] in cache:
-            return cache[ooi_dict[field_name]]
+    cache, cache_field_name = get_cache_and_field_name(ooi_type, ooi_dict, reference_cache)
+    if cache_field_name in cache: return cache[cache_field_name]
     # creation process
     ooi_fields = [
         (field, field if model_field.annotation != Reference else model_field.json_schema_extra['object_type'], model_field.annotation == Reference, model_field.is_required())
@@ -197,13 +196,16 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
         elif not is_reference and (required or not required and ooi_dict.get(field)):
             kwargs[field] = ooi_dict.get(field)
     ooi = ooi_type(**kwargs)
-    dins_field_comb = OOI_TYPES[ooi_type.__name__].get('distinctive_fields')
-    if dins_field_comb:
-        field_name = get_cache_name(ooi_dict, dins_field_comb)
-        cache = reference_cache.setdefault(ooi_type.__name__, {})
-        cache[ooi_dict[field_name]] = ooi
+    # Save to cache
+    cache[cache_field_name] = ooi
     oois_list.append(NormalizerDeclaration(ooi=ooi))
     return ooi
+    
+def get_cache_and_field_name(ooi_type, ooi_dict: dict, reference_cache:dict):
+    dins_fields = get_distinctive_fields(ooi_type)
+    cache_field_name = get_cache_name(ooi_dict, dins_fields)
+    cache = reference_cache.setdefault(ooi_type.__name__, {})
+    return cache, cache_field_name
 
 def get_cache_name(ooi_dict:dict, field_combination: list[str]):
     """It creates name for cache from str values of distinctive fields"""

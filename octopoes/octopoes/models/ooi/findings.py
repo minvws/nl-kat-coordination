@@ -76,6 +76,10 @@ class FindingType(OOI):
     
     @classmethod
     def type_from_raw(cls, raw_input:dict):
+        requested_type = raw_input["id"].split("-", 1)[0]
+        for cls in FindingType.__subclasses__():
+          if cls.__name__.startswith(requested_type):
+            return cls
         return KATFindingType
 
 
