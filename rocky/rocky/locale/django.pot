@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-29 12:18+0000\n"
+"POT-Creation-Date: 2025-04-30 08:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7201,6 +7201,11 @@ msgstr ""
 #: rocky/views/ooi_add.py
 #, python-format
 msgid "Add %(ooi_type)s"
+msgstr ""
+
+#: rocky/views/ooi_detail.py
+msgid ""
+"Cannot set clearance level. It must be provided and must be a valid number."
 msgstr ""
 
 #: rocky/views/ooi_detail.py
