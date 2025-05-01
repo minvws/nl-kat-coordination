@@ -1,0 +1,11 @@
+{
+  "id": "withaname",
+  "name": "Witha.name Ddossia lookup",
+  "description": "Use witha.name to see if our hostnames or ipaddresses are listed for targeting.",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6",
+    "Hostname"
+  ],
+  "scan_level": 1
+}
