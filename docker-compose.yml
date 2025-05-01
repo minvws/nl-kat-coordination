@@ -268,7 +268,7 @@ services:
   pyroscope:
     profiles:
       - monitoring
-    image: docker.io/grafana/pyroscope
+    image: docker.io/grafana/pyroscope:1.13.2
     ports:
       - 4040:4040
 
