@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 ARG BOEFJE_PATH
 ENV PYTHONPATH=/app:$BOEFJE_PATH
