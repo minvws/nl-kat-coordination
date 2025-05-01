@@ -92,8 +92,8 @@ class NormalizerScheduler(Scheduler):
         # Get all unique normalizers for the mime types of the raw data
         normalizers: dict[str, models.Plugin] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type = self.get_normalizers_for_mime_type(
-                mime_type.get("value"), latest_raw_data.organization
+            normalizers_by_mime_type = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
+                latest_raw_data.organization, mime_type.get("value")
             )
 
             self.logger.debug(

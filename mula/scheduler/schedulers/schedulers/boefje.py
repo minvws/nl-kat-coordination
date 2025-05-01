@@ -120,7 +120,7 @@ class BoefjeScheduler(Scheduler):
             if not boefjes:
                 self.logger.debug("No boefjes available for %s", ooi.primary_key, scheduler_id=self.scheduler_id)
                 return
-        except (StorageError, ValidationError):
+        except (StorageError, ValidationError, ExternalServiceError):
             self.logger.exception("Error occurred while processing mutation", scheduler_id=self.scheduler_id)
             return
 
@@ -239,7 +239,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 return
         except StorageError:
-            self.logger.exception("Error occurred while processing rescheduling", scheduler_id=self.scheduler_id)
+            self.logger.warning("Error occurred while processing rescheduling", scheduler_id=self.scheduler_id)
             return
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-rescheduling") as executor:
