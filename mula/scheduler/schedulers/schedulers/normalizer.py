@@ -6,7 +6,6 @@ from opentelemetry import trace
 from pydantic import ValidationError
 
 from scheduler import clients, context, models
-from scheduler.clients.errors import ExternalServiceError
 from scheduler.schedulers import Scheduler, rankers
 from scheduler.schedulers.errors import exception_handler
 

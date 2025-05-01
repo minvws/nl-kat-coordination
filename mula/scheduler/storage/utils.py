@@ -1,7 +1,6 @@
 import time
 from functools import wraps
 
-import psycopg2
 import sqlalchemy
 import structlog
 

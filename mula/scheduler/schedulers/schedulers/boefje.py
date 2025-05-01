@@ -4,16 +4,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry import trace
-from pydantic import ValidationError
 
 from scheduler import clients, context, models
-from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, rankers
 from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
-from scheduler.storage.errors import StorageError
 
 tracer = trace.get_tracer(__name__)
 
