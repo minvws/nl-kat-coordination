@@ -270,7 +270,10 @@ def slowest_queries(ctx: click.Context):
     click.echo(json.dumps(client.slowest_queries()))
 
 
-@cli.command(help="Deletes all OOI's of the given type with an evict. (OOITypes are Case sensitive). This does not remove the assoiated Origins or references and might leave your database in an unknown state for some related objects.")
+@cli.command(
+    help="""Deletes all OOI's of the given type with an evict. (OOITypes are Case sensitive). 
+    This does not remove the assoiated Origins or References and might leave your database in an unknown state for some related objects."""
+)
 @click.option("--ooitype", help="The type of OOI to evict")
 @click.pass_context
 def evict_all_of_type(ctx: click.Context, ooitype: str):
@@ -278,7 +281,7 @@ def evict_all_of_type(ctx: click.Context, ooitype: str):
     ooitype = re.sub(r"[^a-zA-Z0-9]", "", ooitype)  # sanitize the object type.
     if not ooitype:
         return
-    oois = client.query(f'{{:query {{:find [ ?var ] :where [[?var :object_type "{ooitype}" ]]}}}}') 
+    oois = client.query(f'{{:query {{:find [ ?var ] :where [[?var :object_type "{ooitype}" ]]}}}}')
     # the query has double brackets due to fstring parsing
     transactions = []
 
