@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-01 07:41+0000\n"
+"POT-Creation-Date: 2025-05-01 08:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1150,13 +1150,11 @@ msgid "explanation"
 msgstr ""
 
 #: katalogus/templates/partials/no_enabling_permission_message.html
-msgid "No permission to enable/disable:"
+msgid "No permission to enable/disable plugins"
 msgstr ""
 
 #: katalogus/templates/partials/no_enabling_permission_message.html
-msgid ""
-"You don't have permission to enable or disable plugins. Contact the "
-"administrator if you require these permissions."
+msgid "Contact your administrator to request permission."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
