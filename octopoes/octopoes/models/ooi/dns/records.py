@@ -28,6 +28,31 @@ class DNSRecord(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         dns_record_type = cls._get_record_type()
         return f"{reference.tokenized.hostname.name} {dns_record_type} {reference.tokenized.value}"
+    
+    @classmethod
+    def type_from_raw(cls, raw_input:dict):
+        match raw_input.get("dns_record_type"):
+            case "A":
+                return DNSARecord
+            case "AAAA":
+                return DNSAAAARecord
+            case "CAA":
+                return DNSCAARecord
+            case "CNAME":
+                return DNSCNAMERecord
+            case "MX":
+                return DNSMXRecord
+            case "NS":
+                return DNSNSRecord
+            case "PTR":
+                return DNSPTRRecord
+            case "SOA":
+                return DNSSOARecord
+            # case "SRV":
+            #     return
+            case "TXT":
+                return DNSTXTRecord
+        raise ValueError("Falsy DNS record type provided. Using other DNSRecord type OOIs can be better.")
 
 
 class DNSARecord(DNSRecord):

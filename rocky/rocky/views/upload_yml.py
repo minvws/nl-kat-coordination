@@ -3,6 +3,7 @@ import io
 from datetime import datetime, timezone
 from typing import Any, ClassVar, TypedDict
 from uuid import uuid4
+from functools import reduce
 
 import yaml.composer
 
@@ -20,28 +21,11 @@ from tools.forms.upload_oois import  UploadOOIYMLForm
 
 from octopoes.api.models import Declaration
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.dns.records import NXDOMAIN, DNSAAAARecord, DNSARecord, DNSCAARecord, \
-    DNSCNAMERecord, DNSMXRecord, DNSNSRecord, DNSPTRRecord, DNSRecord, DNSSOARecord, DNSTXTRecord
-from octopoes.models.ooi.email_security import DKIMExists, DKIMKey, DKIMSelector, DMARCTXTRecord, \
-    DNSSPFMechanism, DNSSPFMechanismHostname, DNSSPFMechanismIP, DNSSPFMechanismNetBlock, DNSSPFRecord
-from octopoes.models.ooi.findings import FindingType, ADRFindingType, CVEFindingType, CWEFindingType, \
-    CAPECFindingType, RetireJSFindingType, SnykFindingType, KATFindingType, Finding, MutedFinding
+
+from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.geography import GeographicPoint
-from octopoes.models.ooi.monitoring import Application, Incident
-from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.ooi.scans import ExternalScan
-from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
-from octopoes.models.ooi.network import AutonomousSystem, IPAddressV4, IPAddressV6, IPV4NetBlock, \
-    IPV6NetBlock, NetBlock, Network, IPAddress, IPPort
-from octopoes.models.ooi.web import URL, HostnameHTTPURL, WebURL, Website, IPAddressHTTPURL, HTTPResource, \
-    HTTPHeader, HTTPHeaderURL, HTTPHeaderHostname, ImageMetadata, RESTAPI, APIDesignRule, APIDesignRuleResult, \
-    SecurityTXT
-from octopoes.models.ooi.service import Service, IPService, TLSCipher
-from octopoes.models.ooi.software import Software, SoftwareInstance
-from octopoes.models.ooi.certificate import SubjectAlternativeName, SubjectAlternativeNameHostname, \
-    SubjectAlternativeNameIP, SubjectAlternativeNameQualifier, X509Certificate
+from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.web import WebURL
 
 from rocky.bytes_client import get_bytes_client
 
@@ -71,107 +55,34 @@ YML_CRITERIA = [
 
 CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0,1,2,3,4]
 
+def get_subclasses_deep(cls, res=[], sub_clss=[]):
+    if not len(sub_clss):
+        sub_clss = cls.__subclasses__()
+    for s_cls in sub_clss:
+        if s_cls not in res: res.append(s_cls)
+        new_sub_clss = s_cls.__subclasses__()
+        if len(new_sub_clss):
+            get_subclasses_deep(s_cls, res, new_sub_clss)
+    return res
 
 class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_yml.html"
     form_class = UploadOOIYMLForm
     permission_required = "tools.can_scan_organization"
     reference_cache: dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
-    ooi_types: ClassVar[dict[str, Any]] = {
-        # Records
-        "DNSARecord": {"type": DNSARecord },
-        "DNSAAAARecord": {"type": DNSAAAARecord },
-        "DNSMXRecord": {"type": DNSMXRecord },
-        "DNSTXTRecord": {"type": DNSTXTRecord },
-        "DNSNSRecord": {"type": DNSNSRecord },
-        "DNSCNAMERecord": {"type": DNSCNAMERecord },
-        "DNSSOARecord": {"type": DNSSOARecord },
-        "NXDOMAIN": {"type": NXDOMAIN },
-        "DNSPTRRecord": {"type": DNSPTRRecord },
-        "DNSCAARecord": {"type": DNSCAARecord },
-        # Zone
-        "DNSZone": {"type": DNSZone },
-        "Hostname": {"type": Hostname },
-        "ResolvedHostname": {"type": ResolvedHostname },
-        # Certificate
-        "X509Certificate": {"type": X509Certificate },
-        "SubjectAlternativeNameHostname": {"type": SubjectAlternativeNameHostname },
-        "SubjectAlternativeNameIP": {"type": SubjectAlternativeNameIP },
-        "SubjectAlternativeNameQualifier": {"type": SubjectAlternativeNameQualifier },
-        # Config
-        "Config": {"type": Config },
-        # Email Security
-        "DNSSPFRecord": {"type": DNSSPFRecord },
-        "DNSSPFMechanismIP": {"type": DNSSPFMechanismIP },
-        "DNSSPFMechanismHostname": {"type": DNSSPFMechanismHostname },
-        "DNSSPFMechanismNetBlock": {"type": DNSSPFMechanismNetBlock },
-        "DMARCTXTRecord": {"type": DMARCTXTRecord },
-        "DKIMExists": {"type": DKIMExists },
-        "DKIMSelector": {"type": DKIMSelector },
-        "DKIMKey": {"type": DKIMKey },
-        # Findings
-        # ?baseclass
-        "FindingType": {"type": FindingType },
-        "ADRFindingType": {"type": ADRFindingType },
-        "CVEFindingType": {"type": CVEFindingType },
-        "CWEFindingType": {"type": CWEFindingType },
-        "CAPECFindingType": {"type": CAPECFindingType },
-        "RetireJSFindingType": {"type": RetireJSFindingType },
-        "SnykFindingType": {"type": SnykFindingType },
-        "KATFindingType": {"type": KATFindingType },
-        "Finding": {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]},
-        "MutedFinding": {"type": MutedFinding },
-        # Geography
-        "GeographicPoint": {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]},
-        # Monitoring
-        "Application": {"type": Application },
-        "Incident": {"type": Incident },
-        # Network
-        "Network": {"type": Network },
-        # ?baseclass
-        "IPAddress": {"type": IPAddress },
-        "IPAddressV4": {"type": IPAddressV4 },
-        "IPAddressV6": {"type": IPAddressV6 },
-        "IPPort": {"type": IPPort },
-        "AutonomousSystem": {"type": AutonomousSystem },
-        # ?baseclass
-        "NetBlock": {"type": NetBlock },
-        "IPV6NetBlock": {"type": IPV6NetBlock },
-        "IPV4NetBlock": {"type": IPV4NetBlock },
-        # Question
-        "Question": {"type": Question },
-        # Reports
-        "ReportData": {"type": ReportData },
-        "AssetReport": {"type": AssetReport },
-        "Report": {"type": Report },
-        "HydratedReport": {"type": HydratedReport },
-        "ReportRecipe": {"type": ReportRecipe },
-        # Scans
-        "ExternalScan": {"type": ExternalScan },
-        # Service
-        "Service": {"type": Service },
-        "IPService": {"type": IPService },
-        "TLSCipher": {"type": TLSCipher },
-        # Software
-        "Software": {"type": Software },
-        "SoftwareInstance": {"type": SoftwareInstance },
-        # Web
-        "Website": {"type": Website },
-        # ?baseclass
-        "WebURL": {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]},
-        "HostnameHTTPURL": {"type": HostnameHTTPURL },
-        "IPAddressHTTPURL": {"type": IPAddressHTTPURL },
-        "HTTPResource": {"type": HTTPResource },
-        "HTTPHeader": {"type": HTTPHeader },
-        "URL": {"type": URL },
-        "HTTPHeaderURL": {"type": HTTPHeaderURL },
-        "HTTPHeaderHostname": {"type": HTTPHeaderHostname },
-        "ImageMetadata": {"type": ImageMetadata },
-        "RESTAPI": {"type": RESTAPI },
-        "APIDesignRule": {"type": APIDesignRule },
-        "APIDesignRuleResult": {"type": APIDesignRuleResult },
-        "SecurityTXT": {"type": SecurityTXT },
-    }
+    ooi_types: ClassVar[dict[str, Any]] = reduce(
+        lambda ooit, dic: ooit.update(dic) or ooit,
+        map(
+            lambda cls: { cls.__name__: { "type": cls } },
+            get_subclasses_deep(OOI)
+        ),
+        {}
+    )
+    # Types without _natural_key_attrs
+    ooi_types["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
+    ooi_types["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
+    ooi_types["WebURL"] = {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]}
+
     skip_properties = ("object_type", "scan_profile", "primary_key", "user_id")
 
     def setup(self, request, *args, **kwargs):
@@ -183,6 +94,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
+        base_ooi_classes = ["FindingType", "IPAddress", "NetBlock", "WebURL", "DNSRecord", "DNSSPFMechanism", "BaseReport"]
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
@@ -196,7 +108,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         context['ooi_types'] = list(filter(
             None,
             map(
-                lambda x: _(x) if x not in ["FindingType", "IPAddress", "NetBlock", "WebURL"] else None,
+                lambda x: _(x) if x not in base_ooi_classes else None,
                 self.ooi_types.keys()
             )
         ))

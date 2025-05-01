@@ -3,134 +3,44 @@ import io
 import logging
 from collections.abc import Iterable
 from typing import Any, TypedDict, NotRequired
+from functools import reduce
 
 from pydantic import ValidationError
 
 from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
 from octopoes.models import OOI, Reference
-from octopoes.models.types import OOIType
-from octopoes.models.ooi.config import Config
-from octopoes.models.ooi.dns.records import NXDOMAIN, DNSAAAARecord, DNSARecord, DNSCAARecord, \
-    DNSCNAMERecord, DNSMXRecord, DNSNSRecord, DNSPTRRecord, DNSRecord, DNSSOARecord, DNSTXTRecord
-from octopoes.models.ooi.email_security import DKIMExists, DKIMKey, DKIMSelector, DMARCTXTRecord, \
-    DNSSPFMechanism, DNSSPFMechanismHostname, DNSSPFMechanismIP, DNSSPFMechanismNetBlock, DNSSPFRecord
-from models.ooi.findings import FindingType, ADRFindingType, CVEFindingType, CWEFindingType, \
-    CAPECFindingType, RetireJSFindingType, SnykFindingType, KATFindingType, Finding, MutedFinding
+from models.ooi.findings import Finding
 from octopoes.models.ooi.geography import GeographicPoint
-from octopoes.models.ooi.monitoring import Application, Incident
-from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.ooi.scans import ExternalScan
-from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
-from octopoes.models.ooi.network import AutonomousSystem, IPAddressV4, IPAddressV6, IPV4NetBlock, \
-    IPV6NetBlock, NetBlock, Network, IPAddress, IPPort
-from octopoes.models.ooi.web import URL, HostnameHTTPURL, WebURL, Website, IPAddressHTTPURL, HTTPResource, \
-    HTTPHeader, HTTPHeaderURL, HTTPHeaderHostname, ImageMetadata, RESTAPI, APIDesignRule, APIDesignRuleResult, \
-    SecurityTXT
-from octopoes.models.ooi.service import Service, IPService, TLSCipher
-from octopoes.models.ooi.software import Software, SoftwareInstance
-from octopoes.models.ooi.certificate import SubjectAlternativeName, SubjectAlternativeNameHostname, \
-    SubjectAlternativeNameIP, SubjectAlternativeNameQualifier, X509Certificate
+from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.web import WebURL
 
 class OOITypeEntry(TypedDict):
     type: Any
     distinctive_fields: NotRequired[list[str]]
 
-OOI_TYPES: dict[str, OOITypeEntry] = {
-    # Records
-    "DNSARecord": {"type": DNSARecord },
-    "DNSAAAARecord": {"type": DNSAAAARecord },
-    "DNSMXRecord": {"type": DNSMXRecord },
-    "DNSTXTRecord": {"type": DNSTXTRecord },
-    "DNSNSRecord": {"type": DNSNSRecord },
-    "DNSCNAMERecord": {"type": DNSCNAMERecord },
-    "DNSSOARecord": {"type": DNSSOARecord },
-    "NXDOMAIN": {"type": NXDOMAIN },
-    "DNSPTRRecord": {"type": DNSPTRRecord },
-    "DNSCAARecord": {"type": DNSCAARecord },
-    # Zone
-    "DNSZone": {"type": DNSZone },
-    "Hostname": {"type": Hostname },
-    "ResolvedHostname": {"type": ResolvedHostname },
-    # Certificate
-    "X509Certificate": {"type": X509Certificate },
-    "SubjectAlternativeNameHostname": {"type": SubjectAlternativeNameHostname },
-    "SubjectAlternativeNameIP": {"type": SubjectAlternativeNameIP },
-    "SubjectAlternativeNameQualifier": {"type": SubjectAlternativeNameQualifier },
-    # Config
-    "Config": {"type": Config },
-    # Email Security
-    "DNSSPFRecord": {"type": DNSSPFRecord },
-    "DNSSPFMechanismIP": {"type": DNSSPFMechanismIP },
-    "DNSSPFMechanismHostname": {"type": DNSSPFMechanismHostname },
-    "DNSSPFMechanismNetBlock": {"type": DNSSPFMechanismNetBlock },
-    "DMARCTXTRecord": {"type": DMARCTXTRecord },
-    "DKIMExists": {"type": DKIMExists },
-    "DKIMSelector": {"type": DKIMSelector },
-    "DKIMKey": {"type": DKIMKey },
-    # Findings
-    # ?baseclass
-    "FindingType": {"type": FindingType },
-    "ADRFindingType": {"type": ADRFindingType },
-    "CVEFindingType": {"type": CVEFindingType },
-    "CWEFindingType": {"type": CWEFindingType },
-    "CAPECFindingType": {"type": CAPECFindingType },
-    "RetireJSFindingType": {"type": RetireJSFindingType },
-    "SnykFindingType": {"type": SnykFindingType },
-    "KATFindingType": {"type": KATFindingType },
-    "Finding": {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]},
-    "MutedFinding": {"type": MutedFinding },
-    # Geography
-    "GeographicPoint": {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]},
-    # Monitoring
-    "Application": {"type": Application },
-    "Incident": {"type": Incident },
-    # Network
-    "Network": {"type": Network },
-    # ?baseclass
-    "IPAddress": {"type": IPAddress },
-    "IPAddressV4": {"type": IPAddressV4 },
-    "IPAddressV6": {"type": IPAddressV6 },
-    "IPPort": {"type": IPPort },
-    "AutonomousSystem": {"type": AutonomousSystem },
-    # ?baseclass
-    "NetBlock": {"type": NetBlock },
-    "IPV6NetBlock": {"type": IPV6NetBlock },
-    "IPV4NetBlock": {"type": IPV4NetBlock },
-    # Question
-    "Question": {"type": Question },
-    # Reports
-    "ReportData": {"type": ReportData },
-    "AssetReport": {"type": AssetReport },
-    "Report": {"type": Report },
-    "HydratedReport": {"type": HydratedReport },
-    "ReportRecipe": {"type": ReportRecipe },
-    # Scans
-    "ExternalScan": {"type": ExternalScan },
-    # Service
-    "Service": {"type": Service },
-    "IPService": {"type": IPService },
-    "TLSCipher": {"type": TLSCipher },
-    # Software
-    "Software": {"type": Software },
-    "SoftwareInstance": {"type": SoftwareInstance },
-    # Web
-    "Website": {"type": Website },
-    # ?baseclass
-    "WebURL": {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]},
-    "HostnameHTTPURL": {"type": HostnameHTTPURL },
-    "IPAddressHTTPURL": {"type": IPAddressHTTPURL },
-    "HTTPResource": {"type": HTTPResource },
-    "HTTPHeader": {"type": HTTPHeader },
-    "URL": {"type": URL },
-    "HTTPHeaderURL": {"type": HTTPHeaderURL },
-    "HTTPHeaderHostname": {"type": HTTPHeaderHostname },
-    "ImageMetadata": {"type": ImageMetadata },
-    "RESTAPI": {"type": RESTAPI },
-    "APIDesignRule": {"type": APIDesignRule },
-    "APIDesignRuleResult": {"type": APIDesignRuleResult },
-    "SecurityTXT": {"type": SecurityTXT },
-}
+def get_subclasses_deep(cls, res=[], sub_clss=[]):
+    if not len(sub_clss):
+        sub_clss = cls.__subclasses__()
+    for s_cls in sub_clss:
+        if s_cls not in res: res.append(s_cls)
+        new_sub_clss = s_cls.__subclasses__()
+        if len(new_sub_clss):
+            get_subclasses_deep(s_cls, res, new_sub_clss)
+    return res
+
+OOI_TYPES: dict[str, OOITypeEntry] = reduce(
+        lambda ooit, dic: ooit.update(dic) or ooit,
+        map(
+            lambda cls: { cls.__name__: { "type": cls } },
+            get_subclasses_deep(OOI)
+        ),
+        {}
+    )
+# Types without _natural_key_attrs
+OOI_TYPES["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
+OOI_TYPES["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
+OOI_TYPES["WebURL"] = {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]}
+
 
 logger = logging.getLogger(__name__)
 
