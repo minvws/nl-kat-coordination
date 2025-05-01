@@ -53,14 +53,14 @@
                                             class="dropdown-button icon-only ti-dots-vertical"></button>
                                     <div id="action-dropdown" class="dropdown-list">
                                         <ul role="listbox" aria-labelledby="action-dropdown">
-                                            {% if dashboard_items|length > 1 %}
-                                                <form class="inline"
-                                                      method="post"
-                                                      action="{% url "update_dashboard_item" organization_code=organization.code %}">
-                                                    {% csrf_token %}
-                                                    <input type="hidden"
-                                                           name="dashboard_item"
-                                                           value="{{ dashboard_item.item.id }}">
+                                            <form class="inline"
+                                                  method="post"
+                                                  action="{% url "update_dashboard_item" organization_code=organization.code %}">
+                                                {% csrf_token %}
+                                                <input type="hidden"
+                                                       name="dashboard_item"
+                                                       value="{{ dashboard_item.item.id }}">
+                                                {% if dashboard_items|length > 1 %}
                                                     <li role="option">
                                                         <button type="submit" name="move" value="up">
                                                             <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
@@ -71,14 +71,14 @@
                                                             <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
                                                         </button>
                                                     </li>
-                                                </form>
-                                            {% endif %}
-                                            <li>
-                                                <a href="#{{ dashboard_item.item.name|slugify }}-delete-item-modal"
-                                                   data-modal-id="{{ dashboard_item.item.name|slugify }}-delete-item-modal"
-                                                   class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
-                                                </a>
-                                            </li>
+                                                {% endif %}
+                                                <li>
+                                                    <a href="#delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                       data-modal-id="delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                       class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
+                                                    </a>
+                                                </li>
+                                            </form>
                                         </ul>
                                     </div>
                                 </div>

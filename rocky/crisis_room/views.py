@@ -316,7 +316,10 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
         dashboard_item_name = request.POST.get("dashboard_item")
-        dashboard_data = DashboardData.objects.get(name=dashboard_item_name, dashboard__organization=self.organization)
+        dashboard_name = request.POST.get("dashboard")
+        dashboard_data = DashboardData.objects.get(
+            name=dashboard_item_name, dashboard__organization=self.organization, dashboard__name=dashboard_name
+        )
 
         dashboard_data_name = dashboard_data.name
         deleted, _ = dashboard_data.delete()
