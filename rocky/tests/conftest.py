@@ -2234,3 +2234,63 @@ def scheduled_reports_list():
             modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
         )
     ]
+
+
+@pytest.fixture
+def dashboard_items(client_member):
+    # first delete to test that no other dashboard and items exists
+    Dashboard.objects.all().delete()
+
+    dashboard = Dashboard.objects.create(name="Test", organization=client_member.organization)
+    dashboard_data_1 = DashboardData.objects.create(
+        dashboard=dashboard,
+        name="URLs",
+        query_from="object_list",
+        query='{"ooi_types": ["URL"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
+        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        settings={
+            "size": "1",
+            "columns": {
+                "object": "Object",
+                "object_type": "Type",
+                "clearance_type": "Clearance type",
+                "clearance_level": "Clearance level",
+            },
+        },
+        display_in_dashboard=True,
+    )
+    dashboard_data_2 = DashboardData.objects.create(
+        dashboard=dashboard,
+        name="Hostnames",
+        query_from="object_list",
+        query='{"ooi_types": ["Hostname"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
+        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        settings={
+            "size": "1",
+            "columns": {
+                "object": "Object",
+                "object_type": "Type",
+                "clearance_type": "Clearance type",
+                "clearance_level": "Clearance level",
+            },
+        },
+        display_in_dashboard=True,
+    )
+    dashboard_data_3 = DashboardData.objects.create(
+        dashboard=dashboard,
+        name="IPs",
+        query_from="object_list",
+        query='{"ooi_types": ["IPAddress"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
+        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        settings={
+            "size": "1",
+            "columns": {
+                "object": "Object",
+                "object_type": "Type",
+                "clearance_type": "Clearance type",
+                "clearance_level": "Clearance level",
+            },
+        },
+        display_in_dashboard=True,
+    )
+    return [dashboard_data_1, dashboard_data_2, dashboard_data_3]

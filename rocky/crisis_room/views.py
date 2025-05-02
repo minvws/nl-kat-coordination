@@ -369,7 +369,3 @@ class AddDashboardView(OrganizationsCrisisRoomView, FormView):
             return redirect(self.get_success_url() + "?" + query_params)
         else:
             return self.form_invalid(form)
-
-
-class AddDashboardItemView(OrganizationsCrisisRoomView, FormView):
-    pass
