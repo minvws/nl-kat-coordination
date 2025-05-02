@@ -7,7 +7,7 @@ import structlog
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
-REPORT_CATEGORIES_PATH = "boefjes/plugins/kat_abuseipdb/abuseipdb_report_categories.json"
+REPORT_CATEGORIES_PATH = Path(__file__).parent / "abuseipdb_report_categories.json"
 
 with open(REPORT_CATEGORIES_PATH) as json_file:
     report_categories = json.load(json_file)
