@@ -60,23 +60,25 @@
                                                 <input type="hidden"
                                                        name="dashboard_item"
                                                        value="{{ dashboard_item.item.id }}">
-                                                <li role="option">
-                                                    <button type="submit" name="move" value="up">
-                                                        <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
-                                                    </button>
-                                                </li>
-                                                <li role="option">
-                                                    <button type="submit" name="move" value="down">
-                                                        <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
-                                                    </button>
+                                                {% if dashboard_items|length > 1 %}
+                                                    <li role="option">
+                                                        <button type="submit" name="move" value="up">
+                                                            <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
+                                                        </button>
+                                                    </li>
+                                                    <li role="option">
+                                                        <button type="submit" name="move" value="down">
+                                                            <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
+                                                        </button>
+                                                    </li>
+                                                {% endif %}
+                                                <li>
+                                                    <a href="#delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                       data-modal-id="delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                       class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
+                                                    </a>
                                                 </li>
                                             </form>
-                                            <li>
-                                                <a href="#{{ dashboard_item.item.name|slugify }}-delete-item-modal"
-                                                   data-modal-id="{{ dashboard_item.item.name|slugify }}-delete-item-modal"
-                                                   class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
-                                                </a>
-                                            </li>
                                         </ul>
                                     </div>
                                 </div>
