@@ -1,4 +1,5 @@
-from crisis_room.views import CrisisRoomView, DashboardService
+from crisis_room.models import Dashboard, DashboardData
+from crisis_room.views import AddDashboardView, CrisisRoomView, DashboardService, UpdateDashboardItemView
 from pytest_django.asserts import assertContains
 
 from tests.conftest import setup_request
@@ -146,3 +147,65 @@ def test_collect_findings_dashboard(findings_results, expected_findings_results)
         assert findings_results[index].item == expected_findings_results[index].item
         assert findings_results[index].data["report"] == expected_findings_results[index].data["report"]
         assert findings_results[index].data["report_data"] == expected_findings_results[index].data["report_data"]
+
+
+def test_create_dashboard(rf, client_member):
+    dashboard_name = "test"
+    request = setup_request(
+        rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), client_member.user
+    )
+    response = AddDashboardView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+
+    assert f"Dashboard '{dashboard_name}' has been created." in messages[0].message
+
+    dashboard = Dashboard.objects.filter(name=dashboard_name)
+    assert dashboard.exists()
+    assert len(dashboard) == 1
+
+
+def test_create_dashboard_already_exist(rf, client_member):
+    dashboard_name = "test"
+    Dashboard.objects.create(name=dashboard_name, organization=client_member.organization)
+
+    request = setup_request(
+        rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), client_member.user
+    )
+    response = AddDashboardView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+
+    assert f"Dashboard with name '{dashboard_name}' already exists." in messages[0].message
+
+
+def test_update_dashboard_item_position(rf, client_member, dashboard_items):
+    item_1 = dashboard_items[0]
+    item_2 = dashboard_items[1]
+    item_3 = dashboard_items[2]
+
+    # save positions before swapping to check positions later
+    position_item_1 = item_1.position
+    position_item_2 = item_2.position
+    position_item_3 = item_3.position
+
+    request = setup_request(
+        rf.post("update_dashboard_item", {"dashboard_item": item_2.id, "move": "up"}), client_member.user
+    )
+    response = UpdateDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_3 = DashboardData.objects.get(id=item_3.id, dashboard__organization=client_member.organization)
+
+    assert dashboard_data_item_1.position == position_item_1 + 1
+    assert dashboard_data_item_2.position == position_item_2 - 1
+
+    # last item position must not be changed
+    assert dashboard_data_item_3.position == position_item_3

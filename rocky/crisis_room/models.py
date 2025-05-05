@@ -101,7 +101,7 @@ class DashboardData(models.Model):
                     self.position = new_position
                     self.save(update_fields=["position"])
             except DashboardData.DoesNotExist:
-                raise
+                raise ValidationError(_("DashboardData does not exist."))
 
 
 def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
