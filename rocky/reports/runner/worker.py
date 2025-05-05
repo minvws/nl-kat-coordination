@@ -1,3 +1,4 @@
+import gc
 import multiprocessing as mp
 import os
 import signal
@@ -223,6 +224,8 @@ def _start_working(
                     logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
+
+            gc.collect()
 
 
 def get_runtime_manager() -> WorkerManager:
