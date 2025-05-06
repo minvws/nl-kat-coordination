@@ -35,18 +35,9 @@ In this example migration `0010` used to be available, we want to downgrade to `
    If you ran a specific branch, checkout that branch, or some other similar branch that contains the same revision file.
    `alembic` needs this file to know how to migrate back to a lower version.
 
-#. Access the Container
-
-   Obtain an interactive shell in the scheduler container. The `docker` command would be:
-
-   .. code-block:: sh
-
-     docker compose exec <service> /bin/bash
-     docker compose exec scheduler /bin/bash
-
 #. Perform the rollback migration
 
-   Now, inside the container we are going to use `alembic` to migrate back to highest the version that is available in your wanted (older) release.
+   We are going to use `alembic` to migrate back to highest the version that is available in your wanted (older) release.
 
    For example, for release 1.18.2 this is migration `0008`.
 
@@ -57,12 +48,12 @@ In this example migration `0010` used to be available, we want to downgrade to `
 
    .. code-block:: sh
 
-     python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini downgrade 0008
+     docker compose run --rm scheduler python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini downgrade 0008
 
 #. Check if the rollback was completed
 
    .. code-block:: sh
 
-     python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini current
+     docker compose run --rm scheduler python -m alembic --config /app/scheduler/scheduler/storage/migrations/alembic.ini current
 
    If the rollback was completed you should see `0008`. You can now deploy and start the wanted container version again.
