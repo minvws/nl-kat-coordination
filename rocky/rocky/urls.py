@@ -42,6 +42,7 @@ from rocky.views.task_detail import BoefjeTaskDetailView, DownloadTaskDetail, No
 from rocky.views.tasks import (
     AllBoefjesTaskListView,
     AllNormalizersTaskListView,
+    AllReportsTaskListView,
     BoefjesTaskListView,
     NormalizersTaskListView,
     ReportsTaskListView,
@@ -75,6 +76,7 @@ urlpatterns += i18n_patterns(
     path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
     path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
     path("tasks/normalizers", AllNormalizersTaskListView.as_view(), name="all_normalizers_task_list"),
+    path("tasks/reports", AllReportsTaskListView.as_view(), name="all_reports_task_list"),
     path(
         "<organization_code>/settings/indemnifications/", IndemnificationAddView.as_view(), name="indemnification_add"
     ),
