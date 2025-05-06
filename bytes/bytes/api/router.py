@@ -184,7 +184,8 @@ def create_raw(
                 raw_ids[raw.name] = raw_id
 
             all_parsed_mime_types.append(parsed_mime_types)
-            if raw.content: # dont publish rawFile events for empty raw flies, no useful data to normalize present.
+            # don't publish RawFileEvents for empty raw files; no useful data to normalize present
+            if raw.content:
                 event = RawFileReceived(
                     organization=meta.organization,
                     raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
