@@ -25,7 +25,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     response = httpx.get(
         "https://api.abuseipdb.com/api/v2/check",
-        params={"ipAddress": ip_raw, "verbose": ""},
+        params={"ipAddress": ip_raw, "verbose": "true", "maxAgeInDays": getenv("MAX_AGE_DAYS", "30")},
         headers={"Key": api_key, "Accept": "application/json"},
         timeout=int(getenv("REQUEST_TIMEOUT", REQUEST_TIMEOUT)),
     )

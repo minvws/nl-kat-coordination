@@ -8,7 +8,7 @@
       "type": "string",
       "description": "Required (free) AbuseIPDB api token. See https://www.abuseipdb.com/register"
     },
-    "maxAgeInDays":{
+    "MAX_AGE_DAYS":{
       "title": "The maximum age of reports to be included. defaults to 30 days",
       "type": "integer",
       "minimum": 1,
