@@ -2293,4 +2293,21 @@ def dashboard_items(client_member):
         },
         display_in_dashboard=True,
     )
-    return [dashboard_data_1, dashboard_data_2, dashboard_data_3]
+    dashboard_data_4 = DashboardData.objects.create(
+        dashboard=dashboard,
+        name="Networks",
+        query_from="object_list",
+        query='{"ooi_types": ["Network"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
+        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        settings={
+            "size": "1",
+            "columns": {
+                "object": "Object",
+                "object_type": "Type",
+                "clearance_type": "Clearance type",
+                "clearance_level": "Clearance level",
+            },
+        },
+        display_in_dashboard=True,
+    )
+    return [dashboard_data_1, dashboard_data_2, dashboard_data_3, dashboard_data_4]
