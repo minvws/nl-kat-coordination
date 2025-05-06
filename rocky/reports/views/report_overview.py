@@ -260,7 +260,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
                 self.request,
                 _(
                     f"Couldn't rerun { ', '.join(not_updated_reports) }, since the recipe for this "
-                    "report has been deleted."
+                    "report has been disabled or deleted."
                 ),
             )
 
@@ -292,7 +292,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             "filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": report_recipe_id}]
         }
         schedule = self.get_schedule_with_filters(filters)
-        if schedule:
+        if schedule and schedule.enabled:
             self.scheduler_client.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
             return True
         return False
