@@ -22,10 +22,7 @@ body header nav.collapsible {
         width: 100%;
         max-width: 100%;
         height: var(--header-navigation-button-min-height);
-        padding-top: var(--collapsing-element-list-item-link-padding-top);
-        padding-right: var(--collapsing-element-list-item-link-padding-right);
-        padding-bottom: var(--collapsing-element-list-item-link-padding-bottom);
-        padding-left: var(--collapsing-element-list-item-link-padding-left);
+        padding: var(--spacing-grid-150);
         color: var(--collapsing-element-list-item-link-text-color);
         justify-content: flex-start;
         line-height: var(--header-navigation-link-line-height);
@@ -53,6 +50,10 @@ body header nav.collapsible {
             background-color: var(
               --language-selector-list-item-hover-background-color
             );
+          }
+
+          a {
+            padding: var(--spacing-grid-150);
           }
         }
 
