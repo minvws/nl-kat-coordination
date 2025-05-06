@@ -113,7 +113,7 @@ Projects (Root Folder)
 - Boefjes - scanners and normalizers = 5
 - Bytes (raw data storage) = 6
 - Mula (scheduler) = 7
-- Octopies (datamodel) = 8
+- Octopoes (datamodel) = 8
 - Rocky (Front-End) = 9
 
 Category (Action / Sub Folder)
@@ -165,3 +165,4 @@ Event code Model              Category               Description                
 900402     Boefje             katalogus              A boefje was updated.                       U
 900403     Boefje             katalogus              A boefje was deleted.                       D
 900404     Boefje             katalogus              A KATalogus error occured                   E
+========== ================== ====================== =========================================== =====
