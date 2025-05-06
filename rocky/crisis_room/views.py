@@ -359,7 +359,7 @@ class AddDashboardView(OrganizationsCrisisRoomView, FormView):
         if form.is_valid():
             dashboard_name = request.POST.get("dashboard_name")
             try:
-                dashboard, created = get_or_create_dashboard(dashboard_name, self.organization)
+                dashboard, created = get_or_create_dashboard(dashboard_name.strip(), self.organization)
                 if created:
                     messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
                 else:

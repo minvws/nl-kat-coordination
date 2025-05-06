@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-{% if dashboard %}
+{% if all_dashboard_names %}
     <div>
         <div class="horizontal-view">
             <h2>{{ dashboard.name }}</h2>
@@ -60,12 +60,14 @@
                                                 <input type="hidden"
                                                        name="dashboard_item"
                                                        value="{{ dashboard_item.item.id }}">
-                                                {% if dashboard_items|length > 1 %}
+                                                {% if dashboard_items|length > 1 and not forloop.first %}
                                                     <li role="option">
                                                         <button type="submit" name="move" value="up">
                                                             <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
                                                         </button>
                                                     </li>
+                                                {% endif %}
+                                                {% if dashboard_items|length > 1 and not forloop.last %}
                                                     <li role="option">
                                                         <button type="submit" name="move" value="down">
                                                             <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
