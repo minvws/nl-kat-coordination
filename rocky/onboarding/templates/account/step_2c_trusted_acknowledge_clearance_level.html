@@ -6,28 +6,32 @@
 {% block content %}
     {% include "header.html" with view_type="onboarding" %}
 
-    <main id="main-content" class="explanation-page">
+    <main id="main-content">
         <section>
             <div>
                 <h1>{% translate "OpenKAT Introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Setup scan - OOI clearance for" %} {{ ooi|human_readable }}</h2>
+                <h2>{% translate "Setup scan - User clearance level" %}</h2>
                 <h3>{% translate "Trusted clearance level" %}</h3>
-                {% blocktranslate trimmed %}
-                    OpenKAT has a permission system that allows administrators to
-                    configure which users can set a certain clearance level. The will make sure
-                    that only users that are trusted can start the more aggressive scans.
-                {% endblocktranslate %}
+                <p>
+                    {% blocktranslate trimmed %}
+                        OpenKAT has a permission system that allows administrators to
+                        configure which users can set a certain clearance level. The will make sure
+                        that only trusted users can start more aggressive scans.
+                    {% endblocktranslate %}
+                </p>
                 <h3>{% translate "Acknowledge clearance level" %}</h3>
-                {% blocktranslate trimmed %}
-                    Before a member is granted the ability to set clearance levels on an object,
-                    they must first acknowledge and accept the clearance level set by the administrators.
-                    The maximum scanning level permitted for a member is aligned with the trusted clearance level.
-                    By acknowledging the trusted clearance level, this member formally agrees to abide by
-                    this permission and gains the capability to perform scans only up to this trusted clearance level.
-                    This two-step process ensures that the member operates within authorized boundaries.
-                {% endblocktranslate %}
+                <p>
+                    {% blocktranslate trimmed %}
+                        Before a user is granted the ability to set clearance levels on an object,
+                        they must first acknowledge and accept the clearance level set by the administrators.
+                        The maximum scanning level permitted for a member is aligned with the trusted clearance level.
+                        By acknowledging the trusted clearance level, the user formally agrees to abide by
+                        this permission and gains the capability to perform scans only up to this trusted clearance level. Each user can decide to only accept a lower clearance than is given by the administrator.
+                        This two-step process ensures that the member operates within authorized boundaries.
+                    {% endblocktranslate %}
+                </p>
                 <h3>{% translate "What is my clearance level?" %}</h3>
                 {% with tcl=organization_member.trusted_clearance_level acl=organization_member.acknowledged_clearance_level %}
                     {% if tcl < dns_report_least_clearance_level or tcl < 0 %}

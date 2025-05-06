@@ -12,23 +12,22 @@
                 <h1>{% translate "OpenKAT Introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Setup scan - OOI clearance for" %} {{ ooi|human_readable }}</h2>
+                <h2>{% translate "Setup scan - Set clearance level" %}</h2>
                 <h3>{% translate "Introduction" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
                         Some scans are lightweight while others might be a bit more aggressive with their scanning.
                         OpenKAT requires you to set a clearance level for each object to prevent you from unintentionally
                         running aggressive scans. For example you might have the right to run any type of scan on your own server but you
-                        probably don’t have the right to do so for objects owned by other people of companies.
+                        probably don’t have the right to do so for objects owned by other organizations.
                     {% endblocktranslate %}
                 </p>
                 <h3>{% translate "How to know required clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        Each plugin that scans will have a scan intensity score.
-                        The intensity of the scan must be equal to or below the clearance level you set for your object.
-                        If the scan has an intensity level that is too high, OpenKAT will notify you before running it.
-                        Visually clearance levels and intensity scores are indicated with little cat paws.
+                        Each plugin that scans has a scan levels.
+                        The scan level of a plugin must be equal to or below the clearance level you set for your object for it to scan.
+                        Clearance levels on objects and scan levels for plugins are indicated with little cat paws.
                     {% endblocktranslate %}
                 </p>
                 <div id="id_boefjes" class="column-4 plugins tiles images-cover">
@@ -41,7 +40,7 @@
                     <div role="group">
                         <p>
                             {% blocktranslate trimmed %}
-                                This scan has a scan intensity score of 1, requiring a level 1 clearance level to be run.
+                                This plugin has a scan level of 1, requiring a level 1 clearance level of objects to be run.
                                 This means that the scan does not touch the object itself, but only searches for
                                 information about the object.
                             {% endblocktranslate %}
@@ -50,8 +49,8 @@
                     <div role="group">
                         <p>
                             {% blocktranslate trimmed %}
-                                An example of a more aggressive scan. Which has a scan intensity score of 3.
-                                Meaning it requires at least a level 3 clearance level to be set on your object.
+                                This plugn has a scan level of 3, requiring a level 3 clearance of objects to be run.
+                                This means that the scans are intrusive and more aggressive. Depending on what you scan, things could break.
                             {% endblocktranslate %}
                         </p>
                     </div>
