@@ -41,7 +41,7 @@
                         <td>{{ info.occurrences|get_first_seen }}</td>
                         {% if is_dashboard_findings %}
                             <td class="number">
-                                <a href="{% url "view_report" organization.code %}?report_id={{ report.report }}#{{ info.finding_type.id }}"><span class="icon ti-arrow-right"></span></a>
+                                <a href="{% url "view_report" report.organization_code %}?report_id={{ report.primary_key }}#{{ info.finding_type.id }}"><span class="icon ti-arrow-right"></span></a>
                             </td>
                         {% else %}
                             <td class="actions sticky-cell">
