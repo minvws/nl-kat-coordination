@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-24 14:34+0000\n"
+"POT-Creation-Date: 2025-05-07 13:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -914,7 +914,7 @@ msgstr ""
 
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #, python-format
-msgid "Are you sure you want to delete \"%(name)s\" from this dashboard?"
+msgid "Are you sure you want to delete '%(name)s' from this dashboard?"
 msgstr ""
 
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
@@ -931,8 +931,8 @@ msgstr ""
 #: crisis_room/templates/partials/delete_dashboard_modal.html
 #, python-format
 msgid ""
-"Are you sure you want to delete dashboard \"%(dashboard)s\"? All the items "
-"on the dashboard will be deleted as well."
+"Are you sure you want to delete dashboard '%(dashboard)s'? All the items on "
+"the dashboard will be deleted as well."
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
@@ -968,7 +968,6 @@ msgid "Required"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#: crisis_room/templates/partials/new_dashboard_modal.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Add to dashboard"
 msgstr ""
@@ -7358,8 +7357,7 @@ msgid "Unknown action."
 msgstr ""
 
 #: rocky/views/ooi_list.py
-#, python-format
-msgid "Dashboard item has been added to %s."
+msgid "Dashboard item has been added to {}."
 msgstr ""
 
 #: rocky/views/ooi_list.py
