@@ -64,7 +64,16 @@ class DashboardData(models.Model):
     )
 
     class Meta:
-        unique_together = [["dashboard", "position"], ["dashboard", "name"]]
+        constraints = [
+            models.UniqueConstraint(
+                name="unique dashboard position",
+                fields=["dashboard", "position"],
+                deferrable=models.Deferrable.DEFERRED,
+            ),
+            models.UniqueConstraint(
+                name="unique dashboard name", fields=["dashboard", "name"], deferrable=models.Deferrable.DEFERRED
+            ),
+        ]
 
     def __str__(self) -> str:
         try:
