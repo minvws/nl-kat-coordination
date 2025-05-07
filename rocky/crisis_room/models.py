@@ -90,7 +90,7 @@ class DashboardData(models.Model):
             raise ValidationError(_("DashboardData must contain at least a 'recipe' or a 'query_from' with a 'query'."))
         return super().clean()
 
-    def update_position(self, move: str):
+    def update_position(self, move: str) -> None:
         if move not in ("up", "down"):
             return
 
@@ -110,7 +110,7 @@ class DashboardData(models.Model):
                     self.position = new_position
                     self.save(update_fields=["position"])
             except DashboardData.DoesNotExist:
-                raise ValidationError(_("DashboardData does not exist."))
+                return
 
 
 def get_dashboard_data_positions(instance: DashboardData) -> list[int]:
