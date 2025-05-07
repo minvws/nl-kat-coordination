@@ -14,7 +14,7 @@
     </p>
 {% endif %}
 {% if finding_types %}
-    <div class="horizontal-scroll">
+    <div>
         <table>
             <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
             <thead>
@@ -61,7 +61,7 @@
                                 <p>{{ info.finding_type.description }}</p>
                                 <h4 class="heading-normal">{% translate "Source" %}</h4>
                                 {% if info.finding_type.source %}
-                                    <a href="{{ info.finding_type.source }}">{{ info.finding_type.source }}</a>
+                                    <a class="nowrap" href="{{ info.finding_type.source }}">{{ info.finding_type.source }}</a>
                                 {% else %}
                                     <p>{{ info.finding_type.source }}</p>
                                 {% endif %}
@@ -70,7 +70,7 @@
                                 <h4 class="heading-normal">{% translate "Recommendation" %}</h4>
                                 <p>{{ info.finding_type.recommendation }}</p>
                                 <h4 class="heading-normal">{% translate "Findings" %}</h4>
-                                <table class="nowrap">
+                                <table>
                                     <caption class="visually-hidden">{% translate "Findings overview" %}</caption>
                                     <thead>
                                         <tr>
