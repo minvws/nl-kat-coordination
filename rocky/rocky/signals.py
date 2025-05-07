@@ -22,15 +22,15 @@ from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesU
 logger = get_logger(__name__)
 
 
-# Signal sent when a user logs in
-@receiver(user_logged_in)
-def user_logged_in_callback(sender, request, user, **kwargs):
+@receiver(pre_migrate)
+def make_sure_groups_exist_before_migrating(sender, request, user, **kwargs):
     create_missing_groups()
     logger.info("Groups ", username=user.get_username())
 
 
-@receiver(pre_migrate)
-def make_sure_groups_exist_before_migrating(sender, request, user, **kwargs):
+# Signal sent when a user logs in
+@receiver(user_logged_in)
+def user_logged_in_callback(sender, request, user, **kwargs):
     logger.info("User logged in", username=user.get_username())
 
 
