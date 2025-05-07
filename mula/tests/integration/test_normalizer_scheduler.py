@@ -207,7 +207,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje_task = models.BoefjeTask(
+            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
+        )
 
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
@@ -237,7 +240,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje_task = models.BoefjeTask(
+            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
+        )
 
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
@@ -268,7 +274,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje_task = models.BoefjeTask(
+            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
+        )
 
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
@@ -333,7 +342,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje_task = models.BoefjeTask(
+            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
+        )
 
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
@@ -361,7 +373,10 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             scan_profile = ScanProfileFactory(level=0)
             ooi = OOIFactory(scan_profile=scan_profile)
             boefje = BoefjeFactory()
-            boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
+            plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+            boefje_task = models.BoefjeTask(
+                boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
+            )
             task = functions.create_task(
                 scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
             )
