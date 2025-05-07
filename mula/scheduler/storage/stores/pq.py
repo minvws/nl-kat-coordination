@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from sqlalchemy import exc
+from sqlalchemy import exc, func
+from sqlalchemy.orm.query import Query
 
 from scheduler import models
 from scheduler.storage import DBConn
@@ -15,23 +16,62 @@ class PriorityQueueStore:
     def __init__(self, dbconn: DBConn) -> None:
         self.dbconn = dbconn
 
+    def build_pop_query(self, session, scheduler_id: str | None = None, filters: FilterRequest | None = None) -> Query:
+        query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+
+        if scheduler_id is not None:
+            query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+        if filters is not None:
+            query = apply_filter(models.TaskDB, query, filters)
+
+        return query
+
     @retry()
     @exception_handler
     def pop(
-        self, scheduler_id: str | None = None, limit: int = 1, filters: FilterRequest | None = None
+        self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
     ) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
-
-            if scheduler_id is not None:
-                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
-
-            if filters is not None:
-                query = apply_filter(models.TaskDB, query, filters)
+            query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
+                    .order_by(models.TaskDB.created_at.asc())
+                    .limit(limit)
+                    .all()
+                )
+            except exc.ProgrammingError as e:
+                raise StorageError(f"Invalid filter: {e}") from e
+
+            items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
+
+            return items
+
+    def pop_boefje(
+        self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
+    ) -> list[models.Task]:
+        """Custom pop method for the `BoefjeScheduler`"""
+        with self.dbconn.session.begin() as session:
+            query = self.build_pop_query(session, scheduler_id, filters)
+
+            try:
+                # Create a subquery to find the most common `env_hash` value
+                # from the `data` JSON field in TaskDB. This extracts the
+                # "env_hash" key from the JSON column, groups tasks by it,
+                # orders them by descending count, and limits to the top
+                # result.
+                top_env_hash = (
+                    session.query(models.TaskDB.data["env_hash"].astext.label("env_hash"))
+                    .group_by(models.TaskDB.data["env_hash"].astext)
+                    .order_by(func.count().desc())
+                    .limit(1)
+                ).subquery()
+
+                item_orm = (
+                    query.order_by(models.TaskDB.priority.asc())
+                    .filter(models.TaskDB.data["env_hash"].astext == top_env_hash.c.env_hash)
                     .order_by(models.TaskDB.created_at.asc())
                     .limit(limit)
                     .all()

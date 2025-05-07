@@ -110,6 +110,7 @@ class BoefjeTask(BaseModel):
     boefje: Boefje
     input_ooi: str | None = None
     organization: str
+    env_hash: str  # TODO: will this be none?
 
     dispatches: list[Normalizer] = Field(default_factory=list)
 

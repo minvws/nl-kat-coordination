@@ -98,7 +98,7 @@ class PriorityQueue(abc.ABC):
         self.lock: threading.RLock = threading.RLock()
 
     @with_lock
-    def pop(self, limit: int = 1, filters: storage.filters.FilterRequest | None = None) -> list[models.Task]:
+    def pop(self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None) -> list[models.Task]:
         """Remove and return the highest priority items from the queue.
         Optionally apply filters to the queue.
 
