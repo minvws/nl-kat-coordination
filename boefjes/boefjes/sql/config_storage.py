@@ -1,12 +1,13 @@
 import json
 import logging
+from collections.abc import Iterator
 
 from sqlalchemy.orm import Session
 
 from boefjes.config import settings as config_settings
 from boefjes.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
-from boefjes.models import EncryptionMiddleware
-from boefjes.sql.db import ObjectNotFoundException
+from boefjes.models import BoefjeConfig, EncryptionMiddleware
+from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeConfigInDB, BoefjeInDB, NormalizerConfigInDB, NormalizerInDB, OrganisationInDB
 from boefjes.sql.session import SessionMixin
 from boefjes.storage.interfaces import ConfigNotFound, ConfigStorage, OrganisationNotFound, PluginNotFound
@@ -19,6 +20,44 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
         self.encryption = encryption
 
         super().__init__(session)
+
+    def list_boefje_configs(
+        self,
+        offset: int,
+        limit: int,
+        organisation_id: str | None = None,
+        boefje_id: str | None = None,
+        enabled: bool | None = None,
+    ) -> list[BoefjeConfig]:
+        query = self.session.query(BoefjeConfigInDB)
+
+        if organisation_id is not None:
+            query = (
+                query.join(OrganisationInDB)
+                .filter(BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
+                .filter(OrganisationInDB.id == organisation_id)
+            )
+
+        if boefje_id is not None:
+            query = (
+                query.join(BoefjeInDB)
+                .filter(BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
+                .filter(BoefjeInDB.plugin_id == boefje_id)
+            )
+
+        if enabled is not None:
+            query = query.filter(BoefjeConfigInDB.enabled == enabled)
+
+        return [
+            BoefjeConfig(
+                id=x.id,
+                settings=self._convert_settings(x),
+                enabled=x.enabled,
+                boefje_id=x.boefje.plugin_id,
+                organisation_id=x.organisation.id,
+            )
+            for x in query.offset(offset).limit(limit).all()
+        ]
 
     def upsert(
         self, organisation_id: str, plugin_id: str, settings: dict | None = None, enabled: bool | None = None
@@ -71,10 +110,16 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
         except ConfigNotFound:
             return {}
 
-        if not instance.settings or instance.settings == "{}":  # Handle empty settings and the server default of "{}"
-            return {}
+        settings = self._convert_settings(instance)
 
-        return json.loads(self.encryption.decode(instance.settings))
+        return settings
+
+    def _convert_settings(self, instance):
+        if not instance.settings or instance.settings == "{}":  # Handle empty settings and the server default of "{}"
+            settings = {}
+        else:
+            settings = json.loads(self.encryption.decode(instance.settings))
+        return settings
 
     def delete(self, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
@@ -162,10 +207,24 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
 
         return instance
 
+    @staticmethod
+    def to_boefje_config(boefe_config_in_db: BoefjeConfigInDB) -> BoefjeConfig:
+        return BoefjeConfig(
+            id=boefe_config_in_db.id,
+            settings=boefe_config_in_db.settings,
+            enabled=boefe_config_in_db.enabled,
+            boefje_id=boefe_config_in_db.boefje.id,
+            organisation_id=boefe_config_in_db.organisation.id,
+        )
+
 
 def create_config_storage(session) -> ConfigStorage:
     encrypter = create_encrypter()
     return SQLConfigStorage(session, encrypter)
+
+
+def get_config_storage() -> Iterator[ConfigStorage]:
+    yield from session_managed_iterator(create_config_storage)
 
 
 def create_encrypter():
