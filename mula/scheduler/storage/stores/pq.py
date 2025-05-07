@@ -16,9 +16,7 @@ class PriorityQueueStore:
     def __init__(self, dbconn: DBConn) -> None:
         self.dbconn = dbconn
 
-    def build_pop_query(
-        self, session, scheduler_id: str | None = None, limit: int | None = 1, filters: FilterRequest | None = None
-    ) -> Query:
+    def build_pop_query(self, session, scheduler_id: str | None = None, filters: FilterRequest | None = None) -> Query:
         query = session.query(models.TaskDB).filter(models.TaskDB.status == models.TaskStatus.QUEUED)
 
         if scheduler_id is not None:
@@ -32,10 +30,10 @@ class PriorityQueueStore:
     @retry()
     @exception_handler
     def pop(
-        self, scheduler_id: str | None = None, limit: int | None = 1, filters: FilterRequest | None = None
+        self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
     ) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
-            query = self.build_pop_query(session, scheduler_id, limit, filters)
+            query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
                 item_orm = (
@@ -52,11 +50,11 @@ class PriorityQueueStore:
             return items
 
     def pop_boefje(
-        self, scheduler_id: str | None = None, limit: int | None = 1, filters: FilterRequest | None = None
+        self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
     ) -> list[models.Task]:
         """Custom pop method for the `BoefjeScheduler`"""
         with self.dbconn.session.begin() as session:
-            query = self.build_pop_query(session, scheduler_id, limit, filters)
+            query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
                 # Create a subquery to find the most common `env_hash` value
