@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-17 12:03+0000\n"
-"PO-Revision-Date: 2025-04-23 15:01+0000\n"
+"PO-Revision-Date: 2025-04-23 18:03+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/fy/>\n"
@@ -396,6 +396,8 @@ msgid ""
 "You don't have any clearance to scan objects. <br> Get in contact with the "
 "admin to give you the necessary clearance level."
 msgstr ""
+"Jo hawwe gjin ien frijwarring om objekten te scannen. <br> Nim kontakt op "
+"mei de behearder om jo it nedige frijwarringsnivo te jaan."
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -416,7 +418,7 @@ msgstr ""
 #: account/templates/account_detail.html
 #, python-format
 msgid "Withdraw L%(acl)s clearance and responsibility"
-msgstr ""
+msgstr "Frijwarring en ferantwurdlikheid fan L%(acl)s werom lûke"
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
@@ -558,6 +560,8 @@ msgid ""
 "Your password must contain at least the following but longer passwords are "
 "recommended:"
 msgstr ""
+"Jo wachtwurd moat op syn minst it folgjende befetsje, mar langere "
+"wachtwurden wurde oanrekommandearre:"
 
 #: account/validators.py
 msgid " characters"
@@ -575,6 +579,7 @@ msgstr " letters"
 msgid ""
 " special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
+" spesjale karakters lykas: {str(validators.get('special_characters',''))}"
 
 #: account/validators.py
 msgid " lower case letters"
@@ -636,18 +641,20 @@ msgid ""
 "Where on the dashboard do you want to show the data? Position 1 is the most "
 "top level and the max position is 16."
 msgstr ""
+"Wêr op it dashboerd wolle jo de gegevens toane? Posysje 1 is it heechste "
+"nivo en de maksimale posysje is 16."
 
 #: crisis_room/models.py
 msgid "Will be displayed on the general crisis room, for all organizations."
-msgstr ""
+msgstr "Sil toand wurde op it algemiene krisissintrum, foar alle organisaasjes."
 
 #: crisis_room/models.py
 msgid "Will be displayed on a single organization dashboard"
-msgstr ""
+msgstr "Sil toand wurde op in inkeld organisaasjedashboerd"
 
 #: crisis_room/models.py
 msgid "Will be displayed on the findings dashboard for all organizations"
-msgstr ""
+msgstr "Sil toand wurde op it befiningendashboerd foar alle organisaasjes"
 
 #: crisis_room/templates/crisis_room.html rocky/templates/403.html
 #: rocky/templates/404.html
