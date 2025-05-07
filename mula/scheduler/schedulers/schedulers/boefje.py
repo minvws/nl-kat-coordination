@@ -26,8 +26,8 @@ class BoefjePQ(queue.PriorityQueue):
     """
 
     @queue.pq.with_lock
-    def pop(self, limit: int = 1, filters: filters.FilterRequest | None = None) -> list[models.Task]:
-        items = self.pq_store.pop_boefje(self.pq_id, limit=None, filters=filters)
+    def pop(self, limit: int | None = None, filters: filters.FilterRequest | None = None) -> list[models.Task]:
+        items = self.pq_store.pop_boefje(self.pq_id, limit=limit, filters=filters)
         if not items:
             return []
 

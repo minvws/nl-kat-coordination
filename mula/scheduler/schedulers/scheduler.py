@@ -312,7 +312,7 @@ class Scheduler(abc.ABC):
         return item
 
     def pop_item_from_queue(
-        self, limit: int = 1, filters: storage.filters.FilterRequest | None = None
+        self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
     ) -> list[models.Task]:
         """Pop an item from the queue.
         Args:
