@@ -20,7 +20,7 @@ from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
 
-FINDINGS_DASHBOARD_NAME = "Crisis Room Findings Dashboard"
+FINDINGS_DASHBOARD_NAME = "Findings Dashboard"
 FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 logger = structlog.get_logger(__name__)

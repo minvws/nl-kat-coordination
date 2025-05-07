@@ -1880,12 +1880,8 @@ def findings_dashboard_data(client_member, client_member_b):
     recipe_id_a = "7ebcdb32-e7f2-4c2d-840a-d7b8e6b37616"
     recipe_id_b = "c41bbf9a-7102-4b6b-b256-b3036e106316"
 
-    dashboard_a = Dashboard.objects.create(
-        name="Crisis Room Findings Dashboard", organization=client_member.organization
-    )
-    dashboard_b = Dashboard.objects.create(
-        name="Crisis Room Findings Dashboard", organization=client_member_b.organization
-    )
+    dashboard_a = Dashboard.objects.create(name="Findings Dashboard", organization=client_member.organization)
+    dashboard_b = Dashboard.objects.create(name="Findings Dashboard", organization=client_member_b.organization)
 
     dashboard_data_a = DashboardData.objects.create(dashboard=dashboard_a, recipe=recipe_id_a, findings_dashboard=True)
     dashboard_data_b = DashboardData.objects.create(dashboard=dashboard_b, recipe=recipe_id_b, findings_dashboard=True)

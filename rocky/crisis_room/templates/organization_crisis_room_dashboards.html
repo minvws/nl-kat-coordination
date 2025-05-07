@@ -27,10 +27,8 @@
                 </div>
             </div>
         </div>
-        {% include "partials/delete_dashboard_modal.html" %}
-
         {% if dashboard_items %}
-            {% if dashboard.name == "Crisis Room Findings Dashboard" %}
+            {% if dashboard.name == "Findings Dashboard" %}
                 {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
             {% else %}
@@ -105,6 +103,8 @@
             </a>
         {% endif %}
     </div>
+    {% include "partials/delete_dashboard_modal.html" %}
+
 {% else %}
     <p>
         {% blocktranslate trimmed %}
