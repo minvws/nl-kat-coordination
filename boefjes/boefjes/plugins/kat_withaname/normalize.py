@@ -5,58 +5,66 @@ from collections.abc import Iterable
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
+logger = logging.getLogger(__name__)
 
-def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
+
+def run(input_ooi: dict[str, str], raw: bytes) -> Iterable[OOI]:
     """Normalize witha.name output."""
     result = json.loads(raw)
+
     input_ooi_reference = Reference.from_str(input_ooi["primary_key"])
+    found_targets = None
 
-    if input_ooi["primary_key"].startswith("IPAddress"):
-        address = input_ooi_reference.tokenized.address
-        host = None
-    else:
-        host = input_ooi["name"].lower().strip().lstrip("*.").rstrip(".")
-        address = None
+    ooi_category = "IP" if input_ooi["primary_key"].startswith("IPAddress") else "Hostname"
 
-    ft = None
-    if not result:
-        logging.info("No witha.name results available for normalization.")
-    elif "targets" in result:
-        listings = {}
-        for report in result.get("targets", []):
-            if (
-                (
-                    host
-                    and (report.get("host", "").lower() == host)
-                    or report.get("host", "").lstrip("*.").lower() == host
-                )
-                or address
-                and report.get("address", "") == address
-            ):
-                if result["target_id"] not in listings:
-                    listings[result["target_id"]] = [
-                        (
-                            f"IP {input_ooi_reference.human_readable}"
-                            if address
-                            else f"Hostname {input_ooi_reference.human_readable}ytho is listed for tagetting by Ddosia."
-                        )
-                    ]
-                listings[result["target_id"]].extend(
-                    [
-                        report.get("type", "unknown protocol"),
-                        report.get("method", "unknown method"),
-                        report.get("port", "unknown port"),
-                        report.get("path", "unknown path"),
-                    ]
-                )
-        if not ft:
-            ft = KATFindingType("KAT-DDOS-TARGET-DETECTED")
-        # for all listed ports, and attacks construct a single finding
-        description = [
-            listing[0]
-            + " and ".join(list(map(lambda x: f" on port {x[2]}, over {x[0]} using {x[1]} on {x[3]}", listing[1:])))
-            for target_id, listing in listings.items()
+    if ooi_category == "IP":
+        logger.info("Found IP address: %s", input_ooi["primary_key"])
+        logger.info(input_ooi_reference.tokenized.address)
+        found_targets = [
+            target for target in result["targets"] if target["ip"] == input_ooi_reference.tokenized.address
         ]
-        finding = Finding(finding_type=ft.reference, ooi=input_ooi_reference, description=description)
-        yield ft
-        yield finding
+    elif ooi_category == "Hostname":
+        logger.info("Found Hostname address: %s", input_ooi["primary_key"])
+        # Make host always start with www.
+        raw_host = input_ooi["name"].lower()
+        host = raw_host if raw_host.startswith("www.") else "www." + raw_host
+
+        # Because hosts are listed with and without www. prefix, we need to check both
+        found_targets = [target for target in result["targets"] if target["host"] in [host, host.removeprefix("www.")]]
+
+    logger.info("Found targets: %s", found_targets)
+    if found_targets is None:
+        raise ValueError(f"OOI: {input_ooi['primary_key']} is not a valid IP address or hostname.")
+    if not found_targets:
+        logger.info("No targets found for ", input_ooi["primary_key"])
+        return
+
+    # For all listed ports, and attacks construct a single finding
+    report_data = [
+        {
+            "port": target["port"] or "an unknown",
+            "type": target["type"] or "an unknown",
+            "method": target["method"] or "an unknown",
+            "path": target["path"] or "/",
+        }
+        for target in found_targets
+    ]
+
+    description = (
+        f"{ooi_category} {input_ooi_reference.human_readable} is listed for targeting by Ddosia,"
+        + " and".join(
+            [
+                f" on port {data['port']}, over {data['type']} using {data['method']} method on {data['path']}"
+                for data in report_data
+            ]
+        )
+    )
+
+    ft = KATFindingType(id="KAT-DDOS-TARGET-DETECTED")
+
+    finding = Finding(finding_type=ft.reference, ooi=input_ooi_reference, description=description)
+
+    logger.info("Creating finfings")
+
+    yield ft
+    yield finding
