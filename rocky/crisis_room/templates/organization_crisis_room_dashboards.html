@@ -32,59 +32,61 @@
                 {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
             {% else %}
-                <div class="tiles column-2">
+                <div class="dashboard">
                     {% for dashboard_item in dashboard_items %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
                             {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
-                            <div class="horizontal-view">
-                                <h3>{{ dashboard_item.item.name }}</h3>
-                                {% if dashboard_item.item.query_from == "object_list" %}
-                                    <span class="label system-tag color-grey">{% translate "Object list" %}</span>
-                                {% endif %}
-                                <div class="dropdown">
-                                    <button type="button"
-                                            aria-label="{% translate "Options for dashboard items" %}"
-                                            aria-haspopup="listbox"
-                                            aria-controls="action-dropdown"
-                                            aria-expanded="false"
-                                            class="dropdown-button icon-only ti-dots-vertical"></button>
-                                    <div id="action-dropdown" class="dropdown-list">
-                                        <ul role="listbox" aria-labelledby="action-dropdown">
-                                            <form class="inline"
-                                                  method="post"
-                                                  action="{% url "update_dashboard_item" organization_code=organization.code %}">
-                                                {% csrf_token %}
-                                                <input type="hidden"
-                                                       name="dashboard_item"
-                                                       value="{{ dashboard_item.item.id }}">
-                                                {% if dashboard_items|length > 1 and not forloop.first %}
-                                                    <li role="option">
-                                                        <button type="submit" name="move" value="up">
-                                                            <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
-                                                        </button>
+                            <div class="dashboard-item">
+                                <div class="horizontal-view">
+                                    <h3>{{ dashboard_item.item.name }}</h3>
+                                    {% if dashboard_item.item.query_from == "object_list" %}
+                                        <span class="label system-tag color-grey">{% translate "Object list" %}</span>
+                                    {% endif %}
+                                    <div class="dropdown">
+                                        <button type="button"
+                                                aria-label="{% translate "Options for dashboard items" %}"
+                                                aria-haspopup="listbox"
+                                                aria-controls="action-dropdown"
+                                                aria-expanded="false"
+                                                class="dropdown-button icon-only ti-dots-vertical"></button>
+                                        <div id="action-dropdown" class="dropdown-list">
+                                            <ul role="listbox" aria-labelledby="action-dropdown">
+                                                <form class="inline"
+                                                      method="post"
+                                                      action="{% url "update_dashboard_item" organization_code=organization.code %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden"
+                                                           name="dashboard_item"
+                                                           value="{{ dashboard_item.item.id }}">
+                                                    {% if dashboard_items|length > 1 and not forloop.first %}
+                                                        <li role="option">
+                                                            <button type="submit" name="move" value="up">
+                                                                <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
+                                                            </button>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if dashboard_items|length > 1 and not forloop.last %}
+                                                        <li role="option">
+                                                            <button type="submit" name="move" value="down">
+                                                                <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
+                                                            </button>
+                                                        </li>
+                                                    {% endif %}
+                                                    <li>
+                                                        <a href="#delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                           data-modal-id="delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                           class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
+                                                        </a>
                                                     </li>
-                                                {% endif %}
-                                                {% if dashboard_items|length > 1 and not forloop.last %}
-                                                    <li role="option">
-                                                        <button type="submit" name="move" value="down">
-                                                            <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
-                                                        </button>
-                                                    </li>
-                                                {% endif %}
-                                                <li>
-                                                    <a href="#delete-item-modal-{{ dashboard_item.item.name|slugify }}"
-                                                       data-modal-id="delete-item-modal-{{ dashboard_item.item.name|slugify }}"
-                                                       class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
-                                                    </a>
-                                                </li>
-                                            </form>
-                                        </ul>
+                                                </form>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+                                {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
 
+                            </div>
                         </section>
                     {% endfor %}
                 </div>
