@@ -427,13 +427,18 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
+        # fixme: incorrect
+        boefje_task.env_hash = self.ctx.services.katalogus.get_configs(
+            boefje_id=boefje_task.boefje.id, organisation_id=boefje_task.organization, enabled=True
+        )
+
         # We check on input_ooi because we allow for boefje tasks without an
         # ooi, something we can't deduplicate. Additionally, because we
         # potentially call the method itself from `is_ooi_in_other_organisations`,
         # we need to make sure that we don't endlessly call it, by checking the
         # caller.
         if boefje_task.input_ooi is not None and caller != self.is_ooi_in_other_organisations.__name__:
-            self.is_ooi_in_other_organisations(boefje_task)
+            boefje_task = self.is_ooi_in_other_organisations(boefje_task)
 
         task = models.Task(
             id=boefje_task.id,
@@ -718,17 +723,26 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    # TODO:: exception handling
-    def is_ooi_in_other_organisations(self, boefje_task: models.BoefjeTask):
+    # TODO: exception handling
+    # TODO: rename method
+    def is_ooi_in_other_organisations(self, boefje_task: models.BoefjeTask) -> models.BoefjeTask:
         """Is the ooi in other organisations? When the ooi is in other
         organisations we don't want to scan those as well, we still create
         tasks for those organisations but they will be batched together.
         """
-        # From the boefje id we can get the same boefje in other organisations.
         configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
+
+        # We are only interested in the settings of the current boefje task
+        # so we filter the configs based on the organisation id.
+        filtered_configs = {}
         for config in configs:
-            if config.organisation_id == boefje_task.organization:
-                # Skip the organisation we are currently in
+            filtered_configs[config.env_hash] = config
+            if config.organisation_id != boefje_task.organization:
+                continue
+            boefje_task.env_hash = config.env_hash
+
+        for config in filtered_configs[boefje_task.env_hash]:
+            if config.env_hash != boefje_task.env_hash:
                 continue
 
             ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
@@ -751,7 +765,7 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
                 organization=config.organisation_id,
-                env_hash=boefje.env_hash,  # FIXME: get this from config?
+                env_hash=env_hash,
             )
 
             self.push_boefje_task(
@@ -760,6 +774,8 @@ class BoefjeScheduler(Scheduler):
                 create_schedule=self.create_schedule,
                 caller=self.is_ooi_in_other_organisations.__name__,
             )
+
+        return boefje_task
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
