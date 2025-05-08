@@ -87,10 +87,8 @@ class BoefjeConfig(BaseModel):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def env_hash(self) -> str:
-        sorted_settings = dict(
-            sorted(self.settings.items())
-        )  # settings are assumed to be a one level deep mapping of strings to strings
-        settings_bytes = json.dumps(sorted_settings).encode()
+        # settings are assumed to be a one level deep mapping of strings to strings or integers
+        settings_bytes = json.dumps(self.settings.items(), sort_keys=True).encode()
 
         return sha1(settings_bytes).hexdigest()
 
