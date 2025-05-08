@@ -1,4 +1,8 @@
+import random
+from urllib.parse import urlencode
+
 import pytest
+from crisis_room.forms import ObjectListSettingsForm
 from crisis_room.models import Dashboard, DashboardData
 from crisis_room.views import (
     AddDashboardView,
@@ -8,6 +12,7 @@ from crisis_room.views import (
     DeleteDashboardView,
     UpdateDashboardItemView,
 )
+from django.http.request import QueryDict
 from pytest_django.asserts import assertContains
 
 from tests.conftest import setup_request
@@ -294,6 +299,27 @@ def test_delete_dashboard_item(rf, client_member, dashboard_items):
     assert dashboard_data_item_4.position == position_item_4 - 1
 
 
+def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items):
+    """After repositioning of items, mixin the order, see when deleting if positioning calculates correctly"""
+
+    positions = [dashboard_item.position for dashboard_item in dashboard_items]
+    random_positions = random.sample(positions, len(positions))
+
+    # change the positions of dashboard items randomly
+    for index, dashboard_item in enumerate(dashboard_items):
+        dashboard_item.position = random_positions[index]
+        dashboard_item.save()
+
+    dashboard_items[1].delete()
+
+    # get items after deleting, we order items by position
+    dashboard_items = DashboardData.objects.all().order_by("position")
+
+    # position must match index of items
+    for index, dashboard_item in enumerate(dashboard_items, start=1):
+        assert dashboard_item.position == index
+
+
 def test_delete_dashboard_item_no_dashboard(rf, client_member, dashboard_items):
     item_3 = dashboard_items[2]
 
@@ -309,7 +335,7 @@ def test_delete_dashboard_item_no_dashboard(rf, client_member, dashboard_items):
 
     messages = list(request._messages)
 
-    assert "Dashboard 'bla' not found." in messages[0].message
+    assert f"Dashboard item '{item_3.name}' not found." in messages[0].message
 
 
 def test_delete_dashboard_item_no_dashboard_data(rf, client_member, dashboard_items):
@@ -359,3 +385,74 @@ def test_delete_dashboard_wrong_name(rf, client_member):
     messages = list(request._messages)
 
     assert f"Dashboard '{dashboard_name}' not found." in messages[0].message
+
+
+def test_create_dashboard_item_form(client_member, dashboard_items):
+    form_data = {
+        "dashboard": dashboard_items[0].dashboard.name,
+        "title": "Test Form",
+        "order_by": "object_type-asc",
+        "limit": "10",
+        "size": "2",
+        "observed_at": "2025-05-07",
+        "ooi_type": "Hostname",
+        "search_string": "",
+        "template": "partials/dashboard_ooi_list.html",
+        "recipe_id": "",
+        "query_from": "object_list",
+        "column_names": ["Object", "Type", "Clearance level", "Clearance type"],
+        "column_values": ["object", "object_type", "clearance_level", "clearance_type"],
+    }
+
+    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+
+    assert form.is_valid()
+
+    # Check if dashboard data is created, after form is valid, should be created at this point
+    DashboardData.objects.get(dashboard=dashboard_items[0].dashboard, name="Test Form")
+
+    # test empty data
+    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(""))
+
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+
+    # errors on all fields
+    assert "dashboard" in fields
+    assert "title" in fields
+    assert "order_by" in fields
+    assert "limit" in fields
+    assert "size" in fields
+
+    # change for data to have the same title that already exists
+    form_data["title"] = dashboard_items[0].name
+
+    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+    errors = list(form.errors.values())
+
+    assert "title" in fields
+
+    # duplicate title throws form error
+    for error_list in errors:
+        assert "An item with that name already exists. Try a different title." in error_list
+
+    # set it back
+    form_data["title"] = "Test Form"
+
+    # None existent dashboard
+    form_data["dashboard"] = "None"
+
+    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+    errors = list(form.errors.values())
+
+    assert "dashboard" in fields
+
+    for error_list in errors:
+        assert "Select a valid choice. None is not one of the available choices." in error_list

@@ -54,11 +54,12 @@ class ObjectListSettingsForm(BaseRockyForm):
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        self.organization = organization
         self.fields["dashboard"].choices = self.get_dashboard_selection(organization)
 
         data: QueryDict | None = kwargs.pop("data")
 
-        if data is not None:
+        if data:
             self.recipe_id = data.get("recipe_id")
             self.query_from = data.get("query_from")
             self.ooi_types = data.getlist("ooi_type", [])
@@ -145,10 +146,9 @@ class ObjectListSettingsForm(BaseRockyForm):
             for dashboard in Dashboard.objects.filter(organization=organization).exclude(name=FINDINGS_DASHBOARD_NAME)
         ]
 
-    @staticmethod
-    def get_dashboard(name: str) -> Dashboard | None:
+    def get_dashboard(self, name: str) -> Dashboard | None:
         try:
-            return Dashboard.objects.get(name=name)
+            return Dashboard.objects.get(name=name, organization=self.organization)
         except Dashboard.DoesNotExist:
             raise ValidationError("Dashboard does not exist.")
 

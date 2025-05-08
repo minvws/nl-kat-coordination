@@ -323,8 +323,9 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
         dashboard_name = request.POST.get("dashboard")
 
         try:
-            dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-            dashboard_data = DashboardData.objects.get(name=dashboard_item_name, dashboard=dashboard)
+            dashboard_data = DashboardData.objects.get(
+                name=dashboard_item_name, dashboard__organization=self.organization, dashboard__name=dashboard_name
+            )
 
             dashboard_data_name = dashboard_data.name
             deleted, _ = dashboard_data.delete()
@@ -337,8 +338,6 @@ class DeleteDashboardItemView(OrganizationsCrisisRoomView):
             query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
             return redirect(self.get_success_url() + "?" + query_params)
 
-        except Dashboard.DoesNotExist:
-            messages.error(request, f"Dashboard '{dashboard_name}' not found.")
         except DashboardData.DoesNotExist:
             messages.error(request, f"Dashboard item '{dashboard_item_name}' not found.")
 
