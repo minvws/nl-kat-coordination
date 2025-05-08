@@ -1,4 +1,3 @@
-import gc
 import os
 import traceback
 from collections.abc import Callable
@@ -176,8 +175,6 @@ class BoefjeHandler(Handler):
             else:
                 logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
-            gc.collect()
-
 
 class NormalizerHandler(Handler):
     def __init__(
@@ -283,8 +280,6 @@ class NormalizerHandler(Handler):
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)
             self.bytes_client.save_normalizer_meta(normalizer_meta)
-
-            gc.collect()
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
