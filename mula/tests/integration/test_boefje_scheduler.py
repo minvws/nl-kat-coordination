@@ -4,11 +4,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from structlog.testing import capture_logs
-
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
+from structlog.testing import capture_logs
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -89,6 +89,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ).start()
 
         self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
+
+        self.mock_get_configs = mock.patch("scheduler.context.AppContext.services.katalogus.get_configs").start()
 
     def tearDown(self):
         mock.patch.stopall()
@@ -803,8 +805,25 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
-        self.mock_get_organisations_by_ooi.return_value = [second_organisation, third_organisation]
         self.mock_get_object.return_value = ooi
+        self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=8,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=second_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
+            models.BoefjeConfig(
+                id=9,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=third_organisation.id,
+                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
+                settings={},
+            ),
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -845,8 +864,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
-        self.mock_get_organisations_by_ooi.return_value = [second_organisation]
         self.mock_get_object.return_value = ooi
+        self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=8,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=second_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            )
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -885,7 +913,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
-        self.mock_get_organisations_by_ooi.return_value = []
         self.mock_get_object.return_value = ooi
 
         # Act
@@ -914,14 +941,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         first_organisation = self.organisation
-        second_organisation = OrganisationFactory()
-        third_organisation = OrganisationFactory()
 
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
-        self.mock_get_organisations_by_ooi.return_value = []
         self.mock_get_object.return_value = ooi
 
         # Act
@@ -958,8 +982,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.side_effect = [None, None, None, plugin]
-        self.mock_get_organisations_by_ooi.return_value = [second_organisation, third_organisation]
+        self.mock_get_plugin.side_effect = [None, plugin]
         self.mock_get_object.return_value = ooi
 
         # Act
