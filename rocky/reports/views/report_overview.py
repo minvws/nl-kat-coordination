@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -81,9 +82,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": (
-                        datetime.strptime(schedule_datetime, "%Y-%m-%dT%H:%M:%SZ") if schedule_datetime else "asap"
-                    ),
+                    "deadline_at": (datetime.fromisoformat(schedule_datetime) if schedule_datetime else "asap"),
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
@@ -123,13 +122,16 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         return context
 
 
-class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
+class ScheduledReportsEnableDisableView(
+    OrganizationPermissionRequiredMixin, BreadcrumbsReportOverviewView, SchedulerView, ListView
+):
     """
-    Cancel the selected report(s)
+    Enable/disable the schedule for the selected ReportRecipe.
     """
 
     task_type = "report"
     template_name = "report_overview/scheduled_reports.html"
+    permission_required = "tools.can_enable_disable_schedule"
 
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
