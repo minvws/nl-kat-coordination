@@ -316,6 +316,7 @@ class SchedulerClient:
 
     def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
+            filters["filters"].append({"column": "organisation", "operator": "eq", "value": self.organization_code})
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
             return PaginatedSchedulesResponse.model_validate_json(res.content)
@@ -331,7 +332,6 @@ class SchedulerClient:
             raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
-        logger.info("Creating schedule", schedule=schedule)
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             logger.info(res.content)
