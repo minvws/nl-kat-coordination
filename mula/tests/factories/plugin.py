@@ -1,4 +1,5 @@
 from factory import Factory, LazyFunction, Sequence, fuzzy
+
 from scheduler.models import Plugin
 from scheduler.models.ooi import RunOn
 

@@ -51,6 +51,10 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.coverage.run]
 relative_files = true
+data_file = "/tmp/.coverage"
+
+[tool.coverage.xml]
+output = "/tmp/coverage.xml"
 
 omit = [
     "scheduler/alembic/*",
