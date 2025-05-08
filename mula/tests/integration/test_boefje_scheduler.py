@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -823,16 +823,156 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
     def test_push_boefje_task_ooi_in_other_orgs_one_org(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+            env_hash=plugin.env_hash,
+        )
+
+        first_organisation = self.organisation
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = plugin
+        self.mock_get_organisations_by_ooi.return_value = [second_organisation]
+        self.mock_get_object.return_value = ooi
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
+
+        # Assert: there should be 2 tasks in the queue
+        self.assertEqual(2, self.scheduler.queue.qsize())
+
+        # Assert: the tasks should be on the queue
+        items = [self.scheduler.queue.peek(0), self.scheduler.queue.peek(1)]
+        orgs = [item.organisation for item in items]
+
+        self.assertIn(first_organisation.id, orgs)
+        self.assertIn(second_organisation.id, orgs)
+        self.assertNotIn(third_organisation.id, orgs)
+
+        for item in items:
+            self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
     def test_push_boefje_task_ooi_in_other_orgs_no_orgs(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+            env_hash=plugin.env_hash,
+        )
+
+        first_organisation = self.organisation
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = plugin
+        self.mock_get_organisations_by_ooi.return_value = []
+        self.mock_get_object.return_value = ooi
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
+
+        # Assert: there should be 1 task in the queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: the task should be on the queue
+        item = self.scheduler.queue.peek(0)
+        org = item.organisation
+        self.assertEqual(first_organisation.id, org)
 
     def test_push_boefje_task_ooi_in_other_orgs_no_ooi(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+            env_hash=plugin.env_hash,
+        )
+
+        first_organisation = self.organisation
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.return_value = plugin
+        self.mock_get_organisations_by_ooi.return_value = []
+        self.mock_get_object.return_value = ooi
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
+
+        # Assert: there should be 1 task in the queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: the task should be on the queue
+        item = self.scheduler.queue.peek(0)
+        org = item.organisation
+
+        self.assertEqual(first_organisation.id, org)
+        self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
     def test_push_boefje_task_ooi_in_other_orgs_no_boefje(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+            env_hash=plugin.env_hash,
+        )
+
+        first_organisation = self.organisation
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
+
+        # Mocks
+        self.mock_get_latest_task_by_hash.return_value = None
+        self.mock_get_last_run_boefje.return_value = None
+        self.mock_get_plugin.side_effect = [None, None, None, plugin]
+        self.mock_get_organisations_by_ooi.return_value = [second_organisation, third_organisation]
+        self.mock_get_object.return_value = ooi
+
+        # Act
+        self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
+
+        # Assert: there should be 1 task in the queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: the task should be on the queue
+        item = self.scheduler.queue.peek(0)
+        org = item.organisation
+
+        self.assertEqual(first_organisation.id, org)
+        self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
     def test_push_boefje_task_ooi_in_other_orgs_env_hash_mismatch(self):
         pass

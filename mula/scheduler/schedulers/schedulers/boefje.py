@@ -696,6 +696,7 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
+    # TODO:: exception handling
     def is_ooi_in_other_organisations(self, boefje_task: models.BoefjeTask):
         """Is the ooi in other organisations? When the ooi is in other
         organisations we don't want to scan those as well, we still create
@@ -712,7 +713,10 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if len(orgs) < 2:
+        # TODO: we do need to make sure what the endpoint returns, does it
+        # return the original organisation as well? And then this needs to
+        # changed to `if len(orgs) < 2:`
+        if len(orgs) < 1:
             self.logger.debug(
                 "No other organisations found for ooi",
                 ooi_primary_key=boefje_task.input_ooi,
