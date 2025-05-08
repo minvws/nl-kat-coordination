@@ -316,6 +316,7 @@ class SchedulerClient:
 
     def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
+            filters["filters"].append({"column": "organisation", "operator": "eq", "value": self.organization_code})
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
             return PaginatedSchedulesResponse.model_validate_json(res.content)
