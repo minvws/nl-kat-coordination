@@ -702,67 +702,25 @@ class BoefjeScheduler(Scheduler):
         organisations we don't want to scan those as well, we still create
         tasks for those organisations but they will be batched together.
         """
-        try:
-            orgs = self.ctx.services.octopoes.get_organisations_by_ooi(boefje_task.input_ooi)
-        except ExternalServiceError:
-            self.logger.exception(
-                "Error occurred while checking if ooi is in other organisations",
-                ooi_primary_key=boefje_task.input_ooi,
-                organisation_id=boefje_task.organization,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        # TODO: we do need to make sure what the endpoint returns, does it
-        # return the original organisation as well? And then this needs to
-        # changed to `if len(orgs) < 2:`
-        if len(orgs) < 1:
-            self.logger.debug(
-                "No other organisations found for ooi",
-                ooi_primary_key=boefje_task.input_ooi,
-                organisation_id=boefje_task.organization,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        for org in orgs:
-            if org.id == boefje_task.organization:
+        # From the boefje id we can get the same boefje in other organisations.
+        configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
+        for config in configs:
+            if config.organisation_id == boefje_task.organization:
                 # Skip the organisation we are currently in
                 continue
 
-            ooi = self.ctx.services.octopoes.get_object(org.id, boefje_task.input_ooi)
+            ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
 
-            # Check if we have the same boefje in the other organisations
-            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(boefje_task.boefje.id, org)
-            if boefje is None:
-                self.logger.debug(
-                    "Boefje not found in other organisation",
-                    boefje_id=boefje_task.boefje.id,
-                    organisation_id=org,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-
-            # Is boefje enabled
-            if boefje.enabled is False:
-                continue
-
-            # Does the env_hash match?
-            if boefje_task.env_hash is not None and boefje_task.env_hash != boefje.env_hash:
-                self.logger.debug(
-                    "Boefje env_hash does not match",
-                    boefje_id=boefje_task.boefje.id,
-                    organisation_id=org,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-
+            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                boefje_task.boefje.id, config.organisation_id
+            )
+            # TODO: check if we need this, or if this is already handled
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
                     boefje_id=boefje_task.boefje.id,
                     ooi_primary_key=ooi.primary_key,
-                    organisation_id=org,
+                    organisation_id=config.organisation_id,
                     scheduler_id=self.scheduler_id,
                 )
                 continue
@@ -770,13 +728,13 @@ class BoefjeScheduler(Scheduler):
             new_boefje_task = models.BoefjeTask(
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
-                organization=org.id,
-                env_hash=boefje.env_hash,
+                organization=config.organisation_id,
+                env_hash=boefje.env_hash,  # FIXME: get this from config?
             )
 
             self.push_boefje_task(
                 boefje_task=new_boefje_task,
-                organisation_id=org.id,
+                organisation_id=config.organisation_id,
                 create_schedule=self.create_schedule,
                 caller=self.is_ooi_in_other_organisations.__name__,
             )
