@@ -3,14 +3,12 @@ from os import getenv
 
 import httpx
 
-from boefjes.job_models import BoefjeMeta
-
 REQUEST_TIMEOUT = 60
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     """Make request to witha.name."""
-    ip = ip_address(boefje_meta.arguments["input"]["address"])
+    ip = ip_address(boefje_meta["arguments"]["input"]["address"])
     if ip.is_private or ip.is_multicast or ip.is_reserved:
         return [({"info/boefje"}, "Skipping private/multicast/reserved IP address")]
 
