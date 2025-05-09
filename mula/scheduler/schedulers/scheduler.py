@@ -245,16 +245,9 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        if self.create_schedule is False:
-            self.logger.debug(
-                "Not creating schedule for item %s",
-                item.id,
-                item_id=item.id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return item
-
+        # We differentiate between the scheduler configuration if we should
+        # create a schedule for the item, and or if it was specifically
+        # specified for the item to create a schedule.
         scheduler_create_schedule = self.create_schedule
         if not scheduler_create_schedule:
             self.logger.debug(
@@ -312,23 +305,7 @@ class Scheduler(abc.ABC):
 
         item.schedule_id = schedule_db.id
 
-        # Determine the cron expression, either from the overridden set_cron()
-        # or explicitly set.
-        cron_expr = self.set_cron(item)
-        if cron_expr is not None:
-            schedule_db.schedule = cron_expr
-
-        # When a Schedule does not have a schedule (cron expression), we
-        # calculate the deadline when a Schedules specified a way to calculate
-        # this. Otherwise we set the deadline to None make sure the Schedule
-        # will not continue to be processed.
-        if schedule_db.schedule is not None:
-            schedule_db.deadline_at = cron.next_run(schedule_db.schedule)
-        elif self.auto_calculate_deadline:
-            schedule_db.deadline_at = self.calculate_deadline(item)
-        else:
-            schedule_db.deadline_at = None
-
+        schedule_db = self.calculate_deadline(schedule_db)
         self.ctx.datastores.schedule_store.update_schedule(schedule_db)
         self.ctx.datastores.task_store.update_task(item)
 
@@ -369,11 +346,22 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-    def set_cron(self, task: models.Task) -> str | None:
-        """Set the cron schedule for the task."""
-        return None
+    def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
+        """
+        When the schedule is not set, and the auto_calculate_deadline is
+        not set, we set the deadline to None. This means that the task
+        will not be scheduled and was likely a one-off scheduled task.
+        """
+        if schedule.schedule is not None:
+            schedule.deadline_at = cron.next_run(schedule.schedule)
+        elif self.auto_calculate_deadline:
+            schedule.deadline_at = self.calculate_default_deadline(schedule)
+        elif schedule.deadline_at is not None and schedule.deadline_at < datetime.now(timezone.utc):
+            schedule.deadline_at = None
 
-    def calculate_deadline(self, task: models.Task) -> datetime:
+        return schedule
+
+    def calculate_default_deadline(self, schedule: models.Schedule) -> datetime:
         """The default deadline calculation for a task, when the
         auto_calculate_deadline attribute is set to True"""
         # We at least delay a job by the grace period
@@ -423,7 +411,10 @@ class Scheduler(abc.ABC):
         Returns:
             True if there is space on the queue, False otherwise.
         """
-        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+        if self.queue.maxsize == 0:
+            return True
+
+        if self.queue.maxsize <= self.queue.qsize():
             return False
 
         return True

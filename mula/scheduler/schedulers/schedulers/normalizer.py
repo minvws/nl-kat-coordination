@@ -1,6 +1,5 @@
 import uuid
 from concurrent import futures
-from types import SimpleNamespace
 from typing import Any, Literal
 
 from opentelemetry import trace
@@ -145,19 +144,10 @@ class NormalizerScheduler(Scheduler):
     def push_normalizer_task(
         self, normalizer_task: models.NormalizerTask, organisation_id: str, create_schedule: bool, caller: str = ""
     ) -> None:
-        if self.has_normalizer_task_started_running(normalizer_task):
+        is_running = self.has_normalizer_task_started_running(normalizer_task)
+        if is_running:
             self.logger.debug(
                 "Task is still running: %s",
-                normalizer_task.id,
-                task_id=normalizer_task.id,
-                scheduler_id=self.scheduler_id,
-                caller=caller,
-            )
-            return
-
-        if self.is_item_on_queue_by_hash(normalizer_task.hash):
-            self.logger.debug(
-                "Task is already on queue: %s",
                 normalizer_task.id,
                 task_id=normalizer_task.id,
                 scheduler_id=self.scheduler_id,
@@ -174,8 +164,7 @@ class NormalizerScheduler(Scheduler):
             data=normalizer_task.model_dump(),
         )
 
-        task.priority = self.ranker.rank(SimpleNamespace(raw_data=normalizer_task.raw_data, task=normalizer_task))
-
+        task.priority = self.ranker.rank(normalizer_task)
         self.push_item_to_queue_with_timeout(task, self.max_tries, create_schedule=create_schedule)
 
         self.logger.info(
@@ -191,13 +180,19 @@ class NormalizerScheduler(Scheduler):
 
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some normalizer scheduler specific logic before pushing the item to the
-        queue."""
+        queue.
+
+        The task.id and the normalizer_task.id should be the same, this assumption
+        is made by the task runner. Here we enforce this by setting the
+        boefje_task.id to the task.id if they are not the same.
+        """
         normalizer_task = models.NormalizerTask.model_validate(item.data)
 
         # Check if id's are unique and correctly set. Same id's are necessary
         # for the task runner.
-        if item.id != normalizer_task.id or self.ctx.datastores.task_store.get_task(item.id):
+        if item.id != normalizer_task.id:
             new_id = uuid.uuid4()
+
             normalizer_task.id = new_id
             item.id = new_id
             item.data = normalizer_task.model_dump()
@@ -221,7 +216,9 @@ class NormalizerScheduler(Scheduler):
 
         return True
 
-    def has_normalizer_task_started_running(self, task: models.NormalizerTask) -> bool:
+    def has_normalizer_task_started_running(
+        self, task: models.NormalizerTask, task_db: models.Task | None = None
+    ) -> bool:
         """Check if the same task is already running.
 
         Args:
@@ -230,10 +227,6 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is still running, False otherwise.
         """
-        # Get the last tasks that have run or are running for the hash
-        # of this particular NormalizerTask.
-        task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-
         # Is task still running according to the datastore?
         if task_db is not None and task_db.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             self.logger.debug(

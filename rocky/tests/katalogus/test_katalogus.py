@@ -158,8 +158,7 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
         setup_request(request, client_member.user), organization_code=client_member.organization.code
     )
     assert response.status_code == 200
-
-    assertContains(response, "You don't have permission to enable boefje")
+    assertContains(response, '<span class="label system-tag color-2">Enabled</span>')
     assertNotContains(response, '<button type="submit" class="button ghost">Enable</button>')
     assertNotContains(response, '<button type="submit" class="button ghost destructive">Disable</button>')
 
@@ -175,7 +174,7 @@ def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
-    assertContains(response, "KAT-alogus Settings")
+    assertContains(response, "KAT-alogus settings")
     assertContains(response, "Plugin")
     assertContains(response, "Name")
     assertContains(response, "Value")
@@ -198,7 +197,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
     response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
-    assertContains(response, "KAT-alogus Settings")
+    assertContains(response, "KAT-alogus settings")
     assertContains(response, "Plugin")
     assertContains(response, "Name")
     assertContains(response, "Value")
