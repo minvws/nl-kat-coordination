@@ -307,7 +307,7 @@ def test_basic_settings_api(test_client, organisation):
     assert test_client.get(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings").json() == {"PORTS": "80"}
 
 
-def test_clone_settings(test_client, organisation):
+def test_clone_settings_and_config_api_shows_both(test_client, organisation):
     plug = "dns-records"
 
     # Set a setting on the first organisation and enable dns-records
@@ -351,3 +351,40 @@ def test_clone_settings(test_client, organisation):
     # And the originally enabled boefje got disabled
     response = test_client.get(f"/v1/organisations/{new_org_id}/plugins/nmap")
     assert response.json()["enabled"] is False
+
+    # Assert we can fetch the settings with the new configs API
+    expected = [
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "env_hash": "1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+            "id": 8,
+            "organisation_id": "test",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+        },
+        {
+            "boefje_id": "nmap",
+            "enabled": False,
+            "env_hash": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
+            "id": 10,
+            "organisation_id": "org2",
+            "settings": {},
+        },
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "env_hash": "1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+            "id": 9,
+            "organisation_id": "org2",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+        },
+    ]
+    assert test_client.get("/v1/configs").json() == expected
+    assert test_client.get("/v1/configs", params={"limit": "2"}).json() == [expected[0], expected[1]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "test"}).json() == [expected[0]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "org2"}).json() == [expected[2], expected[1]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "org2", "boefje_id": "nmap"}).json() == [
+        expected[1]
+    ]
+    assert test_client.get("/v1/configs", params={"boefje_id": "dns-records"}).json() == [expected[0], expected[2]]
+    assert test_client.get("/v1/configs", params={"enabled": True}).json() == [expected[0], expected[2]]

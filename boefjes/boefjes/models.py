@@ -1,12 +1,14 @@
 import datetime
+import json
 from enum import Enum
 from functools import total_ordering
+from hashlib import sha1
 from typing import Literal
 
 from croniter import croniter
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, computed_field, field_validator
 
 
 # This makes the RunOn sortable when in a list. This is convenient for e.g. the RunOnDB.from_run_ons method, that now
@@ -73,6 +75,22 @@ class Boefje(Plugin):
 
     class Config:
         validate_assignment = True
+
+
+class BoefjeConfig(BaseModel):
+    id: int
+    settings: dict
+    enabled: bool
+    boefje_id: str
+    organisation_id: str
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def env_hash(self) -> str:
+        # settings are assumed to be a one level deep mapping of strings to strings or integers
+        settings_bytes = json.dumps(self.settings.items(), sort_keys=True).encode()
+
+        return sha1(settings_bytes).hexdigest()
 
 
 class Normalizer(Plugin):
