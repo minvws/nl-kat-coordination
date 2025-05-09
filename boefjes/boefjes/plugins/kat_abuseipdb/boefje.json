@@ -1,0 +1,11 @@
+{
+  "id": "abuseipdb",
+  "name": "AbuseIPDB lookup",
+  "description": "Use abuseIPDB.com to see if any abuse report exist for a given IP address.",
+  "oci_image": "ghcr.io/cynalytics/boefje/abuseipdb",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1
+}
