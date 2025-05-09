@@ -1,7 +1,8 @@
-.. _basics-bits:
+.. _basics-origin-types:
 
-Object origin types
--------------------
+Origin types
+============
+
 Each object in OpenKAT has an origin. An origin connects an object, such as a hostname, to the objects produced by a task that used this object as an input, such as a dns-scan.
 The produced objects are called the origin's "output", and we say that each object in the output is "proven" by its origin.
 In OpenKAT, each valid object should therefore be in at least (the output of) one origin: else, it is no longer proven.
