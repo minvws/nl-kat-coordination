@@ -98,9 +98,9 @@ exceptiongroup==1.2.2 ; python_version >= "3.10" and python_version < "3.11" \
 factory-boy==3.3.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:a2cdbdb63228177aa4f1c52f4b6d83fab2b8623bf602c7dedd7eb83c0f69c04c \
     --hash=sha256:bc76d97d1a65bbd9842a6d722882098eb549ec8ee1081f9fb2e8ff29f0c300f1
-faker==26.2.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:7b123090774deff5f2cd3eb92a84dcbbf1e163f30a6d07321b7852c11bfe6a75 \
-    --hash=sha256:81768de19012147521140f0d8bf5353e501ac42c1065d25e0cac455d3615c0a7
+faker==37.1.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:ad9dc66a3b84888b837ca729e85299a96b58fdaef0323ed0baace93c9614af06 \
+    --hash=sha256:dc2f730be71cb770e9c715b13374d80dbcee879675121ab51f9683d262ae9a1c
 fastapi-slim==0.115.12 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:2ebe049cfcd1d8313c781b5405dc84f921f13523269b27692e9bfa08e219bbf8 \
     --hash=sha256:e53b12240bf6492be4deea1d819c4891be75c810f8cdb044b962a0286cbfc5b4
