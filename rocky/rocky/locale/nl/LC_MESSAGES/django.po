@@ -16,16 +16,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-01 08:10+0000\n"
-"PO-Revision-Date: 2025-04-23 15:01+0000\n"
-"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"PO-Revision-Date: 2025-05-08 15:01+0000\n"
+"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.11.1-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -91,7 +91,7 @@ msgstr "Accounttype"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een accounttype."
+msgstr "Elk lid van OpenKAT moet deel uitmaken van een accounttype."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
@@ -182,8 +182,8 @@ msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
-"Stel de status van de leden in op geblokkeerd, zodat ze geen toegang meer "
-"hebben tot de organisatie."
+"Stel de status van het lid in op geblokkeerd, zodat deze geen toegang meer "
+"heeft tot de organisatie."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
@@ -1221,11 +1221,11 @@ msgstr "toelichting"
 
 #: katalogus/templates/partials/no_enabling_permission_message.html
 msgid "No permission to enable/disable plugins"
-msgstr ""
+msgstr "Geen toestemming om plugins in/uit te schakelen"
 
 #: katalogus/templates/partials/no_enabling_permission_message.html
 msgid "Contact your administrator to request permission."
-msgstr ""
+msgstr "Neem contact op met uw beheerder om toestemming te vragen."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
@@ -2447,6 +2447,14 @@ msgid ""
 "two-step process ensures that the member operates within authorized "
 "boundaries."
 msgstr ""
+"Voordat een lid de mogelijkheid krijgt om vrijwaringsniveaus in te stellen "
+"op een object, moet het eerst het vrijwaringsniveau dat is ingesteld door de "
+"beheerders erkennen en accepteren. Het maximaal toegestane scanniveau voor "
+"een lid is afgestemd op het vertrouwde vrijwaringsniveau. Door het "
+"vertrouwde vrijwaringsniveau te bevestigen, gaat het lid formeel akkoord met "
+"deze toestemming en krijgt het de mogelijkheid om alleen scans uit te voeren "
+"tot dit vertrouwde vrijwaringsniveau. Dit proces in twee stappen zorgt "
+"ervoor dat het lid binnen de geautoriseerde grenzen werkt."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
@@ -6841,7 +6849,7 @@ msgstr "Organisatie opslaan"
 
 #: rocky/templates/organizations/organization_list.html
 msgid "An overview of all organizations you are a member of."
-msgstr ""
+msgstr "Een overzicht van alle organisaties waar u lid van bent."
 
 #: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
@@ -6879,7 +6887,7 @@ msgstr "Alle bits opnieuw starten"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid " member account setup"
-msgstr " lidaccount instellen"
+msgstr " ledenaccount instellen"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid "Member details"
@@ -6909,7 +6917,7 @@ msgstr "Lid opslaan"
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
 msgid "An overview of members of <strong>%(organization_name)s</strong>."
-msgstr ""
+msgstr "Een overzicht van leden van <strong>%(organization_name)s</strong>."
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -6933,7 +6941,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
-msgstr "Gebruikersoverzicht:"
+msgstr "Ledenoverzicht:"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "E-mail"
