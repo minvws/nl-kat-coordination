@@ -714,7 +714,6 @@ class BoefjeScheduler(Scheduler):
         return oois
 
     # TODO: exception handling
-    # TODO: rename method
     def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask, caller: str = "") -> models.BoefjeTask:
         """Check if the boefje is also present in other organisations"""
         # We check on input_ooi because we allow for boefje tasks without an
@@ -733,10 +732,11 @@ class BoefjeScheduler(Scheduler):
         # that have the same env_hash as the boefje task
         filtered_configs: dict[str, list[models.BoefjeConfig]] = {}
         for config in configs:
-            filtered_configs.setdefault(config.env_hash, []).append(config)
-
             if config.organisation_id == boefje_task.organization:
                 boefje_task.env_hash = config.env_hash
+                continue
+
+            filtered_configs.setdefault(config.env_hash, []).append(config)
 
         if boefje_task.env_hash is None:
             return boefje_task
