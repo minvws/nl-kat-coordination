@@ -15,6 +15,7 @@ from pathlib import Path
 
 import environ
 import structlog
+from csp.constants import NONE, SELF
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
@@ -397,15 +398,25 @@ if CSP_HEADER:
     MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
     INSTALLED_APPS += ["csp"]
 
-CSP_DEFAULT_SRC = ["'none'"]
-CSP_IMG_SRC = ["'self'"]
-CSP_FONT_SRC = ["'self'"]
-CSP_STYLE_SRC = ["'self'"]
-CSP_FRAME_ANCESTORS = ["'none'"]
-CSP_BASE_URI = ["'none'"]
-CSP_FORM_ACTION = ["'self'"]
-CSP_INCLUDE_NONCE_IN = ["script-src"]
-CSP_CONNECT_SRC = ["'self'"]
+    # CSP_DEFAULT_SRC = ["'none'"]
+    # CSP_IMG_SRC = ["'self'"]
+    # CSP_FONT_SRC = ["'self'"]
+    # CSP_STYLE_SRC = ["'self'"]
+    # CSP_FRAME_ANCESTORS = ["'none'"]
+    # CSP_BASE_URI = ["'none'"]
+    # CSP_FORM_ACTION = ["'self'"]
+    # CSP_INCLUDE_NONCE_IN = ["script-src"]
+    # CSP_CONNECT_SRC = ["'self'"]
+
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {'base-uri': [NONE],
+                'connect-src': [SELF],
+                'default-src': [NONE],
+                'font-src': [SELF],
+                'form-action': [SELF],
+                'frame-ancestors': [NONE],
+                'img-src': [SELF],
+                'style-src': [SELF]}}
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
