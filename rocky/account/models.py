@@ -120,7 +120,12 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     def can_modify_dashboard_items(self) -> bool:
         """If you can add, you might as well change and delete a dashboard items."""
         return self.has_perms(
-            ["crisis_room.add_dashboarddata", "crisis_room.change_dashboarddata", "crisis_room.delete_dashboarddata"]
+            [
+                "crisis_room.add_dashboarddata",
+                "crisis_room.change_dashboarddata",
+                "crisis_room.delete_dashboarddata",
+                "crisis_room.change_dashboarddata_position",
+            ]
         )
 
     @cached_property

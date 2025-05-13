@@ -45,7 +45,7 @@
                                     {% if dashboard_item.item.query_from == "object_list" %}
                                         <span class="label system-tag color-grey">{% translate "Object list" %}</span>
                                     {% endif %}
-                                    {% if request.user.can_modify_dashboard %}
+                                    {% if request.user.can_modify_dashboard_items %}
                                         <div class="dropdown">
                                             <button type="button"
                                                     aria-label="{% translate "Options for dashboard items" %}"
