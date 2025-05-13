@@ -1,6 +1,6 @@
 {
   "id": "withaname",
-  "name": "Witha.name Ddossia lookup",
+  "name": "Witha.name DDoSia lookup",
   "description": "Use witha.name to see if our hostnames or ipaddresses are listed for targeting.",
   "oci_image": "ghcr.io/cynalytics/boefje/withaname",
   "consumes": [
