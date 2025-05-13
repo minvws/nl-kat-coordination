@@ -109,6 +109,20 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     def can_access_all_organizations(self) -> bool:
         return self.has_perm("tools.can_access_all_organizations")
 
+    @property
+    def can_modify_dashboard(self) -> bool:
+        """If you can add, you might as well change and delete a dashboard."""
+        return self.has_perms(
+            ["crisis_room.add_dashboard", "crisis_room.change_dashboard", "crisis_room.delete_dashboard"]
+        )
+
+    @property
+    def can_modify_dashboard_items(self) -> bool:
+        """If you can add, you might as well change and delete a dashboard items."""
+        return self.has_perms(
+            ["crisis_room.add_dashboarddata", "crisis_room.change_dashboarddata", "crisis_room.delete_dashboarddata"]
+        )
+
     @cached_property
     def organizations(self) -> list[Organization]:
         """

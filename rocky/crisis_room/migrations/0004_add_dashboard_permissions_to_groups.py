@@ -38,6 +38,7 @@ def add_dashboard_permissions_to_groups(apps, _):
         "change_dashboarddata",
         "delete_dashboarddata",
         "view_dashboarddata",
+        "can_change_dashboard_item_position",
     ]
 
     dashboard_permissions = get_permissions(apps, dashboard_permissions)

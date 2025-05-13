@@ -64,6 +64,7 @@ class DashboardData(models.Model):
     )
 
     class Meta:
+        permissions = ("can_change_dashboard_item_position", _("Can change dashboard item position"))
         constraints = [
             models.UniqueConstraint(
                 name="unique dashboard position",
