@@ -114,12 +114,12 @@ class XTDBOriginRepository(OriginRepository):
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 
-    def get(self, id_: str, valid_time: datetime) -> Origin:
+    def get(self, origin_id: str, valid_time: datetime) -> Origin:
         try:
-            return self.deserialize(self.session.client.get_entity(id_, valid_time))
+            return self.deserialize(self.session.client.get_entity(origin_id, valid_time))
         except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
-                raise ObjectNotFoundException(id_)
+                raise ObjectNotFoundException(origin_id)
             else:
                 raise e
 
