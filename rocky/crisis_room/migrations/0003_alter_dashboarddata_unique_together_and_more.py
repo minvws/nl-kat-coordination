@@ -67,4 +67,12 @@ class Migration(migrations.Migration):
                 name="unique dashboard name",
             ),
         ),
+        migrations.AlterModelOptions(
+            name="dashboarddata",
+            options={
+                "permissions": [
+                    ("change_dashboarddata_position", "Can change position up or down of a dashboard item.")
+                ]
+            },
+        ),
     ]
