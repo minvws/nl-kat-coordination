@@ -55,7 +55,7 @@ def run(input_ooi: dict[str, str], raw: bytes) -> Iterable[OOI]:
     ]
 
     description = (
-        f"{ooi_category} {input_ooi_reference.human_readable} is listed for targeting by Ddosia,"
+        f"{ooi_category} {input_ooi_reference.human_readable} is listed for targeting by DDoSia,"
         + " and".join(
             [
                 f" on port {data['port']}, over {data['type']} using {data['method']} method on {data['path']}"
