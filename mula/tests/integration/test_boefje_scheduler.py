@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -779,10 +779,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
-    def test_push_boefje_task_ooi_in_other_orgs(self):
-        """When a ooi is also found in other organisations, the task should be
-        pushed to the queue for all organisations.
-        """
+    def test_push_boefje_task_boefje_in_other_orgs__(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -793,7 +790,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         first_organisation = self.organisation
@@ -806,6 +802,14 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = plugin
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=8,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=first_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
             models.BoefjeConfig(
                 id=8,
                 boefje_id=boefje.id,
@@ -841,7 +845,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         for item in items:
             self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
-    def test_push_boefje_task_ooi_in_other_orgs_one_org(self):
+    def test_push_boefje_task_boefje_in_other_orgs_one_org(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -892,7 +896,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         for item in items:
             self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
-    def test_push_boefje_task_ooi_in_other_orgs_no_orgs(self):
+    def test_push_boefje_task_boefje_in_other_orgs_no_orgs(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -925,7 +929,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         org = item.organisation
         self.assertEqual(first_organisation.id, org)
 
-    def test_push_boefje_task_ooi_in_other_orgs_no_ooi(self):
+    def test_push_boefje_task_boefje_in_other_orgs_no_ooi(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -960,7 +964,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(first_organisation.id, org)
         self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
-    def test_push_boefje_task_ooi_in_other_orgs_no_boefje(self):
+    def test_push_boefje_task_boefje_in_other_orgs_no_boefje(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -997,13 +1001,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(first_organisation.id, org)
         self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
 
-    def test_push_boefje_task_ooi_in_other_orgs_env_hash_mismatch(self):
+    def test_push_boefje_task_boefje_in_other_orgs_env_hash_mismatch(self):
         pass
 
-    def test_push_boefje_task_ooi_in_other_orgs_no_permission(self):
+    def test_push_boefje_task_boefje_in_other_orgs_no_permission(self):
         pass
 
-    def test_push_boefje_task_ooi_in_other_orgs_validate_boefje(self):
+    def test_push_boefje_task_boefje_in_other_orgs_validate_boefje(self):
         pass
 
     def test_post_push(self):
