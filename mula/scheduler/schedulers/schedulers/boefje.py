@@ -427,10 +427,11 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        # fixme: incorrect
-        boefje_task.env_hash = self.ctx.services.katalogus.get_configs(
+        # TODO: what to do when no results, or more than one result?
+        configs = self.ctx.services.katalogus.get_configs(
             boefje_id=boefje_task.boefje.id, organisation_id=boefje_task.organization, enabled=True
         )
+        boefje_task.env_hash = configs[0].env_hash if configs else None
 
         # We check on input_ooi because we allow for boefje tasks without an
         # ooi, something we can't deduplicate. Additionally, because we
@@ -732,14 +733,14 @@ class BoefjeScheduler(Scheduler):
         """
         configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
 
-        # We are only interested in the settings of the current boefje task
-        # so we filter the configs based on the organisation id.
+        # The endpoint returns configs of the boefje from multiple organisations
+        # with different settings, but we're only interested in the settings
+        # that have the same env_hash as the boefje task
         filtered_configs = {}
         for config in configs:
             filtered_configs[config.env_hash] = config
             if config.organisation_id != boefje_task.organization:
                 continue
-            boefje_task.env_hash = config.env_hash
 
         for config in filtered_configs[boefje_task.env_hash]:
             if config.env_hash != boefje_task.env_hash:
@@ -747,10 +748,10 @@ class BoefjeScheduler(Scheduler):
 
             ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
 
+            # TODO: check if we need this, or if this is already handled
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                 boefje_task.boefje.id, config.organisation_id
             )
-            # TODO: check if we need this, or if this is already handled
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
@@ -765,7 +766,7 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
                 organization=config.organisation_id,
-                env_hash=env_hash,
+                env_hash=boefje_task.env_hash,
             )
 
             self.push_boefje_task(
