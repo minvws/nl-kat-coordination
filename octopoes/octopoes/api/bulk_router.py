@@ -2,13 +2,15 @@ import uuid
 from datetime import datetime
 
 import structlog
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
-from octopoes.api.router import extract_valid_time
+from octopoes.api.router import extract_reference, extract_valid_time, settings
 from octopoes.api.router import settings as extract_settings
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.core.app import get_xtdb_client
 from octopoes.events.manager import EventManager
+from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.tasks.app import app as celery_app
@@ -49,3 +51,35 @@ def list_reports(
             reports[recipe_id] = report
 
     return reports
+
+
+@router.get("/object-clients")
+def list_object_clients(
+    clients: set[str] = Query(set()),
+    reference: Reference = Depends(extract_reference),
+    settings_: Settings = Depends(settings),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> list[str]:
+    """
+    An efficient endpoint for checking if OOIs live in multiple organizations
+    """
+
+    # See list_reports() for some of the reasoning behind the below code
+    event_manager = EventManager("null", str(settings_.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
+    xtdb_http_client = get_xtdb_client(str(settings_.xtdb_uri), "")
+
+    clients_with_reference = []
+
+    for client in clients:
+        logger.info("client %s", client)
+        xtdb_http_client.client = client
+        ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
+
+        try:
+            ooi_repository.get(reference, valid_time)
+        except ObjectNotFoundException:
+            continue
+
+        clients_with_reference.append(client)
+
+    return clients_with_reference
