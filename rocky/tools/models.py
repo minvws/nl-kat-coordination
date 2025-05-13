@@ -98,6 +98,7 @@ class Organization(models.Model):
             ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
             ("can_access_all_organizations", "Can access all organizations"),
+            ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
 
     def get_absolute_url(self):
