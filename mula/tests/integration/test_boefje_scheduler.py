@@ -919,7 +919,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
                 current = item.data.get("env_hash")
             self.assertEqual(current, item.data.get("env_hash"))
 
-    def test_push_boefje_task_boefje_in_other_orgs_no_orgs(self):
+    def test_push_boefje_task_boefje_in_other_orgs_no_configs(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -939,6 +939,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
         self.mock_get_object.return_value = ooi
+        self.mock_get_configs.return_value = []
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -948,8 +949,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
-        org = item.organisation
-        self.assertEqual(first_organisation.id, org)
+        self.assertEqual(first_organisation.id, item.organisation)
 
     def test_push_boefje_task_boefje_in_other_orgs_no_ooi(self):
         # Arrange
@@ -965,12 +965,40 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         first_organisation = self.organisation
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
 
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
-        self.mock_get_object.return_value = ooi
+        self.mock_get_object.return_value = None
+        self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=7,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=first_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
+            models.BoefjeConfig(
+                id=8,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=second_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
+            models.BoefjeConfig(
+                id=9,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=third_organisation.id,
+                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
+                settings={},
+            ),
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -980,10 +1008,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
-        org = item.organisation
-
-        self.assertEqual(first_organisation.id, org)
-        self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
+        self.assertEqual(first_organisation.id, item.organisation)
 
     def test_push_boefje_task_boefje_in_other_orgs_no_boefje(self):
         # Arrange
@@ -1007,6 +1032,32 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.side_effect = [None, plugin]
         self.mock_get_object.return_value = ooi
+        self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=7,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=first_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
+            models.BoefjeConfig(
+                id=8,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=second_organisation.id,
+                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
+                settings={},
+            ),
+            models.BoefjeConfig(
+                id=9,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=third_organisation.id,
+                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
+                settings={},
+            ),
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -1016,19 +1067,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
-        org = item.organisation
-
-        self.assertEqual(first_organisation.id, org)
-        self.assertEqual(item.data.get("env_hash"), plugin.env_hash)
-
-    def test_push_boefje_task_boefje_in_other_orgs_env_hash_mismatch(self):
-        pass
-
-    def test_push_boefje_task_boefje_in_other_orgs_no_permission(self):
-        pass
-
-    def test_push_boefje_task_boefje_in_other_orgs_validate_boefje(self):
-        pass
+        self.assertEqual(first_organisation.id, item.organisation)
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""

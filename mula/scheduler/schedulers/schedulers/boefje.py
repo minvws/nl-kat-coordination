@@ -699,7 +699,7 @@ class BoefjeScheduler(Scheduler):
         if boefje_task.input_ooi is None:
             return boefje_task
 
-        # Make sure we don't call thir method recursively
+        # Make sure we don't call this method recursively
         if caller == self.is_boefje_in_other_orgs.__name__:
             return boefje_task
 
@@ -720,8 +720,9 @@ class BoefjeScheduler(Scheduler):
             return boefje_task
 
         for config in filtered_configs[boefje_task.env_hash]:
-            # TODO:: what if there isn't a ooi found?
             ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
+            if ooi is None:
+                continue
 
             # TODO: check if we need this, or if this is already handled
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
