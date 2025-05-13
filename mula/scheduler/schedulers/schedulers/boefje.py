@@ -427,20 +427,9 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        # TODO: what to do when no results, or more than one result?
-        configs = self.ctx.services.katalogus.get_configs(
-            boefje_id=boefje_task.boefje.id, organisation_id=boefje_task.organization, enabled=True
-        )
-        boefje_task.env_hash = configs[0].env_hash if configs else None
+        boefje_task = self.is_boefje_in_other_orgs(boefje_task, caller=caller)
 
-        # We check on input_ooi because we allow for boefje tasks without an
-        # ooi, something we can't deduplicate. Additionally, because we
-        # potentially call the method itself from `is_ooi_in_other_organisations`,
-        # we need to make sure that we don't endlessly call it, by checking the
-        # caller.
-        if boefje_task.input_ooi is not None and caller != self.is_ooi_in_other_organisations.__name__:
-            boefje_task = self.is_ooi_in_other_organisations(boefje_task)
-
+        # TODO:: from here the env_hash should be set
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -726,26 +715,34 @@ class BoefjeScheduler(Scheduler):
 
     # TODO: exception handling
     # TODO: rename method
-    def is_ooi_in_other_organisations(self, boefje_task: models.BoefjeTask) -> models.BoefjeTask:
-        """Is the ooi in other organisations? When the ooi is in other
-        organisations we don't want to scan those as well, we still create
-        tasks for those organisations but they will be batched together.
-        """
+    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask, caller: str = "") -> models.BoefjeTask:
+        """Check if the boefje is also present in other organisations"""
+        # We check on input_ooi because we allow for boefje tasks without an
+        # ooi, something we can't deduplicate.
+        if boefje_task.input_ooi is None:
+            return boefje_task
+
+        # Make sure we don't call thir method recursively
+        if caller == self.is_boefje_in_other_orgs.__name__:
+            return boefje_task
+
         configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
 
         # The endpoint returns configs of the boefje from multiple organisations
         # with different settings, but we're only interested in the settings
         # that have the same env_hash as the boefje task
-        filtered_configs = {}
+        filtered_configs: dict[str, list[models.BoefjeConfig]] = {}
         for config in configs:
-            filtered_configs[config.env_hash] = config
-            if config.organisation_id != boefje_task.organization:
-                continue
+            filtered_configs.setdefault(config.env_hash, []).append(config)
+
+            if config.organisation_id == boefje_task.organization:
+                boefje_task.env_hash = config.env_hash
+
+        if boefje_task.env_hash is None:
+            return boefje_task
 
         for config in filtered_configs[boefje_task.env_hash]:
-            if config.env_hash != boefje_task.env_hash:
-                continue
-
+            # TODO:: what if there isn't a ooi found?
             ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
 
             # TODO: check if we need this, or if this is already handled
@@ -766,14 +763,14 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
                 organization=config.organisation_id,
-                env_hash=boefje_task.env_hash,
+                env_hash=config.env_hash,
             )
 
             self.push_boefje_task(
                 boefje_task=new_boefje_task,
                 organisation_id=config.organisation_id,
                 create_schedule=self.create_schedule,
-                caller=self.is_ooi_in_other_organisations.__name__,
+                caller=self.is_boefje_in_other_orgs.__name__,
             )
 
         return boefje_task
