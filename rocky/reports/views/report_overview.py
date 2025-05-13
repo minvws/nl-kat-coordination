@@ -325,8 +325,11 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, report_id=self.report_id)
 
+    def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
+        return self.octopoes_api_connector.get_report(ooi_pk, valid_time=self.observed_at)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
-        context["report_id"] = self.report_id
+        context["report_ooi"] = self.get_report_ooi(self.report_id).to_report()
         return context
