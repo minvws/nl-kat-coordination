@@ -1,6 +1,6 @@
 {
   "id": "kat_withaname_normalize",
-  "name": "Witha.name Ddossia normalizer",
+  "name": "Witha.name DDoSia normalizer",
   "description": "Parses witha.name boefje output into findings.",
   "consumes": [
     "boefje/withaname"
