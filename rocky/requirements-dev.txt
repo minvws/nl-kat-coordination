@@ -364,9 +364,9 @@ django-two-factor-auth==1.17.0 ; python_version >= "3.10" and python_version < "
 django-weasyprint==2.4.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:06bc90bcc84f33d6675815498616cc82153ea924227d336bf32e5bf54da117d1 \
     --hash=sha256:9a1d7c687a6c4678f3ac97e48b0ede495b47e17218e8ee6bea454bc8cfa6b60f
-django==5.2.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:57fe1f1b59462caed092c80b3dd324fd92161b620d59a9ba9181c34746c97284 \
-    --hash=sha256:a9b680e84f9a0e71da83e399f1e922e1ab37b2173ced046b541c72e1589a5961
+django==5.1.9 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:2fd1d4a0a66a5ba702699eb692e75b0d828b73cc2f4e1fc4b6a854a918967411 \
+    --hash=sha256:565881bdd0eb67da36442e9ac788bda90275386b549070d70aee86327781a4fc
 djangorestframework==3.16.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361 \
     --hash=sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9
