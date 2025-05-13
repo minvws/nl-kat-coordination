@@ -1,4 +1,4 @@
-# Ddosia / A bot a name
+# DDoSia / A bot a name
 
 This uses the [WhitAName!](https://witha.name) list to detect if our IPs hostnames are listed for DDoSia to attack.
 
