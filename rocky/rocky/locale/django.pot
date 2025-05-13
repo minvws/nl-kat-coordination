@@ -4293,8 +4293,9 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
-"Are you sure you want to disable the schedule for %(report_name)s? The "
-"recipe will still exist and the schedule can be enabled later on."
+"Are you sure you want to disable the schedule for <strong>%(report_name)s</"
+"strong>? The recipe will still exist and the schedule can be enabled later "
+"on."
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -4618,10 +4619,6 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "No schedule or recipe selected"
-msgstr ""
-
-#: reports/views/report_overview.py
-msgid "Schedule {}"
 msgstr ""
 
 #: reports/views/report_overview.py
