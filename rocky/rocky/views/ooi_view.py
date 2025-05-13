@@ -61,6 +61,16 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Searching for: ")] = self.search_string
         return active_filters
 
+    @property
+    def count_active_filters(self) -> int:
+        return (
+            len(self.filtered_ooi_types)
+            + len(self.clearance_levels)
+            + len(self.clearance_types)
+            + self.count_observed_at_filter
+            + (1 if self.search_string else 0)
+        )
+
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
             return self.scan_levels
@@ -109,7 +119,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
         context["clearance_types_selection"] = self.clearance_types
         context["active_filters"] = self.get_active_filters()
-        context["active_filters_counter"] = len(context["active_filters"])
+        context["active_filters_counter"] = self.count_active_filters
 
         return context
 
