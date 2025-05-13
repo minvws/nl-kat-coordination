@@ -8,7 +8,7 @@ import structlog
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from httpx import HTTPError, HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
@@ -347,8 +347,8 @@ class KATalogus:
         return self._katalogus_client.delete_plugin_settings(self._member.organization.code, plugin_id)
 
     def clone_all_configuration_to_organization(self, to_organization: str):
-        if not self._member.has_perm("tools.can_set_katalogus_settings"):
-            raise KATalogusNotAllowedError(_("User is not allowed to set plugin settings"))
+        if not self._member.has_perm("tools.can_view_katalogus_settings"):
+            raise KATalogusNotAllowedError(_("User is not allowed to view plugin settings"))
 
         try:
             to_member = OrganizationMember.objects.get(user=self._member.user, organization__code=to_organization)
