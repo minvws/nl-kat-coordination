@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-29 12:18+0000\n"
+"POT-Creation-Date: 2025-05-07 14:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -747,6 +747,7 @@ msgid "Show all"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
@@ -755,6 +756,7 @@ msgid "Enabled"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -1064,19 +1066,6 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is enabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is disabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-#, python-format
-msgid "You don't have permission to enable or disable %(plugin)ss."
-msgstr ""
-
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/ooi_list_filters.html
@@ -1150,6 +1139,22 @@ msgstr ""
 
 #: katalogus/templates/partials/modal_report_types.html
 msgid "Report types for "
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+#: katalogus/templates/plugin_container_image.html
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "No permission to enable/disable plugins"
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "Contact your administrator to request permission."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
@@ -1251,6 +1256,7 @@ msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/partials/report_header.html
 #: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1408,13 +1414,6 @@ msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
 msgid "The following arguments are used for this Boefje variant:"
-msgstr ""
-
-#: katalogus/templates/plugin_container_image.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "explanation"
 msgstr ""
 
 #: katalogus/templates/plugin_container_image.html
@@ -3817,12 +3816,16 @@ msgid "No findings have been identified for this organization."
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
+msgid "Download as PDF"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "Download report"
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Download as JSON"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Open asset reports"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
@@ -4290,8 +4293,9 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
-"Are you sure you want to disable the schedule for %(report_name)s? The "
-"recipe will still exist and the schedule can be enabled later on."
+"Are you sure you want to disable the schedule for <strong>%(report_name)s</"
+"strong>? The recipe will still exist and the schedule can be enabled later "
+"on."
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -4615,10 +4619,6 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "No schedule or recipe selected"
-msgstr ""
-
-#: reports/views/report_overview.py
-msgid "Schedule {}"
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -6632,7 +6632,7 @@ msgid "Upload CSV"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Download as JSON"
+msgid "Export"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -7201,6 +7201,11 @@ msgstr ""
 #: rocky/views/ooi_add.py
 #, python-format
 msgid "Add %(ooi_type)s"
+msgstr ""
+
+#: rocky/views/ooi_detail.py
+msgid ""
+"Cannot set clearance level. It must be provided and must be a valid number."
 msgstr ""
 
 #: rocky/views/ooi_detail.py
