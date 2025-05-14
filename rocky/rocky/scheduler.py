@@ -332,7 +332,6 @@ class SchedulerClient:
             raise SchedulerHTTPError()
 
     def post_schedule(self, schedule: ScheduleRequest) -> ScheduleResponse:
-        logger.info("Creating schedule", schedule=schedule)
         try:
             res = self._client.post("/schedules", json=schedule.model_dump(exclude_none=True))
             logger.info(res.content)
