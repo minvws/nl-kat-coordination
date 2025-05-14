@@ -1,0 +1,19 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "SEARCHTARGET": {
+      "title": "SEARCHTARGET",
+      "type": "string",
+      "default": "ssdp:all",
+      "description": "What search target to use. Defaults to ssdp:all, needs to be a valid ssdp query."
+    },
+    "TIMEOUT": {
+      "title": "TIMEOUT",
+      "type": "integer",
+      "minimum": 1,
+      "default": 10,
+      "description": "How long in seconds should we wait for answers, defaults to 10."
+    }
+  }
+}
