@@ -8,7 +8,7 @@ logger = structlog.get_logger(__name__)
 
 
 # https://stackoverflow.com/a/40092780/1336275
-def migrate_permissions(apps, schema_editor):
+def migrate_permissions(apps, _schema_editor):
     for app_config in apps.get_app_configs():
         app_config.models_module = True
         create_permissions(app_config, apps=apps, verbosity=0)
