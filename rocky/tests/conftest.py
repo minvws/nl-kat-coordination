@@ -130,13 +130,22 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="can_delete_oois").id,
         Permission.objects.get(codename="add_indemnification").id,
         Permission.objects.get(codename="can_scan_organization").id,
+        Permission.objects.get(codename="add_dashboard").id,
+        Permission.objects.get(codename="change_dashboard").id,
+        Permission.objects.get(codename="delete_dashboard").id,
+        Permission.objects.get(codename="add_dashboarddata").id,
+        Permission.objects.get(codename="change_dashboarddata").id,
+        Permission.objects.get(codename="delete_dashboarddata").id,
+        Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
+    member.user.user_permissions.set(admin_permissions)
     group.permissions.set(admin_permissions)
 
 
 def add_redteam_group_permissions(member):
     group = Group.objects.get(name=GROUP_REDTEAM)
     member.groups.add(group)
+
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
         Permission.objects.get(codename="can_enable_disable_boefje").id,
@@ -145,7 +154,15 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="can_mute_findings").id,
         Permission.objects.get(codename="can_view_katalogus_settings").id,
         Permission.objects.get(codename="can_set_katalogus_settings").id,
+        Permission.objects.get(codename="add_dashboard").id,
+        Permission.objects.get(codename="change_dashboard").id,
+        Permission.objects.get(codename="delete_dashboard").id,
+        Permission.objects.get(codename="add_dashboarddata").id,
+        Permission.objects.get(codename="change_dashboarddata").id,
+        Permission.objects.get(codename="delete_dashboarddata").id,
+        Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
+    member.user.user_permissions.set(redteam_permissions)
     group.permissions.set(redteam_permissions)
 
 
@@ -154,6 +171,7 @@ def add_client_group_permissions(member):
     member.groups.add(group)
     client_permissions = [Permission.objects.get(codename="can_scan_organization").id]
     group.permissions.set(client_permissions)
+    member.user.user_permissions.set(client_permissions)
 
 
 @pytest.fixture(autouse=True)

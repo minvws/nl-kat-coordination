@@ -110,6 +110,34 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         return self.has_perm("tools.can_access_all_organizations")
 
     @property
+    def can_add_dashboard(self):
+        return self.has_perm("crisis_room.add_dashboard")
+
+    @property
+    def can_change_dashboard(self):
+        return self.has_perm("crisis_room.change_dashboard")
+
+    @property
+    def can_delete_dashboard(self):
+        return self.has_perm("crisis_room.delete_dashboard")
+
+    @property
+    def can_reposition_dashboard_item(self):
+        return self.has_perm("crisis_room.change_dashboarddata_position")
+
+    @property
+    def can_add_dashboard_item(self):
+        return self.has_perm("crisis_room.add_dashboarddata")
+
+    @property
+    def can_delete_dashboard_item(self):
+        return self.has_perm("crisis_room.delete_dashboarddata")
+
+    @property
+    def can_change_dashboard_item(self):
+        return self.has_perm("crisis_room.change_dashboarddata")
+
+    @property
     def can_modify_dashboard(self) -> bool:
         """If you can add, you might as well change and delete a dashboard."""
         return self.has_perms(
@@ -117,7 +145,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         )
 
     @property
-    def can_modify_dashboard_items(self) -> bool:
+    def can_modify_dashboard_item(self) -> bool:
         """If you can add, you might as well change and delete a dashboard items."""
         return self.has_perms(
             [
