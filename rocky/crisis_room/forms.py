@@ -24,7 +24,7 @@ class ObjectListSettingsForm(BaseRockyForm):
     order_by = forms.ChoiceField(label=_("List sorting by"), required=True, widget=forms.Select, choices=([]))
 
     limit = forms.ChoiceField(
-        label=_("Number of objects in list"),
+        label=_("Number of rows in list"),
         required=True,
         widget=forms.Select,
         choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
