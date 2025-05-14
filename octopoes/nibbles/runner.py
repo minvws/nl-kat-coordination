@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Any
@@ -82,6 +82,8 @@ def serialize(obj: Any) -> str:
                 yield jcs.canonicalize(obj.value).decode()
             elif isinstance(obj, AnyUrl | IPv6Address | IPv4Address | Reference):
                 yield jcs.canonicalize(str(obj)).decode()
+            elif isinstance(obj, timedelta):
+                yield jcs.canonicalize(obj.total_seconds()).decode()
             else:
                 yield jcs.canonicalize(obj).decode()
 
