@@ -1272,7 +1272,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
-        self.scheduler.pop_item_from_queue()
+        items = self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task(task.id)

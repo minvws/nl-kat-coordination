@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exc, func
+from sqlalchemy import exc, func, literal
 from sqlalchemy.orm.query import Query
 
 from scheduler import models
@@ -63,15 +63,19 @@ class PriorityQueueStore:
                 # orders them by descending count, and limits to the top
                 # result.
                 top_env_hash = (
-                    session.query(models.TaskDB.data["env_hash"].astext.label("env_hash"))
-                    .group_by(models.TaskDB.data["env_hash"].astext)
+                    session.query(
+                        func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")).label("env_hash")
+                    )
+                    .group_by(func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")))
                     .order_by(func.count().desc())
                     .limit(1)
                 ).subquery()
 
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
-                    .filter(models.TaskDB.data["env_hash"].astext == top_env_hash.c.env_hash)
+                    .filter(
+                        func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")) == top_env_hash.c.env_hash
+                    )
                     .order_by(models.TaskDB.created_at.asc())
                     .limit(limit)
                     .all()
