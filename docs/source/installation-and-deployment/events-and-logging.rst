@@ -14,6 +14,8 @@ Different routes have different ranges of Event Codes, the ranges are as follows
 - report_change: 80007*
 - schedule_change 80008*
 - report_recipe_change 80009*
+- dashboard_change 90030*
+- dashboarddata_change 90040*
 - account_change: 9001**
 - organization_change: 90020* 0 90021* & 9*0000
 - indemnification_change: 90022*
@@ -88,6 +90,13 @@ Event code Model              Routing key            Description                
 900231     OOIInformation     ooi_change             OOI information is created.                 C     900231
 900232     OOIInformation     ooi_change             OOI information changed.                    U     900232
 900233     OOIInformation     ooi_change             OOI information is removed.                 D     900233
+900301     Dashboard          dashboard_change       A Dashboard is created.                     C     No
+900302     Dashboard          dashboard_change       A Dashboard is edited.                      U     No
+900303     Dashboard          dashboard_change       A Dashboard is deleted.                     D     No
+900307     DashboardData      dashboard_data_change  A Dashboard data is created.                C     No
+900308     DashboardData      dashboard_data_change  A Dashboard data is edited.                 U     No
+900309     DashboardData      dashboard_data_change  A Dashboard data is deleted.                D     No
+900310     DashboardData      dashboard_data_change  A Dashboard data is repositioned.           U     No
 910000     Organization       organization_change    An organization is cloned.                  C     910000
 920000     Organization       organization_change    Recalculated bits for organizations         U     920000
 100101     Observation        observation_change     An observation is created.                  C     100101
@@ -152,15 +161,19 @@ Event code Model              Category               Description                
 900211     OrganizationMember organization           User organization membership created.       C
 900212     OrganizationMember organization           User organization membership changed.       U
 900213     OrganizationMember organization           User organization membership removed.       D
-900301     Dashboard          crisis_room            A dashboard was created.                    C
-900302     Dashboard          crisis_room            A dashboard was updated.                    U
-900303     Dashboard          crisis_room            A dashboard was deleted.                    D
+900301     Dashboard          crisis_room            A Dashboard was created.                    C
+900302     Dashboard          crisis_room            A Dashboard was updated.                    U
+900303     Dashboard          crisis_room            A Dashboard was deleted.                    D
 900304     ReportRecipe       crisis_room            A report recipe was created.                C
 900305     ReportRecipe       crisis_room            A report recipe was updated.                U
 900306     ReportRecipe       crisis_room            A report recipe was deleted.                D
-900304     ScheduleRequest    crisis_room            A scheduled task was created.               C
-900305     ScheduleRequest    crisis_room            A scheduled task was updated.               U
-900306     ScheduleRequest    crisis_room            A scheduled task was deleted.               D
+900307     DashboardData      crisis_room            A Dashboard data is created.                C
+900308     DashboardData      crisis_room            A Dashboard data is edited.                 U
+900309     DashboardData      crisis_room            A Dashboard data is deleted.                D
+900310     DashboardData      crisis_room            A Dashboard data is repositioned.           U
+900311     ScheduleRequest    crisis_room            A scheduled task was created.               C
+900312     ScheduleRequest    crisis_room            A scheduled task was updated.               U
+900313     ScheduleRequest    crisis_room            A scheduled task was deleted.               D
 900401     Boefje             katalogus              A boefje was created.                       C        
 900402     Boefje             katalogus              A boefje was updated.                       U
 900403     Boefje             katalogus              A boefje was deleted.                       D
