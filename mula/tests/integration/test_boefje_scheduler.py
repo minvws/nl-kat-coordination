@@ -4,11 +4,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from structlog.testing import capture_logs
-
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
+from structlog.testing import capture_logs
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -157,9 +157,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         # Mock
         self.mock_get_latest_task_by_hash.return_value = None
@@ -180,9 +178,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task = functions.create_task(
             scheduler_id=self.scheduler.scheduler_id, data=boefje_task, organisation=self.organisation.id
@@ -207,9 +203,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db_first = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -255,9 +249,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         # Mock
         self.mock_get_latest_task_by_hash.side_effect = Exception("Something went wrong")
@@ -275,9 +267,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
         last_run_boefje = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key, ended_at=None)
 
         # Mock
@@ -298,9 +288,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
         last_run_boefje = BoefjeMetaFactory(boefje=boefje, input_ooi=ooi.primary_key, ended_at=datetime.utcnow())
 
         # Mock
@@ -319,10 +307,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -351,10 +336,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -386,10 +368,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -424,10 +403,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -457,10 +433,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -493,10 +466,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task_db = models.Task(
@@ -528,9 +498,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -567,9 +535,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -609,7 +575,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         # Mocks
@@ -629,10 +594,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         plugin = PluginFactory(scan_level=0)
 
         boefje_task = models.BoefjeTask(
-            boefje=models.Boefje.model_validate(boefje.dict()),
-            input_ooi=None,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=models.Boefje.model_validate(boefje.dict()), input_ooi=None, organization=self.organisation.id
         )
 
         # Mocks
@@ -669,7 +631,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         self.scheduler.queue.maxsize = 1
@@ -717,9 +678,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = BoefjeFactory()
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        boefje_task = models.BoefjeTask(
-            boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=plugin.env_hash
-        )
+        boefje_task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
 
         task = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
@@ -1031,7 +990,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.side_effect = [None, plugin]
+        self.mock_get_plugin.side_effect = [None, None, plugin]
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
@@ -1077,10 +1036,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -1129,10 +1085,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], cron=cron)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -1187,10 +1140,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], interval=1500)
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -1290,10 +1240,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         boefje_task = models.BoefjeTask(
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            env_hash=plugin.env_hash,
+            boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id
         )
 
         task = models.Task(
@@ -1417,10 +1364,14 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
 
         self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
 
+        self.mock_get_configs = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_configs", return_value=[]
+        ).start()
+
     def tearDown(self):
         mock.patch.stopall()
 
-    def test_process_mutations(self):
+    def test_process_mutations__(self):
         """Scan level change"""
         # Arrange
         ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
@@ -1952,6 +1903,10 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_organisations"
         ).start()
 
+        self.mock_get_configs = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_configs", return_value=[]
+        ).start()
+
     def tearDown(self):
         mock.patch.stopall()
 
@@ -2172,6 +2127,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
+        self.mock_get_configs = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_configs", return_value=[]
+        ).start()
+
     def tearDown(self):
         mock.patch.stopall()
 
@@ -2189,7 +2148,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2234,7 +2192,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2277,7 +2234,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2315,7 +2271,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2353,7 +2308,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2391,7 +2345,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
@@ -2429,7 +2382,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             boefje=models.Boefje.model_validate(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
-            env_hash=plugin.env_hash,
         )
 
         schedule = models.Schedule(
