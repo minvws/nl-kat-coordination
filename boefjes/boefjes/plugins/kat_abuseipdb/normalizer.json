@@ -1,0 +1,11 @@
+{
+  "id": "kat_AbuseIPDB_normalize",
+  "name": "AbuseIPDB normalizer",
+  "description": "Parses AbuseIPDB output into findings.",
+  "consumes": [
+    "boefje/abuseipdb"
+  ],
+  "produces": [
+    "Finding"
+  ]
+}
