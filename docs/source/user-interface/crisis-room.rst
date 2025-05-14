@@ -56,6 +56,23 @@ The following settings can be set:
 - **Dashboard item size:** A dashboard item can be full or half width. Two half width items will be displayed next to each other.
 - **Show table columns:** Select at least one column you want to show in the dashboard item.
 
+Permissions
+-----------
+There are several permissions for the crisis room.
+All users have the permission to:
+
+- View dashboards and dashboard items
+- Change the position of dashboard items
+
+Aditonally, admins and redteamers have permission to:
+
+- Create new dashboards
+- Add new items to a dashboard
+- Change dashboards
+- Change dashboard items
+- Delete dashboards
+- Delete dashboard items
+
 
 General Crisis Room
 ===================
