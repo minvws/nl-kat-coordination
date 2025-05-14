@@ -6,7 +6,7 @@ import structlog
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
-logger = structlog.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def run(input_ooi: dict[str, str], raw: bytes) -> Iterable[OOI]:
