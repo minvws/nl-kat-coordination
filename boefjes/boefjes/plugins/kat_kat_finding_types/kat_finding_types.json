@@ -613,5 +613,13 @@
     "risk": "recommendation",
     "impact": "Depending on what software is outdated this can be critical.",
     "recommendation": "Inspect the software version, determine if additional measures need to be taken and install updates to reduce the attack surface."
+  },
+  "KAT-DDOS-TARGET-DETECTED": {
+    "name":"DDoS target detected",
+    "description": "This host is a known target for DDoS attacks.",
+    "risk": "medium",
+    "impact": "This host is a known target for DDoS attacks. This may result in downtime or degraded performance.",
+    "source": "https://www.cloudflare.com/en-gb/learning/ddos/what-is-a-ddos-attack/",
+    "recommendation": "Contact your hosting provider to see if they can help you mitigate the attack."
   }
 }
