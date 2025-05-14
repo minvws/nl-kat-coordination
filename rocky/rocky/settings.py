@@ -400,14 +400,15 @@ if CSP_HEADER:
 
     CONTENT_SECURITY_POLICY = {
         "DIRECTIVES": {
-            "base-uri": [NONE],
-            "connect-src": [SELF],
             "default-src": [NONE],
-            "font-src": [SELF],
-            "form-action": [SELF],
-            "frame-ancestors": [NONE],
             "img-src": [SELF],
+            "font-src": [SELF],
             "style-src": [SELF],
+            "frame-ancestors": [NONE],
+            "base-uri": [NONE],
+            "form-action": [SELF],
+            "connect-src": [SELF],
+            "script-src": [SELF],
         }
     }
 
