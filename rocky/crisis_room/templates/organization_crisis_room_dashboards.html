@@ -40,9 +40,13 @@
                             <div class="dashboard-item">
                                 <div class="horizontal-view">
                                     <h3>{{ dashboard_item.item.name }}</h3>
-                                    {% if dashboard_item.item.query_from == "object_list" %}
-                                        <span class="label system-tag color-grey">{% translate "Object list" %}</span>
-                                    {% endif %}
+                                    <span class="label system-tag color-grey">
+                                        {% if dashboard_item.item.query_from == "object_list" %}
+                                            {% translate "Object list" %}
+                                        {% elif dashboard_item.item.query_from == "finding_list" %}
+                                            {% translate "Finding list" %}
+                                        {% endif %}
+                                    </span>
                                     <div class="dropdown">
                                         <button type="button"
                                                 aria-label="{% translate "Options for dashboard items" %}"
