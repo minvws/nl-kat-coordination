@@ -26,6 +26,7 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
+    oci_image: str | None = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
@@ -146,6 +147,14 @@ class Task(BaseModel):
         raise ValueError("No organization found related to task")
 
 
+class TaskPush(BaseModel):
+    id: uuid.UUID | None = None
+    scheduler_id: str | None = None
+    organisation: str
+    priority: int | None = None
+    data: dict
+
+
 class ScheduleRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -171,6 +180,17 @@ class ScheduleResponse(BaseModel):
     modified_at: datetime.datetime
 
 
+class SchedulerResponse(BaseModel):
+    id: str
+    enabled: bool
+    priority_queue: dict[str, Any]
+    last_activity: str | None
+
+
+class SchedulerNoResponse(BaseModel):
+    detail: str
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -180,6 +200,10 @@ class PaginatedTasksResponse(BaseModel):
     count: int
     next: str | None = None
     previous: str | None = None
+    results: list[Task]
+
+
+class TaskPop(BaseModel):
     results: list[Task]
 
 
@@ -290,8 +314,9 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def post_schedule_search(self, filters: dict[str, list[dict[str, str]]]) -> PaginatedSchedulesResponse:
+    def post_schedule_search(self, filters: dict[str, list[dict[str, Any]]]) -> PaginatedSchedulesResponse:
         try:
+            filters["filters"].append({"column": "organisation", "operator": "eq", "value": self.organization_code})
             res = self._client.post("/schedules/search", json=filters)
             res.raise_for_status()
             return PaginatedSchedulesResponse.model_validate_json(res.content)
@@ -315,8 +340,12 @@ class SchedulerClient:
             logger.info("Schedule created", event_code=800081, schedule=schedule)
 
             return ScheduleResponse.model_validate_json(res.content)
-        except (ValidationError, HTTPStatusError, ConnectError):
+        except ValidationError:
             raise SchedulerValidationError(extra_message="Report schedule failed: ")
+        except HTTPStatusError:
+            raise SchedulerHTTPError()
+        except ConnectError:
+            raise SchedulerConnectError()
 
     def delete_schedule(self, schedule_id: str) -> None:
         try:
@@ -374,16 +403,16 @@ class SchedulerClient:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         response.raise_for_status()
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0 or len(page.results) == 0:
+        popped_items = TypeAdapter(TaskPop | None).validate_json(response.content)
+        if len(popped_items.results) == 0:
             return None
 
-        return page.results[0]
+        return popped_items.results[0]
 
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> TaskPop | None:
         response = self._client.post(f"/schedulers/{scheduler_id}/pop", json=filters)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        return TypeAdapter(TaskPop | None).validate_json(response.content)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         response = self._client.patch(f"/tasks/{task_id}", json={"status": status.value})
@@ -395,9 +424,9 @@ class SchedulerClient:
     def _get_task_stats(self, scheduler_id: str, organisation_id: str | None = None) -> dict:
         """Return task stats for specific scheduler."""
         if organisation_id is None:
-            return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}")  # type: ignore
+            return self._get(f"/tasks/stats?scheduler_id={scheduler_id}")  # type: ignore
 
-        return self._get(f"/tasks/stats?=scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
+        return self._get(f"/tasks/stats?scheduler_id={scheduler_id}&organisation_id={organisation_id}")  # type: ignore
 
     def get_task_stats(self, task_type: str) -> dict:
         """Return task stats for specific task type."""
@@ -412,9 +441,12 @@ class SchedulerClient:
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
+    def get_task_stats_for_all_organizations(self, scheduler_id: str) -> dict:
+        return self._get_task_stats(scheduler_id)
+
     def get_combined_schedulers_stats(self, scheduler_id: str, organization_codes: list[str]) -> dict:
         """Return merged stats for a set of scheduler ids."""
-        return SchedulerClient._merge_stat_dicts(
+        return self._merge_stat_dicts(
             dicts=[self._get_task_stats(scheduler_id, org_code) for org_code in organization_codes]
         )
 
@@ -432,9 +464,16 @@ class SchedulerClient:
             return res.content
         return res.json()
 
-    def get_scheduled_reports(self, **params) -> list[dict[str, Any]]:
+    def get_scheduled_reports(self) -> list[dict[str, Any]]:
         try:
-            response = self._client.get("/schedules", params=params)
+            filters: dict[str, list[dict[str, Any]]] = {
+                "filters": [
+                    {"column": "scheduler_id", "operator": "eq", "value": "report"},
+                    {"column": "organisation", "operator": "eq", "value": self.organization_code},
+                ]
+            }
+
+            response = self._client.post("/schedules/search", json=filters)
             response.raise_for_status()
         except HTTPStatusError:
             logger.error("A HTTPStatusError occurred. Check logs for more info.")

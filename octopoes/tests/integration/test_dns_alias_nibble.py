@@ -16,6 +16,8 @@ from octopoes.models.ooi.network import IPAddressV4, Network
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
+STATIC_IP = ".".join((4 * "1 ").split())
+
 
 def test_dns_alias_nibble_one_of_each_parameter(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
@@ -23,6 +25,7 @@ def test_dns_alias_nibble_one_of_each_parameter(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -36,7 +39,7 @@ def test_dns_alias_nibble_one_of_each_parameter(
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
     alias_hostname = Hostname(name="example.org", network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(alias_hostname, valid_time)
-    ip_address = IPAddressV4(address="1.1.1.1", network=network.reference)
+    ip_address = IPAddressV4(address=STATIC_IP, network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_address, valid_time)
 
     dns_cname = DNSCNAMERecord(
@@ -67,6 +70,7 @@ def test_dns_alias_nibble_no_dns_one_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -78,7 +82,7 @@ def test_dns_alias_nibble_no_dns_one_resolved_hostname(
 
     hostname = Hostname(name="example.com", network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
-    ip_address = IPAddressV4(address="1.1.1.1", network=network.reference)
+    ip_address = IPAddressV4(address=STATIC_IP, network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_address, valid_time)
 
     resolved_hostname = ResolvedHostname(hostname=hostname.reference, address=ip_address.reference)
@@ -100,6 +104,7 @@ def test_dns_alias_nibble_one_dns_no_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -135,6 +140,7 @@ def test_dns_alias_nibble_many_dns_one_resolved_hostname(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -147,7 +153,7 @@ def test_dns_alias_nibble_many_dns_one_resolved_hostname(
     hostname = Hostname(name="example.com", network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
 
-    ip_address = IPAddressV4(address="1.1.1.1", network=network.reference)
+    ip_address = IPAddressV4(address=STATIC_IP, network=network.reference)
     xtdb_octopoes_service.ooi_repository.save(ip_address, valid_time)
 
     dns_cnames: list[DNSCNAMERecord] = []

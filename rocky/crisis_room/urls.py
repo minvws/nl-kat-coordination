@@ -2,4 +2,5 @@ from django.urls import path
 
 from . import views
 
-urlpatterns = [path("", views.CrisisRoomView.as_view(), name="crisis_room")]
+# Crisis room overview urls
+urlpatterns = [path("", views.CrisisRoom.as_view(), name="crisis_room")]

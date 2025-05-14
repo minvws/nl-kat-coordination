@@ -4,7 +4,7 @@ Scripts
 There are some scripts in the `scripts/installation
 <https://github.com/minvws/nl-kat-coordination/tree/main/scripts/installation>`__ directory
 that can be used to install and update OpenKAT on Debian and will do all the
-steps described on the :doc:`/installation-and-deployment/debian-install` page.
+steps described on the :ref:`debian-install` page.
 
 Installation
 ------------

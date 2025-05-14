@@ -1,3 +1,4 @@
+import gc
 import multiprocessing
 import os
 import signal
@@ -5,7 +6,6 @@ import sys
 import time
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
-from queue import Queue
 
 import structlog
 from httpx import HTTPError
@@ -63,8 +63,15 @@ class SchedulerWorkerManager(WorkerManager):
 
         while True:
             try:
-                self._check_workers()
-                self._fill_queue(self.task_queue, queue_type)
+                self._replace_broken_workers()
+
+                if self.task_queue.qsize() > self.settings.pool_size:
+                    # We have one new task for each worker in the local task queue, so we don't have to ask the
+                    # scheduler for new tasks.
+                    time.sleep(self.settings.worker_heartbeat)
+                    continue
+
+                self._fill_queue(queue_type)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
@@ -80,28 +87,26 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
-        if task_queue.qsize() > self.settings.pool_size:
-            time.sleep(self.settings.worker_heartbeat)
-            return
-
+    def _fill_queue(self, queue_type: WorkerManager.Queue) -> None:
+        """Fill the local task queue with tasks from the scheduler.
+        We only sleep for the poll interval if the scheduler has no (relevant) tasks in its queue."""
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
             p_item = self.scheduler_client.pop_item(queue_type.value)
         except (HTTPError, ValidationError):
-            logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
-            time.sleep(self.settings.worker_heartbeat)
+            logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.settings.poll_interval)
+            time.sleep(self.settings.poll_interval)
             return
 
         if p_item is None:
-            time.sleep(self.settings.worker_heartbeat)
+            time.sleep(self.settings.poll_interval)
             return
 
         logger.info("Handling task[%s]", p_item.data.id)
 
         try:
-            task_queue.put(p_item)
+            self.task_queue.put(p_item)
             logger.info("Dispatched task[%s]", p_item.data.id)
         except:  # noqa
             logger.exception("Exiting worker...")
@@ -113,7 +118,9 @@ class SchedulerWorkerManager(WorkerManager):
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
-    def _check_workers(self) -> None:
+    def _replace_broken_workers(self) -> None:
+        """Clean up any closed workers, replacing them by a new one to keep the pool size constant."""
+
         new_workers = []
 
         for worker in self.workers:
@@ -215,7 +222,7 @@ def _start_working(
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
-        p_item = task_queue.get()
+        p_item = task_queue.get()  # blocks until tasks are pushed in the main process
         status = TaskStatus.FAILED
         handling_tasks[os.getpid()] = str(p_item.id)
 
@@ -237,11 +244,13 @@ def _start_working(
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
+            gc.collect()
+
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
 
-    session = sessionmaker(bind=get_engine())()
+    session = sessionmaker(bind=get_engine())
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
 
     item_handler: Handler

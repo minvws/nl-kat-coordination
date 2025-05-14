@@ -18,10 +18,10 @@
                     <h1>{% translate "Boefje setup" %}</h1>
                 {% endif %}
                 <p>
-                    {% blocktranslate %}
+                    {% blocktranslate trimmed %}
                         You can create a new Boefje. If you want more information on this,
                         you can check out the <a href="https://docs.openkat.nl/developer_documentation/development_tutorial/creating_a_boefje.html">documentation</a>.
-                    {% endblocktranslate%}
+                    {% endblocktranslate %}
                 </p>
                 <form action="" method="post" class="help">
                     {% csrf_token %}

@@ -11,7 +11,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from tools.add_ooi_information import SEPARATOR, get_info
+from tools.add_ooi_information import SEPARATOR, InformationUpdateError, get_info
 from tools.enums import MAX_SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
@@ -98,6 +98,7 @@ class Organization(models.Model):
             ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
             ("can_access_all_organizations", "Can access all organizations"),
+            ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
 
     def get_absolute_url(self):
@@ -233,12 +234,16 @@ class OOIInformation(models.Model):
     def description(self):
         if not self.data["description"]:
             self.get_internet_description()
+            self.save()
         return self.data["description"]
 
     def get_internet_description(self):
-        for key, value in get_info(ooi_type=self.type, natural_key=self.value).items():
-            self.data[key] = value
-        self.save()
+        try:
+            self.data.update(get_info(ooi_type=self.type, natural_key=self.value))
+        except InformationUpdateError:
+            # we keep the old data if we already have some and can't update
+            if not self.data["description"]:
+                self.data = {"description": ""}
 
     def __str__(self) -> str:
         return self.id

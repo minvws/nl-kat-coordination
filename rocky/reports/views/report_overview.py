@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 import structlog
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -15,7 +16,7 @@ from tools.ooi_helpers import create_ooi
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.reports import AssetReport, HydratedReport, Report, ReportRecipe
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportRecipe
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
@@ -63,7 +64,6 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
     def get_queryset(self) -> list[dict[str, Any]]:
         report_schedules = self.get_report_schedules()
-
         if not report_schedules:
             return []
 
@@ -82,7 +82,11 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                     "enabled": schedule["enabled"],
                     "recipe": report_recipe,
                     "cron": schedule["schedule"],
-                    "deadline_at": datetime.fromisoformat(schedule_datetime) if schedule_datetime else "asap",
+                    "deadline_at": (
+                        datetime.strptime(schedule_datetime[0:19] + schedule_datetime[-1:], "%Y-%m-%dT%H:%M:%SZ")
+                        if schedule_datetime
+                        else "asap"
+                    ),
                     "reports": reports,
                     "total_oois": len(
                         {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
@@ -92,56 +96,77 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
 
         return recipes
 
+    def post(self, request, *args, **kwargs):
+        recipe_pk = request.POST.get("report_recipe", "")
+        schedule_id = request.POST.get("schedule_id", "")
+
+        if not self.organization_member.has_perm("tools.can_delete_oois"):
+            messages.error(self.request, _("Not enough permissions"))
+            return self.get(request, *args, **kwargs)
+
+        if recipe_pk and schedule_id and Reference.from_str(recipe_pk).class_type == ReportRecipe:
+            self.delete_report_schedule(schedule_id)
+            try:
+                self.octopoes_api_connector.delete(Reference.from_str(recipe_pk), valid_time=datetime.now(timezone.utc))
+                logger.info(
+                    "Schedule and reportRecipe deleted", event_code="0800083", schedule_id=schedule_id, recipe=recipe_pk
+                )
+                messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_pk))
+            except ObjectNotFoundException:
+                messages.error(self.request, _("Recipe not found."))
+
+        else:
+            messages.error(self.request, _("No schedule or recipe selected"))
+
+        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_report_schedules"] = len(self.object_list)
         return context
 
 
-class ScheduledReportsEnableDisableView(BreadcrumbsReportOverviewView, SchedulerView, ListView):
+class ScheduledReportsEnableDisableView(
+    OrganizationPermissionRequiredMixin, BreadcrumbsReportOverviewView, SchedulerView, ListView
+):
     """
-    Cancel the selected report(s)
+    Enable/disable the schedule for the selected ReportRecipe.
     """
 
     task_type = "report"
     template_name = "report_overview/scheduled_reports.html"
+    permission_required = "tools.can_enable_disable_schedule"
 
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at)
 
-    def get(self, request, *args, **kwargs) -> HttpResponse:
-        schedule_id = request.GET.get("schedule_id")
-        schedule = self.get_schedule_details(schedule_id)
-        is_schedule_enabled = schedule.enabled
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        recipe_id = request.POST.get("recipe_id")
+        report_name_format = request.POST.get("report_name_format")
 
-        self.edit_report_schedule(schedule_id, {"enabled": not is_schedule_enabled})
+        filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": recipe_id}]}
+        schedule = self.get_schedule_with_filters(filters) if recipe_id else None
 
-        logger.info(
-            _("Schedule {}").format("disabled" if is_schedule_enabled else "enabled"),
-            event_code="0800081" if is_schedule_enabled else "0800082",
-            schedule_id=schedule_id,
-        )
+        if schedule:
+            is_schedule_enabled = not schedule.enabled
 
-        report_recipe_id = schedule.data["report_recipe_id"]
-        report_recipe = self.octopoes_api_connector.get(
-            Reference.from_str(f"ReportRecipe|{report_recipe_id}"), valid_time=datetime.now(timezone.utc)
-        )
+            self.edit_report_schedule(str(schedule.id), {"enabled": is_schedule_enabled})
 
-        if is_schedule_enabled:
-            messages.success(
-                self.request,
-                _(
-                    "Schedule disabled successfully. '{}' will not be generated "
-                    "automatically until the schedule is enabled again."
-                ).format(report_recipe.report_name_format),
-            )
-        else:
-            messages.success(
-                self.request,
-                _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
-                    report_recipe.report_name_format
-                ),
-            )
+            if is_schedule_enabled:
+                messages.success(
+                    self.request,
+                    _(
+                        "Schedule disabled successfully. '{}' will not be generated "
+                        "automatically until the schedule is enabled again."
+                    ).format(report_name_format),
+                )
+            else:
+                messages.success(
+                    self.request,
+                    _("Schedule enabled successfully. '{}' will be generated according to schedule.").format(
+                        report_name_format
+                    ),
+                )
 
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
@@ -185,6 +210,15 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             return self.rerun_reports(report_references)
 
     def delete_reports(self, report_references: list[Reference]) -> None:
+        if not self.organization_member.has_perm("tools.can_delete_oois"):
+            messages.error(self.request, _("Not enough permissions"))
+            return
+
+        for report_reference in report_references:
+            if not issubclass(Reference.from_str(report_reference).class_type, BaseReport):
+                messages.error(self.request, _("Other OOI type selected than Report"))
+                return
+
         self.octopoes_api_connector.delete_many(report_references, datetime.now(timezone.utc))
         logger.info("Reports deleted", event_code=800073, reports=report_references)
         messages.success(self.request, _("Deletion successful."))
@@ -291,8 +325,11 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, report_id=self.report_id)
 
+    def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
+        return self.octopoes_api_connector.get_report(ooi_pk, valid_time=self.observed_at)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
-        context["report_id"] = self.report_id
+        context["report_ooi"] = self.get_report_ooi(self.report_id).to_report()
         return context

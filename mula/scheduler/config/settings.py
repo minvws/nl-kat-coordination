@@ -77,8 +77,6 @@ class Settings(BaseSettings):
         10, description="The maximum number of connections to save in the pool for the octopoes api"
     )
 
-    katalogus_cache_ttl: int = Field(30, description="The lifetime of the katalogus cache in seconds")
-
     katalogus_request_timeout: int = Field(
         10, description="The timeout in seconds for the requests to the katalogus api"
     )

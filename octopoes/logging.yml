@@ -41,3 +41,7 @@ loggers:
     level: WARNING
     handlers: [console]
     propagate: 0
+  celery.worker:
+    level: WARNING
+    handlers: [console]
+    propagate: 0

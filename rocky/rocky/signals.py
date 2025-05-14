@@ -1,5 +1,6 @@
 import datetime
 
+from crisis_room.management.commands.dashboards import get_or_create_default_dashboard
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
@@ -113,8 +114,12 @@ def organization_pre_save(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def organization_post_save(sender, instance, *args, **kwargs):
+def organization_post_save(sender, instance, created, *args, **kwargs):
     octopoes_client = _get_healthy_octopoes(instance.code)
+
+    # will trigger only when new organization is created, not for updating.
+    if created:
+        get_or_create_default_dashboard(instance, octopoes_client)
 
     try:
         valid_time = datetime.datetime.now(datetime.timezone.utc)

@@ -107,6 +107,8 @@ class FilterParameters(BaseModel):
     q: str | None = None
     type: Literal["boefje", "normalizer", "bit"] | None = None
     ids: list[str] | None = None
+    consumes: set[str] | None = None
+    produces: set[str] | None = None
     state: bool | None = None
     scan_level: int = 0
     oci_image: str | None = None

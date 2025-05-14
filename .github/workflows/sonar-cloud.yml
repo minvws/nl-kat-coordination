@@ -10,17 +10,29 @@ on:
 
 jobs:
   octopoes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@main
   bytes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@main
   mula-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@main
   rocky-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/rocky-tests.yml@main
   boefjes-tests:
+    permissions:
+      contents: read
     uses: minvws/nl-kat-coordination/.github/workflows/boefjes-tests.yml@main
 
   fix-coverage-reports:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
 
     needs:
@@ -34,9 +46,9 @@ jobs:
       matrix:
         module:
           - name: octopoes
-            prefix_path: "."
+            prefix_path: "octopoes/"
           - name: mula
-            prefix_path: "mula/scheduler/"
+            prefix_path: "mula/"
           - name: bytes
             prefix_path: "bytes/"
           - name: rocky
@@ -54,24 +66,28 @@ jobs:
       - name: Download coverage file
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.module['name'] }}-coverage-unit
-          path: ${{ matrix.module['name'] }}-coverage-unit
+          name: ${{ matrix.module['name'] }}-coverage
+          path: ${{ matrix.module['name'] }}-coverage
 
       - name: Fix coverage report sources
-        uses: Mudlet/xmlstarlet-action@master
+        uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
-          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
       - name: Fix coverage file
-        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
+        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
       - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
-          path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          name: "${{ matrix.module['name'] }}-coverage-fixed"
+          path: "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
   sonar-cloud:
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
     runs-on: ubuntu-24.04
 
     needs:
@@ -86,9 +102,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: "*-coverage-unit-fixed"
+          pattern: "*-coverage-fixed"
 
       - name: SonarCloud
-        uses: SonarSource/sonarcloud-github-action@v4.0.0
+        uses: SonarSource/sonarqube-scan-action@aa494459d7c39c106cc77b166de8b4250a32bb97 # v5.1.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
