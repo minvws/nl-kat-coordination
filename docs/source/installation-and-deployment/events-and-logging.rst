@@ -15,7 +15,7 @@ Different routes have different ranges of Event Codes, the ranges are as follows
 - schedule_change 80008*
 - report_recipe_change 80009*
 - dashboard_change 90030*
-- dashboarddata_change 90040*
+- dashboarddata_change 90030*
 - account_change: 9001**
 - organization_change: 90020* 0 90021* & 9*0000
 - indemnification_change: 90022*
