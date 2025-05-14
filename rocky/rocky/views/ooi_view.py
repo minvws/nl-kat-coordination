@@ -67,7 +67,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             len(self.filtered_ooi_types)
             + len(self.clearance_levels)
             + len(self.clearance_types)
-            + self.count_observed_at_filter
+            + self.count_observed_at_filter()
             + (1 if self.search_string else 0)
         )
 
