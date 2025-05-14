@@ -48,7 +48,7 @@ def query(targets: list[Reference | None]) -> str:
                 """
             ]
         )
-    elif sgn == "111":
+    elif sgn == "11":
         return f"""
             {{
                 :query {{
