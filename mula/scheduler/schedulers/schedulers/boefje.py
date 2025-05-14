@@ -162,7 +162,6 @@ class BoefjeScheduler(Scheduler):
                     boefje=models.Boefje.model_validate(boefje.model_dump()),
                     input_ooi=ooi.primary_key if ooi else None,
                     organization=mutation.client_id,
-                    env_hash=boefje.env_hash,
                 )
             )
 
@@ -205,7 +204,6 @@ class BoefjeScheduler(Scheduler):
                             boefje=models.Boefje.model_validate(boefje.dict()),
                             input_ooi=ooi.primary_key,
                             organization=org.id,
-                            env_hash=boefje.env_hash,
                         )
 
                         boefje_tasks.append((boefje_task, org.id))
@@ -341,7 +339,6 @@ class BoefjeScheduler(Scheduler):
                         boefje=models.Boefje.model_validate(plugin.dict()),
                         input_ooi=ooi.primary_key if ooi else None,
                         organization=schedule.organisation,
-                        env_hash=plugin.env_hash,
                     )
                 except (StorageError, ValidationError, ExternalServiceError):
                     self.logger.exception(
@@ -407,7 +404,6 @@ class BoefjeScheduler(Scheduler):
 
         boefje_task = self.is_boefje_in_other_orgs(boefje_task, caller=caller)
 
-        # TODO:: from here the env_hash should be set
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -724,10 +720,13 @@ class BoefjeScheduler(Scheduler):
             if ooi is None:
                 continue
 
-            # TODO: check if we need this, or if this is already handled
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                 boefje_task.boefje.id, config.organisation_id
             )
+            if boefje is None:
+                continue
+
+            # TODO: check if we need this, or if this is already handled
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
