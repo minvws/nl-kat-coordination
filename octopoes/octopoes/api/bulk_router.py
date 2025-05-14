@@ -40,12 +40,12 @@ def list_reports(
     # The xtdb_http_client is also created outside the loop and the `_client` property changed inside the loop instead,
     # to reuse the httpx Session for all requests.
     xtdb_http_client = get_xtdb_client(str(settings_.xtdb_uri), "")
+    ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
 
     reports = {}
 
     for client, recipe_id in reports_filters:
         xtdb_http_client.client = client
-        ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
 
         for report in ooi_repository.list_reports(valid_time, 0, 1, recipe_id, ignore_count=True).items:
             reports[recipe_id] = report
@@ -55,7 +55,7 @@ def list_reports(
 
 @router.get("/object-clients")
 def list_object_clients(
-    clients: set[str],
+    clients: set[str] = Query(default_factory=set),
     reference: Reference = Depends(extract_reference),
     settings_: Settings = Depends(settings),
     valid_time: datetime = Depends(extract_valid_time),
@@ -67,13 +67,12 @@ def list_object_clients(
     # See list_reports() for some of the reasoning behind the below code
     event_manager = EventManager("null", str(settings_.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
     xtdb_http_client = get_xtdb_client(str(settings_.xtdb_uri), "")
+    ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
 
     clients_with_reference = []
 
     for client in clients:
-        logger.info("client %s", client)
         xtdb_http_client.client = client
-        ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
 
         try:
             ooi_repository.get(reference, valid_time)
