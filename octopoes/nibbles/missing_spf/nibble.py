@@ -1,5 +1,5 @@
 from nibbles.definitions import NibbleDefinition, NibbleParameter
-from octopoes.models import Reference
+from octopoes.models import Reference, ScanLevel
 from octopoes.models.ooi.dns.records import NXDOMAIN
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.email_security import DNSSPFRecord
@@ -81,7 +81,7 @@ def spf_query(targets: list[Reference | None]) -> str:
 NIBBLE = NibbleDefinition(
     id="missing_spf",
     signature=[
-        NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'Hostname'][]"),
+        NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'Hostname'][]", min_scan_level=ScanLevel.L1),
         NibbleParameter(object_type=DNSSPFRecord, parser="[*][?object_type == 'DNSSPFRecord'][]", optional=True),
         NibbleParameter(object_type=NXDOMAIN, parser="[*][?object_type == 'NXDOMAIN'][]", optional=True),
     ],
