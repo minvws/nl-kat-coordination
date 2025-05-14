@@ -7,7 +7,6 @@ from django.db.utils import IntegrityError
 from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
-from tools.models import Organization
 
 from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import Dashboard, DashboardData
@@ -22,19 +21,7 @@ class ObjectListSettingsForm(BaseRockyForm):
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
 
-    order_by = forms.ChoiceField(
-        label=_("List sorting by"),
-        required=True,
-        widget=forms.Select,
-        choices=(
-            [
-                ("object_type-asc", _("Type (A-Z)")),
-                ("object_type-desc", _("Type (Z-A)")),
-                ("scan_level-asc", _("Clearance level (High-Low)")),
-                ("scan_level-desc", _("Clearance level (Low-High)")),
-            ]
-        ),
-    )
+    order_by = forms.ChoiceField(label=_("List sorting by"), required=True, widget=forms.Select, choices=([]))
 
     limit = forms.ChoiceField(
         label=_("Number of objects in list"),
@@ -52,10 +39,12 @@ class ObjectListSettingsForm(BaseRockyForm):
         initial="1",
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, query_from, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = organization
-        self.fields["dashboard"].choices = self.get_dashboard_selection(organization)
+        self.query_from = query_from
+        self.fields["dashboard"].choices = self.get_dashboard_selection()
+        self.fields["order_by"].choices = self.get_order_by_selection()
 
         data: QueryDict | None = kwargs.pop("data")
 
@@ -69,6 +58,11 @@ class ObjectListSettingsForm(BaseRockyForm):
             self.template = data.get("template")
             self.column_values = data.getlist("column_values", [])
             self.column_names = data.getlist("column_names", [])
+            self.severities = data.getlist("severity", [])
+
+            muted_findings = data.get("muted_findings", "non-muted")
+            self.exclude_muted = muted_findings == "non-muted"
+            self.only_muted = muted_findings == "muted"
 
     def clean_dashboard(self):
         dashboard_name = self.cleaned_data.get("dashboard", "")
@@ -115,6 +109,16 @@ class ObjectListSettingsForm(BaseRockyForm):
                 "asc_desc": sorting_order,
                 "limit": limit,
             }
+        elif self.query_from == "finding_list":
+            query = {
+                "severities": self.severities,
+                "exclude_muted": self.exclude_muted,
+                "only_muted": self.only_muted,
+                "search_string": self.search_string,
+                "order_by": order_by,
+                "asc_desc": sorting_order,
+                "limit": limit,
+            }
 
         columns = {column_value: self.column_names[index] for index, column_value in enumerate(self.column_values)}
 
@@ -139,12 +143,30 @@ class ObjectListSettingsForm(BaseRockyForm):
         except IntegrityError:
             raise ValidationError(_("An error occurred while adding dashboard item."))
 
-    @staticmethod
-    def get_dashboard_selection(organization: Organization) -> list[tuple[str, str]]:
+    def get_dashboard_selection(self) -> list[tuple[str, str]]:
         return [
             (dashboard.name, dashboard.name)
-            for dashboard in Dashboard.objects.filter(organization=organization).exclude(name=FINDINGS_DASHBOARD_NAME)
+            for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
+                name=FINDINGS_DASHBOARD_NAME
+            )
         ]
+
+    def get_order_by_selection(self) -> list[tuple[str, str]]:
+        if self.query_from == "object_list":
+            return [
+                ("object_type-asc", _("Type (A-Z)")),
+                ("object_type-desc", _("Type (Z-A)")),
+                ("scan_level-asc", _("Clearance level (Low-High)")),
+                ("scan_level-desc", _("Clearance level (High-Low)")),
+            ]
+        elif self.query_from == "finding_list":
+            return [
+                ("score-asc", _("Severity (Low-High)")),
+                ("score-desc", _("Severity (High-Low)")),
+                ("finding_type-asc", _("Finding (A-Z)")),
+                ("finding_type-desc", _("Finding (Z-A)")),
+            ]
+        return []
 
     def get_dashboard(self, name: str) -> Dashboard | None:
         try:

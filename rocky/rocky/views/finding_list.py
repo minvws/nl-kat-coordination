@@ -1,8 +1,15 @@
 from collections.abc import Iterable
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Literal
+from urllib.parse import urlencode
 
 import structlog
+from crisis_room.forms import ObjectListSettingsForm
+from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -55,6 +62,10 @@ def generate_findings_metadata(
     return sort_by_severity_desc(findings_meta)
 
 
+class PageActions(Enum):
+    ADD_TO_DASHBOARD = "add_to_dashboard"
+
+
 class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListView):
     connector_form_class = ObservedAtForm
 
@@ -88,6 +99,15 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             "asc_desc": self.sorting_order,
         }
 
+    def get_table_columns(self) -> dict[str, str]:
+        return {
+            "severity": _("Severity"),
+            "finding": _("Finding"),
+            "location": _("Location"),
+            "tree": _("Tree"),
+            "graph": _("Graph"),
+        }
+
     @property
     def order_by(self) -> Literal["score", "finding_type"]:
         return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
@@ -100,16 +120,22 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
+        context["object_list_settings_form"] = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["table_columns"] = self.get_table_columns()
         context["finding_search_form"] = FindingSearchForm(self.request.GET)
-        context["only_muted"] = self.only_muted
         context["active_filters_counter"] = self.count_active_filters()
         context["order_by"] = self.order_by
         context["order_by_severity_form"] = OrderBySeverityForm(self.request.GET)
         context["order_by_finding_type_form"] = OrderByFindingTypeForm(self.request.GET)
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
+
+        context["severities"] = self.severities
+        context["exclude_muted"] = self.exclude_muted
+        context["only_muted"] = self.only_muted
+        context["search_string"] = self.search_string
         return context
 
 
@@ -125,15 +151,31 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
             }
         ]
 
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """Perform bulk action on selected oois."""
+        action = request.POST.get("action")
 
-class Top10FindingListView(FindingListView):
-    template_name = "findings/finding_list.html"
-    paginate_by = 10
+        if action == PageActions.ADD_TO_DASHBOARD.value:
+            return self.add_to_dashboard(request, *args, **kwargs)
 
-    def build_breadcrumbs(self) -> list[Breadcrumb]:
-        return [
-            {
-                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
-                "text": _("Crisis room"),
-            }
-        ]
+        messages.add_message(request, messages.ERROR, _("Unknown action."))
+        return self.get(request, status=404, *args, **kwargs)
+
+    def get_object_list_settings_form_kwargs(self):
+        data = self.request.POST if self.request.POST else None
+
+        return {"organization": self.organization, "query_from": "finding_list", "data": data}
+
+    def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
+        form = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
+
+        if form.is_valid():
+            dashboard_name = form.cleaned_data.get("dashboard")
+            messages.success(self.request, _("Dashboard item has been added to {}.").format(dashboard_name))
+            query_params = "?" + urlencode({"dashboard": dashboard_name})
+
+            return redirect(
+                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}) + query_params
+            )
+
+        return self.get(request, *args, **kwargs)

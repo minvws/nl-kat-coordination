@@ -8,6 +8,9 @@
 {% for clearance_type in clearance_types_selection %}
     <input type="hidden" name="clearance_type" value="{{ clearance_type }}">
 {% endfor %}
+{% for severity in severities %}<input type="hidden" name="severity" value="{{ severity }}">{% endfor %}
+<input type="hidden" name="exclude_muted" value="{{ exclude_muted }}">
+<input type="hidden" name="only_muted" value="{{ only_muted }}">
 <input type="hidden" name="search_string" value="{{ search_string }}">
 <input type="hidden" name="template" value="{{ template }}">
 <input type="hidden" name="recipe_id" value="{{ recipe_id }}">

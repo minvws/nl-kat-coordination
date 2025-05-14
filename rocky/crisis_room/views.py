@@ -28,9 +28,11 @@ from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PRO
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.reports import HydratedReport
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.bytes_client import get_bytes_client
+from rocky.views.mixins import FindingList
 
 logger = structlog.get_logger(__name__)
 
@@ -108,10 +110,16 @@ class DashboardService:
                 dashboard_item.item = dashboard_data
                 dashboard_item.data = self.get_ooi_list(dashboard_data)
                 dashboard_items.append(dashboard_item)
-
-            if dashboard_data.recipe:
+            elif not dashboard_data.recipe and dashboard_data.query_from == "finding_list":
+                dashboard_item = DashboardItem()
+                dashboard_item.item = dashboard_data
+                dashboard_item.data = self.get_finding_list(dashboard_data)
+                logger.error("Findings list: %s", dashboard_item.data)
+                dashboard_items.append(dashboard_item)
+            elif dashboard_data.recipe:
                 report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
                 recipes_data[dashboard_data] = dashboard_data.recipe
+
         if recipes_data:
             # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
@@ -221,6 +229,38 @@ class DashboardService:
         ).items
 
         return {"object_list": ooi_list}
+
+    def get_finding_list(self, dashboard_data) -> dict[str, Any]:
+        query = json.loads(dashboard_data.query)
+        finding_list = []
+
+        severities = set()
+        for severity in query["severities"]:
+            try:
+                severities.add(RiskLevelSeverity(severity))
+            except ValueError as e:
+                messages.error(e)
+
+        octopoes_client = OctopoesAPIConnector(
+            settings.OCTOPOES_API,
+            dashboard_data.dashboard.organization.code,
+            timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+        )
+
+        limit = query["limit"]
+
+        finding_list = FindingList(
+            octopoes_connector=octopoes_client,
+            valid_time=datetime.now(timezone.utc),
+            severities=severities,
+            exclude_muted=query["exclude_muted"],
+            only_muted=query["only_muted"],
+            search_string=query["search_string"],
+            order_by=query["order_by"],
+            asc_desc=query["asc_desc"],
+        )[0:limit]
+
+        return {"finding_list": finding_list}
 
 
 class CrisisRoomView(TemplateView):
