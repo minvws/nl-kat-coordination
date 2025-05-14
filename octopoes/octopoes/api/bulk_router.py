@@ -55,7 +55,7 @@ def list_reports(
 
 @router.get("/object-clients")
 def list_object_clients(
-    clients: set[str] = Query(set()),
+    clients: set[str],
     reference: Reference = Depends(extract_reference),
     settings_: Settings = Depends(settings),
     valid_time: datetime = Depends(extract_valid_time),
