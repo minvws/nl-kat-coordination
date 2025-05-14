@@ -20,14 +20,14 @@ def run(input_ooi: dict[str, str], raw: bytes) -> Iterable[OOI]:
     input_ooi_reference = Reference.from_str(input_ooi["primary_key"])
     found_targets = None
 
-    ooi_category = "IP" if input_ooi["primary_key"].startswith("IPAddress") else "Hostname"
+    ooi_category = "Hostname" if input_ooi["object_type"] == "Hostname" else "IP"
 
     if ooi_category == "IP":
         logger.debug("Found IP address: %s", input_ooi["primary_key"])
         found_targets = [
             target for target in result["targets"] if target["ip"] == input_ooi_reference.tokenized.address
         ]
-    elif ooi_category == "Hostname":
+    else:
         logger.debug("Found Hostname address: %s", input_ooi["primary_key"])
         # Make host always start with www.
         raw_host = input_ooi["name"].lower()
@@ -37,8 +37,6 @@ def run(input_ooi: dict[str, str], raw: bytes) -> Iterable[OOI]:
         found_targets = [target for target in result["targets"] if target["host"] in [host, host.removeprefix("www.")]]
 
     logger.info("Found targets: %s", found_targets)
-    if found_targets is None:
-        raise ValueError(f"OOI: {input_ooi['primary_key']} is not a valid IP address or hostname.")
     if not found_targets:
         logger.info("No targets found for %s", input_ooi["primary_key"])
         return
