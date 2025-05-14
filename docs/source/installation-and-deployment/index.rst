@@ -19,6 +19,7 @@ Contains documentation for developers and contributors.
    adding-proxy-to-openkat
    s3-buckets
    debugging-troubleshooting
+   events-and-logging
    environment-settings/index
    external-authentication
    cveapi
