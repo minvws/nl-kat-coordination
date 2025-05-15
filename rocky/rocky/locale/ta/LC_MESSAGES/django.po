@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-17 12:03+0000\n"
+"POT-Creation-Date: 2025-05-07 14:35+0000\n"
 "PO-Revision-Date: 2025-02-04 17:02+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -779,6 +779,7 @@ msgid "Show all"
 msgstr "அனைத்தையும் காட்டு"
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
@@ -787,6 +788,7 @@ msgid "Enabled"
 msgstr "இயக்கப்பட்டது"
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -1111,19 +1113,6 @@ msgstr "இயக்கு"
 msgid "Disable"
 msgstr "முடக்கு"
 
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is enabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is disabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-#, python-format
-msgid "You don't have permission to enable or disable %(plugin)ss."
-msgstr ""
-
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/ooi_list_filters.html
@@ -1198,6 +1187,22 @@ msgstr "அறிக்கை வகைகள்"
 #: katalogus/templates/partials/modal_report_types.html
 msgid "Report types for "
 msgstr "அறிக்கை வகைகள் "
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+#: katalogus/templates/plugin_container_image.html
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr "விளக்கம்"
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "No permission to enable/disable plugins"
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "Contact your administrator to request permission."
+msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
@@ -1311,6 +1316,7 @@ msgid "Plugin description"
 msgstr "சொருகி விளக்கம்"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/partials/report_header.html
 #: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1386,11 +1392,11 @@ msgstr "மாறுபாடுகளின் கண்ணோட்டம்"
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
-#: reports/templates/tasks/report_tasks_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Status"
 msgstr "நிலை"
 
@@ -1458,7 +1464,7 @@ msgstr "போஃப்சே ஐடி"
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
-#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Creation date"
 msgstr "உருவாக்கும் தேதி"
 
@@ -1469,13 +1475,6 @@ msgstr "வாதங்கள்"
 #: katalogus/templates/plugin_container_image.html
 msgid "The following arguments are used for this Boefje variant:"
 msgstr "The following arguments அரே used க்கு this Boefje variant:"
-
-#: katalogus/templates/plugin_container_image.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "explanation"
-msgstr "விளக்கம்"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "There are no arguments used for this Boefje variant."
@@ -2042,7 +2041,7 @@ msgstr "ஒரு அறிக்கையைத் தேர்வுசெய�
 #: reports/templates/report_overview/report_overview_header.html
 #: reports/views/base.py rocky/templates/header.html
 #: rocky/templates/tasks/partials/tab_navigation.html
-#: rocky/templates/tasks/report_tasks.html rocky/views/tasks.py
+#: rocky/templates/tasks/reports.html rocky/views/tasks.py
 msgid "Reports"
 msgstr "அறிக்கைகள்"
 
@@ -4172,13 +4171,17 @@ msgid "No findings have been identified for this organization."
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
-msgstr "ஏற்றுமதி"
+msgid "Download as PDF"
+msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "Download report"
-msgstr "அறிக்கையைப் பதிவிறக்கவும்"
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Download as JSON"
+msgstr "சாதொபொகு ஆக பதிவிறக்கம்"
+
+#: reports/templates/partials/report_header.html
+msgid "Open asset reports"
+msgstr ""
 
 #: reports/templates/partials/report_header.html
 msgid "This is the OpenKAT report for organization"
@@ -4670,8 +4673,9 @@ msgstr "அட்டவணையை முடக்கு"
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
-"Are you sure you want to disable the schedule for %(report_name)s? The "
-"recipe will still exist and the schedule can be enabled later on."
+"Are you sure you want to disable the schedule for <strong>%(report_name)s</"
+"strong>? The recipe will still exist and the schedule can be enabled later "
+"on."
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -4717,7 +4721,7 @@ msgid "Showing %(length)s of %(total)s reports"
 msgstr "%(total)s இல் %(length)s அறிக்கைகளைக் காட்டுகிறது"
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Reports:"
 msgstr "அறிக்கைகள்:"
 
@@ -4947,15 +4951,6 @@ msgid ""
 msgstr ""
 "தேர்ந்தெடுக்கப்பட்ட அறிக்கை வகைகளுக்கு தேவையான அல்லது விருப்ப செருகுநிரல்கள் தேவையில்லை."
 
-#: reports/templates/tasks/report_tasks_list.html
-msgid "Recipe ID"
-msgstr ""
-
-#: reports/templates/tasks/report_tasks_list.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Modified date"
-msgstr "மாற்றியமைக்கப்பட்ட தேதி"
-
 #: reports/views/aggregate_report.py
 msgid "Aggregate report"
 msgstr "மொத்த அறிக்கை"
@@ -5006,6 +5001,10 @@ msgid "View report"
 msgstr "அறிக்கையைக் காண்க"
 
 #: reports/views/report_overview.py
+msgid "Not enough permissions"
+msgstr ""
+
+#: reports/views/report_overview.py
 msgid "Recipe '{}' deleted successfully"
 msgstr ""
 
@@ -5016,10 +5015,6 @@ msgstr ""
 #: reports/views/report_overview.py
 msgid "No schedule or recipe selected"
 msgstr ""
-
-#: reports/views/report_overview.py
-msgid "Schedule {}"
-msgstr "அட்டவணை {}"
 
 #: reports/views/report_overview.py
 msgid ""
@@ -5037,6 +5032,10 @@ msgstr "அட்டவணை வெற்றிகரமாக இயக்க�
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
 msgstr "எதிர்பாராத பிழை ஏற்பட்டது, மேலும் தகவலுக்கு பதிவுகளை சரிபார்க்கவும்."
+
+#: reports/views/report_overview.py
+msgid "Other OOI type selected than Report"
+msgstr ""
 
 #: reports/views/report_overview.py
 msgid "Deletion successful."
@@ -7131,8 +7130,8 @@ msgid "Upload CSV"
 msgstr "காபிம ஐ பதிவேற்றவும்"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Download as JSON"
-msgstr "சாதொபொகு ஆக பதிவிறக்கம்"
+msgid "Export"
+msgstr "ஏற்றுமதி"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as CSV"
@@ -7322,7 +7321,7 @@ msgstr ""
 msgid "List of tasks for boefjes."
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/reports.html
 msgid "Organization Code"
 msgstr "நிறுவன குறியீடு"
 
@@ -7331,6 +7330,11 @@ msgstr "நிறுவன குறியீடு"
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Created date"
 msgstr "உருவாக்கப்பட்ட தேதி"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/reports.html
+msgid "Modified date"
+msgstr "மாற்றியமைக்கப்பட்ட தேதி"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers."
@@ -7402,12 +7406,16 @@ msgstr "எந்த பணிகளும் இல்லை"
 msgid "List of tasks for"
 msgstr "பணிகளின் பட்டியல்"
 
-#: rocky/templates/tasks/report_tasks.html
+#: rocky/templates/tasks/reports.html
 msgid "There are no tasks for reports."
 msgstr ""
 
-#: rocky/templates/tasks/report_tasks.html
+#: rocky/templates/tasks/reports.html
 msgid "List of tasks for reports."
+msgstr ""
+
+#: rocky/templates/tasks/reports.html
+msgid "Recipe ID"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -7732,6 +7740,11 @@ msgstr "தேர்ந்தெடு தட்டச்சு செய்க"
 #, python-format
 msgid "Add %(ooi_type)s"
 msgstr "%(ooi_type)s சேர்க்கவும்"
+
+#: rocky/views/ooi_detail.py
+msgid ""
+"Cannot set clearance level. It must be provided and must be a valid number."
+msgstr ""
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
@@ -8079,6 +8092,12 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#~ msgid "Download report"
+#~ msgstr "அறிக்கையைப் பதிவிறக்கவும்"
+
+#~ msgid "Schedule {}"
+#~ msgstr "அட்டவணை {}"
 
 #~ msgid "KAT-alogus Settings"
 #~ msgstr "கேட்-அலோகச் அமைப்புகள்"

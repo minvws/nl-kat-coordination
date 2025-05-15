@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-17 12:03+0000\n"
+"POT-Creation-Date: 2025-05-07 14:35+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -786,6 +786,7 @@ msgid "Show all"
 msgstr "Mostra tutto"
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
@@ -794,6 +795,7 @@ msgid "Enabled"
 msgstr "Abilitato"
 
 #: katalogus/forms/katalogus_filter.py
+#: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -1119,19 +1121,6 @@ msgstr "Abilitato"
 msgid "Disable"
 msgstr "Disabilita"
 
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is enabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-msgid "This plugin is disabled."
-msgstr ""
-
-#: katalogus/templates/partials/enable_disable_plugin.html
-#, python-format
-msgid "You don't have permission to enable or disable %(plugin)ss."
-msgstr ""
-
 #: katalogus/templates/partials/katalogus_filter.html
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/ooi_list_filters.html
@@ -1208,6 +1197,22 @@ msgstr ""
 
 #: katalogus/templates/partials/modal_report_types.html
 msgid "Report types for "
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+#: katalogus/templates/plugin_container_image.html
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr "spiegazione"
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "No permission to enable/disable plugins"
+msgstr ""
+
+#: katalogus/templates/partials/no_enabling_permission_message.html
+msgid "Contact your administrator to request permission."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
@@ -1326,6 +1331,7 @@ msgid "Plugin description"
 msgstr "Descrizione"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/partials/report_header.html
 #: reports/templates/report_overview/report_history_table.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1402,11 +1408,11 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
-#: reports/templates/tasks/report_tasks_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/ooi_detail_task_list.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Status"
 msgstr "Stato"
 
@@ -1474,7 +1480,7 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_table.html
-#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Creation date"
 msgstr ""
 
@@ -1485,13 +1491,6 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 msgid "The following arguments are used for this Boefje variant:"
 msgstr ""
-
-#: katalogus/templates/plugin_container_image.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "explanation"
-msgstr "spiegazione"
 
 #: katalogus/templates/plugin_container_image.html
 msgid "There are no arguments used for this Boefje variant."
@@ -2071,7 +2070,7 @@ msgstr "Scegli un report - Introduzione"
 #: reports/templates/report_overview/report_overview_header.html
 #: reports/views/base.py rocky/templates/header.html
 #: rocky/templates/tasks/partials/tab_navigation.html
-#: rocky/templates/tasks/report_tasks.html rocky/views/tasks.py
+#: rocky/templates/tasks/reports.html rocky/views/tasks.py
 msgid "Reports"
 msgstr "Report"
 
@@ -4057,12 +4056,16 @@ msgid "No findings have been identified for this organization."
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
-msgstr "Esporta"
+msgid "Download as PDF"
+msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "Download report"
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Download as JSON"
+msgstr "Scarica come JSON"
+
+#: reports/templates/partials/report_header.html
+msgid "Open asset reports"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
@@ -4530,8 +4533,9 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
 #, python-format
 msgid ""
-"Are you sure you want to disable the schedule for %(report_name)s? The "
-"recipe will still exist and the schedule can be enabled later on."
+"Are you sure you want to disable the schedule for <strong>%(report_name)s</"
+"strong>? The recipe will still exist and the schedule can be enabled later "
+"on."
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -4575,7 +4579,7 @@ msgid "Showing %(length)s of %(total)s reports"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-#: reports/templates/tasks/report_tasks_list.html
+#: rocky/templates/tasks/reports.html
 msgid "Reports:"
 msgstr ""
 
@@ -4792,15 +4796,6 @@ msgid ""
 "types."
 msgstr ""
 
-#: reports/templates/tasks/report_tasks_list.html
-msgid "Recipe ID"
-msgstr ""
-
-#: reports/templates/tasks/report_tasks_list.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Modified date"
-msgstr ""
-
 #: reports/views/aggregate_report.py
 msgid "Aggregate report"
 msgstr ""
@@ -4851,6 +4846,10 @@ msgid "View report"
 msgstr ""
 
 #: reports/views/report_overview.py
+msgid "Not enough permissions"
+msgstr ""
+
+#: reports/views/report_overview.py
 msgid "Recipe '{}' deleted successfully"
 msgstr ""
 
@@ -4860,10 +4859,6 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "No schedule or recipe selected"
-msgstr ""
-
-#: reports/views/report_overview.py
-msgid "Schedule {}"
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -4879,6 +4874,10 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
+msgstr ""
+
+#: reports/views/report_overview.py
+msgid "Other OOI type selected than Report"
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -6956,8 +6955,8 @@ msgid "Upload CSV"
 msgstr "Carica CSV"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Download as JSON"
-msgstr "Scarica come JSON"
+msgid "Export"
+msgstr "Esporta"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as CSV"
@@ -7151,7 +7150,7 @@ msgstr ""
 msgid "List of tasks for boefjes."
 msgstr ""
 
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/reports.html
 msgid "Organization Code"
 msgstr ""
 
@@ -7160,6 +7159,11 @@ msgstr ""
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Created date"
 msgstr "Data di creazione"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/reports.html
+msgid "Modified date"
+msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers."
@@ -7231,12 +7235,16 @@ msgstr ""
 msgid "List of tasks for"
 msgstr ""
 
-#: rocky/templates/tasks/report_tasks.html
+#: rocky/templates/tasks/reports.html
 msgid "There are no tasks for reports."
 msgstr ""
 
-#: rocky/templates/tasks/report_tasks.html
+#: rocky/templates/tasks/reports.html
 msgid "List of tasks for reports."
+msgstr ""
+
+#: rocky/templates/tasks/reports.html
+msgid "Recipe ID"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -7565,6 +7573,11 @@ msgstr "Seleziona il tipo"
 #, python-format
 msgid "Add %(ooi_type)s"
 msgstr "Aggiungi %(ooi_type)s"
+
+#: rocky/views/ooi_detail.py
+msgid ""
+"Cannot set clearance level. It must be provided and must be a valid number."
+msgstr ""
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
