@@ -65,7 +65,7 @@ class DashboardData(models.Model):
         default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
-    EVENT_CODES = {"created": 900307, "updated": 900308, "deleted": 900309, "repositioned": 900310}
+    EVENT_CODES = {"created": 900311, "updated": 900312, "deleted": 900313}
 
     class Meta:
         permissions = [("change_dashboarddata_position", _("Can change position up or down of a dashboard item."))]
@@ -118,7 +118,6 @@ class DashboardData(models.Model):
                     old_item.name,
                     new_item.name,
                     old_item.dashboard,
-                    event_code=self.EVENT_CODES.get("repositioned"),
                 )
             except DashboardData.DoesNotExist:
                 return
