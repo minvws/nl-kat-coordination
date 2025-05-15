@@ -77,7 +77,7 @@ def test_settings_storage(plugin_storage, organisation_storage, config_storage):
 
     with config_storage as settings_storage:
         settings_storage.upsert(organisation_id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 12})
-        settings_storage.upsert(org2.id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 12})
+        settings_storage.upsert(org2.id, plugin_id, {"TEST_SETTING2": 12, "TEST_SETTING": "123.9"})
 
     config1 = BoefjeConfig(
         id=6,
