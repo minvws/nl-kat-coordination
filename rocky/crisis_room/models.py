@@ -3,7 +3,7 @@ from typing import Any, Literal
 import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import connection, models, transaction
+from django.db import models, transaction
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -142,13 +142,8 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
     """Change the position of the other items on the dashboard after deleting one object."""
-    position = instance.position
-    dashboard = instance.dashboard_id
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "UPDATE crisis_room_dashboarddata "
-            "SET position = position - 1 "
-            "WHERE position > %s "
-            "AND dashboard_id = %s ",
-            [position, dashboard],
+
+    with transaction.atomic():
+        DashboardData.objects.filter(dashboard=instance.dashboard, position__gte=instance.position).update(
+            position=models.F("position") - 1
         )
