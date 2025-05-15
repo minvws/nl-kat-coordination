@@ -699,15 +699,36 @@ class BoefjeScheduler(Scheduler):
         if caller == self.is_boefje_in_other_orgs.__name__:
             return boefje_task
 
+        # We're only interested in the organisations that have
+        # the same input_ooi as the boefje task
+        orgs = self.ctx.services.octopoes.get_objects_clients(
+            reference=boefje_task.input_ooi,
+            clients=(boefje_task.organisation_id,),
+            valid_time=datetime.now(timezone.utc),
+        )
+        if not orgs:
+            self.logger.debug(
+                "No organisations found for input ooi",
+                input_ooi=boefje_task.input_ooi,
+                organisation_id=boefje_task.organisation_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return boefje_task
+
         configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
 
         # The endpoint returns configs of the boefje from multiple organisations
         # with different settings, but we're only interested in the settings
-        # that have the same env_hash as the boefje task
+        # that have the same env_hash as the boefje task, additionally we
+        # are only interested in the organisations that have the same
+        # input_ooi as the boefje task.
         filtered_configs: dict[str, list[models.BoefjeConfig]] = {}
         for config in configs:
             if config.organisation_id == boefje_task.organization:
                 boefje_task.env_hash = config.env_hash
+                continue
+
+            if config.organisation_id not in orgs:
                 continue
 
             filtered_configs.setdefault(config.env_hash, []).append(config)
@@ -716,17 +737,12 @@ class BoefjeScheduler(Scheduler):
             return boefje_task
 
         for config in filtered_configs[boefje_task.env_hash]:
-            ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
-            if ooi is None:
-                continue
-
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                 boefje_task.boefje.id, config.organisation_id
             )
             if boefje is None:
                 continue
 
-            # TODO: check if we need this, or if this is already handled
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
