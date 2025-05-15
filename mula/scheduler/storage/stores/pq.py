@@ -57,16 +57,18 @@ class PriorityQueueStore:
             query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
-                # Create a subquery to find the most common `env_hash` value
+                # Create a subquery to find the most common `deduplication_key` value
                 # from the `data` JSON field in TaskDB. This extracts the
-                # "env_hash" key from the JSON column, groups tasks by it,
+                # "deduplication_key" key from the JSON column, groups tasks by it,
                 # orders them by descending count, and limits to the top
                 # result.
-                top_env_hash = (
+                top_deduplication_key = (
                     session.query(
-                        func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")).label("env_hash")
+                        func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null")).label(
+                            "deduplication_key"
+                        )
                     )
-                    .group_by(func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")))
+                    .group_by(func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null")))
                     .order_by(func.count().desc())
                     .limit(1)
                 ).subquery()
@@ -74,7 +76,8 @@ class PriorityQueueStore:
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
                     .filter(
-                        func.coalesce(models.TaskDB.data["env_hash"].astext, literal("null")) == top_env_hash.c.env_hash
+                        func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null"))
+                        == top_deduplication_key.c.deduplication_key
                     )
                     .order_by(models.TaskDB.created_at.asc())
                     .limit(limit)
