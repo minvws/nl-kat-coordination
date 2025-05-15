@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from uuid import UUID
 
 import structlog
-from account.mixins import OrganizationView
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.conf import settings
 from django.contrib import messages
 from django.db import IntegrityError
@@ -114,7 +114,6 @@ class DashboardService:
                 dashboard_item = DashboardItem()
                 dashboard_item.item = dashboard_data
                 dashboard_item.data = self.get_finding_list(dashboard_data)
-                logger.error("Findings list: %s", dashboard_item.data)
                 dashboard_items.append(dashboard_item)
             elif dashboard_data.recipe:
                 report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
@@ -334,7 +333,7 @@ class OrganizationsCrisisRoomView(TemplateView, OrganizationView):
         return context
 
 
-class DeleteDashboardView(OrganizationsCrisisRoomView):
+class DeleteDashboardView(OrganizationView):
     """Delete the selected dashboard."""
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
@@ -355,7 +354,7 @@ class DeleteDashboardView(OrganizationsCrisisRoomView):
         return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
 
 
-class DeleteDashboardItemView(OrganizationsCrisisRoomView):
+class DeleteDashboardItemView(OrganizationView):
     """Delete the selected dashboard item."""
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
