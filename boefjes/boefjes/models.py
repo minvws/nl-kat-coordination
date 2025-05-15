@@ -75,6 +75,17 @@ class Boefje(Plugin):
         validate_assignment = True
 
 
+class BoefjeConfig(BaseModel):
+    id: int
+    settings: dict
+    enabled: bool
+    boefje_id: str
+    organisation_id: str
+
+    # a list of BoefjeConfig from other orgs that matching this config
+    duplicates: list["BoefjeConfig"] = Field(default_factory=list)
+
+
 class Normalizer(Plugin):
     type: Literal["normalizer"] = "normalizer"
     consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
