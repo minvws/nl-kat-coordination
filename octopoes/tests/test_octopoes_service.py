@@ -25,6 +25,8 @@ def mocked_bit_definitions():
 def test_process_ooi_create_event(octopoes_service, valid_time):
     # upon creation of a new ooi
     ooi = Hostname(network=Network(name="internet").reference, name="example.com")
+    octopoes_service.nibbler = Mock()
+    octopoes_service.nibbler.infer.return_value = {}
     octopoes_service.process_event(
         OOIDBEvent(
             operation_type=OperationType.CREATE, valid_time=valid_time, client="_dev", old_data=None, new_data=ooi
@@ -41,6 +43,8 @@ def test_process_ooi_create_event(octopoes_service, valid_time):
 def test_process_event_abstract_bit_consumes(octopoes_service, valid_time):
     # upon creation of a new ooi
     ooi = IPAddressV4(network=Network(name="internet").reference, address=ip_address("1.1.1.1"))
+    octopoes_service.nibbler = Mock()
+    octopoes_service.nibbler.infer.return_value = {}
     octopoes_service.process_event(
         OOIDBEvent(
             operation_type=OperationType.CREATE, valid_time=valid_time, client="_dev", old_data=None, new_data=ooi
@@ -94,6 +98,8 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
     octopoes_service.ooi_repository.get.return_value = Mock()
     octopoes_service.origin_parameter_repository.list_by_origin.return_value = {}
     octopoes_service.ooi_repository.load_bulk.return_value = {}
+    octopoes_service.nibbler = Mock()
+    octopoes_service.nibbler.infer.return_value = {}
 
     mock_oois = [Mock(reference="test1"), Mock(reference="test2")]
     bit_runner().run.return_value = mock_oois
