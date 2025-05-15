@@ -156,6 +156,9 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         action = request.POST.get("action")
 
         if action == PageActions.ADD_TO_DASHBOARD.value:
+            if not self.organization_member.has_perm("tools.can_add_dashboard_item"):
+                messages.error(request, _("You do not have the permission to add items to a dashboard."))
+                return self.get(request, status=404, *args, **kwargs)
             return self.add_to_dashboard(request, *args, **kwargs)
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
