@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-{% if all_dashboard_names %}
+{% if dashboard %}
     <div>
         <div class="horizontal-view">
             <h2>{{ dashboard.name }}</h2>
@@ -64,6 +64,9 @@
                                                         <input type="hidden"
                                                                name="dashboard_item"
                                                                value="{{ dashboard_item.item.id }}">
+                                                        <input type="hidden"
+                                                               name="dashboard"
+                                                               value="{{ dashboard_item.dashboard.id }}">
                                                         {% if dashboard_items|length > 1 and not forloop.first %}
                                                             <li role="option">
                                                                 <button type="submit" name="move" value="up">
@@ -116,12 +119,7 @@
 
     {% endif %}
 {% else %}
-    <p>
-        {% blocktranslate trimmed %}
-            There are no dashboards yet.
-            Click on "Add dashboard" to create a new dashboard.
-        {% endblocktranslate %}
-    </p>
+    <p>{% translate "Dashboard does not exist." %}</p>
 {% endif %}
 {% block html_at_end_body %}
     <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>

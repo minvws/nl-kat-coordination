@@ -7,9 +7,9 @@
     <h1>{% translate "Crisis room" %}</h1>
     <nav class="tabs" aria-label="{% translate "Crisis room navigation" %}">
         <ul>
-            {% for dashboard_name in all_dashboard_names %}
-                <li {% if active == dashboard_name %}aria-current="page"{% endif %}>
-                    <a href="{% url "organization_crisis_room" organization_code=organization.code %}?dashboard={{ dashboard_name }}">{{ dashboard_name }}</a>
+            {% for dashboard in dashboards %}
+                <li {% if active == dashboard.name %}aria-current="page"{% endif %}>
+                    <a href="{% url "organization_crisis_room" organization_code=dashboard.organization.code id=dashboard.id %}">{{ dashboard.name }}</a>
                 </li>
             {% endfor %}
             {% if request.user.can_add_dashboard %}

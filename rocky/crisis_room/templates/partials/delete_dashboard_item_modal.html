@@ -4,9 +4,7 @@
     <form id={{ form_id }} method="post" action="{% url "delete_dashboard_item" organization_code=organization.code %}">
         {% csrf_token %}
         <input type="hidden" name="dashboard_item" value="{{ dashboard_item.name }}">
-        <input type="hidden"
-               name="dashboard"
-               value="{{ dashboard_item.dashboard.name }}">
+        <input type="hidden" name="dashboard" value="{{ dashboard_item.id }}">
     </form>
     {% component "modal" modal_id=modal_id size="dialog-small" %}
     {% fill "header" %}

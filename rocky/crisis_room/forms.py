@@ -71,9 +71,9 @@ class ObjectListSettingsForm(BaseRockyForm):
             self.column_names = data.getlist("column_names", [])
 
     def clean_dashboard(self):
-        dashboard_name = self.cleaned_data.get("dashboard", "")
-        self.get_dashboard(dashboard_name)
-        return dashboard_name
+        dashboard_id = self.cleaned_data.get("dashboard", "")
+        self.get_dashboard(dashboard_id)
+        return dashboard_id
 
     def clean_title(self):
         title = self.cleaned_data.get("title", "")
@@ -142,13 +142,13 @@ class ObjectListSettingsForm(BaseRockyForm):
     @staticmethod
     def get_dashboard_selection(organization: Organization) -> list[tuple[str, str]]:
         return [
-            (dashboard.name, dashboard.name)
+            (dashboard.id, dashboard.name)
             for dashboard in Dashboard.objects.filter(organization=organization).exclude(name=FINDINGS_DASHBOARD_NAME)
         ]
 
-    def get_dashboard(self, name: str) -> Dashboard | None:
+    def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
         try:
-            return Dashboard.objects.get(name=name, organization=self.organization)
+            return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
         except Dashboard.DoesNotExist:
             raise ValidationError("Dashboard does not exist.")
 
