@@ -5,7 +5,7 @@
     <div>
         <div class="horizontal-view">
             <h2>{{ dashboard.name }}</h2>
-            {% if request.user.can_modify_dashboard %}
+            {% if request.user.can_delete_dashboard %}
                 <div class="dropdown">
                     <button id="action-dropdown-button"
                             type="button"
@@ -37,8 +37,10 @@
                 <div class="dashboard">
                     {% for dashboard_item in dashboard_items %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
-                            {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
+                            {% if request.user.can_delete_dashboard_item %}
+                                {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
+                            {% endif %}
                             <div class="dashboard-item">
                                 <div class="horizontal-view">
                                     <h3>{{ dashboard_item.item.name }}</h3>
@@ -49,7 +51,7 @@
                                             {% translate "Finding list" %}
                                         {% endif %}
                                     </span>
-                                    {% if request.user.can_modify_dashboard_items %}
+                                    {% if request.user.can_modify_dashboard_item %}
                                         <div class="dropdown">
                                             <button type="button"
                                                     aria-label="{% translate "Options for dashboard items" %}"
@@ -113,8 +115,10 @@
             </a>
         {% endif %}
     </div>
-    {% include "partials/delete_dashboard_modal.html" %}
+    {% if request.user.can_delete_dashboard %}
+        {% include "partials/delete_dashboard_modal.html" %}
 
+    {% endif %}
 {% else %}
     <p>
         {% blocktranslate trimmed %}

@@ -10,10 +10,12 @@ from crisis_room.views import (
     DashboardService,
     DeleteDashboardItemView,
     DeleteDashboardView,
+    OrganizationsCrisisRoomView,
     UpdateDashboardItemView,
 )
+from django.core.exceptions import PermissionDenied
 from django.http.request import QueryDict
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from tests.conftest import setup_request
 
@@ -162,12 +164,12 @@ def test_collect_findings_dashboard(findings_results, expected_findings_results)
         assert findings_results[index].data["report_data"] == expected_findings_results[index].data["report_data"]
 
 
-def test_create_dashboard(rf, client_member):
+def test_create_dashboard(rf, redteam_member):
     dashboard_name = "test"
     request = setup_request(
-        rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), client_member.user
+        rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), redteam_member.user
     )
-    response = AddDashboardView.as_view()(request, organization_code=client_member.organization.code)
+    response = AddDashboardView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
@@ -180,14 +182,24 @@ def test_create_dashboard(rf, client_member):
     assert len(dashboard) == 1
 
 
-def test_create_dashboard_already_exist(rf, client_member):
+def test_create_dashboard_no_permission(rf, client_member):
     dashboard_name = "test"
-    Dashboard.objects.create(name=dashboard_name, organization=client_member.organization)
-
     request = setup_request(
         rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), client_member.user
     )
-    response = AddDashboardView.as_view()(request, organization_code=client_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        AddDashboardView.as_view()(request, organization_code=client_member.organization.code)
+
+
+def test_create_dashboard_already_exist(rf, redteam_member):
+    dashboard_name = "test"
+    Dashboard.objects.create(name=dashboard_name, organization=redteam_member.organization)
+
+    request = setup_request(
+        rf.post("add_dashboard", {"organization_code": "test", "dashboard_name": dashboard_name}), redteam_member.user
+    )
+    response = AddDashboardView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
@@ -196,7 +208,7 @@ def test_create_dashboard_already_exist(rf, client_member):
     assert f"Dashboard with name '{dashboard_name}' already exists." in messages[0].message
 
 
-def test_update_dashboard_item_positioning(rf, client_member, dashboard_items):
+def test_update_dashboard_item_positioning(rf, redteam_member, dashboard_items):
     item_1, item_2, item_3, item_4 = dashboard_items[0], dashboard_items[1], dashboard_items[2], dashboard_items[3]
 
     # save positions before swapping to check positions later
@@ -206,16 +218,16 @@ def test_update_dashboard_item_positioning(rf, client_member, dashboard_items):
     position_item_4 = item_4.position
 
     request = setup_request(
-        rf.post("update_dashboard_item", {"dashboard_item": item_3.id, "move": "up"}), client_member.user
+        rf.post("update_dashboard_item", {"dashboard_item": item_3.id, "move": "up"}), redteam_member.user
     )
-    response = UpdateDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = UpdateDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=client_member.organization)
-    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=client_member.organization)
-    dashboard_data_item_3 = DashboardData.objects.get(id=item_3.id, dashboard__organization=client_member.organization)
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_3 = DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     # item 1 must have moved down (+1), because we have changed item 2 to move up (-1)
     assert dashboard_data_item_2.position == position_item_2 + 1
@@ -226,41 +238,49 @@ def test_update_dashboard_item_positioning(rf, client_member, dashboard_items):
     assert dashboard_data_item_4.position == position_item_4
 
 
-def test_update_dashboard_item_positioning_lower_than_first_item(rf, client_member, dashboard_items):
+def test_update_dashboard_item_positioning_no_permission(rf, client_member, dashboard_items):
+    request = setup_request(
+        rf.post("update_dashboard_item", {"dashboard_item": dashboard_items[2].id, "move": "up"}), client_member.user
+    )
+    with pytest.raises(PermissionDenied):
+        UpdateDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+
+
+def test_update_dashboard_item_positioning_lower_than_first_item(rf, redteam_member, dashboard_items):
     item_1 = dashboard_items[0]
     position_item_1 = item_1.position
 
     request = setup_request(
-        rf.post("update_dashboard_item", {"dashboard_item": item_1.id, "move": "up"}), client_member.user
+        rf.post("update_dashboard_item", {"dashboard_item": item_1.id, "move": "up"}), redteam_member.user
     )
-    response = UpdateDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = UpdateDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
 
     # nothing will be updated, as we cannot move up if this is the first item
     assert dashboard_data_item_1.position == position_item_1
 
 
-def test_update_dashboard_item_positioning_greater_than_last_item(rf, client_member, dashboard_items):
+def test_update_dashboard_item_positioning_greater_than_last_item(rf, redteam_member, dashboard_items):
     item_4 = dashboard_items[3]
     position_item_4 = item_4.position
 
     request = setup_request(
-        rf.post("update_dashboard_item", {"dashboard_item": item_4.id, "move": "down"}), client_member.user
+        rf.post("update_dashboard_item", {"dashboard_item": item_4.id, "move": "down"}), redteam_member.user
     )
-    response = UpdateDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = UpdateDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     # nothing will be updated, as we cannot move down if this is the last item
     assert dashboard_data_item_4.position == position_item_4
 
 
-def test_delete_dashboard_item(rf, client_member, dashboard_items):
+def test_delete_dashboard_item(rf, redteam_member, dashboard_items):
     item_1 = dashboard_items[0]
     item_2 = dashboard_items[1]
     item_3 = dashboard_items[2]
@@ -273,19 +293,19 @@ def test_delete_dashboard_item(rf, client_member, dashboard_items):
 
     request = setup_request(
         rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": item_3.dashboard.name}),
-        client_member.user,
+        redteam_member.user,
     )
-    response = DeleteDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = DeleteDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=client_member.organization)
-    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
 
     with pytest.raises(DashboardData.DoesNotExist):
-        DashboardData.objects.get(id=item_3.id, dashboard__organization=client_member.organization)
+        DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
 
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=client_member.organization)
+    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
@@ -297,6 +317,18 @@ def test_delete_dashboard_item(rf, client_member, dashboard_items):
     assert dashboard_data_item_2.position == position_item_2
 
     assert dashboard_data_item_4.position == position_item_4 - 1
+
+
+def test_delete_dashboard_item_no_permission(rf, client_member, dashboard_items):
+    request = setup_request(
+        rf.post(
+            "delete_dashboard_item",
+            {"dashboard_item": dashboard_items[2].name, "dashboard": dashboard_items[2].dashboard.name},
+        ),
+        client_member.user,
+    )
+    with pytest.raises(PermissionDenied):
+        DeleteDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
 
 
 def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items):
@@ -320,49 +352,49 @@ def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items)
         assert dashboard_item.position == index
 
 
-def test_delete_dashboard_item_no_dashboard(rf, client_member, dashboard_items):
+def test_delete_dashboard_item_no_dashboard(rf, redteam_member, dashboard_items):
     item_3 = dashboard_items[2]
 
     request = setup_request(
-        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": "bla"}), client_member.user
+        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": "bla"}), redteam_member.user
     )
-    response = DeleteDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = DeleteDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
 
     # item still exists but dashboard with unknown name cannot be found
-    DashboardData.objects.get(id=item_3.id, dashboard__organization=client_member.organization)
+    DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
     assert f"Dashboard item '{item_3.name}' not found." in messages[0].message
 
 
-def test_delete_dashboard_item_no_dashboard_data(rf, client_member, dashboard_items):
+def test_delete_dashboard_item_no_dashboard_data(rf, redteam_member, dashboard_items):
     item_2 = dashboard_items[1]
 
     request = setup_request(
         rf.post("delete_dashboard_item", {"dashboard_item": "bla", "dashboard": item_2.dashboard.name}),
-        client_member.user,
+        redteam_member.user,
     )
-    response = DeleteDashboardItemView.as_view()(request, organization_code=client_member.organization.code)
+    response = DeleteDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
 
-    DashboardData.objects.get(id=item_2.id, dashboard__organization=client_member.organization)
+    DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
     assert "Dashboard item 'bla' not found." in messages[0].message
 
 
-def test_delete_dashboard(rf, client_member, dashboard_items):
+def test_delete_dashboard(rf, redteam_member, dashboard_items):
     item_2 = dashboard_items[1]
 
     dashboard_name = item_2.dashboard.name
 
-    request = setup_request(rf.post("delete_dashboard", {"dashboard": dashboard_name}), client_member.user)
-    response = DeleteDashboardView.as_view()(request, organization_code=client_member.organization.code)
+    request = setup_request(rf.post("delete_dashboard", {"dashboard": dashboard_name}), redteam_member.user)
+    response = DeleteDashboardView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
@@ -374,11 +406,21 @@ def test_delete_dashboard(rf, client_member, dashboard_items):
     assert f"Dashboard '{dashboard_name}' has been deleted." in messages[0].message
 
 
-def test_delete_dashboard_wrong_name(rf, client_member):
-    dashboard_name = "bla"
+def test_delete_dashboard_no_permission(rf, client_member, dashboard_items):
+    item_2 = dashboard_items[1]
+
+    dashboard_name = item_2.dashboard.name
 
     request = setup_request(rf.post("delete_dashboard", {"dashboard": dashboard_name}), client_member.user)
-    response = DeleteDashboardView.as_view()(request, organization_code=client_member.organization.code)
+    with pytest.raises(PermissionDenied):
+        DeleteDashboardView.as_view()(request, organization_code=client_member.organization.code)
+
+
+def test_delete_dashboard_wrong_name(rf, redteam_member):
+    dashboard_name = "bla"
+
+    request = setup_request(rf.post("delete_dashboard", {"dashboard": dashboard_name}), redteam_member.user)
+    response = DeleteDashboardView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
 
@@ -455,4 +497,43 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
     assert "dashboard" in fields
 
     for error_list in errors:
-        assert "Select a valid choice. None is not one of the available choices." in error_list
+        assert (
+            "Select a valid choice. None is not one of the available choices." in error_list
+            or "Dashboard does not exist." in error_list
+        )
+
+
+def test_organization_crisis_room(rf, mocker, client_member, dashboard_items):
+    mocker.patch("crisis_room.views.OctopoesAPIConnector")
+
+    request = setup_request(
+        rf.get("organization_crisis_room", {"dashboard": dashboard_items[0].dashboard.name}), client_member.user
+    )
+    response = OrganizationsCrisisRoomView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+
+    for dashboard_item in dashboard_items:
+        assertContains(response, dashboard_item.name)
+
+    assertContains(response, dashboard_items[0].dashboard.name)
+    assertContains(response, "Object list")
+
+
+def test_clients_permissions_for_dashboard(rf, mocker, client_member, dashboard_items):
+    mocker.patch("crisis_room.views.OctopoesAPIConnector")
+
+    request = setup_request(
+        rf.get("organization_crisis_room", {"dashboard": dashboard_items[0].dashboard.name}), client_member.user
+    )
+    response = OrganizationsCrisisRoomView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+
+    assert not client_member.user.can_modify_dashboard
+    assert not client_member.user.can_modify_dashboard_item
+
+    # Clients are restricted to see Delete or add buttons
+    assertNotContains(response, "+ Add Dashboard")
+    assertNotContains(response, "Delete Dashboard")
+    assertNotContains(response, "Delete item ")
