@@ -18,6 +18,8 @@ class Dashboard(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    EVENT_CODES = {"created": 900301, "updated": 900302, "deleted": 900303}
+
     class Meta:
         unique_together = ["name", "organization"]
 
@@ -63,6 +65,8 @@ class DashboardData(models.Model):
         default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
+    EVENT_CODES = {"created": 900307, "updated": 900308, "deleted": 900309, "repositioned": 900310}
+
     class Meta:
         permissions = [("change_dashboarddata_position", _("Can change position up or down of a dashboard item."))]
         constraints = [
@@ -100,13 +104,22 @@ class DashboardData(models.Model):
 
         if 1 <= new_position <= 16:
             try:
-                swap_item = DashboardData.objects.get(dashboard=self.dashboard, position=new_position)
+                old_item = DashboardData.objects.get(dashboard=self.dashboard, position=old_position)
+                new_item = DashboardData.objects.get(dashboard=self.dashboard, position=new_position)
 
                 with transaction.atomic():
-                    swap_item.position = old_position
+                    new_item.position = old_position
                     self.position = new_position
-                    swap_item.save(update_fields=["position"])
+                    new_item.save(update_fields=["position"])
                     self.save(update_fields=["position"])
+
+                logger.info(
+                    "Dashboard item %s has been swapped with %s of dashboard %s",
+                    old_item.name,
+                    new_item.name,
+                    old_item.dashboard,
+                    event_code=self.EVENT_CODES.get("repositioned"),
+                )
             except DashboardData.DoesNotExist:
                 return
 
