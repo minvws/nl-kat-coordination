@@ -357,26 +357,19 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
         {
             "boefje_id": "dns-records",
             "enabled": True,
-            "env_hash": "1e13774dc8efcf7ab12000bb4d10f8aca141673f",
             "id": 8,
             "organisation_id": "test",
             "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [],
         },
-        {
-            "boefje_id": "nmap",
-            "enabled": False,
-            "env_hash": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-            "id": 10,
-            "organisation_id": "org2",
-            "settings": {},
-        },
+        {"boefje_id": "nmap", "enabled": False, "id": 10, "organisation_id": "org2", "settings": {}, "duplicates": []},
         {
             "boefje_id": "dns-records",
             "enabled": True,
-            "env_hash": "1e13774dc8efcf7ab12000bb4d10f8aca141673f",
             "id": 9,
             "organisation_id": "org2",
             "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [],
         },
     ]
     assert test_client.get("/v1/configs").json() == expected
@@ -388,3 +381,29 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
     ]
     assert test_client.get("/v1/configs", params={"boefje_id": "dns-records"}).json() == [expected[0], expected[2]]
     assert test_client.get("/v1/configs", params={"enabled": True}).json() == [expected[0], expected[2]]
+
+    expected_with_duplicates = [
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 8,
+            "organisation_id": "test",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [expected[2]],
+        },
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 9,
+            "organisation_id": "org2",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [expected[0]],
+        },
+    ]
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "test", "with_duplicates": True}
+    ).json() == [expected_with_duplicates[0]]
+
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "org2", "with_duplicates": True}
+    ).json() == [expected_with_duplicates[1]]

@@ -24,40 +24,51 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
     def list_boefje_configs(
         self,
         offset: int,
-        limit: int,
+        limit: int | None,
         organisation_id: str | None = None,
         boefje_id: str | None = None,
         enabled: bool | None = None,
+        with_duplicates: bool = False,  # Only has effect if both organisation_id and boefje_id are set
     ) -> list[BoefjeConfig]:
         query = self.session.query(BoefjeConfigInDB)
 
-        if organisation_id is not None:
-            query = (
-                query.join(OrganisationInDB)
-                .filter(BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
-                .filter(OrganisationInDB.id == organisation_id)
-            )
-
         if boefje_id is not None:
-            query = (
-                query.join(BoefjeInDB)
-                .filter(BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
-                .filter(BoefjeInDB.plugin_id == boefje_id)
+            query = query.join(BoefjeInDB, BoefjeConfigInDB.boefje_id == BoefjeInDB.id).filter(
+                BoefjeInDB.plugin_id == boefje_id
             )
 
         if enabled is not None:
             query = query.filter(BoefjeConfigInDB.enabled == enabled)
 
-        return [
-            BoefjeConfig(
-                id=x.id,
-                settings=self._convert_settings(x),
-                enabled=x.enabled,
-                boefje_id=x.boefje.plugin_id,
-                organisation_id=x.organisation.id,
+        if organisation_id is not None:
+            query = query.join(OrganisationInDB, BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk).filter(
+                OrganisationInDB.id == organisation_id
             )
-            for x in query.offset(offset).limit(limit).all()
-        ]
+
+        if all([organisation_id, boefje_id, with_duplicates]):
+            # The unique constraint on boefje_id and organisation_id ensures at most 1 result
+            config = self._to_boefje_config(query.offset(offset).limit(limit).first())
+
+            if not config:
+                return []
+
+            query = (
+                self.session.query(BoefjeConfigInDB)
+                .join(BoefjeInDB, BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
+                .filter(BoefjeInDB.plugin_id == config.boefje_id)
+                .filter(BoefjeConfigInDB.enabled == config.enabled)
+                .filter(BoefjeConfigInDB.id != config.id)
+            )
+
+            config.duplicates = [
+                duplicate
+                for duplicate in [self._to_boefje_config(config) for config in query.all()]
+                if duplicate.settings == config.settings
+            ]
+
+            return [config]
+
+        return [self._to_boefje_config(x) for x in query.offset(offset).limit(limit).all()]
 
     def upsert(
         self, organisation_id: str, plugin_id: str, settings: dict | None = None, enabled: bool | None = None
@@ -207,13 +218,12 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
 
         return instance
 
-    @staticmethod
-    def to_boefje_config(boefe_config_in_db: BoefjeConfigInDB) -> BoefjeConfig:
+    def _to_boefje_config(self, boefe_config_in_db: BoefjeConfigInDB) -> BoefjeConfig:
         return BoefjeConfig(
             id=boefe_config_in_db.id,
-            settings=boefe_config_in_db.settings,
+            settings=self._convert_settings(boefe_config_in_db),
             enabled=boefe_config_in_db.enabled,
-            boefje_id=boefe_config_in_db.boefje.id,
+            boefje_id=boefe_config_in_db.boefje.plugin_id,
             organisation_id=boefe_config_in_db.organisation.id,
         )
 

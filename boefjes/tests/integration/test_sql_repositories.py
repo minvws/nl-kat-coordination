@@ -77,7 +77,7 @@ def test_settings_storage(plugin_storage, organisation_storage, config_storage):
 
     with config_storage as settings_storage:
         settings_storage.upsert(organisation_id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 12})
-        settings_storage.upsert(org2.id, plugin_id, {"TEST2_SETTING": "223.9", "TEST2_SETTING2": 22})
+        settings_storage.upsert(org2.id, plugin_id, {"TEST_SETTING": "123.9", "TEST_SETTING2": 12})
 
     config1 = BoefjeConfig(
         id=6,
@@ -85,28 +85,29 @@ def test_settings_storage(plugin_storage, organisation_storage, config_storage):
         enabled=False,
         boefje_id="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         organisation_id="test",
-        env_hash="22b4acb207d13fdb8e78dcc3bd607870e45b540b",
     )
     config2 = BoefjeConfig(
         id=7,
-        settings={"TEST2_SETTING": "223.9", "TEST2_SETTING2": 22},
+        settings={"TEST_SETTING": "123.9", "TEST_SETTING2": 12},
         enabled=False,
         boefje_id="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         organisation_id="test2",
-        env_hash="aef80d6d9f47aacf6af980e2aeb99412168ce20d",
     )
+    config2_with_duplicates = config2.model_copy(update={"duplicates": [config1]})
 
     with config_storage as settings_storage:
         assert settings_storage.list_boefje_configs(0, 10) == [config1, config2]
         assert settings_storage.list_boefje_configs(1, 10) == [config2]
         assert settings_storage.list_boefje_configs(2, 10) == []
         assert settings_storage.list_boefje_configs(0, 1) == [config1]
-        assert settings_storage.list_boefje_configs(0, 10, organisation_id=org2.id) == [config2]
-        assert settings_storage.list_boefje_configs(0, 10, organisation_id=org.id) == [config1]
-        assert settings_storage.list_boefje_configs(0, 10, enabled=True) == []
-        assert settings_storage.list_boefje_configs(0, 10, enabled=False) == [config1, config2]
-        assert settings_storage.list_boefje_configs(0, 10, boefje_id="b") == []
-        assert settings_storage.list_boefje_configs(0, 10, boefje_id=64 * "a", organisation_id=org2.id) == [config2]
+        assert settings_storage.list_boefje_configs(0, 10, organisation_id=org2.id, with_duplicates=True) == [config2]
+        assert settings_storage.list_boefje_configs(0, 10, organisation_id=org.id, with_duplicates=True) == [config1]
+        assert settings_storage.list_boefje_configs(0, 10, enabled=True, with_duplicates=True) == []
+        assert settings_storage.list_boefje_configs(0, 10, enabled=False, with_duplicates=True) == [config1, config2]
+        assert settings_storage.list_boefje_configs(0, 10, boefje_id="b", with_duplicates=True) == []
+        assert settings_storage.list_boefje_configs(
+            0, 10, boefje_id=config2.boefje_id, organisation_id=org2.id, with_duplicates=True
+        ) == [config2_with_duplicates]
 
 
 def test_settings_storage_values_respect_field_limits(plugin_storage, organisation_storage, config_storage):
