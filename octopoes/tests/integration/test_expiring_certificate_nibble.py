@@ -28,6 +28,7 @@ def test_expiring_certificate_expired(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -88,6 +89,7 @@ def test_expiring_certificate_expiring_soon(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.nibbler.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()

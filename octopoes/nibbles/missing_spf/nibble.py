@@ -79,7 +79,7 @@ def spf_query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    id="missing_spf",
+    id="missing-spf",
     signature=[
         NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'Hostname'][]", min_scan_level=ScanLevel.L1),
         NibbleParameter(object_type=DNSSPFRecord, parser="[*][?object_type == 'DNSSPFRecord'][]", optional=True),
