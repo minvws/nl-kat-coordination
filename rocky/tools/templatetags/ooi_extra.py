@@ -120,7 +120,7 @@ def get_user_full_name(ooi: OOI) -> str:
 
 
 @register.filter
-def url_encode_query(query_str: str) -> str:
+def url_encode_object_list_query(query_str: str) -> str:
     query = json.loads(query_str)
     params = {
         "ooi_type": query["ooi_types"],
