@@ -716,9 +716,16 @@ class BoefjeScheduler(Scheduler):
         configs = self.ctx.services.katalogus.get_configs(
             boefje_id=boefje_task.boefje.id, organisation=boefje_task.organization, enabled=True
         )
+        if len(configs) == 0:
+            self.logger.debug(
+                "No configs found for boefje",
+                boefje_id=boefje_task.boefje.id,
+                organisation_id=boefje_task.organization,
+                scheduler_id=self.scheduler_id,
+            )
+            return boefje_task
 
-        # todo: check how the api will look
-        for config in configs:
+        for config in configs[0].duplicates:
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                 boefje_task.boefje.id, config.organisation_id
             )

@@ -144,6 +144,7 @@ class Katalogus(HTTPService):
         organisation_id: str,
         boefje_id: str | None = None,
         enabled: bool | None = None,
+        with_duplicates: bool = False,
         offset: int | None = None,
         limit: int | None = None,
     ) -> list[BoefjeConfig]:
@@ -155,11 +156,12 @@ class Katalogus(HTTPService):
                     "organisation_id": organisation_id,
                     "boefje_id": boefje_id,
                     "enabled": enabled,
+                    "with_duplicates": with_duplicates,
                     "offset": offset,
                     "limit": limit,
                 },
             )
-            return [Plugin(**plugin) for plugin in response.json()]
+            return [BoefjeConfig(**config) for config in response.json()]
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
                 return []

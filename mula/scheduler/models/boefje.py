@@ -35,3 +35,4 @@ class BoefjeConfig(BaseModel):
     enabled: bool
     organisation_id: str
     settings: dict
+    duplicates: list["BoefjeConfig"] = Field(default_factory=list)
