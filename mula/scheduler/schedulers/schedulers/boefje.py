@@ -4,16 +4,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry import trace
-from pydantic import ValidationError
 
 from scheduler import clients, context, models
-from scheduler.clients.errors import ExternalServiceError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, rankers
 from scheduler.schedulers.errors import exception_handler
 from scheduler.storage import filters
-from scheduler.storage.errors import StorageError
 
 tracer = trace.get_tracer(__name__)
 
@@ -77,51 +74,47 @@ class BoefjeScheduler(Scheduler):
         Args:
             mutation: The mutation that was received.
         """
-        try:
-            # Convert body into a ScanProfileMutation
-            mutation = models.ScanProfileMutation.model_validate_json(body)
-            self.logger.debug(
-                "Received scan level mutation %s for: %s",
-                mutation.operation,
-                mutation.primary_key,
-                ooi_primary_key=mutation.primary_key,
+        # Convert body into a ScanProfileMutation
+        mutation = models.ScanProfileMutation.model_validate_json(body)
+        self.logger.debug(
+            "Received scan level mutation %s for: %s",
+            mutation.operation,
+            mutation.primary_key,
+            ooi_primary_key=mutation.primary_key,
+            scheduler_id=self.scheduler_id,
+        )
+
+        # There should be an OOI in value
+        ooi = mutation.value
+        if ooi is None:
+            self.logger.debug("Mutation value is None, skipping", scheduler_id=self.scheduler_id)
+            return
+
+        # When the mutation is a delete operation, we need to remove all tasks
+        if mutation.operation == models.MutationOperationType.DELETE:
+            items, _ = self.ctx.datastores.pq_store.get_items(
                 scheduler_id=self.scheduler_id,
+                filters=filters.FilterRequest(
+                    filters=[filters.Filter(column="data", field="input_ooi", operator="eq", value=ooi.primary_key)]
+                ),
             )
 
-            # There should be an OOI in value
-            ooi = mutation.value
-            if ooi is None:
-                self.logger.debug("Mutation value is None, skipping", scheduler_id=self.scheduler_id)
-                return
+            # Delete all items for this ooi, update all tasks for this ooi
+            # to cancelled.
+            for item in items:
+                task = self.ctx.datastores.task_store.get_task(item.id)
+                if task is None:
+                    continue
 
-            # When the mutation is a delete operation, we need to remove all tasks
-            if mutation.operation == models.MutationOperationType.DELETE:
-                items, _ = self.ctx.datastores.pq_store.get_items(
-                    scheduler_id=self.scheduler_id,
-                    filters=filters.FilterRequest(
-                        filters=[filters.Filter(column="data", field="input_ooi", operator="eq", value=ooi.primary_key)]
-                    ),
-                )
+                task.status = models.TaskStatus.CANCELLED
+                self.ctx.datastores.task_store.update_task(task)
 
-                # Delete all items for this ooi, update all tasks for this ooi
-                # to cancelled.
-                for item in items:
-                    task = self.ctx.datastores.task_store.get_task(item.id)
-                    if task is None:
-                        continue
+            return
 
-                    task.status = models.TaskStatus.CANCELLED
-                    self.ctx.datastores.task_store.update_task(task)
-
-                return
-
-            # What available boefjes do we have for this ooi?
-            boefjes = self.get_boefjes_for_ooi(ooi, mutation.client_id)
-            if not boefjes:
-                self.logger.debug("No boefjes available for %s", ooi.primary_key, scheduler_id=self.scheduler_id)
-                return
-        except (StorageError, ValidationError):
-            self.logger.exception("Error occurred while processing mutation", scheduler_id=self.scheduler_id)
+        # What available boefjes do we have for this ooi?
+        boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, mutation.client_id)
+        if not boefjes:
+            self.logger.debug("No boefjes available for %s", ooi.primary_key, scheduler_id=self.scheduler_id)
             return
 
         # Create tasks for the boefjes
@@ -182,38 +175,26 @@ class BoefjeScheduler(Scheduler):
         boefje_tasks = []
 
         # TODO: this should be optimized see #3357
-        try:
-            orgs = self.ctx.services.katalogus.get_organisations()
-        except ExternalServiceError:
-            self.logger.exception("Error occurred while processing new boefjes", scheduler_id=self.scheduler_id)
-            return
+        orgs = self.ctx.services.katalogus.get_organisations()
 
         for org in orgs:
-            try:
-                # Get new boefjes for organisation
-                new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(org.id)
-                if not new_boefjes:
-                    self.logger.debug("No new boefjes found for organisation", organisation_id=org.id)
-                    continue
-
-                # Get all oois for the new boefjes
-                for boefje in new_boefjes:
-                    oois = self.get_oois_for_boefje(boefje, org.id)
-                    for ooi in oois:
-                        boefje_task = models.BoefjeTask(
-                            boefje=models.Boefje.model_validate(boefje.dict()),
-                            input_ooi=ooi.primary_key,
-                            organization=org.id,
-                        )
-
-                        boefje_tasks.append((boefje_task, org.id))
-            except ExternalServiceError:
-                self.logger.warning(
-                    "Error occurred while processing new boefjes",
-                    organisation_id=org.id,
-                    scheduler_id=self.scheduler_id,
-                )
+            # Get new boefjes for organisation
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(org.id)
+            if not new_boefjes:
+                self.logger.debug("No new boefjes found for organisation", organisation_id=org.id)
                 continue
+
+            # Get all oois for the new boefjes
+            for boefje in new_boefjes:
+                oois = self.get_oois_for_boefje(boefje, org.id)
+                for ooi in oois:
+                    boefje_task = models.BoefjeTask(
+                        boefje=models.Boefje.model_validate(boefje.dict()),
+                        input_ooi=ooi.primary_key,
+                        organization=org.id,
+                    )
+
+                    boefje_tasks.append((boefje_task, org.id))
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-new_boefjes") as executor:
             for boefje_task, org_id in boefje_tasks:
@@ -223,130 +204,118 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("BoefjeScheduler.process_rescheduling")
     def process_rescheduling(self):
-        try:
-            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
-                filters=filters.FilterRequest(
-                    filters=[
-                        filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
-                        filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
-                        filters.Filter(column="enabled", operator="eq", value=True),
-                    ]
-                )
+        schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
+            filters=filters.FilterRequest(
+                filters=[
+                    filters.Filter(column="scheduler_id", operator="eq", value=self.scheduler_id),
+                    filters.Filter(column="deadline_at", operator="lt", value=datetime.now(timezone.utc)),
+                    filters.Filter(column="enabled", operator="eq", value=True),
+                ]
             )
-            if not schedules:
-                self.logger.debug(
-                    "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
-                )
-                return
-        except StorageError:
-            self.logger.exception("Error occurred while processing rescheduling", scheduler_id=self.scheduler_id)
+        )
+        if not schedules:
+            self.logger.debug(
+                "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+            )
             return
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-rescheduling") as executor:
             for schedule in schedules:
-                try:
-                    boefje_task = models.BoefjeTask.model_validate(schedule.data)
+                boefje_task = models.BoefjeTask.model_validate(schedule.data)
 
-                    # Plugin still exists?
-                    plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                        boefje_task.boefje.id, schedule.organisation
+                # Plugin still exists?
+                plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                    boefje_task.boefje.id, schedule.organisation
+                )
+                if not plugin:
+                    self.logger.info(
+                        "Boefje does not exist anymore, skipping and disabling schedule",
+                        boefje_id=boefje_task.boefje.id,
+                        schedule_id=schedule.id,
+                        scheduler_id=self.scheduler_id,
                     )
-                    if not plugin:
+                    schedule.enabled = False
+                    self.ctx.datastores.schedule_store.update_schedule(schedule)
+                    continue
+
+                # Plugin still enabled?
+                if not plugin.enabled:
+                    self.logger.debug(
+                        "Boefje is disabled, skipping",
+                        boefje_id=boefje_task.boefje.id,
+                        schedule_id=schedule.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    schedule.enabled = False
+                    self.ctx.datastores.schedule_store.update_schedule(schedule)
+                    continue
+
+                # Plugin a boefje?
+                if plugin.type != "boefje":
+                    # We don't disable the schedule, since we should've gotten
+                    # schedules for boefjes only.
+                    self.logger.warning(
+                        "Plugin is not a boefje, skipping",
+                        plugin_id=plugin.id,
+                        schedule_id=schedule.id,
+                        organisation_id=schedule.organisation,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
+                # When the boefje task has an ooi, we need to do some additional
+                # checks.
+                ooi = None
+                if boefje_task.input_ooi:
+                    # OOI still exists?
+                    ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
+                    if not ooi:
                         self.logger.info(
-                            "Boefje does not exist anymore, skipping and disabling schedule",
-                            boefje_id=boefje_task.boefje.id,
-                            schedule_id=schedule.id,
-                            scheduler_id=self.scheduler_id,
-                        )
-                        schedule.enabled = False
-                        self.ctx.datastores.schedule_store.update_schedule(schedule)
-                        continue
-
-                    # Plugin still enabled?
-                    if not plugin.enabled:
-                        self.logger.debug(
-                            "Boefje is disabled, skipping",
-                            boefje_id=boefje_task.boefje.id,
-                            schedule_id=schedule.id,
-                            scheduler_id=self.scheduler_id,
-                        )
-                        schedule.enabled = False
-                        self.ctx.datastores.schedule_store.update_schedule(schedule)
-                        continue
-
-                    # Plugin a boefje?
-                    if plugin.type != "boefje":
-                        # We don't disable the schedule, since we should've gotten
-                        # schedules for boefjes only.
-                        self.logger.warning(
-                            "Plugin is not a boefje, skipping",
-                            plugin_id=plugin.id,
+                            "OOI does not exist anymore, skipping and disabling schedule",
+                            ooi_primary_key=boefje_task.input_ooi,
                             schedule_id=schedule.id,
                             organisation_id=schedule.organisation,
                             scheduler_id=self.scheduler_id,
                         )
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
-                    # When the boefje task has an ooi, we need to do some additional
-                    # checks.
-                    ooi = None
-                    if boefje_task.input_ooi:
-                        # OOI still exists?
-                        ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
-                        if not ooi:
-                            self.logger.info(
-                                "OOI does not exist anymore, skipping and disabling schedule",
-                                ooi_primary_key=boefje_task.input_ooi,
-                                schedule_id=schedule.id,
-                                organisation_id=schedule.organisation,
-                                scheduler_id=self.scheduler_id,
-                            )
-                            schedule.enabled = False
-                            self.ctx.datastores.schedule_store.update_schedule(schedule)
-                            continue
+                    # Boefje still consuming ooi type?
+                    if ooi.object_type not in plugin.consumes:
+                        self.logger.debug(
+                            "Boefje does not consume ooi anymore, skipping",
+                            boefje_id=boefje_task.boefje.id,
+                            ooi_primary_key=ooi.primary_key,
+                            organisation_id=schedule.organisation,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
+                        continue
 
-                        # Boefje still consuming ooi type?
-                        if ooi.object_type not in plugin.consumes:
-                            self.logger.debug(
-                                "Boefje does not consume ooi anymore, skipping",
-                                boefje_id=boefje_task.boefje.id,
-                                ooi_primary_key=ooi.primary_key,
-                                organisation_id=schedule.organisation,
-                                scheduler_id=self.scheduler_id,
-                            )
-                            schedule.enabled = False
-                            self.ctx.datastores.schedule_store.update_schedule(schedule)
-                            continue
+                    # TODO: do we want to disable the schedule when a
+                    # boefje is not allowed to scan an ooi?
 
-                        # TODO: do we want to disable the schedule when a
-                        # boefje is not allowed to scan an ooi?
+                    # Boefje allowed to scan ooi?
+                    if not self.has_boefje_permission_to_run(plugin, ooi):
+                        self.logger.info(
+                            "Boefje not allowed to scan ooi, skipping and disabling schedule",
+                            boefje_id=boefje_task.boefje.id,
+                            ooi_primary_key=ooi.primary_key,
+                            schedule_id=schedule.id,
+                            organisation_id=schedule.organisation,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
+                        continue
 
-                        # Boefje allowed to scan ooi?
-                        if not self.has_boefje_permission_to_run(plugin, ooi):
-                            self.logger.info(
-                                "Boefje not allowed to scan ooi, skipping and disabling schedule",
-                                boefje_id=boefje_task.boefje.id,
-                                ooi_primary_key=ooi.primary_key,
-                                schedule_id=schedule.id,
-                                organisation_id=schedule.organisation,
-                                scheduler_id=self.scheduler_id,
-                            )
-                            schedule.enabled = False
-                            self.ctx.datastores.schedule_store.update_schedule(schedule)
-                            continue
-
-                    new_boefje_task = models.BoefjeTask(
-                        boefje=models.Boefje.model_validate(plugin.dict()),
-                        input_ooi=ooi.primary_key if ooi else None,
-                        organization=schedule.organisation,
-                    )
-                except (StorageError, ValidationError, ExternalServiceError):
-                    self.logger.exception(
-                        "Error occurred while processing rescheduling",
-                        schedule_id=schedule.id,
-                        scheduler_id=self.scheduler_id,
-                    )
-                    continue
+                new_boefje_task = models.BoefjeTask(
+                    boefje=models.Boefje.model_validate(plugin.dict()),
+                    input_ooi=ooi.primary_key if ooi else None,
+                    organization=schedule.organisation,
+                )
 
                 executor.submit(
                     self.push_boefje_task,
@@ -630,37 +599,6 @@ class BoefjeScheduler(Scheduler):
             return False
 
         return True
-
-    def get_boefjes_for_ooi(self, ooi: models.OOI, organisation: str) -> list[models.Plugin]:
-        """Get available all boefjes (enabled and disabled) for an ooi.
-
-        Args:
-            ooi: The models.OOI to get boefjes for.
-
-        Returns:
-            A list of Plugin of type Boefje that can be run on the ooi.
-        """
-        boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(ooi.object_type, organisation)
-
-        if boefjes is None:
-            self.logger.debug(
-                "No boefjes found for type: %s",
-                ooi.object_type,
-                input_ooi_primary_key=ooi.primary_key,
-                scheduler_id=self.scheduler_id,
-            )
-            return []
-
-        self.logger.debug(
-            "Found %s boefjes for ooi: %s",
-            len(boefjes),
-            ooi,
-            input_ooi_primary_key=ooi.primary_key,
-            boefjes=[boefje.id for boefje in boefjes],
-            scheduler_id=self.scheduler_id,
-        )
-
-        return boefjes
 
     def get_oois_for_boefje(self, boefje: models.Plugin, organisation: str) -> list[models.OOI]:
         oois = []
