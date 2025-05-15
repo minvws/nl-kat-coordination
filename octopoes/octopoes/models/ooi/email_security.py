@@ -79,6 +79,9 @@ class DNSSPFMechanism(OOI):
     spf_record: Reference = ReferenceField(DNSSPFRecord, max_inherit_scan_level=1)
     mechanism: str
 
+    @classmethod
+    def type_from_raw(cls, raw_input:dict):
+        raise ValueError("DNSSPFMechanism OOI type cannot be instantiated.")
 
 class DNSSPFMechanismIP(DNSSPFMechanism):
     """Represents the DNS SPF Mechanism for IPs.

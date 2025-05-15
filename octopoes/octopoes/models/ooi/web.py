@@ -53,6 +53,12 @@ class WebURL(OOI):
     port: int
     path: str
 
+    @classmethod
+    def type_from_raw(cls, raw_input:dict):
+        if raw_input["netloc"].get("name") != None:
+            return HostnameHTTPURL
+        return IPAddressHTTPURL
+
 
 class HostnameHTTPURL(WebURL):
     object_type: Literal["HostnameHTTPURL"] = "HostnameHTTPURL"
