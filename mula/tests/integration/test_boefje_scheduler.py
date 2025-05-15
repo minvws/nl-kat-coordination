@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -83,11 +83,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
-        self.mock_get_organisations_by_ooi = mock.patch(
-            "scheduler.context.AppContext.services.octopoes.get_organisations_by_ooi"
-        ).start()
-
         self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
+
+        self.mock_get_object_clients = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object_clients"
+        ).start()
 
         self.mock_get_configs = mock.patch("scheduler.context.AppContext.services.katalogus.get_configs").start()
 
@@ -772,6 +772,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
                 settings={},
             ),
         ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -842,6 +847,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
                 settings={},
             ),
         ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -885,6 +895,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = plugin
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = []
+        self.mock_get_object_clients.return_value = [first_organisation.id]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -944,6 +955,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
                 settings={},
             ),
         ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
+        ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -1002,6 +1018,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
                 env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
                 settings={},
             ),
+        ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
         ]
 
         # Act

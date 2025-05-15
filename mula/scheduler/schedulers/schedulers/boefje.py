@@ -701,10 +701,8 @@ class BoefjeScheduler(Scheduler):
 
         # We're only interested in the organisations that have
         # the same input_ooi as the boefje task
-        orgs = self.ctx.services.octopoes.get_objects_clients(
-            reference=boefje_task.input_ooi,
-            clients=(boefje_task.organisation_id,),
-            valid_time=datetime.now(timezone.utc),
+        orgs = self.ctx.services.octopoes.get_object_clients(
+            reference=boefje_task.input_ooi, clients=(boefje_task.organization,), valid_time=datetime.now(timezone.utc)
         )
         if not orgs:
             self.logger.debug(
@@ -741,6 +739,19 @@ class BoefjeScheduler(Scheduler):
                 boefje_task.boefje.id, config.organisation_id
             )
             if boefje is None:
+                continue
+
+            ooi = self.ctx.services.octopoes.get_object(
+                config.organisation_id, boefje_task.input_ooi, valid_time=datetime.now(timezone.utc)
+            )
+            if ooi is None:
+                self.logger.debug(
+                    "OOI does not exist anymore, skipping",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
                 continue
 
             if not self.has_boefje_permission_to_run(boefje, ooi):
