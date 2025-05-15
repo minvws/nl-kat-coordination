@@ -1,14 +1,13 @@
 import unittest
-import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -84,11 +83,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
-        self.mock_get_organisations_by_ooi = mock.patch(
-            "scheduler.context.AppContext.services.octopoes.get_organisations_by_ooi"
-        ).start()
-
         self.mock_get_object = mock.patch("scheduler.context.AppContext.services.octopoes.get_object").start()
+
+        self.mock_get_object_clients = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object_clients"
+        ).start()
 
         self.mock_get_configs = mock.patch("scheduler.context.AppContext.services.katalogus.get_configs").start()
 
@@ -749,36 +748,26 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
+        ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
         ]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
-        # Assert: there should be 3 tasks in the queue
-        self.assertEqual(3, self.scheduler.queue.qsize())
+        # Assert: there should be 4 tasks in the queue
+        self.assertEqual(4, self.scheduler.queue.qsize())
 
         # Assert: the tasks should be on the queue
         items = [self.scheduler.queue.peek(0), self.scheduler.queue.peek(1), self.scheduler.queue.peek(2)]
@@ -792,8 +781,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         current = None
         for item in items:
             if current is None:
-                current = item.data.get("env_hash")
-            self.assertEqual(current, item.data.get("env_hash"))
+                current = item.data.get("deduplication_key")
+            self.assertEqual(current, item.data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_one_org(self):
         # Arrange
@@ -819,29 +808,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
-            ),
-            models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
-            ),
-            models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
-            ),
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
+            )
+        ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
         ]
 
         # Act
@@ -862,8 +835,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         current = None
         for item in items:
             if current is None:
-                current = item.data.get("env_hash")
-            self.assertEqual(current, item.data.get("env_hash"))
+                current = item.data.get("deduplication_key")
+            self.assertEqual(current, item.data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_configs(self):
         # Arrange
@@ -886,6 +859,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = plugin
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = []
+        self.mock_get_object_clients.return_value = [first_organisation.id]
 
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
@@ -921,29 +895,19 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = None
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
+        ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
         ]
 
         # Act
@@ -976,33 +940,23 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.side_effect = [None, None, plugin]
+        self.mock_get_plugin.side_effect = [None, None, None, None, plugin]
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
+        ]
+        self.mock_get_object_clients.return_value = [
+            first_organisation.id,
+            second_organisation.id,
+            third_organisation.id,
         ]
 
         # Act
@@ -1170,54 +1124,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Check if the deadline_at is set correctly with the interval
         # set to 1500 minutes (25 hours) to at least the next day
         self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc) + timedelta(days=1))
-
-    def test_pop_batched(self):
-        # Arrange: create boefje tasks with the same env_hash
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        env_hash = uuid.uuid4().hex
-
-        tasks = [
-            models.BoefjeTask(
-                boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=env_hash
-            ),
-            models.BoefjeTask(
-                boefje=BoefjeFactory(), input_ooi=ooi.primary_key, organization=self.organisation.id, env_hash=env_hash
-            ),
-            models.BoefjeTask(
-                boefje=BoefjeFactory(),
-                input_ooi=ooi.primary_key,
-                organization=self.organisation.id,
-                env_hash="other_hash",
-            ),
-        ]
-
-        # Mocks
-        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], interval=1500)
-        self.mock_get_plugin.return_value = plugin
-
-        # Act: push the tasks to the queue
-        for task in tasks:
-            task_db = models.Task(
-                scheduler_id=self.scheduler.scheduler_id,
-                organisation=self.organisation.id,
-                priority=1,
-                type=models.BoefjeTask.type,
-                hash=task.hash,
-                data=task.model_dump(),
-                created_at=datetime.now(timezone.utc),
-                modified_at=datetime.now(timezone.utc),
-            )
-
-            self.scheduler.push_item_to_queue(task_db)
-
-        # Assert: tasks should be on priority queue
-        self.assertEqual(3, self.scheduler.queue.qsize())
-
-        # Act: pop the tasks from the queue
-        tasks = self.scheduler.pop_item_from_queue()
-        self.assertEqual(2, len(tasks))
-        self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
