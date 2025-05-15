@@ -34,5 +34,4 @@ class BoefjeConfig(BaseModel):
     boefje_id: str
     enabled: bool
     organisation_id: str
-    env_hash: str
     settings: dict

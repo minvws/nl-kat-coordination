@@ -713,28 +713,12 @@ class BoefjeScheduler(Scheduler):
             )
             return boefje_task
 
-        configs = self.ctx.services.katalogus.get_configs(boefje_id=boefje_task.boefje.id, enabled=True)
+        configs = self.ctx.services.katalogus.get_configs(
+            boefje_id=boefje_task.boefje.id, organisation=boefje_task.organization, enabled=True
+        )
 
-        # The endpoint returns configs of the boefje from multiple organisations
-        # with different settings, but we're only interested in the settings
-        # that have the same env_hash as the boefje task, additionally we
-        # are only interested in the organisations that have the same
-        # input_ooi as the boefje task.
-        filtered_configs: dict[str, list[models.BoefjeConfig]] = {}
+        # todo: check how the api will look
         for config in configs:
-            if config.organisation_id == boefje_task.organization:
-                boefje_task.env_hash = config.env_hash
-                continue
-
-            if config.organisation_id not in orgs:
-                continue
-
-            filtered_configs.setdefault(config.env_hash, []).append(config)
-
-        if boefje_task.env_hash is None:
-            return boefje_task
-
-        for config in filtered_configs[boefje_task.env_hash]:
             boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                 boefje_task.boefje.id, config.organisation_id
             )
@@ -768,7 +752,7 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=ooi.primary_key,
                 organization=config.organisation_id,
-                env_hash=config.env_hash,
+                deduplication_key=boefje_task.id,
             )
 
             self.push_boefje_task(
@@ -777,6 +761,9 @@ class BoefjeScheduler(Scheduler):
                 create_schedule=self.create_schedule,
                 caller=self.is_boefje_in_other_orgs.__name__,
             )
+
+        if boefje_task.id is not None and boefje_task.deduplication_key is None:
+            boefje_task.deduplication_key = boefje_task.id
 
         return boefje_task
 

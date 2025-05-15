@@ -748,28 +748,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
         ]
         self.mock_get_object_clients.return_value = [
@@ -781,8 +766,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         self.scheduler.push_boefje_task(boefje_task, self.organisation.id)
 
-        # Assert: there should be 3 tasks in the queue
-        self.assertEqual(3, self.scheduler.queue.qsize())
+        # Assert: there should be 4 tasks in the queue
+        self.assertEqual(4, self.scheduler.queue.qsize())
 
         # Assert: the tasks should be on the queue
         items = [self.scheduler.queue.peek(0), self.scheduler.queue.peek(1), self.scheduler.queue.peek(2)]
@@ -796,8 +781,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         current = None
         for item in items:
             if current is None:
-                current = item.data.get("env_hash")
-            self.assertEqual(current, item.data.get("env_hash"))
+                current = item.data.get("deduplication_key")
+            self.assertEqual(current, item.data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_one_org(self):
         # Arrange
@@ -823,29 +808,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
-            ),
-            models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
-            ),
-            models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
-            ),
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
+            )
         ]
         self.mock_get_object_clients.return_value = [
             first_organisation.id,
@@ -871,8 +835,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         current = None
         for item in items:
             if current is None:
-                current = item.data.get("env_hash")
-            self.assertEqual(current, item.data.get("env_hash"))
+                current = item.data.get("deduplication_key")
+            self.assertEqual(current, item.data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_configs(self):
         # Arrange
@@ -931,28 +895,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_object.return_value = None
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
         ]
         self.mock_get_object_clients.return_value = [
@@ -991,32 +940,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_latest_task_by_hash.return_value = None
         self.mock_get_last_run_boefje.return_value = None
-        self.mock_get_plugin.side_effect = [None, None, plugin]
+        self.mock_get_plugin.side_effect = [None, None, None, None, plugin]
         self.mock_get_object.return_value = ooi
         self.mock_get_configs.return_value = [
             models.BoefjeConfig(
-                id=7,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=first_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=8,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=second_organisation.id,
-                env_hash="1e13774dc8efcf7ab12000bb4d10f8aca141673f",
-                settings={},
+                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
             ),
             models.BoefjeConfig(
-                id=9,
-                boefje_id=boefje.id,
-                enabled=True,
-                organisation_id=third_organisation.id,
-                env_hash="bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
-                settings={},
+                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
             ),
         ]
         self.mock_get_object_clients.return_value = [
