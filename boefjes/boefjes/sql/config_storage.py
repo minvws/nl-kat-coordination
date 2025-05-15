@@ -45,6 +45,8 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
                 OrganisationInDB.id == organisation_id
             )
 
+        # It's not possible to query this in the database directly since with encryption enabled, the settings are
+        # encrypted with a nonce. Hence distinct encrypted settings could be identical once decrypted.
         if all([organisation_id, boefje_id, with_duplicates]):
             # The unique constraint on boefje_id and organisation_id ensures at most 1 result
             config = self._to_boefje_config(query.offset(offset).limit(limit).first())
