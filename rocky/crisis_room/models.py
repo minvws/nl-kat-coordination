@@ -142,6 +142,12 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
     """Change the position of the other items on the dashboard after deleting one object."""
     with transaction.atomic():
-        DashboardData.objects.filter(dashboard=instance.dashboard, position__gte=instance.position).update(
-            position=models.F("position") - 1
-        )
+        try:
+            dashboard_items = DashboardData.objects.filter(
+                dashboard=instance.dashboard, position__gte=instance.position
+            )
+            if dashboard_items:
+                dashboard_items.update(position=models.F("position") - 1)
+
+        except (Dashboard.DoesNotExist, instance.DoesNotExist):
+            return
