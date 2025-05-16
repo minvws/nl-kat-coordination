@@ -3,6 +3,7 @@
 import structlog
 from django.contrib.auth.management import create_permissions
 from django.db import migrations
+from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 
 logger = structlog.get_logger(__name__)
 
@@ -31,8 +32,8 @@ def get_permissions(apps, codenames):
 
 def add_dashboard_permissions_to_groups(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
-    admin_group = Group.objects.get(name="admin")
-    redteam_group = Group.objects.get(name="redteam")
+    admin_group = Group.objects.get(name=GROUP_ADMIN)
+    redteam_group = Group.objects.get(name=GROUP_REDTEAM)
 
     dashboard_permissions = [
         "add_dashboard",
