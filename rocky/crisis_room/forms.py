@@ -149,7 +149,7 @@ class ObjectListSettingsForm(BaseRockyForm):
     def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
         try:
             return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
-        except Dashboard.DoesNotExist:
+        except (Dashboard.DoesNotExist, ValueError):
             raise ValidationError("Dashboard does not exist.")
 
     def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
