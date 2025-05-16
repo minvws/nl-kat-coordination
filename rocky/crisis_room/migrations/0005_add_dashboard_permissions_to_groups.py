@@ -7,30 +7,33 @@ from django.db import migrations
 logger = structlog.get_logger(__name__)
 
 
-# https://stackoverflow.com/a/40092780/1336275
-def migrate_permissions(apps, _schema_editor):
+def migrate_permissions(apps, schema_editor):
     for app_config in apps.get_app_configs():
         app_config.models_module = True
         create_permissions(app_config, apps=apps, verbosity=0)
         app_config.models_module = None
 
 
-def get_permissions(apps, codenames) -> list[str]:
+def get_permissions(apps, codenames):
     Permission = apps.get_model("auth", "Permission")
-    permission_ids = []
-    if codenames:
-        for codename in codenames:
-            try:
-                permission = Permission.objects.get(codename=codename)
-                permission_ids.append(permission)
-            except Permission.DoesNotExist:
-                logger.error("Permission code '%s' not found.", codename)
-                continue
+    permissions = []
 
-    return permission_ids
+    for codename in codenames:
+        try:
+            permission = Permission.objects.get(codename=codename)
+            permissions.append(permission)
+        except Permission.DoesNotExist:
+            logger.error("Permission code '%s' not found.", codename)
+            continue
+
+    return permissions
 
 
-def add_dashboard_permissions_to_groups(apps, _):
+def add_dashboard_permissions_to_groups(apps, schema_editor):
+    Group = apps.get_model("auth", "Group")
+    admin_group = Group.objects.get(name="admin")
+    redteam_group = Group.objects.get(name="redteam")
+
     dashboard_permissions = [
         "add_dashboard",
         "change_dashboard",
@@ -44,16 +47,10 @@ def add_dashboard_permissions_to_groups(apps, _):
     ]
 
     dashboard_permissions = get_permissions(apps, dashboard_permissions)
-    for dashboard_permission in dashboard_permissions:
-        try:
-            Group = apps.get_model("auth", "Group")
-            admin_group = Group.objects.get(name="admin")
-            redteam_group = Group.objects.get(name="redteam")
 
-            admin_group.permissions.add(dashboard_permission)
-            redteam_group.permissions.add(dashboard_permission)
-        except Group.DoesNotExist:
-            continue
+    for dashboard_permission in dashboard_permissions:
+        admin_group.permissions.add(dashboard_permission)
+        redteam_group.permissions.add(dashboard_permission)
 
 
 class Migration(migrations.Migration):
