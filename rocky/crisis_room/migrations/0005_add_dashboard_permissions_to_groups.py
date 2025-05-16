@@ -22,17 +22,15 @@ def get_permissions(apps, codenames) -> list[str]:
         for codename in codenames:
             try:
                 permission = Permission.objects.get(codename=codename)
+                permission_ids.append(permission)
             except Permission.DoesNotExist:
                 logger.error("Permission code '%s' not found.", codename)
                 continue
-            else:
-                permission_ids.append(permission.id)
 
     return permission_ids
 
 
 def add_dashboard_permissions_to_groups(apps, _):
-    Group = apps.get_model("auth", "Group")
     dashboard_permissions = [
         "add_dashboard",
         "change_dashboard",
@@ -46,15 +44,16 @@ def add_dashboard_permissions_to_groups(apps, _):
     ]
 
     dashboard_permissions = get_permissions(apps, dashboard_permissions)
+    for dashboard_permission in dashboard_permissions:
+        try:
+            Group = apps.get_model("auth", "Group")
+            admin_group = Group.objects.get(name="admin")
+            redteam_group = Group.objects.get(name="redteam")
 
-    try:
-        admin_group = Group.objects.get(name="admin")
-        redteam_group = Group.objects.get(name="redteam")
-
-        admin_group.permissions.set(dashboard_permissions)
-        redteam_group.permissions.set(dashboard_permissions)
-    except Group.DoesNotExist:
-        pass
+            admin_group.permissions.add(dashboard_permission)
+            redteam_group.permissions.add(dashboard_permission)
+        except Group.DoesNotExist:
+            continue
 
 
 class Migration(migrations.Migration):
