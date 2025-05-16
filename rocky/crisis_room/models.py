@@ -65,7 +65,7 @@ class DashboardData(models.Model):
         default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
 
-    EVENT_CODES = {"created": 900307, "updated": 900308, "deleted": 900309, "repositioned": 900310}
+    EVENT_CODES = {"created": 900311, "updated": 900312, "deleted": 900313}
 
     class Meta:
         permissions = [("change_dashboarddata_position", _("Can change position up or down of a dashboard item."))]
@@ -118,7 +118,6 @@ class DashboardData(models.Model):
                     old_item.name,
                     new_item.name,
                     old_item.dashboard,
-                    event_code=self.EVENT_CODES.get("repositioned"),
                 )
             except DashboardData.DoesNotExist:
                 return
@@ -142,8 +141,7 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
     """Change the position of the other items on the dashboard after deleting one object."""
-    if not instance.DoesNotExist:
-        with transaction.atomic():
-            DashboardData.objects.filter(dashboard=instance.dashboard, position__gte=instance.position).update(
-                position=models.F("position") - 1
-            )
+    with transaction.atomic():
+        DashboardData.objects.filter(dashboard=instance.dashboard, position__gte=instance.position).update(
+            position=models.F("position") - 1
+        )

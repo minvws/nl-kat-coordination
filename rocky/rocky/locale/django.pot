@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-14 16:03+0000\n"
+"POT-Creation-Date: 2025-05-16 07:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -794,6 +794,12 @@ msgstr ""
 msgid "Findings"
 msgstr ""
 
+#: crisis_room/templates/organization_crisis_room.html
+msgid ""
+"There are no dashboards yet. Click on \"Add dashboard\" to create a new "
+"dashboard."
+msgstr ""
+
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Options for dashboard"
 msgstr ""
@@ -840,8 +846,7 @@ msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
-"There are no dashboards yet. Click on \"Add dashboard\" to create a new "
-"dashboard."
+"Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -7363,7 +7368,7 @@ msgid "Unknown action."
 msgstr ""
 
 #: rocky/views/ooi_list.py
-msgid "Dashboard item has been added to {}."
+msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/ooi_list.py
