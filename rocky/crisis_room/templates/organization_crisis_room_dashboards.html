@@ -119,7 +119,7 @@
 
     {% endif %}
 {% else %}
-    <p>{% translate "Dashboard does not exist." %}</p>
+    <p>{% translate "Dashboard does not exist. Choose an existing dashboard or create a new one." %}</p>
 {% endif %}
 {% block html_at_end_body %}
     <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>

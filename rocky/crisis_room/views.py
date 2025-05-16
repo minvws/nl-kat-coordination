@@ -251,17 +251,14 @@ class OrganizationsCrisisRoomLandingView(OrganizationView, TemplateView):
     template_name = "organization_crisis_room.html"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any):
-        try:
-            default_dashboard = Dashboard.objects.filter(organization=self.organization).first()
-            if default_dashboard:
-                return redirect(
-                    reverse(
-                        "organization_crisis_room",
-                        kwargs={"organization_code": self.organization.code, "id": default_dashboard.id},
-                    )
+        default_dashboard = Dashboard.objects.filter(organization=self.organization).first()
+        if default_dashboard:
+            return redirect(
+                reverse(
+                    "organization_crisis_room",
+                    kwargs={"organization_code": self.organization.code, "id": default_dashboard.id},
                 )
-        except Dashboard.DoesNotExist:
-            logger.error("Dashboard does not exist.")
+            )
 
         return super().get(request, *args, **kwargs)
 
@@ -289,6 +286,7 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
             )
 
         except Dashboard.DoesNotExist:
+            messages.error(request, "Dashboard does not exist.")
             self.dashboard = None
             self.dashboard_items = None
 
