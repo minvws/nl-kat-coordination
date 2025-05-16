@@ -103,8 +103,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
             return redirect(
                 reverse(
-                    "organization_crisis_room_landing",
-                    kwargs={"organization_code": self.organization.code, "id": dashboard_id},
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
                 )
             )
 
