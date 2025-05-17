@@ -65,12 +65,10 @@ class FindingsReport(Report):
             total_by_severity[severity] += 1
 
             if finding.reference not in history_cache:
-                history_cache[finding.reference] = self.octopoes_api_connector.get_history(reference=reference)
+                history_cache[finding.reference] = self.octopoes_api_connector.get_history(finding.reference)
 
-            time_history = [transaction.valid_time for transaction in history_cache[finding.reference]]
-
-            if time_history:
-                first_seen = str(time_history[0])
+            if history_cache[finding.reference]:
+                first_seen = str(history_cache[finding.reference][0].valid_time)
             else:
                 first_seen = "-"
 
