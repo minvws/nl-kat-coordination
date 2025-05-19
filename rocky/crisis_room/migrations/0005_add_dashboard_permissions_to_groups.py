@@ -32,8 +32,6 @@ def get_permissions(apps, codenames):
 
 def add_dashboard_permissions_to_groups(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
-    admin_group = Group.objects.get(name=GROUP_ADMIN)
-    redteam_group = Group.objects.get(name=GROUP_REDTEAM)
 
     dashboard_permissions = [
         "add_dashboard",
@@ -49,9 +47,14 @@ def add_dashboard_permissions_to_groups(apps, schema_editor):
 
     dashboard_permissions = get_permissions(apps, dashboard_permissions)
 
-    for dashboard_permission in dashboard_permissions:
-        admin_group.permissions.add(dashboard_permission)
-        redteam_group.permissions.add(dashboard_permission)
+    try:
+        admin_group = Group.objects.get(name=GROUP_ADMIN)
+        redteam_group = Group.objects.get(name=GROUP_REDTEAM)
+
+        admin_group.permissions.set(dashboard_permissions)
+        redteam_group.permissions.set(dashboard_permissions)
+    except Group.DoesNotExist:
+        pass
 
 
 class Migration(migrations.Migration):
