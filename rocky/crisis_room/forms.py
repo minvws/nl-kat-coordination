@@ -30,8 +30,8 @@ class ObjectListSettingsForm(BaseRockyForm):
             [
                 ("object_type-asc", _("Type (A-Z)")),
                 ("object_type-desc", _("Type (Z-A)")),
-                ("scan_level-asc", _("Clearance level (High-Low)")),
-                ("scan_level-desc", _("Clearance level (Low-High)")),
+                ("scan_level-asc", _("Clearance level (Low-High)")),
+                ("scan_level-desc", _("Clearance level (High-Low)")),
             ]
         ),
     )
