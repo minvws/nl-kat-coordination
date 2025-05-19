@@ -8,7 +8,7 @@ from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 logger = structlog.get_logger(__name__)
 
 
-def migrate_permissions(apps, schema_editor):
+def migrate_permissions(apps, _schema_editor):
     for app_config in apps.get_app_configs():
         app_config.models_module = True
         create_permissions(app_config, apps=apps, verbosity=0)
@@ -30,7 +30,7 @@ def get_permissions(apps, codenames):
     return permissions
 
 
-def add_dashboard_permissions_to_groups(apps, schema_editor):
+def add_dashboard_permissions_to_groups(apps, _schema_editor):
     Group = apps.get_model("auth", "Group")
 
     dashboard_permissions = [
