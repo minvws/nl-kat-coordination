@@ -30,12 +30,12 @@
             {% endif %}
         </div>
         {% if dashboard_items %}
-            {% if dashboard.name == "Findings Dashboard" %}
-                {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
+            <div class="dashboard">
+                {% for dashboard_item in dashboard_items %}
+                    {% if dashboard_item.findings_dashboard %}
+                        {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
-            {% else %}
-                <div class="dashboard">
-                    {% for dashboard_item in dashboard_items %}
+                    {% else %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
                             {% if request.user.can_delete_dashboard_item %}
                                 {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
@@ -97,9 +97,9 @@
 
                             </div>
                         </section>
-                    {% endfor %}
-                </div>
-            {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         {% else %}
             <p>
                 {% blocktranslate trimmed %}
