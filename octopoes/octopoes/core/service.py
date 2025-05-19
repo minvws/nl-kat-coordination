@@ -512,6 +512,19 @@ class OctopoesService:
 
         reference = event.old_data.reference
 
+        # get parameters involved if reference is also optional
+        parameters = self.ooi_repository.load_bulk_as_list(
+            {
+                ref
+                for origin in self.origin_repository.list_origins(
+                    event.valid_time, origin_type=OriginType.NIBBLET, optional_references=[reference]
+                )
+                for ref in (origin.parameters_references if origin.parameters_references else [])
+                if ref is not None
+            },
+            event.valid_time,
+        )
+
         # delete related origins to which it is a source
         origins = self.origin_repository.list_origins(event.valid_time, source=reference)
         origins += self.origin_repository.list_origins(
@@ -531,6 +544,10 @@ class OctopoesService:
             self.scan_profile_repository.delete(scan_profile, event.valid_time)
         except ObjectNotFoundException:
             pass
+
+        # process objects that interfered with deleted optional
+        if parameters:
+            self.nibbler.infer(parameters, event.valid_time)
 
     # Origin events
     def _on_create_origin(self, event: OriginDBEvent) -> None:

@@ -197,9 +197,7 @@ class NibblesRunner:
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]:
         return_value: dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]] = {}
-        nibblets = self.origin_repository.list_origins(
-            valid_time, origin_type=OriginType.NIBBLET, parameters_references=[ooi.reference]
-        )
+        nibblets = self.origin_repository.list_nibblets_by_parameter(ooi.reference, valid_time)
         for nibblet in nibblets:
             if nibblet.method in self.nibbles:
                 nibble = self.nibbles[nibblet.method]
@@ -251,7 +249,14 @@ class NibblesRunner:
                         result=result_references,
                         phantom_result=phantom_result,
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
-                        parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
+                        parameters_references=[
+                            a.reference if isinstance(a, OOI) and not s.optional else None
+                            for a, s in zip(arg, self.nibbles[nibble_id].signature)
+                        ],
+                        optional_references=[
+                            a.reference if isinstance(a, OOI) and s.optional else None
+                            for a, s in zip(arg, self.nibbles[nibble_id].signature)
+                        ],
                     )
                     for ooi in filter(lambda ooi: ooi.reference in result_references, result):
                         self.ooi_repository.save(ooi, valid_time=valid_time)

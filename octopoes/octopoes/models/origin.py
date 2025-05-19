@@ -26,6 +26,7 @@ class Origin(BaseModel):
     phantom_result: list[OOIType] | None = None  # None for anything other than nibblet
     parameters_hash: str | None = None  # None for anything other than nibblet
     parameters_references: list[Reference | None] | None = None  # None for anything other than nibblet
+    optional_references: list[Reference | None] | None = None  # None for anything other than nibblet
     task_id: UUID | None = None
 
     def __sub__(self, other: Origin) -> set[Reference]:
