@@ -53,7 +53,7 @@ def list_reports(
     return reports
 
 
-@router.get("/object-clients")
+@router.get("/object-clients", tags=["Objects"])
 def list_object_clients(
     clients: set[str] = Query(default_factory=set),
     reference: Reference = Depends(extract_reference),
