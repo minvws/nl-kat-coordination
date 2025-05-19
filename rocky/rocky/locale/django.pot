@@ -1003,6 +1003,46 @@ msgstr ""
 msgid "Boefje with this ID already exists."
 msgstr ""
 
+#: katalogus/client.py
+msgid "Access to resource not allowed"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to see plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to set plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to delete plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to view plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to access the other organization"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to enable plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to disable plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to create plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to edit plugins"
+msgstr ""
+
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
 msgstr ""
