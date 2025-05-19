@@ -66,6 +66,7 @@ class BoefjeConfigInDB(SQL_BASE):
 
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")
+    boefje = relationship("BoefjeInDB")
 
 
 class NormalizerConfigInDB(SQL_BASE):
