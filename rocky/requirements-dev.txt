@@ -1313,9 +1313,9 @@ rjsmin==1.2.3 ; python_version >= "3.10" and python_version < "4.0" \
 robotframework-assertion-engine==3.0.3 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:1c608d4c69d96520986a1ddc6def0fc7f7e849520f1e6882a633b51dbb98fd88 \
     --hash=sha256:3cd8962744ea4f307feadd596266c1d563e87b586ed61803c9445295ab15a0cd
-robotframework-browser==19.5.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:1438cf015432c8b51635db8cb0ad97247f717d45d2d70723a0a2b827961bcb1c \
-    --hash=sha256:4f3c6a7ecdb02a62a0f3848e8f1977e367a9a232901ec019a42598845b72be9d
+robotframework-browser==19.5.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:6512624c6c456bf23318a2e99b65689827eced5933a99658642d25d80737feec \
+    --hash=sha256:b544dea5aaefbefcaf73a4a0cfbfab15daabb2def9acdd71fe3bfb58e82408f3
 robotframework-debuglibrary==2.5.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:a2bfb2636ead7be440c224317891b4b406a9a71d84b26924031ccf3791a00b96 \
     --hash=sha256:c8e135c7561721d36210d6f59a09b7538064367e82d8a3be67cb87088cf9cba7
