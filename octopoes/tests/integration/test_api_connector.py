@@ -141,6 +141,42 @@ def test_bulk_reports(app_settings: Settings, octopoes_api_connector: OctopoesAP
     assert result[uuid.UUID(recipe_ids[2])].to_report() == reports[2]
 
 
+def test_list_object_clients(
+    app_settings: Settings, octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime
+):
+    clients = ["test1", "test2", "test3", "test4"]
+    for client in clients:
+        xtdb_client = get_xtdb_client(str(app_settings.xtdb_uri), client)
+        xtdb_client.create_node()
+
+    network = Network(name="test")
+
+    for client in ["test2", "test4"]:
+        octopoes_api_connector.client = client
+        octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    octopoes_api_connector.client = "test1"
+    network2 = Network(name="test1")
+    hostname = Hostname(network=network2.reference, name="test1-hostname")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network2, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time))
+
+    result = octopoes_api_connector.list_object_clients(network.reference, set(clients), valid_time)
+    assert set(result) == {"test4", "test2"}
+
+    result = octopoes_api_connector.list_object_clients(network.reference, {"test2"}, valid_time)
+    assert set(result) == {"test2"}
+
+    result = octopoes_api_connector.list_object_clients(network.reference, {"test1"}, valid_time)
+    assert set(result) == set()
+
+    result = octopoes_api_connector.list_object_clients(hostname.reference, set(clients), valid_time)
+    assert set(result) == {"test1"}
+
+    result = octopoes_api_connector.list_object_clients(network2.reference, set(clients), valid_time)
+    assert set(result) == {"test1"}
+
+
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
     network = Network(name="test")
     first_seen = datetime(year=2020, month=10, day=10, tzinfo=timezone.utc)  # XTDB only returns a precision of seconds
