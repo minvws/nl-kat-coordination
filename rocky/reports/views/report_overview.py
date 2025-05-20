@@ -258,9 +258,8 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         else:
             messages.warning(
                 self.request,
-                _(
-                    f"Couldn't rerun { ', '.join(not_updated_reports) }, since the recipe for this "
-                    "report has been disabled or deleted."
+                _("Couldn't rerun {}, since the recipe for this report has been disabled or deleted.").format(
+                    ", ".join(not_updated_reports)
                 ),
             )
 

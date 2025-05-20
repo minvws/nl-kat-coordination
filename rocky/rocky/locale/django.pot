@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-13 15:25+0000\n"
+"POT-Creation-Date: 2025-05-20 07:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4703,8 +4703,8 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Couldn't rerun { ', '.join(not_updated_reports) }, since the recipe for this "
-"report has been deleted."
+"Couldn't rerun {}, since the recipe for this report has been disabled or "
+"deleted."
 msgstr ""
 
 #: reports/views/report_overview.py
