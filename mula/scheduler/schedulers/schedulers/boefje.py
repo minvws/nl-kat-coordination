@@ -748,10 +748,15 @@ class BoefjeScheduler(Scheduler):
             return boefje_task
 
         for config in configs[0].duplicates:
-            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                boefje_task.boefje.id, config.organisation_id
-            )
-            if boefje is None:
+            # We only want to check the organisations that have the same
+            # input_ooi as the boefje task
+            if config.organisation_id not in orgs:
+                self.logger.debug(
+                    "Organisation not found for input ooi",
+                    input_ooi=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
                 continue
 
             ooi = self.ctx.services.octopoes.get_object(
@@ -765,6 +770,12 @@ class BoefjeScheduler(Scheduler):
                     organisation_id=config.organisation_id,
                     scheduler_id=self.scheduler_id,
                 )
+                continue
+
+            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                boefje_task.boefje.id, config.organisation_id
+            )
+            if boefje is None:
                 continue
 
             if not self.has_boefje_permission_to_run(boefje, ooi):
