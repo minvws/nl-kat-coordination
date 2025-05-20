@@ -7,6 +7,7 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.ooi.web import URL
 from reports.report_types.definitions import Report, ReportPlugins
 
 TREE_DEPTH = 9
@@ -29,7 +30,7 @@ class FindingsReport(Report):
         },
         "optional": {"snyk", "service_banner", "shodan", "leakix"},
     }
-    input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
+    input_ooi_types = {Hostname, IPAddressV4, IPAddressV6, URL}
     template_path = "findings_report/report.html"
     label_style = "3-light"
 
