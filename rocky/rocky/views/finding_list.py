@@ -74,7 +74,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     @property
     def count_active_filters(self):
         return (
-            len(self.severities) 
+            len(self.severities)
             + (1 if self.muted_findings else 0)
             + self.count_observed_at_filter()
             + (1 if self.search_string else 0)
