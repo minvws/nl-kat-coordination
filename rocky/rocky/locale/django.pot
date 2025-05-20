@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-13 15:25+0000\n"
+"POT-Creation-Date: 2025-05-20 07:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4524,6 +4524,11 @@ msgid "Delete report recipe"
 msgstr ""
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
+#, python-format
+msgid "Are you sure you want to delete report recipe \"%(name)s\"?"
+msgstr ""
+
+#: reports/templates/report_schedules/delete_recipe_modal.html
 msgid ""
 "Deleting this report recipe means it will be permanently deleted. It will "
 "not be possible anymore to see or enable the schedule. You will find "
@@ -4694,6 +4699,13 @@ msgstr ""
 msgid ""
 "Rerun successful. It may take a moment before the new report has been "
 "generated."
+msgstr ""
+
+#: reports/views/report_overview.py
+#, python-format
+msgid ""
+"Couldn't rerun %s, since the recipe for this report has been disabled or "
+"deleted."
 msgstr ""
 
 #: reports/views/report_overview.py
