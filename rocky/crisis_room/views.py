@@ -314,7 +314,7 @@ class DeleteDashboardView(OrganizationView):
         dashboard_name = request.POST.get("dashboard_name")
         dashboard_id = request.POST.get("dashboard_id")
 
-        if not request.user.can_delete_dashboard:
+        if not self.organization_member.can_delete_dashboard:
             raise PermissionDenied()
 
         try:
@@ -344,7 +344,7 @@ class DeleteDashboardItemView(OrganizationView):
         dashboard_item_name = request.POST.get("dashboard_item")
         dashboard_item_id = request.POST.get("dashboard")
 
-        if not request.user.can_delete_dashboard_item:
+        if not self.organization_member.can_delete_dashboard_item:
             raise PermissionDenied()
 
         try:
@@ -381,7 +381,7 @@ class UpdateDashboardItemView(OrganizationView):
         dashboard_id = request.POST.get("dashboard")
         update_position = request.POST.get("move")
 
-        if not request.user.can_reposition_dashboard_item:
+        if not self.organization_member.can_reposition_dashboard_item:
             raise PermissionDenied()
 
         try:
@@ -412,7 +412,7 @@ class AddDashboardView(OrganizationView, FormView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
 
-        if not request.user.can_add_dashboard:
+        if not self.organization_member.can_add_dashboard:
             raise PermissionDenied()
 
         form = self.get_form()

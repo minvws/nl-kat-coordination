@@ -138,7 +138,7 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="delete_dashboarddata").id,
         Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
-    member.user.user_permissions.set(admin_permissions)
+
     group.permissions.set(admin_permissions)
 
 
@@ -162,7 +162,7 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="delete_dashboarddata").id,
         Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
-    member.user.user_permissions.set(redteam_permissions)
+
     group.permissions.set(redteam_permissions)
 
 

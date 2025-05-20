@@ -51,8 +51,10 @@ def add_dashboard_permissions_to_groups(apps, _schema_editor):
         admin_group = Group.objects.get(name=GROUP_ADMIN)
         redteam_group = Group.objects.get(name=GROUP_REDTEAM)
 
-        admin_group.permissions.set(dashboard_permissions)
-        redteam_group.permissions.set(dashboard_permissions)
+        for dashboard_permission in dashboard_permissions:
+            admin_group.permissions.add(dashboard_permission)
+            redteam_group.permissions.add(dashboard_permission)
+
     except Group.DoesNotExist:
         pass
 

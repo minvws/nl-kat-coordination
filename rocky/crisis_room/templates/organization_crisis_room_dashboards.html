@@ -5,7 +5,7 @@
     <div>
         <div class="horizontal-view">
             <h2>{{ dashboard.name }}</h2>
-            {% if request.user.can_delete_dashboard %}
+            {% if organization_member.can_delete_dashboard %}
                 <div class="dropdown">
                     <button id="action-dropdown-button"
                             type="button"
@@ -37,7 +37,7 @@
 
                     {% else %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
-                            {% if request.user.can_delete_dashboard_item %}
+                            {% if organization_member.can_delete_dashboard_item %}
                                 {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
                             {% endif %}
@@ -47,7 +47,7 @@
                                     {% if dashboard_item.item.query_from == "object_list" %}
                                         <span class="label system-tag color-grey">{% translate "Object list" %}</span>
                                     {% endif %}
-                                    {% if request.user.can_modify_dashboard_item %}
+                                    {% if organization_member.can_modify_dashboard_item %}
                                         <div class="dropdown">
                                             <button type="button"
                                                     aria-label="{% translate "Options for dashboard items" %}"
@@ -114,7 +114,7 @@
             </a>
         {% endif %}
     </div>
-    {% if request.user.can_delete_dashboard %}
+    {% if organization_member.can_delete_dashboard %}
         {% include "partials/delete_dashboard_modal.html" %}
 
     {% endif %}

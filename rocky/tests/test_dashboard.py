@@ -518,8 +518,8 @@ def test_clients_permissions_for_dashboard(rf, mocker, client_member, dashboard_
 
     assert response.status_code == 200
 
-    assert not client_member.user.can_modify_dashboard
-    assert not client_member.user.can_modify_dashboard_item
+    assert not client_member.can_modify_dashboard
+    assert not client_member.can_modify_dashboard_item
 
     # Clients are restricted to see Delete or add buttons
     assertNotContains(response, "+ Add Dashboard")
