@@ -100,6 +100,7 @@ class Organization(models.Model):
             ("can_access_all_organizations", "Can access all organizations"),
             ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
+        ordering = ["name"]
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])
