@@ -139,7 +139,7 @@ def test_internetnl_nibble_query(xtdb_octopoes_service: OctopoesService, event_m
                 for obj in search(internetnl.signature[1].parser, result)
             }.pop()
         )
-        == 6
+        == 3
     )
 
     edn = query([Reference.from_str("Hostname|internet|www.x1.xyz"), None])
@@ -160,5 +160,5 @@ def test_internetnl_nibble_query(xtdb_octopoes_service: OctopoesService, event_m
                 for obj in search(internetnl.signature[1].parser, result)
             }.pop()
         )
-        == 2
+        == 1
     )
