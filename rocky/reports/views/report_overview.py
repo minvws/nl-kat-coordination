@@ -258,9 +258,8 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         else:
             messages.warning(
                 self.request,
-                _("Couldn't rerun {}, since the recipe for this report has been disabled or deleted.").format(
-                    ", ".join(not_updated_reports)
-                ),
+                _("Couldn't rerun %s, since the recipe for this report has been disabled or deleted.")
+                % ", ".join(not_updated_reports),
             )
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
