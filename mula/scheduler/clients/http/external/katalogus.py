@@ -145,8 +145,8 @@ class Katalogus(HTTPService):
         boefje_id: str | None = None,
         enabled: bool | None = None,
         with_duplicates: bool = False,
-        offset: int | None = None,
-        limit: int | None = None,
+        offset: int = 0,
+        limit: int = 0,
     ) -> list[BoefjeConfig]:
         url = f"{self.host}/v1/configs"
         try:

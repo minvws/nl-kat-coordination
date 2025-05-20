@@ -736,7 +736,7 @@ class BoefjeScheduler(Scheduler):
             return boefje_task
 
         configs = self.ctx.services.katalogus.get_configs(
-            boefje_id=boefje_task.boefje.id, organisation=boefje_task.organization, enabled=True
+            boefje_id=boefje_task.boefje.id, organisation_id=boefje_task.organization, enabled=True
         )
         if len(configs) == 0:
             self.logger.debug(
