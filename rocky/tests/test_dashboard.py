@@ -1,4 +1,4 @@
-import secrets
+import random
 from urllib.parse import urlencode
 
 import pytest
@@ -334,7 +334,7 @@ def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items)
     """After repositioning of items, mixin the order, see when deleting if positioning calculates correctly"""
 
     positions = [dashboard_item.position for dashboard_item in dashboard_items]
-    secrets.SystemRandom().shuffle(positions)
+    random.shuffle(positions)
 
     # change the positions of dashboard items randomly
     for index, dashboard_item in enumerate(dashboard_items):
