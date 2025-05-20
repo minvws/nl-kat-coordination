@@ -736,7 +736,10 @@ class BoefjeScheduler(Scheduler):
             return boefje_task
 
         configs = self.ctx.services.katalogus.get_configs(
-            boefje_id=boefje_task.boefje.id, organisation_id=boefje_task.organization, enabled=True
+            boefje_id=boefje_task.boefje.id,
+            organisation_id=boefje_task.organization,
+            enabled=True,
+            with_duplicates=True,
         )
         if len(configs) == 0:
             self.logger.debug(
@@ -747,6 +750,7 @@ class BoefjeScheduler(Scheduler):
             )
             return boefje_task
 
+        count = 0
         for config in configs[0].duplicates:
             # We only want to check the organisations that have the same
             # input_ooi as the boefje task
@@ -801,8 +805,14 @@ class BoefjeScheduler(Scheduler):
                 create_schedule=self.create_schedule,
                 caller=self.is_boefje_in_other_orgs.__name__,
             )
+            count += 1
 
-        if boefje_task.id is not None and boefje_task.deduplication_key is None:
+        # We set the deduplication key to the task id, so we can
+        # deduplicate the tasks in the queue. This is only done when
+        # the boefje task has no deduplication key set and the count
+        # is greater than 0. This means that we have found other
+        # organisations that have the same input ooi as the boefje task.
+        if boefje_task.id is not None and boefje_task.deduplication_key is None and count > 0:
             boefje_task.deduplication_key = boefje_task.id
 
         return boefje_task
