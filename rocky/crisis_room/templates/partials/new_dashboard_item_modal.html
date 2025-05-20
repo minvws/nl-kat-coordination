@@ -25,9 +25,13 @@
     </label>
     {% for key, column_name in table_columns.items %}
         <div class="checkbox">
-            <input type="checkbox" name="column_values" value="{{ key }}" checked id="column_{{key}}">
+            <input type="checkbox"
+                   name="column_values"
+                   value="{{ key }}"
+                   checked
+                   id="column_{{ key }}">
             <input type="hidden" name="column_names" value="{{ column_name }}">
-            <label for="column_{{key}}">{{ column_name }}</label>
+            <label for="column_{{ key }}">{{ column_name }}</label>
         </div>
     {% endfor %}
 </form>
