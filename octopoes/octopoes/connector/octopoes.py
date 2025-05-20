@@ -27,7 +27,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from octopoes.types import DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
+from octopoes.types import AFFIRMATION_CREATED, DECLARATION_CREATED, OBJECT_DELETED, OBSERVATION_CREATED, ORIGIN_DELETED
 
 HydratedReportTypeAdapter = TypeAdapter(dict[UUID, HydratedReport])
 
@@ -206,7 +206,7 @@ class OctopoesAPIConnector:
             content=affirmation.model_dump_json(),
         )
 
-        self.logger.info("Saved affirmation", affirmation=affirmation, event_code=DECLARATION_CREATED)
+        self.logger.info("Saved affirmation", affirmation=affirmation, event_code=AFFIRMATION_CREATED)
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
