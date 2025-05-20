@@ -12,7 +12,7 @@
                     <a href="{% url "organization_crisis_room" organization_code=dashboard.organization.code id=dashboard.id %}">{{ dashboard.name }}</a>
                 </li>
             {% endfor %}
-            {% if request.user.can_add_dashboard %}
+            {% if organization_member.can_add_dashboard %}
                 <li>
                     <a href="#new-dashboard">+ {% translate "Add dashboard" %}</a>
                 </li>
