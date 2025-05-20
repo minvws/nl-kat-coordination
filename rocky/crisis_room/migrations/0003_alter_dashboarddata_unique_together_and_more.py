@@ -27,11 +27,11 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name="dashboarddata", name="name", field=models.CharField(blank=True, max_length=126, null=True)
+            model_name="dashboarddata", name="name", field=models.CharField(blank=True, max_length=126)
         ),
-        migrations.AddField(model_name="dashboarddata", name="query", field=models.CharField(blank=True, null=True)),
+        migrations.AddField(model_name="dashboarddata", name="query", field=models.CharField(blank=True)),
         migrations.AddField(
-            model_name="dashboarddata", name="query_from", field=models.CharField(blank=True, max_length=32, null=True)
+            model_name="dashboarddata", name="query_from", field=models.CharField(blank=True, max_length=32)
         ),
         migrations.AddField(
             model_name="dashboarddata",
