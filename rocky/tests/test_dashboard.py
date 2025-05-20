@@ -334,6 +334,7 @@ def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items)
     """After repositioning of items, mixin the order, see when deleting if positioning calculates correctly"""
 
     positions = [dashboard_item.position for dashboard_item in dashboard_items]
+    random.seed(999)
     random.shuffle(positions)
 
     # change the positions of dashboard items randomly
