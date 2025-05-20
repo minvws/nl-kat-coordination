@@ -3,11 +3,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -783,9 +783,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn(second_organisation.id, orgs)
         self.assertIn(third_organisation.id, orgs)
 
-        # Assert: the env_hash of the items should be the same
+        # Assert: the deduplication_key of the items should be the same
         current = None
         for item in items:
+            if current is None:
+                current = item.data.get("deduplication_key")
+            self.assertEqual(current, item.data.get("deduplication_key"))
+
+        # Assert: deduplication_key should be the same for all items
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(3, len(popped_items))
+        current = None
+        for item in popped_items:
             if current is None:
                 current = item.data.get("deduplication_key")
             self.assertEqual(current, item.data.get("deduplication_key"))
@@ -833,6 +842,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         item = self.scheduler.queue.peek(0)
         self.assertEqual(first_organisation.id, item.organisation)
 
+        # Assert: popped items should be 1
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(1, len(popped_items))
+        self.assertIsNotNone(popped_items[0].data.get("deduplication_key"))
+
     def test_push_boefje_task_boefje_in_other_orgs_no_configs(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -865,6 +879,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
         self.assertEqual(first_organisation.id, item.organisation)
+
+        # Assert: popped items should be 1
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(1, len(popped_items))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_ooi(self):
         # Arrange
@@ -914,6 +932,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
         self.assertEqual(first_organisation.id, item.organisation)
+
+        # Assert: popped items should be 1
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(1, len(popped_items))
+        self.assertIsNotNone(popped_items[0].data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_boefje(self):
         # Arrange
@@ -969,6 +992,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: the task should be on the queue
         item = self.scheduler.queue.peek(0)
         self.assertEqual(first_organisation.id, item.organisation)
+
+        # Assert: popped items should be 1
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(1, len(popped_items))
+        self.assertIsNotNone(popped_items[0].data.get("deduplication_key"))
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
