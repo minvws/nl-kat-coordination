@@ -43,8 +43,8 @@ class DashboardData(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
-    query_from = models.CharField(blank=True, max_length=32, null=True)
-    query = models.CharField(blank=True, null=True)
+    query_from = models.CharField(blank=True, max_length=32)
+    query = models.CharField(blank=True)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.PositiveSmallIntegerField(
         blank=True,
