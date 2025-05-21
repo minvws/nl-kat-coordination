@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 11:58+0000\n"
+"POT-Creation-Date: 2025-05-21 13:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2681,6 +2681,10 @@ msgstr ""
 
 #: onboarding/views.py
 msgid "Plugins successfully enabled."
+msgstr ""
+
+#: onboarding/views.py
+msgid "DNS Report cannot be created, no Hostname."
 msgstr ""
 
 #: onboarding/views.py
