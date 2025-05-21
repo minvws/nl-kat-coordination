@@ -145,7 +145,7 @@ class ObjectListSettingsForm(BaseRockyForm):
 
     def get_dashboard_selection(self) -> list[tuple[str, str]]:
         return [
-            (dashboard.name, dashboard.name)
+            (dashboard.id, dashboard.name)
             for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
                 name=FINDINGS_DASHBOARD_NAME
             )
@@ -168,9 +168,9 @@ class ObjectListSettingsForm(BaseRockyForm):
             ]
         return []
 
-    def get_dashboard(self, name: str) -> Dashboard | None:
+    def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
         try:
-            return Dashboard.objects.get(name=name, organization=self.organization)
+            return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
         except Dashboard.DoesNotExist:
             raise ValidationError("Dashboard does not exist.")
 
