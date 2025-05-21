@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Literal
 
 import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import connection, models, transaction
+from django.db import models, transaction
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +17,8 @@ class Dashboard(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    EVENT_CODES = {"created": 900301, "updated": 900302, "deleted": 900303}
 
     class Meta:
         unique_together = ["name", "organization"]
@@ -37,12 +39,12 @@ def get_default_dashboard_data_settings() -> dict[str, Any]:
 
 class DashboardData(models.Model):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, null=True)
-    name = models.CharField(blank=True, null=True, max_length=126)
+    name = models.CharField(blank=True, max_length=126)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
-    query_from = models.CharField(blank=True, max_length=32, null=True)
-    query = models.CharField(blank=True, null=True)
+    query_from = models.CharField(blank=True, max_length=32)
+    query = models.CharField(blank=True)
     template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
     position = models.PositiveSmallIntegerField(
         blank=True,
@@ -62,6 +64,8 @@ class DashboardData(models.Model):
     findings_dashboard = models.BooleanField(
         default=False, help_text=_("Will be displayed on the findings dashboard for all organizations")
     )
+
+    EVENT_CODES = {"created": 900311, "updated": 900312, "deleted": 900313}
 
     class Meta:
         permissions = [("change_dashboarddata_position", _("Can change position up or down of a dashboard item."))]
@@ -91,25 +95,30 @@ class DashboardData(models.Model):
             raise ValidationError(_("DashboardData must contain at least a 'recipe' or a 'query_from' with a 'query'."))
         return super().clean()
 
-    def update_position(self, move: str) -> None:
+    def update_position(self, move: Literal["up", "down"]) -> None:
         if move not in ("up", "down"):
-            return
+            raise ValueError
 
         old_position = self.position
         new_position = self.position + (-1 if move == "up" else 1)
 
         if 1 <= new_position <= 16:
             try:
-                swap_item = DashboardData.objects.get(dashboard=self.dashboard, position=new_position)
+                old_item = DashboardData.objects.get(dashboard=self.dashboard, position=old_position)
+                new_item = DashboardData.objects.get(dashboard=self.dashboard, position=new_position)
 
-                # Swap positions and temporarily change position to 0 to avoid conflicts
                 with transaction.atomic():
-                    self.position = 0
-                    self.save(update_fields=["position"])
-                    swap_item.position = old_position
-                    swap_item.save(update_fields=["position"])
+                    new_item.position = old_position
                     self.position = new_position
+                    new_item.save(update_fields=["position"])
                     self.save(update_fields=["position"])
+
+                logger.info(
+                    "Dashboard item %s has been swapped with %s of dashboard %s",
+                    old_item.name,
+                    new_item.name,
+                    old_item.dashboard,
+                )
             except DashboardData.DoesNotExist:
                 return
 
@@ -132,13 +141,13 @@ def dashboard_data_pre_save(sender, instance, *args, **kwargs):
 @receiver(post_delete, sender=DashboardData)
 def dashboard_data_post_delete(sender, instance, *args, **kwargs):
     """Change the position of the other items on the dashboard after deleting one object."""
-    position = instance.position
-    dashboard = instance.dashboard_id
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "UPDATE crisis_room_dashboarddata "
-            "SET position = position - 1 "
-            "WHERE position > %s "
-            "AND dashboard_id = %s ",
-            [position, dashboard],
-        )
+    with transaction.atomic():
+        try:
+            dashboard_items = DashboardData.objects.filter(
+                dashboard=instance.dashboard, position__gte=instance.position
+            )
+            if dashboard_items:
+                dashboard_items.update(position=models.F("position") - 1)
+
+        except (Dashboard.DoesNotExist, instance.DoesNotExist):
+            return

@@ -1,11 +1,11 @@
 {% load i18n %}
 {% load static %}
 
-{% if all_dashboard_names %}
+{% if dashboard %}
     <div>
         <div class="horizontal-view">
             <h2>{{ dashboard.name }}</h2>
-            {% if request.user.can_delete_dashboard %}
+            {% if organization_member.can_delete_dashboard %}
                 <div class="dropdown">
                     <button id="action-dropdown-button"
                             type="button"
@@ -30,14 +30,14 @@
             {% endif %}
         </div>
         {% if dashboard_items %}
-            {% if dashboard.name == "Findings Dashboard" %}
-                {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
+            <div class="dashboard">
+                {% for dashboard_item in dashboard_items %}
+                    {% if dashboard_item.item.findings_dashboard %}
+                        {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
 
-            {% else %}
-                <div class="dashboard">
-                    {% for dashboard_item in dashboard_items %}
+                    {% else %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
-                            {% if request.user.can_delete_dashboard_item %}
+                            {% if organization_member.can_delete_dashboard_item %}
                                 {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
 
                             {% endif %}
@@ -51,7 +51,7 @@
                                             {% translate "Finding list" %}
                                         {% endif %}
                                     </span>
-                                    {% if request.user.can_modify_dashboard_item %}
+                                    {% if organization_member.can_modify_dashboard_item %}
                                         <div class="dropdown">
                                             <button type="button"
                                                     aria-label="{% translate "Options for dashboard items" %}"
@@ -68,6 +68,9 @@
                                                         <input type="hidden"
                                                                name="dashboard_item"
                                                                value="{{ dashboard_item.item.id }}">
+                                                        <input type="hidden"
+                                                               name="dashboard"
+                                                               value="{{ dashboard_item.dashboard.id }}">
                                                         {% if dashboard_items|length > 1 and not forloop.first %}
                                                             <li role="option">
                                                                 <button type="submit" name="move" value="up">
@@ -98,9 +101,9 @@
 
                             </div>
                         </section>
-                    {% endfor %}
-                </div>
-            {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         {% else %}
             <p>
                 {% blocktranslate trimmed %}
@@ -115,17 +118,12 @@
             </a>
         {% endif %}
     </div>
-    {% if request.user.can_delete_dashboard %}
+    {% if organization_member.can_delete_dashboard %}
         {% include "partials/delete_dashboard_modal.html" %}
 
     {% endif %}
 {% else %}
-    <p>
-        {% blocktranslate trimmed %}
-            There are no dashboards yet.
-            Click on "Add dashboard" to create a new dashboard.
-        {% endblocktranslate %}
-    </p>
+    <p>{% translate "Dashboard does not exist. Choose an existing dashboard or create a new one." %}</p>
 {% endif %}
 {% block html_at_end_body %}
     <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>

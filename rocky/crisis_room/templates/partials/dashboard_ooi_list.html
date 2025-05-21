@@ -18,7 +18,7 @@
     {% include "partials/dashboard_ooi_list_table.html" %}
 
     <div class="toolbar">
-        {% with params=dashboard_item.query|url_encode_query_objects %}
+        {% with params=dashboard_item.query|url_encode_object_list_query %}
             <a class="button ghost"
                href="{% url "ooi_list" organization_code=organization.code %}?{{ params }}">
                 {% translate "Go to objects" %}

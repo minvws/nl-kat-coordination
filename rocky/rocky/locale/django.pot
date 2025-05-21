@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-14 16:03+0000\n"
+"POT-Creation-Date: 2025-05-21 07:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -810,6 +810,12 @@ msgstr ""
 msgid "Findings"
 msgstr ""
 
+#: crisis_room/templates/organization_crisis_room.html
+msgid ""
+"There are no dashboards yet. Click on \"Add dashboard\" to create a new "
+"dashboard."
+msgstr ""
+
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Options for dashboard"
 msgstr ""
@@ -860,8 +866,7 @@ msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
-"There are no dashboards yet. Click on \"Add dashboard\" to create a new "
-"dashboard."
+"Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -906,24 +911,23 @@ msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: reports/report_types/dns_report/report.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/views/finding_list.py
-msgid "Severity"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_findings_table.html
-#: rocky/templates/findings/finding_add.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/finding_list.py
-msgid "Finding"
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Details"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: rocky/views/finding_list.py
-msgid "Location"
+#: rocky/templates/findings/finding_list.html
+#, python-format
+msgid "Show details for %(finding)s"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
@@ -942,27 +946,6 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #: rocky/views/finding_list.py
 msgid "Graph"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/summary/selected_plugins.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Details"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: rocky/templates/findings/finding_list.html
-#, python-format
-msgid "Show details for %(finding)s"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
@@ -996,6 +979,23 @@ msgid "Open details"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/views/finding_list.py
+msgid "Severity"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: rocky/templates/findings/finding_add.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/views/finding_list.py
+msgid "Finding"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Finding type"
@@ -1016,6 +1016,11 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #, python-format
 msgid "Show %(ooi_type)s objects"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: rocky/views/finding_list.py
+msgid "Location"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
@@ -1202,6 +1207,46 @@ msgstr ""
 
 #: katalogus/client.py
 msgid "Boefje with this ID already exists."
+msgstr ""
+
+#: katalogus/client.py
+msgid "Access to resource not allowed"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to see plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to set plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to delete plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to view plugin settings"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to access the other organization"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to enable plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to disable plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to create plugins"
+msgstr ""
+
+#: katalogus/client.py
+msgid "User is not allowed to edit plugins"
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -4800,6 +4845,11 @@ msgid "Delete report recipe"
 msgstr ""
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
+#, python-format
+msgid "Are you sure you want to delete report recipe \"%(name)s\"?"
+msgstr ""
+
+#: reports/templates/report_schedules/delete_recipe_modal.html
 msgid ""
 "Deleting this report recipe means it will be permanently deleted. It will "
 "not be possible anymore to see or enable the schedule. You will find "
@@ -4970,6 +5020,13 @@ msgstr ""
 msgid ""
 "Rerun successful. It may take a moment before the new report has been "
 "generated."
+msgstr ""
+
+#: reports/views/report_overview.py
+#, python-format
+msgid ""
+"Couldn't rerun %s, since the recipe for this report has been disabled or "
+"deleted."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -7357,11 +7414,15 @@ msgstr ""
 msgid "Add Finding"
 msgstr ""
 
+#: rocky/views/finding_list.py
+msgid "You do not have the permission to add items to a dashboard."
+msgstr ""
+
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Unknown action."
 msgstr ""
 
-#: rocky/views/finding_list.py rocky/views/ooi_list.py
+#: rocky/views/finding_list.py
 msgid "Dashboard item has been added to {}."
 msgstr ""
 
@@ -7413,6 +7474,10 @@ msgstr ""
 
 #: rocky/views/ooi_list.py
 msgid "No OOIs selected."
+msgstr ""
+
+#: rocky/views/ooi_list.py
+msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/ooi_list.py

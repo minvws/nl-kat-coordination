@@ -13,7 +13,7 @@ from uuid import UUID
 import pytest
 import structlog
 from crisis_room.models import Dashboard, DashboardData
-from crisis_room.views import DashboardItem, DashboardService
+from crisis_room.views import DashboardItemView, DashboardService
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
@@ -138,7 +138,6 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="delete_dashboarddata").id,
         Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
-    member.user.user_permissions.set(admin_permissions)
     group.permissions.set(admin_permissions)
 
 
@@ -162,7 +161,6 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="delete_dashboarddata").id,
         Permission.objects.get(codename="change_dashboarddata_position").id,
     ]
-    member.user.user_permissions.set(redteam_permissions)
     group.permissions.set(redteam_permissions)
 
 
@@ -2184,7 +2182,7 @@ def expected_findings_results(findings_dashboard_data, findings_reports, finding
     findings_dashboard = []
 
     for index, data in enumerate(findings_dashboard_data):
-        dashboard_item = DashboardItem()
+        dashboard_item = DashboardItemView()
         dashboard_item.item = data
         report = findings_reports[data.recipe]
         report_data = findings_reports_data[report.data_raw_id]

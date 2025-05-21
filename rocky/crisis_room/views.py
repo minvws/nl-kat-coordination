@@ -1,7 +1,6 @@
 import json
 from datetime import datetime, timezone
 from typing import Any
-from urllib.parse import urlencode
 from uuid import UUID
 
 import structlog
@@ -38,7 +37,7 @@ from rocky.views.mixins import FindingList
 logger = structlog.get_logger(__name__)
 
 
-class DashboardItem:
+class DashboardItemView:
     item: DashboardData | None = None
     data: dict[str, Any] = {}
 
@@ -95,8 +94,8 @@ class DashboardService:
             logger.error("An error occurred: %s", error)
             return {}
 
-    def get_dashboard_items(self, dashboards_data: BaseManager[DashboardData]) -> list[DashboardItem]:
-        dashboard_items: list[DashboardItem] = []
+    def get_dashboard_items(self, dashboards_data: BaseManager[DashboardData]) -> list[DashboardItemView]:
+        dashboard_items: list[DashboardItemView] = []
 
         recipes_data = {}
         reports_data = {}
@@ -107,12 +106,12 @@ class DashboardService:
         # First collect al data, if recipe id is found then fetch recipe ids to get reports later.
         for dashboard_data in dashboards_data:
             if not dashboard_data.recipe and dashboard_data.query_from == "object_list":
-                dashboard_item = DashboardItem()
+                dashboard_item = DashboardItemView()
                 dashboard_item.item = dashboard_data
                 dashboard_item.data = self.get_ooi_list(dashboard_data)
                 dashboard_items.append(dashboard_item)
             elif not dashboard_data.recipe and dashboard_data.query_from == "finding_list":
-                dashboard_item = DashboardItem()
+                dashboard_item = DashboardItemView()
                 dashboard_item.item = dashboard_data
                 dashboard_item.data = self.get_finding_list(dashboard_data)
                 dashboard_items.append(dashboard_item)
@@ -138,7 +137,7 @@ class DashboardService:
 
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_data, hydrated_report in reports_data.items():
-                dashboard_item = DashboardItem()
+                dashboard_item = DashboardItemView()
                 dashboard_item.item = dashboard_data
                 dashboard_item.data = {"report": hydrated_report}
 
@@ -156,7 +155,7 @@ class DashboardService:
         return dashboard_items
 
     @staticmethod
-    def get_organizations_findings_summary(organizations_findings: list[DashboardItem]) -> dict[str, Any]:
+    def get_organizations_findings_summary(organizations_findings: list[DashboardItemView]) -> dict[str, Any]:
         summary: dict[str, Any] = {
             "total_by_severity_per_finding_type": {severity: 0 for severity in SEVERITY_OPTIONS},
             "total_by_severity": {severity: 0 for severity in SEVERITY_OPTIONS},
@@ -181,13 +180,6 @@ class DashboardService:
             return {}
 
         return summary
-
-    def get_dashboard_navigation(self, organization):
-        dashboard_names = []
-        dashboards = Dashboard.objects.filter(organization=organization)
-        for dashboard in dashboards:
-            dashboard_names.append(dashboard.name)
-        return dashboard_names
 
     def get_ooi_list(self, dashboard_data) -> dict[str, Any]:
         query = json.loads(dashboard_data.query)
@@ -294,6 +286,27 @@ class CrisisRoomView(TemplateView):
         return context
 
 
+class OrganizationsCrisisRoomLandingView(OrganizationView, TemplateView):
+    template_name = "organization_crisis_room.html"
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any):
+        default_dashboard = Dashboard.objects.filter(organization=self.organization).first()
+        if default_dashboard:
+            return redirect(
+                reverse(
+                    "organization_crisis_room",
+                    kwargs={"organization_code": self.organization.code, "id": default_dashboard.id},
+                )
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_dashboard_form"] = AddDashboardForm
+        return context
+
+
 class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
     """This is the Crisis Room for a single organization."""
 
@@ -302,32 +315,31 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
         self.dashboard_service = DashboardService()
-        # Default is the findings dashboard
-        dashboard_name = self.request.GET.get("dashboard", FINDINGS_DASHBOARD_NAME)
+        dashboard_id = kwargs["id"]
 
         try:
-            self.dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
+            self.dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
             dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard).order_by("position")
-            self.dashboard_items: list[DashboardItem] | None = self.dashboard_service.get_dashboard_items(
+            self.dashboard_items: list[DashboardItemView] | None = self.dashboard_service.get_dashboard_items(
                 dashboards_data
             )
 
         except Dashboard.DoesNotExist:
+            messages.error(request, "Dashboard does not exist.")
             self.dashboard = None
             self.dashboard_items = None
 
-    def get_success_url(self):
-        return reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["all_dashboard_names"] = self.dashboard_service.get_dashboard_navigation(self.organization)
+        context["dashboards"] = Dashboard.objects.filter(organization=self.organization)
         context["dashboard"] = self.dashboard
         context["dashboard_items"] = self.dashboard_items
         context["add_dashboard_form"] = AddDashboardForm
         context["breadcrumbs"] = [
             {
-                "url": reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "organization_crisis_room_landing", kwargs={"organization_code": self.organization.code}
+                ),
                 "text": "Crisis Room",
             }
         ]
@@ -338,25 +350,30 @@ class DeleteDashboardView(OrganizationView):
     """Delete the selected dashboard."""
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
-        dashboard_name = request.POST.get("dashboard")
+        dashboard_name = request.POST.get("dashboard_name")
+        dashboard_id = request.POST.get("dashboard_id")
 
-        if not request.user.can_delete_dashboard:
+        if not self.organization_member.can_delete_dashboard:
             raise PermissionDenied()
 
         try:
-            dashboard = Dashboard.objects.get(organization=self.organization, name=dashboard_name)
-            deleted, _ = dashboard.delete()
-
-            if deleted >= 1:
-                messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
-                logger.info(event_code=900303)
-            else:
-                messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
-
+            dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
         except Dashboard.DoesNotExist:
             messages.error(request, f"Dashboard '{dashboard_name}' not found.")
+            return redirect(
+                reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
+            )
 
-        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+        deleted, _ = dashboard.delete()
+
+        if deleted >= 1:
+            messages.success(request, f"Dashboard '{dashboard_name}' has been deleted.")
+        else:
+            messages.error(request, f"Dashboard '{dashboard_name}' could not be deleted.")
+
+        return redirect(
+            reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
+        )
 
 
 class DeleteDashboardItemView(OrganizationView):
@@ -364,38 +381,35 @@ class DeleteDashboardItemView(OrganizationView):
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
         dashboard_item_name = request.POST.get("dashboard_item")
-        dashboard_name = request.POST.get("dashboard")
+        dashboard_item_id = request.POST.get("dashboard")
 
-        if not request.user.can_delete_dashboard_item:
+        if not self.organization_member.can_delete_dashboard_item:
             raise PermissionDenied()
 
         try:
-            dashboard_data = DashboardData.objects.get(
-                name=dashboard_item_name, dashboard__organization=self.organization, dashboard__name=dashboard_name
-            )
-
-            dashboard_data_name = dashboard_data.name
-
-            deleted, _ = dashboard_data.delete()
-
-            if deleted >= 1:
-                messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
-                logger.info(event_code=900309)
-            else:
-                messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
-
-            query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
-
-            return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
-            )
-
+            dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
         except DashboardData.DoesNotExist:
             messages.error(request, f"Dashboard item '{dashboard_item_name}' not found.")
+            return redirect(
+                reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
+            )
 
-        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+        dashboard_data_name = dashboard_data.name
+        dashboard_id = dashboard_data.dashboard.id
+
+        deleted, _ = dashboard_data.delete()
+
+        if deleted >= 1:
+            messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
+            logger.info(event_code=900309)
+        else:
+            messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
+
+        return redirect(
+            reverse(
+                "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
+            )
+        )
 
 
 class UpdateDashboardItemView(OrganizationView):
@@ -403,24 +417,29 @@ class UpdateDashboardItemView(OrganizationView):
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
         dashboard_item_id = request.POST.get("dashboard_item")
+        dashboard_id = request.POST.get("dashboard")
         update_position = request.POST.get("move")
 
-        if not request.user.can_reposition_dashboard_item:
+        if not self.organization_member.can_reposition_dashboard_item:
             raise PermissionDenied()
 
         try:
             dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
             dashboard_data.update_position(update_position)
 
-            query_params = urlencode({"dashboard": dashboard_data.dashboard.name})
             return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
+                reverse(
+                    "organization_crisis_room",
+                    kwargs={"organization_code": self.organization.code, "id": dashboard_data.dashboard.id},
+                )
             )
         except DashboardData.DoesNotExist:
             messages.error(request, "Dashboard item not found.")
-        return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+        return redirect(
+            reverse(
+                "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
+            )
+        )
 
 
 class AddDashboardView(OrganizationView, FormView):
@@ -432,7 +451,7 @@ class AddDashboardView(OrganizationView, FormView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Create a new dashboard tab."""
 
-        if not request.user.can_add_dashboard:
+        if not self.organization_member.can_add_dashboard:
             raise PermissionDenied()
 
         form = self.get_form()
@@ -448,11 +467,12 @@ class AddDashboardView(OrganizationView, FormView):
             except IntegrityError:
                 messages.error(request, "Dashboard could not be created.")
 
-            query_params = urlencode({"dashboard": dashboard.name})
             return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code})
-                + "?"
-                + query_params
+                reverse(
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard.id}
+                )
             )
         else:
-            return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
+            return redirect(
+                reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
+            )

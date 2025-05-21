@@ -28,7 +28,7 @@
                     {% with findings=dashboard_item.data.report_data.findings %}
                         <tr>
                             <td>
-                                <a href="{% url "organization_crisis_room" dashboard_item.item.dashboard.organization.code %}">{{ dashboard_item.item.dashboard.organization.name }}</a>
+                                <a href="{% url 'organization_crisis_room_landing' organization_code=dashboard_item.item.dashboard.organization.code %}">{{ dashboard_item.item.dashboard.organization.name }}</a>
                             </td>
                             <td>
                                 {% if findings.summary.total_finding_types %}
