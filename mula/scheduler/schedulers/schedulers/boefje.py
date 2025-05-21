@@ -752,16 +752,15 @@ class BoefjeScheduler(Scheduler):
             )
             return boefje_task
 
+        boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            boefje_task.boefje.id, boefje_task.organization
+        )
+        if boefje is None:
+            return boefje_task
+
         boefje_task.deduplication_key = boefje_task.id
 
         for config in configs[0].duplicates:
-            # TODO: can we use boefje_task.boefje instead?
-            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                boefje_task.boefje.id, config.organisation_id
-            )
-            if boefje is None:
-                continue
-
             # TODO: expose this in the octopoes bulk endpoint instead
             ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
             if ooi is None:
