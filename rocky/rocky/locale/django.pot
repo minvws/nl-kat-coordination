@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 10:22+0000\n"
+"POT-Creation-Date: 2025-05-21 11:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7002,8 +7002,8 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"<strong>Warning:</strong> You don't have permissions to set clearance level. "
-"Contact your administrator."
+"You don't have permissions to set clearance level. Contact your "
+"administrator."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html

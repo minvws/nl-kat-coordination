@@ -73,10 +73,8 @@
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "Set clearance level warning" %}">
-                        {% blocktranslate trimmed %}
-                            <strong>Warning:</strong>
-                            You don't have permissions to set clearance level. Contact your administrator.
-                        {% endblocktranslate %}
+                        <strong>{% translate "Warning" %}</strong>:
+                        {% translate "You don't have permissions to set clearance level. Contact your administrator." %}
                     </p>
                 {% endif %}
                 {% if organization_member.max_clearance_level < ooi.scan_profile.level %}
