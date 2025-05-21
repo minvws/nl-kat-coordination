@@ -46,7 +46,7 @@
                                         <tr>
                                             {% if not organization.code %}
                                                 <td>
-                                                    <a href="{% url "organization_crisis_room" report_task.data.organisation_id %}">{{ report_task.data.organisation_id }}</a>
+                                                    <a href="{% url "organization_crisis_room_landing" report_task.data.organisation_id %}">{{ report_task.data.organisation_id }}</a>
                                                 </td>
                                             {% endif %}
                                             <td>
