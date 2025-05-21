@@ -67,11 +67,11 @@ class MockSchedulerClient(SchedulerClientInterface):
         self.sleep_time = sleep_time
 
         self._iterations = 0
-        self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
-        self._popped_items: dict[str, Task] = multiprocessing.Manager().dict()
-        self._pushed_items: dict[str, Task] = multiprocessing.Manager().dict()
+        self._tasks: dict[str, list[Task]] = multiprocessing.Manager().dict()
+        self._popped_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
 
-    def pop_item(self, queue: str) -> Task | None:
+    def pop_items(self, queue: str) -> list[Task] | None:
         time.sleep(self.sleep_time)
 
         try:
@@ -80,14 +80,18 @@ class MockSchedulerClient(SchedulerClientInterface):
                 p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
-                return p_item
+                return [p_item]
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
                 response = TypeAdapter(TaskPop).validate_json(self.normalizer_responses.pop(0))
                 p_item = response.results[0]
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
-                return p_item
+
+                return [p_item]
+
+            return None
+
         except IndexError:
             time.sleep(3 * self.sleep_time)
             raise self.raise_on_empty_queue
@@ -111,7 +115,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         return self._popped_items[str(task_id)]
 
     def push_item(self, p_item: Task) -> None:
-        self._pushed_items[str(p_item.id)] = p_item
+        self._pushed_items[str(p_item.id)] = [p_item]
 
 
 class MockHandler(Handler):
@@ -120,7 +124,7 @@ class MockHandler(Handler):
         self.queue = Manager().Queue()
         self.exception = exception
 
-    def handle(self, item: BoefjeMeta | NormalizerMeta):
+    def handle(self, item: BoefjeMeta | NormalizerMeta) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]]:
         time.sleep(self.sleep_time)
 
         if str(item.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
@@ -128,6 +132,8 @@ class MockHandler(Handler):
             raise self.exception()
 
         self.queue.put(item)
+
+        return item, []
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
         return [self.queue.get() for _ in range(self.queue.qsize())]

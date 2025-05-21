@@ -73,7 +73,8 @@ def test_handle_boefje_with_exception(mocker):
     )
 
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-        BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, mock_bytes_api_client).handle(meta)
+        out = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, mock_bytes_api_client).handle(meta)
+        tes =3
 
     mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
     mock_bytes_api_client.save_raw.assert_called_once()
