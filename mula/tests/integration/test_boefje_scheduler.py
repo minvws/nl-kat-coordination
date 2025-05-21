@@ -1,4 +1,5 @@
 import unittest
+import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
@@ -1163,6 +1164,80 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # set to 1500 minutes (25 hours) to at least the next day
         self.assertGreater(schedule_db.deadline_at, datetime.now(timezone.utc) + timedelta(days=1))
 
+    def test_pop(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        task = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=self.organisation.id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mocks
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_item_to_queue(task)
+
+        # Assert: popped items should be 1
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(1, len(popped_items))
+
+    def test_pop_deduplication(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        # Mocks
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        orgs = [self.organisation.id, OrganisationFactory().id, OrganisationFactory().id]
+        original_tasks = []
+        dkey = uuid.uuid4()
+        for org in orgs:
+            boefje_task = models.BoefjeTask(
+                boefje=models.Boefje.model_validate(boefje.dict()),
+                input_ooi=ooi.primary_key,
+                organization=org,
+                deduplication_key=dkey.hex,
+            )
+
+            task = models.Task(
+                scheduler_id=self.scheduler.scheduler_id,
+                organisation=self.organisation.id,
+                priority=1,
+                type=models.BoefjeTask.type,
+                hash=boefje_task.hash,
+                data=boefje_task.model_dump(),
+                created_at=datetime.now(timezone.utc),
+                modified_at=datetime.now(timezone.utc),
+            )
+            original_tasks.append(task)
+
+            self.scheduler.push_item_to_queue(task)
+
+        popped_items = self.scheduler.pop_item_from_queue()
+        for item in popped_items:
+            # Assert: the deduplication_key of the items should be the same
+            self.assertEqual(str(dkey), item.data.get("deduplication_key"))
+
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange
@@ -1204,7 +1279,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         self.scheduler.pop_item_from_queue()
 
-        # Assert: task should be in datastore, and queued
+        # Assert: task should be in datastore, and dispatched
         task_db = self.mock_ctx.datastores.task_store.get_task(task.id)
         self.assertEqual(task_db.id, task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
