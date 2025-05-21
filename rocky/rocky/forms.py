@@ -20,12 +20,8 @@ class MemberFilterForm(BaseRockyForm):
 
     def clean_status(self):
         status = self.cleaned_data["status"]
-        if not status:
-            return ["active", "new"]
-        return status
+        return status if status else ["active", "new"]
 
     def clean_blocked(self):
         blocked = self.cleaned_data["blocked"]
-        if not blocked:
-            return [True, False]
-        return blocked
+        return blocked if blocked else [True, False]
