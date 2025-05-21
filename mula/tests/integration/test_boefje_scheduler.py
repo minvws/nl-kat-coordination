@@ -783,14 +783,23 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn(second_organisation.id, orgs)
         self.assertIn(third_organisation.id, orgs)
 
-        # Assert: the deduplication_key of the items should be the same
         current = None
         for item in items:
+            # Assert: the tasks should be in the datastore, and queued
+            task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
+            self.assertEqual(task_db.id, item.id)
+            self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+            # Assert: the deduplication_key of the items should be the same
             if current is None:
                 current = item.data.get("deduplication_key")
             self.assertEqual(current, item.data.get("deduplication_key"))
 
-        # Assert: deduplication_key should be the same for all items
+            # Assert: Schedule should be in datastore
+            schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
+            self.assertEqual(schedule_db.id, task_db.schedule_id)
+
+        # Assert: deduplication_key should be the same for all items when popped
         popped_items = self.scheduler.pop_item_from_queue()
         self.assertEqual(3, len(popped_items))
         current = None

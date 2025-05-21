@@ -727,6 +727,15 @@ class BoefjeScheduler(Scheduler):
             enabled=True,
             with_duplicates=True,
         )
+        if len(configs) == 0:
+            self.logger.debug(
+                "No configs found for boefje",
+                boefje_id=boefje_task.boefje.id,
+                organisation_id=boefje_task.organization,
+                scheduler_id=self.scheduler_id,
+            )
+            return boefje_task
+
         other_orgs_from_configs = [config.organisation_id for config in configs[0].duplicates]
 
         # We're only interested in the organisations that have
@@ -739,15 +748,6 @@ class BoefjeScheduler(Scheduler):
                 "No organisations found for input ooi",
                 input_ooi=boefje_task.input_ooi,
                 organisation_id=boefje_task.organisation_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return boefje_task
-
-        if len(configs) == 0:
-            self.logger.debug(
-                "No configs found for boefje",
-                boefje_id=boefje_task.boefje.id,
-                organisation_id=boefje_task.organization,
                 scheduler_id=self.scheduler_id,
             )
             return boefje_task
