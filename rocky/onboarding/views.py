@@ -349,6 +349,7 @@ class OnboardingSetupScanOOIDetailView(
             return [hostname_ooi[0].primary_key]
         except AttributeError as error:
             logger.error("Attribute error: %s", error)
+            messages.error(self.request, _("DNS Report cannot be created, no Hostname."))
             return []
 
     def get_report_type_ids(self) -> list[str]:
