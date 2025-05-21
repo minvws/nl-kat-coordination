@@ -16,7 +16,7 @@
       "default": 30
     },
     "REQUEST_TIMEOUT": {
-      "title": "timeout for slow lookup requests, defaults to 60 seconds",
+      "title": "Timeout for slow lookup requests, defaults to 60 seconds",
       "type": "integer",
       "minimum": 5,
       "maximum": 1000,
