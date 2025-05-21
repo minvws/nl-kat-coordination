@@ -19,6 +19,7 @@ from katalogus.client import Plugin
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import BaseReportView, get_selection
+from structlog import get_logger
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
@@ -44,6 +45,9 @@ from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
 from rocky.views.scheduler import SchedulerView
 
 User = get_user_model()
+
+
+logger = get_logger(__name__)
 
 
 class OnboardingStart(OrganizationView):
@@ -340,8 +344,12 @@ class OnboardingSetupScanOOIDetailView(
 
     def get_ooi_pks(self) -> list[str]:
         ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
-        return [hostname_ooi[0].primary_key]
+        try:
+            hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
+            return [hostname_ooi[0].primary_key]
+        except AttributeError as error:
+            logger.error("Attribute error: %s", error)
+            return []
 
     def get_report_type_ids(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
