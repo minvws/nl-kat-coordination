@@ -65,11 +65,8 @@
                        role="group"
                        aria-label="{% translate "Indemnification warning" %}">
                         {% url "organization_settings" organization.code as organization_settings %}
-                        {% blocktranslate trimmed %}
-                            <strong>Warning:</strong>
-                            Indemnification is not set for this organization.
-                            Go to the <a href="{{ organization_settings }}">organization settings page</a> to add one.
-                        {% endblocktranslate %}
+                        <strong>{% translate "Warning" %}</strong>: {% translate "Indemnification is not set for this organization." %}
+                        {% translate "Go to the" %} <a href="{{ organization_settings }}">{% translate "organization settings page" %}</a> {% translate "to add one." %}
                     </p>
                 {% endif %}
                 {% if not perms.tools.can_set_clearance_level %}
@@ -86,12 +83,12 @@
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "Scan warning" %}">
-                        {% url "account_detail" organization.code as account_details %}
+                        <strong>{% translate "Warning" %}</strong>:
                         {% blocktranslate trimmed with member_clearance_level=member.max_clearance_level boefje_scan_level=ooi.scan_profile.level %}
-                            <strong>Warning:</strong>
                             You are not allowed to set the clearance level of this OOI. Your maximum clearance level is {{ member_clearance_level }} and this OOI has level {{ boefje_scan_level }}.
-                            Go to your <a href="{{ account_details }}">account details</a> to manage your clearance level.
                         {% endblocktranslate %}
+                        {% url "account_detail" organization.code as account_details %}
+                        {% translate "Go to your" %} <a href="{{ account_details }}">{% translate "account details" %}</a> {% translate "to manage your clearance level." %}
                     </p>
                 {% endif %}
                 {% if indemnification_present and organization_member.max_clearance_level >= ooi.scan_profile.level and perms.tools.can_set_clearance_level %}
