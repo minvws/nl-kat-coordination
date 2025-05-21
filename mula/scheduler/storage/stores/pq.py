@@ -68,16 +68,21 @@ class PriorityQueueStore:
                             "deduplication_key"
                         )
                     )
-                    .group_by(func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null")))
+                    .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                    .filter(models.TaskDB.scheduler_id == scheduler_id)
+                    .group_by("deduplication_key")
                     .order_by(func.count().desc())
                     .limit(1)
-                ).subquery()
+                )
+
+                if filters is not None:
+                    apply_filter(models.TaskDB, top_deduplication_key, filters)
 
                 item_orm = (
                     query.order_by(models.TaskDB.priority.asc())
                     .filter(
                         func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null"))
-                        == top_deduplication_key.c.deduplication_key
+                        == top_deduplication_key.subquery().c.deduplication_key
                     )
                     .order_by(models.TaskDB.created_at.asc())
                     .limit(limit)

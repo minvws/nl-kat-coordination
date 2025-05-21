@@ -721,10 +721,18 @@ class BoefjeScheduler(Scheduler):
         if caller == self.is_boefje_in_other_orgs.__name__:
             return boefje_task
 
+        configs = self.ctx.services.katalogus.get_configs(
+            boefje_id=boefje_task.boefje.id,
+            organisation_id=boefje_task.organization,
+            enabled=True,
+            with_duplicates=True,
+        )
+        other_orgs_from_configs = [config.organisation_id for config in configs[0].duplicates]
+
         # We're only interested in the organisations that have
         # the same input_ooi as the boefje task
         orgs = self.ctx.services.octopoes.get_object_clients(
-            reference=boefje_task.input_ooi, clients=(boefje_task.organization,), valid_time=datetime.now(timezone.utc)
+            reference=boefje_task.input_ooi, clients=set(other_orgs_from_configs), valid_time=datetime.now(timezone.utc)
         )
         if not orgs:
             self.logger.debug(
@@ -735,12 +743,6 @@ class BoefjeScheduler(Scheduler):
             )
             return boefje_task
 
-        configs = self.ctx.services.katalogus.get_configs(
-            boefje_id=boefje_task.boefje.id,
-            organisation_id=boefje_task.organization,
-            enabled=True,
-            with_duplicates=True,
-        )
         if len(configs) == 0:
             self.logger.debug(
                 "No configs found for boefje",
@@ -750,22 +752,18 @@ class BoefjeScheduler(Scheduler):
             )
             return boefje_task
 
-        count = 0
+        boefje_task.deduplication_key = boefje_task.id
+
         for config in configs[0].duplicates:
-            # We only want to check the organisations that have the same
-            # input_ooi as the boefje task
-            if config.organisation_id not in orgs:
-                self.logger.debug(
-                    "Organisation not found for input ooi",
-                    input_ooi=boefje_task.input_ooi,
-                    organisation_id=config.organisation_id,
-                    scheduler_id=self.scheduler_id,
-                )
+            # TODO: can we use boefje_task.boefje instead?
+            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                boefje_task.boefje.id, config.organisation_id
+            )
+            if boefje is None:
                 continue
 
-            ooi = self.ctx.services.octopoes.get_object(
-                config.organisation_id, boefje_task.input_ooi, valid_time=datetime.now(timezone.utc)
-            )
+            # TODO: expose this in the octopoes bulk endpoint instead
+            ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
             if ooi is None:
                 self.logger.debug(
                     "OOI does not exist anymore, skipping",
@@ -776,17 +774,11 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
-                boefje_task.boefje.id, config.organisation_id
-            )
-            if boefje is None:
-                continue
-
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
                     boefje_id=boefje_task.boefje.id,
-                    ooi_primary_key=ooi.primary_key,
+                    ooi_primary_key=boefje_task.input_ooi,
                     organisation_id=config.organisation_id,
                     scheduler_id=self.scheduler_id,
                 )
@@ -794,9 +786,9 @@ class BoefjeScheduler(Scheduler):
 
             new_boefje_task = models.BoefjeTask(
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
-                input_ooi=ooi.primary_key,
+                input_ooi=boefje_task.input_ooi,
                 organization=config.organisation_id,
-                deduplication_key=boefje_task.id,
+                deduplication_key=boefje_task.deduplication_key,
             )
 
             self.push_boefje_task(
@@ -805,15 +797,6 @@ class BoefjeScheduler(Scheduler):
                 create_schedule=self.create_schedule,
                 caller=self.is_boefje_in_other_orgs.__name__,
             )
-            count += 1
-
-        # We set the deduplication key to the task id, so we can
-        # deduplicate the tasks in the queue. This is only done when
-        # the boefje task has no deduplication key set and the count
-        # is greater than 0. This means that we have found other
-        # organisations that have the same input ooi as the boefje task.
-        if boefje_task.id is not None and boefje_task.deduplication_key is None and count > 0:
-            boefje_task.deduplication_key = boefje_task.id
 
         return boefje_task
 
