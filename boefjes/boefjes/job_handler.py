@@ -178,9 +178,7 @@ class BoefjeHandler(Handler):
                 raw_file_id = self.bytes_client.save_raw(
                     boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
                 )
-                logger.info(
-                    "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
-                )
+                logger.info("Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id)
         else:
             logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 

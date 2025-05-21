@@ -99,7 +99,7 @@ class Octopoes(HTTPService):
             raise
 
     @exception_handler
-    def get_object_clients(self, reference: str, clients: set[str], valid_time: datetime) -> list[str]:
+    def get_object_clients(self, reference: str, clients: set[str], valid_time: datetime) -> dict[str, OOI]:
         """Return the clients from the provided list that have the given OOI at the valid_time."""
         url = f"{self.host}/object-clients"
 
@@ -107,10 +107,11 @@ class Octopoes(HTTPService):
             response = self.get(
                 url, params={"reference": reference, "clients": list(clients), "valid_time": valid_time.isoformat()}
             )
-            return response.json()
+
+            return {client: OOI(**data) for client, data in response.json().items()}
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
-                return []
+                return {}
             raise
 
     def is_healthy(self) -> bool:

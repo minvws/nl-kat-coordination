@@ -1178,7 +1178,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             # Assert: the deduplication_key of the items should be the same
             self.assertEqual(str(dkey), item.data.get("deduplication_key"))
 
-    def test_pop_deduplication(self):
+    def test_pop_deduplication_different_deduplication_key(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
