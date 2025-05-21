@@ -189,6 +189,53 @@ class OrganizationMember(models.Model):
     def has_clearance_level(self, level: int) -> bool:
         return level <= self.max_clearance_level
 
+    @property
+    def can_add_dashboard(self):
+        return self.has_perm("crisis_room.add_dashboard")
+
+    @property
+    def can_change_dashboard(self):
+        return self.has_perm("crisis_room.change_dashboard")
+
+    @property
+    def can_delete_dashboard(self):
+        return self.has_perm("crisis_room.delete_dashboard")
+
+    @property
+    def can_reposition_dashboard_item(self):
+        return self.has_perm("crisis_room.change_dashboarddata_position")
+
+    @property
+    def can_add_dashboard_item(self):
+        return self.has_perm("crisis_room.add_dashboarddata")
+
+    @property
+    def can_delete_dashboard_item(self):
+        return self.has_perm("crisis_room.delete_dashboarddata")
+
+    @property
+    def can_change_dashboard_item(self):
+        return self.has_perm("crisis_room.change_dashboarddata")
+
+    @property
+    def can_modify_dashboard(self) -> bool:
+        """If you can add, you might as well change and delete a dashboard."""
+        return self.has_perms(
+            ["crisis_room.add_dashboard", "crisis_room.change_dashboard", "crisis_room.delete_dashboard"]
+        )
+
+    @property
+    def can_modify_dashboard_item(self) -> bool:
+        """If you can add, you might as well change and delete a dashboard items."""
+        return self.has_perms(
+            [
+                "crisis_room.add_dashboarddata",
+                "crisis_room.change_dashboarddata",
+                "crisis_room.delete_dashboarddata",
+                "crisis_room.change_dashboarddata_position",
+            ]
+        )
+
     class Meta:
         unique_together = ["user", "organization"]
 
