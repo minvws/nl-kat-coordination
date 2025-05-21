@@ -1,6 +1,7 @@
 import json
 from multiprocessing import Manager
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 
@@ -69,7 +70,9 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
     assert manager.scheduler_client.log_path.exists()
 
 
-def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path) -> None:
+def test_two_processes_with_exception_in_handler(
+    manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
+) -> None:
     manager.scheduler_client = MockSchedulerClient(
         [
             get_dummy_data("scheduler/pop_response_boefje.json"),
@@ -190,6 +193,100 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+    }
+
+
+def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path):
+    manager.scheduler_client = MockSchedulerClient(
+        boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje.json")],
+        normalizer_responses=[],
+        log_path=tmp_path / "patch_task_log",
+    )
+    with pytest.raises(KeyboardInterrupt):
+        manager.run(WorkerManager.Queue.BOEFJES)
+
+    items = item_handler.get_all()
+
+    # Just one task dispatched
+    assert len(items) == 1
+    assert items[0].boefje.id == "dns-records"
+
+    patched_tasks = manager.scheduler_client.get_all_patched_tasks()
+
+    # But two tasks marked as completed
+    assert len(patched_tasks) == 3
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+    }
+
+    bytes_calls = item_handler.bytes_client.get_all()
+    assert bytes_calls == [
+        (
+            "save_boefje_meta",
+            (
+                {
+                    "id": UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
+                    "started_at": None,
+                    "ended_at": None,
+                    "boefje": {"id": "dns-records", "version": None},
+                    "input_ooi": "Hostname|internet|test.test",
+                    "arguments": {},
+                    "organization": "_dev2",
+                    "runnable_hash": None,
+                    "environment": None,
+                },
+            ),
+        ),
+        ("save_raw", (UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"), b"123", {"boefje/dns-records", "my/mime"})),
+    ]
+
+
+def test_one_process_deduplication_exception_puts_duplicated_task_back_on_the_queue(
+    manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
+):
+    manager.scheduler_client = MockSchedulerClient(
+        boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje_error.json")],
+        normalizer_responses=[],
+        log_path=tmp_path / "patch_task_log",
+    )
+    with pytest.raises(KeyboardInterrupt):
+        manager.run(WorkerManager.Queue.BOEFJES)
+
+    items = item_handler.get_all()
+    assert len(items) == 0
+    patched_tasks = manager.scheduler_client.get_all_patched_tasks()
+
+    assert len(patched_tasks) == 3
+    assert set(patched_tasks) == {
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+        ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "queued"),
+    }
+
+
+def test_one_process_deduplication_do_not_duplicate_docker_boefje_but_fan_tasks_out(
+    manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
+):
+    manager.scheduler_client = MockSchedulerClient(
+        boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_docker_boefje.json")],
+        normalizer_responses=[],
+        log_path=tmp_path / "patch_task_log",
+    )
+    with pytest.raises(KeyboardInterrupt):
+        manager.run(WorkerManager.Queue.BOEFJES)
+
+    items = item_handler.get_all()
+    assert len(items) == 2
+    patched_tasks = manager.scheduler_client.get_all_patched_tasks()
+
+    assert len(patched_tasks) == 4
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }
 
 

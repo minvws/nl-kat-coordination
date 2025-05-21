@@ -257,7 +257,7 @@ def _start_working(
                     scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
                     logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
 
-                if not isinstance(handler, BoefjeHandler):
+                if not isinstance(handler, BoefjeHandler) or not duplicated_items:
                     # We do not deduplicate normalizers
                     continue
 
@@ -302,16 +302,21 @@ def _start_working(
                             if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
                                 logger.warning(
                                     "Invalid mime-type encountered in output for boefje %s[%s]",
-                                    boefje_meta.boefje.id,
-                                    str(boefje_meta.id),
+                                    new_boefje_meta.boefje.id,
+                                    str(new_boefje_meta.id),
                                 )
                             else:
                                 valid_mimetypes.add(mimetype)
                         raw_file_id = handler.bytes_client.save_raw(
-                            boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                            new_boefje_meta.id,
+                            output,
+                            _default_mime_types(new_boefje_meta.boefje).union(valid_mimetypes),
                         )
                         logger.info(
-                            "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
+                            "Saved raw file %s for boefje %s[%s]",
+                            raw_file_id,
+                            new_boefje_meta.boefje.id,
+                            new_boefje_meta.id,
                         )
 
                     scheduler_client.patch_task(item.id, status)
