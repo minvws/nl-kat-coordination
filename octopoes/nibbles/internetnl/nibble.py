@@ -22,7 +22,8 @@ FINDING_TYPES = [
 
 
 def or_finding_types() -> str:
-    return f"(or {"".join([f'[?finding :Finding/finding_type "KATFindingType|{ft}"]' for ft in FINDING_TYPES])})"
+    clauses = "".join([f'[?finding :Finding/finding_type "KATFindingType|{ft}"]' for ft in FINDING_TYPES])
+    return f"(or {clauses})"
 
 
 def query(targets: list[Reference | None]) -> str:
