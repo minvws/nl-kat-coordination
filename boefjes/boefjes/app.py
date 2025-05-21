@@ -1,8 +1,10 @@
+import gc
 import multiprocessing
 import os
 import signal
 import sys
 import time
+from datetime import datetime
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
 
@@ -218,7 +220,7 @@ def _start_working(
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
 ) -> None:
-    logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
+    logger.info("Started listening for tasks from worker", pid=os.getpid())
 
     while True:
         p_item = task_queue.get()  # blocks until tasks are pushed in the main process
@@ -227,21 +229,27 @@ def _start_working(
 
         try:
             scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)
+            start_time = datetime.now()
             handler.handle(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An error occurred handling scheduler item", task=str(p_item.data.id))
         except:  # noqa
-            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An unhandled error occurred handling scheduler item", task=str(p_item.data.id))
             raise
         finally:
+            duration = (datetime.now() - start_time).total_seconds()
             try:
                 if scheduler_client.get_task(p_item.id).status == TaskStatus.RUNNING:
                     # The docker runner could have handled this already
                     scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
-                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                    logger.info(
+                        "Set status in the scheduler", status=status.value, task=str(p_item.data.id), duration=duration
+                    )
             except HTTPError:
-                logger.exception("Could not patch scheduler task to %s", status.value)
+                logger.exception("Could not patch scheduler task to %s", status.value, task=str(p_item.data.id))
+
+            gc.collect()
 
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
