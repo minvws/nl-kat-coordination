@@ -102,4 +102,6 @@ def test_website_discovery_nibble_by_resolved_hostname(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert (xtdb_resolved_hostname, xtdb_ip_service) in result[xtdb_resolved_hostname][website_discovery_nibble.id]
-    assert len(result[xtdb_resolved_hostname][website_discovery_nibble.id][(xtdb_resolved_hostname, xtdb_ip_service)]) == 1
+    assert (
+        len(result[xtdb_resolved_hostname][website_discovery_nibble.id][(xtdb_resolved_hostname, xtdb_ip_service)]) == 1
+    )
