@@ -123,7 +123,7 @@ class MockBytesAPIClient:
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         self.queue.put(("save_boefje_meta", (boefje_meta.model_dump(),)))
 
-    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: set[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: set[str]) -> UUID:
         self.queue.put(("save_raw", (boefje_meta_id, raw, mime_types)))
 
         return uuid.uuid4()

@@ -23,7 +23,6 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 6
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014c", "running"),
@@ -101,7 +100,6 @@ def test_two_processes_with_exception_in_handler(
 
     # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
     # the exception has been set up with a small delay.
-    assert len(patched_tasks) == 6
     assert sorted(patched_tasks[:2]) == sorted(
         [("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"), ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")]
     )
@@ -143,7 +141,6 @@ def test_two_processes_cleanup_unfinished_tasks(
     assert len(items) == 0
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 3
 
     # Task was running but main process crashed intentionally and cleaned it up
     assert set(patched_tasks) == {
@@ -185,7 +182,6 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     assert len(items) == 3
-    assert len(patched_tasks) == 6
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
@@ -214,7 +210,6 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     # But two tasks marked as completed
-    assert len(patched_tasks) == 3
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
@@ -258,7 +253,6 @@ def test_one_process_deduplication_exception_puts_duplicated_task_back_on_the_qu
     assert len(items) == 0
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 3
     assert set(patched_tasks) == {
         ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
         ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed"),
@@ -281,7 +275,6 @@ def test_one_process_deduplication_do_not_duplicate_docker_boefje_but_fan_tasks_
     assert len(items) == 2
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 4
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),

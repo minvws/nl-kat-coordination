@@ -104,8 +104,7 @@ class SchedulerWorkerManager(WorkerManager):
             time.sleep(self.settings.poll_interval)
             return
 
-        for p_item in p_items:
-            logger.info("Handling task[%s]", p_item.data.id)
+        logger.info("Handling tasks[%s]", [p_item.data.id for p_item in p_items])
 
         try:
             self.task_queue.put(p_items)
@@ -193,7 +192,7 @@ class SchedulerWorkerManager(WorkerManager):
                         try:
                             self.scheduler_client.push_item(p_item)
                         except HTTPError:
-                            logger.exception("Rescheduling task failed[id=%s]", p_item.id)
+                            logger.error("Rescheduling task failed[id=%s]", p_item.id)
 
             killed_workers = []
 
