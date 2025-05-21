@@ -55,8 +55,6 @@
                             Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
                             corresponding scan levels.
                         {% endblocktranslate %}
-                        {% include "partials/explanations.html" %}
-
                     </p>
                 {% elif ooi.scan_profile.scan_profile_type == "inherited" %}
                     {% include "partials/explanations.html" %}
@@ -105,7 +103,7 @@
                           class="help">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="change_clearance_level">
-                        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+                        {% include "partials/form/fieldset.html" with fields=form %}
 
                         <button type="submit">{% translate "Set clearance level" %}</button>
                     </form>

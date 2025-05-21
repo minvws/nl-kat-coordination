@@ -71,8 +71,14 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def count_observed_at_filter(self) -> int:
         return 1 if datetime.now(timezone.utc).date() != self.observed_at.date() else 0
 
+    @property
     def count_active_filters(self):
-        return len(self.severities) + 1 if self.muted_findings else 0 + self.count_observed_at_filter()
+        return (
+            len(self.severities)
+            + (1 if self.muted_findings else 0)
+            + self.count_observed_at_filter()
+            + (1 if self.search_string else 0)
+        )
 
     def get_queryset(self) -> FindingList:
         return FindingList(self.octopoes_api_connector, **self.get_queryset_params())
@@ -104,7 +110,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["only_muted"] = self.only_muted
-        context["active_filters_counter"] = self.count_active_filters()
+        context["active_filters_counter"] = self.count_active_filters
         context["order_by"] = self.order_by
         context["order_by_severity_form"] = OrderBySeverityForm(self.request.GET)
         context["order_by_finding_type_form"] = OrderByFindingTypeForm(self.request.GET)
@@ -133,7 +139,9 @@ class Top10FindingListView(FindingListView):
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
-                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy(
+                    "organization_crisis_room_landing", kwargs={"organization_code": self.organization.code}
+                ),
                 "text": _("Crisis room"),
             }
         ]
