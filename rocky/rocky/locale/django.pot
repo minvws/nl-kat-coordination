@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 08:13+0000\n"
+"POT-Creation-Date: 2025-05-21 10:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6315,6 +6315,7 @@ msgid "No Raw file could be found, this might point to an error in OpenKAT"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Warning"
 msgstr ""
 
@@ -6980,11 +6981,19 @@ msgid "Indemnification warning"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-#, python-format
-msgid ""
-"<strong>Warning:</strong> Indemnification is not set for this organization. "
-"Go to the <a href=\"%(organization_settings)s\">organization settings page</"
-"a> to add one."
+msgid "Indemnification is not set for this organization."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Go to the"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "organization settings page"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "to add one."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -7000,11 +7009,21 @@ msgstr ""
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
 msgid ""
-"<strong>Warning:</strong> You are not allowed to set the clearance level of "
-"this OOI. Your maximum clearance level is %(member_clearance_level)s and "
-"this OOI has level %(boefje_scan_level)s. Go to your <a "
-"href=\"%(account_details)s\">account details</a> to manage your clearance "
-"level."
+"You are not allowed to set the clearance level of this OOI. Your maximum "
+"clearance level is %(member_clearance_level)s and this OOI has level "
+"%(boefje_scan_level)s."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Go to your"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "account details"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "to manage your clearance level."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
