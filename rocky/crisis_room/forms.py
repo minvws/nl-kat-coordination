@@ -138,7 +138,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
     )
 
     def __init__(self, organization, *args, **kwargs):
-        super().__init__(*args, organization, **kwargs)
+        super().__init__(organization, *args, **kwargs)
         self.query_from = "object_list"
         self.template = "partials/dashboard_ooi_list.html"
 
