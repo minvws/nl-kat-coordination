@@ -4,7 +4,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Annotated, Literal
 
-from pydantic import Field, StringConstraints
+from pydantic import Field
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -22,11 +22,17 @@ class Network(OOI):
 
     object_type: Literal["Network"] = "Network"
 
-    name: Annotated[str, StringConstraints(to_lower=True)]
+    name: str
 
     _natural_key_attrs = ["name"]
     _traversable = False
 
+    @classmethod
+    def create(cls, **kwargs):
+        if 'name' in kwargs:
+            kwargs['name'] = kwargs['name'].lower()
+        return super().create(**kwargs)
+    
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
