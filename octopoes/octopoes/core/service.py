@@ -607,12 +607,25 @@ class OctopoesService:
         if event.new_data:
             nibblets = [o for o in origins if o.origin_type == OriginType.NIBBLET]
             for nibblet in nibblets:
-                args = {pr for pr in nibblet.parameters_references if pr} if nibblet.parameters_references else set()
-                scan_levels = [sp.level for sp in self.scan_profile_repository.get_bulk(args, event.valid_time)]
-                if self.nibbler.nibbles[nibblet.method].check_scan_levels(scan_levels):
-                    self.nibblet_dephantomize_result(nibblet, event.valid_time)
-                else:
-                    self.nibblet_phantomize_result(nibblet, event.valid_time)
+                if (
+                    self.nibbler.nibbles[nibblet.method].has_scan_levels()
+                    and nibblet.parameters_references is not None
+                    and nibblet.optional_references is not None
+                ):
+                    targets = [
+                        ref or opt for ref, opt in zip(nibblet.parameters_references, nibblet.optional_references)
+                    ]
+                    scan_profiles = self.scan_profile_repository.get_bulk(
+                        {target for target in targets if target is not None}, event.valid_time
+                    )
+                    scan_levels = [
+                        next(sp.level for sp in scan_profiles if sp.reference == target) if target else ScanLevel.L0
+                        for target in targets
+                    ]
+                    if self.nibbler.nibbles[nibblet.method].check_scan_levels(scan_levels):
+                        self.nibblet_dephantomize_result(nibblet, event.valid_time)
+                    else:
+                        self.nibblet_phantomize_result(nibblet, event.valid_time)
 
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:

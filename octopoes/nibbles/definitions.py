@@ -71,6 +71,9 @@ class NibbleDefinition(BaseModel):
     def triggers(self) -> set[type[OOI]]:
         return set.union(*[sgn.triggers for sgn in self.signature]) | self.additional
 
+    def has_scan_levels(self) -> bool:
+        return any(param.min_scan_level is not None for param in self.signature)
+
     def check_scan_levels(self, scan_levels: list[ScanLevel]) -> bool:
         if scan_levels:
             return all(
