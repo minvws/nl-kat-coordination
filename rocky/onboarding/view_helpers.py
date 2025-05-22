@@ -50,7 +50,7 @@ class IntroductionRegistrationStepsMixin(StepsMixin):
             {"text": _("1: Introduction"), "url": reverse_lazy("step_introduction_registration")},
             {"text": _("2: Organization setup"), "url": reverse_lazy("step_organization_setup")},
             {"text": _("3: Indemnification"), "url": ""},
-            {"text": _("4: Account setup"), "url": ""},
+            {"text": _("4: User clearance level"), "url": ""},
         ]
         return steps
 
@@ -67,8 +67,10 @@ class IntroductionAdminStepsMixin(StepsMixin):
                 "url": reverse_lazy("step_indemnification_setup", kwargs={"organization_code": self.organization.code}),
             },
             {
-                "text": _("4: Account setup"),
-                "url": reverse_lazy("step_account_setup_intro", kwargs={"organization_code": self.organization.code}),
+                "text": _("4: User clearance level"),
+                "url": reverse_lazy(
+                    "step_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code}
+                ),
             },
         ]
         return steps

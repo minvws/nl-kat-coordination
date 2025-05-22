@@ -68,7 +68,7 @@ class OrganizationTag(tagulous.models.TagTreeModel):
 
 class Organization(models.Model):
     id: int
-    name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation."))
+    name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organization."))
     code = LowerCaseSlugField(
         max_length=ORGANIZATION_CODE_LENGTH,
         unique=True,

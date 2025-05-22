@@ -1,0 +1,50 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" with view_type="onboarding" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "OpenKAT introduction" %}</h1>
+                {% include "partials/stepper.html" %}
+
+                <h2>{% translate "Report selection" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Reports can be used to gain more insights into your objects. OpenKAT has a lot of reports available. The IPv6 and mailserver report are just a few of the many available reports.
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {% blocktranslate trimmed %}
+                        For this tutorial we will create a DNS report to get you started.
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {% blocktranslate trimmed %}
+                        When you start to generate this report. OpenKAT will guide you through the
+                        necessary steps, such as enabling the required plugins.
+                    {% endblocktranslate %}
+                </p>
+                <form method="get"
+                      action="{% url "step_setup_scan_ooi_info" organization.code %}"
+                      class="inline">
+                    <div class="button-container">
+                        {% if organization %}
+                            <button name="report_type" value="dns-report" type="submit" class="button">{% translate "DNS Report" %}</button>
+                        {% endif %}
+                        <a href="" class="button ghost disabled">IPv6 report</a>
+                        <a href="" class="button ghost disabled">Mailserver report</a>
+                        {% if organization %}
+                            <a href="{% url "complete_onboarding" organization.code %}"
+                               class="button ghost">{% translate "Skip onboarding" %}</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
