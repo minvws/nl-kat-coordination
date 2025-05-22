@@ -37,7 +37,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
 
             confidence = str(data.get("abuseConfidenceScore", "Unknown"))
             reportdate = str(data.get("lastReportedAt", "Unknown"))
-            ft = KATFindingType(id="ABUSEIPDB-REPORT")
+            ft = KATFindingType(id="KAT-ABUSEIPDB-REPORT")
             finding = Finding(
                 finding_type=ft.reference,
                 ooi=input_ooi_reference,

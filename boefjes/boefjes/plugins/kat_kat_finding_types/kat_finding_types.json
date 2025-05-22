@@ -614,7 +614,7 @@
     "impact": "Depending on what software is outdated this can be critical.",
     "recommendation": "Inspect the software version, determine if additional measures need to be taken and install updates to reduce the attack surface."
   },
-  "ABUSEIPDB-REPORT": {
+  "KAT-ABUSEIPDB-REPORT": {
     "name": "AbuseIPDB Report Detected",
     "description": "The IP address has been marked as risky in AbuseIPDB.",
     "risk": "medium",
