@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exc, func, literal
+from sqlalchemy import exc
 from sqlalchemy.orm.query import Query
 
 from scheduler import models
@@ -58,7 +58,7 @@ class PriorityQueueStore:
 
             try:
                 dkey = (
-                    query.filter(models.TaskDB.data["deduplication_key"].astext != None)
+                    query.filter(models.TaskDB.data["deduplication_key"].astext is not None)
                     .order_by(models.TaskDB.priority.asc())
                     .order_by(models.TaskDB.created_at.asc())
                     .all()
