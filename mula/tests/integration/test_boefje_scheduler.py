@@ -893,6 +893,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: popped items should be 1
         popped_items = self.scheduler.pop_item_from_queue()
         self.assertEqual(1, len(popped_items))
+        self.assertIsNone(popped_items[0].data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_ooi(self):
         # Arrange
@@ -916,17 +917,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
         self.mock_get_plugin.return_value = plugin
         self.mock_get_object.return_value = None
-        self.mock_get_configs.return_value = [
-            models.BoefjeConfig(
-                id=7, boefje_id=boefje.id, enabled=True, organisation_id=first_organisation.id, settings={}
-            ),
-            models.BoefjeConfig(
-                id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
-            ),
-            models.BoefjeConfig(
-                id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
-            ),
-        ]
+        self.mock_get_configs.return_value = []
         self.mock_get_object_clients.return_value = {
             first_organisation.id: ooi,
             second_organisation.id: ooi,
@@ -946,7 +937,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: popped items should be 1
         popped_items = self.scheduler.pop_item_from_queue()
         self.assertEqual(1, len(popped_items))
-        self.assertIsNotNone(popped_items[0].data.get("deduplication_key"))
+        self.assertIsNone(popped_items[0].data.get("deduplication_key"))
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
