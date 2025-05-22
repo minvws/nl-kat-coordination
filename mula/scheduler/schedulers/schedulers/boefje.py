@@ -758,8 +758,7 @@ class BoefjeScheduler(Scheduler):
         if boefje is None:
             return boefje_task
 
-        boefje_task.deduplication_key = boefje_task.id
-
+        count = 0
         for config in configs[0].duplicates:
             # TODO: expose this in the octopoes bulk endpoint instead
             if config.organisation_id not in orgs:
@@ -787,7 +786,7 @@ class BoefjeScheduler(Scheduler):
                 boefje=models.Boefje.model_validate(boefje.model_dump()),
                 input_ooi=boefje_task.input_ooi,
                 organization=config.organisation_id,
-                deduplication_key=boefje_task.deduplication_key,
+                deduplication_key=boefje_task.id,
             )
 
             self.push_boefje_task(
@@ -796,6 +795,10 @@ class BoefjeScheduler(Scheduler):
                 create_schedule=self.create_schedule,
                 caller=self.is_boefje_in_other_orgs.__name__,
             )
+            count += 1
+
+        if count > 0:
+            boefje_task.deduplication_key = boefje_task.id
 
         return boefje_task
 
