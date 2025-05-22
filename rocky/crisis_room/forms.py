@@ -8,7 +8,6 @@ from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import Dashboard, DashboardData
 
 
@@ -48,18 +47,23 @@ class AddDashboardItemForm(BaseRockyForm):
         self.data: QueryDict = kwargs.pop("data")
 
     def get_dashboard_selection(self) -> list[tuple[str, str]]:
-        return [
+        default = [("", "--- Select an option ----")]
+        dashboards = [
             (dashboard.id, dashboard.name)
             for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
-                name=FINDINGS_DASHBOARD_NAME
+                dashboarddata__findings_dashboard=True
             )
         ]
+        return default + dashboards
 
-    def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
+    def get_dashboard(self) -> Dashboard | None:
         try:
+            dashboard_id = self.cleaned_data.get("dashboard", "")
             return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
         except Dashboard.DoesNotExist:
             raise ValidationError("Dashboard does not exist.")
+        except ValueError:
+            raise ValidationError("No Dashboard selected. Choose an option from the list.")
 
     def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
         return DashboardData.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
@@ -86,7 +90,7 @@ class AddDashboardItemForm(BaseRockyForm):
         return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
 
     def create_dashboard_item(self) -> None:
-        dashboard = self.get_dashboard(self.cleaned_data.get("dashboard", ""))
+        dashboard = self.get_dashboard()
         title = self.cleaned_data.get("title", "")
 
         dashboard_data = {
@@ -107,13 +111,12 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def clean_dashboard(self):
         dashboard_name = self.cleaned_data.get("dashboard", "")
-        self.get_dashboard(dashboard_name)
+        self.get_dashboard()
         return dashboard_name
 
     def clean_title(self):
         title = self.cleaned_data.get("title", "")
-        dashboard_name = self.cleaned_data.get("dashboard", "")
-        dashboard = self.get_dashboard(dashboard_name)
+        dashboard = self.get_dashboard()
         if dashboard is not None and self.has_duplicate_name(dashboard, title):
             raise ValidationError("An item with that name already exists. Try a different title.")
         return title
