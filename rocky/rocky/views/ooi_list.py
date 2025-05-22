@@ -42,7 +42,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def get_object_list_settings_form_kwargs(self):
         data = self.request.POST if self.request.POST else None
 
-        return {"organization": self.organization, "query_from": "object_list", "data": data}
+        return {"organization": self.organization, "data": data}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
