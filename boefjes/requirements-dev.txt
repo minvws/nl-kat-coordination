@@ -1288,9 +1288,9 @@ selectolax==0.3.29 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:e9e4690894f406863e25ba49da27e1a6fda9bfc21b0b315c399d3093be080e81 \
     --hash=sha256:ea52e0c128e8e89f98ab0ccaabbc853677de5730729a3351da595976131b66e0 \
     --hash=sha256:edd2760699c60dde7d847aebd81f02035f7bddcd0ad3db8e73326dfc84a2dc8f
-setuptools==72.1.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:5a03e1860cf56bb6ef48ce186b0e557fdba433237481a9a625176c2831be15d1 \
-    --hash=sha256:8d243eff56d095e5817f796ede6ae32941278f542e0f941867cc05ae52b162ec
+setuptools==80.7.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:ca5cc1069b85dc23070a6628e6bcecb3292acac802399c7f8edc0100619f9009 \
+    --hash=sha256:f6ffc5f0142b1bd8d0ca94ee91b30c0ca862ffd50826da1ea85258a06fd94552
 shodan==1.25.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:7e2bddbc1b60bf620042d0010f4b762a80b43111dbea9c041d72d4325e260c23
 six==1.16.0 ; python_version >= "3.10" and python_version < "4.0" \
@@ -1492,9 +1492,9 @@ wrapt==1.17.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:f917c1180fdb8623c2b75a99192f4025e412597c50b2ac870f156de8fb101119 \
     --hash=sha256:fc78a84e2dfbc27afe4b2bd7c80c8db9bca75cc5b85df52bfe634596a1da846b \
     --hash=sha256:ff04ef6eec3eee8a5efef2401495967a916feaa353643defcc03fc74fe213b58
-xlsxwriter==3.2.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:9977d0c661a72866a61f9f7a809e25ebbb0fb7036baa3b9fe74afcfca6b3cb8c \
-    --hash=sha256:ecfd5405b3e0e228219bcaf24c2ca0915e012ca9464a14048021d21a995d490e
+xlsxwriter==3.2.3 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:593f8296e8a91790c6d0378ab08b064f34a642b3feb787cf6738236bd0a4860d \
+    --hash=sha256:ad6fd41bdcf1b885876b1f6b7087560aecc9ae5a9cc2ba97dcac7ab2e210d3d5
 zipp==3.20.2 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350 \
     --hash=sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29
