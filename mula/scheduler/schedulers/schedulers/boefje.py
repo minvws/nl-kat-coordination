@@ -727,7 +727,7 @@ class BoefjeScheduler(Scheduler):
             enabled=True,
             with_duplicates=True,
         )
-        if configs != 0:
+        if len(configs) == 0:
             self.logger.debug(
                 "No configs found for boefje",
                 boefje_id=boefje_task.boefje.id,
@@ -738,7 +738,8 @@ class BoefjeScheduler(Scheduler):
 
         other_orgs_from_configs = [config.organisation_id for config in configs[0].duplicates]
 
-        # We're only interested in the organisations that have the same input_ooi as the boefje task
+        # We're only interested in the organisations that have
+        # the same input_ooi as the boefje task
         orgs = self.ctx.services.octopoes.get_object_clients(
             reference=boefje_task.input_ooi, clients=set(other_orgs_from_configs), valid_time=datetime.now(timezone.utc)
         )
@@ -761,9 +762,10 @@ class BoefjeScheduler(Scheduler):
 
         for config in configs[0].duplicates:
             # TODO: expose this in the octopoes bulk endpoint instead
-            if config.organisation_id not in orgs:
+            ooi = self.ctx.services.octopoes.get_object(config.organisation_id, boefje_task.input_ooi)
+            if ooi is None:
                 self.logger.debug(
-                    "OOI does not exist anymore in duplicated organisation, skipping",
+                    "OOI does not exist anymore, skipping",
                     boefje_id=boefje_task.boefje.id,
                     ooi_primary_key=boefje_task.input_ooi,
                     organisation_id=config.organisation_id,
@@ -771,7 +773,6 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            ooi = orgs[config.organisation_id]
             if not self.has_boefje_permission_to_run(boefje, ooi):
                 self.logger.debug(
                     "Boefje not allowed to run on ooi",
