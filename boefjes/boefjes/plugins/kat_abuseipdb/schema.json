@@ -1,0 +1,32 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "ABUSEIPDB_API": {
+      "title": "ABUSEIPDB.com API token",
+      "maxLength": 128,
+      "type": "string",
+      "description": "Required (free) AbuseIPDB api token. See https://www.abuseipdb.com/register"
+    },
+    "MAX_AGE_DAYS":{
+      "title": "The maximum age of reports to be included. defaults to 30 days",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365,
+      "default": 30
+    },
+    "REQUEST_TIMEOUT": {
+      "title": "Timeout for slow lookup requests, defaults to 60 seconds",
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 1000,
+      "default": 60
+    }
+  },
+  "required": [
+    "ABUSEIPDB_API"
+  ],
+  "secret": [
+    "ABUSEIPDB_API"
+  ]
+}
