@@ -1,9 +1,7 @@
-===========
-Quick start
-===========
-
+============
 Installation
-************
+============
+
 This quick start guides will help you to get OpenKAT started on Ubuntu using the Docker setup. The steps below were performed on a clean Ubuntu 22.04 LTS virtual machine. This quick start assumes you have a working Ubuntu installation ready. Please note that these steps help you to setup a playground/developer environment for OpenKAT, this means you should not use it as a production environment. If you do, you do so at your own risk.
 
 Do *not* install Docker directly from the default Ubuntu repositories. This version is older and OpenKAT generally uses newer features. Using the Ubuntu repository version will likely break your OpenKAT install (at some point).
@@ -15,42 +13,42 @@ Do *not* install Docker directly from the default Ubuntu repositories. This vers
 
 #. Install missing Ubuntu packages.
 
-.. code-block:: sh
+   .. code-block:: sh
 
-    sudo apt install make
-..
+        sudo apt install make
+   ..
 
 #. Decide if you want to install the latest stable version of OpenKAT or if you want to run `main`. Clone the OpenKAT repository to a location of your choice as shown below.
 
-.. code-block:: sh
+   .. code-block:: sh
 
-    $ git clone https://github.com/minvws/nl-kat-coordination.git
-..
+        $ git clone https://github.com/minvws/nl-kat-coordination.git
+   ..
 
 #. Change into the cloned repository.
 
-.. code-block:: sh
+   .. code-block:: sh
 
-    $ cd nl-kat-coordination/
-..
+        $ cd nl-kat-coordination/
+    ..
 
 #. Create the environment file and run kat.
 
-.. code-block:: sh
+   .. code-block:: sh
 
-    $ make env
-    $ make kat
-..
+        $ make env
+        $ make kat
+   ..
 
 #. Pet your cat while you wait for all the containers to be built.
 
 #. Get your password from the `.env` file. An example of what this looks like is shown below.
 
-.. code-block:: sh
+   .. code-block:: sh
 
-    $ cat .env | grep DJANGO
-    DJANGO_SUPERUSER_PASSWORD=83d0ddac75c3fed23d2fc3a607affe432f9916d0f9dcc12680
-..
+        $ cat .env | grep DJANGO
+        DJANGO_SUPERUSER_PASSWORD=83d0ddac75c3fed23d2fc3a607affe432f9916d0f9dcc12680
+   ..
 
 #. Open your browser and go to: `http://localhost:8000/en/login`. Login using the username `superuser@localhost` and the password that you found using the previous step (everything after the equal sign `=`).
 
@@ -87,6 +85,9 @@ The next step is to go through the registration process, which let's you create 
 .. image:: img/1-onboarding-registration.png
   :alt: Start page for the registration process.
 
+Organization setup
+==================
+
 On this page you are asked to enter the name of your organization and a code that is used to identify your organization. If you are unsure what to do here, take a look at the next screenshot.
 
 .. image:: img/2-onboarding-organization-setup.png
@@ -97,15 +98,24 @@ The dummy organization for this tutorial is called 'Meow', which is entered in t
 .. image:: img/3-onboarding-organization-setup-meow.png
   :alt: Entering dummy organization information.
 
+Indemnification statement
+=========================
+
 The next step is to add the indemnification statement. Before you are allowed to scan, you are legally required to sign a waiver stating that you know what you are doing when scanning websites/hosts and that the person who signed the waiver can be held accountable. Please read the indemnification carefully and click the checkboxes if you agree.
 
 .. image:: img/4-onboarding-indemnification-setup.png
   :alt: Registration of the indemnification statement.
 
+Account setup
+=============
+
 Decide how you want to add accounts. The easiest way is to follow the onboarding flow, as this will do everything automatically. If you decide to click the 'Create separate accounts' button you'll have to perform manual steps.
 
 .. image:: img/5-onboarding-account-setup.png
   :alt: Create accounts.
+
+Introduction
+============
 
 The next page gives a quick introduction of how OpenKAT works.
 
@@ -117,10 +127,16 @@ A brief introduction on how reports are generated is given.
 .. image:: img/7-onboarding-choose-report-info.png
   :alt: Report introduction.
 
+Choose a report
+===============
+
 The onboarding shows a few report types. The only report you can choose during the onboarding is the DNS report.
 
 .. image:: img/8-onboarding-choose-report-type.png
   :alt: Choose report type.
+
+Adding an object
+================
 
 The next steps gives some basic information before adding your first object.
 
@@ -136,6 +152,9 @@ Here we add our dummy URL `https://mispo.es`. Feel free to add this URL, as it i
 
 .. image:: img/11-onboarding-setup-scan-url-mispoes.png
   :alt: Adding a dummy URL.
+
+Clearance levels
+================
 
 The plugins in OpenKAT have various scan levels to indicate if they are more or less intrusive for the objects that are scanned. Here you can find two examples of a less intrusive plugin (DNS zone) and a more intrusive plugin (Fierce). This level of intrusiveness is indicated by the number of paws, where more paws is more intrusive.
 
@@ -157,6 +176,9 @@ Before we can scan we have to enable plugins. Here you can choose some plugins. 
 .. image:: img/15-onboarding-select-plugins.png
   :alt: Select plugins.
 
+Start your first scan
+=====================
+
 This is the last page giving on overview of some scanning data. Click the button to start scanning!
 
 .. image:: img/16-onboarding-setup-scan-ooi-detail.png
@@ -166,6 +188,9 @@ OpenKAT will now add the URL and perform the scans on this URL, gather and analy
 
 .. image:: img/17-onboarding-scanning-report.png
   :alt: Waiting for your first scan to finish.
+
+First report
+============
 
 This is your very first DNS report! Congrats. After reviewing your report you can become familiar with the user interface by clicking on one of the items in the navigation bar at the top. If you need any help with navigating around and becoming familiar with OpenKAT, you can always go to the user manual.
 
