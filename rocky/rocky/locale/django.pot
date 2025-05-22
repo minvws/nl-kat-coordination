@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 11:58+0000\n"
+"POT-Creation-Date: 2025-05-21 11:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6146,6 +6146,7 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Scan warning"
 msgstr ""
 
@@ -6314,6 +6315,7 @@ msgid "No Raw file could be found, this might point to an error in OpenKAT"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Warning"
 msgstr ""
 
@@ -6936,6 +6938,10 @@ msgid "Current clearance level"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Declared clearance level explanation"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
 msgstr ""
 
@@ -6955,6 +6961,10 @@ msgid "Set clearance level to inherit"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Empty clearance level explanation"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty:"
 msgstr ""
 
@@ -6964,6 +6974,56 @@ msgid ""
 "will not be scanned by any Boefje until that Boefje is run manually for this "
 "object again. Objects with a clearance level higher than \"L0\" will be "
 "scanned automatically by Boefjes with corresponding scan levels."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Indemnification warning"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Indemnification is not set for this organization."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Go to the"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "organization settings page"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "to add one."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Set clearance level warning"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid ""
+"You don't have permissions to set clearance level. Contact your "
+"administrator."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+#, python-format
+msgid ""
+"You are not allowed to set the clearance level of this OOI. Your maximum "
+"clearance level is %(member_clearance_level)s and this OOI has level "
+"%(boefje_scan_level)s."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Go to your"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "account details"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "to manage your clearance level."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
