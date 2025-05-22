@@ -5,6 +5,9 @@ description = "KAT's Django front-end"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 beautifulsoup4 = "^4.11.2"
@@ -53,6 +56,7 @@ opentelemetry-util-http = "^0.53b1"
 structlog = "^25.3.0"
 django-structlog = "^9.1.1"
 cron-descriptor = "^1.4.5"
+pyyaml = "^6.0.2"
 
 
 [tool.poetry.group.dev.dependencies]

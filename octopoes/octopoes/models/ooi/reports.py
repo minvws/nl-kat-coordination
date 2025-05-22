@@ -36,10 +36,6 @@ class BaseReport(OOI):
     observed_at: datetime
     report_recipe: Reference = ReferenceField("ReportRecipe")
 
-    @classmethod
-    def type_from_raw(cls, raw_input:dict):
-        raise ValueError("BaseReport OOI type cannot be instantiated.")
-
 
 class AssetReport(BaseReport):
     object_type: Literal["AssetReport"] = Field("AssetReport", alias="object_type")  # Skip alias generation

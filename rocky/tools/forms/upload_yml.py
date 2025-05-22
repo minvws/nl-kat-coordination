@@ -20,9 +20,4 @@ class UploadYMLForm(forms.Form):
         yml_file = self.cleaned_data["yml_file"]
         if not (yml_file.name.endswith(".yml") or yml_file.name.endswith("yaml")):
             self.add_error("yml_file", YML_ERRORS["only_yml"])
-        try:
-            yml_file.read().decode("UTF-8")
-            yml_file.seek(0)  # set cursor back at the beginning of line
-        except UnicodeDecodeError:
-            self.add_error("yml_file", YML_ERRORS["decoding"])
         return yml_file

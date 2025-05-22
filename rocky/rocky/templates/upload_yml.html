@@ -16,6 +16,12 @@
                     {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
                 </ul>
                 <details>
+                    <summary>See Base OOI type details</summary>
+                    <ul>
+                        {% for criterion in base_ooi_types %}<li>{{ criterion }}</li>{% endfor %}
+                    </ul>
+                </details>
+                <details>
                     <summary>See available OOI types</summary>
                     <ul>
                         {% for ooi_type in ooi_types %}<li>{{ ooi_type }}</li>{% endfor %}

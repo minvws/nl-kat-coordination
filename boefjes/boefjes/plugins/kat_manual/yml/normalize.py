@@ -9,13 +9,16 @@ from pydantic import ValidationError
 
 from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
 from octopoes.models import OOI, Reference
-from models.ooi.findings import Finding
+from models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.geography import GeographicPoint
-from octopoes.models.ooi.network import Network
-from octopoes.models.ooi.web import WebURL
+from octopoes.models.ooi.certificate import SubjectAlternativeName
+from octopoes.models.ooi.network import Network, NetBlock
+from octopoes.models.ooi.web import WebURL, IPAddress
+from octopoes.models.ooi.dns.records import DNSRecord
+from octopoes.models.types import OOI_TYPES as CONCRETE_OOI_TYPES
 
 class OOITypeEntry(TypedDict):
-    type: Any
+    type: type[OOI]
     distinctive_fields: NotRequired[list[str]]
 
 def get_subclasses_deep(cls, res=[], sub_clss=[]):
@@ -28,18 +31,16 @@ def get_subclasses_deep(cls, res=[], sub_clss=[]):
             get_subclasses_deep(s_cls, res, new_sub_clss)
     return res
 
-OOI_TYPES: dict[str, OOITypeEntry] = reduce(
-        lambda ooit, dic: ooit.update(dic) or ooit,
-        map(
-            lambda cls: { cls.__name__: { "type": cls } },
-            get_subclasses_deep(OOI)
-        ),
-        {}
-    )
+OOI_TYPES: dict[str, OOITypeEntry] = {ooi_type: { "type": CONCRETE_OOI_TYPES[ooi_type] } for ooi_type in CONCRETE_OOI_TYPES } 
 # Types without _natural_key_attrs
 OOI_TYPES["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
 OOI_TYPES["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
 OOI_TYPES["WebURL"] = {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]}
+OOI_TYPES["SubjectAlternativeName"] = {"type": SubjectAlternativeName }
+OOI_TYPES["FindingType"] = {"type": FindingType }
+OOI_TYPES["IPAddress"] = {"type": IPAddress }
+OOI_TYPES["NetBlock"] = {"type": NetBlock }
+OOI_TYPES["DNSRecord"] = {"type": DNSRecord }
 
 
 logger = logging.getLogger(__name__)
@@ -63,16 +64,13 @@ def process_yml(yml_raw_data: bytes, reference_cache: dict) -> Iterable[Normaliz
             logger.exception(f"with error: {str(err)}")
     return oois
 
-def get_distinctive_fields(ooi_type):
-    return OOI_TYPES[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
-
 def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     # constants
     skip_properties = ("object_type", "scan_profile", "primary_key", "user_id")
     # check for main ooi
     ooi_type = OOI_TYPES[ooi_dict["ooi_type"]]["type"]
     # Special Cases
-    if hasattr(ooi_type, 'type_from_raw'): ooi_type = ooi_type.type_from_raw(ooi_dict)
+    ooi_type = ooi_type.type_from_raw(ooi_dict)
     # check for cache
     cache, cache_field_name = get_cache_and_field_name(ooi_type, ooi_dict, reference_cache)
     if cache_field_name in cache: return cache[cache_field_name]
@@ -112,7 +110,7 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     return ooi
     
 def get_cache_and_field_name(ooi_type, ooi_dict: dict, reference_cache:dict):
-    dins_fields = get_distinctive_fields(ooi_type)
+    dins_fields = OOI_TYPES[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
     cache_field_name = get_cache_name(ooi_dict, dins_fields)
     cache = reference_cache.setdefault(ooi_type.__name__, {})
     return cache, cache_field_name

@@ -18,23 +18,28 @@ from httpx import HTTPError
 from pydantic import ValidationError
 from tools.forms.upload_yml import YML_ERRORS
 from tools.forms.upload_oois import  UploadOOIYMLForm
+import yaml.parser
 
 from octopoes.api.models import Declaration
-from octopoes.models import OOI, Reference
-
-from octopoes.models.ooi.findings import Finding
+from octopoes.models import Reference
+from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.geography import GeographicPoint
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import Network, IPAddress, NetBlock
+from octopoes.models.ooi.certificate import SubjectAlternativeName
+from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.web import WebURL
+from octopoes.models.types import OOI_TYPES
 
 from rocky.bytes_client import get_bytes_client
 
+
 class OOICandidate(TypedDict):
     ooi_type: str
+    clearance: int
 
 class YamlSchape(TypedDict):
     references: dict[str, dict]
-    oois: list[dict[str, OOICandidate]]
+    oois: list[OOICandidate]
 
 YML_CRITERIA = [
     _(
@@ -47,10 +52,6 @@ YML_CRITERIA = [
         "You can use YAML referencing. "
         'Storing referenced objects in the "references" field is suggested for the next possible updates.'
     ),
-    _(
-        "Don't use base OOI classes for better experience. For example use CWEFindingType instead of FindingType. "
-        "At least FindingType id field should starts with CWE or other types and splitted with the '-' symbol."
-    )
 ]
 
 CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0,1,2,3,4]
@@ -65,36 +66,37 @@ def get_subclasses_deep(cls, res=[], sub_clss=[]):
             get_subclasses_deep(s_cls, res, new_sub_clss)
     return res
 
+def get_cache_name(ooi_dict:dict, field_combination: list[str]):
+    """It creates name for cache from str values of distinctive fields"""
+    return "|".join(filter(None, map(lambda a: str(ooi_dict.get(a, "")), field_combination)))
+
 class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_yml.html"
     form_class = UploadOOIYMLForm
     permission_required = "tools.can_scan_organization"
     reference_cache: dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
-    ooi_types: ClassVar[dict[str, Any]] = reduce(
-        lambda ooit, dic: ooit.update(dic) or ooit,
-        map(
-            lambda cls: { cls.__name__: { "type": cls } },
-            get_subclasses_deep(OOI)
-        ),
-        {}
-    )
-    # Types without _natural_key_attrs
+    ooi_types: ClassVar[dict[str, Any]] = {ooi_type: { "type": OOI_TYPES[ooi_type] } for ooi_type in OOI_TYPES }
+    # Types without _natural_key_attrs and some base OOI classes have type_from_raw class method
     ooi_types["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
     ooi_types["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
     ooi_types["WebURL"] = {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]}
+    ooi_types["SubjectAlternativeName"] = {"type": SubjectAlternativeName }
+    ooi_types["FindingType"] = {"type": FindingType }
+    ooi_types["IPAddress"] = {"type": IPAddress }
+    ooi_types["NetBlock"] = {"type": NetBlock }
+    ooi_types["DNSRecord"] = {"type": DNSRecord }
 
     skip_properties = ("object_type", "scan_profile", "primary_key", "user_id")
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        if not self.organization:
-            self.add_error_notification(YML_ERRORS["no_org"])
 
     def get_success_url(self):
         return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
-        base_ooi_classes = ["FindingType", "IPAddress", "NetBlock", "WebURL", "DNSRecord", "DNSSPFMechanism", "BaseReport"]
+        # Some of cannot instantiated, some of them can stil instantiable but not recommended. Thus they are not on list that user can see.
+        base_ooi_classes = ["FindingType", "IPAddress", "NetBlock", "WebURL", "DNSRecord", "DNSSPFMechanism", "BaseReport", "SubjectAlternativeName"]
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
@@ -112,6 +114,17 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                 self.ooi_types.keys()
             )
         ))
+        context["base_ooi_types"] = [
+            "Followings are about base OOI types (an example of base OOI class or type can be FindingType and it is base for CWEFindingType and more). "
+            "Base OOI classes are not recommended for better experience. They have different prerequisities to turn them into one of their child class types.",
+            "IPAddress base type automaticaly switch to IPAddressV4 or IPAddressV6 according to address field.",
+            "NetBlock base type automaticaly switch to IPV4NetBlock or IPV6NetBlock according to start_ip field.",
+            "DNSRecord base type automaticaly switch to proper class according to dns_record_type field.",
+            "WebUrl base type should have netloc field. "
+            "According to netloc (Hostname or IPv4Address en IPv6Address) it will turn into HostnameHTTPURL or IPAddressHTTPURL.",
+            "SubjectAlternativeName base type should have proper fields to define as one of child types.",
+            "FindingType base type should have an id field that contains \"<SubclassName>-...\"",
+        ]
         return context
 
 
@@ -127,10 +140,19 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def add_success_notification(self, success_message):
         messages.add_message(self.request, messages.SUCCESS, success_message)
         return True
+    
+    def read_file(self, yml_file):
+        try:
+            bytes_from_file =  yml_file.read()
+            # bytes_from_file.decode("UTF-8")
+            return bytes_from_file
+        except UnicodeDecodeError:
+            self.add_error_notification("File could not be decoded)")
 
     def process_yml(self, form):
         yml_file = form.cleaned_data["yml_file"]
-        yml_raw_data = yml_file.read()
+        yml_raw_data = self.read_file(yml_file)
+        if not yml_raw_data: return
         task_id = uuid4()
         get_bytes_client(self.organization.code).add_manual_proof(
             task_id, yml_raw_data, manual_mime_types={"manual/yml"}
@@ -141,12 +163,14 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             refs_and_oois: YamlSchape = yaml.safe_load(yml_data)
         except yaml.composer.ComposerError as err:
             return self.add_error_notification(f"Corrupted yaml file imported. Error: {err}")
+        except yaml.parser.ParserError as err:
+            return self.add_error_notification(f"Corrupted yaml file imported. Error: {err}")
         oois_from_yaml = refs_and_oois["oois"]
 
         # Controlling shape of data
-        if type(oois_from_yaml) != list:
+        if type(oois_from_yaml) is not list:
             return self.add_error_notification("OOI's should be stored in list type in the \"oois\" root field.")
-        if len(list(filter(lambda ooi_c: type(ooi_c) != dict, oois_from_yaml))):
+        if len(list(filter(lambda ooi_c: type(ooi_c) is not dict, oois_from_yaml))):
             return self.add_error_notification("All elements of oois list should object to create OOI.")
         if len(list(filter(lambda ooi_c: len(ooi_c.keys()) < 1, oois_from_yaml))):
             return self.add_error_notification("There are unsupported objects in the file.")
@@ -160,31 +184,18 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                 self.octopoes_api_connector.save_declaration(
                     Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
                 )
-            except ValidationError as err:
-                rows_with_error.append(ooi_number)
-                rows_with_error.append("ValidationError")
-                rows_with_error.append(str(err))
-            except ValueError as err:
-                rows_with_error.append(ooi_number)
-                rows_with_error.append("ValueError")
-                rows_with_error.append(str(err))
-            except KeyError as err:
-                rows_with_error.append(ooi_number)
-                rows_with_error.append("KeyError")
-                rows_with_error.append(str(err))
-                rows_with_error.append(str(err.args))
+            except (ValidationError, ValueError, KeyError) as err:
+                rows_with_error.extend([ooi_number, ooi_dict["ooi_type"], err.__repr__(), err, err.args])
         if rows_with_error:
             message = _("Object(s) could not be created for index: ") + ", ".join(map(str, rows_with_error))
             return self.add_error_notification(message)
         self.add_success_notification(_("Object(s) successfully added."))
 
         
-    def create_ooi(self, ooi_dict: dict):
+    def create_ooi(self, ooi_dict: OOICandidate):
         ooi_type = self.ooi_types[ooi_dict["ooi_type"]]["type"]
         # Special Cases
-        # normally it shouldn't run cause of using ooi_type in each raw object. But if user define some how a base class in the
-        # file it will come here and object will be created with proper subclass. exp: IPAddressV4 instead of IPAddress.
-        if hasattr(ooi_type, 'type_from_raw'): ooi_type = ooi_type.type_from_raw(ooi_dict)
+        ooi_type = ooi_type.type_from_raw(ooi_dict)
         # check for cache
         cache, cache_field_name = self.get_cache_and_field_name(ooi_type, ooi_dict)
         if cache_field_name in cache: return cache[cache_field_name]
@@ -197,10 +208,8 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         kwargs: dict[str, Any] = {}
         for field, referenced_type, is_reference, required in ooi_fields:
             if is_reference and required or is_reference and ooi_dict.get(field):
-                try:
-                    self.ooi_types[referenced_type]['type']
-                except Exception as e: raise Exception(e)
                 # required referenced fields or not required but also defined in yaml
+                if "ooi_type" in kwargs or field == "ooi_type": self.add_error_notification("field here")
                 try:
                     referenced_ooi = self.create_ooi(
                         ooi_dict.get(field.lower()) or ooi_dict[referenced_type.lower()],
@@ -228,16 +237,11 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         if ooi_dict.get("clearance") in CLEARANCE_VALUES:
             self.raise_clearance_level(ooi.reference, int(ooi_dict["clearance"]))
         return ooi
-
-    def get_distinctive_fields(self, ooi_type):
-        return self.ooi_types[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
     
     def get_cache_and_field_name(self, ooi_type, ooi_dict):
-        dins_fields = self.get_distinctive_fields(ooi_type)
-        cache_field_name = self.get_cache_name(ooi_dict, dins_fields)
+        dins_fields = self.ooi_types[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
+        cache_field_name = get_cache_name(ooi_dict, dins_fields)
         cache = self.reference_cache.setdefault(ooi_type.__name__, {})
         return cache, cache_field_name
 
-    def get_cache_name(self, ooi_dict:dict, field_combination: list[str]):
-        """It creates name for cache from str values of distinctive fields"""
-        return "|".join(filter(None, map(lambda a: str(ooi_dict.get(a, "")), field_combination)))
+
