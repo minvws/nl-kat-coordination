@@ -57,33 +57,23 @@ class PriorityQueueStore:
             query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
-                # Create a subquery to find the most common `deduplication_key` value
-                # from the `data` JSON field in TaskDB. This extracts the
-                # "deduplication_key" key from the JSON column, groups tasks by it,
-                # orders them by descending count, and limits to the top
-                # result.
-                top_deduplication_key = (
-                    session.query(
-                        func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null")).label(
-                            "deduplication_key"
-                        )
-                    )
-                    .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
-                    .filter(models.TaskDB.scheduler_id == scheduler_id)
-                    .group_by("deduplication_key")
-                    .order_by(func.count().desc())
-                    .limit(1)
+                dkey = (
+                    query.filter(models.TaskDB.data["deduplication_key"].astext != None)
+                    .order_by(models.TaskDB.priority.asc())
+                    .order_by(models.TaskDB.created_at.asc())
+                    .all()
                 )
+                if len(dkey) == 0:
+                    # No tasks with a deduplication key, fall back to the default pop
+                    return self.pop(scheduler_id, limit, filters)
 
-                if filters is not None:
-                    apply_filter(models.TaskDB, top_deduplication_key, filters)
+                # Get the first task with a deduplication key
+                first_dkey = dkey[0].data["deduplication_key"]
 
+                # Filter the query to only include tasks with the same deduplication key
                 item_orm = (
-                    query.order_by(models.TaskDB.priority.asc())
-                    .filter(
-                        func.coalesce(models.TaskDB.data["deduplication_key"].astext, literal("null"))
-                        == top_deduplication_key.subquery().c.deduplication_key
-                    )
+                    query.filter(models.TaskDB.data["deduplication_key"].astext == first_dkey)
+                    .order_by(models.TaskDB.priority.asc())
                     .order_by(models.TaskDB.created_at.asc())
                     .limit(limit)
                     .all()
