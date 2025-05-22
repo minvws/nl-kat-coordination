@@ -16,12 +16,10 @@ class AddDashboardForm(BaseRockyForm):
     dashboard_name = forms.CharField(label=_("Name"), required=True)
 
 
-class ObjectListSettingsForm(BaseRockyForm):
+class AddDashboardItemForm(BaseRockyForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
-
-    order_by = forms.ChoiceField(label=_("List sorting by"), required=True, widget=forms.Select, choices=([]))
 
     limit = forms.ChoiceField(
         label=_("Number of rows in list"),
@@ -39,30 +37,73 @@ class ObjectListSettingsForm(BaseRockyForm):
         initial="1",
     )
 
-    def __init__(self, *args, organization, query_from, **kwargs):
+    def __init__(self, organization, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = organization
-        self.query_from = query_from
         self.fields["dashboard"].choices = self.get_dashboard_selection()
-        self.fields["order_by"].choices = self.get_order_by_selection()
+        self.recipe_id = None
+        self.query_from = ""
+        self.template = ""
+        self.display_in_dashboard = True
+        self.data: QueryDict = kwargs.pop("data")
 
-        data: QueryDict | None = kwargs.pop("data")
+    def get_dashboard_selection(self) -> list[tuple[str, str]]:
+        return [
+            (dashboard.id, dashboard.name)
+            for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
+                name=FINDINGS_DASHBOARD_NAME
+            )
+        ]
 
-        if data:
-            self.recipe_id = data.get("recipe_id")
-            self.query_from = data.get("query_from")
-            self.ooi_types = data.getlist("ooi_type", [])
-            self.clearance_level = data.getlist("clearance_level", [])
-            self.clearance_type = data.getlist("clearance_type", [])
-            self.search_string = data.get("search_string")
-            self.template = data.get("template")
-            self.column_values = data.getlist("column_values", [])
-            self.column_names = data.getlist("column_names", [])
-            self.severities = data.getlist("severity", [])
+    def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
+        try:
+            return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
+        except Dashboard.DoesNotExist:
+            raise ValidationError("Dashboard does not exist.")
 
-            muted_findings = data.get("muted_findings", "non-muted")
-            self.exclude_muted = muted_findings == "non-muted"
-            self.only_muted = muted_findings == "muted"
+    def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
+        return DashboardData.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
+
+    def get_settings(self) -> dict[str, Any]:
+        column_values = self.data.getlist("column_values", [])
+        column_names = self.data.getlist("column_names", [])
+        columns = {column_value: column_names[index] for index, column_value in enumerate(column_values)}
+
+        if not columns:
+            raise ValidationError("Please choose at least one column.")
+
+        size = self.cleaned_data.get("size", "1")
+
+        return {"size": size, "columns": columns}
+
+    def get_query(self) -> dict[str, Any]:
+        sort_by = self.cleaned_data.get("order_by", "").split("-")
+
+        order_by = sort_by[0]
+        sorting_order = sort_by[1]
+        limit = int(self.cleaned_data.get("limit", 10))
+
+        return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
+
+    def create_dashboard_item(self) -> None:
+        dashboard = self.get_dashboard(self.cleaned_data.get("dashboard", ""))
+        title = self.cleaned_data.get("title", "")
+
+        dashboard_data = {
+            "dashboard": dashboard,
+            "name": title,
+            "recipe": self.recipe_id,
+            "query_from": self.query_from,
+            "query": json.dumps(self.get_query()),
+            "template": self.template,
+            "settings": self.get_settings(),
+            "display_in_dashboard": self.display_in_dashboard,
+        }
+
+        try:
+            DashboardData.objects.create(**dashboard_data)
+        except IntegrityError:
+            raise ValidationError(_("An error occurred while adding dashboard item."))
 
     def clean_dashboard(self):
         dashboard_name = self.cleaned_data.get("dashboard", "")
@@ -79,100 +120,77 @@ class ObjectListSettingsForm(BaseRockyForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
-        # Title is the only thing user really sets, the other values are prefilled which already contains data.
-        title = self.cleaned_data.get("title", "")
-
-        if title:
-            self.create_dashboard_item(**cleaned_data)
+        self.create_dashboard_item()
         return cleaned_data
 
-    def create_dashboard_item(self, **cleaned_data) -> None:
-        dashboard = self.get_dashboard(cleaned_data.get("dashboard", ""))
-        title = self.cleaned_data.get("title", None)
 
-        sort_by = cleaned_data.get("order_by", "").split("-")
-        order_by = sort_by[0]
-        sorting_order = sort_by[1]
+class AddObjectListDashboardItemForm(AddDashboardItemForm):
+    order_by = forms.ChoiceField(
+        label=_("List sorting by"),
+        required=True,
+        widget=forms.Select,
+        choices=(
+            ("object_type-asc", _("Type (A-Z)")),
+            ("object_type-desc", _("Type (Z-A)")),
+            ("scan_level-asc", _("Clearance level (Low-High)")),
+            ("scan_level-desc", _("Clearance level (High-Low)")),
+        ),
+    )
 
-        limit = int(cleaned_data.get("limit", 10))
-        size = cleaned_data.get("size", "1")
+    def __init__(self, organization, *args, **kwargs):
+        super().__init__(*args, organization, **kwargs)
+        self.query_from = "object_list"
+        self.template = "partials/dashboard_finding_list.html"
 
-        query = None
+    def get_query(self):
+        default_query = super().get_query()
 
-        if self.query_from == "object_list":
-            query = {
-                "ooi_types": self.ooi_types,
-                "scan_level": self.clearance_level,
-                "scan_profile_type": self.clearance_type,
-                "search_string": self.search_string,
-                "order_by": order_by,
-                "asc_desc": sorting_order,
-                "limit": limit,
-            }
-        elif self.query_from == "finding_list":
-            query = {
-                "severities": self.severities,
-                "exclude_muted": self.exclude_muted,
-                "only_muted": self.only_muted,
-                "search_string": self.search_string,
-                "order_by": order_by,
-                "asc_desc": sorting_order,
-                "limit": limit,
-            }
+        ooi_types = self.data.getlist("ooi_type", [])
+        clearance_level = self.data.getlist("clearance_level", [])
+        clearance_type = self.data.getlist("clearance_type", [])
+        search_string = self.data.get("search_string")
 
-        columns = {column_value: self.column_names[index] for index, column_value in enumerate(self.column_values)}
+        query = {
+            "ooi_types": ooi_types,
+            "scan_level": clearance_level,
+            "scan_profile_type": clearance_type,
+            "search_string": search_string,
+        }
+        return default_query | query
 
-        if not columns:
-            raise ValidationError("Please choose at least one column.")
 
-        settings = {"size": size, "columns": columns}
+class AddFindingListDashboardItemForm(AddDashboardItemForm):
+    order_by = forms.ChoiceField(
+        label=_("List sorting by"),
+        required=True,
+        widget=forms.Select,
+        choices=(
+            ("score-asc", _("Severity (Low-High)")),
+            ("score-desc", _("Severity (High-Low)")),
+            ("finding_type-asc", _("Finding (A-Z)")),
+            ("finding_type-desc", _("Finding (Z-A)")),
+        ),
+    )
 
-        dashboard_data = {
-            "dashboard": dashboard,
-            "name": title,
-            "recipe": self.recipe_id if self.recipe_id else None,
-            "query_from": self.query_from,
-            "query": json.dumps(query),
-            "template": self.template,
-            "settings": settings,
-            "display_in_dashboard": True,
+    def __init__(self, organization, *args, **kwargs):
+        super().__init__(organization, *args, **kwargs)
+        self.query_from = "finding_list"
+        self.template = "partials/dashboard_finding_list.html"
+
+    def get_query(self):
+        default_query = super().get_query()
+
+        severities = self.data.getlist("severity", [])
+        muted_findings = self.data.get("muted_findings", "non-muted")
+        exclude_muted = muted_findings == "non-muted"
+        only_muted = muted_findings == "muted"
+        search_string = self.data.get("search_string")
+
+        query = {
+            "severities": severities,
+            "exclude_muted": exclude_muted,
+            "only_muted": only_muted,
+            "search_string": search_string,
         }
 
-        try:
-            DashboardData.objects.create(**dashboard_data)
-        except IntegrityError:
-            raise ValidationError(_("An error occurred while adding dashboard item."))
-
-    def get_dashboard_selection(self) -> list[tuple[str, str]]:
-        return [
-            (dashboard.id, dashboard.name)
-            for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
-                name=FINDINGS_DASHBOARD_NAME
-            )
-        ]
-
-    def get_order_by_selection(self) -> list[tuple[str, str]]:
-        if self.query_from == "object_list":
-            return [
-                ("object_type-asc", _("Type (A-Z)")),
-                ("object_type-desc", _("Type (Z-A)")),
-                ("scan_level-asc", _("Clearance level (Low-High)")),
-                ("scan_level-desc", _("Clearance level (High-Low)")),
-            ]
-        elif self.query_from == "finding_list":
-            return [
-                ("score-asc", _("Severity (Low-High)")),
-                ("score-desc", _("Severity (High-Low)")),
-                ("finding_type-asc", _("Finding (A-Z)")),
-                ("finding_type-desc", _("Finding (Z-A)")),
-            ]
-        return []
-
-    def get_dashboard(self, dashboard_id: int) -> Dashboard | None:
-        try:
-            return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
-        except Dashboard.DoesNotExist:
-            raise ValidationError("Dashboard does not exist.")
-
-    def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
-        return DashboardData.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
+        return default_query | query

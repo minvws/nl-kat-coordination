@@ -2,7 +2,7 @@ import random
 from urllib.parse import urlencode
 
 import pytest
-from crisis_room.forms import ObjectListSettingsForm
+from crisis_room.forms import AddObjectListDashboardItemForm
 from crisis_room.models import Dashboard, DashboardData
 from crisis_room.views import (
     AddDashboardView,
@@ -435,7 +435,7 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
         "column_values": ["object", "object_type", "clearance_level", "clearance_type"],
     }
 
-    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
 
     assert form.is_valid()
 
@@ -443,7 +443,7 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
     DashboardData.objects.get(dashboard=dashboard_items[0].dashboard, name="Test Form")
 
     # test empty data
-    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(""))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(""))
 
     assert not form.is_valid()
 
@@ -459,7 +459,7 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
     # change for data to have the same title that already exists
     form_data["title"] = dashboard_items[0].name
 
-    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
     assert not form.is_valid()
 
     fields = list(form.errors)
@@ -477,7 +477,7 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
     # None existent dashboard
     form_data["dashboard"] = "None"
 
-    form = ObjectListSettingsForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
     assert not form.is_valid()
 
     fields = list(form.errors)

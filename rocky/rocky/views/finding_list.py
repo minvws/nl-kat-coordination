@@ -5,7 +5,7 @@ from typing import Any, Literal
 from urllib.parse import urlencode
 
 import structlog
-from crisis_room.forms import ObjectListSettingsForm
+from crisis_room.forms import AddFindingListDashboardItemForm
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -122,11 +122,18 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def sorting_order(self) -> Literal["asc", "desc"]:
         return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
 
+    def get_object_list_settings_form_kwargs(self):
+        data = self.request.POST if self.request.POST else None
+
+        return {"organization": self.organization, "data": data}
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
-        context["object_list_settings_form"] = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
+        context["object_list_settings_form"] = AddFindingListDashboardItemForm(
+            **self.get_object_list_settings_form_kwargs()
+        )
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["table_columns"] = self.get_table_columns()
@@ -162,7 +169,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         action = request.POST.get("action")
 
         if action == PageActions.ADD_TO_DASHBOARD.value:
-            if not self.organization_member.has_perm("tools.can_add_dashboard_item"):
+            if not self.organization_member.can_add_dashboard_item:
                 messages.error(request, _("You do not have the permission to add items to a dashboard."))
                 return self.get(request, status=404, *args, **kwargs)
             return self.add_to_dashboard(request, *args, **kwargs)
@@ -170,13 +177,8 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         messages.add_message(request, messages.ERROR, _("Unknown action."))
         return self.get(request, status=404, *args, **kwargs)
 
-    def get_object_list_settings_form_kwargs(self):
-        data = self.request.POST if self.request.POST else None
-
-        return {"organization": self.organization, "query_from": "finding_list", "data": data}
-
     def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
+        form = AddFindingListDashboardItemForm(**self.get_object_list_settings_form_kwargs())
 
         if form.is_valid():
             dashboard_name = form.cleaned_data.get("dashboard")
