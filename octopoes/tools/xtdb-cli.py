@@ -5,8 +5,7 @@ import json
 import logging
 
 import click
-
-from .xtdb_client import XTDBClient
+from xtdb_client import XTDBClient
 
 logger = logging.getLogger(__name__)
 

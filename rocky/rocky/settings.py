@@ -15,6 +15,7 @@ from pathlib import Path
 
 import environ
 import structlog
+from csp.constants import NONE, SELF
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
@@ -59,13 +60,15 @@ LOGGING = {
         "json_formatter": {"()": structlog.stdlib.ProcessorFormatter, "processor": structlog.processors.JSONRenderer()},
         "plain_console": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(colors=True, pad_level=False),
+            "processor": structlog.dev.ConsoleRenderer(
+                colors=True, pad_level=False, exception_formatter=structlog.dev.plain_traceback
+            ),
         },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": "json_formatter" if LOGGING_FORMAT == "json" else "plain_console",
+            "formatter": ("json_formatter" if LOGGING_FORMAT == "json" else "plain_console"),
         }
     },
     "loggers": {"root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO").upper()}},
@@ -251,25 +254,25 @@ if env.bool("POSTGRES_SSL_ENABLED", False):
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# Although no longer encouraged, it is possible to add more requirements by adding:
+# {  # noqa: ERA001
+#         "NAME": "django_password_validators.password_character_requirements"
+#         ".password_validation.PasswordCharacterValidator",
+#         "OPTIONS": {  # noqa: ERA001
+#             "min_length_digit": env.int("PASSWORD_MIN_DIGIT", 2),  # noqa: ERA001
+#             "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", 2),  # noqa: ERA001
+#             "min_length_special": env.int("PASSWORD_MIN_SPECIAL", 2),  # noqa: ERA001
+#             "min_length_lower": env.int("PASSWORD_MIN_LOWER", 2),  # noqa: ERA001
+#             "min_length_upper": env.int("PASSWORD_MIN_UPPER", 2),  # noqa: ERA001
+#             "special_characters": " ~!@#$%^&*()_+{}\":;'[]",  # noqa: ERA001
+#         },
+#     },
 
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", 12)},
-    },
-    {
-        "NAME": "django_password_validators.password_character_requirements"
-        ".password_validation.PasswordCharacterValidator",
-        "OPTIONS": {
-            "min_length_digit": env.int("PASSWORD_MIN_DIGIT", 2),
-            "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", 2),
-            "min_length_special": env.int("PASSWORD_MIN_SPECIAL", 2),
-            "min_length_lower": env.int("PASSWORD_MIN_LOWER", 2),
-            "min_length_upper": env.int("PASSWORD_MIN_UPPER", 2),
-            "special_characters": " ~!@#$%^&*()_+{}\":;'[]",
-        },
-    },
+    }
 ]
 
 # Internationalization
@@ -395,15 +398,19 @@ if CSP_HEADER:
     MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
     INSTALLED_APPS += ["csp"]
 
-CSP_DEFAULT_SRC = ["'none'"]
-CSP_IMG_SRC = ["'self'"]
-CSP_FONT_SRC = ["'self'"]
-CSP_STYLE_SRC = ["'self'"]
-CSP_FRAME_ANCESTORS = ["'none'"]
-CSP_BASE_URI = ["'none'"]
-CSP_FORM_ACTION = ["'self'"]
-CSP_INCLUDE_NONCE_IN = ["script-src"]
-CSP_CONNECT_SRC = ["'self'"]
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {
+            "default-src": [NONE],
+            "img-src": [SELF],
+            "font-src": [SELF],
+            "style-src": [SELF],
+            "frame-ancestors": [NONE],
+            "base-uri": [NONE],
+            "form-action": [SELF],
+            "connect-src": [SELF],
+            "script-src": [SELF],
+        }
+    }
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)

@@ -15,6 +15,30 @@
     width: 100%;
   }
 
+  ul {
+    li {
+      padding: 0;
+    }
+  }
+
+  form {
+    padding: 0;
+
+    button,
+    a.button {
+      padding: var(--spacing-grid-150);
+      background: transparent;
+      border-radius: unset;
+      border: 0;
+      justify-content: start;
+      font-weight: normal;
+
+      &:hover {
+        background-color: #f2f2f2;
+      }
+    }
+  }
+
   .dropdown-list {
     display: none;
     left: 0;
@@ -31,7 +55,7 @@
     border: 1px solid var(--colors-grey-200);
     background-color: var(--colors-white);
     max-height: 90vh;
-    overflow-x: scroll;
+    overflow-x: auto;
 
     > ul {
       margin: 0;
