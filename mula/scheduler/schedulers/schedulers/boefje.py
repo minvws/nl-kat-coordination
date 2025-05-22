@@ -727,6 +727,7 @@ class BoefjeScheduler(Scheduler):
             enabled=True,
             with_duplicates=True,
         )
+
         if not configs:
             self.logger.debug(
                 "No configs found for boefje",
