@@ -198,6 +198,7 @@ class Scheduler(abc.ABC):
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
+                item=item,
             )
             raise exc
         except QueueFullError as exc:
