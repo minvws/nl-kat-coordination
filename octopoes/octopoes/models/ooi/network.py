@@ -29,8 +29,8 @@ class Network(OOI):
 
     @classmethod
     def create(cls, **kwargs):
-        if 'name' in kwargs:
-            kwargs['name'] = kwargs['name'].lower()
+        if "name" in kwargs:
+            kwargs["name"] = kwargs["name"].lower()
         return super().create(**kwargs)
     
     @classmethod
