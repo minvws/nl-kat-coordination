@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Literal
-from urllib.parse import urlencode
 
 import structlog
 from crisis_room.forms import AddFindingListDashboardItemForm
@@ -181,12 +180,13 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         form = AddFindingListDashboardItemForm(**self.get_object_list_settings_form_kwargs())
 
         if form.is_valid():
-            dashboard_name = form.cleaned_data.get("dashboard")
-            messages.success(self.request, _("Dashboard item has been added to {}.").format(dashboard_name))
-            query_params = "?" + urlencode({"dashboard": dashboard_name})
+            dashboard_id = form.cleaned_data.get("dashboard")
+            messages.success(self.request, _("Dashboard item has been added."))
 
             return redirect(
-                reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}) + query_params
+                reverse(
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
+                )
             )
 
         return self.get(request, *args, **kwargs)
