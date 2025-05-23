@@ -6,7 +6,6 @@ from typing import Any
 from uuid import uuid4
 
 import structlog
-from crisis_room.models import Dashboard, DashboardData
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.utils import IntegrityError
@@ -15,6 +14,7 @@ from pydantic import ValidationError
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
+from crisis_room.models import Dashboard, DashboardData
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
