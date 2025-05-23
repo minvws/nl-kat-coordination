@@ -22,7 +22,7 @@ from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
 from crisis_room.forms import AddDashboardForm
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard
+from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import Dashboard, DashboardData
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -458,7 +458,10 @@ class AddDashboardView(OrganizationView, FormView):
         if form.is_valid():
             dashboard_name = request.POST.get("dashboard_name")
             try:
-                dashboard, created = get_or_create_dashboard(dashboard_name.strip(), self.organization)
+                dashboard, created = Dashboard.objects.get_or_create(
+                    name=dashboard_name, organization=self.organization
+                )
+
                 if created:
                     messages.success(request, f"Dashboard '{dashboard.name}' has been created.")
                 else:
