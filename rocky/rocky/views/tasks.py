@@ -124,7 +124,7 @@ class AllTaskListView(SchedulerListView, PageActionsView):
         return [org.code for org in self.request.user.organizations]
 
     def get_organization_filter(self) -> dict[str, dict[str, list[dict[str, str | list[str]]]]]:
-        if self.request.user.can_access_all_organizations:
+        if self.request.user.has_perm("tools.can_access_all_organizations"):
             # We don't need to add a filter if the user can access all organizations
             return {}
 
@@ -152,7 +152,7 @@ class AllTaskListView(SchedulerListView, PageActionsView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.task_filter_form(self.request.GET)
-        if self.request.user.can_access_all_organizations:
+        if self.request.user.has_perm("tools.can_access_all_organizations"):
             context["stats"] = self.client.get_task_stats_for_all_organizations(self.task_type)
         else:
             context["stats"] = self.client.get_combined_schedulers_stats(self.task_type, self.get_user_organizations())
