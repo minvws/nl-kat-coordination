@@ -4,6 +4,7 @@ from amqp import AMQPError
 from octopoes.config.settings import GATHER_BIT_METRICS, QUEUE_NAME_OCTOPOES, Settings
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager, get_rabbit_channel
+from octopoes.repositories.nibble_repository import XTDBNibbleRepository
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
@@ -37,10 +38,18 @@ def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSessio
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session)
     origin_param_repository = XTDBOriginParameterRepository(event_manager, xtdb_session)
     scan_profile_repository = XTDBScanProfileRepository(event_manager, xtdb_session)
+    nibble_repository = XTDBNibbleRepository(xtdb_session)
 
     if GATHER_BIT_METRICS:
         return OctopoesService(
-            ooi_repository, origin_repository, origin_param_repository, scan_profile_repository, xtdb_session
+            ooi_repository,
+            origin_repository,
+            origin_param_repository,
+            scan_profile_repository,
+            nibble_repository,
+            xtdb_session,
         )
     else:
-        return OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)
+        return OctopoesService(
+            ooi_repository, origin_repository, origin_param_repository, scan_profile_repository, nibble_repository
+        )
