@@ -51,7 +51,7 @@ class AddDashboardItemForm(BaseRockyForm):
         dashboards = [
             (dashboard.id, dashboard.name)
             for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
-                dashboarddata__findings_dashboard=True
+                dashboarditem__findings_dashboard=True
             )
         ]
         return default + dashboards
