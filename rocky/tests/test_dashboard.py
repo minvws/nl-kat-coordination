@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 import pytest
 from crisis_room.forms import AddObjectListDashboardItemForm
-from crisis_room.models import Dashboard, DashboardData
+from crisis_room.models import Dashboard, DashboardItem
 from crisis_room.views import (
     AddDashboardView,
     CrisisRoomView,
@@ -224,10 +224,10 @@ def test_update_dashboard_item_positioning(rf, redteam_member, dashboard_items):
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
-    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
-    dashboard_data_item_3 = DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_1 = DashboardItem.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_2 = DashboardItem.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_3 = DashboardItem.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_4 = DashboardItem.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     # item 1 must have moved down (+1), because we have changed item 2 to move up (-1)
     assert dashboard_data_item_2.position == position_item_2 + 1
@@ -257,7 +257,7 @@ def test_update_dashboard_item_positioning_lower_than_first_item(rf, redteam_mem
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_1 = DashboardItem.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
 
     # nothing will be updated, as we cannot move up if this is the first item
     assert dashboard_data_item_1.position == position_item_1
@@ -274,7 +274,7 @@ def test_update_dashboard_item_positioning_greater_than_last_item(rf, redteam_me
 
     assert response.status_code == 302
 
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_4 = DashboardItem.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     # nothing will be updated, as we cannot move down if this is the last item
     assert dashboard_data_item_4.position == position_item_4
@@ -298,13 +298,13 @@ def test_delete_dashboard_item(rf, redteam_member, dashboard_items):
 
     assert response.status_code == 302
 
-    dashboard_data_item_1 = DashboardData.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
-    dashboard_data_item_2 = DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_1 = DashboardItem.objects.get(id=item_1.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_2 = DashboardItem.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
 
-    with pytest.raises(DashboardData.DoesNotExist):
-        DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
+    with pytest.raises(DashboardItem.DoesNotExist):
+        DashboardItem.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
 
-    dashboard_data_item_4 = DashboardData.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
+    dashboard_data_item_4 = DashboardItem.objects.get(id=item_4.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
@@ -345,7 +345,7 @@ def test_delete_dashboard_item_repositioning(rf, client_member, dashboard_items)
     dashboard_items[1].delete()
 
     # get items after deleting, we order items by position
-    dashboard_items = DashboardData.objects.all().order_by("position")
+    dashboard_items = DashboardItem.objects.all().order_by("position")
 
     # position must match index of items
     for index, dashboard_item in enumerate(dashboard_items, start=1):
@@ -363,7 +363,7 @@ def test_delete_dashboard_item_no_dashboard(rf, redteam_member, dashboard_items)
     assert response.status_code == 302
 
     # item still exists but dashboard with unknown name cannot be found
-    DashboardData.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
+    DashboardItem.objects.get(id=item_3.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
@@ -381,7 +381,7 @@ def test_delete_dashboard_item_no_dashboard_data(rf, redteam_member, dashboard_i
 
     assert response.status_code == 302
 
-    DashboardData.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
+    DashboardItem.objects.get(id=item_2.id, dashboard__organization=redteam_member.organization)
 
     messages = list(request._messages)
 
@@ -440,7 +440,7 @@ def test_create_dashboard_item_form(client_member, dashboard_items):
     assert form.is_valid()
 
     # Check if dashboard data is created, after form is valid, should be created at this point
-    DashboardData.objects.get(dashboard=dashboard_items[0].dashboard, name="Test Form")
+    DashboardItem.objects.get(dashboard=dashboard_items[0].dashboard, name="Test Form")
 
     # test empty data
     form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(""))

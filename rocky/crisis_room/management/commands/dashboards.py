@@ -6,7 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 import structlog
-from crisis_room.models import Dashboard, DashboardData
+from crisis_room.models import Dashboard, DashboardItem
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.utils import IntegrityError
@@ -37,18 +37,18 @@ def get_or_create_default_dashboard(
 
     try:
         dashboard, _ = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
-        dashboard_data, created = DashboardData.objects.get_or_create(dashboard=dashboard)
+        dashboard_item, created = DashboardItem.objects.get_or_create(dashboard=dashboard)
 
         recipe = create_default_crisis_room_recipe(octopoes_client, valid_time, organization, recipe_default)
         schedule_request = create_schedule_request(valid_time, organization, recipe)
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
-        dashboard_data.recipe = recipe.recipe_id
+        dashboard_item.recipe = recipe.recipe_id
 
         if created:
-            dashboard_data.findings_dashboard = True
+            dashboard_item.findings_dashboard = True
 
-        dashboard_data.save()
+        dashboard_item.save()
         return created
 
     except (IntegrityError, ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
@@ -61,7 +61,7 @@ def get_or_create_dashboard(dashboard_name: str, organization: Organization) -> 
     return dashboard, created
 
 
-def get_or_create_dashboard_data(
+def get_or_create_dashboard_item(
     dashboard_name: str,
     organization: Organization,
     name: str,
@@ -70,13 +70,13 @@ def get_or_create_dashboard_data(
     query: dict[str, Any] | None,
     template: str,
     settings: dict[str, Any],
-) -> tuple[DashboardData | None, bool]:
+) -> tuple[DashboardItem | None, bool]:
     dashboard, _ = get_or_create_dashboard(dashboard_name, organization)
 
-    dashboard_data = None
+    dashboard_item = None
     created = False
     if recipe_id or query_from:
-        dashboard_data, created = DashboardData.objects.get_or_create(
+        dashboard_item, created = DashboardItem.objects.get_or_create(
             dashboard=dashboard,
             name=name,
             recipe=recipe_id,
@@ -85,14 +85,14 @@ def get_or_create_dashboard_data(
             template=template,
             settings=settings,
         )
-        dashboard_data.display_in_dashboard = True
-        dashboard_data.save()
+        dashboard_item.display_in_dashboard = True
+        dashboard_item.save()
 
-    return dashboard_data, created
+    return dashboard_item, created
 
 
 def schedule_recipe(
-    dashboard_data: DashboardData,
+    dashboard_item: DashboardItem,
     organization: Organization,
     octopoes_client: OctopoesAPIConnector,
     report_recipe: ReportRecipe,

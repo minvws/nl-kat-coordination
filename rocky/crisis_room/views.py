@@ -23,7 +23,7 @@ from tools.models import Organization, OrganizationMember
 
 from crisis_room.forms import AddDashboardForm
 from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME, get_or_create_dashboard
-from crisis_room.models import Dashboard, DashboardData
+from crisis_room.models import Dashboard, DashboardItem
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import ScanLevel, ScanProfileType
@@ -38,7 +38,7 @@ logger = structlog.get_logger(__name__)
 
 
 class DashboardItemView:
-    item: DashboardData | None = None
+    item: DashboardItem | None = None
     data: dict[str, Any] = {}
 
 
@@ -94,8 +94,8 @@ class DashboardService:
             logger.error("An error occurred: %s", error)
             return {}
 
-    def get_dashboard_items(self, dashboards_data: BaseManager[DashboardData]) -> list[DashboardItemView]:
-        dashboard_items: list[DashboardItemView] = []
+    def get_dashboard_items(self, dashboard_items: BaseManager[DashboardItem]) -> list[DashboardItemView]:
+        dashboard_items_with_data: list[DashboardItemView] = []
 
         recipes_data = {}
         reports_data = {}
@@ -104,31 +104,31 @@ class DashboardService:
         report_filters = []
 
         # First collect al data, if recipe id is found then fetch recipe ids to get reports later.
-        for dashboard_data in dashboards_data:
-            if not dashboard_data.recipe and dashboard_data.query_from == "object_list":
-                dashboard_item = DashboardItemView()
-                dashboard_item.item = dashboard_data
-                dashboard_item.data = self.get_ooi_list(dashboard_data)
-                dashboard_items.append(dashboard_item)
-            elif not dashboard_data.recipe and dashboard_data.query_from == "finding_list":
-                dashboard_item = DashboardItemView()
-                dashboard_item.item = dashboard_data
-                dashboard_item.data = self.get_finding_list(dashboard_data)
-                dashboard_items.append(dashboard_item)
-            elif dashboard_data.recipe:
-                report_filters.append((dashboard_data.dashboard.organization.code, str(dashboard_data.recipe)))
-                recipes_data[dashboard_data] = dashboard_data.recipe
+        for dashboard_item in dashboard_items:
+            if not dashboard_item.recipe and dashboard_item.query_from == "object_list":
+                item_data = DashboardItemView()
+                item_data.item = dashboard_item
+                item_data.data = self.get_ooi_list(dashboard_item)
+                dashboard_items_with_data.append(item_data)
+            elif not dashboard_item.recipe and dashboard_item.query_from == "finding_list":
+                item_data = DashboardItemView()
+                item_data.item = dashboard_item
+                item_data.data = self.get_finding_list(dashboard_item)
+                dashboard_items_with_data.append(item_data)
+            elif dashboard_item.recipe:
+                report_filters.append((dashboard_item.dashboard.organization.code, str(dashboard_item.recipe)))
+                recipes_data[dashboard_item] = dashboard_item.recipe
 
         if recipes_data:
             # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
 
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
-            for dashboard_data, recipe_id in recipes_data.items():
+            for dashboard_item, recipe_id in recipes_data.items():
                 try:
                     hydrated_report = reports[recipe_id]
                     raw_ids.append(hydrated_report.data_raw_id)
-                    reports_data[dashboard_data] = hydrated_report
+                    reports_data[dashboard_item] = hydrated_report
                 except KeyError:
                     continue
 
@@ -136,23 +136,23 @@ class DashboardService:
             report_data_from_bytes: dict[str, dict[str, Any]] = self.get_report_bytes_data(raw_ids)
 
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
-            for dashboard_data, hydrated_report in reports_data.items():
-                dashboard_item = DashboardItemView()
-                dashboard_item.item = dashboard_data
-                dashboard_item.data = {"report": hydrated_report}
+            for dashboard_item, hydrated_report in reports_data.items():
+                item_data = DashboardItemView()
+                item_data.item = dashboard_item
+                item_data.data = {"report": hydrated_report}
 
                 try:
                     report_data = report_data_from_bytes[hydrated_report.data_raw_id]
 
-                    if dashboard_data.findings_dashboard:
+                    if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)
 
-                    dashboard_item.data.update({"report_data": report_data})
-                    dashboard_items.append(dashboard_item)
+                    item_data.data.update({"report_data": report_data})
+                    dashboard_items_with_data.append(item_data)
                 except KeyError:
                     continue
 
-        return dashboard_items
+        return dashboard_items_with_data
 
     @staticmethod
     def get_organizations_findings_summary(organizations_findings: list[DashboardItemView]) -> dict[str, Any]:
@@ -181,8 +181,8 @@ class DashboardService:
 
         return summary
 
-    def get_ooi_list(self, dashboard_data) -> dict[str, Any]:
-        query = json.loads(dashboard_data.query)
+    def get_ooi_list(self, dashboard_item) -> dict[str, Any]:
+        query = json.loads(dashboard_item.query)
         ooi_list = []
 
         all_oois = {
@@ -205,7 +205,7 @@ class DashboardService:
 
         octopoes_client = OctopoesAPIConnector(
             settings.OCTOPOES_API,
-            dashboard_data.dashboard.organization.code,
+            dashboard_item.dashboard.organization.code,
             timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
         )
 
@@ -222,8 +222,8 @@ class DashboardService:
 
         return {"object_list": ooi_list}
 
-    def get_finding_list(self, dashboard_data) -> dict[str, Any]:
-        query = json.loads(dashboard_data.query)
+    def get_finding_list(self, dashboard_item) -> dict[str, Any]:
+        query = json.loads(dashboard_item.query)
         finding_list = []
 
         severities = set()
@@ -235,7 +235,7 @@ class DashboardService:
 
         octopoes_client = OctopoesAPIConnector(
             settings.OCTOPOES_API,
-            dashboard_data.dashboard.organization.code,
+            dashboard_item.dashboard.organization.code,
             timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
         )
 
@@ -266,11 +266,11 @@ class CrisisRoomView(TemplateView):
         dashboard_service = DashboardService()
         organizations = self.get_user_organizations()
 
-        dashboards_data = DashboardData.objects.filter(
+        dashboard_items = DashboardItem.objects.filter(
             dashboard__name=FINDINGS_DASHBOARD_NAME, dashboard__organization__in=organizations, findings_dashboard=True
         )
 
-        self.organizations_findings = dashboard_service.get_dashboard_items(dashboards_data)
+        self.organizations_findings = dashboard_service.get_dashboard_items(dashboard_items)
         self.organizations_findings_summary = dashboard_service.get_organizations_findings_summary(
             self.organizations_findings
         )
@@ -319,10 +319,12 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
 
         try:
             self.dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
-            dashboards_data = DashboardData.objects.filter(dashboard=self.dashboard).order_by("position")
+            dashboard_items = DashboardItem.objects.filter(dashboard=self.dashboard).order_by("position")
+            logger.error("Dashboard items: %s", dashboard_items)
             self.dashboard_items: list[DashboardItemView] | None = self.dashboard_service.get_dashboard_items(
-                dashboards_data
+                dashboard_items
             )
+            logger.error("self.dashboard_items: %s", self.dashboard_items)
 
         except Dashboard.DoesNotExist:
             messages.error(request, "Dashboard does not exist.")
@@ -387,23 +389,23 @@ class DeleteDashboardItemView(OrganizationView):
             raise PermissionDenied()
 
         try:
-            dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
-        except DashboardData.DoesNotExist:
+            dashboard_item = DashboardItem.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+        except DashboardItem.DoesNotExist:
             messages.error(request, f"Dashboard item '{dashboard_item_name}' not found.")
             return redirect(
                 reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
             )
 
-        dashboard_data_name = dashboard_data.name
-        dashboard_id = dashboard_data.dashboard.id
+        dashboard_item_name = dashboard_item.name
+        dashboard_id = dashboard_item.dashboard.id
 
-        deleted, _ = dashboard_data.delete()
+        deleted, _ = dashboard_item.delete()
 
         if deleted >= 1:
-            messages.success(request, f"Dashboard item '{dashboard_data_name}' has been deleted.")
+            messages.success(request, f"Dashboard item '{dashboard_item_name}' has been deleted.")
             logger.info(event_code=900309)
         else:
-            messages.error(request, f"Dashboard item '{dashboard_data_name}' could not be deleted.")
+            messages.error(request, f"Dashboard item '{dashboard_item_name}' could not be deleted.")
 
         return redirect(
             reverse(
@@ -424,16 +426,16 @@ class UpdateDashboardItemView(OrganizationView):
             raise PermissionDenied()
 
         try:
-            dashboard_data = DashboardData.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
-            dashboard_data.update_position(update_position)
+            dashboard_item = DashboardItem.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+            dashboard_item.update_position(update_position)
 
             return redirect(
                 reverse(
                     "organization_crisis_room",
-                    kwargs={"organization_code": self.organization.code, "id": dashboard_data.dashboard.id},
+                    kwargs={"organization_code": self.organization.code, "id": dashboard_item.dashboard.id},
                 )
             )
-        except DashboardData.DoesNotExist:
+        except DashboardItem.DoesNotExist:
             messages.error(request, "Dashboard item not found.")
         return redirect(
             reverse(
