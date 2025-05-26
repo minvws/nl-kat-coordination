@@ -8,7 +8,7 @@ from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
-from crisis_room.models import Dashboard, DashboardData
+from crisis_room.models import Dashboard, DashboardItem
 
 
 class AddDashboardForm(BaseRockyForm):
@@ -66,7 +66,7 @@ class AddDashboardItemForm(BaseRockyForm):
             raise ValidationError("No Dashboard selected. Choose an option from the list.")
 
     def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
-        return DashboardData.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
+        return DashboardItem.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
 
     def get_settings(self) -> dict[str, Any]:
         column_values = self.data.getlist("column_values", [])
@@ -93,7 +93,7 @@ class AddDashboardItemForm(BaseRockyForm):
         dashboard = self.get_dashboard()
         title = self.cleaned_data.get("title", "")
 
-        dashboard_data = {
+        dashboard_item = {
             "dashboard": dashboard,
             "name": title,
             "recipe": self.recipe_id,
@@ -105,7 +105,7 @@ class AddDashboardItemForm(BaseRockyForm):
         }
 
         try:
-            DashboardData.objects.create(**dashboard_data)
+            DashboardItem.objects.create(**dashboard_item)
         except IntegrityError:
             raise ValidationError(_("An error occurred while adding dashboard item."))
 

@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
-from crisis_room.models import Dashboard, DashboardData
+from crisis_room.models import Dashboard, DashboardItem
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
@@ -102,7 +102,7 @@ def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
 def create_findings_dashboard(organization: Organization) -> None:
     dashboard = Dashboard.objects.create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
     recipe_id = create_findings_dashboard_recipe(organization)
-    DashboardData.objects.create(
+    DashboardItem.objects.create(
         dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True
     )
     logger.info("New reecipe with id: %s has been created and scheduled.", recipe_id)
@@ -116,13 +116,13 @@ def get_or_update_findings_dashboard(organization: Organization) -> None:
     try:
         dashboard = Dashboard.objects.filter(dashboarddata__findings_dashboard=True, organization=organization).first()
         if dashboard is not None:
-            findings_dashboard = DashboardData.objects.get(dashboard=dashboard, findings_dashboard=True)
+            findings_dashboard = DashboardItem.objects.get(dashboard=dashboard, findings_dashboard=True)
             reschedule_recipe(organization, str(findings_dashboard.recipe))
             logger.info("Recipe %s has been rescheduled.", str(findings_dashboard.recipe))
         else:
             create_findings_dashboard(organization)
 
-    except DashboardData.DoesNotExist:
+    except DashboardItem.DoesNotExist:
         create_findings_dashboard(organization)
 
     except (IntegrityError, ValueError, ValidationError) as error:

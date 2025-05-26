@@ -100,8 +100,8 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
     this_organization = logs[13]
     this_organization_dashboard = logs[14]
-    this_organization_dashboard_data_created = logs[15]
-    this_organization_dashboard_data_updated = logs[16]
+    this_organization_dashboard_item_created = logs[15]
+    this_organization_dashboard_item_updated = logs[16]
 
     this_organization_organization_member_created = logs[17]
     this_organization_organization_member_updated = logs[18]
@@ -142,8 +142,8 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
     # dashboard and dashboard data created and updated for this test (when org is created)
     assert this_organization_dashboard["event"] == "%s %s created"
-    assert this_organization_dashboard_data_created["event"] == "%s %s created"
-    assert this_organization_dashboard_data_updated["event"] == "%s %s updated"
+    assert this_organization_dashboard_item_created["event"] == "%s %s created"
+    assert this_organization_dashboard_item_updated["event"] == "%s %s updated"
 
     # member created and updated for this org
     assert this_organization_organization_member_created["event"] == "%s %s created"
