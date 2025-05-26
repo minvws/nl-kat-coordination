@@ -4,6 +4,7 @@ import structlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
+from django.db.models.query_utils import Q
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -77,6 +78,9 @@ class DashboardItem(models.Model):
             ),
             models.UniqueConstraint(
                 name="unique dashboard name", fields=["dashboard", "name"], deferrable=models.Deferrable.DEFERRED
+            ),
+            models.UniqueConstraint(
+                fields=["findings_dashboard"], condition=Q(findings_dashboard=True), name="findings_dashboard"
             ),
         ]
 
