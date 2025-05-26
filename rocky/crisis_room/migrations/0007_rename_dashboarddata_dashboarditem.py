@@ -19,7 +19,7 @@ def update_permissions(_apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("crisis_room", "0005_add_dashboard_permissions_to_groups")]
+    dependencies = [("crisis_room", "0006_dashboarddata_findings_dashboard")]
 
     operations = [
         migrations.RenameModel(old_name="DashboardData", new_name="DashboardItem"),
