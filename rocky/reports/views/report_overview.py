@@ -97,21 +97,26 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         return recipes
 
     def post(self, request, *args, **kwargs):
-        recipe_pk = request.POST.get("report_recipe", "")
-        schedule_id = request.POST.get("schedule_id", "")
+        """Delete report recipe"""
+        recipe_id = request.POST.get("recipe_id")
+
+        filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": recipe_id}]}
+        schedule = self.get_schedule_with_filters(filters) if recipe_id else None
 
         if not self.organization_member.has_perm("tools.can_delete_oois"):
             messages.error(self.request, _("Not enough permissions"))
             return self.get(request, *args, **kwargs)
 
-        if recipe_pk and schedule_id and Reference.from_str(recipe_pk).class_type == ReportRecipe:
-            self.delete_report_schedule(schedule_id)
+        if schedule:
+            self.delete_report_schedule(str(schedule.id))
             try:
-                self.octopoes_api_connector.delete(Reference.from_str(recipe_pk), valid_time=datetime.now(timezone.utc))
-                logger.info(
-                    "Schedule and reportRecipe deleted", event_code="0800083", schedule_id=schedule_id, recipe=recipe_pk
+                self.octopoes_api_connector.delete(
+                    Reference.from_str(f"ReportRecipe|{recipe_id}"), valid_time=datetime.now(timezone.utc)
                 )
-                messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_pk))
+                logger.info(
+                    "Schedule and ReportRecipe deleted", event_code="0800083", schedule_id=schedule.id, recipe=recipe_id
+                )
+                messages.success(self.request, _("Recipe '{}' deleted successfully").format(recipe_id))
             except ObjectNotFoundException:
                 messages.error(self.request, _("Recipe not found."))
 
@@ -224,6 +229,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         messages.success(self.request, _("Deletion successful."))
 
     def rerun_reports(self, report_references: list[str]) -> None:
+        not_updated_reports = []
         for report_id in report_references:
             report_ooi = self.get_report_ooi(report_id)
 
@@ -237,14 +243,24 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
                     ),
                 )
             else:
-                self.rerun_report(report_ooi)
+                updated_all = self.rerun_report(report_ooi)
 
-                for asset_report in report_ooi.input_oois:
-                    self.rerun_report(asset_report)
-
-        messages.success(
-            self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
-        )
+                if updated_all:
+                    for asset_report in report_ooi.input_oois:
+                        if not self.rerun_report(asset_report):
+                            updated_all = False
+                if not updated_all:
+                    not_updated_reports.append(report_ooi.name)
+        if not not_updated_reports:
+            messages.success(
+                self.request, _("Rerun successful. It may take a moment before the new report has been generated.")
+            )
+        else:
+            messages.warning(
+                self.request,
+                _("Couldn't rerun %s, since the recipe for this report has been disabled or deleted.")
+                % ", ".join(not_updated_reports),
+            )
 
     def get_input_data(self, report_ooi: Report) -> dict[str, Any]:
         self.bytes_client.login()
@@ -266,15 +282,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
             self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
         ]
 
-    def rerun_report(self, report_ooi: Report | AssetReport):
+    def rerun_report(self, report_ooi: Report | AssetReport) -> bool:
         """Rerun an existing Report and its AssetReports."""
         deadline_at = datetime.now(timezone.utc).isoformat()
         report_recipe_id = str(report_ooi.report_recipe.tokenized.recipe_id)
         filters = {
             "filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": report_recipe_id}]
         }
-        schedule_id = str(self.get_schedule_with_filters(filters).id)
-        self.scheduler_client.patch_schedule(schedule_id=schedule_id, params={"deadline_at": deadline_at})
+        schedule = self.get_schedule_with_filters(filters)
+        if schedule and schedule.enabled:
+            self.scheduler_client.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
+            return True
+        return False
 
     def rename_reports(self, report_references: list[str]) -> None:
         report_names = self.request.POST.getlist("report_name", [])
@@ -325,8 +344,11 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     def get_queryset(self) -> ReportList:
         return ReportList(self.octopoes_api_connector, valid_time=self.observed_at, report_id=self.report_id)
 
+    def get_report_ooi(self, ooi_pk: str) -> HydratedReport:
+        return self.octopoes_api_connector.get_report(ooi_pk, valid_time=self.observed_at)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
-        context["report_id"] = self.report_id
+        context["report_ooi"] = self.get_report_ooi(self.report_id).to_report()
         return context
