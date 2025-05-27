@@ -22,7 +22,6 @@ from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
 from crisis_room.forms import AddDashboardForm
-from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import Dashboard, DashboardItem
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -267,7 +266,7 @@ class CrisisRoomView(TemplateView):
         organizations = self.get_user_organizations()
 
         dashboard_items = DashboardItem.objects.filter(
-            dashboard__name=FINDINGS_DASHBOARD_NAME, dashboard__organization__in=organizations, findings_dashboard=True
+            dashboard__organization__in=organizations, findings_dashboard=True
         )
 
         self.organizations_findings = dashboard_service.get_dashboard_items(dashboard_items)

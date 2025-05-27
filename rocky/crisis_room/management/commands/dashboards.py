@@ -1,5 +1,4 @@
 import json
-import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -52,7 +51,7 @@ def create_findings_dashboard_recipe(organization: Organization) -> str | None:
         return str(report_recipe.recipe_id)
 
     except (ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
-        logging.error("An error occurred: %s", error)
+        logger.error("An error occurred: %s", error)
     return None
 
 
@@ -74,7 +73,7 @@ def schedule_recipe(organization: Organization, recipe: ReportRecipe) -> None:
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
 
     except (ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
-        logging.error("An error occurred: %s", error)
+        logger.error("An error occurred: %s", error)
 
 
 def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
@@ -87,7 +86,8 @@ def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
         schedule = scheduler_cloent.post_schedule_search(filters)
 
         if not schedule.results:
-            return
+            logger.error("No schedule found for recipe %s", recipe_id)
+            return None
 
         schedule = schedule.results[0]
 
@@ -95,37 +95,43 @@ def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
             scheduler_cloent.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
 
     except (ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
-        logging.error("An error occurred: %s", error)
+        logger.error("An error occurred: %s", error)
     return None
 
 
-def get_or_update_findings_dashboard(organization: Organization) -> bool | None:
+def create_findings_dashboard(organization: Organization) -> None:
+    dashboard = Dashboard.objects.create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
+    recipe_id = create_findings_dashboard_recipe(organization)
+    DashboardItem.objects.create(
+        dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True
+    )
+    logger.info("New reecipe with id: %s has been created and scheduled.", recipe_id)
+
+
+def get_or_update_findings_dashboard(organization: Organization) -> None:
     """
     Find a findings dashboard, if found, take the recipe id and rerun the schedule.
-    If no findings dashboard is found, then create one and create a new recipe.
+    If no findings dashboard is found, then create a new one and create a new recipe.
     """
     try:
-        findings_dashboard = DashboardItem.objects.get(findings_dashboard=True)  # there can only be one (unique)
-        reschedule_recipe(organization, str(findings_dashboard.recipe))
-        return False
+        dashboard = Dashboard.objects.filter(dashboarddata__findings_dashboard=True, organization=organization).first()
+        if dashboard is not None:
+            findings_dashboard = DashboardItem.objects.get(dashboard=dashboard, findings_dashboard=True)
+            reschedule_recipe(organization, str(findings_dashboard.recipe))
+            logger.info("Recipe %s has been rescheduled.", str(findings_dashboard.recipe))
+        else:
+            create_findings_dashboard(organization)
+
     except DashboardItem.DoesNotExist:
-        recipe_id = create_findings_dashboard_recipe(organization)
-        dashboard = Dashboard.objects.get_or_create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
-        DashboardItem.objects.create(
-            dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True
-        )
-        return True
+        create_findings_dashboard(organization)
+
     except (IntegrityError, ValueError, ValidationError) as error:
-        logging.error("An error occurred: %s", error)
-    return None
+        logger.info("Findings Dashboard not created. See error logs for more info.")
+        logger.error("An error occurred: %s", error)
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         organizations = Organization.objects.all()
         for organization in organizations:
-            created = get_or_update_findings_dashboard(organization)
-            if created:
-                logging.info("Dashboard created for organization %s", organization.name)
-            else:
-                logging.info("Dashboard updated for organization %s", organization.name)
+            get_or_update_findings_dashboard(organization)
