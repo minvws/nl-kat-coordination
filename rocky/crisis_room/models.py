@@ -80,7 +80,9 @@ class DashboardItem(models.Model):
                 name="unique dashboard name", fields=["dashboard", "name"], deferrable=models.Deferrable.DEFERRED
             ),
             models.UniqueConstraint(
-                fields=["findings_dashboard"], condition=Q(findings_dashboard=True), name="findings_dashboard"
+                fields=["dashboard"],
+                condition=Q(findings_dashboard=True),
+                name="unique_findings_dashboard_per_dashboard",
             ),
         ]
 

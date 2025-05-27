@@ -24,7 +24,9 @@ FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 logger = structlog.get_logger(__name__)
 
 
-def create_findings_dashboard_recipe(organization: Organization) -> str | None:
+def create_findings_dashboard_recipe(
+    organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
+) -> str | None:
     """
     Creates a recipe OOI based on default recipe from recipe_seeder.json.
     Creates a schedule of this recipe so the Report can be created to populate data for the Findings Dashboard.
@@ -37,9 +39,10 @@ def create_findings_dashboard_recipe(organization: Organization) -> str | None:
             recipe_default = json.load(recipe_seeder)
 
         valid_time = datetime.now(timezone.utc)
-        octopoes_client = OctopoesAPIConnector(
-            settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
-        )
+        if octopoes_client is None:
+            octopoes_client = OctopoesAPIConnector(
+                settings.OCTOPOES_API, organization.code, timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT
+            )
         bytes_client = get_bytes_client(organization.code)
 
         report_recipe = ReportRecipe(recipe_id=uuid4(), **recipe_default)
@@ -99,16 +102,18 @@ def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
     return None
 
 
-def create_findings_dashboard(organization: Organization) -> None:
+def create_findings_dashboard(organization: Organization, octopoes_client: OctopoesAPIConnector | None = None) -> None:
     dashboard = Dashboard.objects.create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
-    recipe_id = create_findings_dashboard_recipe(organization)
+    recipe_id = create_findings_dashboard_recipe(organization, octopoes_client)
     DashboardItem.objects.create(
         dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True
     )
     logger.info("New reecipe with id: %s has been created and scheduled.", recipe_id)
 
 
-def get_or_update_findings_dashboard(organization: Organization) -> None:
+def get_or_update_findings_dashboard(
+    organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
+) -> None:
     """
     Find a findings dashboard, if found, take the recipe id and rerun the schedule.
     If no findings dashboard is found, then create a new one and create a new recipe.
@@ -120,13 +125,13 @@ def get_or_update_findings_dashboard(organization: Organization) -> None:
             reschedule_recipe(organization, str(findings_dashboard.recipe))
             logger.info("Recipe %s has been rescheduled.", str(findings_dashboard.recipe))
         else:
-            create_findings_dashboard(organization)
+            create_findings_dashboard(organization, octopoes_client)
 
     except DashboardItem.DoesNotExist:
-        create_findings_dashboard(organization)
+        create_findings_dashboard(organization, octopoes_client)
 
     except (IntegrityError, ValueError, ValidationError) as error:
-        logger.info("Findings Dashboard not created. See error logs for more info.")
+        logger.error("Findings Dashboard not created. See error logs for more info.")
         logger.error("An error occurred: %s", error)
 
 

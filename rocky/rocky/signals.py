@@ -119,7 +119,7 @@ def organization_post_save(sender, instance, created, *args, **kwargs):
 
     # will trigger only when new organization is created, not for updating.
     if created:
-        get_or_update_findings_dashboard(instance)
+        get_or_update_findings_dashboard(instance, octopoes_client)
 
     try:
         valid_time = datetime.datetime.now(datetime.timezone.utc)

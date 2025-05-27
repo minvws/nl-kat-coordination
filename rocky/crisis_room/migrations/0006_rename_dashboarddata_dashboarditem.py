@@ -35,8 +35,8 @@ class Migration(migrations.Migration):
             model_name="dashboarditem",
             constraint=models.UniqueConstraint(
                 condition=models.Q(("findings_dashboard", True)),
-                fields=("findings_dashboard",),
-                name="findings_dashboard",
+                fields=("dashboard",),
+                name="unique_findings_dashboard_per_dashboard",
             ),
         ),
         migrations.RunPython(update_permissions),
