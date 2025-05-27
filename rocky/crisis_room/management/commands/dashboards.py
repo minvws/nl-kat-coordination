@@ -74,6 +74,7 @@ def schedule_recipe(organization: Organization, recipe: ReportRecipe) -> None:
         )
 
         scheduler_client(organization.code).post_schedule(schedule=schedule_request)
+        logger.info("Schedule created for recipe: %s")
 
     except (ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
         logger.error("An error occurred: %s", error)
@@ -81,21 +82,24 @@ def schedule_recipe(organization: Organization, recipe: ReportRecipe) -> None:
 
 def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
     try:
-        scheduler_cloent = scheduler_client(organization.code)
+        scheduler_connector = scheduler_client(organization.code)
         deadline_at = datetime.now(timezone.utc).isoformat()
 
         filters = {"filters": [{"column": "data", "field": "report_recipe_id", "operator": "==", "value": recipe_id}]}
 
-        schedule = scheduler_cloent.post_schedule_search(filters)
+        schedule = scheduler_connector.post_schedule_search(filters)
 
         if not schedule.results:
-            logger.error("No schedule found for recipe %s", recipe_id)
+            logger.error("Schedule with recipe id: %s not found.", recipe_id)
             return None
 
         schedule = schedule.results[0]
 
-        if schedule and schedule.enabled:
-            scheduler_cloent.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
+        if not schedule.enabled:
+            logger.error("A schedule with recipe id: %s is disabled. Enable schedule first.", recipe_id)
+            return None
+
+        scheduler_connector.patch_schedule(schedule_id=str(schedule.id), params={"deadline_at": deadline_at})
 
     except (ValueError, ValidationError, HTTPStatusError, ConnectionError) as error:
         logger.error("An error occurred: %s", error)
@@ -131,8 +135,7 @@ def get_or_update_findings_dashboard(
         create_findings_dashboard(organization, octopoes_client)
 
     except (IntegrityError, ValueError, ValidationError) as error:
-        logger.error("Findings Dashboard not created. See error logs for more info.")
-        logger.error("An error occurred: %s", error)
+        logger.error("Findings Dashboard not created. More info: %s", error)
 
 
 class Command(BaseCommand):
