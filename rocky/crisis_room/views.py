@@ -319,11 +319,9 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
         try:
             self.dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
             dashboard_items = DashboardItem.objects.filter(dashboard=self.dashboard).order_by("position")
-            logger.error("Dashboard items: %s", dashboard_items)
             self.dashboard_items: list[DashboardItemView] | None = self.dashboard_service.get_dashboard_items(
                 dashboard_items
             )
-            logger.error("self.dashboard_items: %s", self.dashboard_items)
 
         except Dashboard.DoesNotExist:
             messages.error(request, "Dashboard does not exist.")
@@ -468,13 +466,17 @@ class AddDashboardView(OrganizationView, FormView):
                 else:
                     messages.error(request, f"Dashboard with name '{dashboard.name}' already exists.")
 
+                return redirect(
+                    reverse(
+                        "organization_crisis_room",
+                        kwargs={"organization_code": self.organization.code, "id": dashboard.id},
+                    )
+                )
             except IntegrityError:
                 messages.error(request, "Dashboard could not be created.")
 
             return redirect(
-                reverse(
-                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard.id}
-                )
+                reverse("organization_crisis_room_landing", kwargs={"organization_code": self.organization.code})
             )
         else:
             return redirect(
