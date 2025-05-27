@@ -4,12 +4,12 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
+from structlog.testing import capture_logs
+
 from scheduler import clients, config, models, schedulers, storage
 from scheduler.models import BoefjeConfig
 from scheduler.models.ooi import RunOn
 from scheduler.storage import stores
-from structlog.testing import capture_logs
-
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -856,7 +856,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: popped items should be 1
         popped_items = self.scheduler.pop_item_from_queue()
         self.assertEqual(1, len(popped_items))
-        self.assertIsNotNone(popped_items[0].data.get("deduplication_key"))
+        self.assertIsNone(popped_items[0].data.get("deduplication_key"))
 
     def test_push_boefje_task_boefje_in_other_orgs_no_configs(self):
         # Arrange
