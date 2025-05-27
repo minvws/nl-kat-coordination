@@ -788,12 +788,17 @@ class BoefjeScheduler(Scheduler):
                 deduplication_key=boefje_task.id,
             )
 
-            self.push_boefje_task(
-                boefje_task=new_boefje_task,
-                organisation_id=config.organisation_id,
-                create_schedule=self.create_schedule,
-                caller=self.is_boefje_in_other_orgs.__name__,
-            )
+            try:
+                self.push_boefje_task(
+                    boefje_task=new_boefje_task,
+                    organisation_id=config.organisation_id,
+                    create_schedule=self.create_schedule,
+                    caller=self.is_boefje_in_other_orgs.__name__,
+                )
+            except Exception:
+                self.logger.critical("Failed to push child dedup task")
+                continue
+
             count += 1
 
         if count > 0:
