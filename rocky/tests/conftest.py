@@ -2249,11 +2249,11 @@ def scheduled_reports_list():
 
 
 @pytest.fixture
-def dashboard_items(client_member):
+def dashboard_items(redteam_member):
     # first delete to test that no other dashboard and items exists
     Dashboard.objects.all().delete()
 
-    dashboard = Dashboard.objects.create(name="Test", organization=client_member.organization)
+    dashboard = Dashboard.objects.create(name="Test", organization=redteam_member.organization)
     dashboard_item_1 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="URLs",
@@ -2323,3 +2323,32 @@ def dashboard_items(client_member):
         display_in_dashboard=True,
     )
     return [dashboard_item_1, dashboard_item_2, dashboard_item_3, dashboard_item_4]
+
+
+@pytest.fixture
+def dashboard_items_from_findings_list(redteam_member):
+    # first delete to test that no other dashboard and items exists
+    Dashboard.objects.all().delete()
+
+    dashboard = Dashboard.objects.create(name="Test", organization=redteam_member.organization)
+
+    dashboard_item_1 = DashboardItem.objects.create(
+        dashboard=dashboard,
+        name="Medium severity findings",
+        query_from="findings_list",
+        query='{"order_by": "score", "asc_desc": "asc", "limit": 5, "severities": ["medium"], '
+        '"exclude_muted": true, "only_muted": false, "search_string": ""}',
+        settings={
+            "size": "2",
+            "columns": {
+                "tree": "Tree",
+                "graph": "Graph",
+                "finding": "Finding",
+                "location": "Location",
+                "severity": "Severity",
+            },
+        },
+        display_in_dashboard=True,
+    )
+
+    return [dashboard_item_1]

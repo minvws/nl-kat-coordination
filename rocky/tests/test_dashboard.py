@@ -2,7 +2,7 @@ import random
 from urllib.parse import urlencode
 
 import pytest
-from crisis_room.forms import AddObjectListDashboardItemForm
+from crisis_room.forms import AddFindingListDashboardItemForm, AddObjectListDashboardItemForm
 from crisis_room.models import Dashboard, DashboardItem
 from crisis_room.views import (
     AddDashboardView,
@@ -418,7 +418,7 @@ def test_delete_dashboard_no_permission(rf, client_member, dashboard_items):
         DeleteDashboardView.as_view()(request, organization_code=client_member.organization.code)
 
 
-def test_create_dashboard_item_form(client_member, dashboard_items):
+def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
     form_data = {
         "dashboard": dashboard_items[0].dashboard.id,
         "title": "Test Form",
@@ -526,3 +526,81 @@ def test_clients_permissions_for_dashboard(rf, mocker, client_member, dashboard_
     assertNotContains(response, "+ Add Dashboard")
     assertNotContains(response, "Delete Dashboard")
     assertNotContains(response, "Delete item ")
+
+
+def test_create_dashboard_item_form_findings_list(client_member, dashboard_items_from_findings_list):
+    form_data = {
+        "dashboard": dashboard_items_from_findings_list[0].dashboard.id,
+        "title": "Test Form",
+        "order_by": "score-asc",
+        "limit": "10",
+        "size": "2",
+        "observed_at": "2025-05-07",
+        "exclude_muted": "True",
+        "only_muted": "False",
+        "query_from": "finding_list",
+        "column_names": ["Tree", "Graph", "Finding", "Location", "Severity"],
+        "column_values": ["tree", "graph", "finding", "location", "severity"],
+    }
+
+    form = AddFindingListDashboardItemForm(
+        organization=client_member.organization, data=QueryDict(urlencode(form_data))
+    )
+
+    assert form.is_valid()
+
+    # Check if dashboard data is created, after form is valid, should be created at this point
+    DashboardItem.objects.get(dashboard=dashboard_items_from_findings_list[0].dashboard, name="Test Form")
+
+    # test empty data
+    form = AddFindingListDashboardItemForm(organization=client_member.organization, data=QueryDict(""))
+
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+
+    # errors on all fields
+    assert "dashboard" in fields
+    assert "title" in fields
+    assert "order_by" in fields
+    assert "limit" in fields
+    assert "size" in fields
+
+    # change for data to have the same title that already exists
+    form_data["title"] = dashboard_items_from_findings_list[0].name
+
+    form = AddFindingListDashboardItemForm(
+        organization=client_member.organization, data=QueryDict(urlencode(form_data))
+    )
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+    errors = list(form.errors.values())
+
+    assert "title" in fields
+
+    # duplicate title throws form error
+    for error_list in errors:
+        assert "An item with that name already exists. Try a different title." in error_list
+
+    # set it back
+    form_data["title"] = "Test Form"
+
+    # None existent dashboard
+    form_data["dashboard"] = "None"
+
+    form = AddFindingListDashboardItemForm(
+        organization=client_member.organization, data=QueryDict(urlencode(form_data))
+    )
+    assert not form.is_valid()
+
+    fields = list(form.errors)
+    errors = list(form.errors.values())
+
+    assert "dashboard" in fields
+
+    for error_list in errors:
+        assert (
+            "No Dashboard selected. Choose an option from the list." in error_list
+            or "Select a valid choice. None is not one of the available choices." in error_list
+        )
