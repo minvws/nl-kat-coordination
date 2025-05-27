@@ -159,6 +159,8 @@ class TaskStore:
 
             results = query.all()
 
+            # From python 3.7+ dict preserves insertion order, so we can use it
+            # to build the response
             response: dict[str, dict[str, int]] = {}
             for row in results:
                 date, status, task_count = row
