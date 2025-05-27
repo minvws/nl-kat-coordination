@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-27 08:57+0000\n"
+"POT-Creation-Date: 2025-05-27 11:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -787,6 +787,7 @@ msgid "Crisis room navigation"
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
+#: crisis_room/templates/organization_crisis_room_dashboards.html
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/findings_report/report.html
@@ -855,13 +856,28 @@ msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
-"There are no dashboard items to display here. You can add an item via the "
-"filter on the object page."
+"There are no dashboard items added yet. You can add dashboard items via the "
+"objects and findings page."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
-#: crisis_room/templates/partials/dashboard_ooi_list.html
-msgid "Go to objects"
+msgid "Actions for adding dashboard items"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room_dashboards.html
+msgid "Add dashboard item from"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
+#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
+msgid "Objects"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
@@ -1082,6 +1098,10 @@ msgstr ""
 #: crisis_room/templates/partials/dashboard_ooi_list.html
 #, python-format
 msgid "Showing %(length)s objects"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_ooi_list.html
+msgid "Go to objects"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_ooi_list_table.html
@@ -4365,17 +4385,6 @@ msgid "Select all %(total_oois)s object"
 msgid_plural "Select all %(total_oois)s objects"
 msgstr[0] ""
 msgstr[1] ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
-#: rocky/templates/admin/delete_selected_confirmation.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
-#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
-msgid "Objects"
-msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object name"

@@ -105,17 +105,36 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p>
-                {% blocktranslate trimmed %}
-                    There are no dashboard items to display here.
-                    You can add an item via the filter on the object page.
-                {% endblocktranslate %}
-            </p>
-            <a class="button ghost"
-               href="{% url "ooi_list" organization_code=organization.code %}">
-                {% translate "Go to objects" %}
-                <span class="icon ti-chevron-right" aria-hidden="true"></span>
-            </a>
+            <div class="centered">
+                <img src="{% static "img/fishbone.svg" %}" alt="Fishbone image">
+                <p>
+                    {% blocktranslate trimmed %}
+                        There are no dashboard items added yet. You can add
+                        dashboard items via the objects and findings page.
+                    {% endblocktranslate %}
+                </p>
+                <div class="dropdown">
+                    <button aria-label="{% translate "Actions for adding dashboard items" %}"
+                            aria-controls="add-item-dropdown"
+                            aria-expanded="false"
+                            class="dropdown-button ghost">
+                        {% translate "Add dashboard item from" %}
+                        <span class="icon ti-chevron-down" aria-hidden="true"></span>
+                    </button>
+                    <div id="add-item-dropdown"
+                         class="dropdown-list"
+                         aria-labelledby="add-item-dropdown-button">
+                        <ul>
+                            <li>
+                                <a href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Objects" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url "finding_list" organization_code=organization.code %}">{% translate "Findings" %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         {% endif %}
     </div>
     {% if organization_member.can_delete_dashboard %}
