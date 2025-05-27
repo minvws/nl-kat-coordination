@@ -11,3 +11,13 @@ table span.icon {
 table .expando-row pre {
   max-width: 50vw;
 }
+table td.ascii{
+  font-family: monospace;
+}
+
+table.hex td.ascii .highlight{
+  background-color: var(--color-alert-informative);
+}
+table.hex td:onmouseover{
+  background-color: var(--color-alert-informative);
+}
