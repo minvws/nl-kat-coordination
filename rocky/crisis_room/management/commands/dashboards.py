@@ -12,14 +12,11 @@ from pydantic import ValidationError
 from tools.models import Organization
 from tools.ooi_helpers import create_ooi
 
-from crisis_room.models import Dashboard, DashboardItem
+from crisis_room.models import FINDINGS_DASHBOARD_NAME, FINDINGS_DASHBOARD_TEMPLATE, Dashboard, DashboardItem
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import ReportTask, ScheduleRequest, scheduler_client
-
-FINDINGS_DASHBOARD_NAME = "Findings Dashboard"
-FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 logger = structlog.get_logger(__name__)
 

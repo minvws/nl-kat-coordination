@@ -1,6 +1,8 @@
 from django.contrib.auth.models import Permission
 from django.db import migrations, models
 
+from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard
+
 
 def update_permissions(_apps, _schema_editor):
     old_permissions = Permission.objects.filter(codename__icontains="dashboarddata")
@@ -16,6 +18,13 @@ def update_permissions(_apps, _schema_editor):
             )
 
         permission.delete()
+
+
+def change_name_findings_dashboard(_apps, _schema_editor):
+    dashboards = Dashboard.objects.filter(name="Findings Dashboard")
+    for dashboard in dashboards:
+        dashboard.name = FINDINGS_DASHBOARD_NAME
+        dashboard.save()
 
 
 class Migration(migrations.Migration):
@@ -40,4 +49,5 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(update_permissions),
+        migrations.RunPython(change_name_findings_dashboard),
     ]

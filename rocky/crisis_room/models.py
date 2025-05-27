@@ -32,6 +32,8 @@ class Dashboard(models.Model):
 
 MIN_POSITION = 1
 MAX_POSITION = 16
+FINDINGS_DASHBOARD_NAME = _("Findings Dashboard")
+FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 
 def get_default_dashboard_item_settings() -> dict[str, Any]:
@@ -46,7 +48,7 @@ class DashboardItem(models.Model):
     recipe = models.UUIDField(blank=True, null=True)
     query_from = models.CharField(blank=True, max_length=32)
     query = models.CharField(blank=True)
-    template = models.CharField(blank=True, max_length=126, default="findings_report/report.html")
+    template = models.CharField(blank=True, max_length=126, default=FINDINGS_DASHBOARD_TEMPLATE)
     position = models.PositiveSmallIntegerField(
         blank=True,
         validators=[MinValueValidator(MIN_POSITION), MaxValueValidator(MAX_POSITION)],
