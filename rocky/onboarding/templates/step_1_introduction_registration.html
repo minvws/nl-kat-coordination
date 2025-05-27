@@ -1,0 +1,28 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" with view_type="onboarding" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Register" %}</h1>
+                {% include "partials/stepper.html" %}
+
+                <h2>{% translate "Welcome to OpenKAT!" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Welcome to the onboarding of OpenKAT. We will walk you through some steps to set everything up.
+                        <br>
+                        <br>
+                        At the end of this onboarding you have added your first object and created your first report.
+                    {% endblocktranslate %}
+                </p>
+                <a href="{% url "step_2a_organization_setup" %}" class="button">{% translate "Let's get started" %}</a>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

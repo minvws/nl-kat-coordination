@@ -52,6 +52,7 @@ class OnboardingStart(OrganizationView):
             return redirect("step_1_introduction_registration")
         if self.organization_member.has_perms(ONBOARDING_PERMISSIONS):
             return redirect("step_1_introduction", kwargs={"organization_code": self.organization.code})
+            #return redirect("step_1_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
 
@@ -418,14 +419,12 @@ class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegis
 
     def get(self, request, *args, **kwargs):
         if member := OrganizationMember.objects.filter(user=self.request.user).first():
-            return redirect(
-                reverse("step_2b_organization_update", kwargs={"organization_code": member.organization.code})
-            )
+            return redirect(reverse("step_2b_organization_update", kwargs={"organization_code": member.organization.code}))
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:
-            return super().post(request, *args, **kwargs)
+            :return super().post(request, *args, **kwargs)
         except RockyError as e:
             messages.add_message(request, messages.ERROR, str(e))
 
