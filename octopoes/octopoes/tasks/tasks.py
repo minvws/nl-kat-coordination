@@ -81,6 +81,48 @@ def handle_event(event: dict) -> None:
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
+def handle_event_batch(events: list[dict]) -> None:
+    """
+    Handle a batch of events efficiently.
+
+    This task processes multiple events of the same type in a single transaction,
+    which significantly reduces the overhead of RabbitMQ message handling and
+    database connections.
+    """
+    if not events:
+        return
+
+    # Group events by client to minimize session creation
+    events_by_client: dict[str, list[DBEvent]] = {}
+
+    # Parse all events first
+    for event_dict in events:
+        parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event_dict)
+        if parsed_event.client not in events_by_client:
+            events_by_client[parsed_event.client] = []
+        events_by_client[parsed_event.client].append(parsed_event)
+
+    # Process events by client
+    for client, client_events in events_by_client.items():
+        timer = timeit.default_timer()
+        batch_size = len(client_events)
+
+        # Create a single session for all events from this client
+        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), client))
+        octopoes_service = bootstrap_octopoes(settings, client, session)
+
+        # Process all events in the batch using the optimized batch processing method
+        octopoes_service.process_events(client_events)
+
+        # Commit all changes in a single transaction
+        session.commit()
+
+        logger.info(
+            "Processed batch of %d events for client %s in %.2fs", batch_size, client, timeit.default_timer() - timer
+        )
+
+
+@app.task(queue=QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     try:
         orgs = KATalogusClient(str(settings.katalogus_api)).get_organisations()

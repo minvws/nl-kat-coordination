@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 import uuid
 from collections.abc import Callable
 
@@ -11,7 +12,7 @@ from pika.exceptions import StreamLostError
 from pydantic import BaseModel
 
 from octopoes.events.events import DBEvent, OperationType, ScanProfileDBEvent
-from octopoes.models import ScanProfile, format_id_short
+from octopoes.models import ScanProfile
 
 logger = structlog.get_logger(__name__)
 
@@ -56,73 +57,136 @@ class EventManager:
         celery_app: Celery,
         celery_queue_name: str,
         channel_factory: Callable[[str], BlockingChannel] = get_rabbit_channel,
+        batch_size: int = 100,
+        flush_interval: float = 5.0,
     ):
         self.client = client
         self.queue_uri = queue_uri
         self.celery_app = celery_app
         self.celery_queue_name = celery_queue_name
         self.channel_factory = channel_factory
+        self.batch_size = batch_size
+        self.flush_interval = flush_interval
+
+        # Batch processing attributes
+        self._event_batch: list[DBEvent] = []
+        self._scan_profile_mutations: list[ScanProfileMutation] = []
+        self._batch_lock = threading.RLock()
+        self._last_flush_time = time.time()
+        self._flush_timer: threading.Timer | None = None
 
         self._try_connect()
+        self._start_flush_timer()
 
     def publish(self, event: DBEvent) -> None:
-        try:
-            self._publish(event)
-        except StreamLostError:  # Retry publishing once on connection issues
-            logger.exception("Failed publishing event, retrying...")
+        with self._batch_lock:
+            # Add event to batch
+            self._event_batch.append(event)
 
-            try:
-                self._connect()
-                self._publish(event)
-            except StreamLostError:
-                logger.exception("Failed publishing event again")
-                raise
+            # If it's a scan profile event, prepare the mutation
+            if isinstance(event, ScanProfileDBEvent):
+                mutation = self._create_scan_profile_mutation(event)
+                if mutation:
+                    self._scan_profile_mutations.append(mutation)
 
-    def _publish(self, event: DBEvent) -> None:
-        # schedule celery event processor
-        self.celery_app.send_task(
-            "octopoes.tasks.tasks.handle_event",
-            (json.loads(event.model_dump_json()),),
-            queue=self.celery_queue_name,
-            task_id=str(uuid.uuid4()),
-        )
+            # Check if we need to flush the batch
+            if len(self._event_batch) >= self.batch_size or time.time() - self._last_flush_time >= self.flush_interval:
+                self._flush_batch()
 
-        logger.debug(
-            "Published handle_event task [operation_type=%s] [primary_key=%s] [client=%s]",
-            event.operation_type,
-            format_id_short(event.primary_key),
-            event.client,
-        )
-
-        if not isinstance(event, ScanProfileDBEvent):
-            return
-
-        # publish mutations
+    def _create_scan_profile_mutation(self, event: ScanProfileDBEvent) -> ScanProfileMutation | None:
+        """Create a scan profile mutation from an event"""
         mutation = ScanProfileMutation(
             operation=event.operation_type, primary_key=event.primary_key, client_id=event.client
         )
 
-        if event.operation_type != OperationType.DELETE:
+        if event.operation_type != OperationType.DELETE and event.new_data is not None:
             mutation.value = AbstractOOI(
-                primary_key=event.new_data.reference,  # type: ignore[union-attr]
-                object_type=event.new_data.reference.class_,  # type: ignore[union-attr]
+                primary_key=event.new_data.reference,
+                object_type=event.new_data.reference.class_,
                 scan_profile=event.new_data,
             )
 
-        self.channel.basic_publish(
-            "",
-            "scan_profile_mutations",
-            mutation.model_dump_json().encode(),
-            properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
-        )
+        return mutation
 
-        level = mutation.value.scan_profile.level if mutation.value is not None else None
-        logger.debug(
-            "Published scan profile mutation [operation_type=%s] [primary_key=%s] [level=%s]",
-            mutation.operation,
-            format_id_short(event.primary_key),
-            level,
-        )
+    def _flush_batch(self) -> None:
+        """Flush the current batch of events to RabbitMQ"""
+        if not self._event_batch:
+            return
+
+        try:
+            self._publish_batch()
+        except StreamLostError:  # Retry publishing once on connection issues
+            logger.exception("Failed publishing event batch, retrying...")
+
+            try:
+                self._connect()
+                self._publish_batch()
+            except StreamLostError:
+                logger.exception("Failed publishing event batch again")
+                raise
+        finally:
+            self._last_flush_time = time.time()
+
+    def _publish_batch(self) -> None:
+        """Publish the current batch of events"""
+        if not self._event_batch:
+            return
+
+        # Make a local copy of the batch and clear the main batch
+        with self._batch_lock:
+            events_to_publish = self._event_batch.copy()
+            scan_profile_mutations = self._scan_profile_mutations.copy()
+            self._event_batch = []
+            self._scan_profile_mutations = []
+
+        # Publish events in batch
+        batch_size = len(events_to_publish)
+        if batch_size > 0:
+            # Group events by type for more efficient processing
+            grouped_events: dict[str, list[DBEvent]] = {}
+            for event in events_to_publish:
+                event_type = event.entity_type
+                if event_type not in grouped_events:
+                    grouped_events[event_type] = []
+                grouped_events[event_type].append(event)
+
+            # Send each group as a batch task
+            for event_type, events in grouped_events.items():
+                self.celery_app.send_task(
+                    "octopoes.tasks.tasks.handle_event_batch",
+                    (json.loads(json.dumps([event.model_dump() for event in events]))),
+                    queue=self.celery_queue_name,
+                    task_id=str(uuid.uuid4()),
+                )
+
+                logger.debug("Published batch of %d %s events", len(events), event_type)
+
+        # Publish scan profile mutations in batch
+        if scan_profile_mutations:
+            mutations_json = [mutation.model_dump_json().encode() for mutation in scan_profile_mutations]
+
+            for mutation_json in mutations_json:
+                self.channel.basic_publish(
+                    "",
+                    "scan_profile_mutations",
+                    mutation_json,
+                    properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
+                )
+
+            logger.debug("Published %d scan profile mutations", len(scan_profile_mutations))
+
+    def _start_flush_timer(self) -> None:
+        """Start a timer to periodically flush the event batch"""
+
+        def _timer_callback():
+            with self._batch_lock:
+                if self._event_batch:
+                    self._flush_batch()
+            self._start_flush_timer()
+
+        self._flush_timer = threading.Timer(self.flush_interval, _timer_callback)
+        self._flush_timer.daemon = True
+        self._flush_timer.start()
 
     def _try_connect(self):
         try:
@@ -135,6 +199,11 @@ class EventManager:
             except StreamLostError:
                 logger.exception("Failed connecting to rabbitmq again")
                 raise
+
+    def force_flush(self) -> None:
+        """Force flush any pending events"""
+        with self._batch_lock:
+            self._flush_batch()
 
     def _connect(self) -> None:
         self.channel = self.channel_factory(self.queue_uri)

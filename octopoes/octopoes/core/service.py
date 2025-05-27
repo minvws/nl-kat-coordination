@@ -430,6 +430,63 @@ class OctopoesService:
             event.operation_type,
         )
 
+    def process_events(self, events: list[DBEvent]) -> None:
+        """
+        Process multiple events efficiently.
+
+        This method processes multiple events in a single transaction, which reduces
+        the overhead of database operations and event publishing.
+
+        Args:
+            events: A list of events to process
+        """
+        if not events:
+            return
+
+        # Group events by type and operation for more efficient processing
+        grouped_events: dict[str, dict[str, list[DBEvent]]] = {}
+
+        for event in events:
+            entity_type = event.entity_type
+            operation_type = event.operation_type.value
+
+            if entity_type not in grouped_events:
+                grouped_events[entity_type] = {}
+
+            if operation_type not in grouped_events[entity_type]:
+                grouped_events[entity_type][operation_type] = []
+
+            grouped_events[entity_type][operation_type].append(event)
+
+        # Process events in a logical order to minimize conflicts
+        # First process deletions, then updates, then creations
+        operation_order = ["delete", "update", "create"]
+
+        # Process OOI events first, then origin events, then scan profile events
+        entity_type_order = ["ooi", "origin", "origin_parameter", "scan_profile"]
+
+        for entity_type in entity_type_order:
+            if entity_type not in grouped_events:
+                continue
+
+            for operation_type in operation_order:
+                if operation_type not in grouped_events[entity_type]:
+                    continue
+
+                batch_events = grouped_events[entity_type][operation_type]
+
+                # Process each event in the batch
+                for event in batch_events:
+                    try:
+                        self.process_event(event)
+                    except Exception:
+                        logger.exception(
+                            "Failed to process event in batch: [primary_key=%s] [operation_type=%s]",
+                            format_id_short(event.primary_key),
+                            event.operation_type,
+                        )
+                        # Continue processing other events in the batch
+
     # OOI events
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
         if event.new_data is None:
