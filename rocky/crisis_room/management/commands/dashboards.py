@@ -114,7 +114,7 @@ def get_or_update_findings_dashboard(organization: Organization) -> None:
     If no findings dashboard is found, then create a new one and create a new recipe.
     """
     try:
-        dashboard = Dashboard.objects.filter(dashboarddata__findings_dashboard=True, organization=organization).first()
+        dashboard = Dashboard.objects.filter(dashboarditem__findings_dashboard=True, organization=organization).first()
         if dashboard is not None:
             findings_dashboard = DashboardItem.objects.get(dashboard=dashboard, findings_dashboard=True)
             reschedule_recipe(organization, str(findings_dashboard.recipe))

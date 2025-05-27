@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from django.db import migrations
+from django.db import migrations, models
 
 
 def update_permissions(_apps, _schema_editor):
@@ -19,7 +19,7 @@ def update_permissions(_apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("crisis_room", "0006_dashboarddata_findings_dashboard")]
+    dependencies = [("crisis_room", "0005_add_dashboard_permissions_to_groups")]
 
     operations = [
         migrations.RenameModel(old_name="DashboardData", new_name="DashboardItem"),
@@ -30,6 +30,14 @@ class Migration(migrations.Migration):
                     ("change_dashboarditem_position", "Can change position up or down of a dashboard item.")
                 ]
             },
+        ),
+        migrations.AddConstraint(
+            model_name="dashboarditem",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("findings_dashboard", True)),
+                fields=("findings_dashboard",),
+                name="findings_dashboard",
+            ),
         ),
         migrations.RunPython(update_permissions),
     ]
