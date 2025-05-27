@@ -200,7 +200,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
 
-        # TODO: this should be optimized see #3357
+        # TODO: this should be optimized see #3357 and #4191
         orgs = self.ctx.services.katalogus.get_organisations()
 
         for org in orgs:
