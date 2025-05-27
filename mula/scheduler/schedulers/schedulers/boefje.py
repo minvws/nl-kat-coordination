@@ -709,7 +709,6 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    # TODO: exception handling
     def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask, caller: str = "") -> models.BoefjeTask:
         """Check if the boefje is also present in other organisations"""
         # We check on input_ooi because we allow for boefje tasks without an
@@ -761,7 +760,6 @@ class BoefjeScheduler(Scheduler):
 
         count = 0
         for config in configs[0].duplicates:
-            # TODO: expose this in the octopoes bulk endpoint instead
             if config.organisation_id not in orgs:
                 self.logger.debug(
                     "OOI does not exist anymore in duplicated organisation, skipping",
