@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import exc, func
+from sqlalchemy import desc, exc, func
 
 from scheduler import models
 from scheduler.storage import DBConn
@@ -148,7 +148,7 @@ class TaskStore:
                 )
                 .filter(models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24))
                 .group_by("hour", models.TaskDB.status)
-                .order_by("hour", models.TaskDB.status)
+                .order_by(desc("hour"), models.TaskDB.status)
             )
 
             if scheduler_id is not None:
