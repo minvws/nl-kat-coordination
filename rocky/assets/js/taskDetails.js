@@ -192,8 +192,12 @@ task_buttons.forEach((button) => {
                   jsondata = JSON.parse(rawdata);
                   rawfile_container.querySelector("pre.json").innerText = JSON.stringify(jsondata, null, "\t")
                   rawfile_container.querySelector("pre.json").classList.remove("hidden");
+                  rawfile_container.querySelector("pre.hex").classList.add("hidden");
                 } catch (e) {
                   rawfile_container.querySelector("pre.json").classList.add("hidden");
+                  let hex_table = rawfile_container.querySelector("table.hex")
+                  let rawbytes = new TextEncoder();
+                  renderHexTable(hex_table, rawbytes.encode(rawdata));
                 }
                 rawfiles_list.appendChild(rawfile_container);
               });
@@ -212,6 +216,54 @@ task_buttons.forEach((button) => {
     }
   });
 });
+
+function renderHexTable(hex_table, bytes) {
+  const rowLength = 16;
+
+  const headerRow = document.createElement('tr');
+  headerRow.innerHTML = '<th>Offset</th>' +
+    Array.from({ length: rowLength }, (_, i) => `<th>${i.toString(16).padStart(2, '0').toUpperCase()}</th>`).join('') +
+    '<th>ASCII</th>';
+  hex_table.appendChild(headerRow);
+
+  for (let i = 0; i < bytes.length; i += rowLength) {
+    const row = document.createElement('tr');
+    const offset = i.toString(16).padStart(8, '0').toUpperCase();
+    const hexBytes = [];
+    const ascii = [];
+
+    for (let j = 0; j < rowLength; j++) {
+      const byte = bytes[i + j];
+      if (byte !== undefined) {
+        hexBytes.push(byte.toString(16).padStart(2, '0').toUpperCase());
+        const char = byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.';
+        ascii.push(char);
+      } else {
+        hexBytes.push('  ');
+        ascii.push(' ');
+      }
+    }
+    row.addEventListener('mouseover', (event) => {
+      let charposition = Array.from(event.target.parentNode.children).indexOf(event.target);
+      if(charposition>0){
+          let asciistring = event.target.parentElement.querySelector(".ascii").textContent
+          let highlightedstring = asciistring.substring(0, charposition-1) 
+            + "<span class='highlight'>"+escapeHTMLEntities(asciistring.charAt(charposition-1))+"</span>" 
+            + asciistring.substring(charposition);
+          //console.log(asciistring.substring(0, charposition-1), asciistring.charAt(charposition-1), asciistring.substring(charposition));
+          event.target.parentElement.querySelector(".ascii").innerHTML = highlightedstring;
+      }
+    });
+    row.addEventListener('mouseout', (event) => {
+      event.target.parentElement.querySelector(".ascii").innerText = event.target.parentElement.querySelector(".ascii").innerText;
+    });
+
+    row.innerHTML = `<td>${offset}</td>` +
+      hexBytes.map(b => `<td>${b}</td>`).join('') +
+      `<td class="ascii">${ascii.join('')}</td>`;
+    hex_table.appendChild(row);
+  }
+}
 
 function escapeHTMLEntities(input) {
   var output = input.replace(/'/g, "&apos;");
