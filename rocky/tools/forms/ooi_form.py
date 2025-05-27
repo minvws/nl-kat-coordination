@@ -106,12 +106,14 @@ def generate_select_ooi_field(
     field: FieldInfo,
     related_ooi_type: type[OOI],
     initial: str | None = None,
+    advanced: bool | None = False
 ) -> forms.fields.Field | None:
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options(name, field)
     is_multiselect = getattr(field.annotation, "__origin__", None) is list
     option_label = default_attrs.get("label", _("option"))
-
+    advanced = False
+    
     manytext = "one or more:" if is_multiselect else "a"
     if field.is_required():
         option_text = _("Please choose {manytext} {option_label}").format(option_label=option_label, manytext=manytext)
@@ -131,9 +133,9 @@ def generate_select_ooi_field(
     # Remove the selection option when only 1 OOI is available, and required
     if field.is_required() and not initial and len(oois) == 1:
         del select_options[0]
-    # Don't show select fields without options if they are not required
+    # Mark select fields as 'advanced' when no options are present and if they are not required
     elif not field.is_required() and not oois:
-        return None
+        default_attrs["class"] = (default_attrs.get("class", ""), "advanced").join(" ") # possibly append to already existing 'list' of classes
 
     if is_multiselect:
         return forms.MultipleChoiceField(
