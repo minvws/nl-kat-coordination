@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-21 07:33+0000\n"
+"POT-Creation-Date: 2025-05-27 08:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -600,10 +600,6 @@ msgid "Title on dashboard"
 msgstr ""
 
 #: crisis_room/forms.py
-msgid "List sorting by"
-msgstr ""
-
-#: crisis_room/forms.py
 msgid "Number of rows in list"
 msgstr ""
 
@@ -621,6 +617,10 @@ msgstr ""
 
 #: crisis_room/forms.py
 msgid "An error occurred while adding dashboard item."
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "List sorting by"
 msgstr ""
 
 #: crisis_room/forms.py
@@ -687,7 +687,7 @@ msgstr ""
 
 #: crisis_room/models.py
 msgid ""
-"DashboardData must contain at least a 'recipe' or a 'query_from' with a "
+"DashboardItem must contain at least a 'recipe' or a 'query_from' with a "
 "'query'."
 msgstr ""
 
@@ -7482,8 +7482,8 @@ msgstr ""
 msgid "Unknown action."
 msgstr ""
 
-#: rocky/views/finding_list.py
-msgid "Dashboard item has been added to {}."
+#: rocky/views/finding_list.py rocky/views/ooi_list.py
+msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/health.py
@@ -7534,10 +7534,6 @@ msgstr ""
 
 #: rocky/views/ooi_list.py
 msgid "No OOIs selected."
-msgstr ""
-
-#: rocky/views/ooi_list.py
-msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/ooi_list.py
