@@ -181,7 +181,7 @@ task_buttons.forEach((button) => {
                     <div id="#hex-${rawfile["id"]}-panel"
                        role="tabpanel"
                        aria-labelledby="#hex-${rawfile["id"]}">
-                        <pre class="hex"></pre>
+                      <table class="hex"></table>
                     </div>
                 </div>
                 <h5>Mimetypes:</h5>
@@ -240,7 +240,7 @@ function renderHexTable(hex_table, bytes) {
         ascii.push(char);
       } else {
         hexBytes.push('  ');
-        ascii.push(' ');
+        ascii.push('.'); // placeholder char
       }
     }
     row.addEventListener('mouseover', (event) => {
@@ -250,7 +250,6 @@ function renderHexTable(hex_table, bytes) {
           let highlightedstring = asciistring.substring(0, charposition-1) 
             + "<span class='highlight'>"+escapeHTMLEntities(asciistring.charAt(charposition-1))+"</span>" 
             + asciistring.substring(charposition);
-          //console.log(asciistring.substring(0, charposition-1), asciistring.charAt(charposition-1), asciistring.substring(charposition));
           event.target.parentElement.querySelector(".ascii").innerHTML = highlightedstring;
       }
     });
