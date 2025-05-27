@@ -8,7 +8,7 @@ from tests.conftest import setup_request
 
 def test_onboarding_create_organization(rf, superuser_member, mock_models_katalogus):
     request = setup_request(
-        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser_member.user
+        rf.post("step_2a_organization_setup", {"name": "Test Organization", "code": "test"}), superuser_member.user
     )
     mock_models_katalogus().organization_exists.return_value = False
 
@@ -21,7 +21,7 @@ def test_onboarding_create_organization_already_exist_katalogus(
     rf, superuser, mock_katalogus_client, mock_models_octopoes
 ):
     request = setup_request(
-        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
+        rf.post("step_2a_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
     )
 
     mock_katalogus_client().organization_exists.return_value = True
@@ -29,4 +29,4 @@ def test_onboarding_create_organization_already_exist_katalogus(
 
     response = OnboardingOrganizationSetupView.as_view()(request)
     assert response.status_code == 302
-    assert response.headers["Location"] == reverse("step_indemnification_setup", kwargs={"organization_code": "test"})
+    assert response.headers["Location"] == reverse("step_3_indemnification_setup", kwargs={"organization_code": "test"})

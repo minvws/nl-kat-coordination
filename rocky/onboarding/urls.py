@@ -3,62 +3,61 @@ from django.urls import path
 from onboarding import views
 
 urlpatterns = [
-    path("<organization_code>/", views.OnboardingStart.as_view(), name="onboarding_index"),
     path(  # Step 1
         "step/introduction/registration/",
         views.OnboardingIntroductionRegistrationView.as_view(),
-        name="step_introduction_registration",
+        name="step_1_introduction_registration",
     ),
     path(  # Step 2
-        "step/organization-setup/", views.OnboardingOrganizationSetupView.as_view(), name="step_organization_setup"
+        "step/organization-setup/", views.OnboardingOrganizationSetupView.as_view(), name="step_2a_organization_setup"
     ),
     path(  # Step 2 update
         "<organization_code>/step/organization-setup/update/",
         views.OnboardingOrganizationUpdateView.as_view(),
-        name="step_organization_update",
+        name="step_2b_organization_update",
     ),
     path(  # Step 3
         "<organization_code>/step/indemnification-setup/",
         views.OnboardingIndemnificationSetupView.as_view(),
-        name="step_indemnification_setup",
+        name="step_3_indemnification_setup",
     ),
     path(  # Step 4
         "<organization_code>/step/account/acknowledge-clearance-level/",
         views.OnboardingAcknowledgeClearanceLevelView.as_view(),
-        name="step_acknowledge_clearance_level",
+        name="step_4_trusted_acknowledge_clearance_level",
     ),
-    path(  # Step 5
+    path(  # Step 5a
         "<organization_code>/step/setup-scan/<ooi_type>/",
         views.OnboardingSetupScanOOIAddView.as_view(),
-        name="step_setup_scan_ooi_add",
+        name="step_5a_setup_scan_ooi_add",
     ),
     path(  # Step 6
         "<organization_code>/step/set-clearance-level/",
         views.OnboardingSetClearanceLevelView.as_view(),
-        name="step_set_clearance_level",
+        name="step_6_set_clearance_level",
     ),
     path(  # Step 7
         "<organization_code>/step/clearance-level-introduction/",
         views.OnboardingClearanceLevelIntroductionView.as_view(),
-        name="step_clearance_level_introduction",
+        name="step_7_clearance_level_introduction",
     ),
     path(  # Step 8
         "<organization_code>/step/setup-scan/select-plugins/",
         views.OnboardingSetupScanSelectPluginsView.as_view(),
-        name="step_setup_scan_select_plugins",
+        name="step_8_setup_scan_select_plugins",
     ),
     path(  # Step 9
         "<organization_code>/step/choose-report-type/",
         views.OnboardingChooseReportTypeView.as_view(),
-        name="step_choose_report_type",
+        name="step_9_choose_report_type",
     ),
     path(  # Step 10
         "<organization_code>/step/setup-scan/ooi/detail/",
         views.OnboardingSetupScanOOIDetailView.as_view(),
-        name="step_setup_scan_ooi_detail",
+        name="step_10_setup_scan_ooi_detail",
     ),
     path(  # Step 11
-        "<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_report"
+        "<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_11_report"
     ),
     path(
         "<organization_code>/step/complete-onboarding/", views.CompleteOnboarding.as_view(), name="complete_onboarding"

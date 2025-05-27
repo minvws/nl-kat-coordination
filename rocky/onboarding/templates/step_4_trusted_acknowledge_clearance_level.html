@@ -13,21 +13,23 @@
                 {% include "partials/stepper.html" %}
 
                 <h2>{% translate "Setup scan - User clearance level" %}</h2>
-                <p>
-                    {% blocktranslate trimmed %}
-                        OpenKAT uses clearance levels to indicate which users can start what type of scans. There are two types of clearance levels: 'Trusted' and 'Accepted' clearance levels.
-                    {% endblocktranslate %}
-                </p>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        Trusted clearance levels are given by the administrator to indicate up to what level of scans the user can perform. A higher trusted clearance level means that more aggressive scans can be started.
+                        OpenKAT has a permission system that allows administrators to
+                        configure which users can set a certain clearance level. The will make sure
+                        that only trusted users can start more aggressive scans.
                     {% endblocktranslate %}
                 </p>
                 <h3>{% translate "Acknowledge clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        The user has to accept the provided clearance level before he can change setings or perform actions. The user can also choose to accept a lower lower clearance level than given by the administrator. By accepting the clearance level the user formally agrees to abide by this permission and perform scans up to this accepted clearance level.
+                        Before a user is granted the ability to set clearance levels on an object,
+                        they must first acknowledge and accept the clearance level set by the administrators.
+                        The maximum scanning level permitted for a member is aligned with the trusted clearance level.
+                        By acknowledging the trusted clearance level, the user formally agrees to abide by
+                        this permission and gains the capability to perform scans only up to this trusted clearance level. Each user can decide to only accept a lower clearance than is given by the administrator.
+                        This two-step process ensures that the member operates within authorized boundaries.
                     {% endblocktranslate %}
                 </p>
                 <h3>{% translate "What is my clearance level?" %}</h3>
@@ -70,7 +72,7 @@
         {% endblocktranslate %}
     </p>
     <div class="button-container">
-        <a href="{% url "step_set_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
+        <a href="{% url "step_6_set_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
            class="button">{% translate "Set clearance level" %}</a>
         <a href="{% url "complete_onboarding" organization.code %}"
            class="button ghost">{% translate "Skip onboarding" %}</a>

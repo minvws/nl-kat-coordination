@@ -22,6 +22,7 @@
                     {% endblocktranslate %}
                 </p>
                 <form novalidate
+                      action="{% url "step_2a_organization_setup" %}"
                       method="post"
                       class="help layout-form">
                     {% csrf_token %}

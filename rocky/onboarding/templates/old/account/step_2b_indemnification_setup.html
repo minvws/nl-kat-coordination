@@ -16,7 +16,7 @@
                 {% if indemnification_present %}
                     <p>{% translate "Indemnification on the organization is already present." %}</p>
                     <a class="button"
-                       href="{% url "step_acknowledge_clearance_level" organization.code %}">{% translate "Continue" %}</a>
+                       href="{% url "step_4_trusted_acknowledge_clearance_level" organization.code %}">{% translate "Continue" %}</a>
                 {% else %}
                     {% include "partials/form/indemnification_add_form.html" %}
 

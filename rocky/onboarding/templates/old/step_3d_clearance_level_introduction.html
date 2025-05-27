@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="button-container">
-                    <a href="{% url "step_acknowledge_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
+                    <a href="{% url "step_4_trusted_acknowledge_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
                        class="button">{% translate "Continue" %}</a>
                     <a href="{% url "complete_onboarding" organization.code %}"
                        class="button ghost">{% translate "Skip onboarding" %}</a>

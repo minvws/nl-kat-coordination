@@ -204,7 +204,7 @@ class OnboardingAcknowledgeClearanceLevelView(
     Here they acknowledge the clearance level assigned by their administrator.
     """
 
-    template_name = "step_2c_trusted_acknowledge_clearance_level.html"
+    template_name = "step_4_trusted_acknowledge_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
@@ -226,7 +226,7 @@ class OnboardingSetClearanceLevelView(
     8. Set the actual clearance level on the object created before.
     """
 
-    template_name = "step_3f_set_clearance_level.html"
+    template_name = "step_6_set_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
     form_class = OnboardingSetClearanceLevelForm
@@ -491,7 +491,9 @@ class OnboardingIndemnificationSetupView(IntroductionAdminStepsMixin, Indemnific
     template_name = "step_3_indemnification_setup.html"
 
     def get_success_url(self) -> str:
-        return reverse_lazy("step_4_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy(
+            "step_4_trusted_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code}
+        )
 
 
 class OnboardingAccountSetupIntroView(

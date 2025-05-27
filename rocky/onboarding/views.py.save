@@ -490,7 +490,7 @@ class OnboardingIndemnificationSetupView(IntroductionAdminStepsMixin, Indemnific
     template_name = "step_3_indemnification_setup.html"
 
     def get_success_url(self) -> str:
-        return reverse_lazy("step_4_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy("step_4_trusted_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code})
 
 
 class OnboardingAccountSetupIntroView(
