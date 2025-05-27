@@ -657,7 +657,7 @@ msgstr ""
 
 #: crisis_room/models.py
 msgid "Findings Dashboard"
-msgstr ""
+msgstr "Bevindingen Dashboard"
 
 #: crisis_room/models.py
 msgid ""
