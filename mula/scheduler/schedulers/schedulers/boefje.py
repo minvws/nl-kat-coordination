@@ -424,8 +424,12 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        boefje_task = self.is_boefje_in_other_orgs(boefje_task, caller=caller)
+        boefje_task = self.is_boefje_in_other_orgs(boefje_task)
+        self.create_task_and_push_to_queue(boefje_task, organisation_id, create_schedule, caller)
 
+    def create_task_and_push_to_queue(
+        self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool = True, caller: str = ""
+    ) -> None:
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -709,15 +713,11 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask, caller: str = "") -> models.BoefjeTask:
+    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> models.BoefjeTask:
         """Check if the boefje is also present in other organisations"""
         # We check on input_ooi because we allow for boefje tasks without an
         # ooi, something we can't deduplicate.
         if boefje_task.input_ooi is None:
-            return boefje_task
-
-        # Make sure we don't call this method recursively
-        if caller == self.is_boefje_in_other_orgs.__name__:
             return boefje_task
 
         configs = self.ctx.services.katalogus.get_configs(
@@ -789,7 +789,7 @@ class BoefjeScheduler(Scheduler):
             )
 
             try:
-                self.push_boefje_task(
+                self.create_task_and_push_to_queue(
                     boefje_task=new_boefje_task,
                     organisation_id=config.organisation_id,
                     create_schedule=self.create_schedule,
