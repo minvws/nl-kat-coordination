@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
+from tools.models import Organization
 
 
 class MemberFilterForm(BaseRockyForm):
@@ -25,3 +26,9 @@ class MemberFilterForm(BaseRockyForm):
     def clean_blocked(self):
         blocked = self.cleaned_data["blocked"]
         return blocked if blocked else [True, False]
+
+    def filter_member(self, organization: Organization, qs):
+        if self.is_valid():
+            current_status = self.cleaned_data.get("status")
+            account_status = self.cleaned_data.get("blocked")
+            return qs.filter(organization=organization, status__in=current_status, blocked__in=account_status)

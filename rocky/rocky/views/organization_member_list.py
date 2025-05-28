@@ -26,21 +26,11 @@ class OrganizationMemberListView(
     context_object_name = "members"
     template_name = "organizations/organization_member_list.html"
     permission_required = "tools.view_organization"
-
-    def get_member_filter_form(self):
-        return MemberFilterForm(self.request.GET)
+    member_filter_form = MemberFilterForm
 
     def get_queryset(self):
-        form = self.get_member_filter_form()
-        if form.is_valid():
-            current_status = form.cleaned_data.get("status")
-            account_status = form.cleaned_data.get("blocked")
-
-            return self.model.objects.filter(
-                organization=self.organization, status__in=current_status, blocked__in=account_status
-            )
-
-        return self.model.objects.filter(organization=self.organization)
+        qs = super().get_queryset()
+        return self.member_filter_form(self.request.GET).filter_member(self.organization, qs)
 
     def post(self, request, *args, **kwargs):
         if not self.organization_member.has_perm("tools.change_organizationmember"):
@@ -76,5 +66,5 @@ class OrganizationMemberListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["member_filter_form"] = self.get_member_filter_form()
+        context["member_filter_form"] = self.member_filter_form(self.request.GET)
         return context
