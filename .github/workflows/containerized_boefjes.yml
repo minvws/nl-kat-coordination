@@ -16,6 +16,8 @@ on:
       - boefjes/boefjes/plugins/kat_nmap_tcp/**
       - boefjes/boefjes/plugins/kat_nmap_udp/**
       - boefjes/boefjes/plugins/kat_dnssec/**
+      - boefjes/boefjes/plugins/kat_nikto/**
+      - boefjes/boefjes/plugins/kat_export_http/**
       - boefjes/images/**
       - .github/workflows/containerized_boefjes.yml
 
@@ -31,6 +33,10 @@ jobs:
             image: openkat/nmap
           - dockerfile: boefjes/boefjes/plugins/kat_dnssec/boefje.Dockerfile
             image: openkat/dns-sec
+          - dockerfile: boefjes/boefjes/plugins/kat_export_http/boefje.Dockerfile
+            image: openkat/export-http
+          - dockerfile: boefjes/boefjes/plugins/kat_nikto/boefje.Dockerfile
+            image: openkat/nikto
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code

@@ -36,11 +36,11 @@ help: ## Show this help.
 build: images
 
 images:  # Build the images for the containerized boefjes
-  # Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709
-	# docker build -f images/base.Dockerfile -t ghcr.io/minvws/openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
+# Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709
+# docker build -f images/base.Dockerfile -t ghcr.io/minvws/openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
 	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t ghcr.io/minvws/openkat/dns-sec:latest .
 	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t ghcr.io/minvws/openkat/nmap:latest  .
-	docker build -f ./boefjes/plugins/kat_nikto/boefje.Dockerfile -t openkat/nikto .
+	docker build -f ./boefjes/plugins/kat_nikto/boefje.Dockerfile -t ghcr.io/minvws/openkat/nikto:latest .
 	docker build -f ./boefjes/plugins/kat_export_http/boefje.Dockerfile -t ghcr.io/minvws/openkat/export-http:latest .
 
 
