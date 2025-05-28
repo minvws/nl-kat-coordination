@@ -124,7 +124,7 @@ def get_or_update_findings_dashboard(
         if dashboard is not None:
             findings_dashboard = DashboardItem.objects.get(dashboard=dashboard, findings_dashboard=True)
             reschedule_recipe(organization, str(findings_dashboard.recipe))
-            logger.info("Recipe %s has been rescheduled.", str(findings_dashboard.recipe))
+            logger.info("Recipe %s has been rescheduled.", findings_dashboard.recipe)
         else:
             create_findings_dashboard(organization, octopoes_client)
 
