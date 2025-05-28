@@ -1,38 +1,33 @@
 {% load i18n %}
 
-{% get_language_info for LANGUAGE_CODE as lang %}
-<div class="language-selector">
-    <div class="dropdown">
-        <button type="button"
-                aria-controls="language-switcher"
-                aria-expanded="false"
-                class="dropdown-button ghost">
-            {{ lang.name_local|title }}
-            <span aria-hidden="true" class="icon ti-chevron-down"></span>
-        </button>
-        <ul id="language-switcher" role="listbox" class="dropdown-list">
-            {% for language in languages %}
-                {% get_language_info for language as lang %}
-                {% if LANGUAGE_CODE != language %}
-                    <li>
-                        <a hreflang="{{ language }}"
-                           href="#"
-                           role="option"
-                           data-value="{{ language }}"
-                           lang="{{ language }}">
-                            <button form="set-language" type="submit" name="language" value={{ language }}>
-                                {{ lang.name_local.title }}
+{% get_language_info for LANGUAGE_CODE as current_language %}
+<div class="dropdown">
+    <button type="button"
+            class="dropdown-button ghost"
+            data-open-label="{{ current_language.name_local.title }}"
+            data-close-label="{{ current_language.name_local.title }}"
+            aria-label="{% translate "Language Selector" %}"
+            aria-controls="language-list"
+            aria-expanded="false"
+            aria-haspopup="listbox"
+            aria-labelledby="language-list">
+        {{ current_language.name_local.title }}<span class="icon ti-chevron-down"></span>
+    </button>
+    <div id="language-list" class="dropdown-list">
+        <ul role="listbox" aria-labelledby="language-list" tabindex="-1">
+            <form action="{% url "set_language" %}" method="post" class="inline">
+                {% csrf_token %}
+                {% for language in languages %}
+                    {% get_language_info for language as language %}
+                    {% if language.code != current_language.code %}
+                        <li role="option">
+                            <button type="submit" name="language" value={{ language.code }}>
+                                {{ language.name_local.title }}
                             </button>
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </form>
         </ul>
     </div>
-    <form id="set-language"
-          action="{% url "set_language" %}"
-          method="post"
-          class="inline">
-        {% csrf_token %}
-    </form>
 </div>
