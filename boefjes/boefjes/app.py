@@ -107,7 +107,12 @@ class SchedulerWorkerManager(WorkerManager):
         logger.info("Handling tasks[%s]", [p_item.data.id for p_item in p_items])
 
         try:
-            self.task_queue.put(p_items)
+            if self.settings.deduplicate:
+                self.task_queue.put(p_items)
+                return
+
+            for p_item in p_items:
+                self.task_queue.put(p_item)
             logger.info("Dispatched tasks[ids=%s]", [p_item.data.id for p_item in p_items])
         except:  # noqa
             logger.exception("Exiting worker...")

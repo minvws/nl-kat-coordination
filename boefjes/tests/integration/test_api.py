@@ -407,3 +407,11 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
     assert test_client.get(
         "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "org2", "with_duplicates": True}
     ).json() == [expected_with_duplicates[1]]
+
+    org2.deduplicate = False
+    test_client.put("/v1/organisations/", content=org2.model_dump_json())
+    assert test_client.get(f"/v1/organisations/{org2.id}").json()["deduplicate"] is False
+
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "test", "with_duplicates": True}
+    ).json() == [expected[0]]

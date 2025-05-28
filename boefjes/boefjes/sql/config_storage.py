@@ -57,9 +57,12 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
             query = (
                 self.session.query(BoefjeConfigInDB)
                 .join(BoefjeInDB, BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
+                .join(OrganisationInDB, BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
                 .filter(BoefjeInDB.plugin_id == config.boefje.plugin_id)
                 .filter(BoefjeConfigInDB.enabled == config.enabled)
                 .filter(BoefjeConfigInDB.id != config.id)
+                .filter(OrganisationInDB.deduplicate == True)  # type: ignore
+                .filter(BoefjeInDB.deduplicate == True)  # type: ignore
             )
 
             parsed = self._to_boefje_config(config)

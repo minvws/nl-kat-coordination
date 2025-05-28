@@ -23,10 +23,16 @@ def get_organisation(organisation_id: str, storage: OrganisationStorage = Depend
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown organisation")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 def add_organisation(organisation: Organisation, storage: OrganisationStorage = Depends(get_organisations_store)):
     with storage as store:
         store.create(organisation)
+
+
+@router.put("")
+def upsert_organisation(organisation: Organisation, storage: OrganisationStorage = Depends(get_organisations_store)):
+    with storage as store:
+        store.update(organisation)
 
 
 @router.delete("/{organisation_id}")
