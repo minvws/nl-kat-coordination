@@ -37,7 +37,7 @@
                     {% if organization_member.can_add_dashboard_item and organization_member.can_change_dashboard %}
                         <a href="#new-dashboard-item-modal"
                            class="button ghost"
-                           data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
+                           data-modal-id="new-dashboard-item-modal"><span class="icon ti-plus"></span>{% translate "Add to dashboard" %}</a>
                     {% endif %}
                 </div>
                 {% include "partials/ooi_list_filters.html" %}
