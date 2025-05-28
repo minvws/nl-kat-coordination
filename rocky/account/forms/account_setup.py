@@ -60,10 +60,6 @@ class UserRegistrationForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request", None)
-        super().__init__(*args, **kwargs)
-
     @staticmethod
     def send_password_reset_email(user):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
