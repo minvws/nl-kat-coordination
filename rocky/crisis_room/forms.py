@@ -81,7 +81,7 @@ class AddDashboardItemForm(BaseRockyForm):
         return {"size": size, "columns": columns}
 
     def get_query(self) -> dict[str, Any]:
-        sort_by = self.cleaned_data.get("order_by", "").split("-")
+        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
 
         order_by = sort_by[0]
         sorting_order = sort_by[1]
