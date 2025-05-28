@@ -709,6 +709,7 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
+    @exception_handler
     def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> models.BoefjeTask:
         """Check if the boefje is also present in other organisations"""
         # We check on input_ooi because we allow for boefje tasks without an
@@ -722,7 +723,6 @@ class BoefjeScheduler(Scheduler):
             enabled=True,
             with_duplicates=True,
         )
-
         if not configs:
             self.logger.debug(
                 "No configs found for boefje",
@@ -743,7 +743,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.debug(
                 "No organisations found for input ooi",
                 input_ooi=boefje_task.input_ooi,
-                organisation_id=boefje_task.organisation_id,
+                organisation_id=boefje_task.organisation,
                 scheduler_id=self.scheduler_id,
             )
             return boefje_task
@@ -756,6 +756,16 @@ class BoefjeScheduler(Scheduler):
 
         count = 0
         for config in configs[0].duplicates:
+            if config.organisation_id == boefje_task.organization:
+                self.logger.debug(
+                    "Skipping organisation of original boefje task",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
             if config.organisation_id not in orgs:
                 self.logger.debug(
                     "OOI does not exist anymore in duplicated organisation, skipping",
@@ -784,34 +794,30 @@ class BoefjeScheduler(Scheduler):
                 deduplication_key=boefje_task.id,
             )
 
-            try:
-                task = models.Task(
-                    id=new_boefje_task.id,
-                    scheduler_id=self.scheduler_id,
-                    organisation=config.organisation_id,
-                    type=self.ITEM_TYPE.type,
-                    hash=new_boefje_task.hash,
-                    data=new_boefje_task.model_dump(),
-                )
+            task = models.Task(
+                id=new_boefje_task.id,
+                scheduler_id=self.scheduler_id,
+                organisation=config.organisation_id,
+                type=self.ITEM_TYPE.type,
+                hash=new_boefje_task.hash,
+                data=new_boefje_task.model_dump(),
+            )
 
-                task.priority = self.ranker.rank(task)
-                self.push_item_to_queue_with_timeout(
-                    item=task, max_tries=self.max_tries, create_schedule=self.create_schedule
-                )
+            task.priority = self.ranker.rank(task)
+            self.push_item_to_queue_with_timeout(
+                item=task, max_tries=self.max_tries, create_schedule=self.create_schedule
+            )
 
-                self.logger.info(
-                    "Created boefje task",
-                    task_id=task.id,
-                    task_hash=task.hash,
-                    boefje_id=new_boefje_task.boefje.id,
-                    ooi_primary_key=new_boefje_task.input_ooi,
-                    scheduler_id=self.scheduler_id,
-                    organisation_id=config.organisation_id,
-                    caller=self.is_boefje_in_other_orgs.__name__,
-                )
-            except Exception:
-                self.logger.critical("Failed to push child dedup task")
-                continue
+            self.logger.info(
+                "Created boefje task",
+                task_id=task.id,
+                task_hash=task.hash,
+                boefje_id=new_boefje_task.boefje.id,
+                ooi_primary_key=new_boefje_task.input_ooi,
+                scheduler_id=self.scheduler_id,
+                organisation_id=config.organisation_id,
+                caller=self.is_boefje_in_other_orgs.__name__,
+            )
 
             count += 1
 
