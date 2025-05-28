@@ -90,7 +90,10 @@ class DashboardItem(models.Model):
 
     def __str__(self) -> str:
         try:
-            return str(self.dashboard)
+            if self.name:
+                return f"{self.name} on dashboard {str(self.dashboard)}"
+            else:
+                return f"Dashboard item on dashboard {str(self.dashboard)}"
         except Dashboard.DoesNotExist:
             return super().__str__()
 
