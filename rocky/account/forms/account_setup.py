@@ -1,8 +1,19 @@
+import structlog
 from django import forms
+from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail
+from django.db.utils import IntegrityError
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm, BaseRockyModelForm
@@ -16,6 +27,8 @@ from tools.models import (
 )
 
 from account.validators import get_password_validators_help_texts
+
+logger = structlog.get_logger(__name__)
 
 User = get_user_model()
 
@@ -46,30 +59,33 @@ class UserRegistrationForm(forms.Form):
             attrs={"autocomplete": "off", "placeholder": "name@example.com", "aria-describedby": "explanation-email"}
         ),
     )
-    password = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput(
-            attrs={
-                "autocomplete": "off",
-                "placeholder": _("Choose a super secret password"),
-                "aria-describedby": "explanation-password",
-            }
-        ),
-        help_text=get_password_validators_help_texts(),
-        validators=[validate_password],
-    )
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            self.add_error("email", _("Choose another email."))
-        return email
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def send_password_reset_email(user):
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+
+        reset_path = reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
+
+        current_site = Site.objects.get_current()
+        domain = current_site.domain
+        protocol = "https"
+        reset_url = f"{protocol}://{domain}{reset_path}"
+
+        subject = "Set your password"
+        message = render_to_string(
+            "password_reset_email.html", {"user": user, "reset_url": reset_url, "uid": uid, "token": token}
+        )
+
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
 
     def register_user(self):
         user = User.objects.create_user(
-            full_name=self.cleaned_data.get("name"),
-            email=self.cleaned_data.get("email"),
-            password=self.cleaned_data.get("password"),
+            username=self.cleaned_data.get("name", ""), email=self.cleaned_data.get("email"), password=None
         )
         return user
 
@@ -107,7 +123,7 @@ class TrustedClearanceLevelRadioPawsForm(forms.Form):
 
 
 class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPawsForm):
-    field_order = ["name", "email", "password", "trusted_clearance_level"]
+    field_order = ["name", "email", "trusted_clearance_level"]
 
     def __init__(self, *args, **kwargs):
         self.organization = kwargs.pop("organization")
@@ -116,18 +132,39 @@ class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPaw
         if self.account_type != GROUP_REDTEAM:
             self.fields.pop("trusted_clearance_level")
 
-    def register_member(self):
-        user = self.register_user()
-        member = OrganizationMember.objects.create(user=user, organization=self.organization)
-        member.groups.add(Group.objects.get(name=self.account_type))
+    def create_new_member(self, user: AbstractBaseUser | None = None) -> None:
+        """When no user is passed, create a new user as well."""
+        try:
+            if user is None:
+                user = self.register_user()
+            member = OrganizationMember.objects.create(user=user, organization=self.organization)
+            member.groups.add(Group.objects.get(name=self.account_type))
 
-        if self.account_type == GROUP_REDTEAM:
-            member.trusted_clearance_level = self.cleaned_data.get("trusted_clearance_level")
+            if self.account_type == GROUP_REDTEAM:
+                member.trusted_clearance_level = self.cleaned_data.get("trusted_clearance_level")
 
-        if self.account_type == GROUP_ADMIN:
-            member.trusted_clearance_level = 4
-            member.acknowledged_clearance_level = 4
-        member.save()
+            if self.account_type == GROUP_ADMIN:
+                member.trusted_clearance_level = 4
+                member.acknowledged_clearance_level = 4
+            member.save()
+            self.send_password_reset_email(user)
+        except (IntegrityError, Group.DoesNotExist) as error:
+            logger.error("An error occurred, more info: %s", error)
+            return None
+
+    def register_member(self) -> None:
+        email = self.cleaned_data.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+            try:
+                OrganizationMember.objects.get(user=user, organization=self.organization)
+            except OrganizationMember.DoesNotExist:
+                self.create_new_member(user)
+
+        # if user does not exist, neither can it be a member, create a new user and member.
+        except User.DoesNotExist:
+            self.create_new_member()
 
     def is_valid(self):
         is_valid = super().is_valid()
