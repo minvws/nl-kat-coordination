@@ -20,6 +20,7 @@ class TaskStore:
     def get_tasks(
         self,
         scheduler_id: str | None = None,
+        organisation: str | None = None,
         task_type: str | None = None,
         status: str | None = None,
         min_created_at: datetime | None = None,
@@ -33,6 +34,9 @@ class TaskStore:
 
             if scheduler_id is not None:
                 query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+            if organisation is not None:
+                query = query.filter(models.TaskDB.organisation == organisation)
 
             if task_type is not None:
                 query = query.filter(models.TaskDB.type == task_type)
