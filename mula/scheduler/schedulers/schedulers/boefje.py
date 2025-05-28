@@ -425,11 +425,7 @@ class BoefjeScheduler(Scheduler):
             self.ctx.datastores.task_store.update_task(task_db)
 
         boefje_task = self.is_boefje_in_other_orgs(boefje_task)
-        self.create_task_and_push_to_queue(boefje_task, organisation_id, create_schedule, caller)
 
-    def create_task_and_push_to_queue(
-        self, boefje_task: models.BoefjeTask, organisation_id: str, create_schedule: bool = True, caller: str = ""
-    ) -> None:
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -789,10 +785,28 @@ class BoefjeScheduler(Scheduler):
             )
 
             try:
-                self.create_task_and_push_to_queue(
-                    boefje_task=new_boefje_task,
+                task = models.Task(
+                    id=new_boefje_task.id,
+                    scheduler_id=self.scheduler_id,
+                    organisation=config.organisation_id,
+                    type=self.ITEM_TYPE.type,
+                    hash=new_boefje_task.hash,
+                    data=new_boefje_task.model_dump(),
+                )
+
+                task.priority = self.ranker.rank(task)
+                self.push_item_to_queue_with_timeout(
+                    item=task, max_tries=self.max_tries, create_schedule=self.create_schedule
+                )
+
+                self.logger.info(
+                    "Created boefje task",
+                    task_id=task.id,
+                    task_hash=task.hash,
+                    boefje_id=new_boefje_task.boefje.id,
+                    ooi_primary_key=new_boefje_task.input_ooi,
+                    scheduler_id=self.scheduler_id,
                     organisation_id=config.organisation_id,
-                    create_schedule=self.create_schedule,
                     caller=self.is_boefje_in_other_orgs.__name__,
                 )
             except Exception:
