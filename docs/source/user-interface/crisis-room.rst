@@ -25,7 +25,7 @@ These findings are shown in a table, grouped by finding types.
 Custom Dashboards
 -----------------
 By clicking on the 'Add Dashboard' button, a new dashboard will be created.
-Each dashboard can contain multiple dashboard items.
+Each dashboard can contain a maximum of 16 dashboard items.
 
 There are three types of dashboard items:
 
@@ -33,7 +33,7 @@ There are three types of dashboard items:
 - **Findings list:** a copy of the findings list, with applied filters
 - **Report section:** a copy of a specific part of a report
 
-Currently, only the object list is implemented. The others will follow soon.
+Currently, only the object list and findings list are implemented. The report section will follow soon.
 
 The dashboard items can be moved up/downwards and can be deleted.
 
@@ -41,7 +41,7 @@ Adding A New Dashboard Item
 ---------------------------
 To add a new dashboard item to a dashboard:
 
-- Go to the Objects page
+- Go to the Objects or Findings page
 - Filter the table as you prefer (the same filters will be applied to the table in the dashboard item)
 - Click on the 'Add to dashboard' button, this opens a modal
 - Choose the settings as you prefer
@@ -52,7 +52,7 @@ The following settings can be set:
 - **Dashboard:** Select the dashboard to which you want to add the dashboard item.
 - **Name:** Give the dashboard item a name.
 - **List sorting by:** This is how the table in the dashboard item will be sorted.
-- **Number of objects in list:** Choose how many objects you wish to show in the dashboard item.
+- **Number of rows in list:** Choose how many objects/findings you wish to show in the dashboard item.
 - **Dashboard item size:** A dashboard item can be full or half width. Two half width items will be displayed next to each other.
 - **Show table columns:** Select at least one column you want to show in the dashboard item.
 

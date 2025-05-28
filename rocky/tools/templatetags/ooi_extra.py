@@ -131,3 +131,25 @@ def url_encode_object_list_query(query_str: str) -> str:
         "sorting_order": query["asc_desc"],
     }
     return urlencode(params, True)
+
+
+@register.filter
+def url_encode_finding_list_query(query_str: str) -> str:
+    query = json.loads(query_str)
+
+    if query["exclude_muted"]:
+        muted_findings = "non-muted"
+    elif query["only_muted"]:
+        muted_findings = "muted"
+    else:
+        muted_findings = "all"
+
+    params = {
+        "severity": query["severities"],
+        "search": query["search_string"],
+        "order_by": query["order_by"],
+        "sorting_order": query["asc_desc"],
+        "muted_findings": muted_findings,
+    }
+
+    return urlencode(params, True)

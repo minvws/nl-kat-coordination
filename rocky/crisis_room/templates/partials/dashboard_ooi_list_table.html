@@ -7,18 +7,20 @@
         <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
     </caption>
     <thead>
-        {% if "object" in dashboard_item.settings.columns %}
-            <th>{% translate "Object" %}</th>
-        {% endif %}
-        {% if "object_type" in dashboard_item.settings.columns %}
-            <th>{% translate "Type" %}</th>
-        {% endif %}
-        {% if "clearance_level" in dashboard_item.settings.columns %}
-            <th>{% translate "Clearance level" %}</th>
-        {% endif %}
-        {% if "clearance_type" in dashboard_item.settings.columns %}
-            <th>{% translate "Clearance type" %}</th>
-        {% endif %}
+        <tr>
+            {% if "object" in dashboard_item.settings.columns %}
+                <th>{% translate "Object" %}</th>
+            {% endif %}
+            {% if "object_type" in dashboard_item.settings.columns %}
+                <th>{% translate "Type" %}</th>
+            {% endif %}
+            {% if "clearance_level" in dashboard_item.settings.columns %}
+                <th>{% translate "Clearance level" %}</th>
+            {% endif %}
+            {% if "clearance_type" in dashboard_item.settings.columns %}
+                <th>{% translate "Clearance type" %}</th>
+            {% endif %}
+        </tr>
     </thead>
     <tbody>
         {% for object in data.object_list %}

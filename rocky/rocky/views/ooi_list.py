@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
-from crisis_room.forms import ObjectListSettingsForm
+from crisis_room.forms import AddObjectListDashboardItemForm
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -49,7 +49,9 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["object_list_settings_form"] = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
+        context["object_list_settings_form"] = AddObjectListDashboardItemForm(
+            **self.get_object_list_settings_form_kwargs()
+        )
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
@@ -95,7 +97,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = ObjectListSettingsForm(**self.get_object_list_settings_form_kwargs())
+        form = AddObjectListDashboardItemForm(**self.get_object_list_settings_form_kwargs())
 
         if form.is_valid():
             dashboard_id = form.cleaned_data.get("dashboard")
