@@ -376,21 +376,6 @@ files = [
 ]
 
 [[package]]
-name = "configparser"
-version = "7.0.0"
-description = "Updated configparser from stdlib for earlier Pythons."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "configparser-7.0.0-py3-none-any.whl", hash = "sha256:f46d52a12811c637104c6bb8eb33693be0038ab6bf01d69aae009c39ec8c2017"},
-    {file = "configparser-7.0.0.tar.gz", hash = "sha256:af3c618a67aaaedc4d689fd7317d238f566b9aa03cae50102e92d7f0dfe78ba0"},
-]
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
-testing = ["pytest (>=6,!=8.1.1)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-ruff (>=0.2.1)", "types-backports"]
-
-[[package]]
 name = "coverage"
 version = "7.8.0"
 description = "Code coverage measurement for Python"
@@ -1782,20 +1767,6 @@ files = [
 ]
 
 [[package]]
-name = "pybinaryedge"
-version = "0.5"
-description = "Python 3 Wrapper for the binary edge API https://www.binaryedge.io/"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pybinaryedge-0.5.tar.gz", hash = "sha256:00cf2f253aa44c7d6589a56d70c5b820a5060c3a0a2aee018f0b4ed732fe7632"},
-]
-
-[package.dependencies]
-configparser = "*"
-requests = "*"
-
-[[package]]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
@@ -2957,4 +2928,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "3ac21214093a603d2a9b09ddcd37f1883a63a31a2303d69bcb96f0b6b84195e7"
+content-hash = "c487d72d3a584905d0c7b35c4da16e90af8d620a8885c16cae3b2d53654a560e"
