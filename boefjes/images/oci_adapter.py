@@ -10,7 +10,9 @@ from main import run
 def main():
     input_url = sys.argv[-1]
     try:
-        boefje_input = httpx.get(input_url).json()
+        response = httpx.get(input_url)
+        response.raise_for_status()
+        boefje_input = response.json()
     except httpx.HTTPError as e:
         # sys.exit will print the message on stderr and return with exit code 1
         sys.exit(f"Failed to get input from boefje API: {e}")
@@ -37,7 +39,8 @@ def main():
         }
 
     try:
-        httpx.post(boefje_input["output_url"], json=out)
+        response = httpx.post(boefje_input["output_url"], json=out)
+        response.raise_for_status()
     except httpx.HTTPError as e:
         sys.exit(f"Failed to post output to boefje API: {e}")
 
