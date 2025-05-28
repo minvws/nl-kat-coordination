@@ -424,7 +424,7 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
-        boefje_task = self.is_boefje_in_other_orgs(boefje_task, caller=caller)
+        boefje_task = self.is_boefje_in_other_orgs(boefje_task)
 
         task = models.Task(
             id=boefje_task.id,
@@ -709,15 +709,11 @@ class BoefjeScheduler(Scheduler):
 
         return oois
 
-    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask, caller: str = "") -> models.BoefjeTask:
+    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> models.BoefjeTask:
         """Check if the boefje is also present in other organisations"""
         # We check on input_ooi because we allow for boefje tasks without an
         # ooi, something we can't deduplicate.
         if boefje_task.input_ooi is None:
-            return boefje_task
-
-        # Make sure we don't call this method recursively
-        if caller == self.is_boefje_in_other_orgs.__name__:
             return boefje_task
 
         configs = self.ctx.services.katalogus.get_configs(
@@ -789,10 +785,28 @@ class BoefjeScheduler(Scheduler):
             )
 
             try:
-                self.push_boefje_task(
-                    boefje_task=new_boefje_task,
+                task = models.Task(
+                    id=new_boefje_task.id,
+                    scheduler_id=self.scheduler_id,
+                    organisation=config.organisation_id,
+                    type=self.ITEM_TYPE.type,
+                    hash=new_boefje_task.hash,
+                    data=new_boefje_task.model_dump(),
+                )
+
+                task.priority = self.ranker.rank(task)
+                self.push_item_to_queue_with_timeout(
+                    item=task, max_tries=self.max_tries, create_schedule=self.create_schedule
+                )
+
+                self.logger.info(
+                    "Created boefje task",
+                    task_id=task.id,
+                    task_hash=task.hash,
+                    boefje_id=new_boefje_task.boefje.id,
+                    ooi_primary_key=new_boefje_task.input_ooi,
+                    scheduler_id=self.scheduler_id,
                     organisation_id=config.organisation_id,
-                    create_schedule=self.create_schedule,
                     caller=self.is_boefje_in_other_orgs.__name__,
                 )
             except Exception:
