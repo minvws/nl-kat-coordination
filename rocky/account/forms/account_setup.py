@@ -3,15 +3,13 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
@@ -61,29 +59,34 @@ class UserRegistrationForm(forms.Form):
     )
 
     @staticmethod
-    def send_password_reset_email(user):
+    def send_password_reset_email(user, organization: Organization):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
 
-        reset_path = reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
-
         current_site = Site.objects.get_current()
-        domain = current_site.domain
-        protocol = "https"
-        reset_url = f"{protocol}://{domain}{reset_path}"
+        site_name = "OpenKAT" if current_site.name == "example.com" else current_site.name
+        domain = "localhost:8000" if current_site.domain == "example.com" else current_site.domain
+        protocol = "http" if domain == "localhost:8000" else "https"
 
-        subject = "Set your password"
+        subject = _("Set password for your new account.")
         message = render_to_string(
-            "password_reset_email.html", {"user": user, "reset_url": reset_url, "uid": uid, "token": token}
+            "registration_email.html",
+            {
+                "organization": organization,
+                "site_name": site_name,
+                "protocol": protocol,
+                "domain": domain,
+                "uid": uid,
+                "token": token,
+            },
         )
 
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
 
-    def register_user(self):
-        user = User.objects.create_user(
-            username=self.cleaned_data.get("name", ""), email=self.cleaned_data.get("email"), password=None
+    def register_user(self) -> AbstractUser:
+        return User.objects.create_user(
+            full_name=self.cleaned_data.get("name", ""), email=self.cleaned_data.get("email"), password=None
         )
-        return user
 
 
 class AccountTypeSelectForm(forms.Form):
@@ -128,13 +131,13 @@ class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPaw
         if self.account_type != GROUP_REDTEAM:
             self.fields.pop("trusted_clearance_level")
 
-    def create_new_member(self, user: AbstractBaseUser | None = None) -> None:
+    def create_new_member(self, user: AbstractUser | None = None) -> None:
         """When no user is passed, create a new user as well."""
         try:
             if user is None:
                 user = self.register_user()
                 # new registered user must set a password through the password reset form.
-                self.send_password_reset_email(user)
+                self.send_password_reset_email(user, self.organization)
             member = OrganizationMember.objects.create(user=user, organization=self.organization)
             member.groups.add(Group.objects.get(name=self.account_type))
 
