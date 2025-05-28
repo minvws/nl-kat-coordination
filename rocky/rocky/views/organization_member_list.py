@@ -30,7 +30,7 @@ class OrganizationMemberListView(
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return self.member_filter_form(self.request.GET).filter_member(self.organization, qs)
+        return self.member_filter_form(self.request.GET).filter_members(self.organization, qs)
 
     def post(self, request, *args, **kwargs):
         if not self.organization_member.has_perm("tools.change_organizationmember"):
