@@ -133,6 +133,8 @@ class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPaw
         try:
             if user is None:
                 user = self.register_user()
+                # new registered user must set a password through the password reset form.
+                self.send_password_reset_email(user)
             member = OrganizationMember.objects.create(user=user, organization=self.organization)
             member.groups.add(Group.objects.get(name=self.account_type))
 
@@ -143,7 +145,7 @@ class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPaw
                 member.trusted_clearance_level = 4
                 member.acknowledged_clearance_level = 4
             member.save()
-            self.send_password_reset_email(user)
+
         except (IntegrityError, Group.DoesNotExist) as error:
             logger.error("An error occurred, more info: %s", error)
             return None
