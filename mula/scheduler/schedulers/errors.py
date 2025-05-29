@@ -1,7 +1,7 @@
 import functools
 
 from scheduler.clients.errors import ExternalServiceError
-from scheduler.schedulers.queue.errors import QueueFullError
+from scheduler.schedulers.queue.errors import NotAllowedError, QueueFullError
 
 
 def exception_handler(func):
@@ -14,6 +14,9 @@ def exception_handler(func):
             return None
         except QueueFullError as exc:
             self.logger.exception("Queue is full", exc=exc)
+            return None
+        except NotAllowedError as exc:
+            self.logger.warning(exc)
             return None
         except Exception as exc:
             self.logger.exception(exc=exc)
