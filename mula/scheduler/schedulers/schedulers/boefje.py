@@ -751,7 +751,7 @@ class BoefjeScheduler(Scheduler):
             self.logger.debug(
                 "No organisations found for input ooi",
                 input_ooi=boefje_task.input_ooi,
-                organisation_id=boefje_task.organisation,
+                organisation_id=boefje_task.organization,
                 scheduler_id=self.scheduler_id,
             )
             return []
