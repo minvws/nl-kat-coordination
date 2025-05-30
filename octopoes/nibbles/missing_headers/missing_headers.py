@@ -1,5 +1,4 @@
 from collections.abc import Iterator
-from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -24,12 +23,9 @@ def is_xss_capable(content_type: str) -> bool:
     return main_type in XSS_CAPABLE_TYPES
 
 
-def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
-    if not additional_oois:
-        return
-
-    header_keys = [header.key.lower() for header in additional_oois]
-    headers = {header.key.lower(): header.value for header in additional_oois}
+def nibble(resource: HTTPResource, http_headers: list[HTTPHeader]) -> Iterator[OOI]:
+    header_keys = [header.key.lower() for header in http_headers]
+    headers = {header.key.lower(): header.value for header in http_headers}
 
     if "location" in header_keys:
         return
