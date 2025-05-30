@@ -613,5 +613,13 @@
     "risk": "recommendation",
     "impact": "Depending on what software is outdated this can be critical.",
     "recommendation": "Inspect the software version, determine if additional measures need to be taken and install updates to reduce the attack surface."
+  },
+  "KAT-ABUSEIPDB-REPORT": {
+    "name": "AbuseIPDB Report Detected",
+    "description": "The IP address has been marked as risky in AbuseIPDB.",
+    "risk": "medium",
+    "source": "https://www.abuseipdb.com/",
+    "impact": "The IP address might be involved in harmful activities which could put your users at risk.",
+    "recommendation": "Check out https://www.abuseipdb.com/check/<ipaddress> and see how big the risk is."
   }
 }

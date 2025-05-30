@@ -16,6 +16,7 @@ on:
       - boefjes/boefjes/plugins/kat_nmap_tcp/**
       - boefjes/boefjes/plugins/kat_nmap_udp/**
       - boefjes/boefjes/plugins/kat_dnssec/**
+      - boefjes/boefjes/plugins/kat_abuseipdb/**
       - boefjes/images/**
       - .github/workflows/containerized_boefjes.yml
 
@@ -29,8 +30,13 @@ jobs:
         include:
           - dockerfile: boefjes/boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
             image: openkat/nmap
+            boefje-path: ""
           - dockerfile: boefjes/boefjes/plugins/kat_dnssec/boefje.Dockerfile
             image: openkat/dns-sec
+            boefje-path: ""
+          - dockerfile: boefjes/images/base.Dockerfile
+            image: cynalytics/abuseipdb
+            boefje-path: boefjes/plugins/kat_abuseipdb
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
@@ -70,3 +76,5 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BOEFJE_PATH=${{ matrix.boefje-path }}
