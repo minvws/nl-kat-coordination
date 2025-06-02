@@ -119,17 +119,7 @@ class OrganizationMemberAddView(
                         "organization_member_add_account_type", kwargs={"organization_code": self.organization.code}
                     ),
                     "text": _("Add member"),
-                },
-                {
-                    "url": reverse(
-                        "organization_member_add",
-                        kwargs={
-                            "organization_code": self.organization.code,
-                            "account_type": self.kwargs["account_type"],
-                        },
-                    ),
-                    "text": _("Account setup"),
-                },
+                }
             ]
         )
         return breadcrumbs

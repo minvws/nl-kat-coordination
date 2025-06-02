@@ -8,18 +8,17 @@
 
     <main id="main-content">
         <section>
-            <div class="layout-form">
+            <div>
                 <h1>{% translate "Add members" %}</h1>
                 <p>
                     {% blocktranslate trimmed with organization as organization %}
                         To upload multiple members at once, you can upload a CSV file
-                        with all the members. You can use the template or you can use
-                        a custom CSV file.
+                        or you can
                     {% endblocktranslate %}
-                    <a href="{% url 'download_organization_member_template' organization_code=organization.code %}">
-                        {% translate "Click here to download the template." %}
-                    </a>
+                    <a href="{% url 'download_organization_member_template' organization_code=organization.code %}">download the template.</a>
                 </p>
+            </div>
+            <div>
                 <p>
                     {% translate "To create a custom CSV file, make sure it meets the following criteria:" %}
                     <ul>

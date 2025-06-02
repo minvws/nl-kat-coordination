@@ -88,7 +88,6 @@ class AccountTypeSelectForm(forms.Form):
 
     account_type = forms.CharField(
         label=_("Account type"),
-        help_text=_("Every member of OpenKAT must be part of an account type."),
         error_messages={"group": {"required": _("Please select an account type to proceed.")}},
         widget=forms.Select(choices=ACCOUNT_TYPE_CHOICES, attrs={"aria-describedby": "explanation-account-type"}),
     )
