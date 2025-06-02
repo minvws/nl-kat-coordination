@@ -71,7 +71,7 @@ class AddDashboardItemForm(BaseRockyForm):
     def get_settings(self) -> dict[str, Any]:
         column_values = self.data.getlist("column_values", [])
         column_names = self.data.getlist("column_names", [])
-        columns = dict(zip(column_names, column_values))
+        columns = dict(zip(column_values, column_names))
 
         if not columns:
             raise ValidationError("Please choose at least one column.")
