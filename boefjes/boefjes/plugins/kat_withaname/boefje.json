@@ -1,0 +1,12 @@
+{
+  "id": "withaname",
+  "name": "Witha.name DDoSia lookup",
+  "description": "Use witha.name to see if our hostnames or ipaddresses are listed for targeting.",
+  "oci_image": "ghcr.io/cynalytics/boefje/withaname",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6",
+    "Hostname"
+  ],
+  "scan_level": 1
+}
