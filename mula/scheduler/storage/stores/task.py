@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import exc, func
+from sqlalchemy import desc, exc, func
 
 from scheduler import models
 from scheduler.storage import DBConn
@@ -148,7 +148,7 @@ class TaskStore:
                 )
                 .filter(models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24))
                 .group_by("hour", models.TaskDB.status)
-                .order_by("hour", models.TaskDB.status)
+                .order_by(desc("hour"), models.TaskDB.status)
             )
 
             if scheduler_id is not None:
@@ -159,6 +159,7 @@ class TaskStore:
 
             results = query.all()
 
+            # We rely on the dict insertion order
             response: dict[str, dict[str, int]] = {}
             for row in results:
                 date, status, task_count = row
