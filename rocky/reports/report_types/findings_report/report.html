@@ -138,7 +138,7 @@
             {% endblocktranslate %}
                 </p>
             </div>
-            {% include "partials/report_findings_table.html" with finding_types=data.report_data.findings.finding_types %}
+            {% include "partials/report_findings_table.html" with finding_types=data.report_data.findings.finding_types is_dashboard_findings="yes" %}
 
         </div>
     {% else %}
