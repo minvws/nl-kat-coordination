@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
@@ -17,6 +18,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from httpx import HTTPStatusError, ReadTimeout
+from pydantic import Field
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
 from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
@@ -36,9 +38,10 @@ from rocky.views.mixins import FindingList
 logger = structlog.get_logger(__name__)
 
 
+@dataclass
 class DashboardItemView:
     item: DashboardItem | None = None
-    data: dict[str, Any] = {}
+    data: dict[str, Any] = Field(default_factory=dict)
 
 
 class DashboardService:
@@ -105,14 +108,10 @@ class DashboardService:
         # First collect al data, if recipe id is found then fetch recipe ids to get reports later.
         for dashboard_item in dashboard_items:
             if not dashboard_item.recipe and dashboard_item.query_from == "object_list":
-                item_data = DashboardItemView()
-                item_data.item = dashboard_item
-                item_data.data = self.get_ooi_list(dashboard_item)
+                item_data = DashboardItemView(dashboard_item, self.get_ooi_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
             elif not dashboard_item.recipe and dashboard_item.query_from == "finding_list":
-                item_data = DashboardItemView()
-                item_data.item = dashboard_item
-                item_data.data = self.get_finding_list(dashboard_item)
+                item_data = DashboardItemView(dashboard_item, self.get_finding_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
             elif dashboard_item.recipe:
                 report_filters.append((dashboard_item.dashboard.organization.code, str(dashboard_item.recipe)))
@@ -136,9 +135,7 @@ class DashboardService:
 
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_item, hydrated_report in reports_data.items():
-                item_data = DashboardItemView()
-                item_data.item = dashboard_item
-                item_data.data = {"report": hydrated_report}
+                item_data = DashboardItemView(dashboard_item, {"report": hydrated_report})
 
                 try:
                     report_data = report_data_from_bytes[hydrated_report.data_raw_id]
