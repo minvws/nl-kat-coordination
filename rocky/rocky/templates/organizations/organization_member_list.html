@@ -53,34 +53,19 @@
                         <caption class="visually-hidden">{% translate "Member overview:" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate "Blocked" %}</th>
                                 <th>{% translate "E-mail" %}</th>
                                 <th>{% translate "Role" %}</th>
                                 <th>{% translate "Status" %}</th>
                                 <th>{% translate "Assigned clearance level" %}</th>
                                 <th>{% translate "Accepted clearance level" %}</th>
                                 <th>{% translate "Edit" %}</th>
+                                <th>{% translate "Blocked" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for member in members %}
                                 {% if not member.user.is_superuser or request.user.is_superuser %}
                                     <tr>
-                                        <td>
-                                            {% if member.blocked %}
-                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
-
-                                            {% else %}
-                                                {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
-                                                {% if member.user.is_superuser or member.user.email == request.user.email %}
-                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
-
-                                                {% else %}
-                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
-
-                                                {% endif %}
-                                            {% endif %}
-                                        </td>
                                         <td>
                                             {{ member.user.email }}
                                             <br>
@@ -126,6 +111,21 @@
                                                 <a href="{% url "organization_member_edit" organization.code member.id %}">
                                                     <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
                                                 </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.blocked %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
+
+                                            {% else %}
+                                                {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
+                                                {% if member.user.is_superuser or member.user.email == request.user.email %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
+
+                                                {% else %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
+
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
