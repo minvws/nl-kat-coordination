@@ -112,9 +112,7 @@ def create_findings_dashboard(organization: Organization, octopoes_client: Octop
     logger.info("New reecipe with id: %s has been created and scheduled.", recipe_id)
 
 
-def get_or_update_findings_dashboard(
-    organization: Organization, octopoes_client: OctopoesAPIConnector | None = None
-) -> None:
+def run_findings_dashboard(organization: Organization, octopoes_client: OctopoesAPIConnector | None = None) -> None:
     """
     Find a findings dashboard, if found, take the recipe id and rerun the schedule.
     If no findings dashboard is found, then create a new one and create a new recipe.
@@ -139,4 +137,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         organizations = Organization.objects.all()
         for organization in organizations:
-            get_or_update_findings_dashboard(organization)
+            run_findings_dashboard(organization)

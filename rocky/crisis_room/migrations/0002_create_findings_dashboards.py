@@ -3,12 +3,12 @@
 from django.db import migrations
 from tools.models import Organization
 
-from crisis_room.management.commands.dashboards import get_or_update_findings_dashboard
+from crisis_room.management.commands.dashboards import run_findings_dashboard
 
 
 def create_findings_dashboard_for_all_orgs(_apps, _schema_editor):
     for organization in Organization.objects.all():
-        get_or_update_findings_dashboard(organization)
+        run_findings_dashboard(organization)
 
 
 class Migration(migrations.Migration):
