@@ -54,7 +54,7 @@ class AddDashboardItemForm(BaseRockyForm):
             raise ValidationError(_("An item with that name already exists. Try a different title."))
         return name
 
-    def clean_dashboard(self) -> Dashboard | None:
+    def get_dashboard(self) -> Dashboard | None:
         try:
             dashboard_id = self.cleaned_data.get("dashboard")
             return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
@@ -99,7 +99,7 @@ class AddDashboardItemForm(BaseRockyForm):
     def create_dashboard_item(self) -> None:
         try:
             dashboard_item = {
-                "dashboard": self.cleaned_data["dashboard"],
+                "dashboard": self.get_dashboard(),
                 "name": self.cleaned_data["title"],
                 "recipe": self.recipe_id,
                 "query_from": self.query_from,
