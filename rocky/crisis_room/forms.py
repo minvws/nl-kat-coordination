@@ -90,35 +90,38 @@ class AddDashboardItemForm(BaseRockyForm):
         return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
 
     def create_dashboard_item(self) -> None:
-        dashboard = self.get_dashboard()
-        title = self.cleaned_data.get("title", "")
-
-        dashboard_item = {
-            "dashboard": dashboard,
-            "name": title,
-            "recipe": self.recipe_id,
-            "query_from": self.query_from,
-            "query": json.dumps(self.get_query()),
-            "template": self.template,
-            "settings": self.get_settings(),
-            "display_in_dashboard": self.display_in_dashboard,
-        }
-
         try:
+            dashboard = self.get_dashboard()
+            title = self.cleaned_data.get("title", "")
+
+            dashboard_item = {
+                "dashboard": dashboard,
+                "name": title,
+                "recipe": self.recipe_id,
+                "query_from": self.query_from,
+                "query": json.dumps(self.get_query()),
+                "template": self.template,
+                "settings": self.get_settings(),
+                "display_in_dashboard": self.display_in_dashboard,
+            }
+
             DashboardItem.objects.create(**dashboard_item)
+
+        except ValidationError:
+            return None
         except IntegrityError:
             raise ValidationError(_("An error occurred while adding dashboard item."))
 
-    def clean_dashboard(self):
-        dashboard_name = self.cleaned_data.get("dashboard", "")
-        self.get_dashboard()
-        return dashboard_name
-
     def clean_title(self):
+        """
+        Check if a dashboard item with the same title already exists for the dashboard and if a title is chosen.
+        """
         title = self.cleaned_data.get("title", "")
         dashboard = self.get_dashboard()
         if dashboard is not None and self.has_duplicate_name(dashboard, title):
-            raise ValidationError("An item with that name already exists. Try a different title.")
+            raise ValidationError(_("An item with that name already exists. Try a different title."))
+        if not title:
+            raise ValidationError(_("Choose a title to continue."))
         return title
 
     def clean(self) -> dict[str, Any]:

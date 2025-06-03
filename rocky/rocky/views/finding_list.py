@@ -75,6 +75,7 @@ class PageActions(Enum):
 
 class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListView):
     connector_form_class = ObservedAtForm
+    add_findings_to_dashboard_form = AddFindingListDashboardItemForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -120,18 +121,15 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def sorting_order(self) -> Literal["asc", "desc"]:
         return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
 
-    def get_object_list_settings_form_kwargs(self):
+    def get_add_dashboard_item_form(self) -> AddFindingListDashboardItemForm:
         data = self.request.POST if self.request.POST else None
-
-        return {"organization": self.organization, "data": data}
+        return self.add_findings_to_dashboard_form(organization=self.organization, data=data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
-        context["object_list_settings_form"] = AddFindingListDashboardItemForm(
-            **self.get_object_list_settings_form_kwargs()
-        )
+        context["object_list_settings_form"] = self.get_add_dashboard_item_form()
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["table_columns"] = FINDING_LIST_COLUMNS
@@ -176,7 +174,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         return self.get(request, status=404, *args, **kwargs)
 
     def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = AddFindingListDashboardItemForm(**self.get_object_list_settings_form_kwargs())
+        form = self.get_add_dashboard_item_form()
 
         if form.is_valid():
             dashboard_id = form.cleaned_data.get("dashboard")

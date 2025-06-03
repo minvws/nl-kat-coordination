@@ -38,20 +38,19 @@ class PageActions(Enum):
 class OOIListView(BaseOOIListView, OctopoesView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": gettext_lazy("Objects")}]
     template_name = "oois/ooi_list.html"
+    add_object_to_dashboard_form = AddObjectListDashboardItemForm
 
-    def get_object_list_settings_form_kwargs(self):
+    def get_add_dashboard_item_form(self):
         data = self.request.POST if self.request.POST else None
 
-        return {"organization": self.organization, "data": data}
+        return AddObjectListDashboardItemForm(organization=self.organization, data=data)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["object_list_settings_form"] = AddObjectListDashboardItemForm(
-            **self.get_object_list_settings_form_kwargs()
-        )
+        context["object_list_settings_form"] = self.get_add_dashboard_item_form()
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
@@ -97,7 +96,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = AddObjectListDashboardItemForm(**self.get_object_list_settings_form_kwargs())
+        form = self.get_add_dashboard_item_form()
 
         if form.is_valid():
             dashboard_id = form.cleaned_data.get("dashboard")
