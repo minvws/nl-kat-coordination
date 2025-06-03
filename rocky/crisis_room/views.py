@@ -249,7 +249,7 @@ class DashboardService:
             search_string=query["search_string"],
             order_by=query["order_by"],
             asc_desc=query["asc_desc"],
-        )[0:limit]
+        )[:limit]
 
         return {"finding_list": finding_list}
 
