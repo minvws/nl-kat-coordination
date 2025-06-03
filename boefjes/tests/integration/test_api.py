@@ -15,6 +15,17 @@ def test_get_local_plugin(test_client, organisation):
     assert data["id"] == "dns-records"
 
 
+def test_create_org(test_client):
+    response = test_client.post(f"/v1/organisations/", json={"id": "test2","name": "test2"})
+    assert response.status_code == 201
+
+    assert test_client.get(f"/v1/organisations/test2/").json() == {
+        "id": "test2",
+        "name": "test2",
+        "deduplicate": True,
+    }
+
+
 def test_filter_plugins(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins")
     assert len(response.json()) > 100
