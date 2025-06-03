@@ -38,7 +38,7 @@
                     {% else %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
                             {% if organization_member.can_delete_dashboard_item %}
-                                {% include "partials/delete_dashboard_item_modal.html" with dashboard_item=dashboard_item.item %}
+                                {% include "partials/delete_dashboard_item_modal.html" with name=dashboard_item.item.name item_id=dashboard_item.item.id|stringformat:"s" %}
 
                             {% endif %}
                             <div class="dashboard-item">
@@ -86,8 +86,8 @@
                                                             </li>
                                                         {% endif %}
                                                         <li>
-                                                            <a href="#delete-item-modal-{{ dashboard_item.item.name|slugify }}"
-                                                               data-modal-id="delete-item-modal-{{ dashboard_item.item.name|slugify }}"
+                                                            <a href="#delete-item-modal-{{ dashboard_item.item.id }}"
+                                                               data-modal-id="delete-item-modal-{{ dashboard_item.item.id }}"
                                                                class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
                                                             </a>
                                                         </li>
