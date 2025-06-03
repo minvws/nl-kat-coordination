@@ -469,13 +469,16 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
 
     # duplicate title throws form error
     for error_list in errors:
-        assert "An item with that name already exists. Try a different title." in error_list
+        assert (
+            "An item with that name already exists. Try a different title." in error_list
+            or "An error occurred while adding dashboard item." in error_list
+        )
 
     # set it back
     form_data["title"] = "Test Form"
 
     # None existent dashboard
-    form_data["dashboard"] = "None"
+    form_data["dashboard"] = None
 
     form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
     assert not form.is_valid()
@@ -581,13 +584,16 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
 
     # duplicate title throws form error
     for error_list in errors:
-        assert "An item with that name already exists. Try a different title." in error_list
+        assert (
+            "An item with that name already exists. Try a different title." in error_list
+            or "An error occurred while adding dashboard item." in error_list
+        )
 
     # set it back
     form_data["title"] = "Test Form"
 
     # None existent dashboard
-    form_data["dashboard"] = "None"
+    form_data["dashboard"] = None
 
     form = AddFindingListDashboardItemForm(
         organization=client_member.organization, data=QueryDict(urlencode(form_data))

@@ -46,27 +46,34 @@ class AddDashboardItemForm(BaseRockyForm):
         self.display_in_dashboard = True
         self.data: QueryDict = kwargs.pop("data")
 
-    def get_dashboard_selection(self) -> list[tuple[str, str]]:
-        default = [("", "--- Select an option ----")]
-        dashboards = [
-            (dashboard.id, dashboard.name)
-            for dashboard in Dashboard.objects.filter(organization=self.organization).exclude(
-                dashboarditem__findings_dashboard=True
-            )
-        ]
-        return default + dashboards
+    def clean_title(self):
+        """Checks if title is already used as dashboard item name"""
+        name = self.cleaned_data.get("title")
+        dashboard = self.cleaned_data.get("dashboard")
+        if dashboard is not None and self.has_duplicate_name(dashboard, name):
+            raise ValidationError(_("An item with that name already exists. Try a different title."))
+        return name
 
-    def get_dashboard(self) -> Dashboard | None:
+    def clean_dashboard(self) -> Dashboard | None:
         try:
-            dashboard_id = self.cleaned_data.get("dashboard", "")
+            dashboard_id = self.cleaned_data.get("dashboard")
             return Dashboard.objects.get(id=dashboard_id, organization=self.organization)
         except Dashboard.DoesNotExist:
             raise ValidationError("Dashboard does not exist.")
         except ValueError:
             raise ValidationError("No Dashboard selected. Choose an option from the list.")
 
-    def has_duplicate_name(self, dashboard: Dashboard, title_dashboard_item: str) -> bool:
-        return DashboardItem.objects.filter(dashboard=dashboard, name=title_dashboard_item).exists()
+    def get_dashboard_selection(self) -> list[tuple[str, str]]:
+        default = [("", "--- Select an option ----")]
+        organization_dashboards = Dashboard.objects.filter(organization=self.organization)
+        dashboards = [
+            (dashboard.id, dashboard.name)
+            for dashboard in organization_dashboards.exclude(dashboarditem__findings_dashboard=True)
+        ]
+        return default + dashboards
+
+    def has_duplicate_name(self, dashboard: Dashboard, name: str | None) -> bool:
+        return DashboardItem.objects.filter(dashboard=dashboard, name=name).exists()
 
     def get_settings(self) -> dict[str, Any]:
         column_values = self.data.getlist("column_values", [])
@@ -91,12 +98,9 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def create_dashboard_item(self) -> None:
         try:
-            dashboard = self.get_dashboard()
-            title = self.cleaned_data.get("title")
-
             dashboard_item = {
-                "dashboard": dashboard,
-                "name": title,
+                "dashboard": self.cleaned_data["dashboard"],
+                "name": self.cleaned_data["title"],
                 "recipe": self.recipe_id,
                 "query_from": self.query_from,
                 "query": json.dumps(self.get_query()),
@@ -107,27 +111,14 @@ class AddDashboardItemForm(BaseRockyForm):
 
             DashboardItem.objects.create(**dashboard_item)
 
-        except ValidationError:
-            return None
-        except IntegrityError:
+        except (ValidationError, IntegrityError):
             raise ValidationError(_("An error occurred while adding dashboard item."))
 
-    def clean_title(self):
-        """
-        Check if a dashboard item with the same title already exists for the dashboard and if a title is chosen.
-        """
-        title = self.cleaned_data.get("title", "")
-        dashboard = self.get_dashboard()
-        if dashboard is not None and self.has_duplicate_name(dashboard, title):
-            raise ValidationError(_("An item with that name already exists. Try a different title."))
-        if not title:
-            raise ValidationError(_("Choose a title to continue."))
-        return title
-
-    def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
-        self.create_dashboard_item()
-        return cleaned_data
+    def is_valid(self):
+        is_valid = super().is_valid()
+        if is_valid:
+            self.create_dashboard_item()
+        return is_valid
 
 
 class AddObjectListDashboardItemForm(AddDashboardItemForm):
