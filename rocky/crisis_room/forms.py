@@ -92,7 +92,7 @@ class AddDashboardItemForm(BaseRockyForm):
     def create_dashboard_item(self) -> None:
         try:
             dashboard = self.get_dashboard()
-            title = self.cleaned_data.get("title", "")
+            title = self.cleaned_data.get("title")
 
             dashboard_item = {
                 "dashboard": dashboard,
