@@ -23,6 +23,13 @@ from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
 
+OBJECT_LIST_COLUMNS = {
+    "object": _("Object"),
+    "object_type": _("Type"),
+    "clearance_level": _("Clearance level"),
+    "clearance_type": _("Clearance type"),
+}
+
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
     """
@@ -133,19 +140,11 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_queryset(self) -> OOIList:
         return OOIList(self.octopoes_api_connector, **self.get_queryset_params())
 
-    def get_table_columns(self) -> dict[str, str]:
-        return {
-            "object": _("Object"),
-            "object_type": _("Type"),
-            "clearance_level": _("Clearance level"),
-            "clearance_type": _("Clearance type"),
-        }
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["total_oois"] = len(self.object_list)
-        context["table_columns"] = self.get_table_columns()
+        context["table_columns"] = OBJECT_LIST_COLUMNS
         return context
 
 

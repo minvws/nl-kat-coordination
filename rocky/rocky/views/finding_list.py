@@ -27,6 +27,14 @@ from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, Se
 
 logger = structlog.get_logger(__name__)
 
+FINDING_LIST_COLUMNS = {
+    "severity": _("Severity"),
+    "finding": _("Finding"),
+    "location": _("Location"),
+    "tree": _("Tree"),
+    "graph": _("Graph"),
+}
+
 
 def sort_by_severity_desc(findings: Iterable) -> list[dict[str, Any]]:
     # Sorting is stable (when multiple records have the same key, their original
@@ -104,15 +112,6 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             "asc_desc": self.sorting_order,
         }
 
-    def get_table_columns(self) -> dict[str, str]:
-        return {
-            "severity": _("Severity"),
-            "finding": _("Finding"),
-            "location": _("Location"),
-            "tree": _("Tree"),
-            "graph": _("Graph"),
-        }
-
     @property
     def order_by(self) -> Literal["score", "finding_type"]:
         return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
@@ -135,7 +134,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         )
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
-        context["table_columns"] = self.get_table_columns()
+        context["table_columns"] = FINDING_LIST_COLUMNS
         context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["active_filters_counter"] = self.count_active_filters
         context["order_by"] = self.order_by
