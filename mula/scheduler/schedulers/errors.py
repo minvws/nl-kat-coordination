@@ -16,7 +16,7 @@ def exception_handler(func):
             self.logger.exception("Queue is full", exc=exc)
             return None
         except NotAllowedError as exc:
-            self.logger.warning(exc)
+            self.logger.debug(exc)
             return None
         except Exception as exc:
             self.logger.exception(exc=exc)

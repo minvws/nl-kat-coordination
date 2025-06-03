@@ -191,7 +191,7 @@ class Scheduler(abc.ABC):
             item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
         except NotAllowedError as exc:
-            self.logger.warning(
+            self.logger.debug(
                 "Not allowed to push to queue %s (%s)",
                 self.queue.pq_id,
                 exc,

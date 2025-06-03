@@ -169,19 +169,17 @@ class PriorityQueue(abc.ABC):
         )
 
         if not allowed:
-            message = f"Item {task} already on queue {self.pq_id}."
+            message = f"Item already on queue {self.pq_id}. "
 
             if item_on_queue and not self.allow_replace:
-                message = "Item already on queue, we're not allowed to replace the item that is already on the queue."
-
-            if item_on_queue and item_changed and not self.allow_updates:
-                message = (
+                message += "Item already on queue, we're not allowed to replace the item that is already on the queue."
+            elif item_on_queue and item_changed and not self.allow_updates:
+                message += (
                     "Item already on queue, and item changed, we're not "
                     "allowed to update the item that is already on the queue."
                 )
-
-            if item_on_queue and priority_changed and not self.allow_priority_updates:
-                message = (
+            elif item_on_queue and priority_changed and not self.allow_priority_updates:
+                message += (
                     "Item already on queue, and priority changed, "
                     "we're not allowed to update the priority of the item "
                     "that is already on the queue."

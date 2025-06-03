@@ -424,6 +424,8 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
+        # We check if the boefje is also present in other organisations
+        # and if so, we create tasks for those organisations as well.
         tasks = self.is_boefje_in_other_orgs(boefje_task)
         if tasks:
             boefje_task.deduplication_key = boefje_task.id
