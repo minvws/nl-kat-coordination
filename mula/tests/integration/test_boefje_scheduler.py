@@ -1385,7 +1385,9 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
         ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_get_boefjes_for_ooi = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id"
+        ).start()
 
         self.mock_get_configs = mock.patch(
             "scheduler.context.AppContext.services.katalogus.get_configs", return_value=[]
