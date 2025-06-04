@@ -35,7 +35,7 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
 
 def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
     manager.pool_size = 2
-    manager._task_queue = Manager().Queue()
+    manager.task_queue = Manager().Queue()
 
     with pytest.raises(KeyboardInterrupt):
         manager.run(WorkerManager.Queue.BOEFJES)
@@ -82,7 +82,7 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
 
     manager.pool_size = 2
     manager.sleep_time = 0.1
-    manager._task_queue = Manager().Queue()
+    manager.task_queue = Manager().Queue()
     with pytest.raises(KeyboardInterrupt):
         manager.run(WorkerManager.Queue.BOEFJES)
 
@@ -132,7 +132,7 @@ def test_two_processes_cleanup_unfinished_tasks(
         3 * [get_dummy_data("scheduler/pop_response_boefje.json")], [], tmp_path / "patch_task_log"
     )
     manager.pool_size = 2
-    manager._task_queue = Manager().Queue()
+    manager.task_queue = Manager().Queue()
 
     item_handler.sleep_time = 200
 

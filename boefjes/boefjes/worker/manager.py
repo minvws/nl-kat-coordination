@@ -81,7 +81,7 @@ class SchedulerWorkerManager(WorkerManager):
                 # should only log the exception and call self.exit() when the
                 # exception is caused by something else and self.exit() hasn't
                 # been called yet.
-                if not self._exited:
+                if not self.exited:
                     logger.exception("Exiting worker...")
                     self.exit()
 
@@ -148,11 +148,11 @@ class SchedulerWorkerManager(WorkerManager):
         self._workers = new_workers
 
     def _cleanup_pending_worker_task(self, worker: BaseProcess) -> None:
-        if worker.pid not in self._handling_tasks:
+        if worker.pid not in self.handling_tasks:
             logger.debug("No pending task found for Worker[pid=%s, %s]", worker.pid, _format_exit_code(worker.exitcode))
             return
 
-        handling_task_id = self._handling_tasks[worker.pid]
+        handling_task_id = self.handling_tasks[worker.pid]
 
         try:
             task = self.scheduler_client.get_task(handling_task_id)
@@ -167,15 +167,15 @@ class SchedulerWorkerManager(WorkerManager):
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
     def _worker_args(self) -> tuple:
-        return self._task_queue, self.item_handler, self.scheduler_client, self._handling_tasks
+        return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
     def exit(self, signum: int | None = None) -> None:
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
-            if not self._task_queue.empty():
-                items: list[Task] = [self._task_queue.get() for _ in range(self._task_queue.qsize())]
+            if not self.task_queue.empty():
+                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:
@@ -198,7 +198,7 @@ class SchedulerWorkerManager(WorkerManager):
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
         finally:
-            self._exited = True
+            self.exited = True
             # If we are called from the main run loop we are already in the
             # process of exiting, so we only need to call sys.exit() in the
             # signal handler.
