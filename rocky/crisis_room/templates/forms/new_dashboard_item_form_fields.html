@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <input type="hidden"
        name="observed_at"
        value="{{ observed_at|date:"Y-m-d" }}">
@@ -15,3 +17,20 @@
 <input type="hidden" name="template" value="{{ template }}">
 <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
 <input type="hidden" name="query_from" value="{{ query_from }}">
+{% if item_type != "report section" %}
+    <label>
+        {% translate "Show table columns" %}
+        <span class="nota-bene" aria-hidden="">({% translate "Required" %})</span>
+    </label>
+    {% for key, column_name in table_columns.items %}
+        <div class="checkbox">
+            <input type="checkbox"
+                   name="column_values"
+                   value="{{ key }}"
+                   checked
+                   id="column_{{ key }}">
+            <input type="hidden" name="column_names" value="{{ column_name }}">
+            <label for="column_{{ key }}">{{ column_name }}</label>
+        </div>
+    {% endfor %}
+{% endif %}

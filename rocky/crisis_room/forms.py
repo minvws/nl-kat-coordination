@@ -20,14 +20,6 @@ class AddDashboardItemForm(BaseRockyForm):
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
 
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
-    )
-
     size = forms.ChoiceField(
         label=_("Dashboard item size"),
         required=True,
@@ -88,31 +80,42 @@ class AddDashboardItemForm(BaseRockyForm):
         return {"size": size, "columns": columns}
 
     def get_query(self) -> dict[str, Any]:
-        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
+        sort_by = self.cleaned_data.get("order_by", "")
 
-        order_by = sort_by[0]
-        sorting_order = sort_by[1]
-        limit = int(self.cleaned_data.get("limit", 10))
+        if sort_by:
+            sort_by = sort_by.split("-", 1)
+            order_by = sort_by[0]
+            sorting_order = sort_by[1]
+            limit = int(self.cleaned_data.get("limit", 10))
+            return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
 
-        return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
+        return {}
+
+    def get_form_data(self):
+        return {
+            "dashboard": self.get_dashboard(),
+            "name": self.cleaned_data.get("title"),
+            "recipe": self.recipe_id,
+            "query_from": self.query_from,
+            "query": json.dumps(self.get_query()) if not self.recipe_id else {},
+            "template": self.template,
+            "settings": self.get_settings() if not self.recipe_id else {},
+            "display_in_dashboard": self.display_in_dashboard,
+        }
 
     def create_dashboard_item(self) -> None:
         try:
-            dashboard_item = {
-                "dashboard": self.get_dashboard(),
-                "name": self.cleaned_data["title"],
-                "recipe": self.recipe_id,
-                "query_from": self.query_from,
-                "query": json.dumps(self.get_query()),
-                "template": self.template,
-                "settings": self.get_settings(),
-                "display_in_dashboard": self.display_in_dashboard,
-            }
-
-            DashboardItem.objects.create(**dashboard_item)
+            form_data = self.get_form_data()
+            DashboardItem.objects.create(**form_data)
 
         except (ValidationError, IntegrityError):
             raise ValidationError(_("An error occurred while adding dashboard item."))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # clean all form data including settings
+        self.get_form_data()
+        return cleaned_data
 
     def is_valid(self):
         is_valid = super().is_valid()
@@ -132,6 +135,14 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
             ("scan_level-asc", _("Clearance level (Low-High)")),
             ("scan_level-desc", _("Clearance level (High-Low)")),
         ),
+    )
+
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
     )
 
     def __init__(self, organization, *args, **kwargs):
@@ -169,6 +180,14 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         ),
     )
 
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
+
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
         self.query_from = "finding_list"
@@ -191,3 +210,18 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         }
 
         return default_query | query
+
+
+class AddReportSectionDashboardItemForm(AddDashboardItemForm):
+    chapter_description = forms.ChoiceField(
+        label=_("Include descriptions"),
+        required=True,
+        widget=forms.RadioSelect(),
+        choices=(("include", _("Yes")), ("exclude", _("No"))),
+        initial="include",
+    )
+
+    def __init__(self, organization, *args, **kwargs):
+        super().__init__(organization, *args, **kwargs)
+        self.template = self.data.get("template")
+        self.recipe_id = self.data.get("recipe_id")

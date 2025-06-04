@@ -129,7 +129,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
-        context["object_list_settings_form"] = self.get_add_dashboard_item_form()
+        context["add_dashboard_item_settings_form"] = self.get_add_dashboard_item_form()
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["table_columns"] = FINDING_LIST_COLUMNS
