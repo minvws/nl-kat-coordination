@@ -8,7 +8,7 @@ from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
-from crisis_room.models import Dashboard, DashboardItem
+from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
 
 
 class AddDashboardForm(BaseRockyForm):
@@ -75,8 +75,8 @@ class AddDashboardItemForm(BaseRockyForm):
                 (dashboard_item.dashboard.id, dashboard_item.dashboard.name) for dashboard_item in dashboard_items
             ]
         else:
-            # When there are no items fetch the dashboards, must exclude the findings dashboard by id
-            dashboards = Dashboard.objects.filter(organization=self.organization).exclude(pk=1)
+            # When there are no items fetch the dashboards, must exclude the findings dashboard
+            dashboards = Dashboard.objects.filter(organization=self.organization).exclude(name=FINDINGS_DASHBOARD_NAME)
             dashboard_choices = [(dashboard.id, dashboard.name) for dashboard in dashboards]
 
         return default + dashboard_choices
