@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal, TypedDict
 
 import structlog
 from django.core.exceptions import ValidationError
@@ -36,8 +36,13 @@ FINDINGS_DASHBOARD_NAME = _("Findings Dashboard")
 FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 
-def get_default_dashboard_item_settings() -> dict[str, Any]:
-    return {"size": "1", "columns": {}}
+class DashboardItemSettings(TypedDict):
+    size: int
+    columns: dict[str, str]
+
+
+def get_default_dashboard_item_settings():
+    return DashboardItemSettings(size=1, columns={})
 
 
 class DashboardItem(models.Model):
