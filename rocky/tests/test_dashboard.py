@@ -490,7 +490,7 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
 
     for error_list in errors:
         assert (
-            "No Dashboard selected. Choose an option from the list." in error_list
+            "Dashboard does not exist." in error_list
             or "Select a valid choice. None is not one of the available choices." in error_list
         )
 
@@ -607,6 +607,6 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
 
     for error_list in errors:
         assert (
-            "No Dashboard selected. Choose an option from the list." in error_list
+            "Dashboard does not exist." in error_list
             or "Select a valid choice. None is not one of the available choices." in error_list
         )
