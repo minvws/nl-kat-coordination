@@ -12,6 +12,7 @@ from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.interfaces import Handler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
@@ -30,7 +31,7 @@ def get_runtime_manager(
     scheduler_client = SchedulerAPIClient(plugin_service, str(settings.scheduler_api), images, plugins)
 
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = CompositeBoefjeHandler(
+        item_handler: Handler = CompositeBoefjeHandler(
             BoefjeHandler(local_repository, bytes_api_client), DockerBoefjeHandler(scheduler_client, bytes_api_client)
         )
     else:
@@ -54,16 +55,16 @@ def cli(queue: str, worker: bool, images: tuple[str] | None, plugins: tuple[str]
     logger.info("Starting runtime for %s [image_filter=%s, plugin_filter=%s]", queue, images, plugins)
 
     if not plugins:
-        plugins = settings.plugins or None
+        parsed_plugins = settings.plugins or None
     else:
-        plugins = list(plugins)
+        parsed_plugins = list(plugins)
 
     if not images:
-        images = settings.images or None
+        parsed_images = settings.images or None
     else:
-        images = list(images)
+        parsed_images = list(images)
 
-    runtime = get_runtime_manager(settings, WorkerManager.Queue(queue), images, plugins)
+    runtime = get_runtime_manager(settings, WorkerManager.Queue(queue), parsed_images, parsed_plugins)
 
     if queue == "boefje":
         import boefjes.api

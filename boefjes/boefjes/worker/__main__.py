@@ -59,9 +59,9 @@ def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
 
     if not plugins:
         env_plugins = os.getenv("PLUGINS")
-        plugins = env_plugins.split(",") if env_plugins else None
+        parsed_plugins = env_plugins.split(",") if env_plugins else None
     else:
-        plugins = list(plugins)
+        parsed_plugins = list(plugins)
 
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
@@ -78,14 +78,14 @@ def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
 
     outgoing_request_timeout = int(os.getenv("OUTGOING_REQUEST_TIMEOUT", "30"))
 
-    boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, [oci_image], plugins)
+    boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, [oci_image], parsed_plugins)
     handler = BoefjeHandler(LocalPluginRepository(Path()), boefje_api)
     logger.info(
         "Configured BoefjeAPI [base_url=%s, outgoing_request_timeout=%s, images=%s, plugins=%s]",
         base_url,
         outgoing_request_timeout,
         [oci_image],
-        plugins,
+        parsed_plugins,
     )
 
     SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)
