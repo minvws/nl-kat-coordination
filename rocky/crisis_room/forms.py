@@ -65,12 +65,21 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def get_dashboard_selection(self) -> list[tuple[str, str]]:
         default = [("", "--- Select an option ----")]
-        organization_dashboards = Dashboard.objects.filter(organization=self.organization)
-        dashboards = [
-            (dashboard.id, dashboard.name)
-            for dashboard in organization_dashboards.exclude(dashboarditem__findings_dashboard=True)
-        ]
-        return default + dashboards
+        dashboard_choices = []
+
+        dashboard_items = DashboardItem.objects.filter(
+            dashboard__organization=self.organization, display_in_dashboard=True
+        )
+        if dashboard_items:
+            dashboard_choices = [
+                (dashboard_item.dashboard.id, dashboard_item.dashboard.name) for dashboard_item in dashboard_items
+            ]
+        else:
+            # When there are no items fetch the dashboards, must exclude the findings dashboard by id
+            dashboards = Dashboard.objects.filter(organization=self.organization).exclude(pk=1)
+            dashboard_choices = [(dashboard.id, dashboard.name) for dashboard in dashboards]
+
+        return default + dashboard_choices
 
     def has_duplicate_name(self, dashboard: Dashboard, name: str | None) -> bool:
         return DashboardItem.objects.filter(dashboard=dashboard, name=name).exists()
