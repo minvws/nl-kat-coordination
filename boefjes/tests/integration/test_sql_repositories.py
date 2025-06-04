@@ -4,7 +4,7 @@ import os
 import pytest
 
 from boefjes.storage.interfaces import ConfigNotFound, OrganisationNotFound, PluginNotFound, StorageError
-from boefjes.worker.models import Boefje, Normalizer, Organisation, BoefjeConfig
+from boefjes.worker.models import Boefje, BoefjeConfig, Normalizer, Organisation
 
 pytestmark = pytest.mark.skipif(os.environ.get("CI") != "1", reason="Needs a CI database.")
 

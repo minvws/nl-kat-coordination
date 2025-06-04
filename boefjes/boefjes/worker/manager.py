@@ -4,14 +4,14 @@ import os
 import signal
 import sys
 import time
-from enum import Enum
 from datetime import datetime
+from enum import Enum
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
-from pydantic import ValidationError
 
 import structlog
 from httpx import HTTPError
+from pydantic import ValidationError
 
 # A deliberate relative import to make this module self-contained
 from .interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
