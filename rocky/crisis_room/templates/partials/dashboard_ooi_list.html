@@ -2,13 +2,6 @@
 {% load static %}
 {% load ooi_extra %}
 
-<p>
-    {% blocktranslate trimmed with organization.name as organization_name %}
-        An overview of objects found for organization <strong>{{ organization_name }}</strong>.
-        Objects can be added manually or by running Boefjes.
-        Click an object for additional information.
-    {% endblocktranslate %}
-</p>
 <div class="horizontal-scroll">
     <p class="de-emphasized">
         {% blocktranslate with length=data.object_list|length trimmed %}
