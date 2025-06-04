@@ -42,7 +42,8 @@ class DashboardItemSettings(TypedDict):
 
 
 def get_default_dashboard_item_settings():
-    return DashboardItemSettings(size=1, columns={})
+    default_settings: DashboardItemSettings = {"size": 1, "columns": {}}
+    return default_settings
 
 
 class DashboardItem(models.Model):
