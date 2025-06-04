@@ -2,9 +2,9 @@ import structlog
 from fastapi import APIRouter, Depends
 
 from boefjes.dependencies.plugins import get_pagination_parameters
-from boefjes.models import BoefjeConfig, PaginationParameters
 from boefjes.sql.config_storage import get_config_storage
 from boefjes.storage.interfaces import ConfigStorage
+from boefjes.worker.models import BoefjeConfig, PaginationParameters
 
 router = APIRouter(tags=["configs"])
 

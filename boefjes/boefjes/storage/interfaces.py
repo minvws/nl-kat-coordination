@@ -167,5 +167,6 @@ class ConfigStorage(ABC):
         organisation_id: str | None = None,
         boefje_id: str | None = None,
         enabled: bool | None = None,
+        with_duplicates: bool = False,  # Only has effect if both organisation_id and boefje_id are set
     ) -> list[BoefjeConfig]:
         raise NotImplementedError
