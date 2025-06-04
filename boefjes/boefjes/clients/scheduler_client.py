@@ -9,22 +9,18 @@ import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import PaginatedTasksResponse, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskStatus, TaskPop
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 
 logger = structlog.get_logger(__name__)
-
-
-class TaskPop(BaseModel):
-    results: list[Task]
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
@@ -49,14 +45,14 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def pop_item(self, queue_id: str) -> Task | None:
         page = self.pop_items(queue_id)
 
-        if not page:
+        if not page or not page.results:
             return None
 
         return page.results[0]
 
     def pop_items(
         self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> PaginatedTasksResponse | None:
+    ) -> TaskPop | None:
         if not filters:
             filters = {"filters": []}
         if self.oci_images:

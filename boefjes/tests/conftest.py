@@ -13,7 +13,6 @@ from pydantic import TypeAdapter
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.clients.scheduler_client import TaskPop
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.job_handler import bytes_api_client
@@ -26,7 +25,7 @@ from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus
+from boefjes.worker.interfaces import Handler, SchedulerClientInterface, Task, TaskStatus, TaskPop
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.models import Organisation
 from boefjes.worker.repository import (

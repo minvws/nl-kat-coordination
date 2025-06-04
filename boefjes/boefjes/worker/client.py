@@ -8,10 +8,9 @@ from pydantic import TypeAdapter
 from .interfaces import (
     BoefjeOutput,
     BoefjeStorageInterface,
-    PaginatedTasksResponse,
     SchedulerClientInterface,
     Task,
-    TaskStatus,
+    TaskStatus, TaskPop,
 )
 from .job_models import BoefjeMeta
 
@@ -32,17 +31,17 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def pop_item(self, queue_id: str) -> Task | None:
-        page = self.pop_items(queue_id, limit=1)
+    def pop_item(self, scheduler_id: str) -> Task | None:
+        page = self.pop_items(scheduler_id, limit=1)
 
-        if not page or page.count == 0:
+        if not page or not page.results:
             return None
 
         return page.results[0]
 
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> PaginatedTasksResponse | None:
+        self, scheduler_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+    ) -> TaskPop | None:
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
@@ -55,17 +54,17 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
             )
 
         response = self._session.post(
-            f"/api/v0/scheduler/queues/{queue_id}/pop",
+            f"/api/v0/scheduler/{scheduler_id}/pop",
             json=filters if filters["filters"] else None,
             params={"limit": limit},
         )
         self._verify_response(response)
 
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        return TypeAdapter(TaskPop | None).validate_json(response.content)
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(
-            f"/api/v0/scheduler/queues/{p_item.scheduler_id}/push", content=p_item.model_dump_json()
+            f"/api/v0/scheduler/{p_item.scheduler_id}/push", content=p_item.model_dump_json()
         )
         self._verify_response(response)
 

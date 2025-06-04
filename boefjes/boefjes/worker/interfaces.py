@@ -44,6 +44,10 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
+class TaskPop(BaseModel):
+    results: list[Task]
+
+
 class StatusEnum(str, Enum):
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
@@ -84,7 +88,7 @@ class SchedulerClientInterface:
 
     def pop_items(
         self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> PaginatedTasksResponse | None:
+    ) -> TaskPop | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
