@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission
 from django.db import migrations, models
 
-from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard
+from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
 
 
 def update_permissions(_apps, _schema_editor):
@@ -27,6 +27,18 @@ def change_name_findings_dashboard(_apps, _schema_editor):
         dashboard.save()
 
 
+def change_settings_columns(_apps, _schema_editor):
+    dashboard_items = DashboardItem.objects.all()
+
+    for item in dashboard_items:
+        if item.settings:
+            columns = item.settings["columns"]
+            if isinstance(columns, dict):
+                new_column_settings = [{k: v} for k, v in columns.items()]
+                item.settings["columns"] = new_column_settings
+                item.save()
+
+
 class Migration(migrations.Migration):
     dependencies = [("crisis_room", "0005_add_dashboard_permissions_to_groups")]
 
@@ -50,4 +62,5 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(update_permissions),
         migrations.RunPython(change_name_findings_dashboard),
+        migrations.RunPython(change_settings_columns),
     ]

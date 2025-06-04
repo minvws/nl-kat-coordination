@@ -36,13 +36,18 @@ FINDINGS_DASHBOARD_NAME = _("Findings Dashboard")
 FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 
+class DashboardItemColumn(TypedDict):
+    name: str
+    value: str
+
+
 class DashboardItemSettings(TypedDict):
     size: int
-    columns: dict[str, str]
+    columns: list[DashboardItemColumn]
 
 
 def get_default_dashboard_item_settings():
-    default_settings: DashboardItemSettings = {"size": 1, "columns": {}}
+    default_settings: DashboardItemSettings = {"size": 1, "columns": []}
     return default_settings
 
 

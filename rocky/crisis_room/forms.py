@@ -78,7 +78,8 @@ class AddDashboardItemForm(BaseRockyForm):
     def get_settings(self) -> dict[str, Any]:
         column_values = self.data.getlist("column_values", [])
         column_names = self.data.getlist("column_names", [])
-        columns = dict(zip(column_values, column_names))
+
+        columns = [{key: name} for key, name in zip(column_values, column_names)]
 
         if not columns:
             raise ValidationError("Please choose at least one column.")
@@ -96,36 +97,33 @@ class AddDashboardItemForm(BaseRockyForm):
 
         return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
 
-    def get_form_data(self):
-        return {
-            "dashboard": self.get_dashboard(),
-            "name": self.cleaned_data.get("title"),
-            "recipe": self.recipe_id,
-            "query_from": self.query_from,
-            "query": json.dumps(self.get_query()),
-            "template": self.template,
-            "settings": self.get_settings(),
-            "display_in_dashboard": self.display_in_dashboard,
-        }
-
     def create_dashboard_item(self) -> None:
-        try:
-            form_data = self.get_form_data()
-            DashboardItem.objects.create(**form_data)
-        except (ValidationError, IntegrityError):
-            raise ValidationError(_("An error occurred while adding dashboard item."))
+        dashboard = self.get_dashboard()
+        name = self.cleaned_data.get("title")
+        if dashboard is not None and name is not None:
+            try:
+                form_data = {
+                    "dashboard": dashboard,
+                    "name": name,
+                    "recipe": self.recipe_id,
+                    "query_from": self.query_from,
+                    "query": json.dumps(self.get_query()),
+                    "template": self.template,
+                    "settings": self.get_settings(),
+                    "display_in_dashboard": self.display_in_dashboard,
+                }
+                DashboardItem.objects.create(**form_data)
+            except ValidationError as error:
+                raise ValidationError(error)
+            except IntegrityError:
+                raise ValidationError(_("An error occurred while adding dashboard item."))
 
     def clean(self):
         cleaned_data = super().clean()
-        # clean all form data including settings
-        self.get_form_data()
-        return cleaned_data
-
-    def is_valid(self):
-        is_valid = super().is_valid()
-        if is_valid:
+        # clean all form data and dashboard item creation
+        if self.data:
             self.create_dashboard_item()
-        return is_valid
+        return cleaned_data
 
 
 class AddObjectListDashboardItemForm(AddDashboardItemForm):
