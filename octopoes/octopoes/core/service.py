@@ -445,12 +445,6 @@ class OctopoesService:
                 None, EmptyScanProfile(reference=ooi.reference), valid_time=event.valid_time
             )
 
-        # The nibble part of inferring
-        try:
-            self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
-        except ObjectNotFoundException:
-            logger.info("OOI not found for inference")
-
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
@@ -479,15 +473,15 @@ class OctopoesService:
                         origin_parameter = OriginParameter(origin_id=origin.id, reference=ooi.reference)
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
+        # The nibble part of inferring
+        try:
+            self.nibbler.infer([self.ooi_repository.get(ooi.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
+
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
         if event.new_data is None:
             raise ValueError("Update event new_data should not be None")
-
-        # The nibble part of inferring
-        try:
-            self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
-        except ObjectNotFoundException:
-            logger.info("OOI not found for inference")
 
         if isinstance(event.new_data, Config):
             relevant_bit_ids = [
@@ -505,6 +499,12 @@ class OctopoesService:
             inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
+
+        # The nibble part of inferring
+        try:
+            self.nibbler.infer([self.ooi_repository.get(event.new_data.reference, event.valid_time)], event.valid_time)
+        except ObjectNotFoundException:
+            logger.info("OOI not found for inference")
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
         if event.old_data is None:
