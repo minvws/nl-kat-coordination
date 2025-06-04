@@ -17,14 +17,48 @@
                 {% include "summary/report_asset_overview.html" %}
 
                 {% for report_type, report in report_data.items %}
-                    {% for ooi,data in report.items %}
+                    {% for ooi, data in report.items %}
                         {% if data.data %}
                             <section id="{{ report_type }}-{{ ooi }}">
-                                <div>
-                                    <h2>{{ data.report_name }}</h2>
-                                    {% include data.template with data=data.data show_introduction="yes" %}
+                                {% with modal_id=data.report_name|slugify|add:"-modal" %}
+                                    <div>
+                                        {% if report_ooi.report_type != "multi-organization-report" %}
+                                            <div class="horizontal-view">
+                                                <h2>{{ data.report_name }}</h2>
+                                                <div class="dropdown">
+                                                    <button id="action-dropdown-button"
+                                                            type="button"
+                                                            aria-label="{% translate "Add section to dashboard" %}"
+                                                            aria-haspopup="menu"
+                                                            aria-controls="action-dropdown"
+                                                            aria-expanded="false"
+                                                            class="icon-only ti-dots-vertical dropdown-button">
+                                                    </button>
+                                                    <div id="action-dropdown"
+                                                         class="dropdown-list"
+                                                         role="menu"
+                                                         aria-labelledby="action-dropdown-button">
+                                                        <ul role="presentation">
+                                                            <li>
+                                                                <a class="plain destructive"
+                                                                   href="#{{ modal_id }}"
+                                                                   data-modal-id="{{ modal_id }}">
+                                                                    {% translate "Add section to dashboard" %}
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <h2>{{ data.report_name }}</h2>
+                                        {% endif %}
+                                        {% include data.template with data=data.data show_introduction="yes" %}
 
-                                </div>
+                                    </div>
+                                    {% include "partials/new_dashboard_item_modal.html" with modal_id=modal_id item_type="report section" template=data.template recipe_id=recipe_ooi.primary_key %}
+
+                                {% endwith %}
                             </section>
                         {% endif %}
                     {% endfor %}
@@ -36,4 +70,5 @@
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "js/sidemenuOl.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

@@ -49,6 +49,8 @@
                                             {% translate "Object list" %}
                                         {% elif dashboard_item.item.query_from == "finding_list" %}
                                             {% translate "Finding list" %}
+                                        {% elif dashboard_item.item.recipe %}
+                                            {% translate "Report section" %}
                                         {% endif %}
                                     </span>
                                     {% if organization_member.can_modify_dashboard_item %}
