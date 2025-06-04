@@ -190,29 +190,27 @@ class Scheduler(abc.ABC):
                 item.type = self.ITEM_TYPE.type
             item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
-        except NotAllowedError as exc:
+        except NotAllowedError:
             self.logger.debug(
-                "Not allowed to push to queue %s (%s)",
+                "Not allowed to push to queue %s",
                 self.queue.pq_id,
-                exc,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
                 item=item,
             )
-            raise exc
-        except QueueFullError as exc:
+            raise
+        except QueueFullError:
             self.logger.warning(
-                "Queue %s is full, not pushing new items (%s)",
+                "Queue %s is full, not pushing new items",
                 self.queue.pq_id,
-                exc,
                 item_id=item.id,
                 queue_id=self.queue.pq_id,
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
             )
-            raise exc
-        except InvalidItemError as exc:
+            raise
+        except InvalidItemError:
             self.logger.warning(
                 "Invalid item %s",
                 item.id,
@@ -221,7 +219,7 @@ class Scheduler(abc.ABC):
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
             )
-            raise exc
+            raise
 
         self.logger.debug(
             "Pushed item %s to queue %s with priority %s ",

@@ -10,6 +10,7 @@ from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, queue, rankers
 from scheduler.schedulers.errors import exception_handler
+from scheduler.schedulers.queue.errors import NotAllowedError
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)
@@ -413,9 +414,22 @@ class BoefjeScheduler(Scheduler):
 
         with self.queue.lock:
             for task in tasks:
-                self.push_item_to_queue_with_timeout(
-                    item=task, max_tries=self.max_tries, create_schedule=create_schedule
-                )
+                try:
+                    self.push_item_to_queue_with_timeout(
+                        item=task, max_tries=self.max_tries, create_schedule=create_schedule
+                    )
+                except NotAllowedError:
+                    self.logger.debug(
+                        "Task is not allowed to be pushed to the queue",
+                        task_id=task.id,
+                        task_hash=task.hash,
+                        boefje_id=boefje_task.boefje.id,
+                        ooi_primary_key=boefje_task.input_ooi,
+                        organisation_id=organisation_id,
+                        scheduler_id=self.scheduler_id,
+                        caller=caller,
+                    )
+                    continue
 
                 self.logger.info(
                     "Created boefje task",
