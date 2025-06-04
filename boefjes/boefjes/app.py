@@ -331,7 +331,10 @@ def _start_working(
                     scheduler_client.patch_task(item.id, status)
 
                     logger.info(
-                        "Set status in the scheduler for deduplicated task", status=status.value, task=str(p_item.data.id), duration=duration
+                        "Set status in the scheduler for deduplicated task",
+                        status=status.value,
+                        task=str(p_item.data.id),
+                        duration=duration,
                     )
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value, task=str(p_item.data.id))

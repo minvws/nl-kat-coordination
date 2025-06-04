@@ -61,8 +61,8 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
                 .filter(BoefjeInDB.plugin_id == config.boefje.plugin_id)
                 .filter(BoefjeConfigInDB.enabled == config.enabled)
                 .filter(BoefjeConfigInDB.id != config.id)
-                .filter(OrganisationInDB.deduplicate == True)  # type: ignore
-                .filter(BoefjeInDB.deduplicate == True)  # type: ignore
+                .filter(OrganisationInDB.deduplicate == True)  # noqa: E712
+                .filter(BoefjeInDB.deduplicate == True)  # noqa: E712
             )
 
             parsed = self._to_boefje_config(config)
