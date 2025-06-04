@@ -12,15 +12,17 @@ on:
 
 jobs:
   pre-commit:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        id: py311
+        id: setup-python
         with:
-          python-version: 3.11
+          python-version: 3.13
           cache: pip
 
       - name: Install pre-commit
@@ -29,7 +31,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit|${{ steps.py311.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit|${{ steps.setup-python.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run pre-commit
         run: pre-commit run --all-files --show-diff-on-failure --color always

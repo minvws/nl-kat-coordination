@@ -16,13 +16,26 @@ def test_get_local_plugin(test_client, organisation):
 
 
 def test_filter_plugins(test_client, organisation):
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins")
+    assert len(response.json()) > 100
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"plugin_type": "boefje"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?plugin_type=boefje")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"state": "true"})
     assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?state=true")
-    assert len(response.json()) > 10
-    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins?limit=10")
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"limit": 10})
+    assert len(response.json()) == 10
+
+    # Test "consumes" and "produces" filters
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "ADRFindingType"})
+    assert len(response.json()) == 1
+    assert response.json()[0]["id"] == "adr-finding-types"
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"produces": "Finding"})
+    assert len(response.json()) == 27
+    response = test_client.get(f"/v1/organisations/{organisation.id}/plugins", params={"consumes": "boefje/censys"})
+    assert len(response.json()) == 1
+    response = test_client.get(
+        f"/v1/organisations/{organisation.id}/plugins", params={"consumes": ["ADRFindingType", "Hostname"]}
+    )
     assert len(response.json()) == 10
 
     response = test_client.get(
@@ -146,7 +159,7 @@ def test_add_normalizer(test_client, organisation):
     assert response.status_code == 201
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/?plugin_type=normalizer")
-    assert len(response.json()) == 57
+    assert len(response.json()) == 58
 
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins/test_normalizer")
     assert response.json() == normalizer.model_dump()
@@ -294,7 +307,7 @@ def test_basic_settings_api(test_client, organisation):
     assert test_client.get(f"/v1/organisations/{organisation.id}/{nmap_ports}/settings").json() == {"PORTS": "80"}
 
 
-def test_clone_settings(test_client, organisation):
+def test_clone_settings_and_config_api_shows_both(test_client, organisation):
     plug = "dns-records"
 
     # Set a setting on the first organisation and enable dns-records
@@ -338,3 +351,59 @@ def test_clone_settings(test_client, organisation):
     # And the originally enabled boefje got disabled
     response = test_client.get(f"/v1/organisations/{new_org_id}/plugins/nmap")
     assert response.json()["enabled"] is False
+
+    # Assert we can fetch the settings with the new configs API
+    expected = [
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 8,
+            "organisation_id": "test",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [],
+        },
+        {"boefje_id": "nmap", "enabled": False, "id": 10, "organisation_id": "org2", "settings": {}, "duplicates": []},
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 9,
+            "organisation_id": "org2",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [],
+        },
+    ]
+    assert test_client.get("/v1/configs").json() == expected
+    assert test_client.get("/v1/configs", params={"limit": "2"}).json() == [expected[0], expected[1]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "test"}).json() == [expected[0]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "org2"}).json() == [expected[2], expected[1]]
+    assert test_client.get("/v1/configs", params={"organisation_id": "org2", "boefje_id": "nmap"}).json() == [
+        expected[1]
+    ]
+    assert test_client.get("/v1/configs", params={"boefje_id": "dns-records"}).json() == [expected[0], expected[2]]
+    assert test_client.get("/v1/configs", params={"enabled": True}).json() == [expected[0], expected[2]]
+
+    expected_with_duplicates = [
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 8,
+            "organisation_id": "test",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [expected[2]],
+        },
+        {
+            "boefje_id": "dns-records",
+            "enabled": True,
+            "id": 9,
+            "organisation_id": "org2",
+            "settings": {"test_key": "test value", "test_key_2": "test value 2"},
+            "duplicates": [expected[0]],
+        },
+    ]
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "test", "with_duplicates": True}
+    ).json() == [expected_with_duplicates[0]]
+
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "org2", "with_duplicates": True}
+    ).json() == [expected_with_duplicates[1]]

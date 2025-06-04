@@ -147,7 +147,11 @@ def save_report_data(
         manual_mime_types={"openkat/report"},
     )
 
-    report_type_name = str(get_report_by_id(recipe.report_type).name)
+    report_type_name = str(
+        get_report_by_id(
+            recipe.report_type if len(recipe.asset_report_types) > 1 else recipe.asset_report_types[0]
+        ).name
+    )
     report_name = observed_at.strftime(
         Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois)), report_type=report_type_name)
     )
@@ -206,8 +210,10 @@ def create_asset_reports(
                 manual_mime_types={"openkat/report"},
             )
 
+            input_ooi = reference if not hasattr(reference, "human_readable") else reference.human_readable
+
             asset_report = AssetReport(
-                name=f"{report_type.name} for {reference.human_readable}",
+                name=f"{report_type.name} for {input_ooi}",
                 report_type=report_type_id,
                 report_recipe=recipe.reference,
                 template=report_type.template_path,

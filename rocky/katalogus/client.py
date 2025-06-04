@@ -8,7 +8,7 @@ import structlog
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_unicode_slug
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from httpx import HTTPError, HTTPStatusError, Response, codes
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
@@ -152,7 +152,7 @@ class DuplicateIdError(KATalogusError):
 
 class KATalogusNotAllowedError(KATalogusError):
     def __init__(self, error_message: str):
-        super().__init__(_(error_message))
+        super().__init__(error_message)
 
 
 def verify_response(response: Response) -> None:
@@ -169,7 +169,7 @@ def verify_response(response: Response) -> None:
             raise DuplicatePluginError(error_message) from error
 
         if error.response.status_code in [codes.FORBIDDEN, codes.NOT_FOUND]:
-            raise KATalogusNotAllowedError("Access to resource not allowed")
+            raise KATalogusNotAllowedError(_("Access to resource not allowed")) from error
 
         raise KATalogusHTTPStatusError(error) from error
     except HTTPError as error:
@@ -207,7 +207,7 @@ class KATalogusClient:
 
         logger.info("Deleted organization", organization_code=organization_code)
 
-    def get_plugins(self, organization_code: str, **params) -> list[Plugin]:
+    def get_plugins(self, organization_code: str, **params) -> list[Boefje | Normalizer]:
         response = self.session.get(f"/v1/organisations/{quote(organization_code)}/plugins", params=params)
 
         return [parse_plugin(plugin) for plugin in response.json()]
@@ -242,10 +242,10 @@ class KATalogusClient:
 
         return response
 
-    def get_normalizers(self, organization_code: str) -> list[Plugin]:
+    def get_normalizers(self, organization_code: str) -> list[Normalizer]:
         return self.get_plugins(organization_code, plugin_type="normalizer")
 
-    def get_boefjes(self, organization_code: str) -> list[Plugin]:
+    def get_boefjes(self, organization_code: str) -> list[Boefje]:
         return self.get_plugins(organization_code, plugin_type="boefje")
 
     def enable_plugin(self, organization_code: str, plugin: Plugin) -> None:
@@ -330,67 +330,71 @@ class KATalogus:
 
     def get_plugin_settings(self, plugin_id: str) -> dict:
         if not self._member.has_perm("tools.can_view_katalogus_settings"):
-            raise KATalogusNotAllowedError("User is not allowed to see plugin settings")
+            raise KATalogusNotAllowedError(_("User is not allowed to see plugin settings"))
 
         return self._katalogus_client.get_plugin_settings(self._member.organization.code, plugin_id)
 
     def upsert_plugin_settings(self, plugin_id: str, values: dict) -> None:
         if not self._member.has_perm("tools.can_set_katalogus_settings"):
-            raise KATalogusNotAllowedError("User is not allowed to set plugin settings")
+            raise KATalogusNotAllowedError(_("User is not allowed to set plugin settings"))
 
         return self._katalogus_client.upsert_plugin_settings(self._member.organization.code, plugin_id, values)
 
     def delete_plugin_settings(self, plugin_id: str) -> None:
         if not self._member.has_perm("tools.can_set_katalogus_settings"):
-            raise KATalogusNotAllowedError("User is not allowed to delete plugin settings")
+            raise KATalogusNotAllowedError(_("User is not allowed to delete plugin settings"))
 
         return self._katalogus_client.delete_plugin_settings(self._member.organization.code, plugin_id)
 
     def clone_all_configuration_to_organization(self, to_organization: str):
-        if not self._member.has_perm("tools.can_set_katalogus_settings") or self._member.user.is_superuser:
-            raise KATalogusNotAllowedError("User is not allowed to set plugin settings")
+        if not self._member.has_perm("tools.can_view_katalogus_settings"):
+            raise KATalogusNotAllowedError(_("User is not allowed to view plugin settings"))
 
         try:
             to_member = OrganizationMember.objects.get(user=self._member.user, organization__code=to_organization)
-            if to_member.blocked:
-                raise KATalogusNotAllowedError("User is not allowed to access the other organization")
         except Organization.DoesNotExist:
             raise
         except OrganizationMember.DoesNotExist:
-            if not self._member.user.is_superuser and not self._member.user.has_perm(
-                "tools.can_access_all_organizations"
-            ):
-                raise KATalogusNotAllowedError("User is not allowed to access the other organization")
+            if not self._member.user.has_perm("tools.can_access_all_organizations"):
+                raise KATalogusNotAllowedError(_("User is not allowed to access the other organization"))
+            if not self._member.user.has_perm("tools.can_set_katalogus_settings"):
+                raise KATalogusNotAllowedError(_("User is not allowed to set plugin settings"))
+        else:
+            if to_member.blocked:
+                raise KATalogusNotAllowedError(_("User is not allowed to access the other organization"))
+
+            if not to_member.has_perm("tools.can_set_katalogus_settings"):
+                raise KATalogusNotAllowedError(_("User is not allowed to set plugin settings"))
 
         return self._katalogus_client.clone_all_configuration_to_organization(
             self._member.organization.code, to_organization
         )
 
-    def get_normalizers(self) -> list[Plugin]:
+    def get_normalizers(self) -> list[Normalizer]:
         return self._katalogus_client.get_normalizers(self._member.organization.code)
 
-    def get_boefjes(self) -> list[Plugin]:
+    def get_boefjes(self) -> list[Boefje]:
         return self._katalogus_client.get_boefjes(self._member.organization.code)
 
     def enable_plugin(self, plugin: Plugin) -> None:
         if not self._member.has_perm("tools.can_enable_disable_boefje"):
-            raise KATalogusNotAllowedError("User is not allowed to enable plugins")
+            raise KATalogusNotAllowedError(_("User is not allowed to enable plugins"))
 
         return self._katalogus_client.enable_plugin(self._member.organization.code, plugin)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
         if not self._member.has_perm("tools.can_enable_disable_boefje"):
-            raise KATalogusNotAllowedError("User is not allowed to enable plugins")
+            raise KATalogusNotAllowedError(_("User is not allowed to enable plugins"))
 
         return self._katalogus_client.enable_boefje_by_id(self._member.organization.code, boefje_id)
 
     def disable_plugin(self, plugin: Plugin) -> None:
         if not self._member.has_perm("tools.can_enable_disable_boefje"):
-            raise KATalogusNotAllowedError("User is not allowed to disable plugins")
+            raise KATalogusNotAllowedError(_("User is not allowed to disable plugins"))
 
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)
 
-    def get_enabled_boefjes(self) -> list[Plugin]:
+    def get_enabled_boefjes(self) -> list[Boefje]:
         return self._katalogus_client.get_plugins(self._member.organization.code, plugin_type="boefje", state=True)
 
     def get_cover(self, plugin_id: str) -> BytesIO:
@@ -398,13 +402,13 @@ class KATalogus:
 
     def create_plugin(self, plugin: Plugin) -> None:
         if not self._member.has_perm("tools.can_add_boefje"):
-            raise KATalogusNotAllowedError("User is not allowed to create plugins")
+            raise KATalogusNotAllowedError(_("User is not allowed to create plugins"))
 
         return self._katalogus_client.create_plugin(self._member.organization.code, plugin)
 
     def edit_plugin(self, plugin: Plugin) -> None:
         if not self._member.has_perm("tools.can_add_boefje"):
-            raise KATalogusNotAllowedError("User is not allowed to edit plugins")
+            raise KATalogusNotAllowedError(_("User is not allowed to edit plugins"))
 
         return self._katalogus_client.edit_plugin(self._member.organization.code, plugin)
 
@@ -459,7 +463,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     )
 
 
-def parse_plugin(plugin: dict) -> Plugin:
+def parse_plugin(plugin: dict) -> Boefje | Normalizer:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
     elif plugin["type"] == "normalizer":

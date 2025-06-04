@@ -22,7 +22,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     data = json.loads(raw)
 
     finding_type_information = data[kat_finding_type_id]
-    logger.info(finding_type_information["risk"].lower())
     risk_severity = RiskLevelSeverity(finding_type_information["risk"].lower())
 
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
@@ -30,6 +29,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     yield NormalizerAffirmation(
         ooi=KATFindingType(
             id=kat_finding_type_id,
+            name=finding_type_information.get("name", None),
             description=finding_type_information.get("description", None),
             source=finding_type_information.get("source", None),
             impact=finding_type_information.get("impact", None),

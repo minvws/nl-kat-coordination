@@ -156,7 +156,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        is_running = self.scheduler.has_boefje_task_started_running(boefje_task)
+        is_running = self.scheduler.has_boefje_task_started_running(boefje_task, None, None)
 
         # Assert
         self.assertFalse(is_running)
@@ -180,7 +180,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        is_running = self.scheduler.has_boefje_task_started_running(task)
+        is_running = self.scheduler.has_boefje_task_started_running(boefje_task, task, None)
 
         # Assert
         self.assertTrue(is_running)
@@ -226,11 +226,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # First run
-        is_running = self.scheduler.has_boefje_task_started_running(boefje_task)
+        is_running = self.scheduler.has_boefje_task_started_running(boefje_task, task_db_first, last_run_boefje)
         self.assertFalse(is_running)
 
         # Second run
-        is_running = self.scheduler.has_boefje_task_started_running(boefje_task)
+        is_running = self.scheduler.has_boefje_task_started_running(boefje_task, task_db_second, last_run_boefje)
         self.assertFalse(is_running)
 
     def test_has_boefje_task_started_running_datastore_exception(self):
@@ -263,7 +263,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # Act
-        is_running = self.scheduler.has_boefje_task_started_running(task)
+        is_running = self.scheduler.has_boefje_task_started_running(task, None, last_run_boefje)
 
         # Assert
         self.assertTrue(is_running)
@@ -283,25 +283,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # Act
-        is_running = self.scheduler.has_boefje_task_started_running(task)
+        is_running = self.scheduler.has_boefje_task_started_running(task, None, last_run_boefje)
 
         # Assert
         self.assertFalse(is_running)
-
-    def test_has_boefje_task_started_running_bytes_exception(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = BoefjeFactory()
-        task = models.BoefjeTask(boefje=boefje, input_ooi=ooi.primary_key, organization=self.organisation.id)
-
-        # Mock
-        self.mock_get_latest_task_by_hash.return_value = None
-        self.mock_get_last_run_boefje.return_value = Exception("Something went wrong")
-
-        # Act
-        with self.assertRaises(Exception):
-            self.scheduler.has_boefje_task_started_running(task)
 
     def test_has_boefje_task_started_running_stalled_before_grace_period(self):
         # Arrange
@@ -329,7 +314,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        self.assertFalse(self.scheduler.has_boefje_task_stalled(boefje_task))
+        self.assertFalse(self.scheduler.has_boefje_task_stalled(task_db))
 
     def test_has_boefje_task_started_running_stalled_after_grace_period(self):
         # Arrange
@@ -357,7 +342,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        self.assertTrue(self.scheduler.has_boefje_task_stalled(boefje_task))
+        self.assertTrue(self.scheduler.has_boefje_task_stalled(task_db))
 
     def test_has_boefje_task_started_running_mismatch_before_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
@@ -389,7 +374,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Act
         with self.assertRaises(RuntimeError):
-            self.scheduler.has_boefje_task_started_running(boefje_task)
+            self.scheduler.has_boefje_task_started_running(boefje_task, task_db, None)
 
     def test_has_boefje_task_started_running_mismatch_after_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
@@ -422,7 +407,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        self.assertFalse(self.scheduler.has_boefje_task_started_running(boefje_task))
+        self.assertFalse(self.scheduler.has_boefje_task_started_running(boefje_task, task_db, None))
 
     def test_has_boefje_task_grace_period_passed_datastore_passed(self):
         """Grace period passed according to datastore, and the status is completed"""
@@ -451,7 +436,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
+        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task, task_db, None)
 
         # Assert
         self.assertTrue(has_passed)
@@ -483,7 +468,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
+        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task, task_db, None)
 
         # Assert
         self.assertFalse(has_passed)
@@ -519,7 +504,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
+        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task, task_db, last_run_boefje)
 
         # Assert
         self.assertTrue(has_passed)
@@ -553,7 +538,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_plugin.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task)
+        has_passed = self.scheduler.has_boefje_task_grace_period_passed(boefje_task, task_db, last_run_boefje)
 
         # Assert
         self.assertFalse(has_passed)
@@ -1007,9 +992,13 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.schedulers.BoefjeScheduler.has_boefje_task_grace_period_passed", return_value=True
         ).start()
 
-        self.mock_set_cron = mock.patch("scheduler.schedulers.BoefjeScheduler.set_cron").start()
+        self.mock_get_plugin = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id"
+        ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_get_boefjes_for_ooi = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id"
+        ).start()
 
     def tearDown(self):
         mock.patch.stopall()
@@ -1342,8 +1331,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
+        self.mock_get_plugin.return_value = boefje
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_set_cron.return_value = "0 0 * * *"
 
         # Act
         self.scheduler.process_mutations(mutation)
@@ -1364,6 +1353,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(task_db.schedule_id)
         self.assertIsNotNone(schedule_db)
 
+        # calculate deadline needs to return correct plugin
+
     def test_process_mutations_op_update_run_on_create(self):
         """When a boefje has the run_on contains the setting create,
         and we receive an update mutation, it should:
@@ -1383,6 +1374,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
+        self.mock_get_plugin.return_value = boefje
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
@@ -1410,6 +1402,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
+        self.mock_get_plugin.return_value = boefje
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
@@ -1450,6 +1443,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
+        self.mock_get_plugin.return_value = boefje
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
@@ -1490,8 +1484,8 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
+        self.mock_get_plugin.return_value = boefje
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_set_cron.return_value = "0 0 * * *"
 
         # Act
         self.scheduler.process_mutations(mutation)

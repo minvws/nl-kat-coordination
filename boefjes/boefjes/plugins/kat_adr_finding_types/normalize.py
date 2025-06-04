@@ -22,7 +22,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     data = json.loads(raw)
 
     finding_type_information = data[adr_finding_type_id]
-    logger.info(finding_type_information["risk"].lower())
     risk_severity = RiskLevelSeverity(finding_type_information["risk"].lower())
 
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]

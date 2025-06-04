@@ -480,7 +480,7 @@ class SingleOOIMixin(OctopoesView):
 class SingleOOITreeMixin(SingleOOIMixin):
     @cached_property
     def tree(self) -> ReferenceTree:
-        return self.get_ooi_tree(depth=1)
+        return self.get_ooi_tree(depth=2)
 
     def get_depth(self):
         try:

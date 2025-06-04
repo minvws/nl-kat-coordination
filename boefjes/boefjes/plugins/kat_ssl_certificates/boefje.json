@@ -5,5 +5,5 @@
   "consumes": [
     "Website"
   ],
-  "scan_level": 1
+  "scan_level": 2
 }

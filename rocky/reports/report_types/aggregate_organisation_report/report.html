@@ -7,7 +7,7 @@
     {% include "partials/report_sidemenu.html" %}
 
     <article>
-        {% include "aggregate_organisation_report/introduction.html" %}
+        {% include "partials/report_header.html" %}
         {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
 
         <div class="chapter-numbers report-content">
@@ -100,6 +100,21 @@
                             {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
 
                         {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+            {% if data.findings %}
+                <section id="findings">
+                    <div>
+                        <h2>{% translate "Findings" %}</h2>
+                        <p>
+                            {% blocktranslate %}
+                                This chapter contains information about the findings that have been identified
+                                for this organization.
+                            {% endblocktranslate%}
+                        </p>
+                        {% include "findings_report/report.html" with data=data.findings %}
+
                     </div>
                 </section>
             {% endif %}

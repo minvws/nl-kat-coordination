@@ -30,6 +30,27 @@ def test_aggregate_report_select_oois(rf, client_member, mock_organization_view_
     assertContains(response, "example.com")
 
 
+def test_aggregate_report_select_oois_empty_list(
+    rf, client_member, mock_organization_view_octopoes, mocker, listed_hostnames
+):
+    mocker.patch("account.mixins.OrganizationView.get_katalogus")
+    kwargs = {"organization_code": client_member.organization.code}
+    url = reverse("aggregate_report_select_oois", kwargs=kwargs)
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+
+    setup_request(request, client_member.user)
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
+        count=len(listed_hostnames), items=[]
+    )
+
+    response = OOISelectionAggregateReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assertContains(response, "Report(s) may be empty due to no objects in the selected filters.")
+
+
 def test_aggregate_report_choose_report_types(
     rf, client_member, mock_organization_view_octopoes, mocker, listed_hostnames, valid_time
 ):
@@ -52,4 +73,4 @@ def test_aggregate_report_choose_report_types(
 
     assert response.status_code == 200
     total_objects = str(len(listed_hostnames))
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")

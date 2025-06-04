@@ -39,7 +39,35 @@ def test_multi_report_select_oois(
 
     total_objects = str(len(oois_selection))
 
-    assertContains(response, f"You have selected {total_objects} objects in previous step.")
+    assertContains(response, f"You have selected {total_objects} objects in the previous step.")
+
+
+def test_multi_report_select_oois_with_query(
+    rf, client_member, valid_time, mock_organization_view_octopoes, report_data_ooi_org_a, report_data_ooi_org_b
+):
+    """
+    Will send the query to the report type selection page.
+    """
+
+    oois = [report_data_ooi_org_a, report_data_ooi_org_b]
+
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](count=len(oois), items=oois)
+
+    request = setup_request(
+        rf.post(
+            "multi_report_select_report_types",
+            {"observed_at": valid_time.strftime("%Y-%m-%d"), "object_selection": "query"},
+        ),
+        client_member.user,
+    )
+
+    response = ReportTypesSelectionMultiReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assert response.context_data["selected_oois"] == []
+
+    assertContains(response, "You have selected a live set in the previous step.")
+    assertContains(response, "this live set results in 0 objects.")
 
 
 def test_multi_report_change_ooi_selection(
@@ -161,19 +189,18 @@ def test_view_multi_report(
     assert response.status_code == 200
 
     assertContains(response, "Sector Report")
-    assertContains(response, "This is the OpenKAT Sector Report")
+    assertContains(response, "This is the OpenKAT report")
 
     assertContains(
         response,
-        f'<p>Created with date from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        f'<p>Created with data from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
         html=True,
     )
     assertContains(
         response,
-        f'<p>Created with date from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
+        f'<p>Created with data from: <strong>{multi_report_ooi.date_generated.strftime("%b. %d, %Y")}</strong></p>',
         html=True,
     )
-    assertContains(response, f"<p>Created by: <strong>{client_member.user.full_name}</strong></p>", html=True)
     assertContains(
         response,
         "<p>This sector contains 2 scanned organizations. The basic security scores are around 71%. "

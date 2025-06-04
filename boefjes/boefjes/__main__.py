@@ -1,10 +1,8 @@
-import json
-import logging.config
-
 import click
 import structlog
 from sqlalchemy.orm import sessionmaker
 
+from boefjes.logging import configure_logging
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService
@@ -17,28 +15,7 @@ from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
-with settings.log_cfg.open() as f:
-    logging.config.dictConfig(json.load(f))
-
-structlog.configure(
-    processors=[
-        structlog.contextvars.merge_contextvars,
-        structlog.processors.add_log_level,
-        structlog.processors.StackInfoRenderer(),
-        structlog.dev.set_exc_info,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper("iso", utc=False),
-        (
-            structlog.dev.ConsoleRenderer(colors=True, pad_level=False)
-            if settings.logging_format == "text"
-            else structlog.processors.JSONRenderer()
-        ),
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    wrapper_class=structlog.stdlib.BoundLogger,
-    cache_logger_on_first_use=True,
-)
+configure_logging()
 
 logger = structlog.get_logger(__name__)
 

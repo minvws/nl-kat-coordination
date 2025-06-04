@@ -28,6 +28,7 @@ from rocky.scheduler import (
     ScheduleResponse,
     SchedulerTaskNotFound,
     Task,
+    TaskPush,
     scheduler_client,
 )
 from rocky.scheduler import Normalizer as SchedulerNormalizer
@@ -138,12 +139,18 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
+    def delete_report_schedule(self, schedule_id: str) -> None:
+        try:
+            self.scheduler_client.delete_schedule(schedule_id)
+        except SchedulerError as error:
+            return messages.error(self.request, error.message)
+
     def edit_report_schedule(self, schedule_id: str, params):
         self.scheduler_client.patch_schedule(schedule_id=schedule_id, params=params)
 
     def get_report_schedules(self) -> list[dict[str, Any]]:
         try:
-            return self.scheduler_client.get_scheduled_reports(scheduler_id=self.scheduler_id)
+            return self.scheduler_client.get_scheduled_reports()
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return []
@@ -190,13 +197,18 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse:
+    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse | None:
         try:
-            return self.scheduler_client.post_schedule_search(filters).results[0]
+            schedule = self.scheduler_client.post_schedule_search(filters)
+            if schedule.results:
+                return schedule.results[0]
+            else:
+                return None
         except SchedulerError as error:
-            return messages.error(self.request, error.message)
+            messages.error(self.request, error.message)
+            return None
 
-    def schedule_task(self, task: Task) -> None:
+    def schedule_task(self, task: TaskPush) -> None:
         if not self.indemnification_present:
             return self.indemnification_error()
         try:
@@ -226,12 +238,12 @@ class SchedulerView(OctopoesView):
                 new_id = uuid.uuid4()
                 task.data.id = new_id
 
-                new_task = Task(
+                new_task = TaskPush(
                     id=new_id,
                     scheduler_id=task.scheduler_id,
                     organisation=self.organization.code,
                     priority=1,
-                    data=task.data,
+                    data=task.data.model_dump(),
                 )
 
                 self.schedule_task(new_task)
@@ -246,8 +258,11 @@ class SchedulerView(OctopoesView):
                 normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()), raw_data=raw_data
             )
 
-            new_task = Task(
-                priority=1, data=normalizer_task, scheduler_id="normalizer", organisation=self.organization.code
+            new_task = TaskPush(
+                priority=1,
+                data=normalizer_task.model_dump(),
+                scheduler_id="normalizer",
+                organisation=self.organization.code,
             )
 
             self.schedule_task(new_task)
@@ -262,7 +277,9 @@ class SchedulerView(OctopoesView):
                 organization=self.organization.code,
             )
 
-            new_task = Task(priority=1, data=boefje_task, scheduler_id="boefje", organisation=self.organization.code)
+            new_task = TaskPush(
+                priority=1, data=boefje_task.model_dump(), scheduler_id="boefje", organisation=self.organization.code
+            )
 
             self.schedule_task(new_task)
 

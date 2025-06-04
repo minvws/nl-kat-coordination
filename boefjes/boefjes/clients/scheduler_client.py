@@ -9,7 +9,7 @@ import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, BaseModel
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
@@ -21,6 +21,10 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 
 logger = structlog.get_logger(__name__)
+
+
+class TaskPop(BaseModel):
+    results: list[Task]
 
 
 class SchedulerAPIClient(SchedulerClientInterface):
@@ -45,7 +49,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def pop_item(self, queue_id: str) -> Task | None:
         page = self.pop_items(queue_id)
 
-        if not page or page.count == 0:
+        if not page:
             return None
 
         return page.results[0]
@@ -69,7 +73,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         )
         self._verify_response(response)
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        page = TypeAdapter(TaskPop | None).validate_json(response.content)
 
         if page is None:
             return None
@@ -100,7 +104,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return task
 
     def _hydrate_boefje_meta(self, boefje_meta: BoefjeMeta) -> BoefjeMeta:
-        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
+        with self.plugin_service as service:
+            plugin = service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
 
         # The octopoes API connector is organization-specific, where the client is generic.
         octopoes_api_connector = get_octopoes_api_connector(boefje_meta.organization)
