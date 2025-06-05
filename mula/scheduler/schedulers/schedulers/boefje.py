@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from opentelemetry import trace
 
-from scheduler import clients, context, models
+from scheduler import clients, context, models, storage
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, queue, rankers
@@ -785,3 +785,47 @@ class BoefjeScheduler(Scheduler):
             schedule.deadline_at = datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(schedule)
+
+    def pop_item_from_queue(
+        self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.Task]:
+        items = self.queue.pop(limit, filters)
+
+        dupe_tasks = self.ctx.datastores.pq_store.get_possible_duplicate_boefje_tasks(
+            self.scheduler_id, items[0].data.get("boefje", {}).get("id", ""), items[0].data.get("input_ooi")
+        )
+        if dupe_tasks:
+            configs = self.ctx.services.katalogus.get_configs(
+                boefje_id=items[0].data.get("boefje", {}).get("id", ""),
+                organisation_id=items[0].data.get("organization"),
+                enabled=True,
+                with_duplicates=True,
+            )
+            orgs_in_configs = set(config.organisation for config in configs if config.organisation is not None)
+
+            for dupe_task in dupe_tasks:
+                if dupe_task.organization not in orgs_in_configs:
+                    continue
+
+                # TODO: also update its deduplication key, and set its status to DISPATCHED
+                dupe_task.data.depuplication_key = items[0].data.get("deduplication_key", dupe_task.id)
+                dupe_task.status = models.TaskStatus.DISPATCHED
+                self.ctx.datastores.task_store.update_task(dupe_task)
+
+                # We have a dupe task, that was not in the original pop. We
+                # need to add it to the items list, so that it can be
+                # processed by the task runner.
+                items.append(dupe_task)
+
+        if items is not None:
+            self.logger.debug(
+                "Popped %s item(s) from queue %s",
+                len(items),
+                self.queue.pq_id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+
+            self.post_pop(items)
+
+        return items
