@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 import structlog
 from httpx import HTTPError, HTTPStatusError, Response, codes
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
+from pydantic import BaseModel, ConfigDict, Field, JsonValue, TypeAdapter
 
 from octopoes.config.settings import Settings
 from octopoes.models.transaction import TransactionRecord
@@ -168,12 +168,12 @@ class XTDBHTTPClient:
 
             raise XTDBException("Could not delete node") from e
 
-    def export_transactions(self):
+    def export_transactions(self) -> JsonValue:
         res = self._session.get(f"{self.client_url()}/tx-log?with-ops?=true", headers={"Accept": "application/json"})
         self._verify_response(res)
         return res.json()
 
-    def sync(self, timeout: int | None = None) -> Any:
+    def sync(self, timeout: int | None = None) -> JsonValue:
         params = {}
 
         if timeout is not None:
@@ -182,6 +182,11 @@ class XTDBHTTPClient:
         res = self._session.get(f"{self.client_url()}/sync", params=params)
         self._verify_response(res)
 
+        return res.json()
+
+    def latest_completed_tx(self) -> JsonValue:
+        res = self._session.get(f"{self.client_url()}/latest-completed-tx")
+        
         return res.json()
 
 
