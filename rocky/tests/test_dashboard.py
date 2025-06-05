@@ -493,10 +493,7 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
     assert "dashboard" in fields
 
     for error_list in errors:
-        assert (
-            "Dashboard does not exist." in error_list
-            or "Select a valid choice. None is not one of the available choices." in error_list
-        )
+        assert "This field is required." in error_list or "Dashboard does not exist." in error_list
 
 
 def test_organization_crisis_room(rf, mocker, client_member, dashboard_items):
@@ -608,7 +605,4 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
     assert "dashboard" in fields
 
     for error_list in errors:
-        assert (
-            "Dashboard does not exist." in error_list
-            or "Select a valid choice. None is not one of the available choices." in error_list
-        )
+        assert "This field is required." in error_list or "Dashboard does not exist." in error_list
