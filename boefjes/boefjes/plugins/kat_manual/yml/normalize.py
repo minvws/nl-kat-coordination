@@ -21,16 +21,6 @@ class OOITypeEntry(TypedDict):
     type: type[OOI]
     distinctive_fields: NotRequired[list[str]]
 
-def get_subclasses_deep(cls, res=[], sub_clss=[]):
-    if not len(sub_clss):
-        sub_clss = cls.__subclasses__()
-    for s_cls in sub_clss:
-        if s_cls not in res: res.append(s_cls)
-        new_sub_clss = s_cls.__subclasses__()
-        if len(new_sub_clss):
-            get_subclasses_deep(s_cls, res, new_sub_clss)
-    return res
-
 OOI_TYPES: dict[str, OOITypeEntry] = {ooi_type: { "type": CONCRETE_OOI_TYPES[ooi_type] } for ooi_type in CONCRETE_OOI_TYPES } 
 # Types without _natural_key_attrs
 OOI_TYPES["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
@@ -53,15 +43,14 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
 
 def process_yml(yml_raw_data: bytes, reference_cache: dict) -> Iterable[NormalizerOutput]:
-    yml_data = io.StringIO(yml_raw_data.decode("UTF-8"))
+    yml_data = io.StringIO(yml_raw_data.decode())
     oois_from_yaml = yaml.safe_load(yml_data)
     oois = []
-    for ooi_number, ooi_dict in enumerate(oois_from_yaml, start=1):
+    for ooi_number, ooi_dict in enumerate(oois_from_yaml):
         try:
             create_oois(ooi_dict, reference_cache, oois)
         except ValidationError as err:
-            logger.exception("Validation failed for indexed object at %s", ooi_number)
-            logger.exception(f"with error: {str(err)}")
+            logger.exception("Validation failed for indexed object at %s, with error: %s", ooi_number, str(err))
     return oois
 
 def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
@@ -109,12 +98,12 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     oois_list.append(NormalizerDeclaration(ooi=ooi))
     return ooi
     
-def get_cache_and_field_name(ooi_type, ooi_dict: dict, reference_cache:dict):
+def get_cache_and_field_name(ooi_type: type[OOI], ooi_dict: dict, reference_cache:dict) -> tuple[dict[str, OOI], str]:
     dins_fields = OOI_TYPES[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
     cache_field_name = get_cache_name(ooi_dict, dins_fields)
-    cache = reference_cache.setdefault(ooi_type.__name__, {})
+    cache: dict[str, OOI] = reference_cache.setdefault(ooi_type.object_type, {})
     return cache, cache_field_name
 
-def get_cache_name(ooi_dict:dict, field_combination: list[str]):
+def get_cache_name(ooi_dict:dict, field_combination: list[str]) -> str:
     """It creates name for cache from str values of distinctive fields"""
-    return "|".join(filter(None, map(lambda a: str(ooi_dict.get(a, "")), field_combination)))
+    return "|".join(filter(None, map(lambda key: str(ooi_dict.get(key, "")), field_combination)))

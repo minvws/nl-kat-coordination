@@ -37,7 +37,7 @@ class OOICandidate(TypedDict):
     ooi_type: str
     clearance: int
 
-class YamlSchape(TypedDict):
+class YAMLData(TypedDict):
     references: dict[str, dict]
     oois: list[OOICandidate]
 
@@ -54,17 +54,7 @@ YML_CRITERIA = [
     ),
 ]
 
-CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0,1,2,3,4]
-
-def get_subclasses_deep(cls, res=[], sub_clss=[]):
-    if not len(sub_clss):
-        sub_clss = cls.__subclasses__()
-    for s_cls in sub_clss:
-        if s_cls not in res: res.append(s_cls)
-        new_sub_clss = s_cls.__subclasses__()
-        if len(new_sub_clss):
-            get_subclasses_deep(s_cls, res, new_sub_clss)
-    return res
+CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0, 1, 2, 3, 4]
 
 def get_cache_name(ooi_dict:dict, field_combination: list[str]):
     """It creates name for cache from str values of distinctive fields"""
@@ -158,9 +148,9 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             task_id, yml_raw_data, manual_mime_types={"manual/yml"}
         )
         yml_data = io.StringIO(yml_raw_data.decode("UTF-8"))
-        refs_and_oois: YamlSchape
+        refs_and_oois: YAMLData
         try:
-            refs_and_oois: YamlSchape = yaml.safe_load(yml_data)
+            refs_and_oois: YAMLData = yaml.safe_load(yml_data)
         except yaml.composer.ComposerError as err:
             return self.add_error_notification(f"Corrupted yaml file imported. Error: {err}")
         except yaml.parser.ParserError as err:
@@ -170,15 +160,15 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         # Controlling shape of data
         if type(oois_from_yaml) is not list:
             return self.add_error_notification("OOI's should be stored in list type in the \"oois\" root field.")
-        if len(list(filter(lambda ooi_c: type(ooi_c) is not dict, oois_from_yaml))):
+        if list(filter(lambda ooi_c: type(ooi_c) is not dict, oois_from_yaml)):
             return self.add_error_notification("All elements of oois list should object to create OOI.")
-        if len(list(filter(lambda ooi_c: len(ooi_c.keys()) < 1, oois_from_yaml))):
+        if list(filter(lambda ooi_c: len(ooi_c.keys()) < 1, oois_from_yaml)):
             return self.add_error_notification("There are unsupported objects in the file.")
-        if len(list(filter(lambda ooi_c: ooi_c.get("ooi_type") not in self.ooi_types.keys(), oois_from_yaml))):
+        if list(filter(lambda ooi_c: ooi_c.get("ooi_type") not in self.ooi_types.keys(), oois_from_yaml)):
             return self.add_error_notification("Unsupported OOI type in the file. All OOI types are case sensitive")
 
         rows_with_error = []
-        for ooi_number, ooi_dict in enumerate(oois_from_yaml, start=1):
+        for ooi_number, ooi_dict in enumerate(oois_from_yaml):
             try:
                 ooi = self.create_ooi(ooi_dict)
                 self.octopoes_api_connector.save_declaration(
