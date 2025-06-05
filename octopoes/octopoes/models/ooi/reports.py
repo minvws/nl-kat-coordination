@@ -85,10 +85,7 @@ class HydratedReport(BaseReport):
     def to_report(self) -> Report:
         as_dict = self.model_dump(exclude={"input_oois", "object_type"})
         as_dict["input_oois"] = [input_ooi.reference for input_ooi in self.input_oois]
-
-        report = Report.model_validate(as_dict)
-        report.observed_at = report.observed_at.strftime("%Y-%m-%dT%H:%M:%SZ")
-        return report
+        return Report.model_validate(as_dict)
 
 
 class ReportRecipe(OOI):
