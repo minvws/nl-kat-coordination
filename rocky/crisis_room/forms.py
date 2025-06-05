@@ -223,5 +223,6 @@ class AddReportSectionDashboardItemForm(AddDashboardItemForm):
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
-        self.template = self.data.get("template")
-        self.recipe_id = self.data.get("recipe_id")
+        if self.data:
+            self.template = self.data.get("template")
+            self.recipe_id = self.data.get("recipe_id")

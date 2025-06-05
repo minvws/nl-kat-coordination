@@ -56,7 +56,7 @@
                                         {% include data.template with data=data.data show_introduction="yes" %}
 
                                     </div>
-                                    {% include "partials/new_dashboard_item_modal.html" with modal_id=modal_id item_type="report section" template=data.template recipe_id=recipe_ooi.primary_key %}
+                                    {% include "partials/new_dashboard_item_modal.html" with modal_id=modal_id item_type="report section" template=data.template recipe_id=recipe_ooi.recipe_id %}
 
                                 {% endwith %}
                             </section>
