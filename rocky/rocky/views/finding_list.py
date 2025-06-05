@@ -23,17 +23,9 @@ from tools.forms.findings import (
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import FINDING_LIST_COLUMNS, ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
 
 logger = structlog.get_logger(__name__)
-
-FINDING_LIST_COLUMNS = {
-    "severity": _("Severity"),
-    "finding": _("Finding"),
-    "location": _("Location"),
-    "tree": _("Tree"),
-    "graph": _("Graph"),
-}
 
 
 def sort_by_severity_desc(findings: Iterable) -> list[dict[str, Any]]:

@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
 from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
+from rocky.views.mixins import FINDING_LIST_COLUMNS, OBJECT_LIST_COLUMNS
 
 
 class AddDashboardForm(BaseRockyForm):
@@ -44,6 +45,7 @@ class AddDashboardItemForm(BaseRockyForm):
         self.query_from = ""
         self.template = ""
         self.display_in_dashboard = True
+        self.table_columns = {}
         self.data: QueryDict = kwargs.pop("data")
 
     def clean_title(self):
@@ -53,6 +55,22 @@ class AddDashboardItemForm(BaseRockyForm):
         if dashboard is not None and self.has_duplicate_name(dashboard, name):
             raise ValidationError(_("An item with that name already exists. Try a different title."))
         return name
+
+    def clean_columns(self):
+        column_values = self.cleaned_data.get("columns", [])
+        columns = [
+            {column_value: str(self.table_columns.get(column_value))}
+            for column_value in column_values
+            if column_value in self.table_columns
+        ]
+        return columns
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # clean all form data and dashboard item creation
+        if self.data:
+            self.create_dashboard_item()
+        return cleaned_data
 
     def get_dashboard(self) -> Dashboard | None:
         try:
@@ -65,37 +83,13 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def get_dashboard_selection(self) -> list[tuple[str, str]]:
         default = [("", "--- Select an option ----")]
-        dashboard_choices = []
-
-        dashboard_items = DashboardItem.objects.filter(
-            dashboard__organization=self.organization, display_in_dashboard=True
-        )
-        if dashboard_items:
-            dashboard_choices = [
-                (dashboard_item.dashboard.id, dashboard_item.dashboard.name) for dashboard_item in dashboard_items
-            ]
-        else:
-            # When there are no items fetch the dashboards, must exclude the findings dashboard
-            dashboards = Dashboard.objects.filter(organization=self.organization).exclude(name=FINDINGS_DASHBOARD_NAME)
-            dashboard_choices = [(dashboard.id, dashboard.name) for dashboard in dashboards]
+        dashboards = Dashboard.objects.filter(organization=self.organization).exclude(name=FINDINGS_DASHBOARD_NAME)
+        dashboard_choices = [(dashboard.id, dashboard.name) for dashboard in dashboards]
 
         return default + dashboard_choices
 
     def has_duplicate_name(self, dashboard: Dashboard, name: str | None) -> bool:
         return DashboardItem.objects.filter(dashboard=dashboard, name=name).exists()
-
-    def get_settings(self) -> dict[str, Any]:
-        column_values = self.data.getlist("column_values", [])
-        column_names = self.data.getlist("column_names", [])
-
-        columns = [{key: name} for key, name in zip(column_values, column_names)]
-
-        if not columns:
-            raise ValidationError("Please choose at least one column.")
-
-        size = self.cleaned_data.get("size", "1")
-
-        return {"size": size, "columns": columns}
 
     def get_query(self) -> dict[str, Any]:
         sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
@@ -105,6 +99,12 @@ class AddDashboardItemForm(BaseRockyForm):
         limit = int(self.cleaned_data.get("limit", 10))
 
         return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
+
+    def get_settings(self) -> dict[str, Any]:
+        size = self.cleaned_data.get("size", "1")
+        columns = self.cleaned_data.get("columns", [])
+
+        return {"size": size, "columns": columns}
 
     def create_dashboard_item(self) -> None:
         dashboard = self.get_dashboard()
@@ -127,13 +127,6 @@ class AddDashboardItemForm(BaseRockyForm):
             except IntegrityError:
                 raise ValidationError(_("An error occurred while adding dashboard item."))
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # clean all form data and dashboard item creation
-        if self.data:
-            self.create_dashboard_item()
-        return cleaned_data
-
 
 class AddObjectListDashboardItemForm(AddDashboardItemForm):
     order_by = forms.ChoiceField(
@@ -147,11 +140,18 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
             ("scan_level-desc", _("Clearance level (High-Low)")),
         ),
     )
+    columns = forms.MultipleChoiceField(
+        label=_("Show table columns"),
+        required=True,
+        widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
+        choices=((value, name) for value, name in OBJECT_LIST_COLUMNS.items()),
+    )
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
         self.query_from = "object_list"
         self.template = "partials/dashboard_ooi_list.html"
+        self.table_columns = OBJECT_LIST_COLUMNS
 
     def get_query(self):
         default_query = super().get_query()
@@ -183,10 +183,18 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         ),
     )
 
+    columns = forms.MultipleChoiceField(
+        label=_("Show table columns"),
+        required=True,
+        widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
+        choices=((value, name) for value, name in FINDING_LIST_COLUMNS.items()),
+    )
+
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
         self.query_from = "finding_list"
         self.template = "partials/dashboard_finding_list.html"
+        self.table_columns = FINDING_LIST_COLUMNS
 
     def get_query(self):
         default_query = super().get_query()

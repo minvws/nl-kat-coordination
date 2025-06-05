@@ -21,14 +21,14 @@ from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
-from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
-
-OBJECT_LIST_COLUMNS = {
-    "object": _("Object"),
-    "object_type": _("Type"),
-    "clearance_level": _("Clearance level"),
-    "clearance_type": _("Clearance type"),
-}
+from rocky.views.mixins import (
+    OBJECT_LIST_COLUMNS,
+    ConnectorFormMixin,
+    OctopoesView,
+    OOIList,
+    SingleOOIMixin,
+    SingleOOITreeMixin,
+)
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):

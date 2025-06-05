@@ -1,5 +1,4 @@
 import random
-from urllib.parse import urlencode
 
 import pytest
 from crisis_room.forms import AddFindingListDashboardItemForm, AddObjectListDashboardItemForm
@@ -419,23 +418,28 @@ def test_delete_dashboard_no_permission(rf, client_member, dashboard_items):
 
 
 def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
-    form_data = {
-        "dashboard": dashboard_items[0].dashboard.id,
-        "title": "Test Form",
-        "order_by": "object_type-asc",
-        "limit": "10",
-        "size": "2",
-        "observed_at": "2025-05-07",
-        "ooi_type": "Hostname",
-        "search_string": "",
-        "template": "partials/dashboard_ooi_list.html",
-        "recipe_id": "",
-        "query_from": "object_list",
-        "column_names": ["Object", "Type", "Clearance level", "Clearance type"],
-        "column_values": ["object", "object_type", "clearance_level", "clearance_type"],
-    }
+    qdict = QueryDict(mutable=True)
+    qdict.update(
+        {
+            "dashboard": dashboard_items[0].dashboard.id,
+            "title": "Test Form",
+            "order_by": "object_type-asc",
+            "limit": "10",
+            "size": "2",
+            "observed_at": "2025-05-07",
+            "ooi_type": "Hostname",
+            "search_string": "",
+            "template": "partials/dashboard_ooi_list.html",
+            "recipe_id": "",
+            "query_from": "object_list",
+        }
+    )
 
-    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    qdict.setlist("columns", ["object", "object_type"])
+
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=qdict)
+
+    print(form)
 
     assert form.is_valid()
 
@@ -457,9 +461,9 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
     assert "size" in fields
 
     # change for data to have the same title that already exists
-    form_data["title"] = dashboard_items[0].name
+    qdict["title"] = dashboard_items[0].name
 
-    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=qdict)
     assert not form.is_valid()
 
     fields = list(form.errors)
@@ -475,12 +479,12 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
         )
 
     # set it back
-    form_data["title"] = "Test Form"
+    qdict["title"] = "Test Form"
 
     # None existent dashboard
-    form_data["dashboard"] = None
+    qdict["dashboard"] = ""
 
-    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=QueryDict(urlencode(form_data)))
+    form = AddObjectListDashboardItemForm(organization=client_member.organization, data=qdict)
     assert not form.is_valid()
 
     fields = list(form.errors)
@@ -532,23 +536,24 @@ def test_clients_permissions_for_dashboard(rf, mocker, client_member, dashboard_
 
 
 def test_create_dashboard_item_form_findings_list(client_member, dashboard_items_from_findings_list):
-    form_data = {
-        "dashboard": dashboard_items_from_findings_list[0].dashboard.id,
-        "title": "Test Form",
-        "order_by": "score-asc",
-        "limit": "10",
-        "size": "2",
-        "observed_at": "2025-05-07",
-        "exclude_muted": "True",
-        "only_muted": "False",
-        "query_from": "finding_list",
-        "column_names": ["Tree", "Graph", "Finding", "Location", "Severity"],
-        "column_values": ["tree", "graph", "finding", "location", "severity"],
-    }
-
-    form = AddFindingListDashboardItemForm(
-        organization=client_member.organization, data=QueryDict(urlencode(form_data))
+    qdict = QueryDict(mutable=True)
+    qdict.update(
+        {
+            "dashboard": dashboard_items_from_findings_list[0].dashboard.id,
+            "title": "Test Form",
+            "order_by": "score-asc",
+            "limit": "10",
+            "size": "2",
+            "observed_at": "2025-05-07",
+            "exclude_muted": "True",
+            "only_muted": "False",
+            "query_from": "finding_list",
+        }
     )
+
+    qdict.setlist("columns", ["severity", "finding"])
+
+    form = AddFindingListDashboardItemForm(organization=client_member.organization, data=qdict)
 
     assert form.is_valid()
 
@@ -570,11 +575,10 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
     assert "size" in fields
 
     # change for data to have the same title that already exists
-    form_data["title"] = dashboard_items_from_findings_list[0].name
+    qdict["title"] = dashboard_items_from_findings_list[0].name
 
-    form = AddFindingListDashboardItemForm(
-        organization=client_member.organization, data=QueryDict(urlencode(form_data))
-    )
+    form = AddFindingListDashboardItemForm(organization=client_member.organization, data=qdict)
+
     assert not form.is_valid()
 
     fields = list(form.errors)
@@ -590,14 +594,12 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
         )
 
     # set it back
-    form_data["title"] = "Test Form"
+    qdict["title"] = "Test Form"
 
     # None existent dashboard
-    form_data["dashboard"] = None
+    qdict["dashboard"] = ""
 
-    form = AddFindingListDashboardItemForm(
-        organization=client_member.organization, data=QueryDict(urlencode(form_data))
-    )
+    form = AddFindingListDashboardItemForm(organization=client_member.organization, data=qdict)
     assert not form.is_valid()
 
     fields = list(form.errors)
