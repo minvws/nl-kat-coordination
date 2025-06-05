@@ -1,14 +1,13 @@
 import structlog
 from amqp import AMQPError
 
-from octopoes.config.settings import GATHER_BIT_METRICS, QUEUE_NAME_OCTOPOES, Settings
+from octopoes.config.settings import GATHER_BIT_METRICS, Settings
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager, get_rabbit_channel
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
-from octopoes.tasks.app import app as celery_app
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 logger = structlog.get_logger(__name__)
@@ -31,7 +30,7 @@ def close_rabbit_channel(queue_uri: str) -> None:
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(client, str(settings.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
+    event_manager = EventManager(client, str(settings.queue_uri))
 
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session)
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session)
