@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 import time
+from datetime import datetime
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
 
@@ -15,9 +16,10 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
+from boefjes.job_handler import MIMETYPE_MIN_LENGTH, BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.local_repository import get_local_repository
+from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
@@ -93,28 +95,42 @@ class SchedulerWorkerManager(WorkerManager):
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            p_item = self.scheduler_client.pop_item(queue_type.value)
+            p_items = self.scheduler_client.pop_items(queue_type.value)
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.settings.poll_interval)
             time.sleep(self.settings.poll_interval)
             return
 
-        if p_item is None:
+        if not p_items:
             time.sleep(self.settings.poll_interval)
             return
 
-        logger.info("Handling task[%s]", p_item.data.id)
+        logger.info("Handling tasks[%s]", [p_item.data.id for p_item in p_items])
 
         try:
-            self.task_queue.put(p_item)
-            logger.info("Dispatched task[%s]", p_item.data.id)
+            if self.settings.deduplicate:
+                self.task_queue.put(p_items)
+                return
+
+            for p_item in p_items:
+                self.task_queue.put(p_item)
+            logger.info("Dispatched tasks[ids=%s]", [p_item.data.id for p_item in p_items])
         except:  # noqa
             logger.exception("Exiting worker...")
-            logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
+            logger.info(
+                "Patching scheduler tasks[ids=%s] to %s",
+                [p_item.data.id for p_item in p_items],
+                TaskStatus.FAILED.value,
+            )
 
             try:
-                self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
-                logger.info("Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id)
+                for p_item in p_items:
+                    self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
+                logger.info(
+                    "Set task status to %s in the scheduler for task[ids=%s]",
+                    TaskStatus.FAILED,
+                    [p_item.data.id for p_item in p_items],
+                )
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", TaskStatus.FAILED.value)
 
@@ -175,13 +191,14 @@ class SchedulerWorkerManager(WorkerManager):
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: list[Task] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+                items: list[list[Task]] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
-                for p_item in items:
-                    try:
-                        self.scheduler_client.push_item(p_item)
-                    except HTTPError:
-                        logger.exception("Rescheduling task failed[id=%s]", p_item.id)
+                for p_items in items:
+                    for p_item in p_items:
+                        try:
+                            self.scheduler_client.push_item(p_item)
+                        except HTTPError:
+                            logger.error("Rescheduling task failed[id=%s]", p_item.id)
 
             killed_workers = []
 
@@ -219,30 +236,108 @@ def _start_working(
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
 ) -> None:
-    logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
+    logger.info("Started listening for tasks from worker", pid=os.getpid())
 
     while True:
-        p_item = task_queue.get()  # blocks until tasks are pushed in the main process
+        p_items = task_queue.get()  # blocks until tasks are pushed in the main process
+        p_item, *duplicated_items = p_items
+
         status = TaskStatus.FAILED
+        out = None
         handling_tasks[os.getpid()] = str(p_item.id)
 
         try:
             scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)
-            handler.handle(p_item.data)
+            start_time = datetime.now()
+            out = handler.handle(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An error occurred handling scheduler item", task=str(p_item.data.id))
         except:  # noqa
-            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.data.id)
+            logger.exception("An unhandled error occurred handling scheduler item", task=str(p_item.data.id))
             raise
         finally:
+            duration = (datetime.now() - start_time).total_seconds()
             try:
                 if scheduler_client.get_task(p_item.id).status == TaskStatus.RUNNING:
                     # The docker runner could have handled this already
                     scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
-                    logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
+                    logger.info(
+                        "Set status in the scheduler", status=status.value, task=str(p_item.data.id), duration=duration
+                    )
+
+                if not isinstance(handler, BoefjeHandler) or not duplicated_items:
+                    # We do not deduplicate normalizers
+                    continue
+
+                if out is None:
+                    # `out` will be None on failures or for Docker boefjes (until #4304 is merged), in which case there
+                    # is nothing to save to Bytes and the statuses have been patched in the except block.
+                    for item in duplicated_items:
+                        # Instead of duplicating errors, give the other deduplicated tasks another chance
+                        scheduler_client.patch_task(item.id, TaskStatus.QUEUED)
+
+                    logger.info("Set status to %s in the scheduler for %s deduplicated", status, len(duplicated_items))
+
+                    continue
+
+                if out is False:
+                    # Docker boefjes cannot be deduplicated at this point, so put them back on the queue separately
+                    for item in duplicated_items:
+                        task_queue.put([item])
+
+                    logger.info("Put %s boefjes that cannot be deduplicated back on the queue", len(duplicated_items))
+
+                    continue
+
+                for item in duplicated_items:
+                    boefje_meta, boefje_results = out
+
+                    new_boefje_meta = item.data
+                    new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
+                    new_boefje_meta.environment = boefje_meta.environment
+                    new_boefje_meta.started_at = boefje_meta.started_at
+                    new_boefje_meta.ended_at = boefje_meta.ended_at
+
+                    handler.bytes_client.save_boefje_meta(new_boefje_meta)
+
+                    if not boefje_results:
+                        scheduler_client.patch_task(item.id, status)
+                        continue
+
+                    for boefje_added_mime_types, output in boefje_results:
+                        valid_mimetypes = set()
+                        for mimetype in boefje_added_mime_types:
+                            if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
+                                logger.warning(
+                                    "Invalid mime-type encountered in output for boefje %s[%s]",
+                                    new_boefje_meta.boefje.id,
+                                    str(new_boefje_meta.id),
+                                )
+                            else:
+                                valid_mimetypes.add(mimetype)
+                        raw_file_id = handler.bytes_client.save_raw(
+                            new_boefje_meta.id,
+                            output,
+                            _default_mime_types(new_boefje_meta.boefje).union(valid_mimetypes),
+                        )
+                        logger.info(
+                            "Saved raw file %s for boefje %s[%s]",
+                            raw_file_id,
+                            new_boefje_meta.boefje.id,
+                            new_boefje_meta.id,
+                        )
+
+                    scheduler_client.patch_task(item.id, status)
+
+                    logger.info(
+                        "Set status in the scheduler for deduplicated task",
+                        status=status.value,
+                        task=str(p_item.data.id),
+                        duration=duration,
+                    )
             except HTTPError:
-                logger.exception("Could not patch scheduler task to %s", status.value)
+                logger.exception("Could not patch scheduler task to %s", status.value, task=str(p_item.data.id))
 
             gc.collect()
 
