@@ -102,4 +102,5 @@ NIBBLE = NibbleDefinition(
         NibbleParameter(object_type=Config, parser="[*][?object_type == 'Config'][]"),
     ],
     query=query,
+    enabled=False,
 )
