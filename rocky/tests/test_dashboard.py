@@ -439,8 +439,6 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
 
     form = AddObjectListDashboardItemForm(organization=client_member.organization, data=qdict)
 
-    print(form)
-
     assert form.is_valid()
 
     # Check if dashboard data is created, after form is valid, should be created at this point
