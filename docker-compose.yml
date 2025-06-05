@@ -76,16 +76,12 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: worker-beat
+    command: worker
     env_file:
       - .env-defaults
       - .env
     volumes:
       - ./octopoes:/app/octopoes
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
 
   boefje:
     restart: unless-stopped
