@@ -8,11 +8,30 @@ from opentelemetry import trace
 from scheduler import clients, context, models
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
-from scheduler.schedulers import Scheduler, rankers
+from scheduler.schedulers import Scheduler, queue, rankers
 from scheduler.schedulers.errors import exception_handler
+from scheduler.schedulers.queue.errors import NotAllowedError
 from scheduler.storage import filters
 
 tracer = trace.get_tracer(__name__)
+
+
+class BoefjePQ(queue.PriorityQueue):
+    """A custom priority queue for the BoefjeScheduler. Since we have specific
+    requirements for popping tasks from the queue. We override the
+    pop method to call the `pop_boefje()` to retrieve batched tasks based on
+    their environment hash.
+    """
+
+    @queue.pq.with_lock
+    def pop(self, limit: int | None = None, filters: filters.FilterRequest | None = None) -> list[models.Task]:
+        items = self.pq_store.pop_boefje(self.pq_id, limit=limit, filters=filters)
+        if not items:
+            return []
+
+        self.pq_store.bulk_update_status(self.pq_id, [item.id for item in items], models.TaskStatus.DISPATCHED)
+
+        return items
 
 
 class BoefjeScheduler(Scheduler):
@@ -33,7 +52,11 @@ class BoefjeScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
-        super().__init__(ctx=ctx, scheduler_id=self.ID, create_schedule=True, auto_calculate_deadline=True)
+        pq = BoefjePQ(
+            pq_id=self.ID, maxsize=ctx.config.pq_maxsize, item_type=self.ITEM_TYPE, pq_store=ctx.datastores.pq_store
+        )
+
+        super().__init__(ctx=ctx, scheduler_id=self.ID, queue=pq, create_schedule=True, auto_calculate_deadline=True)
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
 
     def run(self) -> None:
@@ -374,6 +397,12 @@ class BoefjeScheduler(Scheduler):
             task_db.status = models.TaskStatus.FAILED
             self.ctx.datastores.task_store.update_task(task_db)
 
+        # We check if the boefje is also present in other organisations
+        # and if so, we create tasks for those organisations as well.
+        tasks = self.is_boefje_in_other_orgs(boefje_task)
+        if tasks:
+            boefje_task.deduplication_key = boefje_task.id
+
         task = models.Task(
             id=boefje_task.id,
             scheduler_id=self.scheduler_id,
@@ -384,18 +413,37 @@ class BoefjeScheduler(Scheduler):
         )
 
         task.priority = self.ranker.rank(task)
-        self.push_item_to_queue_with_timeout(item=task, max_tries=self.max_tries, create_schedule=create_schedule)
+        tasks.append(task)
 
-        self.logger.info(
-            "Created boefje task",
-            task_id=task.id,
-            task_hash=task.hash,
-            boefje_id=boefje_task.boefje.id,
-            ooi_primary_key=boefje_task.input_ooi,
-            scheduler_id=self.scheduler_id,
-            organisation_id=organisation_id,
-            caller=caller,
-        )
+        with self.queue.lock:
+            for task in tasks:
+                try:
+                    self.push_item_to_queue_with_timeout(
+                        item=task, max_tries=self.max_tries, create_schedule=create_schedule
+                    )
+                except NotAllowedError:
+                    self.logger.debug(
+                        "Task is not allowed to be pushed to the queue",
+                        task_id=task.id,
+                        task_hash=task.hash,
+                        boefje_id=boefje_task.boefje.id,
+                        ooi_primary_key=boefje_task.input_ooi,
+                        organisation_id=organisation_id,
+                        scheduler_id=self.scheduler_id,
+                        caller=caller,
+                    )
+                    continue
+
+                self.logger.info(
+                    "Created boefje task",
+                    task_id=task.id,
+                    task_hash=task.hash,
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    scheduler_id=self.scheduler_id,
+                    organisation_id=organisation_id,
+                    caller=caller,
+                )
 
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
@@ -625,6 +673,105 @@ class BoefjeScheduler(Scheduler):
             oois.append(ooi)
 
         return oois
+
+    @exception_handler
+    def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> list[models.BoefjeTask]:
+        """Check if the boefje is also present in other organisations"""
+        # We check on input_ooi because we allow for boefje tasks without an
+        # ooi, something we can't deduplicate.
+        if boefje_task.input_ooi is None:
+            return []
+
+        configs = self.ctx.services.katalogus.get_configs(
+            boefje_id=boefje_task.boefje.id,
+            organisation_id=boefje_task.organization,
+            enabled=True,
+            with_duplicates=True,
+        )
+        if not configs:
+            self.logger.debug(
+                "No configs found for boefje",
+                boefje_id=boefje_task.boefje.id,
+                organisation_id=boefje_task.organization,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
+
+        other_orgs_from_configs = [config.organisation_id for config in configs[0].duplicates]
+
+        # We're only interested in the organisations that have
+        # the same input_ooi as the boefje task
+        orgs = self.ctx.services.octopoes.get_object_clients(
+            reference=boefje_task.input_ooi, clients=set(other_orgs_from_configs), valid_time=datetime.now(timezone.utc)
+        )
+        if not orgs:
+            self.logger.debug(
+                "No organisations found for input ooi",
+                input_ooi=boefje_task.input_ooi,
+                organisation_id=boefje_task.organization,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
+
+        boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            boefje_task.boefje.id, boefje_task.organization
+        )
+        if boefje is None:
+            return []
+
+        tasks = []
+        for config in configs[0].duplicates:
+            if config.organisation_id == boefje_task.organization:
+                self.logger.debug(
+                    "Skipping organisation of original boefje task",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            if config.organisation_id not in orgs:
+                self.logger.debug(
+                    "OOI does not exist anymore in duplicated organisation, skipping",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            ooi = orgs[config.organisation_id]
+            if not self.has_boefje_permission_to_run(boefje, ooi):
+                self.logger.debug(
+                    "Boefje not allowed to run on ooi",
+                    boefje_id=boefje_task.boefje.id,
+                    ooi_primary_key=boefje_task.input_ooi,
+                    organisation_id=config.organisation_id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
+            new_boefje_task = models.BoefjeTask(
+                boefje=models.Boefje.model_validate(boefje.model_dump()),
+                input_ooi=boefje_task.input_ooi,
+                organization=config.organisation_id,
+                deduplication_key=boefje_task.id,
+            )
+
+            task = models.Task(
+                id=new_boefje_task.id,
+                scheduler_id=self.scheduler_id,
+                organisation=config.organisation_id,
+                type=self.ITEM_TYPE.type,
+                hash=new_boefje_task.hash,
+                data=new_boefje_task.model_dump(),
+            )
+
+            task.priority = self.ranker.rank(task)
+            tasks.append(task)
+
+        return tasks
 
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
