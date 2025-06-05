@@ -5,7 +5,6 @@ from collections.abc import Callable
 
 import pika
 import structlog
-from celery import Celery
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import StreamLostError
 from pydantic import BaseModel
@@ -53,14 +52,10 @@ class EventManager:
         self,
         client: str,
         queue_uri: str,
-        celery_app: Celery,
-        celery_queue_name: str,
         channel_factory: Callable[[str], BlockingChannel] = get_rabbit_channel,
     ):
         self.client = client
         self.queue_uri = queue_uri
-        self.celery_app = celery_app
-        self.celery_queue_name = celery_queue_name
         self.channel_factory = channel_factory
 
         self._try_connect()
@@ -80,12 +75,12 @@ class EventManager:
 
     def _publish(self, event: DBEvent) -> None:
         # schedule celery event processor
-        self.celery_app.send_task(
-            "octopoes.tasks.tasks.handle_event",
-            (json.loads(event.model_dump_json()),),
-            queue=self.celery_queue_name,
-            task_id=str(uuid.uuid4()),
-        )
+        #self.celery_app.send_task(
+        #    "octopoes.tasks.tasks.handle_event",
+        #    (json.loads(event.model_dump_json()),),
+        #    queue=self.celery_queue_name,
+        #    task_id=str(uuid.uuid4()),
+        #)
 
         logger.debug(
             "Published handle_event task [operation_type=%s] [primary_key=%s] [client=%s]",
