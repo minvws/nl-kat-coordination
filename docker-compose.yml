@@ -83,6 +83,25 @@ services:
     volumes:
       - ./octopoes:/app/octopoes
 
+  octopoes_scan_profiles:
+    restart: unless-stopped
+    depends_on:
+      crux:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: octopoes/
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: scanprofiles
+    env_file:
+      - .env-defaults
+      - .env
+    volumes:
+      - ./octopoes:/app/octopoes
+
   boefje:
     restart: unless-stopped
     depends_on:
