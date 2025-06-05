@@ -72,7 +72,7 @@ class AddDashboardItemForm(BaseRockyForm):
         column_names = self.data.getlist("column_names", [])
         columns = dict(zip(column_values, column_names))
 
-        if not columns:
+        if not columns and not self.recipe_id:
             raise ValidationError("Please choose at least one column.")
 
         size = self.cleaned_data.get("size", "1")
@@ -99,7 +99,7 @@ class AddDashboardItemForm(BaseRockyForm):
             "query_from": self.query_from,
             "query": json.dumps(self.get_query()) if not self.recipe_id else {},
             "template": self.template,
-            "settings": self.get_settings() if not self.recipe_id else {},
+            "settings": self.get_settings(),
             "display_in_dashboard": self.display_in_dashboard,
         }
 
