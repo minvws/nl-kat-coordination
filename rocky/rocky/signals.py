@@ -100,6 +100,7 @@ def organization_pre_save(sender, instance, *args, **kwargs):
         if not katalogus_client.organization_exists(instance.code):
             katalogus_client.create_organization(instance)
     except Exception as e:
+        logger.error("Failed creating organization in the Katalogus: %s", e)
         raise KATalogusException("Failed creating organization in the Katalogus") from e
 
     try:
