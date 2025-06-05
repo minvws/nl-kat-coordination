@@ -1,36 +1,40 @@
-import yaml
 import io
 import logging
 from collections.abc import Iterable
-from typing import Any, TypedDict, NotRequired
-from functools import reduce
+from typing import Any, TypedDict
 
+import yaml
+from models.ooi.findings import Finding, FindingType
 from pydantic import ValidationError
+from typing_extensions import NotRequired
 
 from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
 from octopoes.models import OOI, Reference
-from models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.certificate import SubjectAlternativeName
-from octopoes.models.ooi.network import Network, NetBlock
-from octopoes.models.ooi.web import WebURL, IPAddress
 from octopoes.models.ooi.dns.records import DNSRecord
+from octopoes.models.ooi.geography import GeographicPoint
+from octopoes.models.ooi.network import NetBlock, Network
+from octopoes.models.ooi.web import IPAddress, WebURL
 from octopoes.models.types import OOI_TYPES as CONCRETE_OOI_TYPES
+
 
 class OOITypeEntry(TypedDict):
     type: type[OOI]
     distinctive_fields: NotRequired[list[str]]
 
-OOI_TYPES: dict[str, OOITypeEntry] = {ooi_type: { "type": CONCRETE_OOI_TYPES[ooi_type] } for ooi_type in CONCRETE_OOI_TYPES } 
+
+OOI_TYPES: dict[str, OOITypeEntry] = {
+    ooi_type: {"type": CONCRETE_OOI_TYPES[ooi_type]} for ooi_type in CONCRETE_OOI_TYPES
+}
 # Types without _natural_key_attrs
 OOI_TYPES["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
 OOI_TYPES["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
 OOI_TYPES["WebURL"] = {"type": WebURL, "distinctive_fields": ["scheme", "port", "path"]}
-OOI_TYPES["SubjectAlternativeName"] = {"type": SubjectAlternativeName }
-OOI_TYPES["FindingType"] = {"type": FindingType }
-OOI_TYPES["IPAddress"] = {"type": IPAddress }
-OOI_TYPES["NetBlock"] = {"type": NetBlock }
-OOI_TYPES["DNSRecord"] = {"type": DNSRecord }
+OOI_TYPES["SubjectAlternativeName"] = {"type": SubjectAlternativeName}
+OOI_TYPES["FindingType"] = {"type": FindingType}
+OOI_TYPES["IPAddress"] = {"type": IPAddress}
+OOI_TYPES["NetBlock"] = {"type": NetBlock}
+OOI_TYPES["DNSRecord"] = {"type": DNSRecord}
 
 
 logger = logging.getLogger(__name__)
@@ -45,7 +49,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 def process_yml(yml_raw_data: bytes, reference_cache: dict) -> Iterable[NormalizerOutput]:
     yml_data = io.StringIO(yml_raw_data.decode())
     oois_from_yaml = yaml.safe_load(yml_data)
-    oois = []
+    oois: list[NormalizerOutput] = []
     for ooi_number, ooi_dict in enumerate(oois_from_yaml):
         try:
             create_oois(ooi_dict, reference_cache, oois)
@@ -53,7 +57,8 @@ def process_yml(yml_raw_data: bytes, reference_cache: dict) -> Iterable[Normaliz
             logger.exception("Validation failed for indexed object at %s, with error: %s", ooi_number, str(err))
     return oois
 
-def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
+
+def create_oois(ooi_dict: dict, reference_cache: dict, oois_list: list):
     # constants
     skip_properties = ("object_type", "scan_profile", "primary_key", "user_id")
     # check for main ooi
@@ -62,10 +67,16 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     ooi_type = ooi_type.type_from_raw(ooi_dict)
     # check for cache
     cache, cache_field_name = get_cache_and_field_name(ooi_type, ooi_dict, reference_cache)
-    if cache_field_name in cache: return cache[cache_field_name]
+    if cache_field_name in cache:
+        return cache[cache_field_name]
     # creation process
     ooi_fields = [
-        (field, field if model_field.annotation != Reference else model_field.json_schema_extra['object_type'], model_field.annotation == Reference, model_field.is_required())
+        (
+            field,
+            field if model_field.annotation != Reference else model_field.json_schema_extra["object_type"],
+            model_field.annotation == Reference,
+            model_field.is_required(),
+        )
         for field, model_field in ooi_type.__fields__.items()
         if field not in skip_properties
     ]
@@ -74,12 +85,10 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
         # required referenced fields or not required but also defined in yaml
         if is_reference and required or is_reference and ooi_dict.get(field):
             try:
-                referenced_ooi = create_oois(
-                    ooi_dict.get(field.lower()) or ooi_dict.get(referenced_type.lower()),
-                    reference_cache,
-                    oois_list
-                )
-                kwargs[field] = referenced_ooi.reference
+                new_ooi = ooi_dict.get(field.lower()) or ooi_dict.get(referenced_type.lower())
+                if new_ooi is not None:
+                    referenced_ooi = create_oois(new_ooi, reference_cache, oois_list)
+                    kwargs[field] = referenced_ooi.reference
             except IndexError:
                 if required:
                     raise IndexError(
@@ -89,7 +98,7 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
                 else:
                     kwargs[field] = None
         # not required and not defined referenced field still in loop. they skipped with "not is_reference"
-        # required feilds or not required but also defined in yaml
+        # required fields or not required but also defined in yaml
         elif not is_reference and (required or not required and ooi_dict.get(field)):
             kwargs[field] = ooi_dict.get(field)
     ooi = ooi_type(**kwargs)
@@ -97,13 +106,15 @@ def create_oois(ooi_dict:dict, reference_cache:dict, oois_list:list):
     cache[cache_field_name] = ooi
     oois_list.append(NormalizerDeclaration(ooi=ooi))
     return ooi
-    
-def get_cache_and_field_name(ooi_type: type[OOI], ooi_dict: dict, reference_cache:dict) -> tuple[dict[str, OOI], str]:
-    dins_fields = OOI_TYPES[ooi_type.__name__].get('distinctive_fields', ooi_type._natural_key_attrs)
+
+
+def get_cache_and_field_name(ooi_type: type[OOI], ooi_dict: dict, reference_cache: dict) -> tuple[dict[str, OOI], str]:
+    dins_fields = OOI_TYPES[ooi_type.__name__].get("distinctive_fields", ooi_type._natural_key_attrs)
     cache_field_name = get_cache_name(ooi_dict, dins_fields)
     cache: dict[str, OOI] = reference_cache.setdefault(ooi_type.object_type, {})
     return cache, cache_field_name
 
-def get_cache_name(ooi_dict:dict, field_combination: list[str]) -> str:
+
+def get_cache_name(ooi_dict: dict, field_combination: list[str]) -> str:
     """It creates name for cache from str values of distinctive fields"""
     return "|".join(filter(None, map(lambda key: str(ooi_dict.get(key, "")), field_combination)))
