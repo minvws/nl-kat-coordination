@@ -1,7 +1,7 @@
 import typing
 import uuid
 from base64 import b64encode
-from collections.abc import Callable, Set
+from collections.abc import Callable
 from functools import wraps
 from typing import Any
 from uuid import UUID
@@ -98,7 +98,7 @@ class BytesAPIClient:
         return NormalizerMeta.model_validate_json(response.content)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: set[str]) -> UUID:
         file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
 
         response = self._session.post(
