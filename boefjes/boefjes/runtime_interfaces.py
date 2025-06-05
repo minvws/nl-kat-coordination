@@ -4,7 +4,7 @@ from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerResults
 
 
 class Handler:
-    def handle(self, item: BoefjeMeta | NormalizerMeta) -> None:
+    def handle(self, item: BoefjeMeta | NormalizerMeta):
         raise NotImplementedError()
 
 

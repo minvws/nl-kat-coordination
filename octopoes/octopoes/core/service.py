@@ -131,8 +131,8 @@ class OctopoesService:
         self,
         types: set[type[OOI]],
         valid_time: datetime,
-        limit: int = DEFAULT_LIMIT,
         offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
         scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
@@ -140,7 +140,7 @@ class OctopoesService:
         asc_desc: Literal["asc", "desc"] = "asc",
     ) -> Paginated[OOI]:
         paginated = self.ooi_repository.list_oois(
-            types, valid_time, limit, offset, scan_levels, scan_profile_types, search_string, order_by, asc_desc
+            types, valid_time, offset, limit, scan_levels, scan_profile_types, search_string, order_by, asc_desc
         )
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
