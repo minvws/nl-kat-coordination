@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from datetime import datetime, timezone
-from typing import cast, Literal
+from typing import Literal, cast
 
 import docker
 import structlog

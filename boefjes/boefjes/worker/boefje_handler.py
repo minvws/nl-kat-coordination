@@ -97,21 +97,19 @@ class BoefjeHandler(Handler):
             files.append(
                 File(
                     name=str(len(files)),
-                    content=(
-                        b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
-                    ).decode(),
+                    content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
                     tags=list(
                         _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
                     ),  # default mime-types are added through the API
                 )
             )
 
-        boefje_output = BoefjeOutput(status=StatusEnum.FAILED if error is not None else StatusEnum.COMPLETED, files=files)
+        boefje_output = BoefjeOutput(
+            status=StatusEnum.FAILED if error is not None else StatusEnum.COMPLETED, files=files
+        )
         raw_file_ids = self.boefje_storage.save_output(boefje_meta, boefje_output)
 
-        logger.info(
-            "Saved %s raw files for boefje %s[%s]", len(raw_file_ids), boefje_meta.boefje.id, boefje_meta.id
-        )
+        logger.info("Saved %s raw files for boefje %s[%s]", len(raw_file_ids), boefje_meta.boefje.id, boefje_meta.id)
 
         if error is not None:
             raise error

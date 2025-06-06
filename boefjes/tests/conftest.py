@@ -1,11 +1,10 @@
 import multiprocessing
-from typing import Literal
-
 import time
 import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
 from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
 import alembic.config
@@ -27,7 +26,14 @@ from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
 from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus
+from boefjes.worker.interfaces import (
+    BoefjeOutput,
+    BoefjeStorageInterface,
+    SchedulerClientInterface,
+    Task,
+    TaskPop,
+    TaskStatus,
+)
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.models import Organisation
@@ -117,17 +123,22 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._pushed_items[str(p_item.id)] = [p_item]
 
 
-class MockBytesAPIClient:
+class MockBytesAPIClient(BoefjeStorageInterface):
     def __init__(self):
         self.queue = multiprocessing.Manager().Queue()
+
+    def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+        self.save_boefje_meta(boefje_meta)
+
+        return self.save_raws(boefje_meta.id, boefje_output)
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         self.queue.put(("save_boefje_meta", (boefje_meta.model_dump(),)))
 
-    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: set[str]) -> UUID:
-        self.queue.put(("save_raw", (boefje_meta_id, raw, mime_types)))
+    def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+        self.queue.put(("save_raw", (boefje_meta_id, boefje_output)))
 
-        return uuid.uuid4()
+        return {file.name: uuid.uuid4() for file in boefje_output.files}
 
     def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
@@ -138,7 +149,7 @@ class MockHandler(BoefjeHandler, NormalizerHandler):
         self.sleep_time = 0
         self.queue = multiprocessing.Manager().Queue()
         self.exception = exception
-        self.bytes_client = MockBytesAPIClient()
+        self.boefje_storage = MockBytesAPIClient()
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
         time.sleep(self.sleep_time)

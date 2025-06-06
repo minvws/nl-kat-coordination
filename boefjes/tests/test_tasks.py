@@ -80,14 +80,14 @@ def test_handle_boefje_with_exception(mocker):
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
         BoefjeHandler(local_repository, mock_bytes_api_client).handle(task)
 
-    mock_bytes_api_client.save_raws.assert_called_once()
-    raw_call_args = mock_bytes_api_client.save_raws.call_args
+    mock_bytes_api_client.save_output.assert_called_once()
+    raw_call_args = mock_bytes_api_client.save_output.call_args
 
-    assert raw_call_args[0][0] == UUID("0dca59db-b339-47c4-bcc9-896fc18e2386")
+    assert raw_call_args[0][0].id == UUID("0dca59db-b339-47c4-bcc9-896fc18e2386")
     assert raw_call_args[0][1].status == StatusEnum.FAILED
     contents = base64.b64decode(raw_call_args[0][1].files[0].content).decode()
     assert "Traceback (most recent call last)" in contents
-    assert "JobRuntimeError: Boefje failed" in contents
+    assert "RuntimeError: dummy error" in contents
     # default mime-types are added through the API
     assert set(raw_call_args[0][1].files[0].tags) == {"error/boefje", "boefje/dummy_boefje_runtime_exception"}
 
@@ -118,7 +118,7 @@ def test_cleared_boefje_env(mock_boefje_handler) -> None:
     current_env = os.environ.copy()
     mock_boefje_handler.handle(task)
 
-    output = mock_boefje_handler.boefje_storage.save_raws.mock_calls
+    output = mock_boefje_handler.boefje_storage.save_output.mock_calls
     content = base64.b64decode(output[0][1][1].files[0].content)
     output_dict = ast.literal_eval(content.decode())
 

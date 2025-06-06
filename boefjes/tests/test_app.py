@@ -1,3 +1,4 @@
+import base64
 import json
 from multiprocessing import Manager
 from pathlib import Path
@@ -7,6 +8,7 @@ import pytest
 
 from boefjes.__main__ import get_runtime_manager
 from boefjes.config import Settings
+from boefjes.worker.interfaces import BoefjeOutput, File, StatusEnum
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
 from tests.loading import get_dummy_data
@@ -100,8 +102,12 @@ def test_two_processes_with_exception_in_handler(
 
     # We expect the first two patches to set the task status to running of both task and then process 1 to finish, as
     # the exception has been set up with a small delay.
-    assert sorted(patched_tasks[:2]) == sorted(
-        [("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"), ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")]
+    assert sorted(patched_tasks[:3]) == sorted(
+        [
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+            ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running"),
+            ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ]
     )
 
     # The process completing status then to be set to completed/failed for both tasks.
@@ -204,7 +210,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
 
     # Just one task dispatched
     assert len(items) == 1
-    assert items[0].boefje.id == "dns-records"
+    assert items[0].data.boefje.id == "dns-records"
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
@@ -215,7 +221,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
         ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }
 
-    bytes_calls = item_handler.bytes_client.get_all()
+    bytes_calls = item_handler.boefje_storage.get_all()
     assert bytes_calls == [
         (
             "save_boefje_meta",
@@ -224,7 +230,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
                     "id": UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
                     "started_at": None,
                     "ended_at": None,
-                    "boefje": {"id": "dns-records", "version": None},
+                    "boefje": {"id": "dns-records", "version": None, "oci_image": None},
                     "input_ooi": "Hostname|internet|test.test",
                     "arguments": {},
                     "organization": "_dev2",
@@ -233,8 +239,19 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
                 },
             ),
         ),
-        ("save_raw", (UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"), b"123", {"boefje/dns-records", "my/mime"})),
+        (
+            "save_raw",
+            (
+                UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
+                BoefjeOutput(
+                    status=StatusEnum.COMPLETED,
+                    files=[File(name="0", content="MTIz", tags=["boefje/dns-records", "my/mime"])],
+                ),
+            ),
+        ),
     ]
+    # For clarity:
+    assert base64.b64decode("MTIz") == b"123"
 
 
 def test_one_process_deduplication_exception_puts_duplicated_task_back_on_the_queue(

@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 import time
+from base64 import b64encode
 from datetime import datetime
 from enum import Enum
 from multiprocessing.context import ForkContext
@@ -251,7 +252,7 @@ def _start_working(
         try:
             scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)
             start_time = datetime.now()
-            out = handler.handle(p_item.data)
+            out = handler.handle(p_item)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
             logger.exception("An error occurred handling scheduler item", task=str(p_item.data.id))
@@ -307,7 +308,7 @@ def _start_working(
                         scheduler_client.patch_task(item.id, status)
                         continue
 
-                    files = []
+                    files: list[File] = []
 
                     for boefje_added_mime_types, output in boefje_results:
                         valid_mimetypes = set()
@@ -320,20 +321,29 @@ def _start_working(
                                 )
                             else:
                                 valid_mimetypes.add(mimetype)
+
                         files.append(
                             File(
-                                name=new_boefje_meta.id,
-                                content=output,
-                                tags=list(_default_mime_types(new_boefje_meta.boefje).union(valid_mimetypes)),
+                                name=str(len(files)),
+                                content=(
+                                    b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
+                                ).decode(),
+                                tags=list(
+                                    _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                                ),  # default mime-types are added through the API
                             )
                         )
 
                     handler.boefje_storage.save_output(
-                        new_boefje_meta, BoefjeOutput(status=StatusEnum.from_status(status))
+                        new_boefje_meta,
+                        BoefjeOutput(
+                            status=StatusEnum.FAILED if status is TaskStatus.FAILED else StatusEnum.COMPLETED,
+                            files=files,
+                        ),
                     )
+
                     logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
                     scheduler_client.patch_task(item.id, status)
-
                     logger.info(
                         "Set status in the scheduler for deduplicated task",
                         status=status.value,

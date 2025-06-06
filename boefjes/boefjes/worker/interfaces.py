@@ -52,16 +52,6 @@ class StatusEnum(str, Enum):
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
 
-    @classmethod
-    def from_status(cls, status: TaskStatus):
-        match status:
-            case TaskStatus.COMPLETED:
-                return cls.COMPLETED
-            case TaskStatus.FAILED:
-                return cls.FAILED
-            case _:
-                raise ValueError()
-
 
 class File(BaseModel):
     name: str
