@@ -91,6 +91,9 @@ class OrganisationStorage(ABC):
     def create(self, organisation: Organisation) -> None:
         raise NotImplementedError
 
+    def update(self, organisation: Organisation) -> None:
+        raise NotImplementedError
+
     def delete_by_id(self, organisation_id: str) -> None:
         raise NotImplementedError
 

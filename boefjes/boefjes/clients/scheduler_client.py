@@ -14,7 +14,7 @@ from pydantic import TypeAdapter
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskStatus, TaskPop
+from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -39,20 +39,12 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self.plugins = plugins
 
     @staticmethod
-    def _verify_response(response: Response, filters: dict[str, Any] | None = None) -> None:
+    def _verify_response(response: Response) -> None:
         response.raise_for_status()
-
-    def pop_item(self, queue_id: str) -> Task | None:
-        page = self.pop_items(queue_id)
-
-        if not page or not page.results:
-            return None
-
-        return page.results[0]
 
     def pop_items(
         self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> TaskPop | None:
+    ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
@@ -72,13 +64,13 @@ class SchedulerAPIClient(SchedulerClientInterface):
         page = TypeAdapter(TaskPop | None).validate_json(response.content)
 
         if page is None:
-            return None
+            return []
 
         for task in page.results:
             if isinstance(task.data, BoefjeMeta):
                 task.data = self._hydrate_boefje_meta(task.data)
 
-        return page
+        return page.results
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())

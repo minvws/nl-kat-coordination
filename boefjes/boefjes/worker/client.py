@@ -5,13 +5,7 @@ from httpx import Client, HTTPTransport, Response
 from pydantic import TypeAdapter
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import (
-    BoefjeOutput,
-    BoefjeStorageInterface,
-    SchedulerClientInterface,
-    Task,
-    TaskStatus, TaskPop,
-)
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, SchedulerClientInterface, Task, TaskPop, TaskStatus
 from .job_models import BoefjeMeta
 
 
@@ -31,17 +25,9 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def pop_item(self, scheduler_id: str) -> Task | None:
-        page = self.pop_items(scheduler_id, limit=1)
-
-        if not page or not page.results:
-            return None
-
-        return page.results[0]
-
     def pop_items(
         self, scheduler_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> TaskPop | None:
+    ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
         if self.oci_images:
@@ -60,12 +46,15 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         )
         self._verify_response(response)
 
-        return TypeAdapter(TaskPop | None).validate_json(response.content)
+        page = TypeAdapter(TaskPop | None).validate_json(response.content)
+
+        if page is None:
+            return []
+
+        return page.results
 
     def push_item(self, p_item: Task) -> None:
-        response = self._session.post(
-            f"/api/v0/scheduler/{p_item.scheduler_id}/push", content=p_item.model_dump_json()
-        )
+        response = self._session.post(f"/api/v0/scheduler/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:

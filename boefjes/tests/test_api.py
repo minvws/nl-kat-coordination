@@ -25,8 +25,8 @@ def test_healthz(api):
 
 def test_boefje_input_running(api, tmp_path):
     scheduler_client = _mocked_scheduler_client(tmp_path)
-    task = scheduler_client.pop_item("boefje")
-    scheduler_client.patch_task(task.id, TaskStatus.RUNNING)
+    tasks = scheduler_client.pop_items("boefje")
+    scheduler_client.patch_task(tasks[0].id, TaskStatus.RUNNING)
     api.app.dependency_overrides[boefjes.api.get_scheduler_client] = lambda: scheduler_client
     api.app.dependency_overrides[boefjes.api.get_plugin_service] = lambda: PluginService(
         mock.MagicMock(), mock.MagicMock(), get_local_repository()
@@ -65,7 +65,7 @@ def test_boefje_input_running(api, tmp_path):
 
 def test_boefje_input_not_running(api, tmp_path):
     scheduler_client = _mocked_scheduler_client(tmp_path)
-    scheduler_client.pop_item("boefje")
+    scheduler_client.pop_items("boefje")
     api.app.dependency_overrides[boefjes.api.get_scheduler_client] = lambda: scheduler_client
 
     response = api.get("/api/v0/tasks/70da7d4f-f41f-4940-901b-d98a92e9014b")

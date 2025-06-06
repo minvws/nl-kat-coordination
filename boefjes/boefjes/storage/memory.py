@@ -21,6 +21,9 @@ class OrganisationStorageMemory(OrganisationStorage):
     def create(self, organisation: Organisation) -> None:
         self._data[organisation.id] = organisation
 
+    def update(self, organisation: Organisation) -> None:
+        self._data[organisation.id] = organisation
+
     def delete_by_id(self, organisation_id: str) -> None:
         del self._data[organisation_id]
 

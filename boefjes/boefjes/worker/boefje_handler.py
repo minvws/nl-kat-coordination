@@ -2,6 +2,7 @@ import os
 import traceback
 from base64 import b64encode
 from datetime import datetime, timezone
+from typing import Literal
 
 import structlog
 
@@ -34,16 +35,14 @@ class BoefjeHandler(Handler):
         self.local_repository = local_repository
         self.boefje_storage = boefje_storage
 
-    def handle(self, task: Task) -> None:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
         boefje_meta = task.data
 
         if not isinstance(boefje_meta, BoefjeMeta):
             raise ValueError("Plugin id does not belong to a boefje")
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
-
-        boefje_results: list[tuple[set, bytes | str]] = []
-        failed = False
+        error = None
 
         try:
             logger.debug("Running local boefje plugin")
@@ -65,55 +64,56 @@ class BoefjeHandler(Handler):
 
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
-                try:
-                    # Until we fully switch over to the Boefje API, we need the start and end time here as a fallback.
-                    boefje_meta.started_at = datetime.now(timezone.utc)
-                    boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
-                    boefje_meta.ended_at = datetime.now(timezone.utc)
-                except BaseException as e:  # noqa
-                    raise JobRuntimeError("Boefje failed") from e
-        except:
+                # Until we fully switch over to the Boefje API, we need the start and end time here as a fallback.
+                boefje_meta.started_at = datetime.now(timezone.utc)
+                boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
+                boefje_meta.ended_at = datetime.now(timezone.utc)
+        except BaseException as e:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+            boefje_meta.ended_at = datetime.now(timezone.utc)
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
-            failed = True
+            error = e
 
-            raise
-        finally:
-            logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+        logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-            if not boefje_results:
-                logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-                return None
+        if not boefje_results:
+            logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            return None
 
-            files: list[File] = []
+        files: list[File] = []
 
-            for boefje_added_mime_types, output in boefje_results:
-                valid_mimetypes = set()
-                for mimetype in boefje_added_mime_types:
-                    if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
-                        logger.warning(
-                            "Invalid mime-type encountered in output for boefje %s[%s]",
-                            boefje_meta.boefje.id,
-                            str(boefje_meta.id),
-                        )
-                    else:
-                        valid_mimetypes.add(mimetype)
-
-                files.append(
-                    File(
-                        name=str(len(files)),
-                        content=(
-                            b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
-                        ).decode(),
-                        tags=_default_mime_types(boefje_meta.boefje).union(
-                            valid_mimetypes
-                        ),  # default mime-types are added through the API
+        for boefje_added_mime_types, output in boefje_results:
+            valid_mimetypes = set()
+            for mimetype in boefje_added_mime_types:
+                if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
+                    logger.warning(
+                        "Invalid mime-type encountered in output for boefje %s[%s]",
+                        boefje_meta.boefje.id,
+                        str(boefje_meta.id),
                     )
+                else:
+                    valid_mimetypes.add(mimetype)
+
+            files.append(
+                File(
+                    name=str(len(files)),
+                    content=(
+                        b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
+                    ).decode(),
+                    tags=list(
+                        _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                    ),  # default mime-types are added through the API
                 )
-
-            boefje_output = BoefjeOutput(status=StatusEnum.FAILED if failed else StatusEnum.COMPLETED, files=files)
-            raw_file_ids = self.boefje_storage.save_output(boefje_meta, boefje_output)
-
-            logger.info(
-                "Saved %s raw files for boefje %s[%s]", len(raw_file_ids), boefje_meta.boefje.id, boefje_meta.id
             )
+
+        boefje_output = BoefjeOutput(status=StatusEnum.FAILED if error is not None else StatusEnum.COMPLETED, files=files)
+        raw_file_ids = self.boefje_storage.save_output(boefje_meta, boefje_output)
+
+        logger.info(
+            "Saved %s raw files for boefje %s[%s]", len(raw_file_ids), boefje_meta.boefje.id, boefje_meta.id
+        )
+
+        if error is not None:
+            raise error
+
+        return boefje_meta, boefje_results

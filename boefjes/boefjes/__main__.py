@@ -40,7 +40,12 @@ def get_runtime_manager(
         )
 
     return SchedulerWorkerManager(
-        item_handler, scheduler_client, settings.pool_size, settings.poll_interval, settings.worker_heartbeat
+        item_handler,
+        scheduler_client,
+        settings.pool_size,
+        settings.poll_interval,
+        settings.worker_heartbeat,
+        settings.deduplicate,
     )
 
 

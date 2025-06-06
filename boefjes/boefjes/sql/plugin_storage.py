@@ -115,6 +115,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
             static=boefje.static,
+            deduplicate=boefje.deduplicate,
         )
 
         if pk is not None:
@@ -159,6 +160,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,
             static=boefje_in_db.static,
+            deduplicate=boefje_in_db.deduplicate,
         )
 
     @staticmethod

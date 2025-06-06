@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from datetime import datetime, timezone
-from typing import cast
+from typing import cast, Literal
 
 import docker
 import structlog
@@ -35,7 +35,16 @@ class DockerBoefjeHandler(Handler):
         self.scheduler_client = scheduler_client
         self.bytes_api_client = bytes_api_client
 
-    def handle(self, task: Task) -> None:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+        """
+        With regard to the return type:
+            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
+
+        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
+        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
+        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
+        """
+
         boefje_meta = task.data
         oci_image = boefje_meta.arguments["oci_image"]
 
@@ -94,6 +103,8 @@ class DockerBoefjeHandler(Handler):
             logger.error("Docker API error: %s", e)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
+        return False
+
 
 class NormalizerHandler(Handler):
     def __init__(
@@ -108,7 +119,7 @@ class NormalizerHandler(Handler):
         self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
 
-    def handle(self, task: Task) -> None:
+    def handle(self, task: Task):
         normalizer_meta = task.data
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
@@ -213,7 +224,7 @@ class CompositeBoefjeHandler(Handler):
         self.boefje_handler = boefje_handler
         self.docker_handler = docker_handler
 
-    def handle(self, task: Task) -> None:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
         if not isinstance(task.data, BoefjeMeta):
             raise RuntimeError("Did not receive boefje task")
 

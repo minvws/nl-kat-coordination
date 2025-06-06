@@ -15,6 +15,13 @@ def test_get_local_plugin(test_client, organisation):
     assert data["id"] == "dns-records"
 
 
+def test_create_org(test_client):
+    response = test_client.post("/v1/organisations/", json={"id": "test2", "name": "test2"})
+    assert response.status_code == 201
+
+    assert test_client.get("/v1/organisations/test2/").json() == {"id": "test2", "name": "test2", "deduplicate": True}
+
+
 def test_filter_plugins(test_client, organisation):
     response = test_client.get(f"/v1/organisations/{organisation.id}/plugins")
     assert len(response.json()) > 100
@@ -407,3 +414,11 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
     assert test_client.get(
         "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "org2", "with_duplicates": True}
     ).json() == [expected_with_duplicates[1]]
+
+    org2.deduplicate = False
+    test_client.put("/v1/organisations/", content=org2.model_dump_json())
+    assert test_client.get(f"/v1/organisations/{org2.id}").json()["deduplicate"] is False
+
+    assert test_client.get(
+        "/v1/configs", params={"boefje_id": "dns-records", "organisation_id": "test", "with_duplicates": True}
+    ).json() == [expected[0]]

@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -52,6 +52,16 @@ class StatusEnum(str, Enum):
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
 
+    @classmethod
+    def from_status(cls, status: TaskStatus):
+        match status:
+            case TaskStatus.COMPLETED:
+                return cls.COMPLETED
+            case TaskStatus.FAILED:
+                return cls.FAILED
+            case _:
+                raise ValueError()
+
 
 class File(BaseModel):
     name: str
@@ -71,7 +81,7 @@ class BoefjeOutput(BaseModel):
 
 
 class Handler:
-    def handle(self, task: Task) -> None:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
         raise NotImplementedError()
 
 
@@ -83,12 +93,9 @@ class PaginatedTasksResponse(BaseModel):
 
 
 class SchedulerClientInterface:
-    def pop_item(self, queue_id: str) -> Task | None:
-        raise NotImplementedError()
-
     def pop_items(
         self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
-    ) -> TaskPop | None:
+    ) -> list[Task]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:

@@ -66,6 +66,7 @@ def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
     pool_size = int(os.getenv("POOL_SIZE", "2"))
     poll_interval = float(os.getenv("POLL_INTERVAL", "10.0"))
     heartbeat = float(os.getenv("WORKER_HEARTBEAT", "1.0"))
+    deduplicate = bool(os.getenv("DEDUPLICATE", "false"))
 
     if base_url is None:
         raise ValueError("An task API is needed for a worker setup. See the BOEFJE_API environment variable.")
@@ -88,7 +89,9 @@ def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
         parsed_plugins,
     )
 
-    SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat).run(WorkerManager.Queue.BOEFJES)
+    SchedulerWorkerManager(handler, boefje_api, pool_size, poll_interval, heartbeat, deduplicate).run(
+        WorkerManager.Queue.BOEFJES
+    )
 
 
 if __name__ == "__main__":

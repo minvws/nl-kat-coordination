@@ -116,7 +116,7 @@ class BytesAPIClient(BoefjeStorageInterface):
         return response.json()
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: uuid.UUID, raw: str | bytes, mime_types: set[str]) -> uuid.UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: set[str]) -> uuid.UUID:
         file_name = "raw"  # The name provides a key for all ids returned, so this is arbitrary as we only upload 1 file
 
         response = self._session.post(

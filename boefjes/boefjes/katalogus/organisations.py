@@ -29,6 +29,12 @@ def add_organisation(organisation: Organisation, storage: OrganisationStorage = 
         store.create(organisation)
 
 
+@router.put("/")
+def upsert_organisation(organisation: Organisation, storage: OrganisationStorage = Depends(get_organisations_store)):
+    with storage as store:
+        store.update(organisation)
+
+
 @router.delete("/{organisation_id}")
 def remove_organisation(organisation_id: str, storage: OrganisationStorage = Depends(get_organisations_store)):
     with storage as store:
