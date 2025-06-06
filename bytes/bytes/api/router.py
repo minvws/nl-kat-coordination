@@ -184,13 +184,12 @@ def create_raw(
                 raw_ids[raw.name] = raw_id
 
             all_parsed_mime_types.append(parsed_mime_types)
-            # don't publish RawFileEvents for empty raw files; no useful data to normalize present
-            if raw.content:
-                event = RawFileReceived(
-                    organization=meta.organization,
-                    raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
-                )
-                event_manager.publish(event)
+
+            event = RawFileReceived(
+                organization=meta.organization,
+                raw_data=RawDataMeta(id=raw_id, boefje_meta=raw_data.boefje_meta, mime_types=raw_data.mime_types),
+            )
+            event_manager.publish(event)
         except Exception as error:
             logger.exception("Error saving raw data")
             raise HTTPException(status_code=codes.INTERNAL_SERVER_ERROR, detail="Could not save raw data") from error
