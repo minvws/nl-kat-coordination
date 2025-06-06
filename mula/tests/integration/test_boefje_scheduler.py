@@ -1256,6 +1256,92 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             # Assert: the deduplication_key of the items should be the same
             self.assertEqual(str(dkey), item.data.get("deduplication_key"))
 
+    def test_pop_deduplication_possible_deduplicate_boefje_tasks(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        boefje = BoefjeFactory()
+
+        first_organisation = self.organisation
+        second_organisation = OrganisationFactory()
+        third_organisation = OrganisationFactory()
+        fourth_organisation = OrganisationFactory()
+
+        # Mocks
+        self.mock_get_plugin.return_value = plugin
+        self.mock_get_configs.return_value = [
+            models.BoefjeConfig(
+                id=7,
+                boefje_id=boefje.id,
+                enabled=True,
+                organisation_id=first_organisation.id,
+                settings={},
+                duplicates=[
+                    models.BoefjeConfig(
+                        id=8, boefje_id=boefje.id, enabled=True, organisation_id=second_organisation.id, settings={}
+                    ),
+                    models.BoefjeConfig(
+                        id=9, boefje_id=boefje.id, enabled=True, organisation_id=third_organisation.id, settings={}
+                    ),
+                    models.BoefjeConfig(
+                        id=10, boefje_id=boefje.id, enabled=True, organisation_id=fourth_organisation.id, settings={}
+                    ),
+                ],
+            )
+        ]
+
+        # Act
+        orgs = [first_organisation.id, second_organisation.id, third_organisation.id]
+        original_tasks = []
+        dkey = uuid.uuid4()
+        for org in orgs:
+            boefje_task = models.BoefjeTask(
+                boefje=models.Boefje.model_validate(boefje.dict()),
+                input_ooi=ooi.primary_key,
+                organization=org,
+                deduplication_key=dkey.hex,
+            )
+
+            task = models.Task(
+                scheduler_id=self.scheduler.scheduler_id,
+                organisation=self.organisation.id,
+                priority=1,
+                type=models.BoefjeTask.type,
+                hash=boefje_task.hash,
+                data=boefje_task.model_dump(),
+                created_at=datetime.now(timezone.utc),
+                modified_at=datetime.now(timezone.utc),
+            )
+            original_tasks.append(task)
+
+            self.scheduler.push_item_to_queue(task)
+
+        # Add one test without a deduplication key but same settings
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.model_validate(boefje.dict()),
+            input_ooi=ooi.primary_key,
+            organization=fourth_organisation.id,
+        )
+        task = models.Task(
+            scheduler_id=self.scheduler.scheduler_id,
+            organisation=fourth_organisation.id,
+            priority=1,
+            type=models.BoefjeTask.type,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        self.scheduler.push_item_to_queue(task)
+
+        popped_items = self.scheduler.pop_item_from_queue()
+        self.assertEqual(4, len(popped_items))
+        for item in popped_items:
+            # Assert: the deduplication_key of the items should be the same
+            self.assertEqual(str(dkey), item.data.get("deduplication_key"))
+
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange

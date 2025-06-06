@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from opentelemetry import trace
 
-from scheduler import clients, context, models
+from scheduler import clients, context, models, storage
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, queue, rankers
@@ -788,3 +788,50 @@ class BoefjeScheduler(Scheduler):
             schedule.deadline_at = datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(schedule)
+
+    def pop_item_from_queue(
+        self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.Task]:
+        items = self.queue.pop(limit, filters)
+        if items is None or len(items) == 0:
+            self.logger.debug(
+                "No items popped from queue %s",
+                self.queue.pq_id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
+
+        dupe_tasks = self.ctx.datastores.pq_store.get_possible_duplicate_boefje_tasks(
+            self.scheduler_id, items[0].data.get("boefje", {}).get("id", ""), items[0].data.get("input_ooi")
+        )
+        if not dupe_tasks or items[0].data.get("deduplication_key") is None:
+            self.post_pop(items)
+            return items
+
+        configs = self.ctx.services.katalogus.get_configs(
+            boefje_id=items[0].data.get("boefje", {}).get("id", ""),
+            organisation_id=items[0].data.get("organization"),
+            enabled=True,
+            with_duplicates=True,
+        )
+        orgs_in_configs = {
+            config.organisation_id for config in configs[0].duplicates if config.organisation_id is not None
+        }
+
+        for dupe_task in dupe_tasks:
+            if dupe_task.organisation not in orgs_in_configs:
+                continue
+
+            # Update its deduplication key, and set its status to DISPATCHED
+            dupe_task.data["deduplication_key"] = items[0].data["deduplication_key"]
+            dupe_task.status = models.TaskStatus.DISPATCHED
+            self.ctx.datastores.task_store.update_task(dupe_task)
+
+            # We have a dupe task, that was not in the original pop. We
+            # need to add it to the items list, so that it can be
+            # processed by the task runner.
+            items.append(dupe_task)
+
+        self.post_pop(items)
+        return items
