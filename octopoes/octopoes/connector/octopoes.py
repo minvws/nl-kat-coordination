@@ -1,7 +1,7 @@
 import json
 from collections.abc import Iterable, Sequence, Set
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 import httpx
@@ -394,3 +394,11 @@ class OctopoesAPIConnector:
         self.session.post(
             f"/{self.client}/origins/migrate", params=params, json=[json.loads(x.model_dump_json()) for x in origins]
         )
+
+    def nibble_retrieve(self, nibble_ids: list[str] | None, valid_time: datetime) -> dict[str, list[list[Any]]]:
+        params: dict[str, str | list[str]] = {"valid_time": str(valid_time)}
+        if nibble_ids:
+            params["nibble_ids"] = nibble_ids
+
+        res = self.session.get(f"/{self.client}/nibbles/retrieve", params=params)
+        return res.json()

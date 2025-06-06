@@ -18,7 +18,7 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Networ
 from octopoes.models.ooi.reports import Report, ReportRecipe
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
-from octopoes.models.origin import OriginType
+from octopoes.models.origin import Origin, OriginType
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -52,14 +52,16 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4(), valid_time=valid_time)) == 0
     origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
     assert len(origins) == 1
-    assert origins[0].model_dump() == {
-        "method": "normalizer_id",
-        "origin_type": OriginType.OBSERVATION,
-        "source": network.reference,
-        "source_method": "manual",
-        "result": [hostname.reference for hostname in hostnames],
-        "task_id": task_id,
-    }
+    assert origins[0] == Origin.model_validate(
+        {
+            "method": "normalizer_id",
+            "origin_type": OriginType.OBSERVATION,
+            "source": network.reference,
+            "source_method": "manual",
+            "result": [hostname.reference for hostname in hostnames],
+            "task_id": task_id,
+        }
+    )
 
     assert len(octopoes_api_connector.list_origins(result=hostnames[0].reference, valid_time=valid_time)) == 1
 

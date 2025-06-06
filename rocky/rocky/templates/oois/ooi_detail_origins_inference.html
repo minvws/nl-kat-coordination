@@ -9,6 +9,7 @@
                 <caption class="visually-hidden">{% translate "Inferred by" %}</caption>
                 <thead>
                     <tr>
+                        <th>{% translate "Type" %}</th>
                         <th>{% translate "Bit" %}</th>
                         <th>{% translate "Source" %}</th>
                         <th>{% translate "Parameters" %}</th>
@@ -17,17 +18,29 @@
                 <tbody>
                     {% for inference, params in inference_origin_params %}
                         <tr>
+                            <td>{{ inference.origin.origin_type.value }}</td>
                             <td>{{ inference.origin.method }}</td>
                             <td>
                                 <a href="{% ooi_url 'ooi_detail' inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
                             </td>
                             <td>
                                 <ul>
-                                    {% for param in params %}
-                                        <li>
-                                            <a href="{% ooi_url 'ooi_detail' param.reference organization.code %}">{{ param.reference }}</a>
-                                        </li>
-                                    {% endfor %}
+                                    {% if params %}
+                                        {% for param in params %}
+                                            <li>
+                                                <a href="{% ooi_url 'ooi_detail' param.reference organization.code %}">{{ param.reference }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if inference.origin.parameters_references %}
+                                        {% for param in inference.origin.parameters_references %}
+                                            {% if param %}
+                                                <li>
+                                                    <a href="{% ooi_url 'ooi_detail' param organization.code %}">{{ param }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                 </ul>
                             </td>
                         </tr>
