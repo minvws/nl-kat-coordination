@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-03 17:55+0000\n"
+"POT-Creation-Date: 2025-06-06 12:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -644,6 +644,10 @@ msgid "Clearance level (High-Low)"
 msgstr ""
 
 #: crisis_room/forms.py
+msgid "Show table columns"
+msgstr ""
+
+#: crisis_room/forms.py
 msgid "Severity (Low-High)"
 msgstr ""
 
@@ -959,7 +963,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Tree"
 msgstr ""
 
@@ -968,7 +972,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Graph"
 msgstr ""
 
@@ -1005,8 +1009,7 @@ msgstr ""
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/views/finding_list.py
+#: rocky/templates/oois/ooi_detail_findings_overview.html rocky/views/mixins.py
 msgid "Severity"
 msgstr ""
 
@@ -1015,7 +1018,7 @@ msgstr ""
 #: reports/templates/partials/report_findings_table.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Finding"
 msgstr ""
 
@@ -1043,7 +1046,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Location"
 msgstr ""
 
@@ -1117,43 +1120,6 @@ msgstr ""
 msgid "Objects "
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: katalogus/templates/change_clearance_level.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
-msgid "Object"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/ooi_view.py
-msgid "Type"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html rocky/views/ooi_view.py
-msgid "Clearance level"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
-msgid "Clearance type"
-msgstr ""
-
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #, python-format
 msgid "Are you sure you want to delete '%(name)s' from this dashboard?"
@@ -1192,21 +1158,6 @@ msgid ""
 "        Add these %(item_type)s with the selected filters\n"
 "        to the dashboard of your choice.\n"
 "    "
-msgstr ""
-
-#: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "Show table columns"
-msgstr ""
-
-#: crisis_room/templates/partials/new_dashboard_item_modal.html
-#: reports/templates/partials/report_names_form.html
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_multiselect.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "Required"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
@@ -1474,6 +1425,20 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
+msgstr ""
+
+#: katalogus/templates/change_clearance_level.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+msgid "Object"
+msgstr ""
+
+#: katalogus/templates/change_clearance_level.html onboarding/forms.py
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/explanations.html rocky/views/mixins.py
+msgid "Clearance level"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -2567,6 +2532,20 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
+msgstr ""
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/views/mixins.py
+msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
@@ -4294,6 +4273,16 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/form/field_input.html
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
 msgid "Add reference date"
 msgstr ""
 
@@ -4396,6 +4385,11 @@ msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object name"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html

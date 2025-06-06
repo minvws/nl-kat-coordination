@@ -162,7 +162,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         search_string = self.data.get("search_string", "")
 
         query = {
-            "ooi_types": ooi_types,
+            "ooi_type": ooi_types,
             "scan_level": clearance_level,
             "scan_profile_type": clearance_type,
             "search_string": search_string,
