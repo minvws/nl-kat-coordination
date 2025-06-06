@@ -1,63 +1,21 @@
-import os
 from collections.abc import Iterable
 
 import structlog
 
-from boefjes.job_models import (
-    BoefjeMeta,
-    InvalidReturnValueNormalizer,
+from boefjes.normalizer_interfaces import NormalizerJobRunner
+from boefjes.normalizer_models import (
     NormalizerAffirmation,
     NormalizerDeclaration,
-    NormalizerMeta,
     NormalizerObservation,
     NormalizerOutput,
     NormalizerResults,
-    ObservationsWithoutInputOOI,
 )
-from boefjes.local_repository import LocalPluginRepository
-from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
+from boefjes.worker.interfaces import JobRuntimeError
+from boefjes.worker.job_models import InvalidReturnValueNormalizer, NormalizerMeta, ObservationsWithoutInputOOI
+from boefjes.worker.repository import LocalPluginRepository
 from octopoes.models import OOI, DeclaredScanProfile
 
 logger = structlog.get_logger(__name__)
-
-
-class TemporaryEnvironment:
-    """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
-
-    def __init__(self):
-        self._original_environment = os.environ.copy()
-
-    def __enter__(self):
-        os.environ.clear()
-        return os.environ
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.environ.clear()
-        os.environ.update(self._original_environment)
-
-
-class LocalBoefjeJobRunner(BoefjeJobRunner):
-    def __init__(self, local_repository: LocalPluginRepository):
-        self.local_repository = local_repository
-
-    def run(self, boefje_meta: BoefjeMeta, environment: dict[str, str]) -> list[tuple[set, bytes | str]]:
-        logger.debug("Running local boefje plugin")
-
-        boefjes = self.local_repository.resolve_boefjes()
-        boefje_resource = boefjes[boefje_meta.boefje.id]
-
-        if not boefje_resource.module:
-            if boefje_resource.boefje.oci_image:
-                raise JobRuntimeError("Trying to run OCI image boefje locally")
-            else:
-                raise JobRuntimeError("Boefje doesn't have OCI image or main.py")
-
-        with TemporaryEnvironment() as temporary_environment:
-            temporary_environment.update(environment)
-            try:
-                return boefje_resource.module.run(boefje_meta)
-            except BaseException as e:  # noqa
-                raise JobRuntimeError("Boefje failed") from e
 
 
 class LocalNormalizerJobRunner(NormalizerJobRunner):
