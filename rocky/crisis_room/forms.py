@@ -97,8 +97,16 @@ class AddDashboardItemForm(BaseRockyForm):
         order_by = sort_by[0]
         sorting_order = sort_by[1]
         limit = int(self.cleaned_data.get("limit", 10))
+        observed_at = self.data.get("observed_at")
+        search = self.data.get("search", "")
 
-        return {"order_by": order_by, "asc_desc": sorting_order, "limit": limit}
+        return {
+            "observed_at": observed_at,
+            "order_by": order_by,
+            "sorting_order": sorting_order,
+            "limit": limit,
+            "search": search,
+        }
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
@@ -156,16 +164,11 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
     def get_query(self):
         default_query = super().get_query()
 
-        ooi_types = self.data.getlist("ooi_type", [])
-        clearance_level = self.data.getlist("clearance_level", [])
-        clearance_type = self.data.getlist("clearance_type", [])
-        search_string = self.data.get("search_string", "")
-
         query = {
-            "ooi_type": ooi_types,
-            "scan_level": clearance_level,
-            "scan_profile_type": clearance_type,
-            "search_string": search_string,
+            "ooi_type": self.data.getlist("ooi_type", []),
+            "clearance_level": self.data.getlist("clearance_level", []),
+            "clearance_type": self.data.getlist("clearance_type", []),
+            "search": self.data.get("search_string", ""),
         }
         return default_query | query
 
@@ -201,15 +204,7 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
 
         severities = self.data.getlist("severity", [])
         muted_findings = self.data.get("muted_findings", "non-muted")
-        exclude_muted = muted_findings == "non-muted"
-        only_muted = muted_findings == "muted"
-        search_string = self.data.get("search_string", "")
 
-        query = {
-            "severities": severities,
-            "exclude_muted": exclude_muted,
-            "only_muted": only_muted,
-            "search_string": search_string,
-        }
+        query = {"severity": severities, "muted_findings": muted_findings}
 
         return default_query | query
