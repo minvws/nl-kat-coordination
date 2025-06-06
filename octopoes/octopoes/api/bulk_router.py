@@ -7,11 +7,12 @@ from fastapi import APIRouter, Depends, Query
 from octopoes.api.router import extract_reference, extract_valid_time, settings
 from octopoes.api.router import settings as extract_settings
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
-from octopoes.core.app import get_xtdb_client
+from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.events.manager import EventManager
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
+from octopoes.models.types import OOIType
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.tasks.app import app as celery_app
 from octopoes.xtdb.client import XTDBSession
@@ -59,26 +60,26 @@ def list_object_clients(
     reference: Reference = Depends(extract_reference),
     settings_: Settings = Depends(settings),
     valid_time: datetime = Depends(extract_valid_time),
-) -> list[str]:
+) -> dict[str, OOIType]:
     """
     An efficient endpoint for checking if OOIs live in multiple organizations
     """
 
     # See list_reports() for some of the reasoning behind the below code
-    event_manager = EventManager("null", str(settings_.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
     xtdb_http_client = get_xtdb_client(str(settings_.xtdb_uri), "")
-    ooi_repository = XTDBOOIRepository(event_manager, XTDBSession(xtdb_http_client))
+    session = XTDBSession(xtdb_http_client)
 
-    clients_with_reference = []
+    octopoes = bootstrap_octopoes(settings_, "null", session)
+    clients_with_reference = {}
 
     for client in clients:
         xtdb_http_client.client = client
 
         try:
-            ooi_repository.get(reference, valid_time)
+            ooi = octopoes.get_ooi(reference, valid_time)
         except ObjectNotFoundException:
             continue
 
-        clients_with_reference.append(client)
+        clients_with_reference[client] = ooi
 
     return clients_with_reference

@@ -49,26 +49,30 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
         # encrypted with a nonce. Hence distinct encrypted settings could be identical once decrypted.
         if all([organisation_id, boefje_id, with_duplicates]):
             # The unique constraint on boefje_id and organisation_id ensures at most 1 result
-            config = self._to_boefje_config(query.offset(offset).limit(limit).first())
+            config = query.offset(offset).limit(limit).first()
 
-            if not config:
+            if config is None:
                 return []
 
             query = (
                 self.session.query(BoefjeConfigInDB)
                 .join(BoefjeInDB, BoefjeConfigInDB.boefje_id == BoefjeInDB.id)
-                .filter(BoefjeInDB.plugin_id == config.boefje_id)
+                .join(OrganisationInDB, BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
+                .filter(BoefjeInDB.plugin_id == config.boefje.plugin_id)
                 .filter(BoefjeConfigInDB.enabled == config.enabled)
                 .filter(BoefjeConfigInDB.id != config.id)
+                .filter(OrganisationInDB.deduplicate == True)  # noqa: E712
+                .filter(BoefjeInDB.deduplicate == True)  # noqa: E712
             )
 
-            config.duplicates = [
+            parsed = self._to_boefje_config(config)
+            parsed.duplicates = [
                 duplicate
                 for duplicate in [self._to_boefje_config(config) for config in query.all()]
-                if duplicate.settings == config.settings
+                if duplicate.settings == parsed.settings
             ]
 
-            return [config]
+            return [parsed]
 
         return [self._to_boefje_config(x) for x in query.offset(offset).limit(limit).all()]
 
