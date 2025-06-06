@@ -24,6 +24,7 @@ class RunOn(Enum):
 class Organisation(BaseModel):
     id: str
     name: str
+    deduplicate: bool = True
 
 
 class Plugin(BaseModel):
@@ -51,6 +52,7 @@ class Boefje(Plugin):
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
+    deduplicate: bool = True
 
     @field_validator("boefje_schema")
     @classmethod
