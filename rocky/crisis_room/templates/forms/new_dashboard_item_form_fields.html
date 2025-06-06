@@ -1,17 +1,14 @@
-<input type="hidden"
-       name="observed_at"
-       value="{{ observed_at|date:"Y-m-d" }}">
-{% for ooi_type in ooi_types_selection %}<input type="hidden" name="ooi_type" value="{{ ooi_type }}">{% endfor %}
-{% for clearance_level in clearance_levels_selection %}
-    <input type="hidden" name="clearance_level" value="{{ clearance_level }}">
-{% endfor %}
-{% for clearance_type in clearance_types_selection %}
-    <input type="hidden" name="clearance_type" value="{{ clearance_type }}">
-{% endfor %}
-{% for severity in severities %}<input type="hidden" name="severity" value="{{ severity }}">{% endfor %}
-<input type="hidden" name="exclude_muted" value="{{ exclude_muted }}">
-<input type="hidden" name="only_muted" value="{{ only_muted }}">
-<input type="hidden" name="search_string" value="{{ search_string }}">
-<input type="hidden" name="template" value="{{ template }}">
-<input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-<input type="hidden" name="query_from" value="{{ query_from }}">
+{% if object_list_filters_query %}
+    {% for name, values in object_list_filters_query.items %}
+        {% for value in values %}
+            {% if value %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}
+{% if finding_list_filters_query %}
+    {% for name, values in finding_list_filters_query.items %}
+        {% for value in values %}
+            {% if value %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}

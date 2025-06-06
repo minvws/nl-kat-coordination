@@ -159,7 +159,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         ooi_types = self.data.getlist("ooi_type", [])
         clearance_level = self.data.getlist("clearance_level", [])
         clearance_type = self.data.getlist("clearance_type", [])
-        search_string = self.data.get("search_string")
+        search_string = self.data.get("search_string", "")
 
         query = {
             "ooi_types": ooi_types,
@@ -203,7 +203,7 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         muted_findings = self.data.get("muted_findings", "non-muted")
         exclude_muted = muted_findings == "non-muted"
         only_muted = muted_findings == "muted"
-        search_string = self.data.get("search_string")
+        search_string = self.data.get("search_string", "")
 
         query = {
             "severities": severities,

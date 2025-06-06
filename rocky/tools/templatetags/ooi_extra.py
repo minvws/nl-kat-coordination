@@ -120,36 +120,5 @@ def get_user_full_name(ooi: OOI) -> str:
 
 
 @register.filter
-def url_encode_object_list_query(query_str: str) -> str:
-    query = json.loads(query_str)
-    params = {
-        "ooi_type": query["ooi_types"],
-        "clearance_level": query["scan_level"],
-        "clearance_type": query["scan_profile_type"],
-        "search": query["search_string"],
-        "order_by": query["order_by"],
-        "sorting_order": query["asc_desc"],
-    }
-    return urlencode(params, True)
-
-
-@register.filter
-def url_encode_finding_list_query(query_str: str) -> str:
-    query = json.loads(query_str)
-
-    if query["exclude_muted"]:
-        muted_findings = "non-muted"
-    elif query["only_muted"]:
-        muted_findings = "muted"
-    else:
-        muted_findings = "all"
-
-    params = {
-        "severity": query["severities"],
-        "search": query["search_string"],
-        "order_by": query["order_by"],
-        "sorting_order": query["asc_desc"],
-        "muted_findings": muted_findings,
-    }
-
-    return urlencode(params, True)
+def urlencode_query(query_string: str) -> str:
+    return urlencode(json.loads(query_string), doseq=True)
