@@ -26,8 +26,6 @@ opentelemetry-instrumentation-requests = "^0.53b1"
 opentelemetry-instrumentation = "^0.53b1"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.32.1"
-# required by kat_binaryedge boefje
-pybinaryedge = "0.5"
 # required by kat_burpsuite, kat_snyk boefjes, kat_webpage_analysis/find_images_in_html normalizer
 beautifulsoup4 = "4.11.1"
 # required by kat_censys boefje
