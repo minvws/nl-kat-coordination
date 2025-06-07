@@ -46,7 +46,7 @@ class DashboardItemSettings(TypedDict):
     columns: list[DashboardItemColumn]
 
 
-def get_default_dashboard_item_settings():
+def get_default_dashboard_item_settings() -> DashboardItemSettings:
     default_settings: DashboardItemSettings = {"size": 1, "columns": []}
     return default_settings
 
