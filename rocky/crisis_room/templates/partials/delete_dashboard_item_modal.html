@@ -1,10 +1,10 @@
 {% load i18n %}
 
-{% with modal_id="delete-item-modal-"|add:dashboard_item.name|slugify form_id="delete-item-form-"|add:dashboard_item.name|slugify %}
+{% with modal_id="delete-item-modal-"|add:item_id form_id="delete-item-form-"|add:item_id %}
     <form id={{ form_id }} method="post" action="{% url "delete_dashboard_item" organization_code=organization.code %}">
         {% csrf_token %}
-        <input type="hidden" name="dashboard_item" value="{{ dashboard_item.name }}">
-        <input type="hidden" name="dashboard" value="{{ dashboard_item.id }}">
+        <input type="hidden" name="dashboard_item" value="{{ name }}">
+        <input type="hidden" name="dashboard" value="{{ item_id }}">
     </form>
     {% component "modal" modal_id=modal_id size="dialog-small" %}
     {% fill "header" %}
@@ -12,7 +12,7 @@
 {% endfill %}
 {% fill "content" %}
 <p>
-    {% blocktranslate trimmed with name=dashboard_item.name %}
+    {% blocktranslate trimmed with name=name %}
         Are you sure you want to delete '{{ name }}' from this dashboard?
     {% endblocktranslate %}
 </p>

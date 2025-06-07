@@ -96,7 +96,7 @@
             </tbody>
         </table>
     </div>
-{% elif is_dashboard_findings %}
+{% elif is_dashboard_findings or is_dashboard %}
     <p>{% translate "No critical and high findings have been identified for this organization." %}</p>
 {% else %}
     <p>{% translate "No findings have been identified for this organization." %}</p>

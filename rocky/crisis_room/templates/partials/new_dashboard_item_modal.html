@@ -19,21 +19,6 @@
     {% include "forms/new_dashboard_item_form_fields.html" %}
     {% include "partials/form/fieldset.html" with fields=object_list_settings_form form_view="horizontal" %}
 
-    <label>
-        {% translate "Show table columns" %}
-        <span class="nota-bene" aria-hidden="">({% translate "Required" %})</span>
-    </label>
-    {% for key, column_name in table_columns.items %}
-        <div class="checkbox">
-            <input type="checkbox"
-                   name="column_values"
-                   value="{{ key }}"
-                   checked
-                   id="column_{{ key }}">
-            <input type="hidden" name="column_names" value="{{ column_name }}">
-            <label for="column_{{ key }}">{{ column_name }}</label>
-        </div>
-    {% endfor %}
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
