@@ -2258,8 +2258,8 @@ def dashboard_items(redteam_member):
         dashboard=dashboard,
         name="URLs",
         query_from="object_list",
-        query='{"ooi_types": ["URL"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
-        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        query='{"observed_at":"2015-06-06", "ooi_type": ["URL"], "clearance_level": [], "clearance_type": [],'
+        '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
             "size": "1",
             "columns": {
@@ -2275,8 +2275,8 @@ def dashboard_items(redteam_member):
         dashboard=dashboard,
         name="Hostnames",
         query_from="object_list",
-        query='{"ooi_types": ["Hostname"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
-        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        query='{"observed_at":"2015-06-06", "ooi_type": ["Hostname"], "clearance_level": [], "clearance_type": [],'
+        '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
             "size": "1",
             "columns": {
@@ -2292,8 +2292,8 @@ def dashboard_items(redteam_member):
         dashboard=dashboard,
         name="IPs",
         query_from="object_list",
-        query='{"ooi_types": ["IPAddress"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
-        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        query='{"observed_at":"2015-06-06", "ooi_type": ["IPAddress"], "clearance_level": [], "clearance_type": [],'
+        '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
             "size": "1",
             "columns": {
@@ -2309,8 +2309,8 @@ def dashboard_items(redteam_member):
         dashboard=dashboard,
         name="Networks",
         query_from="object_list",
-        query='{"ooi_types": ["Network"], "scan_level": [], "scan_profile_type": [], "search_string": "", '
-        '"order_by": "object_type", "asc_desc": "asc", "limit": 20}',
+        query='{"observed_at":"2015-06-06", "ooi_type": ["Network"], "clearance_level": [], "clearance_type": [],'
+        '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
             "size": "1",
             "columns": {
@@ -2336,8 +2336,8 @@ def dashboard_items_from_findings_list(redteam_member):
         dashboard=dashboard,
         name="Medium severity findings",
         query_from="findings_list",
-        query='{"order_by": "score", "asc_desc": "asc", "limit": 5, "severities": ["medium"], '
-        '"exclude_muted": true, "only_muted": false, "search_string": ""}',
+        query='{"observed_at":"2015-06-06", "order_by": "score", "asc_desc": "asc", "limit": 5,'
+        '"severities": ["medium"], "exclude_muted": true, "only_muted": false, "search_string": ""}',
         settings={
             "size": "2",
             "columns": {
