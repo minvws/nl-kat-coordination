@@ -72,6 +72,10 @@ class Settings(BaseSettings):
 
     workers: int = Field(4, description="Number of Octopoes Celery workers")
 
+    asset_reports: bool = Field(
+        True, description="Save asset reports for each OOI and report type", validation_alias="ASSET_REPORTS"
+    )
+
     model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
     @classmethod

@@ -133,7 +133,7 @@
                             </td>
                             <td class="report_oois">
                                 {% if report.total_objects == 1 %}
-                                    <a href="{% ooi_url "ooi_detail" report.report.input_oois.0.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.report.input_oois.0.input_ooi|human_readable }}</a>
+                                    <a href="{% ooi_url "ooi_detail" report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.input_oois.0|human_readable }}</a>
                                 {% else %}
                                     {{ report.total_objects }}
                                 {% endif %}
