@@ -131,6 +131,8 @@ def save_report_data(
 
     plugins = report_plugins_union([get_report_by_id(type_id) for type_id in recipe.asset_report_types])
 
+    input_oois: list[str | Reference]
+
     if settings.ASSET_REPORTS:
         asset_reports = create_asset_reports(
             bytes_client, plugins, observed_at, observed_at, octopoes_api_connector, organization, recipe, report_data
