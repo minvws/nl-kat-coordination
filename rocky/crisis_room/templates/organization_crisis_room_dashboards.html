@@ -45,9 +45,9 @@
                                 <div class="horizontal-view">
                                     <h3>{{ dashboard_item.item.name }}</h3>
                                     <span class="label system-tag color-grey">
-                                        {% if dashboard_item.item.query_from == "object_list" %}
+                                        {% if dashboard_item.item.source == "object_list" %}
                                             {% translate "Object list" %}
-                                        {% elif dashboard_item.item.query_from == "finding_list" %}
+                                        {% elif dashboard_item.item.source == "finding_list" %}
                                             {% translate "Finding list" %}
                                         {% endif %}
                                     </span>

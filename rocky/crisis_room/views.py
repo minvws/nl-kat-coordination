@@ -107,10 +107,10 @@ class DashboardService:
 
         # First collect al data, if recipe id is found then fetch recipe ids to get reports later.
         for dashboard_item in dashboard_items:
-            if not dashboard_item.recipe and dashboard_item.query_from == "object_list":
+            if not dashboard_item.recipe and dashboard_item.source == "object_list":
                 item_data = DashboardItemView(dashboard_item, self.get_ooi_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
-            elif not dashboard_item.recipe and dashboard_item.query_from == "finding_list":
+            elif not dashboard_item.recipe and dashboard_item.source == "finding_list":
                 item_data = DashboardItemView(dashboard_item, self.get_finding_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
             elif dashboard_item.recipe:

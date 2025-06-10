@@ -57,7 +57,7 @@ class DashboardItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
-    query_from = models.CharField(blank=True, max_length=32)
+    source = models.CharField(blank=True, max_length=32)
     query = models.CharField(blank=True)
     template = models.CharField(blank=True, max_length=126, default=FINDINGS_DASHBOARD_TEMPLATE)
     position = models.PositiveSmallIntegerField(
@@ -111,10 +111,10 @@ class DashboardItem(models.Model):
     def clean(self) -> None:
         if self.recipe and self.query:
             raise ValidationError(_("You have to choose between a recipe or a query, but not both."))
-        if self.query and not self.query_from:
-            raise ValidationError(_("You have set a query and not where it is from. Also set the query_from."))
-        if not self.recipe and not self.query_from and not self.query:
-            raise ValidationError(_("DashboardItem must contain at least a 'recipe' or a 'query_from' with a 'query'."))
+        if self.query and not self.source:
+            raise ValidationError(_("You have set a query and not where it is from. Also set the source."))
+        if not self.recipe and not self.source and not self.query:
+            raise ValidationError(_("DashboardItem must contain at least a 'recipe' or a 'source' with a 'query'."))
         return super().clean()
 
     def update_position(self, move: Literal["up", "down"]) -> None:
