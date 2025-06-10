@@ -313,13 +313,13 @@ The XTDB-cli tool can be queried as shown below.
 
 From the environment:
 
-```
+```bash
 $ ./xtdb-cli.py -h
 ```
 
 Or from inside the container, using a new `octopoes_api` container instance:
 
-```
+```bash
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py -h
 
 Usage: xtdb-cli.py [OPTIONS] COMMAND [ARGS]...
@@ -358,7 +358,7 @@ Commands:
 
 The help file for the commands can be queried as shown below.
 
-```
+```bash
 
 $ ./xtdb-cli.py history -h
 Usage: xtdb-cli.py history [OPTIONS] KEY
@@ -375,7 +375,7 @@ Options:
 
 The output below gives an example for querying the XTDB database for an organisation called 'MyOrganisationName'. This is the organisation code, not the organisation name and can be found in the organisation overview at: `http://127.0.0.1:8000/en/organizations/` listed in the code column.
 
-```
+```bash
 
 $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
 {
@@ -398,7 +398,7 @@ $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
 
 In these examples we supply the Dockerized calls, expecting the server to be available on localhost:3000 and we use an organization or `node` that's called 'test'
 
-```
+```bash
 
 # list all network OOIs
 
@@ -440,7 +440,7 @@ octopoes/octopoes/config/settings.py
 
 Run a `make reset` in your KAT instance to enable the setting:
 
-```
+```bash
 
 make reset
 
@@ -448,17 +448,17 @@ make reset
 
 Create some data by adding a hostname, enable some boefjes, etc. This will allow the bit metrics to be gathered. You can query the bit metrics using the following commands. The `node` is the name of your organisation. In this example the organisation name is 'aa'.
 
-```
+```bash
 
 python3 octopoes/tools/analyze-bit-metric.py --node "aa" raw |jq
 
 ```
 
-```
+```bash
 
 python3 octopoes/tools/xtdb-cli.py -n "aa" history --with-docs "BIT_METRIC" |jq
 
-````
+```
 
 If you want to query the XTDB database directly, you can use the XTDB-tool. This is explained on the following page: https://docs.openkat.nl/developer_documentation/octopoes.html#xtdb-cli-tool.
 
