@@ -491,7 +491,7 @@ john = Person(name='John', last_name='Doe', age=42)
 # And without having to search this person in a central database, the primary key is known:
 john.natural_key # 'John/Doe'
 john.primary_key # 'Person/John/Doe'
-````
+```
 
 _Note that the primary key consists of the natural key prefixed by the OOI-type, to avoid PK collisions_
 
