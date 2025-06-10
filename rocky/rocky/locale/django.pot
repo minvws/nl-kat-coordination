@@ -154,9 +154,8 @@ msgstr ""
 msgid "Acknowledged to change Clearance Levels."
 msgstr ""
 
-#: account/forms/account_setup.py
+#: account/forms/account_setup.py rocky/forms.py
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/views/organization_member_list.py
 msgid "Blocked"
 msgstr ""
 
@@ -5446,6 +5445,26 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
+#: rocky/forms.py
+msgid "Current status"
+msgstr ""
+
+#: rocky/forms.py rocky/templates/organizations/organization_member_list.html
+msgid "Active"
+msgstr ""
+
+#: rocky/forms.py rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
+#: rocky/forms.py
+msgid "Account status"
+msgstr ""
+
+#: rocky/forms.py
+msgid "Not blocked"
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -6498,7 +6517,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgid "An overview of members of <strong>%(organization_name)s</strong>"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6539,14 +6558,6 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Super user"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "Active"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "New"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
@@ -6856,14 +6867,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
-msgstr ""
-
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Shown status types"
-msgstr ""
-
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Blocked status"
 msgstr ""
 
 #: rocky/templates/partials/organization_member_list_filters.html
@@ -7666,10 +7669,6 @@ msgstr ""
 msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
-msgstr ""
-
-#: rocky/views/organization_member_list.py
-msgid "Not blocked"
 msgstr ""
 
 #: rocky/views/organization_member_list.py
