@@ -3,29 +3,37 @@
 
 {% if dashboard %}
     <div>
-        <div class="horizontal-view">
-            <h2>{{ dashboard.name }}</h2>
-            {% if organization_member.can_delete_dashboard %}
-                <div class="dropdown">
-                    <button id="action-dropdown-button"
-                            type="button"
-                            aria-label="{% translate "Options for dashboard" %}"
-                            aria-haspopup="menu"
-                            aria-controls="action-dropdown"
-                            aria-expanded="false"
-                            class="icon-only ti-dots-vertical dropdown-button"></button>
-                    <div id="action-dropdown"
-                         class="dropdown-list"
-                         role="menu"
-                         aria-labelledby="action-dropdown-button">
-                        <ul role="presentation">
-                            <li>
-                                <a href="#delete-dashboard-modal" class="plain destructive">
-                                    <i class="icon ti-trash"></i>{% translate "Delete dashboard" %}
-                                </a>
-                            </li>
-                        </ul>
+        <div class="fifty-fifty">
+            <div class="horizontal-view">
+                <h2>{{ dashboard.name }}</h2>
+                {% if organization_member.can_delete_dashboard %}
+                    <div class="dropdown">
+                        <button id="action-dropdown-button"
+                                type="button"
+                                aria-label="{% translate "Options for dashboard" %}"
+                                aria-haspopup="menu"
+                                aria-controls="action-dropdown"
+                                aria-expanded="false"
+                                class="icon-only ti-dots-vertical dropdown-button"></button>
+                        <div id="action-dropdown"
+                             class="dropdown-list"
+                             role="menu"
+                             aria-labelledby="action-dropdown-button">
+                            <ul role="presentation">
+                                <li>
+                                    <a href="#delete-dashboard-modal" class="plain destructive">
+                                        <i class="icon ti-trash"></i>{% translate "Delete dashboard" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+                {% endif %}
+            </div>
+            {% if organization_member.can_add_dashboard %}
+                <div class="toolbar">
+                    {% include "partials/new_dashboard_item_action_button.html" %}
+
                 </div>
             {% endif %}
         </div>
@@ -113,26 +121,11 @@
                         dashboard items via the objects and findings page.
                     {% endblocktranslate %}
                 </p>
-                <div class="dropdown">
-                    <button aria-label="{% translate "Actions for adding dashboard items" %}"
-                            aria-controls="add-item-dropdown"
-                            aria-expanded="false"
-                            class="dropdown-button ghost">
-                        {% translate "Add dashboard item from" %}
-                        <span class="icon ti-chevron-down" aria-hidden="true"></span>
-                    </button>
-                    <div id="add-item-dropdown"
-                         class="dropdown-list"
-                         aria-labelledby="add-item-dropdown-button">
-                        <ul>
-                            <li>
-                                <a href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Objects" %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url "finding_list" organization_code=organization.code %}">{% translate "Findings" %}</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="button-container">
+                    <a class="button ghost"
+                       href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Add objects" %}</a>
+                    <a class="button ghost"
+                       href="{% url "finding_list" organization_code=organization.code %}">{% translate "Add findings" %}</a>
                 </div>
             </div>
         {% endif %}
