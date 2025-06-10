@@ -1,7 +1,7 @@
 import uuid
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from typing import Any, Literal
+from typing import Any, Literal, override
 
 from opentelemetry import trace
 
@@ -445,6 +445,7 @@ class BoefjeScheduler(Scheduler):
                     caller=caller,
                 )
 
+    @override
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue.
@@ -465,6 +466,62 @@ class BoefjeScheduler(Scheduler):
             item.data = boefje_task.model_dump()
 
         return super().push_item_to_queue(item=item, create_schedule=create_schedule)
+
+    @override
+    def pop_item_from_queue(
+        self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.Task]:
+        """Some boefje scheduler specific logic before popping the item
+
+        Adds an additional check for potential deduplicated tasks at the time
+        of popping tasks off the queue. It will check if there are currently
+        tasks on the queue that have the same signature as the deduplicated
+        tasks that are about to get popped off. If so it will check the
+        potential similar tasks if they can be deduplicated.
+        """
+        items = self.queue.pop(limit, filters)
+        if not items:
+            self.logger.debug(
+                "No items popped from queue %s",
+                self.queue.pq_id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return []
+
+        dupe_tasks = self.ctx.datastores.pq_store.get_possible_duplicate_boefje_tasks(
+            self.scheduler_id, items[0].data.get("boefje", {}).get("id", ""), items[0].data.get("input_ooi")
+        )
+        if not dupe_tasks or items[0].data.get("deduplication_key") is None:
+            self.post_pop(items)
+            return items
+
+        configs = self.ctx.services.katalogus.get_configs(
+            boefje_id=items[0].data.get("boefje", {}).get("id", ""),
+            organisation_id=items[0].data.get("organization"),
+            enabled=True,
+            with_duplicates=True,
+        )
+        orgs_in_configs = {
+            config.organisation_id for config in configs[0].duplicates if config.organisation_id is not None
+        }
+
+        for dupe_task in dupe_tasks:
+            if dupe_task.organisation not in orgs_in_configs:
+                continue
+
+            # Update its deduplication key, and set its status to DISPATCHED
+            dupe_task.data["deduplication_key"] = items[0].data["deduplication_key"]
+            dupe_task.status = models.TaskStatus.DISPATCHED
+            self.ctx.datastores.task_store.update_task(dupe_task)
+
+            # We have a dupe task, that was not in the original pop. We
+            # need to add it to the items list, so that it can be
+            # processed by the task runner.
+            items.append(dupe_task)
+
+        self.post_pop(items)
+        return items
 
     def has_boefje_permission_to_run(self, boefje: models.Plugin, ooi: models.OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
@@ -788,50 +845,3 @@ class BoefjeScheduler(Scheduler):
             schedule.deadline_at = datetime.now(timezone.utc) + timedelta(minutes=plugin.interval)
 
         return super().calculate_deadline(schedule)
-
-    def pop_item_from_queue(
-        self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
-    ) -> list[models.Task]:
-        items = self.queue.pop(limit, filters)
-        if not items:
-            self.logger.debug(
-                "No items popped from queue %s",
-                self.queue.pq_id,
-                queue_id=self.queue.pq_id,
-                scheduler_id=self.scheduler_id,
-            )
-            return []
-
-        dupe_tasks = self.ctx.datastores.pq_store.get_possible_duplicate_boefje_tasks(
-            self.scheduler_id, items[0].data.get("boefje", {}).get("id", ""), items[0].data.get("input_ooi")
-        )
-        if not dupe_tasks or items[0].data.get("deduplication_key") is None:
-            self.post_pop(items)
-            return items
-
-        configs = self.ctx.services.katalogus.get_configs(
-            boefje_id=items[0].data.get("boefje", {}).get("id", ""),
-            organisation_id=items[0].data.get("organization"),
-            enabled=True,
-            with_duplicates=True,
-        )
-        orgs_in_configs = {
-            config.organisation_id for config in configs[0].duplicates if config.organisation_id is not None
-        }
-
-        for dupe_task in dupe_tasks:
-            if dupe_task.organisation not in orgs_in_configs:
-                continue
-
-            # Update its deduplication key, and set its status to DISPATCHED
-            dupe_task.data["deduplication_key"] = items[0].data["deduplication_key"]
-            dupe_task.status = models.TaskStatus.DISPATCHED
-            self.ctx.datastores.task_store.update_task(dupe_task)
-
-            # We have a dupe task, that was not in the original pop. We
-            # need to add it to the items list, so that it can be
-            # processed by the task runner.
-            items.append(dupe_task)
-
-        self.post_pop(items)
-        return items
