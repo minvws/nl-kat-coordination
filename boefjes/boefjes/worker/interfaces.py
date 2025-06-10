@@ -1,0 +1,103 @@
+import datetime
+import uuid
+from enum import Enum
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+# A deliberate relative import to make this module self-contained
+from .job_models import BoefjeMeta, NormalizerMeta
+
+
+class JobRuntimeError(RuntimeError):
+    """Base exception class for exceptions raised during running of jobs"""
+
+
+class Queue(BaseModel):
+    id: str
+    size: int
+
+
+class TaskStatus(Enum):
+    """Status of a task."""
+
+    PENDING = "pending"
+    QUEUED = "queued"
+    DISPATCHED = "dispatched"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class Task(BaseModel):
+    id: uuid.UUID
+    scheduler_id: str
+    schedule_id: str | None
+    organisation: str
+    priority: int
+    status: TaskStatus
+    type: str
+    hash: str | None = None
+    data: BoefjeMeta | NormalizerMeta
+    created_at: datetime.datetime
+    modified_at: datetime.datetime
+
+
+class TaskPop(BaseModel):
+    results: list[Task]
+
+
+class StatusEnum(str, Enum):
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class File(BaseModel):
+    name: str
+    content: str = Field(json_schema_extra={"contentEncoding": "base64"})
+    tags: list[str] | None = None
+
+
+class BoefjeInput(BaseModel):
+    output_url: str
+    task: Task
+    model_config = ConfigDict(extra="forbid")
+
+
+class BoefjeOutput(BaseModel):
+    status: StatusEnum
+    files: list[File] | None = None
+
+
+class Handler:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+        raise NotImplementedError()
+
+
+class PaginatedTasksResponse(BaseModel):
+    count: int
+    next: str | None = None
+    previous: str | None = None
+    results: list[Task]
+
+
+class SchedulerClientInterface:
+    def pop_items(
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+    ) -> list[Task]:
+        raise NotImplementedError()
+
+    def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
+        raise NotImplementedError()
+
+    def get_task(self, task_id: uuid.UUID) -> Task:
+        raise NotImplementedError()
+
+    def push_item(self, p_item: Task) -> None:
+        raise NotImplementedError()
+
+
+class BoefjeStorageInterface:
+    def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
+        raise NotImplementedError()

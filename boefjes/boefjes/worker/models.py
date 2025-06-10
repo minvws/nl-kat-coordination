@@ -106,11 +106,6 @@ class Bit(Plugin):
 PluginType = Boefje | Normalizer | Bit
 
 
-class EncryptionMiddleware(Enum):
-    IDENTITY = "IDENTITY"
-    NACL_SEALBOX = "NACL_SEALBOX"
-
-
 class PaginationParameters(BaseModel):
     offset: int = 0
     limit: int | None = None
