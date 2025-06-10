@@ -174,15 +174,18 @@ class BoefjeScheduler(Scheduler):
                 continue
 
             boefje_tasks.append(
-                models.BoefjeTask(
-                    boefje=models.Boefje.model_validate(boefje.model_dump()),
-                    input_ooi=ooi.primary_key if ooi else None,
-                    organization=mutation.client_id,
+                (
+                    models.BoefjeTask(
+                        boefje=models.Boefje.model_validate(boefje.model_dump()),
+                        input_ooi=ooi.primary_key if ooi else None,
+                        organization=mutation.client_id,
+                    ),
+                    create_schedule,
                 )
             )
 
         with futures.ThreadPoolExecutor(thread_name_prefix=f"TPE-{self.scheduler_id}-mutations") as executor:
-            for boefje_task in boefje_tasks:
+            for boefje_task, create_schedule in boefje_tasks:
                 executor.submit(
                     self.push_boefje_task,
                     boefje_task,
