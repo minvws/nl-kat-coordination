@@ -9,7 +9,7 @@ from pydantic import AnyUrl, BaseModel
 from xxhash import xxh3_128_hexdigest as xxh3
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
@@ -186,12 +186,15 @@ class NibblesRunner:
         }
 
     def _check_arg_scan_level(self, nibble: NibbleDefinition, arg: Iterable, valid_time: datetime) -> bool:
+        scan_profiles = self.scan_profile_repository.get_bulk(
+            {a.reference for a in arg if isinstance(a, OOI)}, valid_time
+        )
         return nibble.check_scan_levels(
             [
-                sp.level
-                for sp in self.scan_profile_repository.get_bulk(
-                    {a.reference for a in arg if isinstance(a, OOI)}, valid_time
-                )
+                next((sp.level for sp in scan_profiles if sp.reference == a.reference), ScanLevel.L0)
+                if isinstance(a, OOI)
+                else ScanLevel.L0
+                for a in arg
             ]
         )
 
