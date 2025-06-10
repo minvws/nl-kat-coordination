@@ -271,8 +271,9 @@ def slowest_queries(ctx: click.Context):
 
 
 @cli.command(
-    help="""Deletes all OOI's of the given type with an evict. (OOITypes are Case sensitive). 
-    This does not remove the assoiated Origins or References and might leave your database in an unknown state for some related objects."""
+    help="""Deletes all OOI's of the given type with an evict. (OOITypes are Case sensitive).
+    This does not remove the associated Origins or References and might leave your database in an unknown state for
+    some related objects."""
 )
 @click.option("--ooitype", help="The type of OOI to evict")
 @click.pass_context
