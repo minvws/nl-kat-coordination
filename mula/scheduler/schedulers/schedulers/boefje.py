@@ -793,7 +793,7 @@ class BoefjeScheduler(Scheduler):
         self, limit: int | None = None, filters: storage.filters.FilterRequest | None = None
     ) -> list[models.Task]:
         items = self.queue.pop(limit, filters)
-        if items is None or len(items) == 0:
+        if not items:
             self.logger.debug(
                 "No items popped from queue %s",
                 self.queue.pq_id,
