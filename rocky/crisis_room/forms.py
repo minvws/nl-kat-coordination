@@ -147,6 +147,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
             ("scan_level-asc", _("Clearance level (Low-High)")),
             ("scan_level-desc", _("Clearance level (High-Low)")),
         ),
+        initial="scan_level-desc",
     )
     columns = forms.MultipleChoiceField(
         label=_("Show table columns"),
