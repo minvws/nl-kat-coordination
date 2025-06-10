@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 09:23+0000\n"
+"POT-Creation-Date: 2025-06-03 07:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,11 +79,7 @@ msgid "--- Please select one of the available options ----"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Account Type"
-msgstr ""
-
-#: account/forms/account_setup.py
-msgid "Every member of OpenKAT must be part of an account type."
+msgid "Account type"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -5161,6 +5157,10 @@ msgstr ""
 msgid "Show Boefjes that exceed the objects clearance level."
 msgstr ""
 
+#: tools/forms/ooi.py
+msgid "Expires by (UTC)"
+msgstr ""
+
 #: tools/forms/ooi_form.py
 msgid "option"
 msgstr ""
@@ -5401,6 +5401,10 @@ msgstr ""
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
 msgid "Upload raw file"
+msgstr ""
+
+#: tools/forms/upload_raw.py
+msgid "Input or Scan OOI"
 msgstr ""
 
 #: tools/forms/upload_raw.py
@@ -6096,7 +6100,10 @@ msgid "Add %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_add_type_select.html
-msgid "Manual creation"
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html
+#: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
+msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_add_type_select.html
@@ -6220,7 +6227,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/oois/ooi_detail_object.html
-#: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Object details"
 msgstr ""
 
@@ -6237,12 +6243,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Select an object type to add."
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/elements/ooi_add_type_select_form.html
-#: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
-msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -6489,23 +6489,21 @@ msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_add.html
-msgid " member account setup"
+msgid "Change account type"
 msgstr ""
 
-#: rocky/templates/organizations/organization_member_add.html
-msgid "Member details"
+#: rocky/templates/organizations/organization_member_add_header.html
+#: rocky/views/organization_member_add.py
+msgid "Add member"
 msgstr ""
 
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Member account type setup"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Choose an account type for this new member."
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Account type details"
+#: rocky/templates/organizations/organization_member_add_header.html
+#, python-format
+msgid ""
+"Creating a new member of organization <strong>%(organization)s</strong>. For "
+"detailed information about the different account types, check the <a "
+"href=\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" "
+"target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_edit.html
@@ -6563,20 +6561,19 @@ msgid "Super user"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
-msgid "Upload a csv file with members for organisation"
+#: rocky/views/organization_member_add.py
+msgid "Add members"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
-msgid "Download the template"
+#, python-format
+msgid ""
+"To upload multiple members at once, you can upload a CSV file or you can <a "
+"href=\"%(download_url)s\">download the template</a>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
-msgid "or create a csv file with the following criteria"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_upload.html
-#: rocky/templates/upload_csv.html
-msgid "These are the criteria for CSV upload:"
+msgid "To create a custom CSV file, make sure it meets the following criteria:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
@@ -7403,6 +7400,10 @@ msgstr ""
 msgid "Automate the creation of multiple objects by uploading a CSV file."
 msgstr ""
 
+#: rocky/templates/upload_csv.html
+msgid "These are the criteria for CSV upload:"
+msgstr ""
+
 #: rocky/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
 msgstr ""
@@ -7442,10 +7443,6 @@ msgstr ""
 
 #: rocky/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
-msgstr ""
-
-#: rocky/views/ooi_add.py
-msgid "Type select"
 msgstr ""
 
 #: rocky/views/ooi_add.py
@@ -7607,8 +7604,8 @@ msgstr ""
 msgid "Organization %s successfully updated."
 msgstr ""
 
-#: rocky/views/organization_member_add.py rocky/views/upload_csv.py
-msgid "Add column titles. Followed by each object on a new line."
+#: rocky/views/organization_member_add.py
+msgid "Add column titles, followed by each object on a new line."
 msgstr ""
 
 #: rocky/views/organization_member_add.py
@@ -7624,15 +7621,7 @@ msgid "Account type can be one of: "
 msgstr ""
 
 #: rocky/views/organization_member_add.py
-msgid "Add Account Type"
-msgstr ""
-
-#: rocky/views/organization_member_add.py
 msgid "Member added successfully."
-msgstr ""
-
-#: rocky/views/organization_member_add.py
-msgid "Add Member"
 msgstr ""
 
 #: rocky/views/organization_member_add.py
@@ -7728,6 +7717,10 @@ msgstr ""
 
 #: rocky/views/tasks.py
 msgid "All Tasks"
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid "Add column titles. Followed by each object on a new line."
 msgstr ""
 
 #: rocky/views/upload_csv.py
