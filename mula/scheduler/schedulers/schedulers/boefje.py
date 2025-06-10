@@ -1,9 +1,10 @@
 import uuid
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from typing import Any, Literal, override
+from typing import Any, Literal
 
 from opentelemetry import trace
+from typing_extensions import override
 
 from scheduler import clients, context, models, storage
 from scheduler.models import MutationOperationType
@@ -830,6 +831,7 @@ class BoefjeScheduler(Scheduler):
 
         return tasks
 
+    @override
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
         for a task and based on the boefje interval."""
