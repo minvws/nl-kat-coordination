@@ -321,7 +321,6 @@ Or from inside the container, using a new `octopoes_api` container instance:
 
 ```
 $ docker compose run --rm octopoes_api tools/xtdb-cli.py -h
-```
 
 Usage: xtdb-cli.py [OPTIONS] COMMAND [ARGS]...
 
@@ -355,7 +354,6 @@ Commands:
  tx-committed         Checks if a submitted tx was successfully committed, returning a map with tx-committed and...
  tx-log               Returns a list of all transactions, from oldest to newest transaction time - optionally...
  txs                  Show all document transactions
-
 ```
 
 The help file for the commands can be queried as shown below.
