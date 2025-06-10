@@ -2257,7 +2257,7 @@ def dashboard_items(redteam_member):
     dashboard_item_1 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="URLs",
-        query_from="object_list",
+        source="object_list",
         query='{"observed_at":"2015-06-06", "ooi_type": ["URL"], "clearance_level": [], "clearance_type": [],'
         '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
@@ -2274,7 +2274,7 @@ def dashboard_items(redteam_member):
     dashboard_item_2 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="Hostnames",
-        query_from="object_list",
+        source="object_list",
         query='{"observed_at":"2015-06-06", "ooi_type": ["Hostname"], "clearance_level": [], "clearance_type": [],'
         '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
@@ -2291,7 +2291,7 @@ def dashboard_items(redteam_member):
     dashboard_item_3 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="IPs",
-        query_from="object_list",
+        source="object_list",
         query='{"observed_at":"2015-06-06", "ooi_type": ["IPAddress"], "clearance_level": [], "clearance_type": [],'
         '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
@@ -2308,7 +2308,7 @@ def dashboard_items(redteam_member):
     dashboard_item_4 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="Networks",
-        query_from="object_list",
+        source="object_list",
         query='{"observed_at":"2015-06-06", "ooi_type": ["Network"], "clearance_level": [], "clearance_type": [],'
         '"search": "", "order_by": "object_type", "sorting_order": "asc", "limit": 20}',
         settings={
@@ -2335,7 +2335,7 @@ def dashboard_items_from_findings_list(redteam_member):
     dashboard_item_1 = DashboardItem.objects.create(
         dashboard=dashboard,
         name="Medium severity findings",
-        query_from="findings_list",
+        source="findings_list",
         query='{"observed_at":"2015-06-06", "order_by": "score", "asc_desc": "asc", "limit": 5,'
         '"severities": ["medium"], "exclude_muted": true, "only_muted": false, "search_string": ""}',
         settings={

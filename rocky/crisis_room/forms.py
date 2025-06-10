@@ -42,7 +42,7 @@ class AddDashboardItemForm(BaseRockyForm):
         self.organization = organization
         self.fields["dashboard"].choices = self.get_dashboard_selection()
         self.recipe_id = None
-        self.query_from = ""
+        self.source = ""
         self.template = ""
         self.display_in_dashboard = True
         self.table_columns = {}
@@ -123,7 +123,7 @@ class AddDashboardItemForm(BaseRockyForm):
                     "dashboard": dashboard,
                     "name": name,
                     "recipe": self.recipe_id,
-                    "query_from": self.query_from,
+                    "source": self.source,
                     "query": json.dumps(self.get_query()),
                     "template": self.template,
                     "settings": self.get_settings(),
@@ -158,7 +158,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
-        self.query_from = "object_list"
+        self.source = "object_list"
         self.template = "partials/dashboard_ooi_list.html"
         self.table_columns = OBJECT_LIST_COLUMNS
 
@@ -196,7 +196,7 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
-        self.query_from = "finding_list"
+        self.source = "finding_list"
         self.template = "partials/dashboard_finding_list.html"
         self.table_columns = FINDING_LIST_COLUMNS
 

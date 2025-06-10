@@ -431,7 +431,7 @@ def test_create_dashboard_item_form_object_list(client_member, dashboard_items):
             "search_string": "",
             "template": "partials/dashboard_ooi_list.html",
             "recipe_id": "",
-            "query_from": "object_list",
+            "source": "object_list",
         }
     )
 
@@ -542,7 +542,7 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
             "observed_at": "2025-05-07",
             "exclude_muted": "True",
             "only_muted": "False",
-            "query_from": "finding_list",
+            "source": "finding_list",
         }
     )
 
