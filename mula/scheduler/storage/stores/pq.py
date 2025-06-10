@@ -87,7 +87,7 @@ class PriorityQueueStore:
 
     def get_possible_duplicate_boefje_tasks(
         self, scheduler_id: str, boefje_id: str, input_ooi: str
-    ) -> list[models.Task] | None:
+    ) -> list[models.Task]:
         """Get all tasks with the same boefje id and ooi exists in the queue that doesn't have a deduplication key."""
         with self.dbconn.session.begin() as session:
             query = (
@@ -100,13 +100,7 @@ class PriorityQueueStore:
             )
 
             items_orm = query.all()
-
-            if not items_orm:
-                return None
-
-            items = [models.Task.model_validate(item_orm) for item_orm in items_orm]
-
-            return items
+            return [models.Task.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
     @exception_handler
