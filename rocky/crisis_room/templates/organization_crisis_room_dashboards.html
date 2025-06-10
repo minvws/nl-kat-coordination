@@ -121,26 +121,11 @@
                         dashboard items via the objects and findings page.
                     {% endblocktranslate %}
                 </p>
-                <div class="dropdown">
-                    <button aria-label="{% translate "Actions for adding dashboard items" %}"
-                            aria-controls="add-item-dropdown"
-                            aria-expanded="false"
-                            class="dropdown-button ghost">
-                        {% translate "Add dashboard item from" %}
-                        <span class="icon ti-chevron-down" aria-hidden="true"></span>
-                    </button>
-                    <div id="add-item-dropdown"
-                         class="dropdown-list"
-                         aria-labelledby="add-item-dropdown-button">
-                        <ul>
-                            <li>
-                                <a href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Objects" %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url "finding_list" organization_code=organization.code %}">{% translate "Findings" %}</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="button-container">
+                    <a class="button ghost"
+                       href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Add objects" %}</a>
+                    <a class="button ghost"
+                       href="{% url "finding_list" organization_code=organization.code %}">{% translate "Add findings" %}</a>
                 </div>
             </div>
         {% endif %}
