@@ -15,6 +15,7 @@ from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.text import slugify
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from httpx import HTTPStatusError, ReadTimeout
@@ -442,6 +443,8 @@ class UpdateDashboardItemView(OrganizationView):
                     "organization_crisis_room",
                     kwargs={"organization_code": self.organization.code, "id": dashboard_item.dashboard.id},
                 )
+                + "#dashboard-item-"
+                + slugify(dashboard_item.name)
             )
         except DashboardItem.DoesNotExist:
             messages.error(request, "Dashboard item not found.")

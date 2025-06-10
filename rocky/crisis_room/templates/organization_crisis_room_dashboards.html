@@ -51,7 +51,7 @@
                             {% endif %}
                             <div class="dashboard-item">
                                 <div class="horizontal-view">
-                                    <h3>{{ dashboard_item.item.name }}</h3>
+                                    <h3 id="dashboard-item-{{ dashboard_item.item.name|slugify }}">{{ dashboard_item.item.name }}</h3>
                                     <span class="label system-tag color-grey">
                                         {% if dashboard_item.item.query_from == "object_list" %}
                                             {% translate "Object list" %}
