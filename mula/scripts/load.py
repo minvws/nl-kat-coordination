@@ -123,10 +123,14 @@ def create_oois(orgs: list[dict[str, Any]], ooi_num: int = 10) -> None:
             logger.info("Org %s created scan profile %s", org.get("id"), declaration.get("ooi").get("scan_profile"))
 
 
-def enable_boefjes(orgs: list[dict[str, Any]]) -> None:
+def enable_boefjes(orgs: list[dict[str, Any]], boefjes_str: str = "dns-records,dns-zone") -> None:
+    boefjes = [boefje.strip() for boefje in boefjes_str.split(",")]
+    if not boefjes:
+        logger.info("No boefjes specified to enable")
+        return
+
     for org in orgs:
         # Enable boefjes for organisation
-        boefjes = ("dns-records", "dns-sec", "dns-zone")
         for boefje_id in boefjes:
             resp_enable_boefje = katalogus_client.patch(
                 url=f"/v1/organisations/{org.get('id')}/plugins/{boefje_id}", json={"enabled": True}, timeout=30
@@ -141,7 +145,7 @@ def enable_boefjes(orgs: list[dict[str, Any]]) -> None:
             logger.info("Enabled boefje %s", boefje_id)
 
 
-def run(org_num: int = 1, ooi_num: int = 10) -> None:
+def run(org_num: int = 1, ooi_num: int = 10, boefjes_str: str = "dns-records,dns-zone") -> None:
     # Create organisations
     orgs: list[dict[str, Any]] = create_organisations(org_num=org_num)
 
@@ -149,7 +153,7 @@ def run(org_num: int = 1, ooi_num: int = 10) -> None:
     create_oois(orgs=orgs, ooi_num=ooi_num)
 
     # Enable boefjes
-    enable_boefjes(orgs=orgs)
+    enable_boefjes(orgs=orgs, boefjes_str=boefjes_str)
 
 
 if __name__ == "__main__":
@@ -161,7 +165,11 @@ if __name__ == "__main__":
 
     parser.add_argument("--oois", type=int, default=10, help="Number of OOIs to create per organisation")
 
+    parser.add_argument(
+        "--boefjes", type=str, default="dns-records,dns-zone", help="Comma-separated list of boefjes to enable"
+    )
+
     # Parse arguments
     args = parser.parse_args()
 
-    run(org_num=args.orgs, ooi_num=args.oois)
+    run(org_num=args.orgs, ooi_num=args.oois, boefjes_str=args.boefjes)
