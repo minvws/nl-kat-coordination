@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from httpx import codes
 from starlette.responses import JSONResponse
 
-from bytes.api.models import BoefjeOutput, File
+from bytes.api.models import BoefjeOutput, File, StatusEnum
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -272,9 +272,14 @@ def get_raws(
     )
 
     raws = meta_repository.get_raws(query_filter)
+    status = StatusEnum.COMPLETED
+
+    if len(raws) == 1 and {"error/boefje"} in raws[0][1].mime_types:
+        status = StatusEnum.FAILED
 
     return BoefjeOutput(
-        files=[File(name=raw_id, content=b64encode(raw.value), tags=raw.mime_types) for raw_id, raw in raws]
+        status=status,
+        files=[File(name=raw_id, content=b64encode(raw.value), tags=raw.mime_types) for raw_id, raw in raws],
     )
 
 
