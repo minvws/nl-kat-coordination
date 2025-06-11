@@ -57,17 +57,12 @@ class AddDashboardItemForm(BaseRockyForm):
         return name
 
     def clean_columns(self):
-        column_values = self.cleaned_data.get("columns", [])
-        columns = [
-            {column_value: str(self.table_columns.get(column_value))}
-            for column_value in column_values
-            if column_value in self.table_columns
-        ]
+        column_values = self.cleaned_data.get("columns")
 
-        if not columns:
+        if column_values is None:
             raise ValidationError("Choose at least one column to continue.")
 
-        return columns
+        return column_values
 
     def get_dashboard(self) -> Dashboard | None:
         try:
@@ -166,7 +161,6 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         super().__init__(organization, *args, **kwargs)
         self.source = "object_list"
         self.template = "partials/dashboard_ooi_list.html"
-        self.table_columns = OBJECT_LIST_COLUMNS
 
     def get_query(self):
         default_query = super().get_query()
@@ -204,7 +198,6 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         super().__init__(organization, *args, **kwargs)
         self.source = "finding_list"
         self.template = "partials/dashboard_finding_list.html"
-        self.table_columns = FINDING_LIST_COLUMNS
 
     def get_query(self):
         default_query = super().get_query()

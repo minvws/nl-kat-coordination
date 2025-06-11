@@ -8,8 +8,8 @@
     </caption>
     <thead>
         <tr>
-            {% for column in dashboard_item.settings.columns %}
-                {% for column_value, column_name in column.items %}<th>{{ column_name }}</th>{% endfor %}
+            {% for column_value in dashboard_item.settings.columns %}
+                <th>{{ column_value|get_column_name_findings_list }}</th>
             {% endfor %}
             <th class="sticky-cell visually-hidden actions">{% translate "Details" %}</th>
         </tr>
@@ -18,36 +18,34 @@
         {% for finding in data.finding_list %}
             <tr>
                 {% for column in dashboard_item.settings.columns %}
-                    {% for column_value, column_name in column.items %}
-                        <td>
-                            {% if column_value == "severity" %}
-                                <span class="{{ finding.finding_type.risk_severity.value|lower }}">{{ finding.finding_type.risk_severity.value|capfirst }}</span>
+                    <td>
+                        {% if column_value == "severity" %}
+                            <span class="{{ finding.finding_type.risk_severity.value|lower }}">{{ finding.finding_type.risk_severity.value|capfirst }}</span>
+                        {% endif %}
+                        {% if column_value == "finding" %}
+                            {% if finding.finding_type.name %}
+                                <a href="{% ooi_url "ooi_detail" finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}"
+                                   title="{% blocktranslate trimmed with finding=finding.finding_type.name %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding_type.name }}</a>
+                            {% else %}
+                                <a href="{% ooi_url "ooi_detail" finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}"
+                                   title="{% blocktranslate trimmed with finding=finding.finding.finding_type %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding.finding_type.human_readable }}</a>
                             {% endif %}
-                            {% if column_value == "finding" %}
-                                {% if finding.finding_type.name %}
-                                    <a href="{% ooi_url "ooi_detail" finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}"
-                                       title="{% blocktranslate trimmed with finding=finding.finding_type.name %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding_type.name }}</a>
-                                {% else %}
-                                    <a href="{% ooi_url "ooi_detail" finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}"
-                                       title="{% blocktranslate trimmed with finding=finding.finding.finding_type %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding.finding_type.human_readable }}</a>
-                                {% endif %}
-                            {% endif %}
-                            {% if column_value == "location" %}
-                                <a href="{% ooi_url "ooi_detail" finding.finding.ooi organization.code query=mandatory_fields observed_at=observed_at %}"
-                                   title="{% blocktranslate trimmed with finding=finding.finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding.ooi.human_readable }}</a>
-                            {% endif %}
-                            {% if column_value == "tree" %}
-                                <a aria-label="Navigate to tree view of {{ finding.finding.human_readable }}"
-                                   class="actions icon-only ti-subtask button"
-                                   href="{% ooi_url 'ooi_tree' finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}">{% translate "Tree" %}</a>
-                            {% endif %}
-                            {% if column_value == "graph" %}
-                                <a aria-label="Navigate to graph view of {{ finding.finding.human_readable }}"
-                                   class="actions icon-only ti-affiliate button"
-                                   href="{% ooi_url 'ooi_graph' finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}">{% translate "Graph" %}</a>
-                            {% endif %}
-                        </td>
-                    {% endfor %}
+                        {% endif %}
+                        {% if column_value == "location" %}
+                            <a href="{% ooi_url "ooi_detail" finding.finding.ooi organization.code query=mandatory_fields observed_at=observed_at %}"
+                               title="{% blocktranslate trimmed with finding=finding.finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.finding.ooi.human_readable }}</a>
+                        {% endif %}
+                        {% if column_value == "tree" %}
+                            <a aria-label="Navigate to tree view of {{ finding.finding.human_readable }}"
+                               class="actions icon-only ti-subtask button"
+                               href="{% ooi_url 'ooi_tree' finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}">{% translate "Tree" %}</a>
+                        {% endif %}
+                        {% if column_value == "graph" %}
+                            <a aria-label="Navigate to graph view of {{ finding.finding.human_readable }}"
+                               class="actions icon-only ti-affiliate button"
+                               href="{% ooi_url 'ooi_graph' finding.finding.primary_key organization.code query=mandatory_fields observed_at=observed_at %}">{% translate "Graph" %}</a>
+                        {% endif %}
+                    </td>
                 {% endfor %}
                 <td class="actions sticky-cell">
                     <button type="button"
