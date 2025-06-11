@@ -6,7 +6,15 @@ from typing import Literal
 
 import structlog
 
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, JobRuntimeError, StatusEnum, Task
+from .interfaces import (
+    BoefjeHandlerInterface,
+    BoefjeOutput,
+    BoefjeStorageInterface,
+    File,
+    JobRuntimeError,
+    StatusEnum,
+    Task,
+)
 from .job_models import BoefjeMeta
 from .repository import BoefjeResource, LocalPluginRepository, _default_mime_types
 
@@ -30,12 +38,12 @@ class TemporaryEnvironment:
         os.environ.update(self._original_environment)
 
 
-class BoefjeHandler(Handler):
+class BoefjeHandler(BoefjeHandlerInterface):
     def __init__(self, local_repository: LocalPluginRepository, boefje_storage: BoefjeStorageInterface):
         self.local_repository = local_repository
         self.boefje_storage = boefje_storage
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         boefje_meta = task.data
 
         if not isinstance(boefje_meta, BoefjeMeta):
@@ -114,4 +122,23 @@ class BoefjeHandler(Handler):
         if error is not None:
             raise error
 
-        return boefje_meta, boefje_results
+        return boefje_meta, boefje_output
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        if output is False:
+            return  # Output belonged to a docker boefje
+
+        boefje_meta, boefje_output = output
+
+        for item in duplicated_tasks:
+            new_boefje_meta = item.data
+            new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
+            new_boefje_meta.environment = boefje_meta.environment
+            new_boefje_meta.started_at = boefje_meta.started_at
+            new_boefje_meta.ended_at = boefje_meta.ended_at
+
+            self.boefje_storage.save_output(new_boefje_meta, boefje_output)
+
+            logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)

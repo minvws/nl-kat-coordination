@@ -70,8 +70,18 @@ class BoefjeOutput(BaseModel):
     files: list[File] | None = None
 
 
-class Handler:
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+class BoefjeHandlerInterface:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
+        raise NotImplementedError()
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        raise NotImplementedError()
+
+
+class NormalizerHandlerInterface:
+    def handle(self, task: Task) -> None:
         raise NotImplementedError()
 
 

@@ -12,7 +12,7 @@ import click
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from boefjes.config import settings
-from boefjes.job_handler import NormalizerHandler, bytes_api_client
+from boefjes.job_handler import NormalizerHandlerInterface, bytes_api_client
 from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.worker.job_models import Normalizer, NormalizerMeta
 from boefjes.worker.repository import get_local_repository
@@ -34,7 +34,7 @@ def run_normalizer(start_pdb, normalizer_id, raw_id):
 
     local_repository = get_local_repository()
 
-    handler = NormalizerHandler(
+    handler = NormalizerHandlerInterface(
         LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
     )
     try:

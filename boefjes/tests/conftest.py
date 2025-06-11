@@ -1,3 +1,4 @@
+import base64
 import multiprocessing
 import time
 import uuid
@@ -16,7 +17,7 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService, get_plugin_service
-from boefjes.job_handler import NormalizerHandler, bytes_api_client
+from boefjes.job_handler import NormalizerHandlerInterface, bytes_api_client
 from boefjes.katalogus.root import app
 from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
@@ -25,11 +26,13 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import BoefjeHandlerInterface
 from boefjes.worker.interfaces import (
     BoefjeOutput,
     BoefjeStorageInterface,
+    File,
     SchedulerClientInterface,
+    StatusEnum,
     Task,
     TaskPop,
     TaskStatus,
@@ -144,14 +147,14 @@ class MockBytesAPIClient(BoefjeStorageInterface):
         return [self.queue.get() for _ in range(self.queue.qsize())]
 
 
-class MockHandler(BoefjeHandler, NormalizerHandler):
+class MockHandler(BoefjeHandlerInterface, NormalizerHandlerInterface):
     def __init__(self, exception=Exception):
         self.sleep_time = 0
         self.queue = multiprocessing.Manager().Queue()
         self.exception = exception
         self.boefje_storage = MockBytesAPIClient()
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         time.sleep(self.sleep_time)
 
         if str(task.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
@@ -163,7 +166,11 @@ class MockHandler(BoefjeHandler, NormalizerHandler):
         if task.data.boefje.id == "docker":
             return False
 
-        return task.data, [({"my/mime"}, b"123")]
+        return task.data, BoefjeOutput(
+            status=StatusEnum.COMPLETED, files=[
+                File(name="1", content=base64.b64decode(b"123").decode(), tags=["my/mime"])
+            ]
+        )
 
     def get_all(self) -> list[Task]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
@@ -184,7 +191,7 @@ def item_handler(tmp_path: Path):
 
 @pytest.fixture
 def mock_boefje_handler(mock_local_repository: LocalPluginRepository, mocker):
-    return BoefjeHandler(mock_local_repository, mocker.MagicMock())
+    return BoefjeHandlerInterface(mock_local_repository, mocker.MagicMock())
 
 
 @pytest.fixture
