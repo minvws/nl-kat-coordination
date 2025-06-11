@@ -64,7 +64,7 @@ All users have the permission to:
 - View dashboards and dashboard items
 - Change the position of dashboard items
 
-Aditonally, admins and redteamers have permission to:
+Additonally, admins and redteamers have permission to:
 
 - Create new dashboards
 - Add new items to a dashboard
