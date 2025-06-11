@@ -65,7 +65,7 @@ class PriorityQueueStore:
                 )
                 if len(dkey) == 0:
                     # No tasks with a deduplication key, fall back to the default pop
-                    return self.pop(scheduler_id, limit, filters)
+                    return self.pop(scheduler_id, 1, filters)
 
                 # Get the first task with a deduplication key
                 first_dkey = dkey[0].data["deduplication_key"]
