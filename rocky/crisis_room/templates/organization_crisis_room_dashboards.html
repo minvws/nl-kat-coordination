@@ -30,7 +30,7 @@
                     </div>
                 {% endif %}
             </div>
-            {% if organization_member.can_add_dashboard %}
+            {% if organization_member.can_add_dashboard and not dashboard_items.0.item.findings_dashboard %}
                 <div class="toolbar">
                     {% include "partials/new_dashboard_item_action_button.html" %}
 
