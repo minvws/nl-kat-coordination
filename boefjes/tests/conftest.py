@@ -169,7 +169,7 @@ class MockHandler(BoefjeHandlerInterface, NormalizerHandlerInterface):
 
         return task.data, BoefjeOutput(
             status=StatusEnum.COMPLETED,
-            files=[File(name="1", content=base64.b64decode(b"123").decode(), tags=["my/mime"])],
+            files=[File(name="1", content=base64.b64encode(b"123").decode(), tags=["my/mime"])],
         )
 
     def get_all(self) -> list[Task]:

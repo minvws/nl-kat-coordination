@@ -246,7 +246,7 @@ class CompositeBoefjeHandler(BoefjeHandlerInterface):
         self.docker_handler = docker_handler
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
-        self.get_handler(task).handle(task)
+        return self.get_handler(task).handle(task)
 
     def get_handler(self, task: Task) -> BoefjeHandlerInterface:
         if not isinstance(task.data, BoefjeMeta):
