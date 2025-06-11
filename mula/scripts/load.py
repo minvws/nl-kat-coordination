@@ -86,8 +86,7 @@ def create_oois(orgs: list[dict[str, Any]], ooi_num: int = 10) -> None:
             }
             declarations.append(declaration)
 
-    if ooi_num <= 0 or ooi_num > len(declarations):
-        ooi_num = len(declarations)
+    ooi_num = max(1, min(ooi_num, len(declarations)))
 
     for org in orgs:
         for declaration in declarations[:ooi_num]:
