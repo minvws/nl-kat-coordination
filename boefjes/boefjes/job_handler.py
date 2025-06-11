@@ -246,19 +246,21 @@ class CompositeBoefjeHandler(BoefjeHandlerInterface):
         self.docker_handler = docker_handler
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+        self.get_handler(task).handle(task)
+
+    def get_handler(self, task: Task) -> BoefjeHandlerInterface:
         if not isinstance(task.data, BoefjeMeta):
             raise RuntimeError("Did not receive boefje task")
 
         if self.docker_handler and task.data.arguments["oci_image"]:
-            logger.info(
-                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
-                task.data.boefje.id,
-                str(task.data.id),
-                task.data.arguments["oci_image"],
-            )
-            return self.docker_handler.handle(task)
+            return self.docker_handler
 
         if not self.boefje_handler:
             raise RuntimeError("No handlers defined")
 
-        return self.boefje_handler.handle(task)
+        return self.boefje_handler
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        self.get_handler(task).copy_raw_files(task, output, duplicated_tasks)
