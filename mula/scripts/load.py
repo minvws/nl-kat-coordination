@@ -146,7 +146,7 @@ def enable_boefjes(orgs: list[dict[str, Any]], boefjes_str: str = "dns-records,d
 
 def run(org_num: int = 1, ooi_num: int = 10, boefjes_str: str = "dns-records,dns-zone") -> None:
     # Create organisations
-    orgs: list[dict[str, Any]] = create_organisations(org_num=org_num)
+    orgs = create_organisations(org_num=org_num)
 
     # Create OOIs
     create_oois(orgs=orgs, ooi_num=ooi_num)
