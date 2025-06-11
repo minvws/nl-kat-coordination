@@ -137,6 +137,7 @@ class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPaw
                 user = self.register_user()
                 # new registered user must set a password through the password reset form.
                 self.send_password_reset_email(user, self.organization)
+
             member = OrganizationMember.objects.create(user=user, organization=self.organization)
             member.groups.add(Group.objects.get(name=self.account_type))
 
