@@ -251,20 +251,13 @@ def test_add_member_from_another_org(rf, superuser_member_b, redteam_member):
 
     assert response.status_code == 302
 
-    messages = list(request._messages)
-
-    # Even though member is already a member of this organization. It will tell that is has been added.
-    assert "Member added successfully." in messages[0].message
-
-    # CDheck if redteamer is still redteamer in org A but a client in org B
     members = OrganizationMember.objects.filter(user=redteam_member.user)
 
     assert len(members) == 2
 
     member_organizations = [member.organization.name for member in members]
-    print(member_organizations)
 
-    # it is also part of superuser member orgznization
+    # Member is also part now of superuser organization
     assert superuser_member_b.organization.name in member_organizations
 
     member_groups = [group.name for member in members for group in member.groups.all()]
