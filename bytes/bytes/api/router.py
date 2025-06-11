@@ -280,7 +280,7 @@ def get_raws(
     return BoefjeOutput(
         status=status,
         files=[
-            File(name=str(raw_id), content=b64encode(raw.value).decode(), tags=[m.value for m in mime_types])
+            File(name=str(raw_id), content=b64encode(raw.value).decode(), tags=[m.value for m in raw.mime_types])
             for raw_id, raw in raws
         ],
     )
