@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-03 17:55+0000\n"
+"POT-Creation-Date: 2025-06-10 14:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,11 +79,7 @@ msgid "--- Please select one of the available options ----"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Account Type"
-msgstr ""
-
-#: account/forms/account_setup.py
-msgid "Every member of OpenKAT must be part of an account type."
+msgid "Account type"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -158,9 +154,8 @@ msgstr ""
 msgid "Acknowledged to change Clearance Levels."
 msgstr ""
 
-#: account/forms/account_setup.py
+#: account/forms/account_setup.py rocky/forms.py
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/views/organization_member_list.py
 msgid "Blocked"
 msgstr ""
 
@@ -644,6 +639,10 @@ msgid "Clearance level (High-Low)"
 msgstr ""
 
 #: crisis_room/forms.py
+msgid "Show table columns"
+msgstr ""
+
+#: crisis_room/forms.py
 msgid "Severity (Low-High)"
 msgstr ""
 
@@ -690,13 +689,12 @@ msgid "You have to choose between a recipe or a query, but not both."
 msgstr ""
 
 #: crisis_room/models.py
-msgid "You have set a query and not where it is from. Also set the query_from."
+msgid "You have set a query and not where it is from. Also set the source."
 msgstr ""
 
 #: crisis_room/models.py
 msgid ""
-"DashboardItem must contain at least a 'recipe' or a 'query_from' with a "
-"'query'."
+"DashboardItem must contain at least a 'recipe' or a 'source' with a 'query'."
 msgstr ""
 
 #: crisis_room/models.py
@@ -795,7 +793,7 @@ msgid "Crisis room navigation"
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/partials/new_dashboard_item_action_button.html
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/findings_report/report.html
@@ -869,23 +867,11 @@ msgid ""
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Actions for adding dashboard items"
+msgid "Add objects"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Add dashboard item from"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
-#: rocky/templates/admin/delete_selected_confirmation.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
-#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
-msgid "Objects"
+msgid "Add findings"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
@@ -959,7 +945,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Tree"
 msgstr ""
 
@@ -968,7 +954,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Graph"
 msgstr ""
 
@@ -1005,8 +991,7 @@ msgstr ""
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/views/finding_list.py
+#: rocky/templates/oois/ooi_detail_findings_overview.html rocky/views/mixins.py
 msgid "Severity"
 msgstr ""
 
@@ -1015,7 +1000,7 @@ msgstr ""
 #: reports/templates/partials/report_findings_table.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Finding"
 msgstr ""
 
@@ -1043,7 +1028,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: rocky/views/finding_list.py
+#: rocky/views/mixins.py
 msgid "Location"
 msgstr ""
 
@@ -1117,43 +1102,6 @@ msgstr ""
 msgid "Objects "
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: katalogus/templates/change_clearance_level.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
-msgid "Object"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/ooi_view.py
-msgid "Type"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html rocky/views/ooi_view.py
-msgid "Clearance level"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_ooi_list_table.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html rocky/views/ooi_view.py
-msgid "Clearance type"
-msgstr ""
-
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #, python-format
 msgid "Are you sure you want to delete '%(name)s' from this dashboard?"
@@ -1177,6 +1125,26 @@ msgid ""
 "the dashboard will be deleted as well."
 msgstr ""
 
+#: crisis_room/templates/partials/new_dashboard_item_action_button.html
+msgid "Actions for adding dashboard items"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_action_button.html
+msgid "Add item"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
+#: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
+msgid "Objects"
+msgstr ""
+
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #, python-format
 msgid ""
@@ -1192,21 +1160,6 @@ msgid ""
 "        Add these %(item_type)s with the selected filters\n"
 "        to the dashboard of your choice.\n"
 "    "
-msgstr ""
-
-#: crisis_room/templates/partials/new_dashboard_item_modal.html
-msgid "Show table columns"
-msgstr ""
-
-#: crisis_room/templates/partials/new_dashboard_item_modal.html
-#: reports/templates/partials/report_names_form.html
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_multiselect.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "Required"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
@@ -1474,6 +1427,20 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
+msgstr ""
+
+#: katalogus/templates/change_clearance_level.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+msgid "Object"
+msgstr ""
+
+#: katalogus/templates/change_clearance_level.html onboarding/forms.py
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/explanations.html rocky/views/mixins.py
+msgid "Clearance level"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -2567,6 +2534,20 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
+msgstr ""
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/views/mixins.py
+msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
@@ -4294,6 +4275,16 @@ msgid "Report names:"
 msgstr ""
 
 #: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/form/field_input.html
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
 msgid "Add reference date"
 msgstr ""
 
@@ -4396,6 +4387,11 @@ msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object name"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -5295,6 +5291,10 @@ msgstr ""
 msgid "Show Boefjes that exceed the objects clearance level."
 msgstr ""
 
+#: tools/forms/ooi.py
+msgid "Expires by (UTC)"
+msgstr ""
+
 #: tools/forms/ooi_form.py
 msgid "option"
 msgstr ""
@@ -5538,6 +5538,10 @@ msgid "Upload raw file"
 msgstr ""
 
 #: tools/forms/upload_raw.py
+msgid "Input or Scan OOI"
+msgstr ""
+
+#: tools/forms/upload_raw.py
 msgid "Click to select one of the available options, or type one yourself"
 msgstr ""
 
@@ -5573,6 +5577,26 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
+msgstr ""
+
+#: rocky/forms.py
+msgid "Current status"
+msgstr ""
+
+#: rocky/forms.py rocky/templates/organizations/organization_member_list.html
+msgid "Active"
+msgstr ""
+
+#: rocky/forms.py rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
+#: rocky/forms.py
+msgid "Account status"
+msgstr ""
+
+#: rocky/forms.py
+msgid "Not blocked"
 msgstr ""
 
 #: rocky/messaging.py
@@ -6143,7 +6167,10 @@ msgid "Add %(display_type)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_add_type_select.html
-msgid "Manual creation"
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html
+#: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
+msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_add_type_select.html
@@ -6267,7 +6294,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/oois/ooi_detail_object.html
-#: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Object details"
 msgstr ""
 
@@ -6284,12 +6310,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Select an object type to add."
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/elements/ooi_add_type_select_form.html
-#: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
-msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -6536,23 +6556,21 @@ msgid "Rerun all bits"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_add.html
-msgid " member account setup"
+msgid "Change account type"
 msgstr ""
 
-#: rocky/templates/organizations/organization_member_add.html
-msgid "Member details"
+#: rocky/templates/organizations/organization_member_add_header.html
+#: rocky/views/organization_member_add.py
+msgid "Add member"
 msgstr ""
 
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Member account type setup"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Choose an account type for this new member."
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_add_account_type.html
-msgid "Account type details"
+#: rocky/templates/organizations/organization_member_add_header.html
+#, python-format
+msgid ""
+"Creating a new member of organization <strong>%(organization)s</strong>. For "
+"detailed information about the different account types, check the <a "
+"href=\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" "
+"target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_edit.html
@@ -6566,7 +6584,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgid "An overview of members of <strong>%(organization_name)s</strong>"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6609,29 +6627,20 @@ msgstr ""
 msgid "Super user"
 msgstr ""
 
-#: rocky/templates/organizations/organization_member_list.html
-msgid "Active"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "New"
+#: rocky/templates/organizations/organization_member_upload.html
+#: rocky/views/organization_member_add.py
+msgid "Add members"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
-msgid "Upload a csv file with members for organisation"
+#, python-format
+msgid ""
+"To upload multiple members at once, you can upload a CSV file or you can <a "
+"href=\"%(download_url)s\">download the template</a>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
-msgid "Download the template"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_upload.html
-msgid "or create a csv file with the following criteria"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_upload.html
-#: rocky/templates/upload_csv.html
-msgid "These are the criteria for CSV upload:"
+msgid "To create a custom CSV file, make sure it meets the following criteria:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
@@ -6925,14 +6934,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
-msgstr ""
-
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Shown status types"
-msgstr ""
-
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Blocked status"
 msgstr ""
 
 #: rocky/templates/partials/organization_member_list_filters.html
@@ -7466,6 +7467,10 @@ msgstr ""
 msgid "Automate the creation of multiple objects by uploading a CSV file."
 msgstr ""
 
+#: rocky/templates/upload_csv.html
+msgid "These are the criteria for CSV upload:"
+msgstr ""
+
 #: rocky/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
 msgstr ""
@@ -7517,10 +7522,6 @@ msgstr ""
 
 #: rocky/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
-msgstr ""
-
-#: rocky/views/ooi_add.py
-msgid "Type select"
 msgstr ""
 
 #: rocky/views/ooi_add.py
@@ -7674,8 +7675,8 @@ msgstr ""
 msgid "Organization %s successfully updated."
 msgstr ""
 
-#: rocky/views/organization_member_add.py rocky/views/upload_csv.py
-msgid "Add column titles. Followed by each object on a new line."
+#: rocky/views/organization_member_add.py
+msgid "Add column titles, followed by each object on a new line."
 msgstr ""
 
 #: rocky/views/organization_member_add.py
@@ -7691,15 +7692,7 @@ msgid "Account type can be one of: "
 msgstr ""
 
 #: rocky/views/organization_member_add.py
-msgid "Add Account Type"
-msgstr ""
-
-#: rocky/views/organization_member_add.py
 msgid "Member added successfully."
-msgstr ""
-
-#: rocky/views/organization_member_add.py
-msgid "Add Member"
 msgstr ""
 
 #: rocky/views/organization_member_add.py
@@ -7750,10 +7743,6 @@ msgid ""
 msgstr ""
 
 #: rocky/views/organization_member_list.py
-msgid "Not blocked"
-msgstr ""
-
-#: rocky/views/organization_member_list.py
 #, python-format
 msgid "Blocked member %s successfully."
 msgstr ""
@@ -7799,6 +7788,10 @@ msgstr ""
 
 #: rocky/views/tasks.py
 msgid "All Tasks"
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid "Add column titles. Followed by each object on a new line."
 msgstr ""
 
 #: rocky/views/upload_csv.py

@@ -11,7 +11,7 @@
     {% include "partials/dashboard_finding_list_table.html" %}
 
     <div class="toolbar">
-        {% with params=dashboard_item.query|url_encode_finding_list_query %}
+        {% with params=dashboard_item.query|urlencode_query %}
             <a class="button ghost"
                href="{% url "finding_list" organization_code=organization.code %}?{{ params }}">
                 {% translate "Go to findings" %}

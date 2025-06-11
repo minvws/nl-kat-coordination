@@ -7,6 +7,7 @@ import structlog
 from crisis_room.forms import AddFindingListDashboardItemForm
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
+from django.http.request import QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -23,17 +24,9 @@ from tools.forms.findings import (
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import FINDING_LIST_COLUMNS, ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
 
 logger = structlog.get_logger(__name__)
-
-FINDING_LIST_COLUMNS = {
-    "severity": _("Severity"),
-    "finding": _("Finding"),
-    "location": _("Location"),
-    "tree": _("Tree"),
-    "graph": _("Graph"),
-}
 
 
 def sort_by_severity_desc(findings: Iterable) -> list[dict[str, Any]]:
@@ -113,6 +106,20 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             "asc_desc": self.sorting_order,
         }
 
+    def get_filters_query(self) -> dict[str, Any]:
+        qdict = QueryDict(mutable=True)
+        qdict.update(
+            {
+                "observed_at": self.observed_at.strftime("%Y-%m-%d"),
+                "muted_findings": self.muted_findings,
+                "search": self.search_string,
+                "order_by": self.order_by,
+                "sorting_order": self.sorting_order,
+            }
+        )
+        qdict.setlist("severity", self.request.GET.getlist("severity"))
+        return {k: qdict.getlist(k) for k in qdict if qdict.getlist(k)}
+
     @property
     def order_by(self) -> Literal["score", "finding_type"]:
         return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
@@ -140,7 +147,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["order_by_finding_type_form"] = OrderByFindingTypeForm(self.request.GET)
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
-
+        context["finding_list_filters_query"] = self.get_filters_query()
         context["severities"] = self.severities
         context["exclude_muted"] = self.exclude_muted
         context["only_muted"] = self.only_muted

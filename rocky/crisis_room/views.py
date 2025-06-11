@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone
 from typing import Any
 from uuid import UUID
 
@@ -15,6 +15,7 @@ from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.text import slugify
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from httpx import HTTPStatusError, ReadTimeout
@@ -107,10 +108,10 @@ class DashboardService:
 
         # First collect al data, if recipe id is found then fetch recipe ids to get reports later.
         for dashboard_item in dashboard_items:
-            if not dashboard_item.recipe and dashboard_item.query_from == "object_list":
+            if not dashboard_item.recipe and dashboard_item.source == "object_list":
                 item_data = DashboardItemView(dashboard_item, self.get_ooi_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
-            elif not dashboard_item.recipe and dashboard_item.query_from == "finding_list":
+            elif not dashboard_item.recipe and dashboard_item.source == "finding_list":
                 item_data = DashboardItemView(dashboard_item, self.get_finding_list(dashboard_item))
                 dashboard_items_with_data.append(item_data)
             elif dashboard_item.recipe:
@@ -188,14 +189,16 @@ class DashboardService:
         all_scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
         ooi_types = (
-            {type_by_name(t) for t in query["ooi_types"] if t not in _EXCLUDED_OOI_TYPES}
-            if query["ooi_types"]
+            {type_by_name(t) for t in query["ooi_type"] if t not in _EXCLUDED_OOI_TYPES}
+            if query["ooi_type"]
             else all_oois
         )
-        scan_level = {ScanLevel(int(cl)) for cl in query["scan_level"]} if query["scan_level"] else all_scan_levels
+        scan_level = (
+            {ScanLevel(int(cl)) for cl in query["clearance_level"]} if query["clearance_level"] else all_scan_levels
+        )
         scan_profile_type = (
-            {ScanProfileType(ct) for ct in query["scan_profile_type"]}
-            if query["scan_profile_type"]
+            {ScanProfileType(ct) for ct in query["clearance_type"]}
+            if query["clearance_type"]
             else all_scan_profile_types
         )
 
@@ -205,15 +208,19 @@ class DashboardService:
             timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
         )
 
+        observed_at = datetime.strptime(query["observed_at"], "%Y-%m-%d")
+        # for now we check till end of day
+        valid_time = datetime.combine(observed_at.date(), time(23, 59, 59), tzinfo=timezone.utc)
+
         ooi_list = octopoes_client.list_objects(
             ooi_types,
-            valid_time=datetime.now(timezone.utc),
+            valid_time=valid_time,
             limit=query["limit"],
             scan_level=scan_level,
             scan_profile_type=scan_profile_type,
-            search_string=query["search_string"],
+            search_string=query["search"],
             order_by=query["order_by"],
-            asc_desc=query["asc_desc"],
+            asc_desc=query["sorting_order"],
         ).items
 
         return {"object_list": ooi_list}
@@ -223,7 +230,7 @@ class DashboardService:
         finding_list = []
 
         severities = set()
-        for severity in query["severities"]:
+        for severity in query["severity"]:
             try:
                 severities.add(RiskLevelSeverity(severity))
             except ValueError as e:
@@ -237,15 +244,23 @@ class DashboardService:
 
         limit = query["limit"]
 
+        muted_findings = query["muted_findings"]
+        exclude_muted = muted_findings == "non-muted"
+        only_muted = muted_findings == "muted"
+
+        observed_at = datetime.strptime(query["observed_at"], "%Y-%m-%d")
+        # for now we check till end of day
+        valid_time = datetime.combine(observed_at.date(), time(23, 59, 59), tzinfo=timezone.utc)
+
         finding_list = FindingList(
             octopoes_connector=octopoes_client,
-            valid_time=datetime.now(timezone.utc),
+            valid_time=valid_time,
             severities=severities,
-            exclude_muted=query["exclude_muted"],
-            only_muted=query["only_muted"],
-            search_string=query["search_string"],
+            exclude_muted=exclude_muted,
+            only_muted=only_muted,
+            search_string=query["search"],
             order_by=query["order_by"],
-            asc_desc=query["asc_desc"],
+            asc_desc=query["sorting_order"],
         )[:limit]
 
         return {"finding_list": finding_list}
@@ -428,6 +443,8 @@ class UpdateDashboardItemView(OrganizationView):
                     "organization_crisis_room",
                     kwargs={"organization_code": self.organization.code, "id": dashboard_item.dashboard.id},
                 )
+                + "#dashboard-item-"
+                + slugify(dashboard_item.name)
             )
         except DashboardItem.DoesNotExist:
             messages.error(request, "Dashboard item not found.")
