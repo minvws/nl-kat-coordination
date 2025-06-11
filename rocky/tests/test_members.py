@@ -272,7 +272,6 @@ def test_add_member_from_another_org(rf, superuser_member_b, redteam_member):
 def test_add_new_user(rf, superuser_member):
     email_new_member = "test@example.com"
 
-    # Super user from org B tries to add a redteam user from org A and assign a new role as a client
     request = setup_request(
         rf.post("organization_member_add", {"name": "New member", "email": email_new_member}), superuser_member.user
     )
