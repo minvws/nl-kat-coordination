@@ -57,7 +57,7 @@ def _get_xtdb_http_session(base_url: str) -> httpx.Client:
 
 class XTDBHTTPClient:
     def __init__(self, base_url: str, client: str):
-        self._client = client
+        self.client = client
         self._session = _get_xtdb_http_session(base_url)
 
     @staticmethod
@@ -73,7 +73,7 @@ class XTDBHTTPClient:
             raise e
 
     def client_url(self) -> str:
-        return f"/{self._client}"
+        return f"/{self.client}"
 
     def status(self) -> XTDBStatus:
         res = self._session.get(f"{self.client_url()}/status")
@@ -150,15 +150,15 @@ class XTDBHTTPClient:
 
     def create_node(self) -> None:
         try:
-            res = self._session.post("/create-node", json={"node": self._client})
+            res = self._session.post("/create-node", json={"node": self.client})
             self._verify_response(res)
         except HTTPError as e:
-            logger.exception("Failed creating node")
+            logger.exception("Failed creating node %s", self._session.base_url)
             raise XTDBException("Could not create node") from e
 
     def delete_node(self) -> None:
         try:
-            res = self._session.post("/delete-node", json={"node": self._client})
+            res = self._session.post("/delete-node", json={"node": self.client})
             self._verify_response(res)
         except HTTPError as e:
             if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:

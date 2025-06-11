@@ -95,11 +95,21 @@ class BoefjeHandler(Handler):
         self.plugin_service = plugin_service
         self.bytes_client = bytes_client
 
-    def handle(self, boefje_meta: BoefjeMeta) -> None:
+    def handle(self, boefje_meta: BoefjeMeta) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool:
+        """
+        With regard to the return type:
+            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
+
+        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
+        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
+        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
+        """
+
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-        # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
-        plugin = self.plugin_service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
+        with self.plugin_service as service:
+            # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
+            plugin = service.by_plugin_id(boefje_meta.boefje.id, boefje_meta.organization)
 
         if plugin.type != "boefje":
             raise ValueError("Plugin id does not belong to a boefje")
@@ -112,7 +122,9 @@ class BoefjeHandler(Handler):
                 plugin.oci_image,
             )
             docker_runner = DockerBoefjesRunner(plugin, boefje_meta)
-            return docker_runner.run()
+            docker_runner.run()
+
+            return False
 
         if boefje_meta.input_ooi:
             reference = Reference.from_str(boefje_meta.input_ooi)
@@ -127,7 +139,7 @@ class BoefjeHandler(Handler):
                     ooi=reference,
                     task_id=boefje_meta.id,
                 )
-                return
+                return boefje_meta, []
 
             boefje_meta.arguments["input"] = ooi.serialize()
 
@@ -137,42 +149,43 @@ class BoefjeHandler(Handler):
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
-
-        boefje_results: list[tuple[set, bytes | str]] = []
+        error = None
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
-        except:
+        except BaseException as e:
+            error = e
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
-            raise
-        finally:
-            boefje_meta.ended_at = datetime.now(timezone.utc)
-            logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+        boefje_meta.ended_at = datetime.now(timezone.utc)
+        logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-            self.bytes_client.save_boefje_meta(boefje_meta)
+        self.bytes_client.save_boefje_meta(boefje_meta)
 
-            if boefje_results:
-                for boefje_added_mime_types, output in boefje_results:
-                    valid_mimetypes = set()
-                    for mimetype in boefje_added_mime_types:
-                        if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
-                            logger.warning(
-                                "Invalid mime-type encountered in output for boefje %s[%s]",
-                                boefje_meta.boefje.id,
-                                str(boefje_meta.id),
-                            )
-                        else:
-                            valid_mimetypes.add(mimetype)
-                    raw_file_id = self.bytes_client.save_raw(
-                        boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
-                    )
-                    logger.info(
-                        "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
-                    )
-            else:
-                logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+        if boefje_results:
+            for boefje_added_mime_types, output in boefje_results:
+                valid_mimetypes = set()
+                for mimetype in boefje_added_mime_types:
+                    if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
+                        logger.warning(
+                            "Invalid mime-type encountered in output for boefje %s[%s]",
+                            boefje_meta.boefje.id,
+                            str(boefje_meta.id),
+                        )
+                    else:
+                        valid_mimetypes.add(mimetype)
+                raw_file_id = self.bytes_client.save_raw(
+                    boefje_meta.id, output, _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                )
+                logger.info("Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id)
+        else:
+            logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+
+        if error is not None:
+            raise error
+
+        return boefje_meta, boefje_results
 
 
 class NormalizerHandler(Handler):
@@ -188,7 +201,7 @@ class NormalizerHandler(Handler):
         self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
 
-    def handle(self, normalizer_meta: NormalizerMeta) -> None:
+    def handle(self, normalizer_meta: NormalizerMeta):
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
         raw = self.bytes_client.get_raw(normalizer_meta.raw_data.id)

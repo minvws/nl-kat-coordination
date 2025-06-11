@@ -1,6 +1,7 @@
 import json
+from datetime import datetime
 from typing import Any
-from urllib import parse
+from urllib.parse import urlencode
 
 from account.models import KATUser
 from django import template
@@ -12,11 +13,6 @@ from octopoes.models.ooi.findings import Finding, FindingType
 from tools.view_helpers import get_ooi_url
 
 register = template.Library()
-
-
-@register.filter
-def get_encoded_dict(data_dict: dict) -> str:
-    return parse.urlencode(data_dict)
 
 
 @register.filter
@@ -105,8 +101,33 @@ def ooi_type(reference_string: str) -> str:
 
 
 @register.filter
+def get_datetime(date_str: str) -> datetime:
+    return datetime.fromisoformat(date_str)
+
+
+@register.filter
+def get_first_seen(occurrences: dict) -> datetime:
+    first_seen = min(occurrences, key=lambda occurrence: occurrence["first_seen"])["first_seen"]
+    return datetime.fromisoformat(first_seen)
+
+
+@register.filter
 def get_user_full_name(ooi: OOI) -> str:
     try:
         return KATUser.objects.get(id=ooi.user_id).get_full_name()
     except ObjectDoesNotExist:
         return _("Unknown user")
+
+
+@register.filter
+def url_encode_object_list_query(query_str: str) -> str:
+    query = json.loads(query_str)
+    params = {
+        "ooi_type": query["ooi_types"],
+        "clearance_level": query["scan_level"],
+        "clearance_type": query["scan_profile_type"],
+        "search": query["search_string"],
+        "order_by": query["order_by"],
+        "sorting_order": query["asc_desc"],
+    }
+    return urlencode(params, True)

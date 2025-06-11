@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if plugins %}
-    <h3>{% translate "Plugins" %} ({{ plugins|length }})</h3>
+    <h3 id="selected-plugins">{% translate "Plugins" %} ({{ plugins|length }})</h3>
     <p>
         {% blocktranslate trimmed %}
             The table below shows all required or optional plugins for the selected reports.
@@ -78,6 +78,6 @@
         </table>
     </div>
 {% else %}
-    <h3>{% translate "Plugins" %}</h3>
+    <h3 id="selected-plugins">{% translate "Plugins" %}</h3>
     {% translate "There are no required or optional plugins needed for the selected report types." %}
 {% endif %}

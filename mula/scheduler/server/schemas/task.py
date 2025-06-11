@@ -65,3 +65,7 @@ class TaskPush(BaseModel):
     organisation: str
     priority: int | None = None
     data: dict
+
+
+class TaskPop(BaseModel):
+    results: list[Task]

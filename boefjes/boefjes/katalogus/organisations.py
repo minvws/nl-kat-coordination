@@ -10,13 +10,15 @@ router = APIRouter(prefix="/organisations", tags=["organisations"])
 
 @router.get("", response_model=dict[str, Organisation])
 def list_organisations(storage: OrganisationStorage = Depends(get_organisations_store)):
-    return storage.get_all()
+    with storage as store:
+        return store.get_all()
 
 
 @router.get("/{organisation_id}", response_model=Organisation)
 def get_organisation(organisation_id: str, storage: OrganisationStorage = Depends(get_organisations_store)):
     try:
-        return storage.get_by_id(organisation_id)
+        with storage as store:
+            return store.get_by_id(organisation_id)
     except (KeyError, ObjectNotFoundException):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown organisation")
 
@@ -25,6 +27,12 @@ def get_organisation(organisation_id: str, storage: OrganisationStorage = Depend
 def add_organisation(organisation: Organisation, storage: OrganisationStorage = Depends(get_organisations_store)):
     with storage as store:
         store.create(organisation)
+
+
+@router.put("/")
+def upsert_organisation(organisation: Organisation, storage: OrganisationStorage = Depends(get_organisations_store)):
+    with storage as store:
+        store.update(organisation)
 
 
 @router.delete("/{organisation_id}")

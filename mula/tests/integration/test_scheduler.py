@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-from scheduler.schedulers.queue import InvalidItemError, QueueEmptyError, QueueFullError
+from scheduler.schedulers.queue import InvalidItemError, QueueFullError
 from scheduler.storage import stores
 
 from tests.factories import OrganisationFactory
@@ -176,22 +176,16 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.push_item_to_queue(item)
 
         # Act
-        popped_items, count = self.scheduler.pop_item_from_queue()
+        popped_items = self.scheduler.pop_item_from_queue()
 
         # Assert
         self.assertEqual(0, self.scheduler.queue.qsize())
-        self.assertEqual(1, count)
         self.assertEqual(1, len(popped_items))
         self.assertEqual(popped_items[0].id, item.id)
 
         # Status should be dispatched
         task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
-
-    def test_pop_item_from_queue_empty(self):
-        self.assertEqual(0, self.scheduler.queue.qsize())
-        with self.assertRaises(QueueEmptyError):
-            self.scheduler.pop_item_from_queue()
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""

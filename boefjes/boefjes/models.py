@@ -24,6 +24,7 @@ class RunOn(Enum):
 class Organisation(BaseModel):
     id: str
     name: str
+    deduplicate: bool = True
 
 
 class Plugin(BaseModel):
@@ -51,6 +52,7 @@ class Boefje(Plugin):
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
+    deduplicate: bool = True
 
     @field_validator("boefje_schema")
     @classmethod
@@ -73,6 +75,17 @@ class Boefje(Plugin):
 
     class Config:
         validate_assignment = True
+
+
+class BoefjeConfig(BaseModel):
+    id: int
+    settings: dict
+    enabled: bool
+    boefje_id: str
+    organisation_id: str
+
+    # a list of BoefjeConfig from other orgs that matching this config
+    duplicates: list["BoefjeConfig"] = Field(default_factory=list)
 
 
 class Normalizer(Plugin):

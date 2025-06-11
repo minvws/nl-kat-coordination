@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from enum import Enum
-from typing import Any
 
 from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
@@ -41,10 +40,7 @@ class Task(BaseModel):
     modified_at: datetime.datetime
 
 
-class PaginatedTasksResponse(BaseModel):
-    count: int
-    next: str | None = None
-    previous: str | None = None
+class TaskPop(BaseModel):
     results: list[Task]
 
 
@@ -52,10 +48,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, scheduler_id: str) -> Task | None:
-        raise NotImplementedError()
-
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
+    def pop_items(self, scheduler_id: str) -> list[Task]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -78,21 +71,12 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def pop_item(self, scheduler_id: str) -> Task | None:
+    def pop_items(self, scheduler_id: str) -> list[Task]:
         response = self._session.post(f"/schedulers/{scheduler_id}/pop?limit=1")
         self._verify_response(response)
 
-        page = TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
-        if page.count == 0:
-            return None
-
-        return page.results[0]
-
-    def pop_items(self, scheduler_id: str, filters: dict[str, Any]) -> PaginatedTasksResponse | None:
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop", json=filters)
-        self._verify_response(response)
-
-        return TypeAdapter(PaginatedTasksResponse | None).validate_json(response.content)
+        popped_tasks = TypeAdapter(TaskPop | None).validate_json(response.content)
+        return popped_tasks.results
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())

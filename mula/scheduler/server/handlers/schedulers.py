@@ -4,7 +4,7 @@ from fastapi import status
 
 from scheduler import context, models, schedulers, storage
 from scheduler.schedulers.queue import NotAllowedError, QueueFullError
-from scheduler.server import schemas, utils
+from scheduler.server import schemas
 from scheduler.server.errors import BadRequestError, ConflictError, NotFoundError, TooManyRequestsError
 
 
@@ -46,7 +46,7 @@ class SchedulerAPI:
             path="/schedulers/{scheduler_id}/pop",
             endpoint=self.pop,
             methods=["POST"],
-            response_model=utils.PaginatedResponse,
+            response_model=schemas.TaskPop,
             status_code=status.HTTP_200_OK,
             description="Pop a task from a scheduler",
         )
@@ -65,20 +65,16 @@ class SchedulerAPI:
         self,
         request: fastapi.Request,
         scheduler_id: str,
-        offset: int = 0,
-        limit: int = 100,
+        limit: int | None = None,
         filters: storage.filters.FilterRequest | None = None,
-    ) -> utils.PaginatedResponse:
-        results, count = self.ctx.datastores.pq_store.pop(
-            scheduler_id=scheduler_id, offset=offset, limit=limit, filters=filters
-        )
+    ) -> schemas.TaskPop:
+        s = self.schedulers.get(scheduler_id)
+        if s is None:
+            raise NotFoundError(f"Scheduler {scheduler_id} not found")
 
-        # Update status for popped items
-        self.ctx.datastores.pq_store.bulk_update_status(
-            scheduler_id, [item.id for item in results], schemas.TaskStatus.DISPATCHED
-        )
+        results = s.pop_item_from_queue(limit=limit, filters=filters)
 
-        return utils.paginate(request, results, count, offset, limit)
+        return schemas.TaskPop(results=[schemas.Task(**item.dict()) for item in results])
 
     def push(self, scheduler_id: str, item: schemas.TaskPush) -> schemas.Task:
         s = self.schedulers.get(scheduler_id)
