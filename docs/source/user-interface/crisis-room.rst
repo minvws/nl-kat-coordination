@@ -103,7 +103,7 @@ The default settings for this report recipe are:
 It is possible to update the report recipe*. To do this:
 
 - Go to "Reports"- Click on the tab "Scheduled"
-- Look for the "Criris Room Aggregate Report"
+- Look for the "Crisis Room Aggregate Report"
 - Open the row
 - Click on "Edit report recipe"
 
