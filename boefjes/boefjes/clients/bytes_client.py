@@ -149,7 +149,7 @@ class BytesAPIClient(BoefjeStorageInterface):
 
     @retry_with_login
     def get_raws(self, boefje_meta_id: str) -> BoefjeOutput:
-        response = self._session.get(f"/bytes/raws", headers=self.headers, params={"boefje_meta_id": boefje_meta_id})
+        response = self._session.get("/bytes/raws", headers=self.headers, params={"boefje_meta_id": boefje_meta_id})
         self._verify_response(response)
 
         return BoefjeOutput.model_validate_json(response.content)
