@@ -63,14 +63,11 @@ class AddDashboardItemForm(BaseRockyForm):
             for column_value in column_values
             if column_value in self.table_columns
         ]
-        return columns
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # clean all form data and dashboard item creation
-        if self.data:
-            self.create_dashboard_item()
-        return cleaned_data
+        if not columns:
+            raise ValidationError("Choose at least one column to continue.")
+
+        return columns
 
     def get_dashboard(self) -> Dashboard | None:
         try:
@@ -110,13 +107,20 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
-        columns = self.cleaned_data.get("columns", [])
+        columns = self.cleaned_data.get("columns")
 
         return {"size": size, "columns": columns}
 
-    def create_dashboard_item(self) -> None:
+    def is_valid(self):
+        is_valid = super().is_valid()
+        if is_valid:
+            dashboard_created = self.create_dashboard_item()
+        return is_valid and dashboard_created
+
+    def create_dashboard_item(self) -> bool:
         dashboard = self.get_dashboard()
         name = self.cleaned_data.get("title")
+
         if dashboard is not None and name is not None:
             try:
                 form_data = {
@@ -130,10 +134,12 @@ class AddDashboardItemForm(BaseRockyForm):
                     "display_in_dashboard": self.display_in_dashboard,
                 }
                 DashboardItem.objects.create(**form_data)
+                return True
             except ValidationError as error:
                 raise ValidationError(error)
             except IntegrityError:
                 raise ValidationError(_("An error occurred while adding dashboard item."))
+        return False
 
 
 class AddObjectListDashboardItemForm(AddDashboardItemForm):
