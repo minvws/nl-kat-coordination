@@ -21,5 +21,5 @@ class StatusEnum(str, Enum):
 
 
 class BoefjeOutput(BaseModel):
-    status: StatusEnum
+    status: StatusEnum = StatusEnum.COMPLETED
     files: list[File] = Field(default_factory=list)
