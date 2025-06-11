@@ -344,11 +344,12 @@ class OnboardingSetupScanOOIDetailView(
 
     def get_ooi_pks(self) -> list[str]:
         ooi = self.get_ooi(self.request.GET.get("ooi"))
+        ooi.web_url = None
         if ooi.web_url is not None:
             hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
             return [hostname_ooi[0].primary_key]
 
-        messages.error(self.request, _("DNS Report cannot be created, web url not found."))
+        messages.error(self.request, _("Web URL not found."))
         return []
 
     def get_report_type_ids(self) -> list[str]:
