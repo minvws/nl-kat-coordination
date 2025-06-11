@@ -26,8 +26,9 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_handler import BoefjeHandlerInterface
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.interfaces import (
+    BoefjeHandlerInterface,
     BoefjeOutput,
     BoefjeStorageInterface,
     File,
@@ -167,9 +168,8 @@ class MockHandler(BoefjeHandlerInterface, NormalizerHandlerInterface):
             return False
 
         return task.data, BoefjeOutput(
-            status=StatusEnum.COMPLETED, files=[
-                File(name="1", content=base64.b64decode(b"123").decode(), tags=["my/mime"])
-            ]
+            status=StatusEnum.COMPLETED,
+            files=[File(name="1", content=base64.b64decode(b"123").decode(), tags=["my/mime"])],
         )
 
     def get_all(self) -> list[Task]:
@@ -191,7 +191,7 @@ def item_handler(tmp_path: Path):
 
 @pytest.fixture
 def mock_boefje_handler(mock_local_repository: LocalPluginRepository, mocker):
-    return BoefjeHandlerInterface(mock_local_repository, mocker.MagicMock())
+    return BoefjeHandler(mock_local_repository, mocker.MagicMock())
 
 
 @pytest.fixture

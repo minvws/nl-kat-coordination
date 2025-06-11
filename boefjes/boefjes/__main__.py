@@ -5,14 +5,13 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import Settings, settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.job_handler import CompositeBoefjeHandler, DockerBoefjeHandler, NormalizerHandlerInterface, bytes_api_client
+from boefjes.job_handler import CompositeBoefjeHandler, DockerBoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.local.runner import LocalNormalizerJobRunner
 from boefjes.logging import configure_logging
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.worker.boefje_handler import BoefjeHandlerInterface
-from boefjes.worker.interfaces import BoefjeHandlerInterface
+from boefjes.worker.boefje_handler import BoefjeHandler
 from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
 from boefjes.worker.repository import get_local_repository
 
@@ -32,10 +31,10 @@ def get_runtime_manager(
 
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler: BoefjeHandlerInterface = CompositeBoefjeHandler(
-            BoefjeHandlerInterface(local_repository, bytes_api_client), DockerBoefjeHandler(scheduler_client, bytes_api_client)
+            BoefjeHandler(local_repository, bytes_api_client), DockerBoefjeHandler(scheduler_client, bytes_api_client)
         )
     else:
-        item_handler = NormalizerHandlerInterface(
+        item_handler = NormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
 
