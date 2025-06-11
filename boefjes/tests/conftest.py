@@ -26,7 +26,7 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import BoefjeHandler, _copy_raw_files
 from boefjes.worker.interfaces import (
     BoefjeHandlerInterface,
     BoefjeOutput,
@@ -171,6 +171,16 @@ class MockHandler(BoefjeHandlerInterface, NormalizerHandlerInterface):
             status=StatusEnum.COMPLETED,
             files=[File(name="1", content=base64.b64encode(b"123").decode(), tags=["my/mime"])],
         )
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        if output is False:
+            return
+
+        boefje_meta, boefje_output = output
+
+        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)
 
     def get_all(self) -> list[Task]:
         return [self.queue.get() for _ in range(self.queue.qsize())]

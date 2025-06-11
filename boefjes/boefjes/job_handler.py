@@ -11,6 +11,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.normalizer_interfaces import NormalizerJobRunner
+from boefjes.worker.boefje_handler import _copy_raw_files
 from boefjes.worker.interfaces import BoefjeHandlerInterface, BoefjeOutput, NormalizerHandlerInterface, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
@@ -113,16 +114,7 @@ class DockerBoefjeHandler(BoefjeHandlerInterface):
         boefje_meta = self.boefje_storage.get_boefje_meta(task.data.id)
         boefje_output = self.boefje_storage.get_raws(task.data.id)
 
-        for item in duplicated_tasks:
-            new_boefje_meta = item.data
-            new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
-            new_boefje_meta.environment = boefje_meta.environment
-            new_boefje_meta.started_at = boefje_meta.started_at
-            new_boefje_meta.ended_at = boefje_meta.ended_at
-
-            self.boefje_storage.save_output(new_boefje_meta, boefje_output)
-
-            logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
+        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)
 
 
 class NormalizerHandler(NormalizerHandlerInterface):

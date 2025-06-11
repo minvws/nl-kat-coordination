@@ -38,6 +38,21 @@ class TemporaryEnvironment:
         os.environ.update(self._original_environment)
 
 
+def _copy_raw_files(
+    storage: BoefjeStorageInterface, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput, duplicated_tasks: list[Task]
+):
+    for item in duplicated_tasks:
+        new_boefje_meta = item.data
+        new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
+        new_boefje_meta.environment = boefje_meta.environment
+        new_boefje_meta.started_at = boefje_meta.started_at
+        new_boefje_meta.ended_at = boefje_meta.ended_at
+
+        storage.save_output(new_boefje_meta, boefje_output)
+
+        logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
+
+
 class BoefjeHandler(BoefjeHandlerInterface):
     def __init__(self, local_repository: LocalPluginRepository, boefje_storage: BoefjeStorageInterface):
         self.local_repository = local_repository
@@ -132,13 +147,4 @@ class BoefjeHandler(BoefjeHandlerInterface):
 
         boefje_meta, boefje_output = output
 
-        for item in duplicated_tasks:
-            new_boefje_meta = item.data
-            new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
-            new_boefje_meta.environment = boefje_meta.environment
-            new_boefje_meta.started_at = boefje_meta.started_at
-            new_boefje_meta.ended_at = boefje_meta.ended_at
-
-            self.boefje_storage.save_output(new_boefje_meta, boefje_output)
-
-            logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
+        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)
