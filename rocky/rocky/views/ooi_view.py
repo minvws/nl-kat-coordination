@@ -61,12 +61,14 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Searching for: ")] = self.search_string
         return active_filters
 
-    def count_active_filters(self):
+    @property
+    def count_active_filters(self) -> int:
         return (
             len(self.filtered_ooi_types)
             + len(self.clearance_levels)
             + len(self.clearance_types)
             + self.count_observed_at_filter()
+            + (1 if self.search_string else 0)
         )
 
     def get_ooi_scan_levels(self) -> set[ScanLevel]:
@@ -112,12 +114,13 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
+        context["search_string"] = self.search_string
         context["ooi_types_selection"] = self.filtered_ooi_types
         context["clearance_levels_selection"] = self.clearance_levels
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
         context["clearance_types_selection"] = self.clearance_types
         context["active_filters"] = self.get_active_filters()
-        context["active_filters_counter"] = self.count_active_filters()
+        context["active_filters_counter"] = self.count_active_filters
 
         return context
 
@@ -130,10 +133,19 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_queryset(self) -> OOIList:
         return OOIList(self.octopoes_api_connector, **self.get_queryset_params())
 
+    def get_table_columns(self) -> dict[str, str]:
+        return {
+            "object": _("Object"),
+            "object_type": _("Type"),
+            "clearance_level": _("Clearance level"),
+            "clearance_type": _("Clearance type"),
+        }
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["total_oois"] = len(self.object_list)
+        context["table_columns"] = self.get_table_columns()
         return context
 
 

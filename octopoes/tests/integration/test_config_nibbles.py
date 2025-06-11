@@ -297,7 +297,7 @@ def test_nibble_origin_deletion_propagation_with_optional(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 0
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 0
-    assert counter == 2
+    assert counter == 4
 
     xtdb_octopoes_service.ooi_repository.delete(url.reference, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
@@ -308,4 +308,4 @@ def test_nibble_origin_deletion_propagation_with_optional(
 
     assert xtdb_octopoes_service.ooi_repository.list_oois({Finding}, valid_time).count == 1
     assert xtdb_octopoes_service.ooi_repository.list_oois({KATFindingType}, valid_time).count == 1
-    assert counter == 4
+    assert counter == 6

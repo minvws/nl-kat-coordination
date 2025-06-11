@@ -105,10 +105,6 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         return self.members.select_related("organization")
 
-    @property
-    def can_access_all_organizations(self) -> bool:
-        return self.has_perm("tools.can_access_all_organizations")
-
     @cached_property
     def organizations(self) -> list[Organization]:
         """

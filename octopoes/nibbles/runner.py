@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Any
@@ -9,7 +9,7 @@ from pydantic import AnyUrl, BaseModel
 from xxhash import xxh3_128_hexdigest as xxh3
 
 from nibbles.definitions import NibbleDefinition, get_nibble_definitions
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
@@ -82,6 +82,8 @@ def serialize(obj: Any) -> str:
                 yield jcs.canonicalize(obj.value).decode()
             elif isinstance(obj, AnyUrl | IPv6Address | IPv4Address | Reference):
                 yield jcs.canonicalize(str(obj)).decode()
+            elif isinstance(obj, timedelta):
+                yield jcs.canonicalize(obj.total_seconds()).decode()
             else:
                 yield jcs.canonicalize(obj).decode()
 
@@ -184,22 +186,23 @@ class NibblesRunner:
         }
 
     def _check_arg_scan_level(self, nibble: NibbleDefinition, arg: Iterable, valid_time: datetime) -> bool:
+        scan_profiles = self.scan_profile_repository.get_bulk(
+            {a.reference for a in arg if isinstance(a, OOI)}, valid_time
+        )
         return nibble.check_scan_levels(
             [
-                sp.level
-                for sp in self.scan_profile_repository.get_bulk(
-                    {a.reference for a in arg if isinstance(a, OOI)}, valid_time
-                )
+                next((sp.level for sp in scan_profiles if sp.reference == a.reference), ScanLevel.L0)
+                if isinstance(a, OOI)
+                else ScanLevel.L0
+                for a in arg
             ]
         )
 
     def _run(self, ooi: OOI, valid_time: datetime) -> dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]]:
         return_value: dict[str, dict[tuple[Any, ...], tuple[set[OOI], bool]]] = {}
-        nibblets = self.origin_repository.list_origins(
-            valid_time, origin_type=OriginType.NIBBLET, parameters_references=[ooi.reference]
-        )
+        nibblets = self.origin_repository.list_nibblets_by_parameter(ooi.reference, valid_time)
         for nibblet in nibblets:
-            if nibblet.method in self.nibbles:
+            if nibblet.method in self.nibbles and ooi.reference not in nibblet.result:
                 nibble = self.nibbles[nibblet.method]
                 args = self.ooi_repository.nibble_query(
                     ooi,
@@ -245,11 +248,18 @@ class NibblesRunner:
                     nibble_origin = Origin(
                         method=nibble_id,
                         origin_type=OriginType.NIBBLET,
-                        source=source_ooi.reference,
+                        source=next((a.reference for a in arg if isinstance(a, OOI)), None),
                         result=result_references,
                         phantom_result=phantom_result,
                         parameters_hash=nibble_hasher(arg, self.nibbles[nibble_id]._checksum),
-                        parameters_references=[a.reference if isinstance(a, OOI) else None for a in arg],
+                        parameters_references=[
+                            a.reference if isinstance(a, OOI) and not s.optional else None
+                            for a, s in zip(arg, self.nibbles[nibble_id].signature)
+                        ],
+                        optional_references=[
+                            a.reference if isinstance(a, OOI) and s.optional else None
+                            for a, s in zip(arg, self.nibbles[nibble_id].signature)
+                        ],
                     )
                     for ooi in filter(lambda ooi: ooi.reference in result_references, result):
                         self.ooi_repository.save(ooi, valid_time=valid_time)

@@ -1,7 +1,7 @@
 import re
 from abc import ABC
 
-from boefjes.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.models import Boefje, BoefjeConfig, Normalizer, Organisation, PluginType
 
 
 class StorageError(Exception):
@@ -91,6 +91,9 @@ class OrganisationStorage(ABC):
     def create(self, organisation: Organisation) -> None:
         raise NotImplementedError
 
+    def update(self, organisation: Organisation) -> None:
+        raise NotImplementedError
+
     def delete_by_id(self, organisation_id: str) -> None:
         raise NotImplementedError
 
@@ -158,4 +161,15 @@ class ConfigStorage(ABC):
         raise NotImplementedError
 
     def get_states_for_organisation(self, organisation_id: str) -> dict[str, bool]:
+        raise NotImplementedError
+
+    def list_boefje_configs(
+        self,
+        offset: int,
+        limit: int,
+        organisation_id: str | None = None,
+        boefje_id: str | None = None,
+        enabled: bool | None = None,
+        with_duplicates: bool = False,
+    ) -> list[BoefjeConfig]:
         raise NotImplementedError

@@ -21,6 +21,7 @@ def test_missing_mx_nibble_with_and_without_nx(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -56,6 +57,7 @@ def test_missing_mx_nibble_with_and_without_mx(
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
@@ -89,6 +91,7 @@ def test_missing_mx_nibble_non_tld(xtdb_octopoes_service: OctopoesService, event
     nibbler = NibblesRunner(
         xtdb_octopoes_service.ooi_repository,
         xtdb_octopoes_service.origin_repository,
+        xtdb_octopoes_service.scan_profile_repository,
         xtdb_octopoes_service.nibbler.nibble_repository,
     )
     xtdb_octopoes_service.nibbler.disable()
