@@ -177,7 +177,8 @@ class OctopoesService:
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
         try:
-            self.ooi_repository.get(origin.source, valid_time)
+            if origin.source is not None:
+                self.ooi_repository.get(origin.source, valid_time)
         except ObjectNotFoundException:
             if (
                 origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION, OriginType.NIBBLET]
@@ -201,7 +202,8 @@ class OctopoesService:
             )
         ):
             logger.debug("Affirmation source %s seems dangling, deleting", origin.source)
-            self.ooi_repository.delete_if_exists(origin.source, valid_time)
+            if origin.source is not None:
+                self.ooi_repository.delete_if_exists(origin.source, valid_time)
             return
 
         for ooi in oois:
@@ -228,16 +230,22 @@ class OctopoesService:
             self.save_origin(origin, [], valid_time)
             return
 
-        try:
-            level = self.scan_profile_repository.get(origin.source, valid_time).level.value
-        except ObjectNotFoundException:
+        if origin.source:
+            try:
+                level = self.scan_profile_repository.get(origin.source, valid_time).level.value
+            except ObjectNotFoundException:
+                level = 0
+        else:
             level = 0
 
         if level < bit_definition.min_scan_level:
             self.save_origin(origin, [], valid_time)
             return
 
-        source = self.ooi_repository.get(origin.source, valid_time)
+        if origin.source:
+            source = self.ooi_repository.get(origin.source, valid_time)
+        else:
+            return
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
         parameters = self.ooi_repository.load_bulk_as_list({x.reference for x in parameters_references}, valid_time)
@@ -600,12 +608,13 @@ class OctopoesService:
             pass
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        origins = self.origin_repository.list_origins(event.valid_time, source=event.reference)
-        inference_origins = [o for o in origins if o.origin_type == OriginType.INFERENCE]
+        inference_origins = self.origin_repository.list_origins(
+            event.valid_time, origin_type=OriginType.INFERENCE, source=event.reference
+        )
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
         if event.new_data:
-            nibblets = [o for o in origins if o.origin_type == OriginType.NIBBLET]
+            nibblets = self.origin_repository.list_nibblets_by_parameter(event.reference, event.valid_time)
             for nibblet in nibblets:
                 if (
                     self.nibbler.nibbles[nibblet.method].has_scan_levels()
