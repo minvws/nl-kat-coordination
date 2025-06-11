@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load crisis_room %}
 
 <table>
     <caption class="visually-hidden">
@@ -9,7 +10,7 @@
     <thead>
         <tr>
             {% for column_value in dashboard_item.settings.columns %}
-                <th>{{ column_value|get_column_name_findings_list }}</th>
+                <th>{{ column_value|get_column_name_finding_list }}</th>
             {% endfor %}
             <th class="sticky-cell visually-hidden actions">{% translate "Details" %}</th>
         </tr>
@@ -17,7 +18,7 @@
     <tbody>
         {% for finding in data.finding_list %}
             <tr>
-                {% for column in dashboard_item.settings.columns %}
+                {% for column_value in dashboard_item.settings.columns %}
                     <td>
                         {% if column_value == "severity" %}
                             <span class="{{ finding.finding_type.risk_severity.value|lower }}">{{ finding.finding_type.risk_severity.value|capfirst }}</span>
