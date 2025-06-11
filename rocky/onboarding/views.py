@@ -349,6 +349,7 @@ class OnboardingSetupScanOOIDetailView(
             return [hostname_ooi[0].primary_key]
 
         messages.error(self.request, _("Web URL not found."))
+        logger.error("Web URL not found.")
         return []
 
     def get_report_type_ids(self) -> list[str]:
