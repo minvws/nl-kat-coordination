@@ -343,14 +343,13 @@ class OnboardingSetupScanOOIDetailView(
         )
 
     def get_ooi_pks(self) -> list[str]:
-        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        try:
+        ooi = self.get_ooi(self.request.GET.get("ooi"))
+        if ooi.web_url is not None:
             hostname_ooi = [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network)]
             return [hostname_ooi[0].primary_key]
-        except AttributeError as error:
-            logger.error("Attribute error: %s", error)
-            messages.error(self.request, _("DNS Report cannot be created, no Hostname."))
-            return []
+
+        messages.error(self.request, _("DNS Report cannot be created, web url not found."))
+        return []
 
     def get_report_type_ids(self) -> list[str]:
         return [self.request.GET.get("report_type", "")]
