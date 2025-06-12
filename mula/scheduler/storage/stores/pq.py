@@ -64,8 +64,11 @@ class PriorityQueueStore:
                     .all()
                 )
                 if len(dkey) == 0:
-                    # No tasks with a deduplication key, fall back to the default pop
-                    return self.pop(scheduler_id, limit, filters)
+                    # No tasks with a deduplication key, fall back to the
+                    # default pop. We explicitly limit to 1 for the boefje
+                    # scheduler, when there are no tasks with a deduplication
+                    # key.
+                    return self.pop(scheduler_id, 1, filters)
 
                 # Get the first task with a deduplication key
                 first_dkey = dkey[0].data["deduplication_key"]
