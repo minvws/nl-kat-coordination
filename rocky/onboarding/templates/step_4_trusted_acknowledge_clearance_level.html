@@ -12,7 +12,7 @@
                 <h1>{% translate "OpenKAT Introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Setup scan - User clearance level" %}</h2>
+                <h2>{% translate "User clearance level" %}</h2>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
@@ -27,8 +27,12 @@
                         Before a user is granted the ability to set clearance levels on an object,
                         they must first acknowledge and accept the clearance level set by the administrators.
                         The maximum scanning level permitted for a member is aligned with the trusted clearance level.
+                        <br>
                         By acknowledging the trusted clearance level, the user formally agrees to abide by
-                        this permission and gains the capability to perform scans only up to this trusted clearance level. Each user can decide to only accept a lower clearance than is given by the administrator.
+                        this permission and gains the capability to perform scans only up to this trusted clearance level.
+                    </p>
+                    <p>
+                        Each user can decide to only accept a lower clearance than is given by the administrator.
                         This two-step process ensures that the member operates within authorized boundaries.
                     {% endblocktranslate %}
                 </p>
@@ -72,7 +76,7 @@
         {% endblocktranslate %}
     </p>
     <div class="button-container">
-        <a href="{% url "step_6_set_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
+        <a href="{% url "step_5_add_scan_ooi" organization.code %}"
            class="button">{% translate "Set clearance level" %}</a>
         <a href="{% url "complete_onboarding" organization.code %}"
            class="button ghost">{% translate "Skip onboarding" %}</a>

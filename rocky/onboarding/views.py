@@ -101,8 +101,8 @@ class OnboardingSetupScanOOIInfoView(
     4. Explanation that an object is needed to make scans.
     """
 
-    template_name = "step_3a_setup_scan_ooi_info.html"
-    current_step = 3
+    template_name = "step_5_add_scan_ooi.html"
+    current_step = 5
     permission_required = "tools.can_scan_organization"
 
 
@@ -113,8 +113,8 @@ class OnboardingSetupScanOOIAddView(
     5. The user will create a URL object. Shows a form and validation to create object.
     """
 
-    template_name = "step_3b_setup_scan_ooi_add.html"
-    current_step = 3
+    template_name = "step_5_add_scan_ooi.html"
+    current_step = 5
     permission_required = "tools.can_scan_organization"
     form_class = OnboardingCreateObjectURLForm
 
@@ -134,14 +134,16 @@ class OnboardingSetupScanOOIAddView(
         ooi = self.get_or_create_url_object(cleaned_url)
         selection = {"ooi": ooi.primary_key, "report_type": self.report_type}
         return redirect(
-            reverse("step_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
+            reverse("step_7_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
             + get_selection(self.request, selection)
         )
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return super().build_breadcrumbs() + [
             {
-                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code})
+                "url": reverse(
+                    "step_7_clearance_level_introduction", kwargs={"organization_code": self.organization.code}
+                )
                 + get_selection(self.request),
                 "text": _("Creating an object"),
             }
@@ -206,7 +208,7 @@ class OnboardingAcknowledgeClearanceLevelView(
 
     template_name = "step_4_trusted_acknowledge_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
-    current_step = 3
+    current_step = 4
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -504,7 +506,7 @@ class OnboardingAccountSetupIntroView(
     """
 
     template_name = "step_2c_account_setup_intro.html"
-    current_step = 4
+    current_step = 7
     permission_required = "tools.add_organizationmember"
 
 

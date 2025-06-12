@@ -68,6 +68,12 @@ class IntroductionAdminStepsMixin(StepsMixin):
                     "step_4_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code}
                 ),
             },
+            {
+                "text": _("5: Scan setup object information"),
+                "url": reverse_lazy(
+                    "step_5_add_scan_ooi"  # , kwargs={"organization_code": self.organization.code}
+                ),
+            },
         ]
         return steps
 

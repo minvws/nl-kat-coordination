@@ -22,14 +22,14 @@ urlpatterns = [
         name="step_3_indemnification_setup",
     ),
     path(  # Step 4
-        "<organization_code>/step/account/acknowledge-clearance-level/",
+        "<organization_code>/step/acknowledge-clearance-level/",
         views.OnboardingAcknowledgeClearanceLevelView.as_view(),
         name="step_4_trusted_acknowledge_clearance_level",
     ),
-    path(  # Step 5a
+    path(  # Step 5
         "<organization_code>/step/setup-scan/<ooi_type>/",
         views.OnboardingSetupScanOOIAddView.as_view(),
-        name="step_5a_setup_scan_ooi_add",
+        name="step_5_add_scan_ooi",
     ),
     path(  # Step 6
         "<organization_code>/step/set-clearance-level/",
