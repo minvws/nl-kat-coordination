@@ -212,7 +212,7 @@ class OOI(BaseModel):
     @classmethod
     def traversable(cls) -> bool:
         return cls._traversable
-    
+
     @classmethod
     def type_from_raw(cls, fields: dict[str, Any]) -> type[OOI]:
         return cls

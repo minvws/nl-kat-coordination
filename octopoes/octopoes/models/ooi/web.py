@@ -54,7 +54,7 @@ class WebURL(OOI):
     path: str
 
     @classmethod
-    def type_from_raw(cls, raw_input:dict):
+    def type_from_raw(cls, raw_input: dict):
         if raw_input["netloc"].get("name") is not None:
             return HostnameHTTPURL
         return IPAddressHTTPURL

@@ -30,6 +30,7 @@
                 <form novalidate method="post" enctype="multipart/form-data" class="help">
                     {% csrf_token %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
                     <button type="submit">{% translate "Upload YML" %}</button>
                 </form>
             </div>

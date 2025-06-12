@@ -48,8 +48,8 @@ from rocky.views.tasks import (
     ReportsTaskListView,
 )
 from rocky.views.upload_csv import UploadCSV
-from rocky.views.upload_yml import UploadYML
 from rocky.views.upload_raw import UploadRaw
+from rocky.views.upload_yml import UploadYML
 
 handler404 = "rocky.views.handler404.handler404"
 handler403 = "rocky.views.handler403.handler403"

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from ipaddress import IPv4Address, IPv6Address, IPv4Network, ip_network
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, ip_network
 from typing import Annotated, Literal
 
 from pydantic import Field
@@ -47,7 +47,8 @@ class IPAddress(OOI):
 
     @classmethod
     def type_from_raw(cls, raw_input: dict):
-        return IPAddressV4 if isinstance(ip_network(raw_input['address']), IPv4Network) else IPAddressV6
+        return IPAddressV4 if isinstance(ip_network(raw_input["address"]), IPv4Network) else IPAddressV6
+
 
 class IPAddressV4(IPAddress):
     """Represents IPv4 address objects.
@@ -189,9 +190,9 @@ class NetBlock(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.start_ip.address}/{reference.tokenized.mask}"
-    
+
     @classmethod
-    def type_from_raw(cls, raw_input:dict):
+    def type_from_raw(cls, raw_input: dict):
         ip_address_type = IPAddress.type_from_raw(raw_input["start_ip"])
         return IPV6NetBlock if ip_address_type == IPAddressV6 else IPV4NetBlock
 

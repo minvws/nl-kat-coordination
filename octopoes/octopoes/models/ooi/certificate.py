@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Literal, Any
+from typing import Any, Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -68,10 +68,16 @@ class SubjectAlternativeName(OOI):
 
     @classmethod
     def type_from_raw(cls, raw_input: dict[str, Any]):
-        if raw_input.get("hostname"): return SubjectAlternativeNameHostname
-        if raw_input.get("address"): return SubjectAlternativeNameIP
-        if raw_input.get("name"): return SubjectAlternativeNameQualifier
-        raise ValueError("Falsy SubjectAlternativeName record type provided. Using other SubjectAlternativeName type OOIs can be better.")
+        if raw_input.get("hostname"):
+            return SubjectAlternativeNameHostname
+        if raw_input.get("address"):
+            return SubjectAlternativeNameIP
+        if raw_input.get("name"):
+            return SubjectAlternativeNameQualifier
+        raise ValueError(
+            "Falsy SubjectAlternativeName record type provided. "
+            "Using other SubjectAlternativeName type OOIs can be better."
+        )
 
 
 class SubjectAlternativeNameHostname(SubjectAlternativeName):
