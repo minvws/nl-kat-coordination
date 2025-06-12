@@ -37,7 +37,7 @@ def change_settings_columns(_apps, _schema_editor):
         if item.settings:
             columns = item.settings["columns"]
             if isinstance(columns, dict):
-                new_column_settings = [{k: v} for k, v in columns.items()]
+                new_column_settings = [column_value for column_value, _ in columns.items()]
                 item.settings["columns"] = new_column_settings
                 item.save()
 

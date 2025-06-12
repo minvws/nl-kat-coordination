@@ -36,14 +36,9 @@ FINDINGS_DASHBOARD_NAME = _("Findings Dashboard")
 FINDINGS_DASHBOARD_TEMPLATE = "findings_report/report.html"
 
 
-class DashboardItemColumn(TypedDict):
-    name: str
-    value: str
-
-
 class DashboardItemSettings(TypedDict):
     size: int
-    columns: list[DashboardItemColumn]
+    columns: list[str]
 
 
 def get_default_dashboard_item_settings() -> DashboardItemSettings:

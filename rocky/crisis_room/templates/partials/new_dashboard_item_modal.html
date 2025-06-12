@@ -18,8 +18,8 @@
 <form method="post" id="new-dashboard-item-form-{{ modal_id }}">
     {% csrf_token %}
     {% include "partials/form/form_errors.html" with form=add_dashboard_item_settings_form %}
-    {% include "partials/form/fieldset.html" with fields=add_dashboard_item_settings_form form_view="horizontal" %}
     {% include "forms/new_dashboard_item_form_fields.html" %}
+    {% include "partials/form/fieldset.html" with fields=add_dashboard_item_settings_form form_view="horizontal" %}
 
 </form>
 {% endfill %}
