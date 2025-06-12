@@ -48,7 +48,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_items(self, scheduler_id: str) -> list[Task]:
+    def pop_items(self, scheduler_id: str, limit: int | None = None) -> list[Task]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
