@@ -23,6 +23,9 @@
                     <li>
                         <a href="{% url 'upload_csv' organization.code %}"><span class="icon ti-file-upload" aria-hidden="true"></span>{% translate "Upload CSV" %}</a>
                     </li>
+                    <li>
+                        <a href="{% url 'upload_yml' organization.code %}"><span class="icon ti-file" aria-hidden="true"></span>{% translate "Upload YAML" %}</a>
+                    </li>
                 </ul>
             </div>
         </div>

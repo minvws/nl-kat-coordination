@@ -170,7 +170,7 @@ class DMARCTXTRecord(OOI):
 
     object_type: Literal["DMARCTXTRecord"] = "DMARCTXTRecord"
     value: str
-    ttl: int | None
+    ttl: int | None = None
     hostname: Reference = ReferenceField(Hostname)
 
     _natural_key_attrs = ["value", "hostname"]

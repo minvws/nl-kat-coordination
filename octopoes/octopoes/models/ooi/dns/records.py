@@ -29,6 +29,29 @@ class DNSRecord(OOI):
         dns_record_type = cls._get_record_type()
         return f"{reference.tokenized.hostname.name} {dns_record_type} {reference.tokenized.value}"
 
+    @classmethod
+    def type_from_raw(cls, raw_input: dict):
+        match raw_input.get("dns_record_type"):
+            case "A":
+                return DNSARecord
+            case "AAAA":
+                return DNSAAAARecord
+            case "CAA":
+                return DNSCAARecord
+            case "CNAME":
+                return DNSCNAMERecord
+            case "MX":
+                return DNSMXRecord
+            case "NS":
+                return DNSNSRecord
+            case "PTR":
+                return DNSPTRRecord
+            case "SOA":
+                return DNSSOARecord
+            case "TXT":
+                return DNSTXTRecord
+        raise ValueError("Falsy DNS record type provided. Using other DNSRecord type OOIs can be better.")
+
 
 class DNSARecord(DNSRecord):
     """Represents the DNS A record.
@@ -169,7 +192,7 @@ class DNSPTRRecord(DNSRecord):
 
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
-    address: Reference | None = ReferenceField(IPAddress)
+    address: Reference = ReferenceField(IPAddress)
 
     _natural_key_attrs = ["hostname", "address"]
 

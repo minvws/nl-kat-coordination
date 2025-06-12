@@ -74,6 +74,14 @@ class FindingType(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.id
 
+    @classmethod
+    def type_from_raw(cls, raw_input: dict):
+        requested_type = raw_input["id"].split("-", 1)[0]
+        for cls in FindingType.__subclasses__():
+            if cls.__name__.startswith(requested_type):
+                return cls
+        return KATFindingType
+
 
 class ADRFindingType(FindingType):
     """Represents the API Design Rules (ADR) Finding Types"""
