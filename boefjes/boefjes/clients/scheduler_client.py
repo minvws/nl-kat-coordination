@@ -9,6 +9,9 @@ import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from pydantic import TypeAdapter
 
 from boefjes.config import settings
@@ -16,9 +19,6 @@ from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 
 logger = structlog.get_logger(__name__)
 
@@ -43,7 +43,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = None
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
@@ -57,7 +57,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
             )
 
         response = self._session.post(
-            f"/schedulers/{queue_id}/pop", json=filters if filters["filters"] else None, params={"limit": limit}
+            f"/schedulers/{queue_id}/pop",
+            json=filters if filters["filters"] else None,
+            params={"limit": limit} if limit else None,
         )
         self._verify_response(response)
 
