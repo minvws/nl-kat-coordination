@@ -27,57 +27,58 @@ class PriorityQueueStore:
 
         return query
 
+    def _pop_with_session(
+        self, session, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
+    ) -> list[models.Task]:
+        query = self.build_pop_query(session, scheduler_id, filters)
+
+        try:
+            task_db_items = (
+                query.order_by(models.TaskDB.priority.asc(), models.TaskDB.created_at.asc()).limit(limit).all()
+            )
+        except exc.ProgrammingError as e:
+            raise StorageError(f"Invalid filter: {e}") from e
+
+        return [models.Task.model_validate(item) for item in task_db_items]
+
     @retry()
     @exception_handler
     def pop(
         self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
     ) -> list[models.Task]:
-        with self.dbconn.session.begin() as session:
-            query = self.build_pop_query(session, scheduler_id, filters)
-
-            try:
-                item_orm = (
-                    query.order_by(models.TaskDB.priority.asc())
-                    .order_by(models.TaskDB.created_at.asc())
-                    .limit(limit)
-                    .all()
-                )
-            except exc.ProgrammingError as e:
-                raise StorageError(f"Invalid filter: {e}") from e
-
-            items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
-
-            return items
+        with self.dbconn.session() as session:
+            return self._pop_with_session(session, scheduler_id, limit, filters)
 
     def pop_boefje(
         self, scheduler_id: str | None = None, limit: int | None = None, filters: FilterRequest | None = None
     ) -> list[models.Task]:
         """Custom pop method for the `BoefjeScheduler`"""
-        with self.dbconn.session.begin() as session:
+        with self.dbconn.session() as session:
             query = self.build_pop_query(session, scheduler_id, filters)
 
             try:
-                dkey = (
-                    query.filter(models.TaskDB.data["deduplication_key"].astext is not None)
-                    .order_by(models.TaskDB.priority.asc())
-                    .order_by(models.TaskDB.created_at.asc())
+                dkey_tasks = (
+                    query.filter(models.TaskDB.data["deduplication_key"].astext.isnot(None))
+                    .order_by(models.TaskDB.priority.asc(), models.TaskDB.created_at.asc())
                     .all()
                 )
-                if len(dkey) == 0:
+                if not dkey_tasks:
                     # No tasks with a deduplication key, fall back to the
                     # default pop. We explicitly limit to 1 for the boefje
                     # scheduler, when there are no tasks with a deduplication
                     # key.
-                    return self.pop(scheduler_id, 1, filters)
+                    return self._pop_with_session(session, scheduler_id, limit=1, filters=filters)
 
                 # Get the first task with a deduplication key
-                first_dkey = dkey[0].data["deduplication_key"]
+                first_dkey = dkey_tasks[0].data["deduplication_key"]
+
+                # Fresh query to avoid issues with the previous query
+                query = self.build_pop_query(session, scheduler_id, filters)
 
                 # Filter the query to only include tasks with the same deduplication key
                 item_orm = (
                     query.filter(models.TaskDB.data["deduplication_key"].astext == first_dkey)
-                    .order_by(models.TaskDB.priority.asc())
-                    .order_by(models.TaskDB.created_at.asc())
+                    .order_by(models.TaskDB.priority.asc(), models.TaskDB.created_at.asc())
                     .limit(limit)
                     .all()
                 )
