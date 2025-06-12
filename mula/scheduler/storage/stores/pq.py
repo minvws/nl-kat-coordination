@@ -82,6 +82,12 @@ class PriorityQueueStore:
                     .limit(limit)
                     .all()
                 )
+            except exc.ProgrammingError as e:
+                raise StorageError(f"Invalid filter: {e}") from e
+
+            items = [models.Task.model_validate(item_orm) for item_orm in item_orm]
+
+            return items
 
     @retry()
     @exception_handler
