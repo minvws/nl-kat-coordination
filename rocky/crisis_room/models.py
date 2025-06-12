@@ -52,7 +52,7 @@ class DashboardItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
-    source = models.CharField(blank=True, max_length=32)
+    source = models.CharField(blank=True, max_length=126)
     query = models.CharField(blank=True)
     template = models.CharField(blank=True, max_length=126, default=FINDINGS_DASHBOARD_TEMPLATE)
     position = models.PositiveSmallIntegerField(

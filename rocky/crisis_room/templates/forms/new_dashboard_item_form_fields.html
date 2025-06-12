@@ -4,11 +4,14 @@
             {% if value %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}
         {% endfor %}
     {% endfor %}
-{% endif %}
-{% if finding_list_filters_query %}
+{% elif finding_list_filters_query %}
     {% for name, values in finding_list_filters_query.items %}
         {% for value in values %}
             {% if value %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}
         {% endfor %}
     {% endfor %}
+{% else %}
+    <input type="hidden" name="recipe_id" value="{{ recipe_ooi.recipe_id }}">
+    <input type="hidden" name="source" value="{{ report_pk }}">
+    <input type="hidden" name="template" value="{{ template }}">
 {% endif %}

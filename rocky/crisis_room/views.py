@@ -28,7 +28,7 @@ from crisis_room.forms import AddDashboardForm
 from crisis_room.models import Dashboard, DashboardItem
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.reports import HydratedReport
@@ -125,7 +125,17 @@ class DashboardService:
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
             for dashboard_item, recipe_id in recipes_data.items():
                 try:
-                    hydrated_report = reports[recipe_id]
+                    if dashboard_item.findings_dashboard:
+                        hydrated_report = reports[recipe_id]
+                    else:
+                        octopoes_client = OctopoesAPIConnector(
+                            settings.OCTOPOES_API,
+                            dashboard_item.dashboard.organization.code,
+                            timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+                        )
+                        hydrated_report = octopoes_client.get(
+                            Reference.from_str(dashboard_item.source), datetime.now(timezone.utc)
+                        )
                     raw_ids.append(hydrated_report.data_raw_id)
                     reports_data[dashboard_item] = hydrated_report
                 except KeyError:
@@ -133,6 +143,7 @@ class DashboardService:
 
             # Get report data from bytes, per data raw id its report data
             report_data_from_bytes: dict[str, dict[str, Any]] = self.get_report_bytes_data(raw_ids)
+            logger.error("report_data_from_bytes: %s", report_data_from_bytes)
 
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_item, hydrated_report in reports_data.items():

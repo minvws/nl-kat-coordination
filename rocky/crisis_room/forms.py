@@ -21,14 +21,6 @@ class AddDashboardItemForm(BaseRockyForm):
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
 
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
-    )
-
     size = forms.ChoiceField(
         label=_("Dashboard item size"),
         required=True,
@@ -123,9 +115,9 @@ class AddDashboardItemForm(BaseRockyForm):
                     "name": name,
                     "recipe": self.recipe_id,
                     "source": self.source,
-                    "query": json.dumps(self.get_query()),
+                    "query": json.dumps(self.get_query() if not self.recipe_id else None),
                     "template": self.template,
-                    "settings": self.get_settings(),
+                    "settings": self.get_settings() if not self.recipe_id else None,
                     "display_in_dashboard": self.display_in_dashboard,
                 }
                 DashboardItem.objects.create(**form_data)
@@ -149,6 +141,14 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
             ("scan_level-desc", _("Clearance level (High-Low)")),
         ),
         initial="scan_level-desc",
+    )
+
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
     )
 
     columns = forms.MultipleChoiceField(
@@ -188,6 +188,14 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         ),
     )
 
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
+
     columns = forms.MultipleChoiceField(
         label=_("Show table columns"),
         required=True,
@@ -212,16 +220,9 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
 
 
 class AddReportSectionDashboardItemForm(AddDashboardItemForm):
-    chapter_description = forms.ChoiceField(
-        label=_("Include descriptions"),
-        required=True,
-        widget=forms.RadioSelect(),
-        choices=(("include", _("Yes")), ("exclude", _("No"))),
-        initial="include",
-    )
-
     def __init__(self, organization, *args, **kwargs):
         super().__init__(organization, *args, **kwargs)
         if self.data:
             self.template = self.data.get("template")
             self.recipe_id = self.data.get("recipe_id")
+            self.source = self.data.get("source")

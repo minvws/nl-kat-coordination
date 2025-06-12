@@ -7,14 +7,12 @@
 {% endblocktranslate %}
 {% endfill %}
 {% fill "content" %}
-{% if item_type != "report section" %}
-    <p>
-        {% blocktranslate with item_type=item_type trimmed %}
-            Add these {{ item_type }} with the selected filters
-            to the dashboard of your choice.
-        {% endblocktranslate %}
-    </p>
-{% endif %}
+<p>
+    {% blocktranslate with item_type=item_type trimmed %}
+        Add these {{ item_type }} with the selected filters
+        to the dashboard of your choice.
+    {% endblocktranslate %}
+</p>
 <form method="post" id="new-dashboard-item-form-{{ modal_id }}">
     {% csrf_token %}
     {% include "partials/form/form_errors.html" with form=add_dashboard_item_settings_form %}
