@@ -94,7 +94,7 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
-        columns = self.cleaned_data.get("columns")
+        columns = self.cleaned_data.get("columns", [])
 
         return {"size": size, "columns": columns}
 
@@ -117,7 +117,7 @@ class AddDashboardItemForm(BaseRockyForm):
                     "source": self.source,
                     "query": json.dumps(self.get_query() if not self.recipe_id else None),
                     "template": self.template,
-                    "settings": self.get_settings() if not self.recipe_id else None,
+                    "settings": self.get_settings(),
                     "display_in_dashboard": self.display_in_dashboard,
                 }
                 DashboardItem.objects.create(**form_data)

@@ -151,6 +151,7 @@ class DashboardService:
 
                 try:
                     report_data = report_data_from_bytes[hydrated_report.data_raw_id]
+                    logger.error("report_data: %s", report_data["report_data"])
 
                     if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)
