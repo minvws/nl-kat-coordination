@@ -166,11 +166,11 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         # Controlling shape of data # con
         if type(oois_from_yaml) is not list:
             return self.add_error_notification('OOI\'s should be stored in list type in the "oois" root field.')
-        if any(filter(lambda ooi_c: type(ooi_c) is not dict, oois_from_yaml)):
+        if any(type(ooi_c) is not dict for ooi_c in oois_from_yaml):
             return self.add_error_notification("All elements of oois list should object to create OOI.")
-        if any(filter[OOICandidate](lambda ooi_c: len(ooi_c.keys()) < 1, oois_from_yaml)):
+        if any(len(ooi_c.keys()) < 1 for ooi_c in oois_from_yaml):
             return self.add_error_notification("There are unsupported objects in the file.")
-        if any(filter[OOICandidate](lambda ooi_c: ooi_c.get("ooi_type") not in self.ooi_types, oois_from_yaml)):
+        if any(ooi_c.get("ooi_type") not in self.ooi_types for ooi_c in oois_from_yaml):
             return self.add_error_notification("Unsupported OOI type in the file. All OOI types are case sensitive")
 
         rows_with_error = []
@@ -210,8 +210,6 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         for field, referenced_type, is_reference, required in ooi_fields:
             if is_reference and required or is_reference and ooi_dict.get(field):
                 # required referenced fields or not required but also defined in yaml
-                if "ooi_type" in kwargs or field == "ooi_type":
-                    self.add_error_notification("field here")
                 try:
                     referenced_ooi = self.create_ooi(ooi_dict.get(field.lower()) or ooi_dict[referenced_type.lower()])
                     self.octopoes_api_connector.save_declaration(

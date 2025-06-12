@@ -192,7 +192,7 @@ class DNSPTRRecord(DNSRecord):
 
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
-    address: Reference | None = ReferenceField(IPAddress)
+    address: Reference = ReferenceField(IPAddress)
 
     _natural_key_attrs = ["hostname", "address"]
 
