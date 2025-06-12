@@ -20,7 +20,7 @@ I want to add indemnifications
     Get Title    equal    OpenKAT - step_account_setup_intro
 
 I want to onboard and create all optional users
-    Click    "Create separate accounts"
+    Click    xpath=//a[@id="create-account"]
     Click    "Let's add accounts"
     Get Title    equal    OpenKAT - step_account_setup_admin
 

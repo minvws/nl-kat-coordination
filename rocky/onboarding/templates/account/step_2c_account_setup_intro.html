@@ -35,6 +35,7 @@
                 {% if organization %}
                     <div class="button-container">
                         <a href="{% url "step_choose_user_type" organization.code %}"
+                           id="create-account"
                            class="button ghost">{% translate "Create separate accounts" %}</a>
                         <a href="{% url "step_introduction" organization.code %}"
                            class="button ">{% translate "Continue with this account, onboard me!" %}</a>

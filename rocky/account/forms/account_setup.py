@@ -147,6 +147,7 @@ class OrganizationForm(BaseRockyModelForm):
         widgets = {
             "name": forms.TextInput(
                 attrs={
+                    "id": "id_name",
                     "placeholder": _("The name of the organization."),
                     "autocomplete": "off",
                     "aria-describedby": _("explanation-organization-name"),
@@ -181,7 +182,7 @@ class IndemnificationAddForm(BaseRockyForm):
             "that I have permission to scan these assets. "
             "I am aware of the implications a scan with a higher scan level brings on my systems."
         ),
-        widget=forms.CheckboxInput(),
+        widget=forms.CheckboxInput(attrs={"id": "id_may_scan'"}),
     )
     am_authorized = forms.CharField(
         label=_(
@@ -189,7 +190,7 @@ class IndemnificationAddForm(BaseRockyForm):
             "I have the experience and knowledge to know what the consequences might be and"
             " can be held responsible for them."
         ),
-        widget=forms.CheckboxInput(),
+        widget=forms.CheckboxInput(attrs={"id": "id_am_authorized"}),
     )
 
 
