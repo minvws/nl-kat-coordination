@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div>
-                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" query_from="object_list" %}
+                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" source="object_list" %}
 
                 <div class="toolbar">
                     {% if organization_member.can_add_dashboard_item and organization_member.can_change_dashboard %}
