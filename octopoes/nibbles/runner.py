@@ -1,3 +1,6 @@
+import cProfile
+import io
+import pstats
 from collections.abc import Iterable
 from datetime import datetime, timedelta
 from enum import Enum
@@ -5,6 +8,7 @@ from ipaddress import IPv4Address, IPv6Address
 from typing import Any
 
 import jcs
+import structlog
 from pydantic import AnyUrl, BaseModel
 from xxhash import xxh3_128_hexdigest as xxh3
 
@@ -15,6 +19,46 @@ from octopoes.repositories.nibble_repository import NibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+
+logger = structlog.get_logger("nibbler")
+profiler = cProfile.Profile()
+
+
+def parse_profile_output(stats_obj: pstats.Stats, top_n=30):
+    entries = []
+    for func, stat in stats_obj.stats.items():  # type: ignore[attr-defined]
+        filename, lineno, funcname = func
+        cc, nc, tt, ct, _ = stat
+        entry = {
+            "filename": filename,
+            "lineno": lineno,
+            "funcname": funcname,
+            "function": f"{filename}:{lineno}::{funcname}",
+            "pcalls": cc,
+            "ncalls": nc,
+            "tottime": tt,
+            "percall_tottime": tt / cc if cc > 0 else 0,
+            "cumtime": ct,
+            "percall_cumtime": ct / nc if nc > 0 else 0,
+        }
+        entries.append(entry)
+    return sorted(entries, key=lambda x: x["cumtime"], reverse=True)[:top_n]
+
+
+def pretty_print_profile(profile_data, limit=30):
+    if isinstance(profile_data, str):
+        raise TypeError("Expected structured profile data (list of dicts), got str")
+
+    header = f"{'pcalls':>6} {'ncalls':>6} {'tottime':>10} {'percall':>10} {'cumtime':>10} {'percall':>10}  function"
+    lines = [header]
+    for row in profile_data[:limit]:
+        lines.append(
+            f"{row['pcalls']:6} {row['ncalls']:6} "
+            f"{row['tottime']:10.4f} {row['percall_tottime']:10.4f} "
+            f"{row['cumtime']:10.4f} {row['percall_cumtime']:10.4f}  "
+            f"{row['function']}"
+        )
+    return "\n".join(lines)
 
 
 def merge_results(
@@ -267,6 +311,7 @@ class NibblesRunner:
         self.cache = {}
 
     def infer(self, stack: list[OOI], valid_time: datetime) -> dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]]:
+        profiler.enable()
         self.sync(valid_time)
         inferences: dict[OOI, dict[str, dict[tuple[Any, ...], set[OOI]]]] = {}
         blockset = set(stack)
@@ -292,4 +337,12 @@ class NibblesRunner:
                     }
                 }
         self._write(valid_time)
+        profiler.disable()
+        stream = io.StringIO()
+        stats = pstats.Stats(profiler, stream=stream)
+        stats.sort_stats("cumulative")
+        stats.print_stats()
+        structured_profile = parse_profile_output(stats)
+        pretty = pretty_print_profile(structured_profile)
+        logger.error("\n\n%s\n\n", pretty)
         return inferences
