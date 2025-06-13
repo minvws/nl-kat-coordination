@@ -10,7 +10,7 @@ List Objects
     Insert Normalizer Output
     Await Sync
     Object List Should Contain    ${REF_HOSTNAME}
-    Total Object Count Should Be    ${6}
+    Total Object Count Should Be    ${8}
 
 List Objects With Filter
     Insert Normalizer Output
@@ -44,7 +44,7 @@ Load Bulk
 *** Keywords ***
 Verify Object List With Filter
     ${response_data}    Get Objects With ScanLevel 0
-    Should Be Equal    ${response_data["count"]}    ${6}
+    Should Be Equal    ${response_data["count"]}    ${8}
 
 Get Objects With ScanLevel 0
     ${params}    Create Dictionary    scan_level=0    valid_time=${VALID_TIME}
@@ -55,7 +55,7 @@ Get Objects With ScanLevel 0
 
 Verify Object List With SearchString
     ${response_data}    Get Objects With SearchString example.com
-    Should Be Equal    ${response_data["count"]}    ${4}
+    Should Be Equal    ${response_data["count"]}    ${5}
 
 Get Objects With SearchString example.com
     ${params}    Create Dictionary    search_string=example.com    valid_time=${VALID_TIME}
