@@ -125,9 +125,11 @@ class DashboardService:
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
             for dashboard_item, recipe_id in recipes_data.items():
                 try:
-                    if dashboard_item.findings_dashboard:
+                    if (
+                        dashboard_item.findings_dashboard or not dashboard_item.source
+                    ):  # Report section from aggregate report
                         hydrated_report = reports[recipe_id]
-                    else:
+                    else:  # Report section from a normal report
                         octopoes_client = OctopoesAPIConnector(
                             settings.OCTOPOES_API,
                             dashboard_item.dashboard.organization.code,
@@ -143,7 +145,6 @@ class DashboardService:
 
             # Get report data from bytes, per data raw id its report data
             report_data_from_bytes: dict[str, dict[str, Any]] = self.get_report_bytes_data(raw_ids)
-            logger.error("report_data_from_bytes: %s", report_data_from_bytes)
 
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_item, hydrated_report in reports_data.items():
@@ -151,7 +152,6 @@ class DashboardService:
 
                 try:
                     report_data = report_data_from_bytes[hydrated_report.data_raw_id]
-                    logger.error("report_data: %s", report_data["report_data"])
 
                     if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)

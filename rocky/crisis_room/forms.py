@@ -115,7 +115,7 @@ class AddDashboardItemForm(BaseRockyForm):
                     "name": name,
                     "recipe": self.recipe_id,
                     "source": self.source,
-                    "query": json.dumps(self.get_query() if not self.recipe_id else None),
+                    "query": json.dumps(self.get_query()) if not self.recipe_id else "",
                     "template": self.template,
                     "settings": self.get_settings(),
                     "display_in_dashboard": self.display_in_dashboard,

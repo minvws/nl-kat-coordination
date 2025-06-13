@@ -56,8 +56,10 @@
                                         {% include data.template with data=data.data show_introduction="yes" %}
 
                                     </div>
-                                    {% include "partials/new_dashboard_item_modal_report_section.html" with template=data.template ooi=data.input_oois.0 report_type=data.report_types.0 %}
+                                    {% with ooi=data.input_oois.0 report_type=data.report_types.0 %}
+                                        {% include "partials/new_dashboard_item_modal_report_section.html" with template=data.template report_pk="AssetReport|"|add:ooi|add:"|"|add:report_type %}
 
+                                    {% endwith %}
                                 {% endwith %}
                             </section>
                         {% endif %}

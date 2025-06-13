@@ -107,8 +107,11 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                {% if dashboard_item.item.recipe %}
+                                {% if dashboard_item.item.recipe and dashboard_item.item.source %}
                                     {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data.report_data is_dashboard="yes" %}
+
+                                {% elif dashboard_item.item.recipe %}
+                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data is_dashboard="yes" %}
 
                                 {% else %}
                                     {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
