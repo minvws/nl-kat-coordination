@@ -345,6 +345,14 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
+        self.logger.debug(
+            "Popped %s item(s) from queue %s",
+            len(items),
+            self.queue.pq_id,
+            queue_id=self.queue.pq_id,
+            scheduler_id=self.scheduler_id,
+        )
+
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """
         When the schedule is not set, and the auto_calculate_deadline is
