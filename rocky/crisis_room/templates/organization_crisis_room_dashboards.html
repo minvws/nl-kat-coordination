@@ -41,7 +41,7 @@
             <div class="dashboard">
                 {% for dashboard_item in dashboard_items %}
                     {% if dashboard_item.item.findings_dashboard %}
-                        {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data is_dashboard="yes" %}
+                        {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data.report_data is_crisis_room="yes" %}
 
                     {% else %}
                         <section class="width-{{ dashboard_item.item.settings.size }}">
@@ -108,13 +108,13 @@
                                     {% endif %}
                                 </div>
                                 {% if dashboard_item.item.recipe and dashboard_item.item.source %}
-                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data.report_data is_dashboard="yes" %}
+                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data.report_data is_dashboard_item="yes" %}
 
                                 {% elif dashboard_item.item.recipe %}
-                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data is_dashboard="yes" %}
+                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data is_dashboard_item="yes" %}
 
                                 {% else %}
-                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard="yes" %}
+                                    {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard_item="yes" %}
 
                                 {% endif %}
                             </div>

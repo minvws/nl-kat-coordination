@@ -96,14 +96,20 @@
             {% if data.findings %}
                 <section id="findings">
                     <div>
-                        <h2>{% translate "Findings" %}</h2>
-                        <p>
-                            {% blocktranslate %}
-                                This chapter contains information about the findings that have been identified
-                                for this organization.
-                            {% endblocktranslate%}
-                        </p>
-                        {% include "findings_report/report.html" with data=data.findings %}
+                        <div>
+                            <div class="horizontal-view">
+                                <h2>{% translate "Findings" %}</h2>
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="findings-modal" template="aggregate_organisation_report/findings.html" %}
+
+                            </div>
+                            <p>
+                                {% blocktranslate %}
+                                    This chapter contains information about the findings that have been identified
+                                    for this organization.
+                                {% endblocktranslate%}
+                            </p>
+                        </div>
+                        {% include "aggregate_organisation_report/findings.html" with report_section="yes" %}
 
                     </div>
                 </section>
