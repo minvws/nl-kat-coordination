@@ -20,6 +20,8 @@
         </ul>
     </div>
 </div>
+{% include "partials/new_dashboard_item_modal_report_section.html" %}
+
 {% block html_at_end_body %}
     <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

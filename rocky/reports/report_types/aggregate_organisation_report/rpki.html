@@ -1,0 +1,20 @@
+{% load i18n %}
+
+{% if not report_section %}
+    <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+{% endif %}
+<p>
+    {% blocktranslate trimmed %}
+        This section contains basic security information about resource public key
+        infrastructure. If your web server employs RPKI for its IP addresses and
+        associated nameservers, then it enhances visitor protection against
+        misconfigurations and malicious route intercepts through verified route
+        announcements, ensuring reliable server access and secure internet traffic.
+    {% endblocktranslate %}
+</p>
+{% for system_type, system in data.basic_security.rpki.items %}
+    {% if system %}
+        {% include "rpki_report/report.html" with data=system type=system_type %}
+
+    {% endif %}
+{% endfor %}

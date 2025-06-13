@@ -25,8 +25,10 @@
                                         {% if report_ooi.report_type != "multi-organization-report" %}
                                             <div class="horizontal-view">
                                                 <h2>{{ data.report_name }}</h2>
-                                                {% include "partials/new_dashboard_item_three_dots.html" %}
+                                                {% with ooi=data.input_oois.0 report_type=data.report_types.0 %}
+                                                    {% include "partials/new_dashboard_item_three_dots.html" with template=data.template report_pk="AssetReport|"|add:ooi|add:"|"|add:report_type %}
 
+                                                {% endwith %}
                                             </div>
                                         {% else %}
                                             <h2>{{ data.report_name }}</h2>
@@ -34,10 +36,6 @@
                                         {% include data.template with data=data.data show_introduction="yes" %}
 
                                     </div>
-                                    {% with ooi=data.input_oois.0 report_type=data.report_types.0 %}
-                                        {% include "partials/new_dashboard_item_modal_report_section.html" with template=data.template report_pk="AssetReport|"|add:ooi|add:"|"|add:report_type %}
-
-                                    {% endwith %}
                                 {% endwith %}
                             </section>
                         {% endif %}

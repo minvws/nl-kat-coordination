@@ -35,10 +35,9 @@
                             </p>
                             <div class="horizontal-view">
                                 <h3>{% translate "Overview of the basic security status" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="basic-security-modal" %}
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="basic-security-modal" template="aggregate_organisation_report/basic_security.html" %}
 
                             </div>
-                            {% include "partials/new_dashboard_item_modal_report_section.html" with modal_id="basic-security-modal" template="aggregate_organisation_report/basic_security.html" %}
                             {% include "aggregate_organisation_report/basic_security.html" with report_section="yes" %}
 
                         </div>
@@ -47,10 +46,9 @@
                         <div id="safe-connections">
                             <div class="horizontal-view">
                                 <h3>{% translate "Safe connections" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="safe-connections-modal" %}
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="safe-connections-modal" template="aggregate_organisation_report/safe_connections.html" %}
 
                             </div>
-                            {% include "partials/new_dashboard_item_modal_report_section.html" with modal_id="safe-connections-modal" template="aggregate_organisation_report/safe_connections.html" %}
                             {% include "aggregate_organisation_report/safe_connections.html" with report_section="yes" %}
 
                         </div>
@@ -59,32 +57,22 @@
                         <div id="system-specific">
                             <div class="horizontal-view">
                                 <h3>{% translate "System specific" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="system-specific-modal" %}
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="system-specific-modal" template="aggregate_organisation_report/system_specific_overview.html" %}
 
                             </div>
-                            {% include "partials/new_dashboard_item_modal_report_section.html" with modal_id="system-specific-modal" template="aggregate_organisation_report/system_specific_overview.html" %}
                             {% include "aggregate_organisation_report/system_specific_overview.html" with report_section="yes" %}
 
                         </div>
                     {% endif %}
                     {% if data.basic_security.rpki %}
                         <div id="rpki">
-                            <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                            <p>
-                                {% blocktranslate trimmed %}
-                                    This section contains basic security information about resource public key
-                                    infrastructure. If your web server employs RPKI for its IP addresses and
-                                    associated nameservers, then it enhances visitor protection against
-                                    misconfigurations and malicious route intercepts through verified route
-                                    announcements, ensuring reliable server access and secure internet traffic.
-                                {% endblocktranslate %}
-                            </p>
-                            {% for system_type, system in data.basic_security.rpki.items %}
-                                {% if system %}
-                                    {% include "rpki_report/report.html" with data=system type=system_type %}
+                            <div class="horizontal-view">
+                                <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="rpki-modal" template="aggregate_organisation_report/rpki.html" %}
 
-                                {% endif %}
-                            {% endfor %}
+                            </div>
+                            {% include "aggregate_organisation_report/rpki.html" with report_section="yes" %}
+
                         </div>
                     {% endif %}
                 </div>
@@ -92,14 +80,16 @@
             {% if data.vulnerabilities %}
                 <section id="vulnerabilities">
                     <div>
-                        <h2>{% translate "Vulnerabilities" %}</h2>
-                        <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                        {% if not data.vulnerabilities %}
-                            <p>{% translate "No CVEs have been found." %}</p>
-                        {% else %}
-                            {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
+                        <div>
+                            <div class="horizontal-view">
+                                <h2>{% translate "Vulnerabilities" %}</h2>
+                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="vulnerabilities-modal" template="aggregate_organisation_report/vulnerabilities.html" %}
 
-                        {% endif %}
+                            </div>
+                            <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                        </div>
+                        {% include "aggregate_organisation_report/vulnerabilities.html" with report_section="yes" %}
+
                     </div>
                 </section>
             {% endif %}
