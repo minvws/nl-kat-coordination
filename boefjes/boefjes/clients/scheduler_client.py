@@ -48,7 +48,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_items(self, scheduler_id: str) -> list[Task]:
+    def pop_items(self, scheduler_id: str, limit: int | None = None) -> list[Task]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -71,8 +71,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def pop_items(self, scheduler_id: str) -> list[Task]:
-        response = self._session.post(f"/schedulers/{scheduler_id}/pop?limit=1")
+    def pop_items(self, scheduler_id: str, limit: int | None = None) -> list[Task]:
+        response = self._session.post(f"/schedulers/{scheduler_id}/pop", params={"limit": limit} if limit else {})
         self._verify_response(response)
 
         popped_tasks = TypeAdapter(TaskPop | None).validate_json(response.content)
