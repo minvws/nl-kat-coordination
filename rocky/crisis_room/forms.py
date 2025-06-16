@@ -94,7 +94,7 @@ class AddDashboardItemForm(BaseRockyForm):
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
-        columns = self.cleaned_data.get("columns", [])
+        columns = self.cleaned_data.get("columns")
 
         return {"size": size, "columns": columns}
 
