@@ -113,7 +113,7 @@ class SchedulerWorkerManager(WorkerManager):
                 return
 
             for p_item in p_items:
-                self.task_queue.put(p_item)
+                self.task_queue.put([p_item])
             logger.info("Dispatched tasks[ids=%s]", [p_item.data.id for p_item in p_items])
         except:  # noqa
             logger.exception("Exiting worker...")

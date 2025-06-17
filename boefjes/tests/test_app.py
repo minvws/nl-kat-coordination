@@ -197,6 +197,37 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     }
 
 
+def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path):
+    manager.scheduler_client = MockSchedulerClient(
+        boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje.json")],
+        normalizer_responses=[],
+        log_path=tmp_path / "patch_task_log",
+    )
+    manager.settings.deduplicate = False
+    with pytest.raises(KeyboardInterrupt):
+        manager.run(WorkerManager.Queue.BOEFJES)
+
+    items = item_handler.get_all()
+
+    # Just one task dispatched
+    assert len(items) == 2
+    assert items[0].boefje.id == "dns-records"
+    assert items[1].boefje.id == "dns-records"
+
+    patched_tasks = manager.scheduler_client.get_all_patched_tasks()
+
+    # But two tasks marked as completed
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+    }
+
+    bytes_calls = item_handler.bytes_client.get_all()
+    assert bytes_calls == []
+
+
 def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path):
     manager.scheduler_client = MockSchedulerClient(
         boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje.json")],

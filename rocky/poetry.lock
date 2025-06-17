@@ -525,13 +525,13 @@ dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "setuptools", "tox"]
 
 [[package]]
 name = "django"
-version = "5.1.9"
+version = "5.1.10"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "django-5.1.9-py3-none-any.whl", hash = "sha256:2fd1d4a0a66a5ba702699eb692e75b0d828b73cc2f4e1fc4b6a854a918967411"},
-    {file = "django-5.1.9.tar.gz", hash = "sha256:565881bdd0eb67da36442e9ac788bda90275386b549070d70aee86327781a4fc"},
+    {file = "django-5.1.10-py3-none-any.whl", hash = "sha256:19c9b771e9cf4de91101861aadd2daaa159bcf10698ca909c5755c88e70ccb84"},
+    {file = "django-5.1.10.tar.gz", hash = "sha256:73e5d191421d177803dbd5495d94bc7d06d156df9561f4eea9e11b4994c07137"},
 ]
 
 [package.dependencies]
@@ -900,14 +900,17 @@ test = ["tox", "tox-gh-actions"]
 
 [[package]]
 name = "editorconfig"
-version = "0.17.0"
+version = "0.17.1"
 description = "EditorConfig File Locator and Interpreter for Python"
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 files = [
-    {file = "EditorConfig-0.17.0-py3-none-any.whl", hash = "sha256:fe491719c5f65959ec00b167d07740e7ffec9a3f362038c72b289330b9991dfc"},
-    {file = "editorconfig-0.17.0.tar.gz", hash = "sha256:8739052279699840065d3a9f5c125d7d5a98daeefe53b0e5274261d77cb49aa2"},
+    {file = "editorconfig-0.17.1-py3-none-any.whl", hash = "sha256:1eda9c2c0db8c16dbd50111b710572a5e6de934e39772de1959d41f64fc17c82"},
+    {file = "editorconfig-0.17.1.tar.gz", hash = "sha256:23c08b00e8e08cc3adcddb825251c497478df1dada6aefeb01e626ad37303745"},
 ]
+
+[package.extras]
+dev = ["mypy (>=1.15)"]
 
 [[package]]
 name = "exceptiongroup"
@@ -943,13 +946,13 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "37.1.0"
+version = "37.3.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "faker-37.1.0-py3-none-any.whl", hash = "sha256:dc2f730be71cb770e9c715b13374d80dbcee879675121ab51f9683d262ae9a1c"},
-    {file = "faker-37.1.0.tar.gz", hash = "sha256:ad9dc66a3b84888b837ca729e85299a96b58fdaef0323ed0baace93c9614af06"},
+    {file = "faker-37.3.0-py3-none-any.whl", hash = "sha256:48c94daa16a432f2d2bc803c7ff602509699fca228d13e97e379cd860a7e216e"},
+    {file = "faker-37.3.0.tar.gz", hash = "sha256:77b79e7a2228d57175133af0bbcdd26dc623df81db390ee52f5104d46c010f2f"},
 ]
 
 [package.dependencies]
@@ -3506,4 +3509,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d979fe8f2d03529399651d3d8d723e64251895b066f9f0873de8c297843f81e8"
+content-hash = "f6fd5dbdd27a2db71ec96ce8d36a7cb0c3ea609b44c6d5dc80ff7a1cf2b36624"
