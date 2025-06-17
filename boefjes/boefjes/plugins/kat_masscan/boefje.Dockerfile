@@ -1,17 +1,18 @@
 # syntax=docker/dockerfile:1
 
-FROM alpine:3.18
+FROM python:3.11-slim
+
+ARG BOEFJE_PATH=./boefjes/plugins/kat_masscan
+ENV PYTHONPATH=/app:$BOEFJE_PATH
+
+RUN adduser --disabled-password lama
+WORKDIR /home/lama
 
 # Packages:
-# build-base, gcc, make, linux-headers: create masscan binary
 # git: get masscan source
 # libpcap(-dev): run masscan
 # libcap: set cap_net_raw permission for user lama
-RUN apk update && apk upgrade \
-    && apk add --no-cache build-base git make gcc libpcap libpcap-dev linux-headers libcap \
-    && adduser -D lama
-
-WORKDIR /home/lama
+RUN apt-get update && apt-get install -y git libpcap-dev libcap2-bin make gcc && pip install httpx
 
 # Version pinning on specific commit. Tag in boefje.py may need an update when updating this hash.
 RUN mkdir masscan \
@@ -25,4 +26,8 @@ RUN mkdir masscan \
     && setcap cap_net_raw=eip /home/lama/masscan/bin/masscan
 
 USER lama
-ENTRYPOINT [ "/home/lama/masscan/bin/masscan" ]
+
+COPY ./images/oci_adapter.py ./
+COPY $BOEFJE_PATH $BOEFJE_PATH
+
+ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
