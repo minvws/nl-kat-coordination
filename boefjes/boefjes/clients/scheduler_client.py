@@ -43,7 +43,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = None
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = None
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
