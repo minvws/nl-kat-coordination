@@ -100,6 +100,7 @@ class Organization(models.Model):
             ("can_access_all_organizations", "Can access all organizations"),
             ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
+        ordering = ["name"]
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])
@@ -202,19 +203,19 @@ class OrganizationMember(models.Model):
 
     @property
     def can_reposition_dashboard_item(self):
-        return self.has_perm("crisis_room.change_dashboarddata_position")
+        return self.has_perm("crisis_room.change_dashboarditem_position")
 
     @property
     def can_add_dashboard_item(self):
-        return self.has_perm("crisis_room.add_dashboarddata")
+        return self.has_perm("crisis_room.add_dashboarditem")
 
     @property
     def can_delete_dashboard_item(self):
-        return self.has_perm("crisis_room.delete_dashboarddata")
+        return self.has_perm("crisis_room.delete_dashboarditem")
 
     @property
     def can_change_dashboard_item(self):
-        return self.has_perm("crisis_room.change_dashboarddata")
+        return self.has_perm("crisis_room.change_dashboarditem")
 
     @property
     def can_modify_dashboard(self) -> bool:
@@ -228,10 +229,10 @@ class OrganizationMember(models.Model):
         """If you can add, you might as well change and delete a dashboard items."""
         return self.has_perms(
             [
-                "crisis_room.add_dashboarddata",
-                "crisis_room.change_dashboarddata",
-                "crisis_room.delete_dashboarddata",
-                "crisis_room.change_dashboarddata_position",
+                "crisis_room.add_dashboarditem",
+                "crisis_room.change_dashboarditem",
+                "crisis_room.delete_dashboarditem",
+                "crisis_room.change_dashboarditem_position",
             ]
         )
 

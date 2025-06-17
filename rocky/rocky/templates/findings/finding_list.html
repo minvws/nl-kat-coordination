@@ -26,6 +26,13 @@
                 </div>
             </div>
             <div>
+                {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" source="finding_list" %}
+
+                <div class="toolbar">
+                    <a href="#new-dashboard-item-modal"
+                       class="button ghost"
+                       data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
+                </div>
                 {% include "findings/findings_filter.html" %}
 
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
@@ -59,7 +66,7 @@
                                         class="sortable"
                                         {% if order_by == "score" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
                                         <button form="finding-list" name="order_by" value="score" class="sort">
-                                            {% translate "Severity" %}
+                                            {{ table_columns.severity }}
                                             <span aria-hidden="true"
                                                   class="icon ti-{% if order_by == "score" and sorting_order == "asc" %}chevron-up{% elif order_by == "score" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                         </button>
@@ -68,14 +75,14 @@
                                         class="sortable"
                                         {% if order_by == "finding_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
                                         <button form="finding-list" name="order_by" value="finding_type" class="sort">
-                                            {% translate "Finding" %}
+                                            {{ table_columns.finding }}
                                             <span aria-hidden="true"
                                                   class="icon ti-{% if order_by == "finding_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "finding_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                                         </button>
                                     </th>
-                                    <th>{% translate "Location" %}</th>
-                                    <th>{% translate "Tree" %}</th>
-                                    <th>{% translate "Graph" %}</th>
+                                    <th>{{ table_columns.location }}</th>
+                                    <th>{{ table_columns.tree }}</th>
+                                    <th>{{ table_columns.graph }}</th>
                                     <th class="sticky-cell visually-hidden actions">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
@@ -141,13 +148,6 @@
                                                         <dd>
                                                             <a href="{% url "ooi_list" organization_code=organization.code %}?observed_at={{ observed_at }}&ooi_type={{ hydrated_finding.ooi.object_type }}"
                                                                title="{% blocktranslate trimmed with ooi_type=hydrated_finding.ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ hydrated_finding.ooi.object_type }}</a>
-                                                        </dd>
-                                                    </div>
-                                                    <div>
-                                                        <dt>{% translate "Source OOI" %}</dt>
-                                                        <dd>
-                                                            <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.ooi organization.code query=mandatory_fields observed_at=observed_at %}"
-                                                               title="{% blocktranslate trimmed with ooi=hydrated_finding.finding.ooi.human_readable %} Show details for {{ ooi }} {% endblocktranslate %}">{{ hydrated_finding.finding.ooi.human_readable }}</a>
                                                         </dd>
                                                     </div>
                                                     <div>
@@ -230,5 +230,6 @@
     {{ block.super }}
     {% compress js %}
         <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}
