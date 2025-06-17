@@ -1,13 +1,15 @@
 import json
 from datetime import datetime, timezone
 
-from django.contrib.auth.models import Permission
 from django.db import migrations, models
 
-from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
+from crisis_room.management.commands.dashboards import run_findings_dashboard
+from crisis_room.models import FINDINGS_DASHBOARD_NAME
 
 
-def update_permissions(_apps, _schema_editor):
+def update_permissions(apps, _schema_editor):
+    Permission = apps.get_model("auth", "Permission")
+
     old_permissions = Permission.objects.filter(codename__icontains="dashboarddata")
 
     for permission in old_permissions:
@@ -23,14 +25,18 @@ def update_permissions(_apps, _schema_editor):
         permission.delete()
 
 
-def change_name_findings_dashboard(_apps, _schema_editor):
+def change_name_findings_dashboard(apps, _schema_editor):
+    Dashboard = apps.get_model("crisis_room", "Dashboard")
+
     dashboards = Dashboard.objects.filter(name="Findings Dashboard")
     for dashboard in dashboards:
         dashboard.name = FINDINGS_DASHBOARD_NAME
         dashboard.save()
 
 
-def change_settings_columns(_apps, _schema_editor):
+def change_settings_columns(apps, _schema_editor):
+    DashboardItem = apps.get_model("crisis_room", "DashboardItem")
+
     dashboard_items = DashboardItem.objects.all()
 
     for item in dashboard_items:
@@ -42,7 +48,9 @@ def change_settings_columns(_apps, _schema_editor):
                 item.save()
 
 
-def change_query_params(_apps, _schema_editor):
+def change_query_params(apps, _schema_editor):
+    DashboardItem = apps.get_model("crisis_room", "DashboardItem")
+
     dashboard_items = DashboardItem.objects.all()
     new_query = {}
     for dashboard_item in dashboard_items:
@@ -59,6 +67,15 @@ def change_query_params(_apps, _schema_editor):
 
             dashboard_item.query = json.dumps(new_query)
             dashboard_item.save()
+
+
+def create_findings_dashboard_for_all_orgs(apps, _schema_editor):
+    Organization = apps.get_model("tools", "Organization")
+    Dashboard = apps.get_model("crisis_room", "Dashboard")
+    DashboardItem = apps.get_model("crisis_room", "DashboardItem")
+
+    for organization in Organization.objects.all():
+        run_findings_dashboard(organization, None, Dashboard, DashboardItem)
 
 
 class Migration(migrations.Migration):
@@ -87,4 +104,5 @@ class Migration(migrations.Migration):
         migrations.RunPython(change_name_findings_dashboard),
         migrations.RunPython(change_settings_columns),
         migrations.RunPython(change_query_params),
+        migrations.RunPython(create_findings_dashboard_for_all_orgs),
     ]
