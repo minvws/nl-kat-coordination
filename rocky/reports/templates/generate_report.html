@@ -26,7 +26,7 @@
                                             <div class="horizontal-view">
                                                 <h2>{{ data.report_name }}</h2>
                                                 {% with ooi=data.input_oois.0 report_type=data.report_types.0 %}
-                                                    {% include "partials/new_dashboard_item_three_dots.html" with template=data.template report_pk="AssetReport|"|add:ooi|add:"|"|add:report_type %}
+                                                    {% include "partials/report_section_action_button.html" with template=data.template report_pk="AssetReport|"|add:ooi|add:"|"|add:report_type %}
 
                                                 {% endwith %}
                                             </div>
