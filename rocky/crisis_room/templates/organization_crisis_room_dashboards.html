@@ -64,6 +64,17 @@
                                         </span>
                                     </div>
                                     <div class="toolbar">
+                                        {% if dashboard_item.item.recipe and dashboard_item.item.source %}
+                                            <a class="button ghost"
+                                               href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.parent_report.primary_key }}&observed_at={{ dashboard_item.data.report.observed_at|date:"Y-m-d H:i:s:u" }}">
+                                                {{ dashboard_item.data.report.reference_date }} {{ dashboard_item.data.parent_report.name }}
+                                            </a>
+                                        {% elif dashboard_item.item.recipe %}
+                                            <a class="button ghost"
+                                               href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.report.primary_key }}&observed_at={{ dashboard_item.data.report.observed_at|date:"Y-m-d H:i:s:u" }}">
+                                                {{ dashboard_item.data.report.reference_date }} {{ dashboard_item.data.report.name }}
+                                            </a>
+                                        {% endif %}
                                         {% if organization_member.can_modify_dashboard_item %}
                                             <div class="dropdown">
                                                 <button type="button"
