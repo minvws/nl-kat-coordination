@@ -11,8 +11,52 @@
             {% include "organization_crisis_room_header.html" with active=dashboard.name %}
 
             {% if dashboards %}
-                {% include "organization_crisis_room_dashboards.html" %}
+                {% if dashboard %}
+                    <div>
+                        <div class="fifty-fifty">
+                            <div class="horizontal-view">
+                                <h2>{{ dashboard.name }}</h2>
+                                {% if organization_member.can_delete_dashboard %}
+                                    <div class="dropdown">
+                                        <button id="action-dropdown-button"
+                                                type="button"
+                                                aria-label="{% translate "Options for dashboard" %}"
+                                                aria-haspopup="menu"
+                                                aria-controls="action-dropdown"
+                                                aria-expanded="false"
+                                                class="icon-only ti-dots-vertical dropdown-button"></button>
+                                        <div id="action-dropdown"
+                                             class="dropdown-list"
+                                             role="menu"
+                                             aria-labelledby="action-dropdown-button">
+                                            <ul role="presentation">
+                                                <li>
+                                                    <a href="#delete-dashboard-modal" class="plain destructive">
+                                                        <i class="icon ti-trash"></i>{% translate "Delete dashboard" %}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if organization_member.can_add_dashboard and not dashboard_items.0.item.findings_dashboard %}
+                                <div class="toolbar">
+                                    {% include "partials/new_dashboard_item_action_button.html" %}
 
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% include "organization_crisis_room_dashboard_items.html" %}
+
+                    </div>
+                    {% if organization_member.can_delete_dashboard %}
+                        {% include "partials/delete_dashboard_modal.html" %}
+
+                    {% endif %}
+                {% else %}
+                    <p>{% translate "Dashboard does not exist. Choose an existing dashboard or create a new one." %}</p>
+                {% endif %}
             {% else %}
                 <p>
                     {% blocktranslate trimmed %}
@@ -24,3 +68,6 @@
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+{% endblock html_at_end_body %}

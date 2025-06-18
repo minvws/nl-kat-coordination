@@ -35,7 +35,7 @@
                             </p>
                             <div class="horizontal-view">
                                 <h3>{% translate "Overview of the basic security status" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="basic-security-modal" template="aggregate_organisation_report/basic_security.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="basic-security-modal" template="aggregate_organisation_report/basic_security.html" %}
 
                             </div>
                             {% include "aggregate_organisation_report/basic_security.html" with report_section="yes" %}
@@ -46,7 +46,7 @@
                         <div id="safe-connections">
                             <div class="horizontal-view">
                                 <h3>{% translate "Safe connections" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="safe-connections-modal" template="aggregate_organisation_report/safe_connections.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="safe-connections-modal" template="aggregate_organisation_report/safe_connections.html" %}
 
                             </div>
                             {% include "aggregate_organisation_report/safe_connections.html" with report_section="yes" %}
@@ -57,7 +57,7 @@
                         <div id="system-specific">
                             <div class="horizontal-view">
                                 <h3>{% translate "System specific" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="system-specific-modal" template="aggregate_organisation_report/system_specific_overview.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="system-specific-modal" template="aggregate_organisation_report/system_specific_overview.html" %}
 
                             </div>
                             {% include "aggregate_organisation_report/system_specific_overview.html" with report_section="yes" %}
@@ -68,7 +68,7 @@
                         <div id="rpki">
                             <div class="horizontal-view">
                                 <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="rpki-modal" template="aggregate_organisation_report/rpki.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="rpki-modal" template="aggregate_organisation_report/rpki.html" %}
 
                             </div>
                             {% include "aggregate_organisation_report/rpki.html" with report_section="yes" %}
@@ -83,7 +83,7 @@
                         <div>
                             <div class="horizontal-view">
                                 <h2>{% translate "Vulnerabilities" %}</h2>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="vulnerabilities-modal" template="aggregate_organisation_report/vulnerabilities.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="vulnerabilities-modal" template="aggregate_organisation_report/vulnerabilities.html" %}
 
                             </div>
                             <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
@@ -99,7 +99,7 @@
                         <div>
                             <div class="horizontal-view">
                                 <h2>{% translate "Findings" %}</h2>
-                                {% include "partials/new_dashboard_item_three_dots.html" with modal_id="findings-modal" template="aggregate_organisation_report/findings.html" %}
+                                {% include "partials/report_section_action_button.html" with modal_id="findings-modal" template="aggregate_organisation_report/findings.html" %}
 
                             </div>
                             <p>

@@ -188,10 +188,18 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     task_type = "report"
 
     def post(self, request, *args, **kwargs):
+        dashboard = self.request.POST.get("dashboard")
         try:
             self.run_bulk_actions()
         except (ObjectNotFoundException, ValidationError):
             messages.error(request, _("An unexpected error occurred, please check logs for more info."))
+
+        if dashboard:
+            return redirect(
+                reverse(
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard}
+                )
+            )
         return self.get(request, *args, **kwargs)
 
     def get_queryset(self) -> ReportList:
@@ -203,7 +211,6 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     def run_bulk_actions(self) -> None:
         action = self.request.POST.get("action", "")
         report_references = self.request.POST.getlist("report_reference", [])
-        logger.error("Report_references: %s", report_references)
 
         if action == "rename":
             return self.rename_reports(report_references)

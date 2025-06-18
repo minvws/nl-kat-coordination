@@ -121,6 +121,11 @@ class DashboardService:
         if recipes_data:
             # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
+            octopoes_client = OctopoesAPIConnector(
+                settings.OCTOPOES_API,
+                dashboard_item.dashboard.organization.code,
+                timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+            )
 
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
             for dashboard_item, recipe_id in recipes_data.items():
@@ -130,11 +135,6 @@ class DashboardService:
                     ):  # Report section from aggregate report
                         hydrated_report = reports[recipe_id]
                     else:  # Report section from a normal report
-                        octopoes_client = OctopoesAPIConnector(
-                            settings.OCTOPOES_API,
-                            dashboard_item.dashboard.organization.code,
-                            timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
-                        )
                         hydrated_report = octopoes_client.get(
                             Reference.from_str(dashboard_item.source), datetime.now(timezone.utc)
                         )
@@ -155,6 +155,13 @@ class DashboardService:
 
                     if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)
+
+                    if dashboard_item.recipe and dashboard_item.source:
+                        parent_report_id = hydrated_report.report_recipe.replace("ReportRecipe", "Report")
+                        parent_report = octopoes_client.get_report(parent_report_id, datetime.now(timezone.utc))
+                        item_data.data.update(
+                            {"parent_report": {"primary_key": parent_report.primary_key, "name": parent_report.name}}
+                        )
 
                     item_data.data.update({"report_data": report_data})
                     dashboard_items_with_data.append(item_data)
