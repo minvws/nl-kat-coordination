@@ -13,27 +13,23 @@
                 {% include "partials/stepper.html" %}
 
                 <h2>{% translate "User clearance level" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        The user clearance level specifies the maximum scan level for security scans and the
+                        maximum clearance level you can assign to objects (e.g. a URL).
+                    {% endblocktranslate %}
+                </p>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        OpenKAT has a permission system that allows administrators to
-                        configure which users can set a certain clearance level. The will make sure
-                        that only trusted users can start more aggressive scans.
+                        The administrator assigns a maximum user clearance level to each user.
+                        This will make sure that only trusted users can start more aggressive scans.
                     {% endblocktranslate %}
                 </p>
-                <h3>{% translate "Acknowledge clearance level" %}</h3>
+                <h3>{% translate "Accepted clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        Before a user is granted the ability to set clearance levels on an object,
-                        they must first acknowledge and accept the clearance level set by the administrators.
-                        The maximum scanning level permitted for a member is aligned with the trusted clearance level.
-                        <br>
-                        By acknowledging the trusted clearance level, the user formally agrees to abide by
-                        this permission and gains the capability to perform scans only up to this trusted clearance level.
-                    </p>
-                    <p>
-                        Each user can decide to only accept a lower clearance than is given by the administrator.
-                        This two-step process ensures that the member operates within authorized boundaries.
+                        A user must accept a clearance level, before they perform actions in OpenKAT. Here you may accept the maximum trusted clearance level, as assigned by your administrator. On your user settings page you can choose to lower your accepted clearance level after completing the onboarding.
                     {% endblocktranslate %}
                 </p>
                 <h3>{% translate "What is my clearance level?" %}</h3>
@@ -71,17 +67,15 @@
         <p>
             {% blocktranslate trimmed %}
                 Your administrator has <strong>trusted</strong> you with a clearance level of <strong>L{{ tcl }}</strong>.
-            </br>
-            You have also <strong>acknowledged</strong> to use this clearance level of <strong>L{{ acl }}</strong>.
-        {% endblocktranslate %}
-    </p>
-    <div class="button-container">
-        <a href="{% url "step_5_add_scan_ooi" organization.code %}"
-           class="button">{% translate "Set clearance level" %}</a>
-        <a href="{% url "complete_onboarding" organization.code %}"
-           class="button ghost">{% translate "Skip onboarding" %}</a>
-    </div>
-{% endif %}
+            {% endblocktranslate %}
+        </p>
+        <div class="button-container">
+            <a href="{% url "step_5_add_scan_ooi" organization.code %}"
+               class="button">{% translate "Accept clearance level" %}</a>
+            <a href="{% url "complete_onboarding" organization.code %}"
+               class="button ghost">{% translate "Skip onboarding" %}</a>
+        </div>
+    {% endif %}
 {% endwith %}
 </div>
 </section>

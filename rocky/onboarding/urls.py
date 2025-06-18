@@ -32,14 +32,14 @@ urlpatterns = [
         name="step_5_add_scan_ooi",
     ),
     path(  # Step 6
-        "<organization_code>/step/clearance-level-introduction/",
-        views.OnboardingClearanceLevelIntroductionView.as_view(),
-        name="step_6_clearance_level_introduction",
-    ),
-    path(  # Step 7
         "<organization_code>/step/set-clearance-level/",
         views.OnboardingSetClearanceLevelView.as_view(),
-        name="step_7_set_clearance_level",
+        name="step_6_set_clearance_level",
+    ),
+    path(  # Step 7
+        "<organization_code>/step/clearance-level-introduction/",
+        views.OnboardingClearanceLevelIntroductionView.as_view(),
+        name="step_7_clearance_level_introduction",
     ),
     path(  # Step 8
         "<organization_code>/step/setup-scan/select-plugins/",

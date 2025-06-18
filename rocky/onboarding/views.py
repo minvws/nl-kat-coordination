@@ -134,16 +134,14 @@ class OnboardingSetupScanOOIAddView(
         ooi = self.get_or_create_url_object(cleaned_url)
         selection = {"ooi": ooi.primary_key, "report_type": self.report_type}
         return redirect(
-            reverse("step_6_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
+            reverse("step_6_set_clearance_level", kwargs={"organization_code": self.organization.code})
             + get_selection(self.request, selection)
         )
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return super().build_breadcrumbs() + [
             {
-                "url": reverse(
-                    "step_6_clearance_level_introduction", kwargs={"organization_code": self.organization.code}
-                )
+                "url": reverse("step_6_set_clearance_level", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
                 "text": _("Creating an object"),
             }
@@ -161,7 +159,7 @@ class OnboardingClearanceLevelIntroductionView(
     6. Explanation what clearance levels mean.
     """
 
-    template_name = "step_6_clearance_level_introduction.html"
+    template_name = "step_7_clearance_level_introduction.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
@@ -228,7 +226,7 @@ class OnboardingSetClearanceLevelView(
     8. Set the actual clearance level on the object created before.
     """
 
-    template_name = "step_7_set_clearance_level.html"
+    template_name = "step_6_set_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
     form_class = OnboardingSetClearanceLevelForm
@@ -300,7 +298,7 @@ class OnboardingSetupScanSelectPluginsView(
         messages.success(request, _("Plugins successfully enabled."))
 
         return redirect(
-            reverse("step_setup_scan_ooi_detail", kwargs={"organization_code": self.organization.code})
+            reverse("AAAAAstep_10_setup_scan_ooi_detail", kwargs={"organization_code": self.organization.code})
             + get_selection(self.request)
         )
 
@@ -323,7 +321,7 @@ class OnboardingSetupScanOOIDetailView(
     9. Shows the user object information, more in depth info about the object.
     """
 
-    template_name = "step_3c_setup_scan_ooi_detail.html"
+    template_name = "step_10_setup_scan_ooi_detail.html"
     current_step = 3
     permission_required = "tools.can_scan_organization"
     task_type = "report"
@@ -336,7 +334,7 @@ class OnboardingSetupScanOOIDetailView(
         self.create_report_schedule(report_recipe, datetime.now(timezone.utc) + timedelta(minutes=2))
 
         return redirect(
-            reverse("step_report", kwargs={"organization_code": self.organization.code})
+            reverse("step_11_report", kwargs={"organization_code": self.organization.code})
             + get_selection(self.request, {"recipe_id": report_recipe.primary_key})
         )
 
