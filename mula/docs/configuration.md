@@ -4,7 +4,7 @@ The scheduler allows some configuration options to be set. Environment
 variables are used to configure the scheduler. And these can be set in the
 `.env-dist` file. When a value isn't set the default value from the scheduler
 will be used. Check the [`settings.py`](../scheduler/config/settings.py) file
-fo the default values and what value you can set.
+for the default values and what value you can set.
 
 ## Setting scheduler configuration values
 
