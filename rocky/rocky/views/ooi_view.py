@@ -12,7 +12,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
-from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES, ClearanceFilterForm, OOIForm, OrderByObjectTypeForm
+from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES, ClearanceFilterForm, OOIFilterForm, OOIForm, OrderByObjectTypeForm
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
@@ -145,7 +145,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["active_filters"] = self.get_active_filters()
         context["object_list_filters_query"] = self.get_filters_query()
         context["active_filters_counter"] = self.count_active_filters
-
+        context["list_filters"] = OOIFilterForm(self.request.GET)
         return context
 
 

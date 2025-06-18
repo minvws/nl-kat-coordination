@@ -8,17 +8,21 @@ from typing import Literal, TypedDict
 import structlog
 from account.mixins import OrganizationView
 from account.models import KATUser
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.http import Http404, HttpRequest
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 from httpx import HTTPError
 from katalogus.client import Boefje
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
-from tools.models import Organization
+from tools.models import Organization, OrganizationMember
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
@@ -120,6 +124,8 @@ class ObservedAtMixin:
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):
+    add_object_to_dashboard_form = None
+
     def get_single_ooi(self, pk: str) -> OOI:
         try:
             ref = Reference.from_str(pk)
@@ -533,3 +539,49 @@ class SeveritiesMixin:
                 messages.error(self.request, _(str(e)))
 
         return severities
+
+
+class AddDashboardItemFormView(FormView):
+    add_dashboard_item_form: type[forms.Form] | None = None
+    organization: Organization
+    template_name: str
+    organization_member: OrganizationMember
+
+    def get_form_class(self):
+        if self.add_dashboard_item_form is None:
+            raise ImproperlyConfigured(f"{self.__class__.__name__} requires 'dashboard_form_class' to be set.")
+        return self.add_dashboard_item_form
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = self.organization
+        return kwargs
+
+    def get_initial(self):
+        initial = {}
+        for key in self.request.GET:
+            values = self.request.GET.getlist(key)
+            initial[key] = values if len(values) > 1 else values[0]
+        return initial
+
+    def add_to_dashboard(self) -> HttpResponseRedirect | HttpResponsePermanentRedirect | HttpResponse:
+        if not self.organization_member.can_add_dashboard_item:
+            messages.error(self.request, _("You do not have the permission to add items to a dashboard."))
+            raise PermissionDenied
+
+        form = self.get_form()
+        if form.is_valid():
+            dashboard_id = form.cleaned_data.get("dashboard")
+            messages.success(self.request, _("Dashboard item has been added."))
+            return redirect(
+                reverse(
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
+                )
+            )
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_dashboard_item_form"] = self.get_form()
+        return context

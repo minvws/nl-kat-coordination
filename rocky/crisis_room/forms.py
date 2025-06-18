@@ -1,12 +1,13 @@
 import json
+from datetime import datetime, timezone
 from typing import Any
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
-from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
+from tools.forms.ooi_form import OOIFilterForm
 
 from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
 from rocky.views.mixins import FINDING_LIST_COLUMNS, OBJECT_LIST_COLUMNS
@@ -16,7 +17,7 @@ class AddDashboardForm(BaseRockyForm):
     dashboard_name = forms.CharField(label=_("Name"), required=True)
 
 
-class AddDashboardItemForm(BaseRockyForm):
+class AddDashboardItemForm(OOIFilterForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
@@ -28,6 +29,13 @@ class AddDashboardItemForm(BaseRockyForm):
         choices=(("1", _("Full width")), ("2", _("Half width"))),
         initial="1",
     )
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,7 +46,6 @@ class AddDashboardItemForm(BaseRockyForm):
         self.template = ""
         self.display_in_dashboard = True
         self.table_columns = {}
-        self.data: QueryDict = kwargs.pop("data")
 
     def clean_title(self):
         """Checks if title is already used as dashboard item name"""
@@ -81,11 +88,11 @@ class AddDashboardItemForm(BaseRockyForm):
         order_by = sort_by[0]
         sorting_order = sort_by[1]
         limit = int(self.cleaned_data.get("limit", 10))
-        observed_at = self.data.get("observed_at")
-        search = self.data.get("search", "")
+        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
+        search = self.cleaned_data.get("search", "")
 
         return {
-            "observed_at": observed_at,
+            "observed_at": observed_at.strftime("%Y-%m-%d"),
             "order_by": order_by,
             "sorting_order": sorting_order,
             "limit": limit,
@@ -143,14 +150,6 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         initial="scan_level-desc",
     )
 
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
-    )
-
     columns = forms.MultipleChoiceField(
         label=_("Show table columns"),
         required=True,
@@ -167,10 +166,9 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         default_query = super().get_query()
 
         query = {
-            "ooi_type": self.data.getlist("ooi_type", []),
-            "clearance_level": self.data.getlist("clearance_level", []),
-            "clearance_type": self.data.getlist("clearance_type", []),
-            "search": self.data.get("search_string", ""),
+            "ooi_type": self.cleaned_data.get("ooi_type", []),
+            "clearance_level": self.cleaned_data.get("clearance_level", []),
+            "clearance_type": self.cleaned_data.get("clearance_type", []),
         }
         return default_query | query
 
@@ -186,14 +184,6 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
             ("finding_type-asc", _("Finding (A-Z)")),
             ("finding_type-desc", _("Finding (Z-A)")),
         ),
-    )
-
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
     )
 
     columns = forms.MultipleChoiceField(

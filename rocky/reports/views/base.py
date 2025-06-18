@@ -40,7 +40,7 @@ from reports.report_types.helpers import (
 )
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.utils import JSONEncoder, debug_json_keys
-from rocky.views.mixins import ObservedAtMixin, OOIList
+from rocky.views.mixins import AddDashboardItemFormView, ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
 from rocky.views.scheduler import SchedulerView
 
@@ -539,13 +539,13 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
-class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
+class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView, AddDashboardItemFormView):
     """
     This will display reports using report_id from reports history.
     Will fetch Report OOI and recreate report with data saved in bytes.
     """
 
-    add_report_section_to_dashboard_form = AddReportSectionDashboardItemForm
+    add_dashboard_item_form = AddReportSectionDashboardItemForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -555,26 +555,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         self.recipe_ooi = self.get_recipe_ooi(self.report_ooi.report_recipe)
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        """Add report section(s) to a dashboard."""
-        if not self.organization_member.can_add_dashboard_item:
-            messages.error(request, _("You do not have the permission to add items to a dashboard."))
-            return self.get(request, status=404, *args, **kwargs)
-        return self.add_to_dashboard(request, *args, **kwargs)
-
-    def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = self.get_add_dashboard_item_form()
-
-        if form.is_valid():
-            dashboard_id = form.cleaned_data.get("dashboard")
-            messages.success(self.request, _("Dashboard item has been added."))
-
-            return redirect(
-                reverse(
-                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
-                )
-            )
-
-        return self.get(request, *args, **kwargs)
+        return self.add_to_dashboard()
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
@@ -746,10 +727,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         return self.get_report_data_single_report()
 
-    def get_add_dashboard_item_form(self) -> AddReportSectionDashboardItemForm:
-        data = self.request.POST if self.request.POST else None
-        return self.add_report_section_to_dashboard_form(organization=self.organization, data=data)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["report_data"] = self.report_data
@@ -758,7 +735,6 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context["oois"] = self.input_oois
         context["report_types"] = self.report_types
         context["plugins"] = self.plugins
-        context["add_dashboard_item_settings_form"] = self.get_add_dashboard_item_form()
         context["report_download_json_url"] = url_with_querystring(
             reverse("view_report", kwargs={"organization_code": self.organization.code}),
             True,

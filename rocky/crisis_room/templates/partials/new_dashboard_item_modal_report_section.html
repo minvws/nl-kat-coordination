@@ -5,12 +5,12 @@
 {% translate "Add report section to dashboard" %}
 {% endfill %}
 {% fill "content" %}
-{% if recipe_ooi.cron_expression and add_dashboard_item_settings_form.dashboard|length > 1 %}
+{% if recipe_ooi.cron_expression and add_dashboard_item_form.dashboard|length > 1 %}
     <form method="post" id="new-dashboard-item-form-{{ modal_id }}">
         {% csrf_token %}
-        {% include "partials/form/form_errors.html" with form=add_dashboard_item_settings_form %}
+        {% include "partials/form/form_errors.html" with form=add_dashboard_item_form %}
         {% include "forms/new_dashboard_item_form_fields.html" %}
-        {% include "partials/form/fieldset.html" with fields=add_dashboard_item_settings_form form_view="horizontal" %}
+        {% include "partials/form/fieldset.html" with fields=add_dashboard_item_form form_view="horizontal" %}
 
     </form>
 {% elif recipe_ooi.cron_expression %}
@@ -51,7 +51,7 @@
 {% endif %}
 {% endfill %}
 {% fill "footer_buttons" %}
-{% if recipe_ooi.cron_expression and add_dashboard_item_settings_form.dashboard|length > 1 %}
+{% if recipe_ooi.cron_expression and add_dashboard_item_form.dashboard|length > 1 %}
     <button type="submit"
             form="new-dashboard-item-form-{{ modal_id }}"
             class="submit"

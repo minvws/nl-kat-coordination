@@ -14,7 +14,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_collapsed_types, get_relations
 from tools.enums import SCAN_LEVEL
-from tools.forms.base import BaseRockyForm, CheckboxGroup
+from tools.forms.base import BaseRockyForm, ObservedAtForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 
 
@@ -171,12 +171,17 @@ def default_field_options(name: str, field_info: FieldInfo) -> DefaultFieldOptio
 
 
 class ClearanceFilterForm(BaseRockyForm):
-    clearance_level = forms.CharField(
-        label=_("Filter by clearance level"), widget=CheckboxGroup(choices=SCAN_LEVEL.choices), required=False
+    clearance_level = forms.MultipleChoiceField(
+        label=_("Filter by clearance level"),
+        choices=SCAN_LEVEL.choices,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
     )
-
-    clearance_type = forms.CharField(
-        label=_("Filter by clearance type"), widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES), required=False
+    clearance_type = forms.MultipleChoiceField(
+        label=_("Filter by clearance type"),
+        choices=CLEARANCE_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
     )
 
 
@@ -214,3 +219,13 @@ class OOISearchForm(BaseRockyForm):
 
 class OrderByObjectTypeForm(BaseRockyForm):
     order_by = forms.CharField(widget=forms.HiddenInput(attrs={"value": "object_type"}), required=False)
+
+
+class OOIFilterForm(OOISearchForm, ClearanceFilterForm, OOITypeMultiCheckboxForm, ObservedAtForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["observed_at"].widget = forms.HiddenInput()
+        self.fields["ooi_type"].widget = forms.MultipleHiddenInput()
+        self.fields["clearance_level"].widget = forms.MultipleHiddenInput()
+        self.fields["clearance_type"].widget = forms.MultipleHiddenInput()
+        self.fields["search"].widget = forms.HiddenInput()

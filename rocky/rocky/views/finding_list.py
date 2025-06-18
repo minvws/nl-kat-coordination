@@ -8,8 +8,6 @@ from crisis_room.forms import AddFindingListDashboardItemForm
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.http.request import QueryDict
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -24,7 +22,14 @@ from tools.forms.findings import (
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import FINDING_LIST_COLUMNS, ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import (
+    FINDING_LIST_COLUMNS,
+    AddDashboardItemFormView,
+    ConnectorFormMixin,
+    FindingList,
+    OctopoesView,
+    SeveritiesMixin,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -68,7 +73,6 @@ class PageActions(Enum):
 
 class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListView):
     connector_form_class = ObservedAtForm
-    add_findings_to_dashboard_form = AddFindingListDashboardItemForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -128,15 +132,10 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def sorting_order(self) -> Literal["asc", "desc"]:
         return "asc" if self.request.GET.get("sorting_order", "") == "asc" else "desc"
 
-    def get_add_dashboard_item_form(self) -> AddFindingListDashboardItemForm:
-        data = self.request.POST if self.request.POST else None
-        return self.add_findings_to_dashboard_form(organization=self.organization, data=data)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
-        context["add_dashboard_item_settings_form"] = self.get_add_dashboard_item_form()
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["table_columns"] = FINDING_LIST_COLUMNS
@@ -155,9 +154,10 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         return context
 
 
-class FindingListView(BreadcrumbsMixin, FindingListFilter):
+class FindingListView(BreadcrumbsMixin, FindingListFilter, AddDashboardItemFormView):
     template_name = "findings/finding_list.html"
     paginate_by = 150
+    add_dashboard_item_form = AddFindingListDashboardItemForm
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
@@ -172,25 +172,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         action = request.POST.get("action")
 
         if action == PageActions.ADD_TO_DASHBOARD.value:
-            if not self.organization_member.can_add_dashboard_item:
-                messages.error(request, _("You do not have the permission to add items to a dashboard."))
-                return self.get(request, status=404, *args, **kwargs)
-            return self.add_to_dashboard(request, *args, **kwargs)
+            return self.add_to_dashboard()
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
         return self.get(request, status=404, *args, **kwargs)
-
-    def add_to_dashboard(self, request, *args, **kwargs) -> HttpResponse:
-        form = self.get_add_dashboard_item_form()
-
-        if form.is_valid():
-            dashboard_id = form.cleaned_data.get("dashboard")
-            messages.success(self.request, _("Dashboard item has been added."))
-
-            return redirect(
-                reverse(
-                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
-                )
-            )
-
-        return self.get(request, *args, **kwargs)
