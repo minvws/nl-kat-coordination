@@ -11,7 +11,6 @@
     <div id="action-dropdown" class="dropdown-list">
         <ul role="listbox" aria-labelledby="action-dropdown">
             <form class="inline"
-                  id="change_position_form"
                   method="post"
                   action="{% url "update_dashboard_item" organization_code=organization.code %}">
                 {% csrf_token %}
@@ -23,14 +22,14 @@
                        value="{{ dashboard_item.dashboard.id }}">
                 {% if dashboard_items|length > 1 and not forloop.first %}
                     <li role="option">
-                        <button type="submit" form="change_position_form" name="move" value="up">
+                        <button type="submit" name="move" value="up">
                             <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
                         </button>
                     </li>
                 {% endif %}
                 {% if dashboard_items|length > 1 and not forloop.last %}
                     <li role="option">
-                        <button type="submit" form="change_position_form" name="move" value="down">
+                        <button type="submit" name="move" value="down">
                             <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
                         </button>
                     </li>
@@ -38,7 +37,6 @@
             </form>
             {% if dashboard_item.item.recipe %}
                 <form class="inline"
-                      id="rerun_report_form"
                       method="post"
                       action="{% url "report_history" organization_code=organization.code %}">
                     {% csrf_token %}
@@ -53,7 +51,7 @@
                                value="{{ dashboard_item.data.report.primary_key }}">
                     {% endif %}
                     <li role="option">
-                        <button type="submit" form="rerun_report_form" name="action" value="rerun">
+                        <button type="submit" name="action" value="rerun">
                             <i class="icon ti-refresh"></i>{% translate "Rerun report" %}
                         </button>
                     </li>
