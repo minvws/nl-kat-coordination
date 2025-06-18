@@ -76,49 +76,8 @@
                                             </a>
                                         {% endif %}
                                         {% if organization_member.can_modify_dashboard_item %}
-                                            <div class="dropdown">
-                                                <button type="button"
-                                                        aria-label="{% translate "Options for dashboard items" %}"
-                                                        aria-haspopup="listbox"
-                                                        aria-controls="action-dropdown"
-                                                        aria-expanded="false"
-                                                        class="dropdown-button icon-only ti-dots-vertical"></button>
-                                                <div id="action-dropdown" class="dropdown-list">
-                                                    <ul role="listbox" aria-labelledby="action-dropdown">
-                                                        <form class="inline"
-                                                              method="post"
-                                                              action="{% url "update_dashboard_item" organization_code=organization.code %}">
-                                                            {% csrf_token %}
-                                                            <input type="hidden"
-                                                                   name="dashboard_item"
-                                                                   value="{{ dashboard_item.item.id }}">
-                                                            <input type="hidden"
-                                                                   name="dashboard"
-                                                                   value="{{ dashboard_item.dashboard.id }}">
-                                                            {% if dashboard_items|length > 1 and not forloop.first %}
-                                                                <li role="option">
-                                                                    <button type="submit" name="move" value="up">
-                                                                        <i class="icon ti-arrow-up"></i>{% translate "Position up" %}
-                                                                    </button>
-                                                                </li>
-                                                            {% endif %}
-                                                            {% if dashboard_items|length > 1 and not forloop.last %}
-                                                                <li role="option">
-                                                                    <button type="submit" name="move" value="down">
-                                                                        <i class="icon ti-arrow-down"></i>{% translate "Position down" %}
-                                                                    </button>
-                                                                </li>
-                                                            {% endif %}
-                                                            <li>
-                                                                <a href="#delete-item-modal-{{ dashboard_item.item.id }}"
-                                                                   data-modal-id="delete-item-modal-{{ dashboard_item.item.id }}"
-                                                                   class="plain destructive"><i class="icon ti-trash"></i>{% translate "Delete item" %}
-                                                                </a>
-                                                            </li>
-                                                        </form>
-                                                    </ul>
-                                                </div>
-                                            </div>
+                                            {% include "partials/dashboard_item_three_dots.html" %}
+
                                         {% endif %}
                                     </div>
                                 </div>
