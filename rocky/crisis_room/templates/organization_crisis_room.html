@@ -50,6 +50,10 @@
                         {% include "organization_crisis_room_dashboard_items.html" %}
 
                     </div>
+                    {% if organization_member.can_delete_dashboard %}
+                        {% include "partials/delete_dashboard_modal.html" %}
+
+                    {% endif %}
                 {% else %}
                     <p>{% translate "Dashboard does not exist. Choose an existing dashboard or create a new one." %}</p>
                 {% endif %}
@@ -64,3 +68,6 @@
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+{% endblock html_at_end_body %}
