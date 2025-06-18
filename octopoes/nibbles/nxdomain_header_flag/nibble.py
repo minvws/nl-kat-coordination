@@ -9,12 +9,10 @@ def query(targets: list[Reference | None]) -> str:
         return f"""
             {{
                 :query {{
-                    :find [(pull ?var [*])] :where [
+                    :find [(pull ?httpheaderhostname [*])(pull ?nxdomain [*])] :where [
                         {" ".join(statements)}
-                        (or-join [?var ?hostname]
-                            [?var :NXDOMAIN/hostname ?hostname]
-                            [?var :HTTPHeaderHostname/hostname ?hostname]
-                        )
+                        [?httpheaderhostname :HTTPHeaderHostname/hostname ?hostname]
+                        [?nxdomain :NXDOMAIN/hostname ?hostname]
                     ]
                 }}
             }}
@@ -22,11 +20,30 @@ def query(targets: list[Reference | None]) -> str:
 
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
 
-    if sgn == "1":
+    if sgn == "10":
         return pull(
             [
                 f"""
-                    [?var :HTTPHeaderHostname/primary_key "{str(targets[0])}"]
+                    [?httpheaderhostname :HTTPHeaderHostname/primary_key "{str(targets[0])}"]
+                """
+            ]
+        )
+
+    elif sgn == "01":
+        return pull(
+            [
+                f"""
+                    [?nxdomain :NXDOMAIN/primary_key "{str(targets[1])}"]
+                """
+            ]
+        )
+
+    elif sgn == "11":
+        return pull(
+            [
+                f"""
+                    [?httpheaderhostname :HTTPHeaderHostname/primary_key "{str(targets[0])}"]
+                    [?nxdomain :NXDOMAIN/primary_key "{str(targets[1])}"]
                 """
             ]
         )
@@ -38,9 +55,8 @@ def query(targets: list[Reference | None]) -> str:
 NIBBLE = NibbleDefinition(
     id="nxdomain_header_flag",
     signature=[
-        NibbleParameter(
-            object_type=HTTPHeaderHostname, parser="[*][?object_type == 'HTTPHeaderHostname'][]", additional={NXDOMAIN}
-        )
+        NibbleParameter(object_type=HTTPHeaderHostname, parser="[*][?object_type == 'HTTPHeaderHostname'][]"),
+        NibbleParameter(object_type=NXDOMAIN, parser="[*][?object_type == 'NXDOMAIN'][]"),
     ],
     query=query,
 )
