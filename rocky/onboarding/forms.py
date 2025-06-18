@@ -41,5 +41,5 @@ class OnboardingCreateObjectURLForm(forms.Form):
         label_suffix="",
         required=True,
         help_text=_("Please enter a valid URL starting with 'http://' or 'https://'."),
-        widget=forms.URLInput({"placeholder": "Enter URL here (e.g., https://www.example.com)"}),
+        widget=forms.URLInput({"placeholder": "Enter your URL (e.g., https://mispo.es)"}),
     )

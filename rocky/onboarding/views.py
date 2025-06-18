@@ -89,7 +89,7 @@ class OnboardingChooseReportTypeView(
     3. Choose a report type. Gives the user a choice of many report types. Ex. DNS report
     """
 
-    template_name = "step_2b_choose_report_type.html"
+    template_name = "step_9_choose_report_type.html"
     current_step = 2
     permission_required = "tools.can_scan_organization"
 
@@ -134,7 +134,7 @@ class OnboardingSetupScanOOIAddView(
         ooi = self.get_or_create_url_object(cleaned_url)
         selection = {"ooi": ooi.primary_key, "report_type": self.report_type}
         return redirect(
-            reverse("step_7_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
+            reverse("step_6_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
             + get_selection(self.request, selection)
         )
 
@@ -142,7 +142,7 @@ class OnboardingSetupScanOOIAddView(
         return super().build_breadcrumbs() + [
             {
                 "url": reverse(
-                    "step_7_clearance_level_introduction", kwargs={"organization_code": self.organization.code}
+                    "step_6_clearance_level_introduction", kwargs={"organization_code": self.organization.code}
                 )
                 + get_selection(self.request),
                 "text": _("Creating an object"),
@@ -161,7 +161,7 @@ class OnboardingClearanceLevelIntroductionView(
     6. Explanation what clearance levels mean.
     """
 
-    template_name = "step_3d_clearance_level_introduction.html"
+    template_name = "step_6_clearance_level_introduction.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
@@ -228,7 +228,7 @@ class OnboardingSetClearanceLevelView(
     8. Set the actual clearance level on the object created before.
     """
 
-    template_name = "step_6_set_clearance_level.html"
+    template_name = "step_7_set_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
     form_class = OnboardingSetClearanceLevelForm
@@ -263,7 +263,7 @@ class OnboardingSetupScanSelectPluginsView(
     9. Shows the user all required and optional plugins to select from. Required plugins are mandatory to continue.
     """
 
-    template_name = "step_3g_setup_scan_select_plugins.html"
+    template_name = "step_8_setup_scan_select_plugins.html"
     permission_required = "tools.can_enable_disable_boefje"
     current_step = 3
     plugins: ReportPlugins = DNSReport.plugins
