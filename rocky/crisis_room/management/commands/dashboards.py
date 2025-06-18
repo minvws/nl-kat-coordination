@@ -103,34 +103,46 @@ def reschedule_recipe(organization: Organization, recipe_id: str) -> None:
     return None
 
 
-def create_findings_dashboard(organization: Organization, octopoes_client: OctopoesAPIConnector | None = None) -> None:
-    dashboard = Dashboard.objects.create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
+def create_findings_dashboard(
+    organization: Organization,
+    octopoes_client: OctopoesAPIConnector | None = None,
+    DashboardModel=Dashboard,
+    DashboardItemModel=DashboardItem,
+) -> None:
+    dashboard = DashboardModel.objects.create(name=FINDINGS_DASHBOARD_NAME, organization=organization)
     recipe_id = create_findings_dashboard_recipe(organization, octopoes_client)
-    DashboardItem.objects.create(
-        dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True
+    DashboardItemModel.objects.create(
+        dashboard=dashboard, recipe=recipe_id, template=FINDINGS_DASHBOARD_TEMPLATE, findings_dashboard=True, position=1
     )
     logger.info("New reecipe with id: %s has been created and scheduled.", recipe_id)
 
 
-def run_findings_dashboard(organization: Organization, octopoes_client: OctopoesAPIConnector | None = None) -> None:
+def run_findings_dashboard(
+    organization: Organization,
+    octopoes_client: OctopoesAPIConnector | None = None,
+    DashboardModel=Dashboard,
+    DashboardItemModel=DashboardItem,
+) -> None:
     """
     Find a findings dashboard, if found, take the recipe id and rerun the schedule.
     If no findings dashboard is found, then create a new one and create a new recipe.
     """
     try:
-        dashboard = Dashboard.objects.filter(dashboarditem__findings_dashboard=True, organization=organization).first()
+        dashboard = DashboardModel.objects.filter(
+            dashboarditem__findings_dashboard=True, organization=organization
+        ).first()
         if dashboard is not None:
-            findings_dashboard = DashboardItem.objects.get(dashboard=dashboard, findings_dashboard=True)
+            findings_dashboard = DashboardItemModel.objects.get(dashboard=dashboard, findings_dashboard=True)
             reschedule_recipe(organization, str(findings_dashboard.recipe))
             logger.info("Recipe %s has been rescheduled.", findings_dashboard.recipe)
         else:
-            create_findings_dashboard(organization, octopoes_client)
+            create_findings_dashboard(organization, octopoes_client, DashboardModel, DashboardItemModel)
 
-    except DashboardItem.DoesNotExist:
-        create_findings_dashboard(organization, octopoes_client)
+    except DashboardItemModel.DoesNotExist:
+        create_findings_dashboard(organization, octopoes_client, DashboardModel, DashboardItemModel)
 
-    except (IntegrityError, ValueError, ValidationError) as error:
-        logger.error("Findings Dashboard not created. More info: %s", error)
+    except (IntegrityError, ValueError, ValidationError):
+        logger.exception("Findings Dashboard not created.")
 
 
 class Command(BaseCommand):
