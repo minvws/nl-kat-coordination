@@ -21,6 +21,7 @@ if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
 STATIC_IP = ".".join((4 * "1 ").split())
+internetnl.enabled = True
 
 
 def test_internetnl_nibble(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
