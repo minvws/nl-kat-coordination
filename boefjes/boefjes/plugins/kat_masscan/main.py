@@ -8,7 +8,7 @@ def run_masscan(target_ip: str) -> bytes:
     port_range = os.getenv("PORTS", "53,80,443")
     max_rate = os.getenv("MAX_RATE", 100)
     logging.info("Running masscan...")
-    cmd = ["/home/lama/masscan/bin/masscan", "-p", port_range, "--max-rate", max_rate, "-oJ", "/dev/stdout", target_ip]
+    cmd = ["/app/boefje/masscan/bin/masscan", "-p", port_range, "--max-rate", max_rate, "-oJ", "/dev/stdout", target_ip]
     return subprocess.run(cmd, capture_output=True).stdout
 
 

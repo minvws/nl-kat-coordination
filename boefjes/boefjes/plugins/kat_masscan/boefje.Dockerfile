@@ -1,17 +1,14 @@
-# syntax=docker/dockerfile:1
+FROM openkat/boefje-base:latest
 
-FROM python:3.11-slim
-
-ARG BOEFJE_PATH=./boefjes/plugins/kat_masscan
-ENV PYTHONPATH=/app:$BOEFJE_PATH
-
-RUN adduser --disabled-password lama
-WORKDIR /home/lama
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/masscan:latest
+ENV OCI_IMAGE=$OCI_IMAGE
 
 # Packages:
 # git: get masscan source
 # libpcap(-dev): run masscan
-# libcap: set cap_net_raw permission for user lama
+# libcap: set cap_net_raw permission for user nonroot
+USER root
+
 RUN apt-get update && apt-get install -y git libpcap-dev libcap2-bin make gcc && pip install httpx
 
 # Version pinning on specific commit. Tag in boefje.py may need an update when updating this hash.
@@ -22,12 +19,9 @@ RUN mkdir masscan \
     && git fetch --dept 1 origin 9065684c52682d3e12a35559ef72cd0f07838bff \
     && git checkout FETCH_HEAD \
     && make -j \
-    && chown -R lama:lama /home/lama/masscan \
-    && setcap cap_net_raw=eip /home/lama/masscan/bin/masscan
+    && chown -R nonroot:nonroot /app/boefje/masscan \
+    && setcap cap_net_raw=eip /app/boefje/masscan/bin/masscan
 
-USER lama
+USER nonroot
 
-COPY ./images/oci_adapter.py ./
-COPY $BOEFJE_PATH $BOEFJE_PATH
-
-ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
+COPY ./boefjes/plugins/kat_masscan ./kat_masscan
