@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 from opentelemetry import trace
 from pydantic import ValidationError
+from typing_extensions import override
 
 from scheduler import clients, context, models
 from scheduler.schedulers import Scheduler, rankers
@@ -177,6 +178,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
+    @override
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some normalizer scheduler specific logic before pushing the item to the
         queue.

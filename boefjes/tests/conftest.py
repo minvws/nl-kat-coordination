@@ -71,13 +71,13 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._popped_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
         self._pushed_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
 
-    def pop_items(self, queue: str) -> list[Task] | None:
+    def pop_items(self, scheduler_id: str, limit: int | None = None) -> list[Task] | None:
         time.sleep(self.sleep_time)
 
         try:
-            if WorkerManager.Queue.BOEFJES.value in queue:
+            if WorkerManager.Queue.BOEFJES.value in scheduler_id:
                 response = TypeAdapter(TaskPop).validate_json(self.boefje_responses.pop(0))
-            elif WorkerManager.Queue.NORMALIZERS.value in queue:
+            elif WorkerManager.Queue.NORMALIZERS.value in scheduler_id:
                 response = TypeAdapter(TaskPop).validate_json(self.normalizer_responses.pop(0))
             else:
                 return None

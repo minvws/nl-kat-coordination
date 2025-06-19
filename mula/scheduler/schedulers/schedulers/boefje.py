@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry import trace
+from typing_extensions import override
 
 from scheduler import clients, context, models
 from scheduler.models import MutationOperationType
@@ -52,11 +53,14 @@ class BoefjeScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
+        # Note: that we use the BoefjePQ here, which is a custom priority queue
+        # that overrides the pop method to call the `pop_boefje()` method.
         pq = BoefjePQ(
             pq_id=self.ID, maxsize=ctx.config.pq_maxsize, item_type=self.ITEM_TYPE, pq_store=ctx.datastores.pq_store
         )
 
         super().__init__(ctx=ctx, scheduler_id=self.ID, queue=pq, create_schedule=True, auto_calculate_deadline=True)
+
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
 
     def run(self) -> None:
@@ -67,7 +71,8 @@ class BoefjeScheduler(Scheduler):
         - Scan profile mutations; when a scan profile is updated for an ooi
         e.g. the scan level is changed, we need to create new tasks for the
         ooi. We gather all boefjes that can run on the ooi and create tasks
-        for them.
+        for them. We get this event from the RabbitMQ `ScanProfileMutation`
+        client.
 
         - New boefjes; when new boefjes are added or enabled we find the ooi's
         that boefjes can run on, and create tasks for it.
@@ -95,7 +100,7 @@ class BoefjeScheduler(Scheduler):
         """Create tasks for oois that have a scan level change.
 
         Args:
-            mutation: The mutation that was received.
+            body: The mutation that was received.
         """
         # Convert body into a ScanProfileMutation
         mutation = models.ScanProfileMutation.model_validate_json(body)
@@ -200,7 +205,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
 
-        # TODO: this should be optimized see #3357
+        # TODO: this should be optimized see #3357 and #4191
         orgs = self.ctx.services.katalogus.get_organisations()
 
         for org in orgs:
@@ -445,6 +450,7 @@ class BoefjeScheduler(Scheduler):
                     caller=caller,
                 )
 
+    @override
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue.
@@ -773,6 +779,7 @@ class BoefjeScheduler(Scheduler):
 
         return tasks
 
+    @override
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
         for a task and based on the boefje interval."""
