@@ -49,7 +49,7 @@ images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_nikto/boefje.Dockerfile -t $(REGISTRY)/nikto:latest .
 	docker build -f */*/kat_adr_validator/boefje.Dockerfile -t $(REGISTRY)/adr-validator:latest  .
 	docker build -f */*/kat_masscan/boefje.Dockerfile -t $(REGISTRY)/masscan:latest  .
-	docker build -f */*/kat_nuclei_cve/boefje.Dockerfile -t $(REGISTRY)/nuclei-cve:latest  .
+	docker build -f */*/kat_nuclei_cve/boefje.Dockerfile -t $(REGISTRY)/nuclei:latest  .
 	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 ##

@@ -1,6 +1,6 @@
 FROM openkat/boefje-base:latest
 
-ARG OCI_IMAGE=ghcr.io/minvws/openkat/nuclei-cve:latest
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/nuclei:latest
 ENV OCI_IMAGE=$OCI_IMAGE
 
 COPY --from=projectdiscovery/nuclei:v3.2.4 /usr/local/bin/nuclei /usr/local/bin/
