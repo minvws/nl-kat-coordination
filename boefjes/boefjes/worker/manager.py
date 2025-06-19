@@ -14,7 +14,7 @@ from httpx import HTTPError
 from pydantic import ValidationError
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import BoefjeHandlerInterface, SchedulerClientInterface, Task, TaskStatus
+from .interfaces import BoefjeHandlerInterface, NormalizerHandlerInterface, SchedulerClientInterface, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")
@@ -32,7 +32,7 @@ class WorkerManager:
 class SchedulerWorkerManager(WorkerManager):
     def __init__(
         self,
-        item_handler: BoefjeHandlerInterface,
+        item_handler: BoefjeHandlerInterface | NormalizerHandlerInterface,
         scheduler_client: SchedulerClientInterface,
         pool_size: int,
         poll_interval: float,
