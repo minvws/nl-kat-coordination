@@ -98,4 +98,5 @@ NIBBLE = NibbleDefinition(
         NibbleParameter(object_type=list[Finding], parser="[[*][?object_type == 'Finding'][]]", additional={Finding}),
     ],
     query=query,
+    enabled=False,
 )
