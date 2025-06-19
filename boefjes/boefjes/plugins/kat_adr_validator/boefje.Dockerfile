@@ -1,12 +1,8 @@
-FROM python:3.11-slim
+FROM openkat/boefje-base:latest
 
-ARG BOEFJE_PATH=./boefjes/plugins/kat_adr_validator
-ENV PYTHONPATH=/app:$BOEFJE_PATH
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/dns-sec:latest
+ENV OCI_IMAGE=$OCI_IMAGE
 
-RUN apt-get update && pip install httpx
 COPY --from=registry.gitlab.com/commonground/don/adr-validator:0.2.0 /usr/local/bin/adr-validator /usr/local/bin/
 
-COPY ./images/oci_adapter.py ./
-COPY $BOEFJE_PATH $BOEFJE_PATH
-
-ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
+COPY ./boefjes/plugins/kat_adr_validator ./kat_adr_validator
