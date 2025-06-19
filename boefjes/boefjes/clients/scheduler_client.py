@@ -43,7 +43,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = None
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
@@ -57,7 +57,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
             )
 
         response = self._session.post(
-            f"/schedulers/{queue_id}/pop", json=filters if filters["filters"] else None, params={"limit": limit}
+            f"/schedulers/{queue_id}/pop",
+            json=filters if filters["filters"] else None,
+            params={"limit": limit} if limit else None,
         )
         self._verify_response(response)
 
