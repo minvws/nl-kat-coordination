@@ -26,6 +26,7 @@ COPY --chown=nonroot boefjes/plugins/kat_fierce boefjes/plugins/kat_fierce
 COPY --chown=nonroot boefjes/plugins/kat_green_hosting boefjes/plugins/kat_green_hosting
 COPY --chown=nonroot boefjes/plugins/kat_kat_finding_types boefjes/plugins/kat_kat_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_leakix boefjes/plugins/kat_leakix
+COPY --chown=nonroot boefjes/plugins/kat_maxmind_geoip boefjes/plugins/kat_maxmind_geoip
 COPY --chown=nonroot boefjes/plugins/kat_rdns boefjes/plugins/kat_rdns
 COPY --chown=nonroot boefjes/plugins/kat_retirejs_finding_types boefjes/plugins/kat_retirejs_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_rpki boefjes/plugins/kat_rpki
