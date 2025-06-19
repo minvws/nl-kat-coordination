@@ -1,15 +1,4 @@
-import docker
-
-ADR_VALIDATOR_REPOSITORY = "registry.gitlab.com/commonground/don/adr-validator"
-ADR_VALIDATOR_VERSION = "0.2.0"
-
-
-def run_adr_validator(url: str) -> str:
-    client = docker.from_env()
-    image = f"{ADR_VALIDATOR_REPOSITORY}:{ADR_VALIDATOR_VERSION}"
-    args = ("-format", "json", url)
-
-    return client.containers.run(image, args, remove=True, read_only=True)
+import subprocess
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
@@ -21,7 +10,6 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     scheme = api_url["scheme"]
 
     url = f"{scheme}://{hostname}{path}"
+    cmd = ["/usr/local/bin/adr-validator", "-format", "json", url]
 
-    output = run_adr_validator(url)
-
-    return [(set(), output)]
+    return [({"openkat/adr-validator-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]

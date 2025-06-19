@@ -45,6 +45,8 @@ images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_nmap_tcp/boefje.Dockerfile -t $(REGISTRY)/nmap:latest -t openkat/nmap .
 	docker build -f */*/kat_export_http/boefje.Dockerfile -t $(REGISTRY)/export-http:latest -t openkat/export-http .
 	docker build -f */*/kat_nikto/boefje.Dockerfile -t $(REGISTRY)/nikto:latest .
+	docker build -f */*/kat_adr_validator/boefje.Dockerfile -t $(REGISTRY)/adr-validator:latest  .
+	docker build -f */*/kat_masscan/boefje.Dockerfile -t $(REGISTRY)/masscan:latest  .
 	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 ##
