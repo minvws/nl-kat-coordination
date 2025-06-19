@@ -224,7 +224,7 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
         ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }
 
-    bytes_calls = item_handler.bytes_client.get_all()
+    bytes_calls = item_handler.boefje_storage.get_all()
     assert bytes_calls == []
 
 
