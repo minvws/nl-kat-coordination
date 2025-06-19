@@ -211,8 +211,8 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
 
     # Just one task dispatched
     assert len(items) == 2
-    assert items[0].boefje.id == "dns-records"
-    assert items[1].boefje.id == "dns-records"
+    assert items[0].data.boefje.id == "dns-records"
+    assert items[1].data.boefje.id == "dns-records"
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
