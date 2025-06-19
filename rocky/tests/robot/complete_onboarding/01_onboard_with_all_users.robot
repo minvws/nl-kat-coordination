@@ -10,12 +10,12 @@ I want to login as the default superuser for the first time
 
 I want to add indemnifications
     Click    xpath=//a[@class="button"]
-    Fill Text    xpath=//*[@id="id_name"]    Dev Org
-    Fill Text    xpath=//*[@id="id_code"]    dev
+    Fill Text    xpath=//*[@id="create_organization_name"]    Dev Org
+    Fill Text    xpath=//*[@id="create_organization_code"]    dev
     Click    "Submit"
     # Click    xpath=//button[contains(text(),"Submit")]
-    Check Checkbox    css=#id_may_scan
-    Check Checkbox    css=#id_am_authorized
+    Check Checkbox    css=#add_indemnification_may_scan
+    Check Checkbox    css=#add_indemnification_am_authorized
     Click    "Submit"
     Get Title    equal    OpenKAT - step_account_setup_intro
 
