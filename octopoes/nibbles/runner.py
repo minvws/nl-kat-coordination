@@ -224,7 +224,7 @@ class NibblesRunner:
             lambda x: x.enabled and x not in nibblet_nibbles and any(isinstance(ooi, t) for t in x.triggers),
             self.nibbles.values(),
         ):
-            if len(nibble.signature) > 1:
+            if len(nibble.signature) > 1 or nibble.query is not None:
                 self._write(valid_time)
             results = {
                 tuple(arg): (set(flatten([nibble(arg)])), self._check_arg_scan_level(nibble, arg, valid_time))
