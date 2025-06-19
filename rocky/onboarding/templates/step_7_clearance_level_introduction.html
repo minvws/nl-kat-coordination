@@ -21,12 +21,12 @@
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs non-intrusive scans which look for publicly available information.
+                        The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs non-intrusive scans which look for publicly available information. It scans objects with a clearance level of 1 or higher.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        The plugin <b>Fierce</b> has a scan level of 3, meaning that it more aggressive and could potentially break things.
+                        The plugin <b>Fierce</b> has a scan level of 3, meaning that it more aggressive and could potentially break things. It scans objects with a clearance level of 3 or higher.
                     {% endblocktranslate %}
                 </p>
                 <div id="id_boefjes" class="column-4 plugins tiles images-cover">
@@ -35,6 +35,7 @@
 
                     {% endfor %}
                 </div>
+                <br>
                 <div class="button-container">
                     <a href="{% url "step_8_setup_scan_select_plugins" organization.code %}?{{ request.GET.urlencode }}"
                        class="button">{% translate "Continue" %}</a>

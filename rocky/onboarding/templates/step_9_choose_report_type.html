@@ -12,32 +12,27 @@
                 <h1>{% translate "OpenKAT introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Report selection" %}</h2>
+                <h2>{% translate "Generate a report" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
-                        Reports can be used to gain more insights into your objects. OpenKAT has a lot of reports available. The IPv6 and mailserver report are just a few of the many available reports.
+                        Reports can be used to gain more insights in your organizations assets. You can generate different types of reports in OpenKAT. Each report may require one or more plugins that provide the input for the report.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        For this tutorial we will create a DNS report to get you started.
+                        For the onboarding we will generate a DNS report for your added URL. In the previous step you enabled the required plugins for this report.
                     {% endblocktranslate %}
                 </p>
-                <p>
-                    {% blocktranslate trimmed %}
-                        When you start to generate this report. OpenKAT will guide you through the
-                        necessary steps, such as enabling the required plugins.
-                    {% endblocktranslate %}
-                </p>
+                <br>
                 <form method="get"
                       action="{% url "step_10_setup_scan_ooi_detail" organization.code %}"
                       class="inline">
                     <div class="button-container">
                         {% if organization %}
-                            <button name="report_type" value="dns-report" type="submit" class="button">{% translate "DNS Report" %}</button>
+                            <button name="report_type" value="dns-report" type="submit" class="button">
+                                {% translate "Generate DNS Report" %}
+                            </button>
                         {% endif %}
-                        <a href="" class="button ghost disabled">IPv6 report</a>
-                        <a href="" class="button ghost disabled">Mailserver report</a>
                         {% if organization %}
                             <a href="{% url "complete_onboarding" organization.code %}"
                                class="button ghost">{% translate "Skip onboarding" %}</a>
