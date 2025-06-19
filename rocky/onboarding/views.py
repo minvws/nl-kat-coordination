@@ -330,7 +330,7 @@ class OnboardingCreateReportRecipe(
     """
 
     template_name = "step_9_choose_report_type.html"
-    current_step = 6
+    current_step = 5
     permission_required = "tools.can_scan_organization"
     task_type = "report"
 
@@ -378,8 +378,9 @@ class OnboardingReportView(
         messages.success(
             self.request,
             _(
-                "Your report has been scheduled. It will take about 3 minutes before "
-                "the new report has been generated. After being generated, the report will show up in this overview."
+                "Your report is scheduled for generation in about 3 minutes, "
+                "as we are waiting for Boefjes to complete. "
+                "In the meantime get familiar with OpenKAT and visit the Reports History tab later."
             ),
         )
         return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))

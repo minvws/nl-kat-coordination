@@ -17,20 +17,14 @@
                 <h3>{% translate "Boefjes are scanning" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-                        The enabled boefjes are collecting the data needed to generate the DNS-report.
-                        This may take some time based on the type of scans and the number of objects found.
-                        For the current scan we expect boefjes to take about 3 minutes.
+                        The enabled Boefjes are running in the background to gather the data for your DNS Report.
+                        This may take a few minutes.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        Boefjes run in the background. This enables you to use OpenKAT in the meantime without waiting for scans to finish.
-                        When you would like to see the status of a scan you can open the "tasks" page.
-                    {% endblocktranslate %}
-                </p>
-                <p>
-                    {% blocktranslate trimmed %}
-                        In the meantime, you can explore OpenKAT. Come back after a couple of minutes to view your report.
+                        In the meantime you can explore OpenKAT and view your DNS Report
+                        on the Reports page once it has been generated.
                     {% endblocktranslate %}
                 </p>
                 {% include "partials/cat_loader.html" %}
