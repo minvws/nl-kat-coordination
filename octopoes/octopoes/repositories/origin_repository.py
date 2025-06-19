@@ -125,9 +125,7 @@ class XTDBOriginRepository(OriginRepository):
     def list_nibblets_by_parameter(self, reference: Reference, valid_time: datetime) -> list[Origin]:
         query = f""" {{:query {{
                 :find [(pull ?var [*])] :where [
-                    [?var :type "Origin"]
-                    [?var :origin_type "nibblet"]
-                    (or
+                    (or-join [?var]
                         [?var :parameters_references "{reference}"]
                         [?var :optional_references "{reference}"]
                     )

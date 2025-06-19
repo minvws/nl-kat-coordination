@@ -13,7 +13,7 @@ def query(targets: list[Reference | None]) -> str:
                         [?resolved_hostname :ResolvedHostname/address ?ip_address]
                         [?ip_service :IPService/ip_port ?ip_port]
                         [?ip_service :IPService/service ?service]
-                        (or [?service :Service/name "http"][?service :Service/name "https"])
+                        (or-join [?service] [?service :Service/name "http"][?service :Service/name "https"])
                         [?ip_port :IPPort/address ?ip_address]
                         {" ".join(statements)}
                     ]
