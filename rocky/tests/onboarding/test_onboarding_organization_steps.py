@@ -7,11 +7,11 @@ from onboarding.views import (
     OnboardingChooseReportInfoView,
     OnboardingChooseReportTypeView,
     OnboardingClearanceLevelIntroductionView,
+    OnboardingCreateReportRecipe,
     OnboardingIntroductionView,
     OnboardingReportView,
     OnboardingSetClearanceLevelView,
     OnboardingSetupScanOOIAddView,
-    OnboardingSetupScanOOIDetailView,
     OnboardingSetupScanOOIInfoView,
     OnboardingSetupScanSelectPluginsView,
 )
@@ -296,7 +296,7 @@ def test_onboarding_ooi_detail_scan(
     mock_organization_view_octopoes().get.return_value = url
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
-    response = OnboardingSetupScanOOIDetailView.as_view()(
+    response = OnboardingCreateReportRecipe.as_view()(
         setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
         organization_code=member.organization.code,
     )
@@ -326,7 +326,7 @@ def test_onboarding_ooi_detail_scan_create_report_schedule(
         + f"?report_type=dns-report&ooi={url.primary_key}"
     )
 
-    response = OnboardingSetupScanOOIDetailView.as_view()(
+    response = OnboardingCreateReportRecipe.as_view()(
         setup_request(rf.post(request_url), member.user), organization_code=member.organization.code
     )
 

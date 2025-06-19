@@ -72,9 +72,7 @@
                 <form id="enable_plugin_form" novalidate method="post" class="inline">
                     {% csrf_token %}
                     <div class="button-container">
-                        <a href="{% url "step_9_choose_report_type" organization.code %}"
-                           class="button"
-                           type="submit">{% translate "Enable and start scan" %}</a>
+                        <button type="submit">{% translate "Enable and continue" %}</button>
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     </div>

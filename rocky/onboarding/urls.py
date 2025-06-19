@@ -27,7 +27,7 @@ urlpatterns = [
         name="step_4_trusted_acknowledge_clearance_level",
     ),
     path(  # Step 5
-        "<organization_code>/step/setup-scan/URL/",
+        "<organization_code>/step/add-scan-ooi/<ooi_type>/",
         views.OnboardingSetupScanOOIAddView.as_view(),
         name="step_5_add_scan_ooi",
     ),
@@ -51,13 +51,13 @@ urlpatterns = [
         views.OnboardingChooseReportTypeView.as_view(),
         name="step_9_choose_report_type",
     ),
-    path(  # Step 10
+    path(  # Step 9a
         "<organization_code>/step/setup-scan/ooi/detail/",
-        views.OnboardingSetupScanOOIDetailView.as_view(),
+        views.OnboardingCreateReportRecipe.as_view(),
         name="step_10_setup_scan_ooi_detail",
     ),
-    path(  # Step 11
-        "<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_11_report"
+    path(  # Step 10
+        "<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_10_report"
     ),
     path(
         "<organization_code>/step/complete-onboarding/", views.CompleteOnboarding.as_view(), name="complete_onboarding"

@@ -29,9 +29,10 @@
                         necessary steps, such as enabling the required plugins.
                     {% endblocktranslate %}
                 </p>
-                <form method="get"
-                      action="{% url "step_10_setup_scan_ooi_detail" organization.code %}"
+                <form method="post"
+                      action="{% url "step_10_setup_scan_ooi_detail" organization.code %}?{{ request.GET.urlencode }}"
                       class="inline">
+                    {% csrf_token %}
                     <div class="button-container">
                         {% if organization %}
                             <button name="report_type" value="dns-report" type="submit" class="button">{% translate "DNS Report" %}</button>

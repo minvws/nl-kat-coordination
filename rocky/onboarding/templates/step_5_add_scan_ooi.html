@@ -33,9 +33,7 @@
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
                     <div class="button-container">
-                        <a href="{% url "step_6_set_clearance_level" organization.code %}"
-                           class="button"
-                           type="submit">{% translate "Create object" %}</a>
+                        <button type="submit">{% translate "Create object" %}</button>
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     </div>

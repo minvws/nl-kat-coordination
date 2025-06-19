@@ -70,8 +70,8 @@
             {% endblocktranslate %}
         </p>
         <div class="button-container">
-            <a href="{% url "step_5_add_scan_ooi" organization.code %}"
-               class="button">{% translate "Accept clearance level" %}</a>
+            <a href="{% url "step_5_add_scan_ooi" ooi_type="URL" organization_code=organization.code %}"
+               class="button">{% translate "Add URL" %}</a>
             <a href="{% url "complete_onboarding" organization.code %}"
                class="button ghost">{% translate "Skip onboarding" %}</a>
         </div>

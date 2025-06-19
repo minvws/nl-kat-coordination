@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from reports.views.base import get_selection
 from tools.models import Organization
-from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, StepsMixin
+from tools.view_helpers import StepsMixin
 
 ONBOARDING_PERMISSIONS = (
     "tools.can_scan_organization",
@@ -19,17 +19,35 @@ class IntroductionStepsMixin(StepsMixin):
     def build_steps(self):
         steps = [
             {
-                "text": _("1: Introduction"),
+                "text": _("1: Welcome"),
                 "url": reverse_lazy("step_1_introduction_registration") + get_selection(self.request),
             },
             {
-                "text": _("2: Choose a report"),
+                "text": _("2: Organization setup"),
+                "url": reverse_lazy("step_2a_organization_setup") + get_selection(self.request),
+            },
+            {
+                "text": _("3: Add object"),
+                "url": reverse_lazy(
+                    "step_5_add_scan_ooi", kwargs={"ooi_type": "URL", "organization_code": self.organization.code}
+                )
+                + get_selection(self.request),
+            },
+            {
+                "text": _("4: Plugins"),
                 "url": reverse_lazy("step_9_choose_report_type", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
             },
             {
-                "text": _("4: Open report"),
-                "url": reverse_lazy("step_11_report", kwargs={"organization_code": self.organization.code})
+                "text": _("5: Choose report"),
+                "url": reverse_lazy(
+                    "step_8_setup_scan_select_plugins", kwargs={"organization_code": self.organization.code}
+                )
+                + get_selection(self.request),
+            },
+            {
+                "text": _("6: Generating report"),
+                "url": reverse_lazy("step_10_report", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
             },
         ]
@@ -41,49 +59,13 @@ class IntroductionRegistrationStepsMixin(StepsMixin):
 
     def build_steps(self):
         steps = [
-            {"text": _("1: Introduction"), "url": reverse_lazy("step_1_introduction_registration")},
-            {"text": _("2: Organization setup"), "url": reverse_lazy("step_2a_organization_setup")},
-            {"text": _("3: Indemnification"), "url": ""},
-            {"text": _("4: User clearance level"), "url": ""},
-        ]
-        return steps
-
-
-class IntroductionAdminStepsMixin(StepsMixin):
-    organization: Organization
-
-    def build_steps(self):
-        steps = [
-            {"text": _("1: Introduction"), "url": reverse_lazy("step_1_introduction_registration")},
-            {"text": _("2: Organization setup"), "url": reverse_lazy("step_2a_organization_setup")},
             {
-                "text": _("3: Indemnification"),
-                "url": reverse_lazy(
-                    "step_3_indemnification_setup", kwargs={"organization_code": self.organization.code}
-                ),
+                "text": _("1: Introduction"),
+                "url": reverse_lazy("step_1_introduction_registration") + get_selection(self.request),
             },
             {
-                "text": _("4: User clearance level"),
-                "url": reverse_lazy(
-                    "step_4_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code}
-                ),
-            },
-            {
-                "text": _("5: Scan setup object information"),
-                "url": reverse_lazy(
-                    "step_5_add_scan_ooi"  # , kwargs={"organization_code": self.organization.code}
-                ),
+                "text": _("2: Organization setup"),
+                "url": reverse_lazy("step_2a_organization_setup") + get_selection(self.request),
             },
         ]
         return steps
-
-
-class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
-    organization: Organization
-
-    def build_breadcrumbs(self) -> list[Breadcrumb]:
-        return [{"url": reverse_lazy("step_1_introduction_registration"), "text": _("OpenKAT introduction")}]
-
-
-class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
-    breadcrumbs = [{"url": reverse_lazy("step_1_introduction_registration"), "text": _("OpenKAT Setup")}]

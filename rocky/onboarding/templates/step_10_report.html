@@ -24,20 +24,20 @@
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        During this introduction we ask you to wait till the scan is ready. After which you can view the report.
+                        Boefjes run in the background. This enables you to use OpenKAT in the meantime without waiting for scans to finish.
+                        When you would like to see the status of a scan you can open the "tasks" page.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        After the onboarding, boefjes run in the background. This enables you to use OpenKAT in the meantime without waiting for scans to finish.
-                        When you would like to see the status of a scan you can open the "tasks" page.
+                        In the meantime, you can explore OpenKAT. Come back after a couple of minutes to view your report.
                     {% endblocktranslate %}
                 </p>
                 {% include "partials/cat_loader.html" %}
 
                 <form method="post" class="inline">
                     {% csrf_token %}
-                    <button disabled type="submit" class="button" id="js-disabled-for-10">{% translate "Open my DNS-report" %}</button>
+                    <button type="submit" class="button">{% translate "Continue to OpenKAT" %}</button>
                 </form>
             </div>
         </section>
