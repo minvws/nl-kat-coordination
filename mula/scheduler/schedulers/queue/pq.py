@@ -1,3 +1,4 @@
+# TODO: Use database row locking instead of threading locks, see: #4129
 from __future__ import annotations
 
 import abc

@@ -95,7 +95,9 @@ class SchedulerWorkerManager(WorkerManager):
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            p_items = self.scheduler_client.pop_items(queue_type.value)
+            p_items = self.scheduler_client.pop_items(
+                queue_type.value, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None
+            )
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.settings.poll_interval)
             time.sleep(self.settings.poll_interval)
