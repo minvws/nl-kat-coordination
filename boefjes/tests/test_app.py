@@ -203,7 +203,7 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
         normalizer_responses=[],
         log_path=tmp_path / "patch_task_log",
     )
-    manager.settings.deduplicate = False
+    manager.deduplicate = False
     with pytest.raises(KeyboardInterrupt):
         manager.run(WorkerManager.Queue.BOEFJES)
 
