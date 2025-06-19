@@ -50,6 +50,11 @@ class IntroductionStepsMixin(StepsMixin):
                 "url": reverse_lazy("step_10_report", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
             },
+            {
+                "text": _("5: Generating report"),
+                "url": reverse_lazy("step_9_choose_report_type", kwargs={"organization_code": self.organization.code})
+                + get_selection(self.request),
+            },
         ]
         return steps
 

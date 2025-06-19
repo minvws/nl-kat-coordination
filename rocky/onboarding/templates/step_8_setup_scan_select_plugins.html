@@ -13,52 +13,29 @@
                 <h1>{% translate "Setup scan - Enable plugins" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Plugins introduction" %}</h2>
+                <h2>{% translate "Enabling plugins and start scanning" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
-                        OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a
-                        specific skillset that will help to generate your report.
-                        There are three types of plugins.
-                    {% endblocktranslate %}
-                </p>
-                <ul>
-                    <li>
-                        <strong>{% translate "Boefjes:" %}</strong>
-                        {% blocktranslate trimmed %}
-                            Scan objects for data. Each boefje has a scan intensity score to
-                            prevent invasive scanning on objects where you don’t have the clearance to
-                            do so.
-                        {% endblocktranslate %}
-                    </li>
-                    <li>
-                        <strong>{% translate "Normalizers:" %}</strong>
-                        {% blocktranslate trimmed %}
-                            Check the data for specific objects and add these object to your object list.
-                        {% endblocktranslate %}
-                    </li>
-                    <li>
-                        <strong>{% translate "Bits:" %}</strong>
-                        {% blocktranslate trimmed %}
-                            Analyze the available data to come to insights and conclusions.
-                        {% endblocktranslate %}
-                    </li>
-                </ul>
-                <p>
-                    {% blocktranslate trimmed %}
-                        OpenKAT will be able to generate a full report when all the required and
-                        suggested plugins are enabled. If you choose not to give a plugin
-                        permission to run, the data that plugin would collect or produce will be
-                        left out of the report which will then be generated based on the available
-                        data collected by the enabled plugins. Below are the suggested and required
-                        plugins for this report.
+                        OpenKAT uses plugins to scan, check and analyze. There are three types of plugins.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        Let’s setup your scan by enabling the plugins of your choice below.
+                        The first plugin are <b>Boefjes</b>, which scan objects for data. These are security tools like nmap, LeakIX and WPscan.
+                    </p>
+                {% endblocktranslate %}
+                <p>
+                    {% blocktranslate trimmed %}
+                        The other two plugins are <b>Normalizers</b> and <b>Bits</b>, which are used to process the output of Boefjes. They can create findings and related objects.
+                        Bits are also used to create organization specific findings, based on policy requirements.
+                    </p>
+                {% endblocktranslate %}
+                <br>
+                <p>
+                    {% blocktranslate trimmed %}
+                        For the onboarding we will enable the Boefjes shown below. Once enabled these Boefjes gather publicly available information on suitable objects with a clearance level of 1 or higher. Normalizers and Bits are enabled by default.
                     {% endblocktranslate %}
                 </p>
-                <h2>{% translate "Required and suggested plugins" %}</h2>
                 <div class="column-4 tiles plugins images-cover">
                     {% for required_plugin in plugins.required %}
                         {% include "partials/plugin_tile.html" with form_id="enable_plugin_form" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
@@ -69,6 +46,7 @@
 
                     {% endfor %}
                 </div>
+                <br>
                 <form id="enable_plugin_form" novalidate method="post" class="inline">
                     {% csrf_token %}
                     <div class="button-container">
