@@ -150,7 +150,7 @@ class SchedulerView(OctopoesView):
 
     def get_report_schedules(self) -> list[dict[str, Any]]:
         try:
-            return self.scheduler_client.get_scheduled_reports(scheduler_id=self.scheduler_id)
+            return self.scheduler_client.get_scheduled_reports()
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return []
@@ -197,11 +197,16 @@ class SchedulerView(OctopoesView):
         except SchedulerError as error:
             return messages.error(self.request, error.message)
 
-    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse:
+    def get_schedule_with_filters(self, filters: dict[str, list[dict[str, str]]]) -> ScheduleResponse | None:
         try:
-            return self.scheduler_client.post_schedule_search(filters).results[0]
+            schedule = self.scheduler_client.post_schedule_search(filters)
+            if schedule.results:
+                return schedule.results[0]
+            else:
+                return None
         except SchedulerError as error:
-            return messages.error(self.request, error.message)
+            messages.error(self.request, error.message)
+            return None
 
     def schedule_task(self, task: TaskPush) -> None:
         if not self.indemnification_present:

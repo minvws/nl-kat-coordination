@@ -1,7 +1,9 @@
+import json
 import uuid
 from base64 import b64decode, b64encode
 from collections.abc import Set
 from datetime import datetime, timezone
+from typing import Any
 
 import httpx
 import structlog
@@ -146,6 +148,19 @@ class BytesClient:
 
         return [(file["name"], b64decode(file["content"])) for file in response.json().get("files", [])]
 
+    def get_raws_all(self, raw_ids: list[str]) -> dict[str, dict[str, Any]]:
+        params: dict[str, str | int | list[str]] = {"limit": len(raw_ids), "raw_ids": raw_ids}
+
+        response = self.session.get("/bytes/raws", params=params)
+        response.raise_for_status()
+        try:
+            return {
+                file["name"]: json.loads(b64decode(file["content"]).decode("utf-8"))
+                for file in response.json().get("files", [])
+            }
+        except httpx.ReadTimeout:
+            return {}
+
     def get_raw_metas(self, boefje_meta_id: uuid.UUID, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
 
@@ -189,5 +204,5 @@ class BytesClient:
         return response.json()["access_token"]
 
 
-def get_bytes_client(organization: str) -> BytesClient:
+def get_bytes_client(organization: str | None) -> BytesClient:
     return BytesClient(settings.BYTES_API, settings.BYTES_USERNAME, settings.BYTES_PASSWORD, organization)

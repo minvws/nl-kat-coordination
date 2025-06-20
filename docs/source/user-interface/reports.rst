@@ -7,7 +7,7 @@ OpenKAT displays all findings in the crisis room, the entry point for all curren
   :alt: Report
 
 Report types
-------------
+************
 With the Reports functionality you can create reports with a specific focus.
 
 There are 3 different kinds of reports available. These are:
@@ -36,7 +36,7 @@ The table below gives an overview of the 12 reports available. It also describes
      - Normal
    * - Findings
      - Shows all the finding types and their occurrences.
-     - **Any**
+     - Hostname, IPAddressV4, IPAddressv6, URL
      -
      -
      - Normal
@@ -103,8 +103,8 @@ The table below gives an overview of the 12 reports available. It also describes
 
 
 
-Report contents:
-================
+Report contents
+***************
 
 The table below gives an overview of the elements that can be found in each report type based on the required plugins:
 
@@ -188,7 +188,7 @@ The table below gives an overview of the elements that can be found in each repo
      - The number of occurrences for each web check are shown.
 
 Report flow
-===========
+***********
 On the Reports page you can generate new reports and get an overview of all generated reports.
 With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report.
 There are two ways to select objects. You can manually select objects, which will be static.
@@ -199,7 +199,7 @@ as the plugins will take some time before they have gathered and analyzed all da
 Check the Tasks page to verify that all tasks have completed.
 
 Report naming
-=============
+*************
 When creating a report, two name formats are needed, one for the overall report and one for the underlying asset reports.
 Every asset report consists of one input object and one report type (e.g. a DNS report for mispo.es).
 The overall report contains all the asset reports and also has its own name.
@@ -233,17 +233,20 @@ Besides these placeholders, it is also possible to use Python Strftime formats. 
 
 
 Plugins
-=======
+*******
+
 Each report has both required and suggested plugins that are used to show data in the report. These plugins are shown in the report flow. You can still generate reports if not all required plugins are enabled, however a warning a message is shown and the generated report will show that not all required plugins were enabled at the time of generation.
 
 
 Downloading and/or exporting a report
-=====================================
+*************************************
+
 The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file. Just click the 'Download' or 'Export' button on the right. The JSON output can be used to create a Multi-Report and compare organisation sectors.
 
 
 Generating a Multi Report
-=========================
+*************************
+
 With the Multi report you can compare organisations, for example if both are similar health care institutions.
 Create two organisations and make sure both organisations have data. For this tutorial they are named `CAT` and `DOG`.
 
@@ -262,7 +265,8 @@ Create two organisations and make sure both organisations have data. For this tu
 
 
 Troubleshooting
-===============
+***************
+
 When you do not see one (or more) of the reports options, please check the following things:
 
 - Do you have the required object selected? (This is either the Hostname or IPService for all reports, except the findings report.)

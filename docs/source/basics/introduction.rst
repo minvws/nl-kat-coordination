@@ -4,10 +4,6 @@
 Basics of OpenKAT
 =================
 
-======================
-How does OpenKAT work?
-======================
-
 General notes
 =============
 
