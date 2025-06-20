@@ -53,12 +53,15 @@ class IntroductionRegistrationStepsMixin(StepsMixin):
     def build_steps(self):
         steps = [
             {
-                "text": _("1: Introduction"),
+                "text": _("1: Welcome"),
                 "url": reverse_lazy("step_1_introduction_registration") + get_selection(self.request),
             },
             {
                 "text": _("2: Organization setup"),
                 "url": reverse_lazy("step_2a_organization_setup") + get_selection(self.request),
             },
+            {"text": _("3: Add Object"), "url": "" + get_selection(self.request)},
+            {"text": _("4: Plugins"), "url": "" + get_selection(self.request)},
+            {"text": _("5: Generating report"), "url": "" + get_selection(self.request)},
         ]
         return steps
