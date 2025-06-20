@@ -1,6 +1,6 @@
 from _datetime import datetime, timedelta
 
-from bits.expiring_certificate.expiring_certificate import run
+from nibbles.expiring_certificate.expiring_certificate import nibble
 
 from octopoes.models.ooi.certificate import X509Certificate
 
@@ -13,7 +13,7 @@ def test_expiring_cert_simple_success():
         serial_number="abc123",
     )
 
-    results = list(run(certificate, [], {}))
+    results = list(nibble(certificate, None))
 
     assert len(results) == 0
 
@@ -26,7 +26,7 @@ def test_expiring_cert_simple_expired():
         serial_number="abc123",
     )
 
-    results = list(run(certificate, [], {}))
+    results = list(nibble(certificate, None))
 
     assert len(results) == 2
 
@@ -40,6 +40,6 @@ def test_expiring_cert_simple_expires_soon():
         expires_in=timedelta(days=2),
     )
 
-    results = list(run(certificate, [], {}))
+    results = list(nibble(certificate, None))
 
     assert len(results) == 2
