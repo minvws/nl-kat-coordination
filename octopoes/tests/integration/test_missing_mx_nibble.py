@@ -7,12 +7,15 @@ from nibbles.missing_mx.nibble import NIBBLE as missing_mx_nibble
 from nibbles.runner import NibblesRunner
 
 from octopoes.core.service import OctopoesService
+from octopoes.models import ScanLevel
 from octopoes.models.ooi.dns.records import NXDOMAIN, DNSMXRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
+
+missing_mx_nibble.signature[0].min_scan_level = ScanLevel.L0
 
 
 def test_missing_mx_nibble_with_and_without_nx(
