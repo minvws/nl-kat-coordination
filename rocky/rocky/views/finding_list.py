@@ -7,7 +7,6 @@ import structlog
 from crisis_room.forms import AddFindingListDashboardItemForm
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
-from django.http.request import QueryDict
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -24,7 +23,7 @@ from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import (
     FINDING_LIST_COLUMNS,
-    AddDashboardItemFormView,
+    AddDashboardItemFormMixin,
     ConnectorFormMixin,
     FindingList,
     OctopoesView,
@@ -110,20 +109,6 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             "asc_desc": self.sorting_order,
         }
 
-    def get_filters_query(self) -> dict[str, Any]:
-        qdict = QueryDict(mutable=True)
-        qdict.update(
-            {
-                "observed_at": self.observed_at.strftime("%Y-%m-%d"),
-                "muted_findings": self.muted_findings,
-                "search": self.search_string,
-                "order_by": self.order_by,
-                "sorting_order": self.sorting_order,
-            }
-        )
-        qdict.setlist("severity", self.request.GET.getlist("severity"))
-        return {k: qdict.getlist(k) for k in qdict if qdict.getlist(k)}
-
     @property
     def order_by(self) -> Literal["score", "finding_type"]:
         return "finding_type" if self.request.GET.get("order_by", "") == "finding_type" else "score"
@@ -136,8 +121,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.observed_at
-        context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
-        context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["severity_filter"] = FindingSeverityMultiSelectForm(self.request.GET)
+        context["muted_findings_filter"] = MutedFindingSelectionForm(self.request.GET)
         context["table_columns"] = FINDING_LIST_COLUMNS
         context["finding_search_form"] = FindingSearchForm(self.request.GET)
         context["active_filters_counter"] = self.count_active_filters
@@ -146,7 +131,6 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["order_by_finding_type_form"] = OrderByFindingTypeForm(self.request.GET)
         context["sorting_order"] = self.sorting_order
         context["sorting_order_class"] = "ascending" if self.sorting_order == "asc" else "descending"
-        context["finding_list_filters_query"] = self.get_filters_query()
         context["severities"] = self.severities
         context["exclude_muted"] = self.exclude_muted
         context["only_muted"] = self.only_muted
@@ -154,7 +138,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         return context
 
 
-class FindingListView(BreadcrumbsMixin, FindingListFilter, AddDashboardItemFormView):
+class FindingListView(BreadcrumbsMixin, FindingListFilter, AddDashboardItemFormMixin):
     template_name = "findings/finding_list.html"
     paginate_by = 150
     add_dashboard_item_form = AddFindingListDashboardItemForm

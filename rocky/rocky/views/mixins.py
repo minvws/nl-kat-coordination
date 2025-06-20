@@ -16,7 +16,7 @@ from django.http import Http404, HttpRequest, HttpResponse, HttpResponsePermanen
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic.edit import FormMixin
 from httpx import HTTPError
 from katalogus.client import Boefje
 from pydantic import BaseModel
@@ -541,13 +541,15 @@ class SeveritiesMixin:
         return severities
 
 
-class AddDashboardItemFormView(FormView):
+class AddDashboardItemFormMixin(FormMixin):
     add_dashboard_item_form: type[forms.Form] | None = None
     organization: Organization
     template_name: str
     organization_member: OrganizationMember
+    request: HttpRequest
 
     def get_form_class(self):
+        """Specific naming for forms, so that it does not interferre with other forms."""
         if self.add_dashboard_item_form is None:
             raise ImproperlyConfigured(f"{self.__class__.__name__} requires 'dashboard_form_class' to be set.")
         return self.add_dashboard_item_form
@@ -558,6 +560,7 @@ class AddDashboardItemFormView(FormView):
         return kwargs
 
     def get_initial(self):
+        """This will initiate all filters set by GET request parameters."""
         initial = {}
         for key in self.request.GET:
             values = self.request.GET.getlist(key)
@@ -579,6 +582,8 @@ class AddDashboardItemFormView(FormView):
                 )
             )
         else:
+            # if subclassing has ListView, which will clash with this Mixin.
+            self.object_list = self.get_queryset()
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):

@@ -40,7 +40,7 @@ from reports.report_types.helpers import (
 )
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.utils import JSONEncoder, debug_json_keys
-from rocky.views.mixins import AddDashboardItemFormView, ObservedAtMixin, OOIList
+from rocky.views.mixins import AddDashboardItemFormMixin, ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
 from rocky.views.scheduler import SchedulerView
 
@@ -539,7 +539,7 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
-class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView, AddDashboardItemFormView):
+class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView, AddDashboardItemFormMixin):
     """
     This will display reports using report_id from reports history.
     Will fetch Report OOI and recreate report with data saved in bytes.

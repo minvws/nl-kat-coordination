@@ -15,6 +15,7 @@ from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_collapsed_types, get_relations
 from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm, ObservedAtForm
+from tools.forms.findings import FindingSearchForm, FindingSeverityMultiSelectForm, MutedFindingSelectionForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 
 
@@ -221,11 +222,32 @@ class OrderByObjectTypeForm(BaseRockyForm):
     order_by = forms.CharField(widget=forms.HiddenInput(attrs={"value": "object_type"}), required=False)
 
 
+class CustomMultipleHiddenInput(forms.MultipleHiddenInput):
+    def format_value(self, value):
+        if isinstance(value, str):
+            return [value]
+        return super().format_value(value)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        # Custom render logic if needed
+        value = self.format_value(value)
+        return super().render(name, value, attrs, renderer=renderer)
+
+
 class OOIFilterForm(OOISearchForm, ClearanceFilterForm, OOITypeMultiCheckboxForm, ObservedAtForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["observed_at"].widget = forms.HiddenInput()
-        self.fields["ooi_type"].widget = forms.MultipleHiddenInput()
-        self.fields["clearance_level"].widget = forms.MultipleHiddenInput()
-        self.fields["clearance_type"].widget = forms.MultipleHiddenInput()
+        self.fields["ooi_type"].widget = CustomMultipleHiddenInput()
+        self.fields["clearance_level"].widget = CustomMultipleHiddenInput()
+        self.fields["clearance_type"].widget = CustomMultipleHiddenInput()
+        self.fields["search"].widget = forms.HiddenInput()
+
+
+class FindingFilterForm(FindingSearchForm, MutedFindingSelectionForm, FindingSeverityMultiSelectForm, ObservedAtForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["observed_at"].widget = forms.HiddenInput()
+        self.fields["muted_findings"].widget = forms.HiddenInput()
+        self.fields["severity"].widget = CustomMultipleHiddenInput()
         self.fields["search"].widget = forms.HiddenInput()

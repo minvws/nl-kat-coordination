@@ -25,7 +25,7 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
-from rocky.views.mixins import AddDashboardItemFormView, OctopoesView, OOIList
+from rocky.views.mixins import AddDashboardItemFormMixin, OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -35,7 +35,7 @@ class PageActions(Enum):
     ADD_TO_DASHBOARD = "add_to_dashboard"
 
 
-class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormView):
+class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": gettext_lazy("Objects")}]
     template_name = "oois/ooi_list.html"
     add_dashboard_item_form = AddObjectListDashboardItemForm

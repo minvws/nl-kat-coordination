@@ -9,9 +9,11 @@
     <form method="post" id="new-dashboard-item-form-{{ modal_id }}">
         {% csrf_token %}
         {% include "partials/form/form_errors.html" with form=add_dashboard_item_form %}
-        {% include "forms/new_dashboard_item_form_fields.html" %}
         {% include "partials/form/fieldset.html" with fields=add_dashboard_item_form form_view="horizontal" %}
 
+        <input type="hidden" name="recipe_id" value="{{ recipe_ooi.recipe_id }}">
+        <input type="hidden" name="source" value="{{ report_pk }}">
+        <input type="hidden" name="template" value="{{ template }}">
     </form>
 {% elif recipe_ooi.cron_expression %}
     <div class="message">

@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
-from tools.forms.ooi_form import OOIFilterForm
+from tools.forms.ooi_form import FindingFilterForm, OOIFilterForm
 
 from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
 from rocky.views.mixins import FINDING_LIST_COLUMNS, OBJECT_LIST_COLUMNS
@@ -41,11 +41,6 @@ class AddDashboardItemForm(OOIFilterForm):
         super().__init__(*args, **kwargs)
         self.organization = organization
         self.fields["dashboard"].choices = self.get_dashboard_selection()
-        self.recipe_id = None
-        self.source = ""
-        self.template = ""
-        self.display_in_dashboard = True
-        self.table_columns = {}
 
     def clean_title(self):
         """Checks if title is already used as dashboard item name"""
@@ -114,18 +109,19 @@ class AddDashboardItemForm(OOIFilterForm):
     def create_dashboard_item(self) -> bool:
         dashboard = self.get_dashboard()
         name = self.cleaned_data.get("title")
+        recipe_id = self.cleaned_data.get("recipe_id")
 
         if dashboard is not None and name is not None:
             try:
                 form_data = {
                     "dashboard": dashboard,
                     "name": name,
-                    "recipe": self.recipe_id,
-                    "source": self.source,
-                    "query": json.dumps(self.get_query()) if not self.recipe_id else "",
-                    "template": self.template,
+                    "recipe": recipe_id,
+                    "source": self.cleaned_data.get("source", ""),
+                    "query": json.dumps(self.get_query()),
+                    "template": self.cleaned_data.get("template", ""),
                     "settings": self.get_settings(),
-                    "display_in_dashboard": self.display_in_dashboard,
+                    "display_in_dashboard": True,
                 }
                 DashboardItem.objects.create(**form_data)
                 return True
@@ -156,11 +152,8 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
         choices=((value, name) for value, name in OBJECT_LIST_COLUMNS.items()),
     )
-
-    def __init__(self, organization, *args, **kwargs):
-        super().__init__(organization, *args, **kwargs)
-        self.source = "object_list"
-        self.template = "partials/dashboard_ooi_list.html"
+    source = forms.CharField(initial="object_list", widget=forms.HiddenInput())
+    template = forms.CharField(initial="partials/dashboard_ooi_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
         default_query = super().get_query()
@@ -173,7 +166,7 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         return default_query | query
 
 
-class AddFindingListDashboardItemForm(AddDashboardItemForm):
+class AddFindingListDashboardItemForm(AddDashboardItemForm, FindingFilterForm):
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -192,17 +185,14 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
         choices=((value, name) for value, name in FINDING_LIST_COLUMNS.items()),
     )
-
-    def __init__(self, organization, *args, **kwargs):
-        super().__init__(organization, *args, **kwargs)
-        self.source = "finding_list"
-        self.template = "partials/dashboard_finding_list.html"
+    source = forms.CharField(initial="finding_list", widget=forms.HiddenInput())
+    template = forms.CharField(initial="partials/dashboard_finding_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
         default_query = super().get_query()
 
-        severities = self.data.getlist("severity", [])
-        muted_findings = self.data.get("muted_findings", "non-muted")
+        severities = self.cleaned_data.get("severity", [])
+        muted_findings = self.cleaned_data.get("muted_findings", "non-muted")
 
         query = {"severity": severities, "muted_findings": muted_findings}
 
@@ -210,9 +200,4 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
 
 
 class AddReportSectionDashboardItemForm(AddDashboardItemForm):
-    def __init__(self, organization, *args, **kwargs):
-        super().__init__(organization, *args, **kwargs)
-        if self.data:
-            self.template = self.data.get("template")
-            self.recipe_id = self.data.get("recipe_id")
-            self.source = self.data.get("source")
+    pass
