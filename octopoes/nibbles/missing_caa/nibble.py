@@ -1,10 +1,10 @@
 from nibbles.definitions import NibbleDefinition, NibbleParameter
 from octopoes.models import Reference, ScanLevel
-from octopoes.models.ooi.dns.records import NXDOMAIN, DNSMXRecord
+from octopoes.models.ooi.dns.records import NXDOMAIN, DNSCAARecord
 from octopoes.models.ooi.dns.zone import Hostname
 
 
-def mx_query(targets: list[Reference | None]) -> str:
+def caa_query(targets: list[Reference | None]) -> str:
     def pull(statements: list[str]) -> str:
         return f"""
             {{
@@ -14,7 +14,7 @@ def mx_query(targets: list[Reference | None]) -> str:
 
                         (or-join [?var ?hostname]
                             [?var :Hostname/primary_key ?hostname]
-                            [?var :DNSMXRecord/hostname ?hostname]
+                            [?var :DNSCAARecord/hostname ?hostname]
                             [?var :NXDOMAIN/hostname ?hostname]
                         )
                     ]
@@ -35,8 +35,8 @@ def mx_query(targets: list[Reference | None]) -> str:
         return pull(
             [
                 f"""
-                    [?mx :DNSMXRecord/primary_key "{str(targets[1])}"]
-                    [?mx :DNSMXRecord/hostname ?hostname]
+                    [?mx :DNSCAARecord/primary_key "{str(targets[1])}"]
+                    [?mx :DNSCAARecord/hostname ?hostname]
                 """
             ]
         )
@@ -56,7 +56,7 @@ def mx_query(targets: list[Reference | None]) -> str:
                     :find [(pull ?var [*])] :where [
                         (or-join [?var]
                             [?var :Hostname/primary_key "{str(targets[0])}"]
-                            [?var :DNSMXRecord/primary_key "{str(targets[1])}"]
+                            [?var :DNSCAARecord/primary_key "{str(targets[1])}"]
                             [?var :NXDOMAIN/primary_key "{str(targets[2])}"]
                         )
                     ]
@@ -74,11 +74,11 @@ def mx_query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    id="missing_mx",
+    id="missing-caa",
     signature=[
         NibbleParameter(object_type=Hostname, parser="[*][?object_type == 'Hostname'][]", min_scan_level=ScanLevel.L1),
-        NibbleParameter(object_type=DNSMXRecord, parser="[*][?object_type == 'DNSMXRecord'][]", optional=True),
+        NibbleParameter(object_type=DNSCAARecord, parser="[*][?object_type == 'DNSCAARecord'][]", optional=True),
         NibbleParameter(object_type=NXDOMAIN, parser="[*][?object_type == 'NXDOMAIN'][]", optional=True),
     ],
-    query=mx_query,
+    query=caa_query,
 )
