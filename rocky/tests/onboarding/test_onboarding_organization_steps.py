@@ -7,11 +7,11 @@ from onboarding.views import (
     OnboardingChooseReportInfoView,
     OnboardingChooseReportTypeView,
     OnboardingClearanceLevelIntroductionView,
+    OnboardingCreateReportRecipe,
     OnboardingIntroductionView,
     OnboardingReportView,
     OnboardingSetClearanceLevelView,
     OnboardingSetupScanOOIAddView,
-    OnboardingSetupScanOOIDetailView,
     OnboardingSetupScanOOIInfoView,
     OnboardingSetupScanSelectPluginsView,
 )
@@ -37,7 +37,7 @@ def test_onboarding_introduction(request, member, rf):
 def test_onboarding_choose_report_info(request, member, rf):
     member = request.getfixturevalue(member)
     response = OnboardingChooseReportInfoView.as_view()(
-        setup_request(rf.get("step_choose_report_info"), member.user), organization_code=member.organization.code
+        setup_request(rf.get("step_9_choose_report_info"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -139,7 +139,9 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
 
 def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, url):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
+        setup_request(
+            rf.get("step_4_trusted_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user
+        ),
         organization_code=redteam_member.organization.code,
     )
 
@@ -167,7 +169,9 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
     redteam_member.save()
 
     response_accept = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
+        setup_request(
+            rf.get("step_4_trusted_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user
+        ),
         organization_code=redteam_member.organization.code,
     )
 
@@ -185,7 +189,9 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
     rf, redteam_member, clearance_level, mock_organization_view_octopoes, url
 ):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
+        setup_request(
+            rf.get("step_4_trusted_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user
+        ),
         organization_code=redteam_member.organization.code,
     )
 
@@ -195,7 +201,9 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
     redteam_member.save()
 
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
+        setup_request(
+            rf.get("step_4_trusted_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user
+        ),
         organization_code=redteam_member.organization.code,
     )
     assertContains(response, "Unfortunately you cannot continue the onboarding.")
@@ -220,11 +228,11 @@ def test_onboarding_set_clearance_level(
     rf, superuser_member, admin_member, redteam_member, client_member, mock_organization_view_octopoes, url
 ):
     response_superuser = OnboardingSetClearanceLevelView.as_view()(
-        setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), superuser_member.user),
+        setup_request(rf.get("step_6_set_clearance_level", {"ooi": url.primary_key}), superuser_member.user),
         organization_code=superuser_member.organization.code,
     )
     response_redteam = OnboardingSetClearanceLevelView.as_view()(
-        setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
+        setup_request(rf.get("step_6_set_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -238,12 +246,12 @@ def test_onboarding_set_clearance_level(
 
     with pytest.raises(PermissionDenied):
         OnboardingSetClearanceLevelView.as_view()(
-            setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), admin_member.user),
+            setup_request(rf.get("step_6_set_clearance_level", {"ooi": url.primary_key}), admin_member.user),
             organization_code=admin_member.organization.code,
         )
     with pytest.raises(PermissionDenied):
         OnboardingSetClearanceLevelView.as_view()(
-            setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), client_member.user),
+            setup_request(rf.get("step_6_set_clearance_level", {"ooi": url.primary_key}), client_member.user),
             organization_code=client_member.organization.code,
         )
 
@@ -289,7 +297,7 @@ def test_onboarding_ooi_detail_scan(
     mock_organization_view_octopoes().get.return_value = url
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
-    response = OnboardingSetupScanOOIDetailView.as_view()(
+    response = OnboardingCreateReportRecipe.as_view()(
         setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
         organization_code=member.organization.code,
     )
@@ -320,7 +328,7 @@ def test_onboarding_ooi_detail_scan_create_report_schedule(
         + f"?report_type=dns-report&ooi={url.primary_key}"
     )
 
-    response = OnboardingSetupScanOOIDetailView.as_view()(
+    response = OnboardingCreateReportRecipe.as_view()(
         setup_request(rf.post(request_url), member.user), organization_code=member.organization.code
     )
 
