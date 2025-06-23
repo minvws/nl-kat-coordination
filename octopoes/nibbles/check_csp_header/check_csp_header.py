@@ -1,7 +1,6 @@
 import ipaddress
 import re
 from collections.abc import Iterator
-from typing import Any
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -21,11 +20,11 @@ def is_xss_capable(content_type: str) -> bool:
     return main_type in XSS_CAPABLE_TYPES
 
 
-def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
-    if not additional_oois:
+def nibble(resource: HTTPResource, header_list: list[HTTPHeader]) -> Iterator[OOI]:
+    if not header_list:
         return
 
-    headers = {header.key.lower(): header.value for header in additional_oois}
+    headers = {header.key.lower(): header.value for header in header_list}
 
     content_type = headers.get("content-type", "")
     # if no content type is present, we can't determine if the resource is XSS capable, so assume it is

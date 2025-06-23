@@ -40,8 +40,8 @@ def query(targets: list[Reference | None]) -> str:
 
 
 NIBBLE = NibbleDefinition(
-    # TODO: Merge with "check-csp=header" nibble
-    id="missing-headers",
+    # TODO: Merge with "missing-headers" nibble
+    id="check-csp-header",
     signature=[
         NibbleParameter(object_type=HTTPResource, parser="[*][?object_type == 'HTTPResource'][]"),
         NibbleParameter(
