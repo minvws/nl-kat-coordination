@@ -2,7 +2,6 @@ import hashlib
 import json
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import CVEFindingType, Finding, RetireJSFindingType
@@ -10,9 +9,9 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging.version import parse
 
 
-def run(input_ooi: Software, additional_oois: list[SoftwareInstance], config: dict[str, Any]) -> Iterator[OOI]:
-    software_name = input_ooi.name
-    software_version = input_ooi.version if input_ooi.version else "999.9.9"
+def nibble(software: Software, instance: SoftwareInstance) -> Iterator[OOI]:
+    software_name = software.name
+    software_version = software.version if software.version else "999.9.9"
 
     filename_path = Path(__file__).parent / "retirejs.json"
     with filename_path.open(encoding="utf-8") as json_file:
@@ -20,24 +19,22 @@ def run(input_ooi: Software, additional_oois: list[SoftwareInstance], config: di
 
     vulnerabilities = _check_vulnerabilities(software_name, software_version, known_vulnerabilities)
     for vulnerability in vulnerabilities["CVE"]:
-        for instance in additional_oois:
-            ft = CVEFindingType(id=vulnerability)
-            yield ft
-            yield Finding(
-                finding_type=ft.reference,
-                ooi=instance.reference,
-                description="This JavaScript Library has known vulnerabilities",
-            )
+        ft = CVEFindingType(id=vulnerability)
+        yield ft
+        yield Finding(
+            finding_type=ft.reference,
+            ooi=instance.reference,
+            description="This JavaScript Library has known vulnerabilities",
+        )
 
     for vulnerability in vulnerabilities["RetireJS"]:
-        for instance in additional_oois:
-            ft = RetireJSFindingType(id=vulnerability)
-            yield ft
-            yield Finding(
-                finding_type=ft.reference,
-                ooi=instance.reference,
-                description="This JavaScript Library has known vulnerabilities",
-            )
+        ft = RetireJSFindingType(id=vulnerability)
+        yield ft
+        yield Finding(
+            finding_type=ft.reference,
+            ooi=instance.reference,
+            description="This JavaScript Library has known vulnerabilities",
+        )
 
 
 def _check_vulnerabilities(name: str, package_version: str, known_vulnerabilities: dict) -> dict[str, list[str]]:
