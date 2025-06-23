@@ -29,7 +29,6 @@ def query(targets: list[Reference | None]) -> str:
 
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
     ref_query = [""]
-    ref_query = ["[?hostname :Hostname/primary_key]"]
     if sgn.startswith("1"):
         ref_query = [f'[?hostnamehttpurl :HostnameHTTPURL/primary_key "{str(targets[0])}"]']
     elif sgn.endswith("1"):
