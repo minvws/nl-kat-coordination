@@ -1,6 +1,6 @@
 from nibbles.definitions import NibbleDefinition, NibbleParameter
 from octopoes.models import Reference
-from octopoes.models.ooi.web import HTTPHeader, HTTPResource
+from octopoes.models.ooi.web import HostnameHTTPURL, HTTPHeader
 
 
 def query(targets: list[Reference | None]) -> str:
@@ -9,7 +9,7 @@ def query(targets: list[Reference | None]) -> str:
                 {{
                     :query {{
                         :find [
-                                (pull ?resource [*])
+                                (pull ?hostnamehttpurl [*])
                                 (pull ?headers [*])
                               ]
                         :where [
@@ -21,29 +21,29 @@ def query(targets: list[Reference | None]) -> str:
 
     base_query = [
         """
-            [?resource :object_type "HTTPResource"]
+            [?hostnamehttpurl :object_type "HostnameHTTPURL"]
             [?headers :HTTPHeader/resource ?resource]
+            [?resource :HTTPResource/web_url ?hostnamehttpurl]
         """
     ]
 
     sgn = "".join(str(int(isinstance(target, Reference))) for target in targets)
-    ref_query = []
+    ref_query = [""]
+    ref_query = ["[?hostname :Hostname/primary_key]"]
     if sgn.startswith("1"):
-        ref_query = [f'[?resource :HTTPResource/primary_key "{str(targets[0])}"]']
+        ref_query = [f'[?hostnamehttpurl :HostnameHTTPURL/primary_key "{str(targets[0])}"]']
     elif sgn.endswith("1"):
-        ref = str(targets[1]).split("|")
-        ref.pop()
-        ref[0] = "HTTPResource"
+        ref = str(targets[1]).split("|")[7:12]
+        ref[0] = "HostnameHTTPURL"
         target_reference = Reference.from_str("|".join(ref))
-        ref_query = [f'[?resource :HTTPResource/primary_key "{str(target_reference)}"]']
+        ref_query = [f'[?hostnamehttpurl :HostnameHTTPURL/primary_key "{str(target_reference)}"]']
     return pull(ref_query + base_query)
 
 
 NIBBLE = NibbleDefinition(
-    # TODO: Merge with "missing-headers" nibble
-    id="check-csp-header",
+    id="https-redirect",
     signature=[
-        NibbleParameter(object_type=HTTPResource, parser="[*][?object_type == 'HTTPResource'][]"),
+        NibbleParameter(object_type=HostnameHTTPURL, parser="[*][?object_type == 'HostnameHTTPURL'][]"),
         NibbleParameter(
             object_type=list[HTTPHeader], parser="[[*][?object_type == 'HTTPHeader'][]]", additional={HTTPHeader}
         ),
