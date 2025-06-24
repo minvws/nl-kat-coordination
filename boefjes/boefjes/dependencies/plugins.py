@@ -86,16 +86,29 @@ class PluginService:
         return self.config_storage.get_all_settings(organisation_id, plugin_id)
 
     def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
-        # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target.
+        # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target,
+        # and only normalizers disabled in the from_organisation end up being disabled.
         for plugin_id in self.config_storage.get_enabled_boefjes(to_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=False)
 
-        for plugin in self.get_all(from_organisation):
+        # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target.
+        for plugin_id in self.config_storage.get_enabled_normalizers(to_organisation):
+            self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
+
+        # Clone all settings from the from_organisation to the to_organisation
+        for plugin in self._get_all_without_enabled().values():
+            if not isinstance(plugin, Boefje):  # Only boefjes have settings
+                continue
             if all_settings := self.get_all_settings(from_organisation, plugin.id):
                 self.upsert_settings(all_settings, to_organisation, plugin.id)
 
+        # Enable the same boefjes
         for plugin_id in self.config_storage.get_enabled_boefjes(from_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
+
+        # Disable the same normalizers
+        for plugin_id in self.config_storage.get_disabled_normalizers(from_organisation):
+            self.set_enabled_by_id(plugin_id, to_organisation, enabled=False)
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
         self._assert_settings_match_schema(settings, plugin_id, organisation_id)
