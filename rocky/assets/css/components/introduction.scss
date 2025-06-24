@@ -1,0 +1,12 @@
+.introduction {
+  flex-direction: row;
+  justify-content: space-between;
+
+  .toolbar {
+    width: unset;
+  }
+
+  .tabs {
+    margin-top: calc(var(--section-gap) * -1);
+  }
+}
