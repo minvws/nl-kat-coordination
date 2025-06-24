@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-24 15:03+0000\n"
+"POT-Creation-Date: 2025-06-24 15:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5973,11 +5973,12 @@ msgid "Showing %(length)s of %(total)s findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/mute_findings_modal.html
 msgid "Mute findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Unmute Findings"
+msgid "Unmute findings"
 msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
@@ -6426,6 +6427,7 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/partials/mute_findings_modal.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute finding"
 msgstr ""
 
@@ -6855,10 +6857,6 @@ msgstr ""
 msgid "Expires by (UTC):"
 msgstr ""
 
-#: rocky/templates/partials/mute_findings_modal.html
-msgid "Mute Findings"
-msgstr ""
-
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr ""
@@ -6869,10 +6867,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Mute Finding"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
