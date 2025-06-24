@@ -6,15 +6,7 @@ from typing import Literal
 
 import structlog
 
-from .interfaces import (
-    BoefjeHandlerInterface,
-    BoefjeOutput,
-    BoefjeStorageInterface,
-    File,
-    JobRuntimeError,
-    StatusEnum,
-    Task,
-)
+from .interfaces import BoefjeHandler, BoefjeOutput, BoefjeStorageInterface, File, JobRuntimeError, StatusEnum, Task
 from .job_models import BoefjeMeta
 from .repository import BoefjeResource, LocalPluginRepository, _default_mime_types
 
@@ -53,7 +45,7 @@ def _copy_raw_files(
         logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
 
 
-class BoefjeHandler(BoefjeHandlerInterface):
+class LocalBoefjeHandler(BoefjeHandler):
     def __init__(self, local_repository: LocalPluginRepository, boefje_storage: BoefjeStorageInterface):
         self.local_repository = local_repository
         self.boefje_storage = boefje_storage

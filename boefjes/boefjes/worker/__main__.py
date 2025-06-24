@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import structlog
 
-from .boefje_handler import BoefjeHandler
+from .boefje_handler import LocalBoefjeHandler
 from .client import BoefjeAPIClient
 from .manager import SchedulerWorkerManager, WorkerManager
 from .oci_adapter import run_with_callback
@@ -80,7 +80,7 @@ def cli(plugins: tuple[str] | None, log_level: str, input_url: str) -> None:
     outgoing_request_timeout = int(os.getenv("OUTGOING_REQUEST_TIMEOUT", "30"))
 
     boefje_api = BoefjeAPIClient(base_url, outgoing_request_timeout, [oci_image], parsed_plugins)
-    handler = BoefjeHandler(LocalPluginRepository(Path()), boefje_api)
+    handler = LocalBoefjeHandler(LocalPluginRepository(Path()), boefje_api)
     logger.info(
         "Configured BoefjeAPI [base_url=%s, outgoing_request_timeout=%s, images=%s, plugins=%s]",
         base_url,

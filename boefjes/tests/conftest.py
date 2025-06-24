@@ -26,9 +26,9 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_handler import BoefjeHandler, _copy_raw_files
+from boefjes.worker.boefje_handler import LocalBoefjeHandler, _copy_raw_files
 from boefjes.worker.interfaces import (
-    BoefjeHandlerInterface,
+    BoefjeHandler,
     BoefjeOutput,
     BoefjeStorageInterface,
     File,
@@ -148,7 +148,7 @@ class MockBytesAPIClient(BoefjeStorageInterface):
         return [self.queue.get() for _ in range(self.queue.qsize())]
 
 
-class MockHandler(BoefjeHandlerInterface, NormalizerHandlerInterface):
+class MockHandler(BoefjeHandler, NormalizerHandlerInterface):
     def __init__(self, exception=Exception):
         self.sleep_time = 0
         self.queue = multiprocessing.Manager().Queue()
@@ -201,7 +201,7 @@ def item_handler(tmp_path: Path):
 
 @pytest.fixture
 def mock_boefje_handler(mock_local_repository: LocalPluginRepository, mocker):
-    return BoefjeHandler(mock_local_repository, mocker.MagicMock())
+    return LocalBoefjeHandler(mock_local_repository, mocker.MagicMock())
 
 
 @pytest.fixture

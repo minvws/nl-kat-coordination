@@ -14,7 +14,7 @@ from httpx import HTTPError
 from pydantic import ValidationError
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import BoefjeHandlerInterface, NormalizerHandlerInterface, SchedulerClientInterface, Task, TaskStatus
+from .interfaces import BoefjeHandler, NormalizerHandlerInterface, SchedulerClientInterface, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")
@@ -32,7 +32,7 @@ class WorkerManager:
 class SchedulerWorkerManager(WorkerManager):
     def __init__(
         self,
-        item_handler: BoefjeHandlerInterface | NormalizerHandlerInterface,
+        item_handler: BoefjeHandler | NormalizerHandlerInterface,
         scheduler_client: SchedulerClientInterface,
         pool_size: int,
         poll_interval: float,
@@ -232,7 +232,7 @@ def _format_exit_code(exitcode: int | None) -> str:
 
 def _start_working(
     task_queue: multiprocessing.Queue,
-    handler: BoefjeHandlerInterface,
+    handler: BoefjeHandler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
 ) -> None:
@@ -266,7 +266,7 @@ def _start_working(
                         "Set status in the scheduler", status=status.value, task=str(p_item.data.id), duration=duration
                     )
 
-                if not isinstance(handler, BoefjeHandlerInterface) or not duplicated_items:
+                if not isinstance(handler, BoefjeHandler) or not duplicated_items:
                     # We do not deduplicate normalizers
                     continue
 

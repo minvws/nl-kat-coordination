@@ -12,7 +12,7 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_ap
 from boefjes.config import settings
 from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.worker.boefje_handler import _copy_raw_files
-from boefjes.worker.interfaces import BoefjeHandlerInterface, BoefjeOutput, NormalizerHandlerInterface, Task, TaskStatus
+from boefjes.worker.interfaces import BoefjeHandler, BoefjeOutput, NormalizerHandlerInterface, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
 from octopoes.api.models import Affirmation, Declaration, Observation
@@ -26,7 +26,7 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-class DockerBoefjeHandler(BoefjeHandlerInterface):
+class DockerBoefjeHandler(BoefjeHandler):
     CACHE_VOLUME_NAME = "openkat_cache"
     CACHE_VOLUME_TARGET = "/home/nonroot/openkat_cache"
 
@@ -226,21 +226,19 @@ class NormalizerHandler(NormalizerHandlerInterface):
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
 
-class CompositeBoefjeHandler(BoefjeHandlerInterface):
+class CompositeBoefjeHandler(BoefjeHandler):
     """This is a pattern that allows us to use the Handler interface while allowing multiple handlers to be active at
     the same time, depending on the configuration. This way, we don't need to keep the option to delegate in every
     BoefjeHandler instance."""
 
-    def __init__(
-        self, boefje_handler: BoefjeHandlerInterface | None = None, docker_handler: DockerBoefjeHandler | None = None
-    ):
+    def __init__(self, boefje_handler: BoefjeHandler | None = None, docker_handler: DockerBoefjeHandler | None = None):
         self.boefje_handler = boefje_handler
         self.docker_handler = docker_handler
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         return self.get_handler(task).handle(task)
 
-    def get_handler(self, task: Task) -> BoefjeHandlerInterface:
+    def get_handler(self, task: Task) -> BoefjeHandler:
         if not isinstance(task.data, BoefjeMeta):
             raise RuntimeError("Did not receive boefje task")
 

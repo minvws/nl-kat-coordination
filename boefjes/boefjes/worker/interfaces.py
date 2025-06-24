@@ -70,7 +70,7 @@ class BoefjeOutput(BaseModel):
     files: list[File] | None = None
 
 
-class BoefjeHandlerInterface:
+class BoefjeHandler:
     def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         raise NotImplementedError()
 
