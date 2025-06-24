@@ -1,0 +1,19 @@
+{
+  "id": "kat_ssdp_normalize",
+  "name": "SSDP normalizer",
+  "consumes": [
+    "boefje/ssdp"
+  ],
+  "produces": [
+    "Network",
+    "SSDPResponse",
+    "Service",
+    "IPAddressV4",
+    "IPAddressV6",
+    "IPService",
+    "Hostname",
+    "Website",
+    "HTTPResource",
+    "HostnameHTTPURL"
+  ]
+}

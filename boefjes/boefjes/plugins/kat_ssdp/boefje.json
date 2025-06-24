@@ -1,0 +1,10 @@
+{
+  "id": "ssdp",
+  "name": "SSDP discovery",
+  "description": "Scan a local network using SSDP",
+  "consumes": [
+    "Network"
+  ],
+  "scan_level": 1,
+  "oci_image": "ghcr.io/minvws/openkat/ssdp:latest"
+}
