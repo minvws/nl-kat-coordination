@@ -33,6 +33,7 @@ COPY --chown=nonroot boefjes/plugins/kat_rpki boefjes/plugins/kat_rpki
 COPY --chown=nonroot boefjes/plugins/kat_security_txt_downloader boefjes/plugins/kat_security_txt_downloader
 COPY --chown=nonroot boefjes/plugins/kat_service_banner boefjes/plugins/kat_service_banner
 COPY --chown=nonroot boefjes/plugins/kat_shodan boefjes/plugins/kat_shodan
+COPY --chown=nonroot boefjes/plugins/kat_shodan_internetdb boefjes/plugins/kat_shodan_internetdb
 COPY --chown=nonroot boefjes/plugins/kat_snyk boefjes/plugins/kat_snyk
 COPY --chown=nonroot boefjes/plugins/kat_snyk_finding_types boefjes/plugins/kat_snyk_finding_types
 COPY --chown=nonroot boefjes/plugins/kat_webpage_analysis boefjes/plugins/kat_webpage_analysis
