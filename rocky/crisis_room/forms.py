@@ -28,13 +28,6 @@ class AddDashboardItemForm(BaseRockyForm):
         choices=(("1", _("Full width")), ("2", _("Half width"))),
         initial="1",
     )
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
-    )
 
     def __init__(self, organization, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -95,6 +88,7 @@ class AddDashboardItemForm(BaseRockyForm):
         dashboard = self.get_dashboard()
         name = self.cleaned_data.get("title")
         recipe_id = self.cleaned_data.get("recipe_id")
+        query = self.get_query()
 
         if dashboard is not None and name is not None:
             try:
@@ -103,7 +97,7 @@ class AddDashboardItemForm(BaseRockyForm):
                     "name": name,
                     "recipe": recipe_id,
                     "source": self.cleaned_data.get("source", ""),
-                    "query": json.dumps(self.get_query()),
+                    "query": json.dumps(query) if query else "",
                     "template": self.cleaned_data.get("template", ""),
                     "settings": self.get_settings(),
                     "display_in_dashboard": True,
@@ -118,6 +112,13 @@ class AddDashboardItemForm(BaseRockyForm):
 
 
 class AddObjectListDashboardItemForm(OOIFilterForm, AddDashboardItemForm):
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -152,6 +153,13 @@ class AddObjectListDashboardItemForm(OOIFilterForm, AddDashboardItemForm):
 
 
 class AddFindingListDashboardItemForm(FindingFilterForm, AddDashboardItemForm):
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
