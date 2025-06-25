@@ -12,7 +12,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
         return [({"info/boefje"}, "Skipping check due to non-TLS scheme")]
 
     cmd = (
-        ["openssl"]
+        ["/usr/bin/openssl"]
         + boefje_meta["arguments"]["oci_arguments"]
         + ["-host", ip_address, "-port", port, "-servername", hostname]
     )
