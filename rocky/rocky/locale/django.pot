@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-25 10:59+0000\n"
+"POT-Creation-Date: 2025-06-25 13:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -608,15 +608,15 @@ msgid "Half width"
 msgstr ""
 
 #: crisis_room/forms.py
-msgid "Number of rows in list"
-msgstr ""
-
-#: crisis_room/forms.py
 msgid "An item with that name already exists. Try a different title."
 msgstr ""
 
 #: crisis_room/forms.py
 msgid "An error occurred while adding dashboard item."
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "Number of rows in list"
 msgstr ""
 
 #: crisis_room/forms.py
