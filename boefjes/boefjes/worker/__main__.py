@@ -6,10 +6,9 @@ from pathlib import Path
 import click
 import structlog
 
-from boefjes.worker.interfaces import WorkerManager
-
 from .boefje_handler import BoefjeHandler
 from .client import BoefjeAPIClient
+from .interfaces import WorkerManager
 from .manager import SchedulerWorkerManager
 from .oci_adapter import run_with_callback
 from .repository import LocalPluginRepository
