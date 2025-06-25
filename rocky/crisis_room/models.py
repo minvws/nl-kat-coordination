@@ -1,4 +1,6 @@
-from typing import Literal, TypedDict
+import json
+from typing import Any, Literal, TypedDict
+from urllib.parse import urlencode
 
 import structlog
 from django.core.exceptions import ValidationError
@@ -102,6 +104,18 @@ class DashboardItem(models.Model):
                 return f"Dashboard item on dashboard {str(self.dashboard)}"
         except Dashboard.DoesNotExist:
             return super().__str__()
+
+    @property
+    def get_query_url(self) -> str:
+        if self.query:
+            return urlencode(json.loads(self.query), doseq=True)
+        return ""
+
+    @property
+    def get_query(self) -> dict[str, Any]:
+        if self.query:
+            return json.loads(self.query)
+        return {}
 
     def clean(self) -> None:
         if self.recipe and self.query:
