@@ -1,14 +1,6 @@
-import logging
+import os
+import subprocess
 from ipaddress import ip_address
-from os import getenv
-
-import docker
-from docker.errors import APIError
-from requests.exceptions import RequestException
-
-from boefjes.plugins.helpers import get_file_from_container
-
-SSL_TEST_IMAGE = "drwetter/testssl.sh:3.2"
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
@@ -17,28 +9,15 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     address = input_["ip_port"]["address"]["address"]
 
     if ip_address(address).version == 6:
-        args = f" --jsonfile tmp/output.json --server-preference -6 [{address}]:{ip_port}"
+        cmd = (
+            ["/usr/local/bin/testssl.sh"] + boefje_meta["arguments"]["oci_arguments"] + ["-6", f"[{address}]:{ip_port}"]
+        )
     else:
-        args = f" --jsonfile tmp/output.json --server-preference {address}:{ip_port}"
+        cmd = ["/usr/local/bin/testssl.sh"] + boefje_meta["arguments"]["oci_arguments"] + [f"[{address}]:{ip_port}"]
 
-    timeout = getenv("TIMEOUT", 30)
+    env = os.environ.copy()
 
-    environment_vars = {"OPENSSL_TIMEOUT": timeout, "CONNECT_TIMEOUT": timeout}
+    env["OPENSSL_TIMEOUT"] = os.getenv("TIMEOUT", 30)
+    env["CONNECT_TIMEOUT"] = env["OPENSSL_TIMEOUT"]
 
-    client = docker.from_env()
-    container = client.containers.run(SSL_TEST_IMAGE, args, detach=True, environment=environment_vars)
-
-    try:
-        container.wait(timeout=300)
-        output = get_file_from_container(container, "tmp/output.json")
-    except (APIError, RequestException) as e:
-        logging.warning("DockerException occurred: %s", e)
-        container.stop()
-        raise Exception("Error occurred (possibly a timeout) while running testssl.sh")
-    finally:
-        container.remove()
-
-    if not output:
-        raise Exception("Couldn't get tmp/output.json from testsll container")
-
-    return [(set(), output)]
+    return [({"openkat/testssl-sh-ciphers-output"}, subprocess.run(cmd, capture_output=True, env=env).stdout.decode())]
