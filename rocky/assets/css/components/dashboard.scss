@@ -14,6 +14,10 @@
 
     &.width-1 {
       width: 100%;
+
+      .dashboard-item-link {
+        margin-left: auto;
+      }
     }
 
     &.width-2 {
