@@ -69,10 +69,6 @@ dev = [
 [tool.uv]
 package = false
 
-[build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
-
 [tool.flynt]
 line-length = 120
 transform-concats = true
