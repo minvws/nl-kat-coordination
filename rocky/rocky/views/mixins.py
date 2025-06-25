@@ -12,10 +12,11 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
 from django.views.generic.edit import FormMixin
 from httpx import HTTPError
 from katalogus.client import Boefje
@@ -567,7 +568,7 @@ class AddDashboardItemFormMixin(FormMixin):
             initial[key] = values if len(values) > 1 else values[0]
         return initial
 
-    def add_to_dashboard(self) -> HttpResponseRedirect | HttpResponsePermanentRedirect | HttpResponse:
+    def add_to_dashboard(self) -> HttpResponse:
         if not self.organization_member.can_add_dashboard_item:
             messages.error(self.request, _("You do not have the permission to add items to a dashboard."))
             raise PermissionDenied
@@ -581,10 +582,12 @@ class AddDashboardItemFormMixin(FormMixin):
                     "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
                 )
             )
-        else:
-            # if subclassing has ListView, which will clash with this Mixin.
+
+        # If this mixin is used together with ListView, they will clash,
+        # it must return invalid form with get_queryset from ListView so they can work together.
+        if isinstance(self, ListView):
             self.object_list = self.get_queryset()
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

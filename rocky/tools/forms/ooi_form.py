@@ -243,6 +243,16 @@ class OOIFilterForm(OOISearchForm, ClearanceFilterForm, OOITypeMultiCheckboxForm
         self.fields["clearance_type"].widget = CustomMultipleHiddenInput()
         self.fields["search"].widget = forms.HiddenInput()
 
+    def get_query(self) -> dict[str, Any]:
+        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
+        return {
+            "observed_at": observed_at.strftime("%Y-%m-%d"),
+            "ooi_type": self.cleaned_data.get("ooi_type", []),
+            "clearance_level": self.cleaned_data.get("clearance_level", []),
+            "clearance_type": self.cleaned_data.get("clearance_type", []),
+            "search": self.cleaned_data.get("search", ""),
+        }
+
 
 class FindingFilterForm(FindingSearchForm, MutedFindingSelectionForm, FindingSeverityMultiSelectForm, ObservedAtForm):
     def __init__(self, *args, **kwargs):
@@ -251,3 +261,13 @@ class FindingFilterForm(FindingSearchForm, MutedFindingSelectionForm, FindingSev
         self.fields["muted_findings"].widget = forms.HiddenInput()
         self.fields["severity"].widget = CustomMultipleHiddenInput()
         self.fields["search"].widget = forms.HiddenInput()
+
+    def get_query(self) -> dict[str, Any]:
+        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
+
+        return {
+            "observed_at": observed_at.strftime("%Y-%m-%d"),
+            "severity": self.cleaned_data.get("severity"),
+            "muted_findings": self.cleaned_data.get("muted_findings", "non-muted"),
+            "search": self.cleaned_data.get("search", ""),
+        }

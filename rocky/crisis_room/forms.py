@@ -1,5 +1,4 @@
 import json
-from datetime import datetime, timezone
 from typing import Any
 
 from django import forms
@@ -17,7 +16,7 @@ class AddDashboardForm(BaseRockyForm):
     dashboard_name = forms.CharField(label=_("Name"), required=True)
 
 
-class AddDashboardItemForm(OOIFilterForm):
+class AddDashboardItemForm(BaseRockyForm):
     dashboard = forms.ChoiceField(required=True, widget=forms.Select, choices=[])
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
@@ -78,21 +77,7 @@ class AddDashboardItemForm(OOIFilterForm):
         return DashboardItem.objects.filter(dashboard=dashboard, name=name).exists()
 
     def get_query(self) -> dict[str, Any]:
-        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
-
-        order_by = sort_by[0]
-        sorting_order = sort_by[1]
-        limit = int(self.cleaned_data.get("limit", 10))
-        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
-        search = self.cleaned_data.get("search", "")
-
-        return {
-            "observed_at": observed_at.strftime("%Y-%m-%d"),
-            "order_by": order_by,
-            "sorting_order": sorting_order,
-            "limit": limit,
-            "search": search,
-        }
+        return {}
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
@@ -132,7 +117,7 @@ class AddDashboardItemForm(OOIFilterForm):
         return False
 
 
-class AddObjectListDashboardItemForm(AddDashboardItemForm):
+class AddObjectListDashboardItemForm(OOIFilterForm, AddDashboardItemForm):
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -156,17 +141,17 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
     template = forms.CharField(initial="partials/dashboard_ooi_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
-        default_query = super().get_query()
+        query = super().get_query()
+        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
 
-        query = {
-            "ooi_type": self.cleaned_data.get("ooi_type", []),
-            "clearance_level": self.cleaned_data.get("clearance_level", []),
-            "clearance_type": self.cleaned_data.get("clearance_type", []),
-        }
-        return default_query | query
+        order_by = sort_by[0]
+        sorting_order = sort_by[1]
+        limit = int(self.cleaned_data.get("limit", 10))
+
+        return {"order_by": order_by, "sorting_order": sorting_order, "limit": limit} | query
 
 
-class AddFindingListDashboardItemForm(AddDashboardItemForm, FindingFilterForm):
+class AddFindingListDashboardItemForm(FindingFilterForm, AddDashboardItemForm):
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -189,15 +174,17 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm, FindingFilterForm):
     template = forms.CharField(initial="partials/dashboard_finding_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
-        default_query = super().get_query()
+        query = super().get_query()
+        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
 
-        severities = self.cleaned_data.get("severity", [])
-        muted_findings = self.cleaned_data.get("muted_findings", "non-muted")
+        order_by = sort_by[0]
+        sorting_order = sort_by[1]
+        limit = int(self.cleaned_data.get("limit", 10))
 
-        query = {"severity": severities, "muted_findings": muted_findings}
-
-        return default_query | query
+        return {"order_by": order_by, "sorting_order": sorting_order, "limit": limit} | query
 
 
 class AddReportSectionDashboardItemForm(AddDashboardItemForm):
-    pass
+    recipe_id = forms.CharField(widget=forms.HiddenInput())
+    source = forms.CharField(required=False, widget=forms.HiddenInput())
+    template = forms.CharField(widget=forms.HiddenInput())

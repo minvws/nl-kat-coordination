@@ -14,10 +14,13 @@
 
                     {% endif %}
                     <div class="dashboard-item">
-                        <div class="fifty-fifty">
-                            <div class="horizontal-view">
-                                <h3 id="dashboard-item-{{ dashboard_item.item.name|slugify }}">{{ dashboard_item.item.name }}</h3>
-                                <span class="label system-tag color-grey">
+                        <div class="header">
+                            <div class="header-group">
+                                <h3 class="header-group-item header-title"
+                                    id="dashboard-item-{{ dashboard_item.item.name|slugify }}">
+                                    {{ dashboard_item.item.name }}
+                                </h3>
+                                <span class="header-group-item label system-tag color-grey">
                                     {% if dashboard_item.item.source == "object_list" %}
                                         {% translate "Object list" %}
                                     {% elif dashboard_item.item.source == "finding_list" %}
@@ -26,19 +29,19 @@
                                         {% translate "Report section" %}
                                     {% endif %}
                                 </span>
-                            </div>
-                            <div class="toolbar">
                                 {% if dashboard_item.item.recipe and dashboard_item.item.source %}
-                                    <a class="button ghost"
+                                    <a class="header-group-item dashboard-item-link"
                                        href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.parent_report.primary_key }}&observed_at={{ dashboard_item.data.report.observed_at|date:"Y-m-d H:i:s:u" }}">
-                                        {{ dashboard_item.data.report.reference_date }} {{ dashboard_item.data.parent_report.name }}
+                                        <span class="date">{{ dashboard_item.data.report.reference_date }}</span> <span class="name">{{ dashboard_item.data.parent_report.name }}</span>
                                     </a>
                                 {% elif dashboard_item.item.recipe %}
-                                    <a class="button ghost"
+                                    <a class="header-group-item dashboard-item-link"
                                        href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.report.primary_key }}&observed_at={{ dashboard_item.data.report.observed_at|date:"Y-m-d H:i:s:u" }}">
-                                        {{ dashboard_item.data.report.reference_date }} {{ dashboard_item.data.report.name }}
+                                        <span class="date">{{ dashboard_item.data.report.reference_date }}</span> <span class="name">{{ dashboard_item.data.report.name }}</span>
                                     </a>
                                 {% endif %}
+                            </div>
+                            <div class="header-toolbar">
                                 {% if organization_member.can_modify_dashboard_item %}
                                     {% include "partials/dashboard_item_action_button.html" %}
 
