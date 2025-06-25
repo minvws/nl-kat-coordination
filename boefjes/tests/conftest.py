@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 import alembic.config
@@ -33,9 +33,10 @@ from boefjes.worker.interfaces import (
     Task,
     TaskPop,
     TaskStatus,
+    WorkerManager,
 )
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager
 from boefjes.worker.models import Organisation
 from boefjes.worker.repository import (
     LocalPluginRepository,
@@ -78,16 +79,18 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._popped_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
         self._pushed_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
 
-    def pop_items(self, queue: str) -> list[Task] | None:
+    def pop_items(
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+    ) -> list[Task]:
         time.sleep(self.sleep_time)
 
         try:
-            if WorkerManager.Queue.BOEFJES.value in queue:
+            if queue is WorkerManager.Queue.BOEFJES:
                 response = TypeAdapter(TaskPop).validate_json(self.boefje_responses.pop(0))
-            elif WorkerManager.Queue.NORMALIZERS.value in queue:
+            elif queue is WorkerManager.Queue.NORMALIZERS:
                 response = TypeAdapter(TaskPop).validate_json(self.normalizer_responses.pop(0))
             else:
-                return None
+                return []
 
             p_items = response.results
 

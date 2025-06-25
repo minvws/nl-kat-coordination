@@ -6,7 +6,6 @@ import sys
 import time
 from base64 import b64encode
 from datetime import datetime
-from enum import Enum
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
 
@@ -16,20 +15,20 @@ from pydantic import ValidationError
 
 # A deliberate relative import to make this module self-contained
 from .boefje_handler import MIMETYPE_MIN_LENGTH, BoefjeHandler
-from .interfaces import BoefjeOutput, File, Handler, SchedulerClientInterface, StatusEnum, Task, TaskStatus
+from .interfaces import (
+    BoefjeOutput,
+    File,
+    Handler,
+    SchedulerClientInterface,
+    StatusEnum,
+    Task,
+    TaskStatus,
+    WorkerManager,
+)
 from .repository import _default_mime_types
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")
-
-
-class WorkerManager:
-    class Queue(Enum):
-        BOEFJES = "boefje"
-        NORMALIZERS = "normalizer"
-
-    def run(self, queue: Queue) -> None:
-        raise NotImplementedError()
 
 
 class SchedulerWorkerManager(WorkerManager):
@@ -98,7 +97,7 @@ class SchedulerWorkerManager(WorkerManager):
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            p_items = self.scheduler_client.pop_items(queue_type.value)
+            p_items = self.scheduler_client.pop_items(queue_type)
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.poll_interval)
             time.sleep(self.poll_interval)

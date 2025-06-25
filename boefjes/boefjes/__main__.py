@@ -12,8 +12,8 @@ from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.interfaces import Handler
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.interfaces import Handler, WorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager
 from boefjes.worker.repository import get_local_repository
 
 configure_logging()

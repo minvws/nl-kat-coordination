@@ -82,9 +82,18 @@ class PaginatedTasksResponse(BaseModel):
     results: list[Task]
 
 
+class WorkerManager:
+    class Queue(Enum):
+        BOEFJES = "boefje"
+        NORMALIZERS = "normalizer"
+
+    def run(self, queue: Queue) -> None:
+        raise NotImplementedError()
+
+
 class SchedulerClientInterface:
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
     ) -> list[Task]:
         raise NotImplementedError()
 
