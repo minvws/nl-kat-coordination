@@ -540,16 +540,16 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
             "limit": "10",
             "size": "2",
             "observed_at": "2025-05-07",
-            "exclude_muted": "True",
-            "only_muted": "False",
+            "muted_findings": "non-muted",
             "source": "finding_list",
+            "template": "partials/dashboard_finding_list.html",
         }
     )
 
     qdict.setlist("columns", ["severity", "finding"])
 
     form = AddFindingListDashboardItemForm(organization=client_member.organization, data=qdict)
-
+    print(form)
     assert form.is_valid()
 
     # Check if dashboard data is created, after form is valid, should be created at this point
