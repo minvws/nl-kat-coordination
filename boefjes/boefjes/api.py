@@ -15,7 +15,7 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient
 from boefjes.config import settings
 from boefjes.dependencies.plugins import get_plugin_service
-from boefjes.worker.interfaces import BoefjeInput, BoefjeOutput, StatusEnum, Task, TaskPop, TaskStatus, WorkerManager
+from boefjes.worker.interfaces import BoefjeInput, BoefjeOutput, StatusEnum, Task, TaskStatus, WorkerManager
 from boefjes.worker.repository import _default_mime_types
 
 app = FastAPI(title="Boefje API")
@@ -124,13 +124,13 @@ def get_task_from_scheduler(task_id: UUID, scheduler_client: SchedulerAPIClient)
 # The "scheduler proxy" endpoints
 
 
-@app.post("/api/v0/scheduler/{queue_id}/pop", response_model=list[TaskPop], tags=["scheduler"])
+@app.post("/api/v0/scheduler/{queue_id}/pop", response_model=list[Task], tags=["scheduler"])
 def pop_tasks(
     queue_id: str,
     limit: int = 1,
     filters: dict[str, Any] | None = Body(...),
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
-) -> list[TaskPop]:
+) -> list[Task]:
     return scheduler_client.pop_items(WorkerManager.Queue(queue_id), filters, limit)
 
 

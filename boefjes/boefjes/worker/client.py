@@ -5,15 +5,7 @@ from httpx import Client, HTTPTransport, Response
 from pydantic import TypeAdapter
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import (
-    BoefjeOutput,
-    BoefjeStorageInterface,
-    SchedulerClientInterface,
-    Task,
-    TaskPop,
-    TaskStatus,
-    WorkerManager,
-)
+from .interfaces import BoefjeOutput, BoefjeStorageInterface, SchedulerClientInterface, Task, TaskStatus, WorkerManager
 from .job_models import BoefjeMeta
 
 
@@ -54,12 +46,7 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         )
         self._verify_response(response)
 
-        page = TypeAdapter(TaskPop | None).validate_json(response.content)
-
-        if page is None:
-            return []
-
-        return page.results
+        return TypeAdapter(list[Task]).validate_json(response.content)
 
     def push_item(self, p_item: Task) -> None:
         response = self._session.post(f"/api/v0/scheduler/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
