@@ -91,7 +91,6 @@ class PluginService:
         for plugin_id in self.config_storage.get_enabled_boefjes(to_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=False)
 
-        # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target.
         for plugin_id in self.config_storage.get_enabled_normalizers(to_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
