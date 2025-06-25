@@ -71,7 +71,7 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    {% if object_list|length >= 1 and perms.tools.can_mute_findings %}
+                                    {% if object_list and perms.tools.can_mute_findings %}
                                         <th>
                                             <input class="toggle-all" data-toggle-target="finding" type="checkbox">
                                         </th>
