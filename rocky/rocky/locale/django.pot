@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 14:56+0000\n"
+"POT-Creation-Date: 2025-06-25 10:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -349,7 +349,7 @@ msgid "Member type"
 msgstr ""
 
 #: account/templates/account_detail.html
-#: reports/report_types/findings_report/report.html
+#: crisis_room/templates/partials/crisis_room_findings_table.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr ""
@@ -576,6 +576,7 @@ msgstr ""
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
@@ -595,10 +596,6 @@ msgid "Title on dashboard"
 msgstr ""
 
 #: crisis_room/forms.py
-msgid "Number of rows in list"
-msgstr ""
-
-#: crisis_room/forms.py
 msgid "Dashboard item size"
 msgstr ""
 
@@ -608,6 +605,10 @@ msgstr ""
 
 #: crisis_room/forms.py
 msgid "Half width"
+msgstr ""
+
+#: crisis_room/forms.py
+msgid "Number of rows in list"
 msgstr ""
 
 #: crisis_room/forms.py
@@ -732,6 +733,7 @@ msgid "There are no dashboards to display."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
+#: crisis_room/templates/partials/crisis_room_findings_table.html
 #: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/partials/report_sidemenu.html
@@ -794,6 +796,7 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#: reports/report_types/aggregate_organisation_report/findings.html
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/findings_report/report.html
@@ -818,65 +821,57 @@ msgid "Findings"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room.html
+msgid "Options for dashboard"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room.html
+#: crisis_room/templates/partials/delete_dashboard_modal.html
+msgid "Delete dashboard"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room.html
+msgid ""
+"Dashboard does not exist. Choose an existing dashboard or create a new one."
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room.html
 msgid ""
 "There are no dashboards yet. Click on \"Add dashboard\" to create a new "
 "dashboard."
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Options for dashboard"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-#: crisis_room/templates/partials/delete_dashboard_modal.html
-msgid "Delete dashboard"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Object list"
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid "Finding list"
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Options for dashboard items"
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
+#: crisis_room/templates/partials/new_dashboard_item_action_button.html
+msgid "Report section"
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Position up"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid "Position down"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-#: crisis_room/templates/partials/delete_dashboard_item_modal.html
-msgid "Delete item"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
 "objects and findings page."
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid "Add objects"
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid "Add findings"
 msgstr ""
 
-#: crisis_room/templates/organization_crisis_room_dashboards.html
-msgid ""
-"Dashboard does not exist. Choose an existing dashboard or create a new one."
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
+msgid "Add report section"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -889,13 +884,116 @@ msgstr ""
 msgid "Add dashboard"
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_finding_list.html
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid "Findings per organization overview"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: tools/forms/finding_type.py
+msgid "Finding types"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid "Highest risk level"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid "Critical finding types"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
 #: rocky/templates/findings/finding_list.html
-#, python-format
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Details"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Close details"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: crisis_room/templates/partials/dashboard_finding_list_table.html
+#: katalogus/templates/plugin_container_image.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_findings_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+#: reports/templates/summary/selected_plugins.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/ooi_detail_task_list.html
+#: rocky/templates/tasks/plugin_detail_task_list.html
+msgid "Open details"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
 msgid ""
-"An overview of all findings OpenKAT found for organization "
-"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
-"Click a finding for additional information."
+"This overview shows the total number of findings per severity that have been "
+"identified for this organization."
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/report_types/findings_report/report.html
+msgid "Critical and high findings"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid ""
+"\n"
+"                                            This table shows the top 25 "
+"critical and high findings that have\n"
+"                                            been identified for this "
+"organization, grouped by finding types.\n"
+"                                            A table with all the identified "
+"findings can be found in the Findings Report.\n"
+"                                        "
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid "No findings have been identified. Check report for more details."
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+msgid "View findings report"
+msgstr ""
+
+#: crisis_room/templates/partials/crisis_room_findings_table.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Edit report recipe"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
@@ -920,21 +1018,6 @@ msgid "column headers with buttons are sortable"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/summary/selected_plugins.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Details"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: rocky/templates/findings/finding_list.html
 #, python-format
 msgid "Show details for %(finding)s"
@@ -956,36 +1039,6 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #: rocky/views/mixins.py
 msgid "Graph"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: katalogus/templates/plugin_container_image.html
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/summary/selected_plugins.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Close details"
-msgstr ""
-
-#: crisis_room/templates/partials/dashboard_finding_list_table.html
-#: katalogus/templates/plugin_container_image.html
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-#: reports/templates/summary/selected_plugins.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/ooi_detail_task_list.html
-#: rocky/templates/tasks/plugin_detail_task_list.html
-msgid "Open details"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
@@ -1079,13 +1132,25 @@ msgstr ""
 msgid "Impact"
 msgstr ""
 
-#: crisis_room/templates/partials/dashboard_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid ""
-"An overview of objects found for organization <strong>%(organization_name)s</"
-"strong>. Objects can be added manually or by running Boefjes. Click an "
-"object for additional information."
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Options for dashboard items"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Position up"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Position down"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Rerun report"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+#: crisis_room/templates/partials/delete_dashboard_item_modal.html
+msgid "Delete item"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_ooi_list.html
@@ -1149,23 +1214,74 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            Add %(item_type)s to dashboard\n"
-"        "
+"    Add %(item_type)s to dashboard\n"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #, python-format
 msgid ""
-"\n"
-"        Add these %(item_type)s with the selected filters\n"
-"        to the dashboard of your choice.\n"
-"    "
+"Add these %(item_type)s with the selected filters to the dashboard of your "
+"choice."
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#: katalogus/templates/partials/no_enabling_permission_message.html
+#: katalogus/templates/plugin_container_image.html
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid "You do not have a custom dashboard yet"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal.html
+#, python-format
+msgid ""
+"In order to add these %(item_type)s to a dashboard, you first need to create "
+"a dashboard. Please add a dashboard in the crisis room of your organization."
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Add to dashboard"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid "Go to crisis room"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid "Add report section to dashboard"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid ""
+"In order to add this report section to a dashboard, you first need to create "
+"a dashboard. Please create a dashboard in the crisis room of your "
+"organization."
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid "Report must be scheduled for dashboard items"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+msgid ""
+"In order for dashboard information to be updated on a regular basis instead "
+"of showing static data, the report should be scheduled. The frequency of the "
+"schedules recurrence determines how fresh the data on the dashboard will be."
+msgstr ""
+
+#: crisis_room/templates/partials/report_section_action_button.html
+msgid "Add section to dashboard"
 msgstr ""
 
 #: katalogus/client.py
@@ -1613,14 +1729,6 @@ msgstr ""
 
 #: katalogus/templates/partials/modal_report_types.html
 msgid "Report types for "
-msgstr ""
-
-#: katalogus/templates/partials/no_enabling_permission_message.html
-#: katalogus/templates/plugin_container_image.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "explanation"
 msgstr ""
 
 #: katalogus/templates/partials/no_enabling_permission_message.html
@@ -3063,17 +3171,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Basic security"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/basic_security.html
-msgid ""
-"In this chapter, first a table of compliance checks is displayed, followed "
-"by a detailed examination of compliance issues for each component."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/report.html
 msgid "Overview of the basic security status"
 msgstr ""
 
@@ -3097,6 +3195,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/safe_connections.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Safe connections"
@@ -3115,6 +3214,15 @@ msgstr ""
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "server"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/findings.html
+msgid ""
+"\n"
+"                This chapter contains information about the findings that "
+"have been identified\n"
+"                for this organization.\n"
+"            "
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -3143,30 +3251,24 @@ msgid "There are no recommendations."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/multi_organization_report/basic_security_details.html
-msgid ""
-"In this chapter we check if the connections of all the IP ports of the "
-"system are safe. Safe connections are important to prevent unauthorised "
-"access and data breaches. Strong ciphers are crucial because they ensure "
-"strong encryption which protects the data from interception during "
-"communiction."
+#: reports/templates/partials/report_sidemenu.html
+msgid "Basic security"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+msgid ""
+"In this chapter, first a table of compliance checks is displayed, followed "
+"by a detailed examination of compliance issues for each component."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/system_specific_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "System specific"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/multi_organization_report/basic_security_details.html
-msgid ""
-"This is where checks are done that are specific to system types. Different "
-"security and compliance issues come into play for different systems. They "
-"are listed here under each other."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/rpki.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/rpki_report/report.html
 #: reports/templates/partials/report_sidemenu.html
@@ -3174,6 +3276,32 @@ msgid "Resource Public Key Infrastructure"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/vulnerabilities.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Vulnerabilities"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/vulnerabilities.html
+msgid "Vulnerabilities found are grouped per system."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+msgid ""
+"\n"
+"                                    This chapter contains information about "
+"the findings that have been identified\n"
+"                                    for this organization.\n"
+"                                "
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Aggregate Organisation Report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/rpki.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/rpki_report/report.html
 msgid ""
@@ -3184,55 +3312,20 @@ msgid ""
 "announcements, ensuring reliable server access and secure internet traffic."
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/multi_organization_report/vulnerabilities.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Vulnerabilities"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-msgid "Vulnerabilities found are grouped per system."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/multi_organization_report/vulnerabilities.html
-msgid "No CVEs have been found."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/safe_connections.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 msgid ""
-"\n"
-"                                This chapter contains information about the "
-"findings that have been identified\n"
-"                                for this organization.\n"
-"                            "
+"In this chapter we check if the connections of all the IP ports of the "
+"system are safe. Safe connections are important to prevent unauthorised "
+"access and data breaches. Strong ciphers are crucial because they ensure "
+"strong encryption which protects the data from interception during "
+"communiction."
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Aggregate Organisation Report"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report_design.html
-msgid "Observed at:"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report_design.html
-msgid "Created by:"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/vulnerability_report/report.html
-msgid "vulnerabilities on this system"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/summary.html
@@ -3254,6 +3347,15 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
 msgid "System specific checks"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/aggregate_organisation_report/system_specific_overview.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid ""
+"This is where checks are done that are specific to system types. Different "
+"security and compliance issues come into play for different systems. They "
+"are listed here under each other."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -3395,6 +3497,11 @@ msgid ""
 "format."
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/vulnerabilities.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "No CVEs have been found."
+msgstr ""
+
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
 msgstr ""
@@ -3455,17 +3562,6 @@ msgstr ""
 msgid "Findings information"
 msgstr ""
 
-#: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr ""
-
 #: reports/report_types/dns_report/report.py
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
@@ -3476,60 +3572,6 @@ msgstr ""
 msgid ""
 "The Findings Report contains information about the findings that have been "
 "identified for the selected asset and organization."
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "Findings per organization overview"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: tools/forms/finding_type.py
-msgid "Finding types"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "Highest risk level"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "Critical finding types"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"This overview shows the total number of findings per severity that have been "
-"identified for this organization."
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "Critical and high findings"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                                                This table shows the top 25 "
-"critical and high findings that have\n"
-"                                                been identified for this "
-"organization, grouped by finding types.\n"
-"                                                A table with all the "
-"identified findings can be found in the Findings Report.\n"
-"                                            "
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "No findings have been identified. Check report for more details."
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "View findings report"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Edit report recipe"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
@@ -4000,6 +4042,10 @@ msgid ""
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "vulnerabilities on this system"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -5968,6 +6014,14 @@ msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #, python-format
+msgid ""
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#, python-format
 msgid "Showing %(length)s of %(total)s findings"
 msgstr ""
 
@@ -6424,6 +6478,14 @@ msgid "Currently no findings have been identified for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid ""
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
+msgstr ""
+
+#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -6767,7 +6829,6 @@ msgid "Forgot password"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_errors.html
-#: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
 msgid "error"
 msgstr ""
@@ -7496,16 +7557,8 @@ msgstr ""
 msgid "Add Finding"
 msgstr ""
 
-#: rocky/views/finding_list.py
-msgid "You do not have the permission to add items to a dashboard."
-msgstr ""
-
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Unknown action."
-msgstr ""
-
-#: rocky/views/finding_list.py rocky/views/ooi_list.py
-msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/health.py
@@ -7522,6 +7575,14 @@ msgstr ""
 
 #: rocky/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
+msgstr ""
+
+#: rocky/views/mixins.py
+msgid "You do not have the permission to add items to a dashboard."
+msgstr ""
+
+#: rocky/views/mixins.py
+msgid "Dashboard item has been added."
 msgstr ""
 
 #: rocky/views/ooi_add.py
