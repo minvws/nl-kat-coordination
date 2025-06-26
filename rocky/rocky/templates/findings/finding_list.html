@@ -71,7 +71,7 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    {% if object_list|length >= 1 and perms.tools.can_mute_findings %}
+                                    {% if object_list and perms.tools.can_mute_findings %}
                                         <th>
                                             <input class="toggle-all" data-toggle-target="finding" type="checkbox">
                                         </th>
@@ -103,7 +103,7 @@
                             <tbody>
                                 {% for hydrated_finding in object_list %}
                                     <tr>
-                                        {% if object_list|length >= 1 and perms.tools.can_mute_findings %}
+                                        {% if object_list and perms.tools.can_mute_findings %}
                                             <td>
                                                 <input type="checkbox"
                                                        name="finding"
