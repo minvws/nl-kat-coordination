@@ -203,7 +203,7 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
         normalizer_responses=[],
         log_path=tmp_path / "patch_task_log",
     )
-    manager.settings.deduplicate = False
+    manager.deduplicate = False
     with pytest.raises(KeyboardInterrupt):
         manager.run(WorkerManager.Queue.BOEFJES)
 
@@ -276,7 +276,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
                 UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
                 BoefjeOutput(
                     status=StatusEnum.COMPLETED,
-                    files=[File(name="0", content="MTIz", tags=["boefje/dns-records", "my/mime"])],
+                    files=[File(name="0", content="MTIz", tags={"boefje/dns-records", "my/mime"})],
                 ),
             ),
         ),

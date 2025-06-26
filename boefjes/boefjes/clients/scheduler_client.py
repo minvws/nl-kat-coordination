@@ -43,7 +43,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
@@ -116,8 +116,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 boefje_meta.arguments["input"] = ooi.serialize()
             except ObjectNotFoundException:
                 logger.info(
-                    "Can't run boefje because OOI does not exist anymore [reference=%s]",
-                    reference,
+                    "Can't run boefje because OOI does not exist anymore",
+                    reference=reference,
                     boefje_id=boefje_meta.boefje.id,
                     ooi=boefje_meta.input_ooi,
                     task_id=boefje_meta.id,

@@ -36,15 +36,6 @@ class DockerBoefjeHandler(Handler):
         self.bytes_api_client = bytes_api_client
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
-        """
-        With regard to the return type:
-            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
-
-        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
-        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
-        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
-        """
-
         boefje_meta = task.data
         oci_image = boefje_meta.arguments["oci_image"]
 

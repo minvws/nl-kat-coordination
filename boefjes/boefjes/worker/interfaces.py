@@ -56,7 +56,7 @@ class StatusEnum(str, Enum):
 class File(BaseModel):
     name: str
     content: str = Field(json_schema_extra={"contentEncoding": "base64"})
-    tags: list[str] | None = None
+    tags: set[str] | None = None
 
 
 class BoefjeInput(BaseModel):
@@ -72,6 +72,15 @@ class BoefjeOutput(BaseModel):
 
 class Handler:
     def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+        """
+        With regard to the return type:
+            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
+
+        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
+        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
+        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
+        """
+
         raise NotImplementedError()
 
 
@@ -93,7 +102,7 @@ class WorkerManager:
 
 class SchedulerClientInterface:
     def pop_items(
-        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
     ) -> list[Task]:
         raise NotImplementedError()
 

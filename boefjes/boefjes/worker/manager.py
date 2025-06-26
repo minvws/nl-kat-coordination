@@ -97,7 +97,9 @@ class SchedulerWorkerManager(WorkerManager):
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            p_items = self.scheduler_client.pop_items(queue_type, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None)
+            p_items = self.scheduler_client.pop_items(
+                queue_type, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None
+            )
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.poll_interval)
             time.sleep(self.poll_interval)
@@ -327,7 +329,7 @@ def _start_working(
                                 content=(
                                     b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
                                 ).decode(),
-                                tags=list(
+                                tags=set(
                                     _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
                                 ),  # default mime-types are added through the API
                             )

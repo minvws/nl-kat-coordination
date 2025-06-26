@@ -26,7 +26,7 @@ class BoefjeAPIClient(SchedulerClientInterface, BoefjeStorageInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}

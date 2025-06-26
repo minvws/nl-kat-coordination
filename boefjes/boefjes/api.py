@@ -96,7 +96,7 @@ def boefje_output(
     if boefje_output.files:
         mime_types = _default_mime_types(boefje_meta.boefje)
         for file in boefje_output.files:
-            file.tags = list(mime_types.union(file.tags)) if file.tags else list(mime_types)
+            file.tags = set(mime_types.union(file.tags)) if file.tags else set(mime_types)
 
         # when supported, also save file.name to Bytes
         bytes_response = bytes_client.save_raws(task_id, boefje_output)

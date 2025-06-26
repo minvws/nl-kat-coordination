@@ -80,7 +80,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._pushed_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
 
     def pop_items(
-        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
     ) -> list[Task]:
         time.sleep(self.sleep_time)
 
