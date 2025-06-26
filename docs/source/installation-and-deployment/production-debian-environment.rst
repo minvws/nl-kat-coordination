@@ -253,12 +253,6 @@ Create an admin user for OpenKAT
 
     sudo -u kat rocky-cli createsuperuser
 
-Create the default groups and permissions for KAT:
-
-.. code-block:: sh
-
-    sudo -u kat rocky-cli setup_dev_account
-
 Configure Bytes credentials
 ===========================
 

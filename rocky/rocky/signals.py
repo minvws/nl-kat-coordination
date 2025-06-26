@@ -1,16 +1,19 @@
 import datetime
+import logging
 
 from crisis_room.management.commands.dashboards import run_findings_dashboard
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.signals import post_delete, post_save, pre_migrate, pre_save
 from django.dispatch import receiver
 from httpx import HTTPError
 from katalogus.client import KATalogusClient, get_katalogus_client
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 from structlog import get_logger
-from tools.models import Organization
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -18,6 +21,12 @@ from octopoes.models.ooi.network import Network
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 
 logger = get_logger(__name__)
+
+
+@receiver(pre_migrate)
+def make_sure_groups_exist_before_migrating(sender, request, user, **kwargs):
+    create_missing_groups()
+    logger.info("Groups ", username=user.get_username())
 
 
 # Signal sent when a user logs in
@@ -156,3 +165,63 @@ def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
         raise OctopoesUnhealthyException
 
     return octopoes_client
+
+
+def get_permissions(codenames):
+    permission_objects = []
+    if codenames:
+        for codename in codenames:
+            try:
+                permission = Permission.objects.get(codename=codename)
+            except Permission.DoesNotExist:
+                raise ObjectDoesNotExist("Permission:" + codename + " does not exist.")
+            else:
+                permission_objects.append(permission.id)
+
+    return permission_objects
+
+
+def create_missing_groups():
+    group_redteam, group_redteam_created = Group.objects.get_or_create(name=GROUP_REDTEAM)
+    group_admin, group_admin_created = Group.objects.get_or_create(name=GROUP_ADMIN)
+    group_client, group_client_created = Group.objects.get_or_create(name=GROUP_CLIENT)
+
+    redteamer_permissions = [
+        "can_scan_organization",
+        "can_enable_disable_boefje",
+        "can_add_boefje",
+        "can_set_clearance_level",
+        "can_delete_oois",
+        "can_mute_findings",
+        "can_view_katalogus_settings",
+        "can_set_katalogus_settings",
+    ]
+
+    if group_redteam_created:
+        redteam_permissions = get_permissions(redteamer_permissions)
+        group_redteam.permissions.set(redteam_permissions)
+        logging.info("Group 'redteam' created successfully")
+
+    if group_admin_created:
+        admin_permissions = get_permissions(
+            redteamer_permissions
+            + [
+                "view_organization",
+                "view_organizationmember",
+                "add_organizationmember",
+                "change_organization",
+                "can_scan_organization",
+                "change_organizationmember",
+                "add_indemnification",
+                "can_recalculate_bits",
+            ]
+        )
+        group_admin.permissions.set(admin_permissions)
+        logging.info("Group 'admin' created successfully")
+
+    if group_client_created:
+        client_permissions = get_permissions(["can_scan_organization"])
+        group_client.permissions.set(client_permissions)
+        logging.info("Group 'clients' created successfully")
+
+    logging.info("Groups created successfully")
