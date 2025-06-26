@@ -9,13 +9,13 @@
     </p>
     {% include "partials/dashboard_finding_list_table.html" %}
 
-    <div class="toolbar">
-        {% with params=dashboard_item.get_query_url %}
-            <a class="button ghost"
-               href="{% url "finding_list" organization_code=organization.code %}?{{ params }}">
-                {% translate "Go to findings" %}
-                <span class="icon ti-chevron-right" aria-hidden="true"></span>
-            </a>
-        {% endwith %}
-    </div>
+</div>
+<div class="toolbar">
+    {% with params=dashboard_item.get_query_url %}
+        <a class="button ghost"
+           href="{% url "finding_list" organization_code=organization.code %}?{{ params }}">
+            {% translate "Go to findings" %}
+            <span class="icon ti-chevron-right" aria-hidden="true"></span>
+        </a>
+    {% endwith %}
 </div>
