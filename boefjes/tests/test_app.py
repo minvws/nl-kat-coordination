@@ -209,10 +209,9 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
 
     items = item_handler.get_all()
 
-    # Just one task dispatched
     assert len(items) == 2
-    assert items[0].boefje.id == "dns-records"
-    assert items[1].boefje.id == "dns-records"
+    assert items[0].data.boefje.id == "dns-records"
+    assert items[1].data.boefje.id == "dns-records"
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
@@ -224,7 +223,7 @@ def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, i
         ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }
 
-    bytes_calls = item_handler.bytes_client.get_all()
+    bytes_calls = item_handler.boefje_storage.get_all()
     assert bytes_calls == []
 
 
