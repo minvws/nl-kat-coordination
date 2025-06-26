@@ -181,7 +181,7 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
             .join(OrganisationInDB)
             .filter(BoefjeConfigInDB.organisation_pk == OrganisationInDB.pk)
             .filter(OrganisationInDB.id == organisation_id)
-            .filter(BoefjeConfigInDB.enabled == False)
+            .filter(BoefjeConfigInDB.enabled == False)  # noqa: E712
         )
         return [x[0] for x in enabled_boefjes.all()]
 
@@ -193,7 +193,7 @@ class SQLConfigStorage(SessionMixin, ConfigStorage):
             .join(OrganisationInDB)
             .filter(NormalizerConfigInDB.organisation_pk == OrganisationInDB.pk)
             .filter(OrganisationInDB.id == organisation_id)
-            .filter(NormalizerConfigInDB.enabled == False)
+            .filter(NormalizerConfigInDB.enabled == False)  # noqa: E712
         )
 
         return [plugin[0] for plugin in enabled_normalizers.all()]
