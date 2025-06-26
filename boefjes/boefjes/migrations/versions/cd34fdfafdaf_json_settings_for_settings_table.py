@@ -65,7 +65,8 @@ def upgrade_encrypted_settings(conn: Connection) -> None:
     for result in results:
         conn.execute(
             sa.text(
-                "INSERT INTO settings (values, plugin_id, organisation_pk) VALUES (:values, :plugin_id, :organisation_pk)"
+                "INSERT INTO settings (values, plugin_id, organisation_pk) VALUES "
+                "(:values, :plugin_id, :organisation_pk)"
             ),
             {"values": result[0], "plugin_id": result[1], "organisation_pk": result[2]},
         )
