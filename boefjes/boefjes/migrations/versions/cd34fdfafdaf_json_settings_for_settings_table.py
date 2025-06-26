@@ -64,8 +64,10 @@ def upgrade_encrypted_settings(conn: Connection) -> None:
     # Seed the encrypted original data into the new table
     for result in results:
         conn.execute(
-            sa.text("INSERT INTO settings (values, plugin_id, organisation_pk) VALUES (%s, %s, %s)"),
-            [result[0], result[1], result[2]],
+            sa.text(
+                "INSERT INTO settings (values, plugin_id, organisation_pk) VALUES (:values, :plugin_id, :organisation_pk)"
+            ),
+            {"values": result[0], "plugin_id": result[1], "organisation_pk": result[2]},
         )
 
 
