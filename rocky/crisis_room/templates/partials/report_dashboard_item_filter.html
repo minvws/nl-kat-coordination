@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load static %}
+
+<div class="filter">
+    <div>
+        {% if type == "report-section" %}
+            <button aria-expanded="false"
+                    data-hide-filters-label='{% translate "Objects" %}'>{% translate "Objects" %}</button>
+        {% else %}
+            <button aria-expanded="false"
+                    data-hide-filters-label='{% translate "Applied filters" %}'>
+                {% translate "Applied filters" %}
+            </button>
+        {% endif %}
+    </div>
+    <form>
+        <ul>
+            {% if type == "report-section" %}
+                <div>
+                    {% for ooi in input_oois %}<li>{{ ooi|human_readable }}</li>{% endfor %}
+                </div>
+            {% else %}
+                {% if dashboard_item.item.query %}
+                    {% with query=dashboard_item.item.get_query %}
+                        {% for filter, value in query.items %}
+                            {% if value %}
+                                <li>
+                                    <strong>{{ filter|capfirst }}:</strong> {{ value }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                {% else %}
+                    <li>{% translate "No filters applied" %}</li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </form>
+</div>
