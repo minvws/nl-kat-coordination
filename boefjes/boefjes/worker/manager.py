@@ -97,7 +97,7 @@ class SchedulerWorkerManager(WorkerManager):
         logger.debug("Popping from queue %s", queue_type.value)
 
         try:
-            p_items = self.scheduler_client.pop_items(queue_type)
+            p_items = self.scheduler_client.pop_items(queue_type, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None)
         except (HTTPError, ValidationError):
             logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.poll_interval)
             time.sleep(self.poll_interval)
@@ -115,7 +115,7 @@ class SchedulerWorkerManager(WorkerManager):
                 return
 
             for p_item in p_items:
-                self.task_queue.put(p_item)
+                self.task_queue.put([p_item])
             logger.info("Dispatched tasks[ids=%s]", [p_item.data.id for p_item in p_items])
         except:  # noqa
             logger.exception("Exiting worker...")

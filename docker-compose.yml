@@ -248,11 +248,11 @@ services:
       - ./monitoring/jaeger.yml:/etc/jaeger/config.yml
     command: ["--config", "/etc/jaeger/config.yml"]
     ports:
-      - "16686:16686"
-      - "8888:8888"
-      - "8889:8889"
-      - "4317:4317"
-      - "4318:4318"
+      - "127.0.0.1:16686:16686"
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:8889:8889"
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
 
   prometheus:
     profiles:
@@ -270,7 +270,7 @@ services:
       - monitoring
     image: docker.io/grafana/pyroscope:1.13.2
     ports:
-      - 4040:4040
+      - "127.0.0.1:4040:4040"
 
   alloy:
     profiles:
@@ -283,7 +283,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./monitoring/config.alloy:/config.alloy
     ports:
-      - 12345:12345
+      - "127.0.0.1:12345:12345"
     command:
       - run
       - /config.alloy
@@ -302,7 +302,7 @@ services:
     volumes:
       - ./monitoring/grafana-provisioning:/etc/grafana/provisioning
     ports:
-      - 4000:3000
+      - "127.0.0.1:4000:3000"
 
 networks:
   default:
