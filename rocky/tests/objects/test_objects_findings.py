@@ -192,8 +192,11 @@ def test_muted_finding_button_not_presence(rf, mock_organization_view_octopoes, 
     )
 
     assert response.status_code == 200
-    # Does not show button with 1 Finding, multiselect for 2 or more findings
-    assertNotContains(response, '<button type="submit">Mute findings</button>')
+    assertContains(
+        response,
+        '<a class="button ghost" href="#mute-findings-modal"><icon aria-hidden="true" '
+        'class="icon ti-bell-off"></icon>Mute findings</a>',
+    )
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
@@ -240,7 +243,11 @@ def test_muted_finding_button_presence_more_findings_and_post(
     assert response.status_code == 200
     assertContains(response, '<input class="toggle-all" data-toggle-target="finding" type="checkbox">', html=True)
     assertContains(response, '<input type="checkbox" name="finding" value="' + finding_1.primary_key + '">', html=True)
-    assertContains(response, '<button type="submit" form="finding-list-form">Mute findings</button>')
+    assertContains(
+        response,
+        '<a class="button ghost" href="#mute-findings-modal"><icon aria-hidden="true" '
+        'class="icon ti-bell-off"></icon>Mute findings</a>',
+    )
 
     request = setup_request(
         rf.post("finding_mute_bulk", {"finding": [finding_1, finding_2], "reason": "testing"}), member.user
@@ -285,7 +292,11 @@ def test_can_mute_findings_perms(rf, request, member, mock_organization_view_oct
     )
 
     assert response.status_code == 200
-    assertNotContains(response, '<button type="submit" form="finding-list-form">Mute findings</button>')
+    assertNotContains(
+        response,
+        '<a class="button ghost" href="#mute-findings-modal"><icon aria-hidden="true" '
+        'class="icon ti-bell-off"></icon>Mute findings</a>',
+    )
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
