@@ -121,7 +121,7 @@ test-rf: # Usage: `make test-rf headless=<bool>`
 	rfbrowser init
 
 # Test fresh login while creating all users and running report generation as the superadmin
-	docker exec -it nl-kat-coordination_rocky_1 make test-prepare
+	docker exec -it nl-kat-coordination-rocky-1 make test-prepare
 	robot -d tests/robot/results-complete_onboarding -v headless:$(headless) tests/robot/complete_onboarding
 
 #test-rf-onboarding: # Usage: `make test-rf-onboarding headless=<bool>`
