@@ -70,8 +70,25 @@ class BoefjeOutput(BaseModel):
     files: list[File] | None = None
 
 
+class WorkerManager:
+    class Queue(Enum):
+        BOEFJES = "boefje"
+        NORMALIZERS = "normalizer"
+
+    def run(self, queue: Queue) -> None:
+        raise NotImplementedError()
+
+
 class BoefjeHandler:
     def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
+        """
+        With regard to the return type:
+            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
+
+        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
+        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
+        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
+        """
         raise NotImplementedError()
 
     def copy_raw_files(
@@ -80,7 +97,7 @@ class BoefjeHandler:
         raise NotImplementedError()
 
 
-class NormalizerHandlerInterface:
+class NormalizerHandler:
     def handle(self, task: Task) -> None:
         raise NotImplementedError()
 
@@ -94,7 +111,7 @@ class PaginatedTasksResponse(BaseModel):
 
 class SchedulerClientInterface:
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
     ) -> list[Task]:
         raise NotImplementedError()
 

@@ -12,7 +12,7 @@ from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_ap
 from boefjes.config import settings
 from boefjes.normalizer_interfaces import NormalizerJobRunner
 from boefjes.worker.boefje_handler import _copy_raw_files
-from boefjes.worker.interfaces import BoefjeHandler, BoefjeOutput, NormalizerHandlerInterface, Task, TaskStatus
+from boefjes.worker.interfaces import BoefjeHandler, BoefjeOutput, NormalizerHandler, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
 from octopoes.api.models import Affirmation, Declaration, Observation
@@ -33,18 +33,9 @@ class DockerBoefjeHandler(BoefjeHandler):
     def __init__(self, scheduler_client: SchedulerAPIClient, bytes_api_client: BytesAPIClient):
         self.docker_client = docker.from_env()
         self.scheduler_client = scheduler_client
-        self.boefje_storage = bytes_api_client
+        self.bytes_api_client = bytes_api_client
 
     def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
-        """
-        With regard to the return type:
-            :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
-
-        The return type signals the app how the boefje was handled. A successful run returns a tuple of the updated
-        boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
-        solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
-        """
-
         boefje_meta = task.data
         oci_image = boefje_meta.arguments["oci_image"]
 
@@ -73,8 +64,8 @@ class DockerBoefjeHandler(BoefjeHandler):
             # if status is still running the container didn't call the output API endpoint, so set to status to failed
             if task.status == TaskStatus.RUNNING:
                 boefje_meta.ended_at = datetime.now(timezone.utc)
-                self.boefje_storage.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
-                self.boefje_storage.save_raws(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
+                self.bytes_api_client.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
+                self.bytes_api_client.save_raws(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
                 self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
                 # have to raise exception to prevent _start_working function from setting status to completed
@@ -87,14 +78,14 @@ class DockerBoefjeHandler(BoefjeHandler):
             )
 
             # save container log (stderr) to bytes
-            self.boefje_storage.login()
+            self.bytes_api_client.login()
             boefje_meta.ended_at = datetime.now(timezone.utc)
             try:
                 # this boefje_meta might be incomplete, it comes from the scheduler instead of the Boefje I/O API
-                self.boefje_storage.save_boefje_meta(boefje_meta)
+                self.bytes_api_client.save_boefje_meta(boefje_meta)
             except HTTPError:
                 logger.error("Failed to save boefje meta to bytes, continuing anyway")
-            self.boefje_storage.save_raw(task_id, e.stderr, stderr_mime_types)
+            self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
         except ImageNotFound:
             logger.error("Docker image %s not found", oci_image)
@@ -111,13 +102,13 @@ class DockerBoefjeHandler(BoefjeHandler):
         if output is not False:
             return  # Output belonged to a regular boefje
 
-        boefje_meta = self.boefje_storage.get_boefje_meta(task.data.id)
-        boefje_output = self.boefje_storage.get_raws(task.data.id)
+        boefje_meta = self.bytes_api_client.get_boefje_meta(task.data.id)
+        boefje_output = self.bytes_api_client.get_raws(task.data.id)
 
-        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)
+        _copy_raw_files(self.bytes_api_client, boefje_meta, boefje_output, duplicated_tasks)
 
 
-class NormalizerHandler(NormalizerHandlerInterface):
+class LocalNormalizerHandler(NormalizerHandler):
     def __init__(
         self,
         job_runner: NormalizerJobRunner,

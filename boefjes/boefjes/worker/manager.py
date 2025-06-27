@@ -5,7 +5,6 @@ import signal
 import sys
 import time
 from datetime import datetime
-from enum import Enum
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
 
@@ -14,25 +13,16 @@ from httpx import HTTPError
 from pydantic import ValidationError
 
 # A deliberate relative import to make this module self-contained
-from .interfaces import BoefjeHandler, NormalizerHandlerInterface, SchedulerClientInterface, Task, TaskStatus
+from .interfaces import BoefjeHandler, NormalizerHandler, SchedulerClientInterface, Task, TaskStatus, WorkerManager
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")
 
 
-class WorkerManager:
-    class Queue(Enum):
-        BOEFJES = "boefje"
-        NORMALIZERS = "normalizer"
-
-    def run(self, queue: Queue) -> None:
-        raise NotImplementedError()
-
-
 class SchedulerWorkerManager(WorkerManager):
     def __init__(
         self,
-        item_handler: BoefjeHandler | NormalizerHandlerInterface,
+        item_handler: BoefjeHandler | NormalizerHandler,
         scheduler_client: SchedulerClientInterface,
         pool_size: int,
         poll_interval: float,

@@ -8,8 +8,8 @@ import pytest
 
 from boefjes.__main__ import get_runtime_manager
 from boefjes.config import Settings
-from boefjes.worker.interfaces import BoefjeOutput, File, StatusEnum
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.interfaces import BoefjeOutput, File, StatusEnum, WorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
 from tests.loading import get_dummy_data
 
