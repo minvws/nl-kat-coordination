@@ -113,8 +113,8 @@ class LocalBoefjeHandler(BoefjeHandler):
                 File(
                     name=str(len(files)),
                     content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
-                    tags=list(
-                        _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                    tags=_default_mime_types(boefje_meta.boefje).union(
+                        valid_mimetypes
                     ),  # default mime-types are added through the API
                 )
             )

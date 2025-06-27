@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
 from pathlib import Path
-from typing import Literal, Any
+from typing import Any, Literal
 from uuid import UUID
 
 import alembic.config
@@ -172,7 +172,7 @@ class MockHandler(BoefjeHandler, NormalizerHandler):
 
         return task.data, BoefjeOutput(
             status=StatusEnum.COMPLETED,
-            files=[File(name="1", content=base64.b64encode(b"123").decode(), tags=["my/mime"])],
+            files=[File(name="1", content=base64.b64encode(b"123").decode(), tags={"my/mime"})],
         )
 
     def copy_raw_files(

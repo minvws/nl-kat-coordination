@@ -274,7 +274,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
             "save_raw",
             (
                 UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
-                BoefjeOutput(status=StatusEnum.COMPLETED, files=[File(name="1", content="MTIz", tags=["my/mime"])]),
+                BoefjeOutput(status=StatusEnum.COMPLETED, files=[File(name="1", content="MTIz", tags={"my/mime"})]),
             ),
         ),
     ]
