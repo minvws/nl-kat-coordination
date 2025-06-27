@@ -72,11 +72,10 @@ jobs:
           context: ./boefjes
           file: boefjes/images/base.Dockerfile
           # We don't push as this is an intermediate image that handles common operations for most boefjes
-          push: false
           load: true
-          tags: openkat/boefje-base:latest
+          tags: localhost:5000/openkat/boefje-base:latest
           cache-from: type=gha
-          cache-to: type=local,dest=/tmp/base.tar
+          cache-to: type=gha,mode=max
 
       - name: Build container image for ${{ matrix.image }}
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
@@ -88,5 +87,7 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=local,src=/tmp/base.tar
+          build-contexts: |
+            openkat/boefje-base:latest=docker-image://localhost:5000/openkat/boefje-base:latest
+          cache-from: type=gha
           cache-to: type=gha,mode=max
