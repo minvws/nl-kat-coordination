@@ -49,6 +49,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+        id: buildx
+        with:
+          driver-opts: network=host
+
+      - name: Build the boefje base image for ${{ matrix.image }}
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: ./boefjes
+          file: boefjes/images/base.Dockerfile
+          # We don't push as this is an intermediate image that handles common operations for most boefjes
+          load: true
+          push: true
+          tags: localhost:5000/openkat/boefje-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
@@ -60,29 +78,12 @@ jobs:
             type=ref,event=tag
             type=ref,event=pr
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
-        id: buildx
-        with:
-          driver-opts: network=host
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build the boefje base image for ${{ matrix.image }}
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-        with:
-          context: ./boefjes
-          file: boefjes/images/base.Dockerfile
-          # We don't push as this is an intermediate image that handles common operations for most boefjes
-          load: true
-          tags: localhost:5000/openkat/boefje-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Build container image for ${{ matrix.image }}
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
