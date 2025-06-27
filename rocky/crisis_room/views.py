@@ -162,11 +162,9 @@ class DashboardService:
                         item_data.data.update(
                             {"parent_report": {"primary_key": parent_report.primary_key, "name": parent_report.name}}
                         )
-                        input_oois = [item_data.data["report"].input_ooi]
-                    else:
-                        input_oois = list({asset.input_ooi for asset in item_data.data["report"].input_oois})
-
-                    item_data.data.update({"report_data": report_data, "input_oois": input_oois})
+                    report = item_data.data["report"]
+                    recipe = octopoes_client.get(report.report_recipe, report.observed_at)
+                    item_data.data.update({"report_data": report_data, "recipe": recipe})
                     dashboard_items_with_data.append(item_data)
                 except KeyError:
                     continue
