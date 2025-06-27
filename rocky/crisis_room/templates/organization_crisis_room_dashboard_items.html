@@ -50,15 +50,15 @@
                         </div>
                         {% if dashboard_item.item.recipe and dashboard_item.item.source %}
                             {% include "partials/report_dashboard_item_filter.html" with type="report-section" recipe=dashboard_item.data.recipe data=dashboard_item.data.report_data.report_data %}
-                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data.report_data is_dashboard_item="yes" %}
+                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data.report_data %}
 
                         {% elif dashboard_item.item.recipe %}
                             {% include "partials/report_dashboard_item_filter.html" with type="report-section" recipe=dashboard_item.data.recipe %}
-                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data is_dashboard_item="yes" %}
+                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data %}
 
                         {% else %}
                             {% include "partials/report_dashboard_item_filter.html" %}
-                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data is_dashboard_item="yes" %}
+                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data %}
 
                         {% endif %}
                     </div>
