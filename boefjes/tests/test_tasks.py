@@ -118,7 +118,7 @@ def test_cleared_boefje_env(mock_boefje_handler) -> None:
     current_env = os.environ.copy()
     mock_boefje_handler.handle(task)
 
-    output = mock_boefje_handler.bytes_api_client.save_output.mock_calls
+    output = mock_boefje_handler.boefje_storage.save_output.mock_calls
     content = base64.b64decode(output[0][1][1].files[0].content)
     output_dict = ast.literal_eval(content.decode())
 
