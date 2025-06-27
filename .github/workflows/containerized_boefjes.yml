@@ -73,7 +73,7 @@ jobs:
           file: boefjes/images/base.Dockerfile
           # We don't push as this is an intermediate image that handles common operations for most boefjes
           push: false
-          tags: openkat/boefje-base:latest
+          tags: docker.io/openkat/boefje-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
