@@ -1,4 +1,4 @@
-name: Check Poetry dependencies
+name: Check dependencies
 
 on:
   push:
@@ -11,15 +11,15 @@ on:
       - "**/requirements.txt"
       - "**/requirements-dev.txt"
       - "**/pyproject.toml"
-      - "**/poetry.lock"
-      - ".github/workflows/check_poetry_dependencies.yml"
+      - "**/uv.lock"
+      - ".github/workflows/check_requirements.yml"
   pull_request:
     paths:
       - "**/requirements.txt"
       - "**/requirements-dev.txt"
       - "**/pyproject.toml"
-      - "**/poetry.lock"
-      - ".github/workflows/check_poetry_dependencies.yml"
+      - "**/uv.lock"
+      - ".github/workflows/check_requirements.yml"
 
 jobs:
   poetry-dependencies:
@@ -34,16 +34,16 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        id: py311
+        id: py313
         with:
           python-version: 3.13
           cache: pip
 
-      - name: Install pip dependencies
-        run: pip install poetry==1.6.1
+      - name: Install uv
+        run: pip install uv==0.7.13
 
-      - name: Check, lock, and export Poetry dependencies
-        run: make poetry-dependencies
+      - name: Check, lock, and export requirements
+        run: make requirements
 
       - name: Check if there are any changed files
         if: ${{ github.actor != 'dependabot[bot]' }}
