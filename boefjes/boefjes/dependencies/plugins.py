@@ -8,8 +8,6 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
-from boefjes.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
@@ -20,6 +18,8 @@ from boefjes.storage.interfaces import (
     PluginStorage,
     SettingsNotConformingToSchema,
 )
+from boefjes.worker.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
+from boefjes.worker.repository import BoefjeResource, LocalPluginRepository, NormalizerResource, get_local_repository
 
 logger = structlog.get_logger(__name__)
 
@@ -123,7 +123,7 @@ class PluginService:
             try:
                 plugin = self.local_repo.by_name(boefje.name)
 
-                if plugin.type == "boefje":
+                if isinstance(plugin, BoefjeResource):
                     raise DuplicatePlugin("name")
                 else:
                     self.plugin_storage.create_boefje(boefje)
@@ -138,7 +138,7 @@ class PluginService:
             try:
                 plugin = self.local_repo.by_name(normalizer.name)
 
-                if plugin.types == "normalizer":
+                if isinstance(plugin, NormalizerResource):
                     raise DuplicatePlugin(field="name")
                 else:
                     self.plugin_storage.create_normalizer(normalizer)
@@ -156,9 +156,9 @@ class PluginService:
             except KeyError:
                 raise e
 
-            if plugin.type != "boefje":
+            if not isinstance(plugin, BoefjeResource):
                 raise e
-            self.plugin_storage.create_boefje(plugin)
+            self.plugin_storage.create_boefje(plugin.boefje)
 
     def _put_normalizer(self, normalizer_id: str) -> None:
         """Check existence of a normalizer, and insert a database entry if it concerns a local normalizer"""
@@ -171,9 +171,9 @@ class PluginService:
             except KeyError:
                 raise
 
-            if plugin.type != "normalizer":
+            if not isinstance(plugin, NormalizerResource):
                 raise
-            self.plugin_storage.create_normalizer(plugin)
+            self.plugin_storage.create_normalizer(plugin.normalizer)
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)

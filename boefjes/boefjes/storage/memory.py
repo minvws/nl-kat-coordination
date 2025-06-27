@@ -1,5 +1,5 @@
-from boefjes.models import Boefje, BoefjeConfig, Normalizer, Organisation, PluginType
 from boefjes.storage.interfaces import ConfigStorage, OrganisationStorage, PluginNotFound, PluginStorage
+from boefjes.worker.models import Boefje, BoefjeConfig, Normalizer, Organisation, PluginType
 
 # key = organisation id; value = organisation
 organisations: dict[str, Organisation] = {}
@@ -158,7 +158,7 @@ class ConfigStorageMemory(ConfigStorage):
         organisation_id: str | None = None,
         boefje_id: str | None = None,
         enabled: bool | None = None,
-        with_duplicates: bool = False,
+        with_duplicates: bool = False,  # Only has effect if both organisation_id and boefje_id are set
     ) -> list[BoefjeConfig]:
         return [
             BoefjeConfig(

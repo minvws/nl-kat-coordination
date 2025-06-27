@@ -4,13 +4,14 @@ from collections.abc import Iterator
 
 from sqlalchemy.orm import Session
 
+from boefjes.config import EncryptionMiddleware
 from boefjes.config import settings as config_settings
 from boefjes.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
-from boefjes.models import BoefjeConfig, EncryptionMiddleware
 from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeConfigInDB, BoefjeInDB, NormalizerConfigInDB, NormalizerInDB, OrganisationInDB
 from boefjes.sql.session import SessionMixin
 from boefjes.storage.interfaces import ConfigNotFound, ConfigStorage, OrganisationNotFound, PluginNotFound
+from boefjes.worker.models import BoefjeConfig
 
 logger = logging.getLogger(__name__)
 
