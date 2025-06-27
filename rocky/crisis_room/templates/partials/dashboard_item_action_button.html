@@ -10,6 +10,14 @@
             class="dropdown-button icon-only ti-dots-vertical"></button>
     <div id="action-dropdown" class="dropdown-list">
         <ul role="listbox" aria-labelledby="action-dropdown">
+            <li role="option">
+                <button type="button"
+                        class="toggle-item-button"
+                        data-id="{{ dashboard_item.item.id }}">
+                    <span class="toggle-item"><i class="icon ti-eye"></i>{% translate "Show description" %}</span>
+                    <span class="toggle-item" data-show="off"><i class="icon ti-eye-off"></i>{% translate "Hide description" %}</span>
+                </button>
+            </li>
             <form class="inline"
                   method="post"
                   action="{% url "update_dashboard_item" organization_code=organization.code %}">

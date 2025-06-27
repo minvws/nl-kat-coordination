@@ -8,7 +8,8 @@
                 {% include dashboard_items.0.item.template with dashboard_item=dashboard_items.0.item data=dashboard_items.0.data.report_data is_dashboard_item="yes" %}
 
             {% else %}
-                <section class="width-{{ dashboard_item.item.settings.size }}">
+                <section id="item-{{ dashboard_item.item.id }}"
+                         class="width-{{ dashboard_item.item.settings.size }}">
                     {% if organization_member.can_delete_dashboard_item %}
                         {% include "partials/delete_dashboard_item_modal.html" with name=dashboard_item.item.name item_id=dashboard_item.item.id|stringformat:"s" %}
 

@@ -25,6 +25,25 @@
     }
   }
 
+  [id^="item-"] {
+    .toggle-item {
+      &[data-show="off"] {
+        display: none;
+      }
+    }
+
+    .toggle-item-button {
+      [data-show="off"] {
+        display: none;
+      }
+
+      span {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+  }
+
   &-item {
     width: 100%;
     gap: 24px;
@@ -59,7 +78,7 @@
           text-decoration: none;
           border: 1px solid #d4d4d4;
           border-radius: 12px;
-          padding: 12px 16px;
+          padding: 8px 16px;
 
           span.date {
             color: var(--application-base-text-color);
@@ -78,5 +97,16 @@
         flex-shrink: 0;
       }
     }
+  }
+}
+
+#toggle-dashboard-button {
+  span {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  [data-show="off"] {
+    display: none;
   }
 }
