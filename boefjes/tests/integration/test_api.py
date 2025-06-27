@@ -323,6 +323,7 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
         json={"test_key": "test value", "test_key_2": "test value 2"},
     )
     test_client.patch(f"/v1/organisations/{organisation.id}/plugins/{plug}", json={"enabled": True})
+    test_client.patch(f"/v1/organisations/{organisation.id}/plugins/kat_dns_normalize", json={"enabled": False})
 
     assert test_client.get(f"/v1/organisations/{organisation.id}/{plug}/settings").json() == {
         "test_key": "test value",
@@ -357,6 +358,10 @@ def test_clone_settings_and_config_api_shows_both(test_client, organisation):
 
     # And the originally enabled boefje got disabled
     response = test_client.get(f"/v1/organisations/{new_org_id}/plugins/nmap")
+    assert response.json()["enabled"] is False
+
+    # And the originally disabled normalizer got disabled
+    response = test_client.get(f"/v1/organisations/{new_org_id}/plugins/kat_dns_normalize")
     assert response.json()["enabled"] is False
 
     # Assert we can fetch the settings with the new configs API
