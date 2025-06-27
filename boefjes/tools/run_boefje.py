@@ -15,7 +15,7 @@ from boefjes.dependencies.plugins import PluginService
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import get_engine
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import LocalBoefjeHandler
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -42,7 +42,7 @@ def run_boefje(start_pdb, organization_code, boefje_id, input_ooi):
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
     meta = SchedulerAPIClient(plugin_service, "/dev/null")._hydrate_boefje_meta(meta)
 
-    handler = BoefjeHandler(local_repository, bytes_api_client)
+    handler = LocalBoefjeHandler(local_repository, bytes_api_client)
     try:
         handler.handle(meta)
     except Exception:
