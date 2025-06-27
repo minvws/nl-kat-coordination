@@ -40,6 +40,11 @@ jobs:
           - dockerfile: boefjes/images/generic.Dockerfile
             image: openkat/generic
     runs-on: ubuntu-24.04
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
