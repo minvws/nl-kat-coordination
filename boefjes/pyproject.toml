@@ -26,15 +26,8 @@ opentelemetry-instrumentation-requests = "^0.53b1"
 opentelemetry-instrumentation = "^0.53b1"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.32.1"
-# required by kat_binaryedge boefje
-pybinaryedge = "0.5"
-# required by kat_burpsuite, kat_snyk boefjes, kat_webpage_analysis/find_images_in_html normalizer
+# required by kat_burpsuite, kat_webpage_analysis/find_images_in_html normalizer
 beautifulsoup4 = "4.11.1"
-# required by kat_censys boefje
-censys = "2.1.8"
-# required by kat_dicom boefje
-pynetdicom = "2.0.2"
-pydicom = "2.4.4"
 # required by kat_dns, kat_dns_zone boefjes
 dnspython = "^2.6.1"
 # required by kat_fierce
@@ -43,8 +36,6 @@ tldextract = "^3.4.4"
 validators = "0.20.0"
 # required by kat_nmap boefje
 python-libnmap = "0.7.3"
-# required by kat_shodan boefje
-shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
 cryptography = "^44.0.1"
 # required by kat_webpage_analysis
@@ -53,8 +44,6 @@ forcediphttpsadapter = "1.1.0"
 urllib3 = "^2.1.0"
 # required by kat_wpscan
 wpscan-out-parse = "1.9.3"
-# required by kat_sec_txt
-sectxt = "0.9.0"
 # required by kat_rpki
 netaddr = "^1.3.0"
 # required by kat_burpsuite, kat_cwe_finding_types and kat_ssl_scan
@@ -70,6 +59,8 @@ opentelemetry-proto = "^1.32.1"
 opentelemetry-semantic-conventions = "^0.53b1"
 opentelemetry-util-http = "^0.53b1"
 fastapi-slim = "^0.115.2"
+# required for building octopoes
+setuptools= "^80.7.1"
 structlog = "^25.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
