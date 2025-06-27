@@ -1,4 +1,4 @@
-from bits.cipher_classification.cipher_classification import run as cipher_classification
+from nibbles.cipher_classification.cipher_classification import nibble as cipher_classification
 
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddressV4, IPPort
@@ -91,7 +91,7 @@ def test_medium_bad_ciphers():
         },
     )
 
-    results = list(cipher_classification(cipher, {}, {}))
+    results = list(cipher_classification(cipher))
 
     assert len(results) == 2
     assert results[0].reference == "KATFindingType|KAT-MEDIUM-BAD-CIPHER"
@@ -124,6 +124,6 @@ def test_good_ciphers():
         },
     )
 
-    results = list(cipher_classification(cipher, {}, {}))
+    results = list(cipher_classification(cipher))
 
     assert len(results) == 0

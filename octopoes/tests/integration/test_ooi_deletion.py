@@ -11,7 +11,7 @@ from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OriginDBEvent
-from octopoes.models import OOI
+from octopoes.models import OOI, ScanLevel
 from octopoes.models.ooi.dns.records import NXDOMAIN, DNSARecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -131,9 +131,9 @@ def test_events_created_in_worker_during_handling(
         xtdb_octopoes_service.process_event(event)
     xtdb_octopoes_service.commit()
 
-    assert len(event_manager.queue) == 8  # Handling OOI delete event triggers Origin delete event
+    assert len(event_manager.queue) == 5  # Handling OOI delete event triggers Origin delete event
 
-    event = event_manager.queue[7]  # OOIDelete event
+    event = event_manager.queue[4]  # OOIDelete event
 
     assert isinstance(event, OriginDBEvent)
     assert event.operation_type.value == "delete"
@@ -184,6 +184,8 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
 def test_deletion_events_after_nxdomain(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
 ):
+    xtdb_octopoes_service.nibbler.nibbles["missing-spf"].signature[0].min_scan_level = ScanLevel.L0
+
     network = Network(name="internet")
 
     origin = Origin(
@@ -229,7 +231,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 8
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 12
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
@@ -250,7 +252,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 6
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 9
 
 
 @pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")

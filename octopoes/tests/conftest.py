@@ -34,6 +34,7 @@ from octopoes.models.types import (
     Service,
     Website,
 )
+from octopoes.repositories.nibble_repository import XTDBNibbleRepository
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
 from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
@@ -202,7 +203,7 @@ def app_settings():
 
 @pytest.fixture
 def octopoes_service() -> OctopoesService:
-    return OctopoesService(Mock(), Mock(), Mock(), Mock())
+    return OctopoesService(Mock(), Mock(), Mock(), Mock(), Mock())
 
 
 @pytest.fixture
@@ -267,7 +268,7 @@ class MockEventManager:
 
 
 @pytest.fixture
-def event_manager(xtdb_session: XTDBSession) -> Mock:
+def event_manager(xtdb_session: XTDBSession) -> MockEventManager:
     return MockEventManager()
 
 
@@ -277,18 +278,25 @@ def xtdb_ooi_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XT
 
 
 @pytest.fixture
-def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOriginRepository]:
     yield XTDBOriginRepository(event_manager, xtdb_session)
 
 
 @pytest.fixture
-def xtdb_origin_parameter_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_origin_parameter_repository(
+    xtdb_session: XTDBSession, event_manager
+) -> Iterator[XTDBOriginParameterRepository]:
     yield XTDBOriginParameterRepository(event_manager, xtdb_session)
 
 
 @pytest.fixture
-def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBScanProfileRepository]:
     yield XTDBScanProfileRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_nibble_repository(xtdb_session: XTDBSession) -> Iterator[XTDBNibbleRepository]:
+    yield XTDBNibbleRepository(xtdb_session)
 
 
 @pytest.fixture
@@ -297,9 +305,14 @@ def xtdb_octopoes_service(
     xtdb_origin_repository: XTDBOriginRepository,
     xtdb_origin_parameter_repository: XTDBOriginParameterRepository,
     xtdb_scan_profile_repository: XTDBScanProfileRepository,
+    xtdb_nibble_repository: XTDBNibbleRepository,
 ) -> OctopoesService:
     return OctopoesService(
-        xtdb_ooi_repository, xtdb_origin_repository, xtdb_origin_parameter_repository, xtdb_scan_profile_repository
+        xtdb_ooi_repository,
+        xtdb_origin_repository,
+        xtdb_origin_parameter_repository,
+        xtdb_scan_profile_repository,
+        xtdb_nibble_repository,
     )
 
 

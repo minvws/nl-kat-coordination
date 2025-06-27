@@ -157,7 +157,9 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
                 if origin.origin.origin_type == OriginType.DECLARATION:
                     declarations.append(origin)
-                elif origin.origin.origin_type == OriginType.INFERENCE:
+                elif (
+                    origin.origin.origin_type == OriginType.INFERENCE or origin.origin.origin_type == OriginType.NIBBLET
+                ):
                     inferences.append(origin)
                 continue
 
