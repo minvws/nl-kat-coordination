@@ -59,6 +59,8 @@ opentelemetry-proto = "^1.32.1"
 opentelemetry-semantic-conventions = "^0.53b1"
 opentelemetry-util-http = "^0.53b1"
 fastapi-slim = "^0.115.2"
+# required for building octopoes
+setuptools= "^80.7.1"
 structlog = "^25.2.0"
 # required by kat_maxmind_geoip
 maxminddb = "^2.6.2"
