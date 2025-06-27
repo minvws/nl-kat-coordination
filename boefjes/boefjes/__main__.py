@@ -30,7 +30,7 @@ def get_runtime_manager(
     plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
     scheduler_client = SchedulerAPIClient(plugin_service, str(settings.scheduler_api), images, plugins)
 
-    item_handler: LocalBoefjeHandler | LocalNormalizerHandler | CompositeBoefjeHandler | None = None
+    item_handler: LocalBoefjeHandler | LocalNormalizerHandler | CompositeBoefjeHandler | None
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = CompositeBoefjeHandler(
             LocalBoefjeHandler(local_repository, bytes_api_client),
@@ -40,9 +40,6 @@ def get_runtime_manager(
         item_handler = LocalNormalizerHandler(
             LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
-
-    if item_handler is None:
-        raise ValueError(f"Unsupported queue type: {queue}")
 
     return SchedulerWorkerManager(
         item_handler,
