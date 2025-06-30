@@ -3,7 +3,7 @@
 {% if not report_section %}
     <h3>{% translate "Overview of the basic security status" %}</h3>
 {% endif %}
-<p>
+<p class="toggle-item" data-show="off">
     {% blocktranslate trimmed %}
         This table provides an overview of the basic security status of the known assets.
         Basic security in order. In principle, all values in this table should be checked off.

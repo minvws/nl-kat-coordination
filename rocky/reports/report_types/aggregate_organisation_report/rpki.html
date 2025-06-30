@@ -1,9 +1,6 @@
 {% load i18n %}
 
-{% if not report_section %}
-    <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-{% endif %}
-<p>
+<p class="toggle-item" data-show="off">
     {% blocktranslate trimmed %}
         This section contains basic security information about resource public key
         infrastructure. If your web server employs RPKI for its IP addresses and

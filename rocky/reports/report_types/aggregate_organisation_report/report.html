@@ -27,7 +27,7 @@
                     {% if data.basic_security.summary %}
                         <div id="basic-security-overview">
                             <h2>{% translate "Basic security" %}</h2>
-                            <p>
+                            <p class="toggle-item" data-show="off">
                                 {% blocktranslate trimmed %}
                                     In this chapter, first a table of compliance checks is displayed, followed by a
                                     detailed examination of compliance issues for each component.
@@ -60,7 +60,7 @@
                                 {% include "partials/report_section_action_button.html" with modal_id="system-specific-modal" template="aggregate_organisation_report/system_specific_overview.html" %}
 
                             </div>
-                            {% include "aggregate_organisation_report/system_specific_overview.html" with report_section="yes" %}
+                            {% include "aggregate_organisation_report/system_specific_overview.html" with show_heading="yes" %}
 
                         </div>
                     {% endif %}
@@ -71,7 +71,7 @@
                                 {% include "partials/report_section_action_button.html" with modal_id="rpki-modal" template="aggregate_organisation_report/rpki.html" %}
 
                             </div>
-                            {% include "aggregate_organisation_report/rpki.html" with report_section="yes" %}
+                            {% include "aggregate_organisation_report/rpki.html" with show_heading="yes" %}
 
                         </div>
                     {% endif %}
@@ -86,7 +86,7 @@
                                 {% include "partials/report_section_action_button.html" with modal_id="vulnerabilities-modal" template="aggregate_organisation_report/vulnerabilities.html" %}
 
                             </div>
-                            <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                            <p class="toggle-item" data-show="off">{% translate "Vulnerabilities found are grouped per system." %}</p>
                         </div>
                         {% include "aggregate_organisation_report/vulnerabilities.html" with report_section="yes" %}
 
@@ -102,7 +102,7 @@
                                 {% include "partials/report_section_action_button.html" with modal_id="findings-modal" template="aggregate_organisation_report/findings.html" %}
 
                             </div>
-                            <p>
+                            <p class="toggle-item" data-show="off">
                                 {% blocktranslate %}
                                     This chapter contains information about the findings that have been identified
                                     for this organization.

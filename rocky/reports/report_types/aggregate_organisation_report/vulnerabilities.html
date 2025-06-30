@@ -3,7 +3,7 @@
 {% if not report_section %}
     <div>
         <h3>{% translate "Vulnerabilities" %}</h3>
-        <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+        <p class="toggle-item" data-show="off">{% translate "Vulnerabilities found are grouped per system." %}</p>
     </div>
 {% endif %}
 {% if not data.vulnerabilities %}

@@ -1,9 +1,6 @@
 {% load i18n %}
 
-{% if not report_section %}
-    <h3>{% translate "System specific" %}</h3>
-{% endif %}
-<p>
+<p class="toggle-item" data-show="off">
     {% blocktranslate trimmed %}
         This is where checks are done that are specific to system types. Different security
         and compliance issues come into play for different systems. They are listed here
