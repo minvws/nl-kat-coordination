@@ -156,13 +156,14 @@ class DashboardService:
                     if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)
 
+                    report = item_data.data["report"]
+
                     if dashboard_item.recipe and dashboard_item.source:
                         parent_report_id = hydrated_report.report_recipe.replace("ReportRecipe", "Report")
-                        parent_report = octopoes_client.get_report(parent_report_id, datetime.now(timezone.utc))
+                        parent_report = octopoes_client.get_report(parent_report_id, report.observed_at)
                         item_data.data.update(
                             {"parent_report": {"primary_key": parent_report.primary_key, "name": parent_report.name}}
                         )
-                    report = item_data.data["report"]
                     recipe = octopoes_client.get(report.report_recipe, report.observed_at)
                     item_data.data.update({"report_data": report_data, "recipe": recipe})
                     dashboard_items_with_data.append(item_data)
