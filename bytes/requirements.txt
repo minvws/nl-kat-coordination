@@ -283,9 +283,9 @@ deprecated==1.2.14 ; python_version >= "3.10" and python_version < "4.0" \
 exceptiongroup==1.2.2 ; python_version >= "3.10" and python_version < "3.11" \
     --hash=sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b \
     --hash=sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc
-fastapi-slim==0.115.12 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:2ebe049cfcd1d8313c781b5405dc84f921f13523269b27692e9bfa08e219bbf8 \
-    --hash=sha256:e53b12240bf6492be4deea1d819c4891be75c810f8cdb044b962a0286cbfc5b4
+fastapi-slim==0.115.14 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:34ba4a3dff5a86adac92a72d02ac539039be5a21dfc39cac081bb87494c42674 \
+    --hash=sha256:5a42f18d1a0bf8166c6cb4aebe9360816a77a139881996bad8c4f876cc1fa76e
 googleapis-common-protos==1.65.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:2972e6c496f435b92590fd54045060867f3fe9be2c82ab148fc8885035479a63 \
     --hash=sha256:334a29d07cddc3aa01dee4988f9afd9b2916ee2ff49d6b757155dc0d197852c0
