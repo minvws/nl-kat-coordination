@@ -16,9 +16,9 @@
     <form>
         {% if type == "report-section" %}
             <div class="horizontal-scroll">
-                <dl>
-                    {% if recipe.input_recipe.query %}
-                        {% with query=recipe.input_recipe.query %}
+                {% if recipe.input_recipe.query %}
+                    {% with query=recipe.input_recipe.query %}
+                        <dl>
                             <div>
                                 <dt>{% translate "Object types" %}</dt>
                                 <dd>
@@ -37,20 +37,27 @@
                                     {{ query.scan_type|join:", " }}
                                 </dd>
                             </div>
-                        {% endwith %}
-                    {% else %}
+                        </dl>
+                    {% endwith %}
+                {% else %}
+                    <dl>
                         <div>
                             <dt>{% translate "Input objects" %}</dt>
                             <dd>
-                                {% if recipe.report_type == "aggregate-organisation-report" %}
-                                    {{ recipe.input_recipe.input_oois|join:", " }}
-                                {% else %}
-                                    {{ data.input_ooi|human_readable }}
-                                {% endif %}
+                                {% with oois=input_oois|slice:":10" %}{{ oois|join:", " }}{% endwith %}
                             </dd>
                         </div>
+                    </dl>
+                    {% if input_oois|length > 10 %}
+                        <div class="toolbar">
+                            <a class="button ghost"
+                               href="{% url "view_report" dashboard_item.data.report.organization_code %}?report_id={{ dashboard_item.data.report.primary_key }}&observed_at={{ dashboard_item.data.report.observed_at|date:"Y-m-d H:i:s:u" }}#selected-oois">
+                                {% translate "Show all objects" %}
+                                <span class="icon ti-chevron-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
                     {% endif %}
-                </dl>
+                {% endif %}
             </div>
         {% else %}
             {% if dashboard_item.item.query %}
