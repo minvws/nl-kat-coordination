@@ -18,7 +18,7 @@ class CallbackStorageClient(BoefjeStorageInterface):
         self.callback_url = callback_url
 
     def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, UUID]:
-        response = self._session.post(self.callback_url, json=boefje_output.model_dump())
+        response = self._session.post(self.callback_url, json=boefje_output.model_dump(mode="json"))
         response.raise_for_status()
 
         return response.json()
