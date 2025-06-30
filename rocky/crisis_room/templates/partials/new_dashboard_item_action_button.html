@@ -20,6 +20,9 @@
             <li>
                 <a href="{% url "finding_list" organization_code=organization.code %}">{% translate "Findings" %}</a>
             </li>
+            <li>
+                <a href="{% url "report_history" organization_code=organization.code %}">{% translate "Report section" %}</a>
+            </li>
         </ul>
     </div>
 </div>

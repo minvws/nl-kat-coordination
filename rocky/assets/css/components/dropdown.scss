@@ -5,8 +5,8 @@
   position: relative;
   align-self: center;
 
-  button,
-  a.button {
+  > button,
+  > a.button {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -19,10 +19,6 @@
     li {
       padding: 0;
     }
-  }
-
-  form {
-    padding: 0;
 
     button,
     a.button {
@@ -37,6 +33,11 @@
         background-color: #f2f2f2;
       }
     }
+  }
+
+  form {
+    padding: 0;
+    gap: 0;
   }
 
   .dropdown-list {
