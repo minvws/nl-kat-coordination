@@ -128,6 +128,7 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "python-libnmap" },
     { name = "requests" },
+    { name = "setuptools" },
     { name = "sqlalchemy" },
     { name = "structlog" },
     { name = "tanimachi" },
@@ -184,6 +185,7 @@ requires-dist = [
     { name = "python-dateutil", specifier = ">=2.8.2,<3" },
     { name = "python-libnmap", specifier = "==0.7.3" },
     { name = "requests", specifier = ">=2.32.1,<3" },
+    { name = "setuptools", specifier = ">=80.9.0" },
     { name = "sqlalchemy", specifier = ">=1.4.48" },
     { name = "structlog", specifier = ">=25.2.0,<26" },
     { name = "tanimachi", specifier = ">=0.0.6,<0.0.7" },
@@ -1779,6 +1781,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/65/7f/c4cb5f85827129ee363ea7cdd7b5a51d94bf9f665b0e0098885d50df921a/selectolax-0.3.30-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a32541fcccd442bba53ab11478037504e9f414fdbff7aa7eb4e3ee6b4ba38f4f", size = 5898285, upload-time = "2025-06-15T23:39:37.249Z" },
     { url = "https://files.pythonhosted.org/packages/7c/58/befd700f1d7a258a5d9342349f93c91859e026455aa75694d68745a84788/selectolax-0.3.30-cp313-cp313-win_amd64.whl", hash = "sha256:8b9d4546b598f2d7ad05ef38f086c10ac9e3809f432810d162ea99563b42f300", size = 1796397, upload-time = "2025-06-15T23:39:38.901Z" },
     { url = "https://files.pythonhosted.org/packages/6f/37/a6cd80a0c0f12a968f9f1bd8149c3ba12c36321b2a6de23fc5033d95f21e/selectolax-0.3.30-cp313-cp313-win_arm64.whl", hash = "sha256:fffd61187f92c0749cfc02d8085a24db0245e623a8329f0376e5c1d41c921c66", size = 1741828, upload-time = "2025-06-15T23:39:40.346Z" },
+]
+
+[[package]]
+name = "setuptools"
+version = "80.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
 ]
 
 [[package]]
