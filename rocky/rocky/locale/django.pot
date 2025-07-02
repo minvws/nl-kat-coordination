@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-24 15:35+0000\n"
+"POT-Creation-Date: 2025-07-02 09:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -586,6 +586,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
 #: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/partials/mute_findings_modal.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
 msgstr ""
@@ -5967,23 +5968,12 @@ msgid "Showing %(length)s of %(total)s findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/mute_findings_modal.html
 msgid "Mute findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason:"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Expires by (UTC):"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Unmute Findings"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Mute Findings"
+msgid "Unmute findings"
 msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
@@ -6431,6 +6421,8 @@ msgid "Give a reason below why you want to mute this finding."
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/partials/mute_findings_modal.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute finding"
 msgstr ""
 
@@ -6848,6 +6840,18 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "You are muting the selected findings."
+msgstr ""
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Reason:"
+msgstr ""
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Expires by (UTC):"
+msgstr ""
+
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr ""
@@ -6862,10 +6866,6 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate Report"
-msgstr ""
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Mute Finding"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
