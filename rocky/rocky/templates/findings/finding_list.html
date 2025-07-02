@@ -10,24 +10,20 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
-                <div>
-                    <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
-                    <p>
-                        {% blocktranslate trimmed with organization.name as organization_name %}
-                            An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
-                            Each finding relates to an object. Click a finding for additional information.
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="horizontal-view toolbar">
+            <div>
+                <div class="fifty-fifty">
+                    <div>
+                        <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
+                        <p>
+                            {% blocktranslate trimmed with organization.name as organization_name %}
+                                An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
+                                Each finding relates to an object. Click a finding for additional information.
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
                     {% include "partials/findings_list_toolbar.html" %}
 
                 </div>
-            </div>
-            <div>
-                {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" source="finding_list" %}
-
                 <div class="toolbar">
                     <a href="#new-dashboard-item-modal"
                        class="button ghost"
@@ -212,7 +208,7 @@
                     </div>
                 </form>
                 {% include "partials/mute_findings_modal.html" %}
-
+                {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" source="finding_list" %}
             </div>
         </section>
     </main>
