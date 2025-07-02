@@ -575,9 +575,9 @@ packaging==25.0 \
     # via
     #   django-csp
     #   opentelemetry-instrumentation
-phonenumbers==9.0.7 \
-    --hash=sha256:306eb14d1eaeb82230a08aa1614d04c93322b65b1ded2fff585161ed7eca39fc \
-    --hash=sha256:d4cc2aa36cbf9b0004c370f406d1510ddef56bba9e5f759471ef47e998d8a2f9
+phonenumbers==9.0.8 \
+    --hash=sha256:16f03f2cf65b5eee99ed25827d810febcab92b5d76f977e425fcd2e4ca6d4865 \
+    --hash=sha256:53d357111c0ead0d6408ae443613b18d3a053431ca1ddf7e881457c0969afcf9
     # via rocky
 pillow==11.2.1 \
     --hash=sha256:036e53f4170e270ddb8797d4c590e6dd14d28e15c7da375c18978045f7e6c37b \
