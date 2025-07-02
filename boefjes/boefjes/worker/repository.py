@@ -10,6 +10,7 @@ from typing import Protocol
 
 import structlog
 from jsonschema.exceptions import SchemaError
+from pydantic_core import ValidationError
 
 from .models import Boefje, Normalizer, PluginType
 
@@ -170,7 +171,7 @@ def _cached_resolve_boefjes(path: Path) -> dict[str, BoefjeResource]:
     for path, package in paths_and_packages:
         try:
             boefje_resources.append(get_boefje_resource(path, package, hash_path(path)))
-        except ModuleException as exc:
+        except (ModuleException, ValidationError) as exc:
             logger.exception(exc)
 
     return {resource.boefje.id: resource for resource in boefje_resources}
