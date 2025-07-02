@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 import time
+from base64 import b64encode
 from datetime import datetime
 from multiprocessing.context import ForkContext
 from multiprocessing.process import BaseProcess
@@ -11,19 +12,20 @@ from multiprocessing.process import BaseProcess
 import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
-from sqlalchemy.orm import sessionmaker
 
-from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, Task, TaskStatus
-from boefjes.config import Settings
-from boefjes.dependencies.plugins import PluginService
-from boefjes.job_handler import MIMETYPE_MIN_LENGTH, BoefjeHandler, NormalizerHandler, bytes_api_client
-from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from boefjes.local_repository import get_local_repository
-from boefjes.plugins.models import _default_mime_types
-from boefjes.runtime_interfaces import Handler, WorkerManager
-from boefjes.sql.config_storage import create_config_storage
-from boefjes.sql.db import get_engine
-from boefjes.sql.plugin_storage import create_plugin_storage
+# A deliberate relative import to make this module self-contained
+from .boefje_handler import MIMETYPE_MIN_LENGTH, BoefjeHandler
+from .interfaces import (
+    BoefjeOutput,
+    File,
+    Handler,
+    SchedulerClientInterface,
+    StatusEnum,
+    Task,
+    TaskStatus,
+    WorkerManager,
+)
+from .repository import _default_mime_types
 
 logger = structlog.get_logger(__name__)
 ctx: ForkContext = multiprocessing.get_context("fork")
@@ -34,30 +36,30 @@ class SchedulerWorkerManager(WorkerManager):
         self,
         item_handler: Handler,
         scheduler_client: SchedulerClientInterface,
-        settings: Settings,
-        log_level: str,  # TODO: (re)move?
+        pool_size: int,
+        poll_interval: float,
+        worker_heartbeat: float,
+        deduplicate: bool,
     ):
         self.item_handler = item_handler
         self.scheduler_client = scheduler_client
-        self.settings = settings
+        self.pool_size = pool_size
+        self.poll_interval = poll_interval
+        self.worker_heartbeat = worker_heartbeat
 
         manager = ctx.Manager()
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
         self.workers: list[BaseProcess] = []
-
-        logger.setLevel(log_level)
-
+        self.deduplicate = deduplicate
         self.exited = False
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        self.workers = [
-            ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
-        ]
-        for worker in self.workers:
+        self._workers = [ctx.Process(target=_start_working, args=self._worker_args()) for _ in range(self.pool_size)]
+        for worker in self._workers:
             worker.start()
 
         signal.signal(signal.SIGINT, lambda signum, _: self.exit(signum))
@@ -67,10 +69,10 @@ class SchedulerWorkerManager(WorkerManager):
             try:
                 self._replace_broken_workers()
 
-                if self.task_queue.qsize() > self.settings.pool_size:
+                if self.task_queue.qsize() > self.pool_size:
                     # We have one new task for each worker in the local task queue, so we don't have to ask the
                     # scheduler for new tasks.
-                    time.sleep(self.settings.worker_heartbeat)
+                    time.sleep(self.worker_heartbeat)
                     continue
 
                 self._fill_queue(queue_type)
@@ -96,21 +98,21 @@ class SchedulerWorkerManager(WorkerManager):
 
         try:
             p_items = self.scheduler_client.pop_items(
-                queue_type.value, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None
+                queue_type, limit=1 if queue_type is not WorkerManager.Queue.BOEFJES else None
             )
         except (HTTPError, ValidationError):
-            logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.settings.poll_interval)
-            time.sleep(self.settings.poll_interval)
+            logger.exception("Popping task from scheduler failed, sleeping %s seconds", self.poll_interval)
+            time.sleep(self.poll_interval)
             return
 
         if not p_items:
-            time.sleep(self.settings.poll_interval)
+            time.sleep(self.poll_interval)
             return
 
         logger.info("Handling tasks[%s]", [p_item.data.id for p_item in p_items])
 
         try:
-            if self.settings.deduplicate:
+            if self.deduplicate:
                 self.task_queue.put(p_items)
                 return
 
@@ -141,7 +143,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         new_workers = []
 
-        for worker in self.workers:
+        for worker in self._workers:
             closed = False
 
             try:
@@ -163,7 +165,7 @@ class SchedulerWorkerManager(WorkerManager):
             new_worker.start()
             new_workers.append(new_worker)
 
-        self.workers = new_workers
+        self._workers = new_workers
 
     def _cleanup_pending_worker_task(self, worker: BaseProcess) -> None:
         if worker.pid not in self.handling_tasks:
@@ -204,7 +206,7 @@ class SchedulerWorkerManager(WorkerManager):
 
             killed_workers = []
 
-            for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
+            for worker in self._workers:  # Send all signals before joining, speeding up shutdowns
                 try:
                     if worker.is_alive():
                         worker.kill()
@@ -251,7 +253,7 @@ def _start_working(
         try:
             scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)
             start_time = datetime.now()
-            out = handler.handle(p_item.data)
+            out = handler.handle(p_item)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
             logger.exception("An error occurred handling scheduler item", task=str(p_item.data.id))
@@ -301,11 +303,13 @@ def _start_working(
                     new_boefje_meta.started_at = boefje_meta.started_at
                     new_boefje_meta.ended_at = boefje_meta.ended_at
 
-                    handler.bytes_client.save_boefje_meta(new_boefje_meta)
-
                     if not boefje_results:
+                        handler.boefje_storage.save_output(new_boefje_meta, BoefjeOutput(status=StatusEnum.COMPLETED))
+
                         scheduler_client.patch_task(item.id, status)
                         continue
+
+                    files: list[File] = []
 
                     for boefje_added_mime_types, output in boefje_results:
                         valid_mimetypes = set()
@@ -318,20 +322,29 @@ def _start_working(
                                 )
                             else:
                                 valid_mimetypes.add(mimetype)
-                        raw_file_id = handler.bytes_client.save_raw(
-                            new_boefje_meta.id,
-                            output,
-                            _default_mime_types(new_boefje_meta.boefje).union(valid_mimetypes),
-                        )
-                        logger.info(
-                            "Saved raw file %s for boefje %s[%s]",
-                            raw_file_id,
-                            new_boefje_meta.boefje.id,
-                            new_boefje_meta.id,
+
+                        files.append(
+                            File(
+                                name=str(len(files)),
+                                content=(
+                                    b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())
+                                ).decode(),
+                                tags=set(
+                                    _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                                ),  # default mime-types are added through the API
+                            )
                         )
 
+                    handler.boefje_storage.save_output(
+                        new_boefje_meta,
+                        BoefjeOutput(
+                            status=StatusEnum.FAILED if status is TaskStatus.FAILED else StatusEnum.COMPLETED,
+                            files=files,
+                        ),
+                    )
+
+                    logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
                     scheduler_client.patch_task(item.id, status)
-
                     logger.info(
                         "Set status in the scheduler for deduplicated task",
                         status=status.value,
@@ -342,20 +355,3 @@ def _start_working(
                 logger.exception("Could not patch scheduler task to %s", status.value, task=str(p_item.data.id))
 
             gc.collect()
-
-
-def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
-    local_repository = get_local_repository()
-
-    session = sessionmaker(bind=get_engine())
-    plugin_service = PluginService(create_plugin_storage(session), create_config_storage(session), local_repository)
-
-    item_handler: Handler
-    if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), plugin_service, bytes_api_client)
-    else:
-        item_handler = NormalizerHandler(
-            LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
-        )
-
-    return SchedulerWorkerManager(item_handler, SchedulerAPIClient(str(settings.scheduler_api)), settings, log_level)
