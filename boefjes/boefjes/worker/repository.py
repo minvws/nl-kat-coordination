@@ -43,7 +43,9 @@ class BoefjeResource:
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
 
         try:
-            self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+            self.module: Runnable | None = get_runnable_module_from_package(
+                package, ENTRYPOINT_BOEFJES, parameter_count=1
+            )
         except ModuleException:
             self.module = None  # Most likely an OCI boefje
 
