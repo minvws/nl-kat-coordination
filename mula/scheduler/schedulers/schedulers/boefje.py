@@ -666,10 +666,12 @@ class BoefjeScheduler(Scheduler):
             oois = self.ctx.services.octopoes.get_objects_by_object_types(
                 organisation,
                 boefje.consumes,
-                list(range(boefje.scan_level, 5)) ,  # type: ignore
+                list(range(boefje.scan_level, 5)),  # type: ignore
             )
             return oois
-        except ExternalServiceResponseError: #maybe our consumes list does not match the Models, or the organisation does not exists
+        except (
+            ExternalServiceResponseError
+        ): #maybe our consumes list does not match the Models, or the organisation does not exists
             return []
 
     @exception_handler
