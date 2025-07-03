@@ -41,7 +41,6 @@ class Octopoes(HTTPService):
             "valid_time": datetime.now(timezone.utc),
         }
 
-        pagesize = 1000
         offset = 0
         count = 1  # just to get the loop going
 
@@ -58,7 +57,7 @@ class Octopoes(HTTPService):
 
             list_objects = ListObjectsResponse(**response.json())
             count = list_objects.count
-            offset = offset + pagesize
+            offset = offset + params["limit"]
             yield from list_objects.items
 
     @exception_handler
