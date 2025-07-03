@@ -671,7 +671,7 @@ class BoefjeScheduler(Scheduler):
             return oois
         except (
             ExternalServiceResponseError
-        ): #maybe our consumes list does not match the Models, or the organisation does not exists
+        ):  # maybe our consumes list does not match the Models, or the organisation does not exists
             return []
 
     @exception_handler
