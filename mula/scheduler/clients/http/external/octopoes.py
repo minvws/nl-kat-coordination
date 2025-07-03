@@ -37,24 +37,19 @@ class Octopoes(HTTPService):
             "types": object_types,
             "scan_level": [s for s in scan_level],
             "offset": 0,
-            "limit": 1,
+            "limit": 1000,
             "valid_time": datetime.now(timezone.utc),
         }
 
-        # Get the total count of objects
-        response = self.get(url, params=params)
-        list_objects = ListObjectsResponse(**response.json())
-        count = list_objects.count
-
-        # Update the limit for the paginated results
-        limit = 1000
-        params["limit"] = limit
-
+        pagesize = 1000
+        offset = 0
+        count = 1 # just to get the loop going
+        
         # Loop over the paginated results
         oois = []
-        for offset in range(0, count, limit):
+        while offset < count:
             params["offset"] = offset
-
+            
             try:
                 response = self.get(url, params=params)
             except httpx.HTTPStatusError as e:
@@ -63,8 +58,9 @@ class Octopoes(HTTPService):
                 raise
 
             list_objects = ListObjectsResponse(**response.json())
+            count = list_objects.count
             oois.extend([ooi for ooi in list_objects.items])
-
+            offset = offset + pagesize
         return oois
 
     @exception_handler
