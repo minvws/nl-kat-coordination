@@ -36,4 +36,5 @@ class Question(OOI):
 
     @property
     def config_pk(self) -> str:
-        return f"Config|{self.ooi.tokenized.name}|{self.schema_id.split("/")[-1]}"
+        config_id = self.schema_id.split("/")[-1]
+        return f"Config|{self.ooi.tokenized.name}|{config_id}"
