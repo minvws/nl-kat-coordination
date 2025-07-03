@@ -137,72 +137,71 @@ task_buttons.forEach((button) => {
                 let rawfile_container = document.createElement("div");
                 let signed = rawfile["signing_provider_url"] ? `, signed by <a href="${rawfile["signing_provider_url"]}">${rawfile["signing_provider_url"]}</a>` : '';
                 rawfile_container.innerHTML = `<h3 id="raw-file-${rawfile["id"]}">File id: ${rawfile["id"]}</h3>
-                <div class="tabs">
                     <div role="tablist"
                        aria-labelledby="raw-file-${rawfile["id"]}"
                        class="manual">
-                        <button id="#plain-${rawfile["id"]}"
-                            type="button"
-                            role="tab"
-                            aria-selected="true"
-                            aria-controls="#plain-${rawfile["id"]}-panel">
-                          <span class="focus">
-                            Plain text
-                          </span>
-                        </button>
-                        <button id="#json-${rawfile["id"]}"
-                            type="button"
-                            role="tab"
-                            aria-selected="true"
-                            aria-controls="#json-${rawfile["id"]}-panel">
-                          <span class="focus">
-                            Json
-                          </span>
-                        </button>
-                        <button id="#hex-${rawfile["id"]}"
-                            type="button"
-                            role="tab"
-                            aria-selected="true"
-                            aria-controls="#hex-${rawfile["id"]}-panel">
-                          <span class="focus">
-                            HEX view
-                          </span>
-                        </button>                        
-                    <div id="#plain-${rawfile["id"]}-panel"
+                        <div class="button-container">
+                            <button id="plain-${rawfile["id"]}"
+                                type="button"
+                                role="tab"
+                                aria-selected="true"
+                                aria-controls="plain-${rawfile["id"]}-panel">
+                                Plain text
+                            </button>
+                            <button id="json-${rawfile["id"]}"
+                                type="button"
+                                role="tab"
+                                aria-selected="false"
+                                aria-controls="json-${rawfile["id"]}-panel">
+                                Json
+                            </button>
+                            <button id="hex-${rawfile["id"]}"
+                                type="button"
+                                role="tab"
+                                aria-selected="false"
+                                aria-controls="hex-${rawfile["id"]}-panel">
+                                HEX view
+                            </button>
+                        </div>
+                    <div id="plain-${rawfile["id"]}-panel"
                        role="tabpanel"
                        aria-labelledby="#plain-${rawfile["id"]}">
                         <pre class="plain"><code></code></pre>
                     </div>
-                    <div id="#json-${rawfile["id"]}-panel"
+                    <div id="json-${rawfile["id"]}-panel"
                        role="tabpanel"
-                       aria-labelledby="#json-${rawfile["id"]}-panel">
+                       aria-labelledby="#json-${rawfile["id"]}-panel"
+                       class="hidden">
                         <pre class="json"></pre>
                     </div>
-                    <div id="#hex-${rawfile["id"]}-panel"
+                    <div id="hex-${rawfile["id"]}-panel"
                        role="tabpanel"
-                       aria-labelledby="#hex-${rawfile["id"]}">
+                       aria-labelledby="#hex-${rawfile["id"]}"
+                       class="hidden">
                       <table class="hex"></table>
                     </div>
-                </div>
                 <h5>Mimetypes:</h5>
                   <ul class="tags">${mimetypes}</ul>
                 <p>Secure Hash: <code>${rawfile["secure_hash"]} ${signed}</code></p>`;
+                rawfiles_list.appendChild(rawfile_container);
                 rawfile_container.querySelector("pre.plain code").innerText = rawdata;
                 try {
                   jsondata = JSON.parse(rawdata);
                   rawfile_container.querySelector("pre.json").innerText = JSON.stringify(jsondata, null, "\t")
                   rawfile_container.querySelector("pre.json").classList.remove("hidden");
-                  rawfile_container.querySelector("pre.hex").classList.add("hidden");
+                  rawfile_container.querySelector(`#hex-${rawfile["id"]}`).classList.add("hidden");
+                  rawfile_container.querySelector(`#hex-${rawfile["id"]}-panel`).classList.add("hidden");
                 } catch (e) {
-                  rawfile_container.querySelector("pre.json").classList.add("hidden");
+                  rawfile_container.querySelector(`#json-${rawfile["id"]}-panel`).classList.add("hidden");
+                  rawfile_container.querySelector(`#json-${rawfile["id"]}`).classList.add("hidden");
                   let hex_table = rawfile_container.querySelector("table.hex")
                   let rawbytes = new TextEncoder();
                   renderHexTable(hex_table, rawbytes.encode(rawdata));
                 }
-                rawfiles_list.appendChild(rawfile_container);
               });
 
               rawfiles_element.appendChild(rawfiles_list);
+              
             } else if(task_type == "boefje") {
               rawfiles_element.innerHTML =
                 "<p class='explanation'>Task yielded no raw files.</p>";
@@ -210,6 +209,7 @@ task_buttons.forEach((button) => {
             // Insert HTML snippet into the expando row, which is the buttons parent TR next TR-element sibling.
             expando_row.querySelector("#yielded-rawfiles-" + raw_task_id)
               .appendChild(rawfiles_element);
+            initTablist();
         });
     } else {
       return;
@@ -220,22 +220,22 @@ task_buttons.forEach((button) => {
 function renderHexTable(hex_table, bytes) {
   const rowLength = 16;
 
-  const headerRow = document.createElement('tr');
-  headerRow.innerHTML = '<th>Offset</th>' +
-    Array.from({ length: rowLength }, (_, i) => `<th>${i.toString(16).padStart(2, '0').toUpperCase()}</th>`).join('') +
-    '<th>ASCII</th>';
+  const headerRow = document.createElement("tr");
+  headerRow.innerHTML = "<th>Offset</th>" +
+    Array.from({ length: rowLength }, (_, i) => `<th>${i.toString(16).padStart(2, '0').toUpperCase()}</th>`).join("") +
+    "<th>ASCII</th>";
   hex_table.appendChild(headerRow);
 
   for (let i = 0; i < bytes.length; i += rowLength) {
-    const row = document.createElement('tr');
-    const offset = i.toString(16).padStart(8, '0').toUpperCase();
+    const row = document.createElement("tr");
+    const offset = i.toString(16).padStart(8, "0").toUpperCase();
     const hexBytes = [];
     const ascii = [];
 
     for (let j = 0; j < rowLength; j++) {
       const byte = bytes[i + j];
       if (byte !== undefined) {
-        hexBytes.push(byte.toString(16).padStart(2, '0').toUpperCase());
+        hexBytes.push(byte.toString(16).padStart(2, "0").toUpperCase());
         const char = byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.';
         ascii.push(char);
       } else {
@@ -243,7 +243,7 @@ function renderHexTable(hex_table, bytes) {
         ascii.push('.'); // placeholder char
       }
     }
-    row.addEventListener('mouseover', (event) => {
+    row.addEventListener("mouseover", (event) => {
       let charposition = Array.from(event.target.parentNode.children).indexOf(event.target);
       if(charposition>0){
           let asciistring = event.target.parentElement.querySelector(".ascii").textContent
@@ -253,7 +253,7 @@ function renderHexTable(hex_table, bytes) {
           event.target.parentElement.querySelector(".ascii").innerHTML = highlightedstring;
       }
     });
-    row.addEventListener('mouseout', (event) => {
+    row.addEventListener("mouseout", (event) => {
       event.target.parentElement.querySelector(".ascii").innerText = event.target.parentElement.querySelector(".ascii").innerText;
     });
 
