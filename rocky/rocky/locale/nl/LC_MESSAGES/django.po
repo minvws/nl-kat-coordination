@@ -15,17 +15,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 14:56+0000\n"
-"PO-Revision-Date: 2025-06-18 14:04+0000\n"
+"POT-Creation-Date: 2025-07-02 09:35+0000\n"
+"PO-Revision-Date: 2025-07-02 21:01+0000\n"
 "Last-Translator: paulvandenbraken <paul.vandenbraken@ezzenz.nl>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.1\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -87,8 +87,9 @@ msgid "--- Please select one of the available options ----"
 msgstr "--- Selecteer een van de beschikbare opties ---"
 
 #: account/forms/account_setup.py
+#, fuzzy
 msgid "Account type"
-msgstr ""
+msgstr "Accounttype"
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
@@ -418,9 +419,9 @@ msgstr ""
 "vrijwaringsniveau niet meer kunt wijzigen als u dat doet."
 
 #: account/templates/account_detail.html
-#, python-format
+#, fuzzy, python-format
 msgid "Withdraw L%(acl)s clearance and responsibility"
-msgstr ""
+msgstr "Vrijwaring en verantwoordelijkheid L%(acl)s intrekken"
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
@@ -563,6 +564,8 @@ msgid ""
 "Your password must contain at least the following but longer passwords are "
 "recommended:"
 msgstr ""
+"Uw password moet minimaal voldoen aan onderstaande maar langere passwords "
+"worden aanbevolen:"
 
 #: account/validators.py
 msgid " characters"
@@ -577,9 +580,11 @@ msgid " letters"
 msgstr " letters"
 
 #: account/validators.py
+#, fuzzy
 msgid ""
 " special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
+" speciale karakters als: {str(validators.get('special_characters',''))}"
 
 #: account/validators.py
 msgid " lower case letters"
@@ -636,135 +641,173 @@ msgstr "Modal sluiten"
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
 #: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/partials/mute_findings_modal.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
 msgstr "Annuleren"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Title on dashboard"
-msgstr ""
+msgstr "Titel op dashboard"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Number of rows in list"
-msgstr ""
+msgstr "Aantal rijen in de lijst"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Dashboard item size"
-msgstr ""
+msgstr "Grootte dashboard-item"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Full width"
-msgstr ""
+msgstr "Volledige breedte"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Half width"
-msgstr ""
+msgstr "Halve breedte"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "An item with that name already exists. Try a different title."
-msgstr ""
+msgstr "Item-naam bestaat al. Probeer een andere titel."
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "An error occurred while adding dashboard item."
-msgstr ""
+msgstr "Fout tijdens toevoegen van een dashboard-item."
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "List sorting by"
-msgstr ""
+msgstr "Lijstsortering op"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Type (A-Z)"
-msgstr ""
+msgstr "Type (A-Z)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Type (Z-A)"
-msgstr ""
+msgstr "Type (Z-A)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Clearance level (Low-High)"
-msgstr ""
+msgstr "Vrijwaringsniveau (Laag-Hoog)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Clearance level (High-Low)"
-msgstr ""
+msgstr "Vrijwaringsniveau (Hoog-Laag)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Show table columns"
-msgstr ""
+msgstr "Toon kolommen"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Severity (Low-High)"
-msgstr ""
+msgstr "Ernst (Laag-Hoog)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Severity (High-Low)"
-msgstr ""
+msgstr "Ernst (Hoog-Laag)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Finding (A-Z)"
-msgstr ""
+msgstr "Bevinding (A-Z)"
 
 #: crisis_room/forms.py
+#, fuzzy
 msgid "Finding (Z-A)"
-msgstr ""
+msgstr "Bevinding (Z-A)"
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Findings Dashboard"
-msgstr ""
+msgstr "Bevindingen-dashboard"
 
 #: crisis_room/models.py
+#, fuzzy
 msgid ""
 "Where on the dashboard do you want to show the data? Position {} is the most "
 "top level and the max position is {}."
 msgstr ""
+"Waar wilt u de data op het dashboard tonen? Positie {} is het bovenste top "
+"level en de maximale positie is {}."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Will be displayed on the general crisis room, for all organizations."
-msgstr ""
+msgstr "Wordt getoond in het algemene crisiscentrum voor alle organisaties."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Will be displayed on a single organization dashboard"
-msgstr ""
+msgstr "Wordt getoond op het dashboard van één orgnisatie."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Will be displayed on the findings dashboard for all organizations"
-msgstr ""
+msgstr "Wordt getoond op het bevindingen-dashboard voor alle organisaties"
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Can change position up or down of a dashboard item."
-msgstr ""
+msgstr "Wijzigt de positie van een dashboards-item naar boven of beneden."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "You have to choose between a recipe or a query, but not both."
-msgstr ""
+msgstr "Kies tussen recept of query, beide is niet toegestaan."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "You have set a query and not where it is from. Also set the source."
 msgstr ""
+"U heeft een query gemaakt zonder aan te geven waarop. Geef tevens de bron "
+"aan."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid ""
 "DashboardItem must contain at least a 'recipe' or a 'source' with a 'query'."
 msgstr ""
+"Een dashboard-item moet minimaal een 'recept' of 'bron' bevatten inclusief "
+"een \"query'."
 
 #: crisis_room/models.py
+#, fuzzy
 msgid "Max dashboard items reached."
-msgstr ""
+msgstr "Maximaal aantal dashboard-items bereikt."
 
-#: crisis_room/templates/crisis_room.html rocky/templates/403.html
-#: rocky/templates/404.html
-msgid "Crisis Room"
+#: crisis_room/templates/crisis_room.html
+#: crisis_room/templates/organization_crisis_room.html
+#: rocky/templates/header.html
+msgid "Crisis room"
 msgstr "Crisiscentrum"
 
 #: crisis_room/templates/crisis_room.html
-msgid "Crisis Room overview for all organizations."
-msgstr "Crisiscentrum overzicht voor alle organisaties."
+#, fuzzy
+msgid "Crisis room overview for all organizations."
+msgstr "Crisiscentrum-overzicht voor alle organisaties"
 
 #: crisis_room/templates/crisis_room_dashboards.html
+#, fuzzy
 msgid "Dashboards"
-msgstr ""
+msgstr "Dashboards"
 
 #: crisis_room/templates/crisis_room_dashboards.html
+#, fuzzy
 msgid ""
 "\n"
 "                        On this page you can see an overview of the "
@@ -772,14 +815,22 @@ msgid ""
 "                        **More context can be written here**\n"
 "                    "
 msgstr ""
+"\n"
+"                        Op deze pagina ziet u een overzicht van de "
+"dashboards voor alle organisaties.\n"
+"\n"
+"                        **Meer context kan hier worden gegeven**\n"
+"                    "
 
 #: crisis_room/templates/crisis_room_dashboards.html
+#, fuzzy
 msgid "dashboards"
-msgstr ""
+msgstr "dashboards"
 
 #: crisis_room/templates/crisis_room_dashboards.html
+#, fuzzy
 msgid "There are no dashboards to display."
-msgstr ""
+msgstr "Er zijn geen dashboards o te tonen."
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
@@ -789,6 +840,7 @@ msgid "Findings overview"
 msgstr "Bevindingenoverzicht"
 
 #: crisis_room/templates/crisis_room_findings.html
+#, fuzzy
 msgid ""
 "\n"
 "                            This overview shows the total number of findings "
@@ -803,7 +855,7 @@ msgstr ""
 "\n"
 "                            Dit overzicht toont het totaal aantal "
 "bevindingen per\n"
-"risiconiveau dat is gevonden voor alle organisaties.\n"
+"risiconiveau (ernst) dat is gevonden voor alle organisaties.\n"
 "Deze data is gebaseerd op de meest actuele Crisicentrum\n"
 "rapportage voor elke organisatie.\n"
 "                        "
@@ -813,6 +865,7 @@ msgid "Findings per organization"
 msgstr "Bevindingen per organisatie"
 
 #: crisis_room/templates/crisis_room_findings.html
+#, fuzzy
 msgid ""
 "\n"
 "                            This table shows the findings that have been "
@@ -824,9 +877,22 @@ msgid ""
 "                            of each organization.\n"
 "                        "
 msgstr ""
+"\n"
+"                            Deze tabel toont de bevindingen die zijn "
+"gevonden voor elke organisatie,\n"
+"\n"
+"                            gesorteerd op bevindingstype en gegroepeerd per "
+"organisatie.\n"
+"\n"
+"                            De data is gebaseerd op de meest recente "
+"Crisiscentrum bevindingenrapportage\n"
+"\n"
+"                            van elke organisatie.\n"
+"                        "
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid ""
 "\n"
 "                    No findings have been identified yet. As soon as they "
@@ -834,8 +900,15 @@ msgid ""
 "                    identified, they will be shown on this page.\n"
 "                "
 msgstr ""
+"\n"
+"                    Er zijn nog geen bevindingen gevonden. Zodra deze "
+"gevonden worden,\n"
+"\n"
+"                    worden ze op deze pagina getoond.\n"
+"                "
 
 #: crisis_room/templates/crisis_room_findings.html
+#, fuzzy
 msgid ""
 "\n"
 "                There are no organizations yet. After creating an "
@@ -843,11 +916,18 @@ msgid ""
 "                the identified findings will be shown here.\n"
 "            "
 msgstr ""
+"\n"
+"                Er zijn nog geen organisaties. Na het aanmaken van een "
+"organisatie,\n"
+"\n"
+"                worden de gevonden bevindingen hier getoond.\n"
+"            "
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/organization_crisis_room_header.html
+#, fuzzy
 msgid "Crisis room navigation"
-msgstr ""
+msgstr "Crisiscentrum navigatie"
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
@@ -875,19 +955,24 @@ msgid "Findings"
 msgstr "Bevindingen"
 
 #: crisis_room/templates/organization_crisis_room.html
+#, fuzzy
 msgid ""
 "There are no dashboards yet. Click on \"Add dashboard\" to create a new "
 "dashboard."
 msgstr ""
+"Er zijn nog geen dashboards. Selecteer \"Aanmaken dashboard\" om een nieuw "
+"dashboard te maken."
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Options for dashboard"
-msgstr ""
+msgstr "Opties voor dashboard"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
+#, fuzzy
 msgid "Delete dashboard"
-msgstr ""
+msgstr "Verwijder dashboard"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: katalogus/templates/partials/objects_to_scan.html
@@ -897,54 +982,63 @@ msgid "Object list"
 msgstr "Objectenlijst"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Finding list"
-msgstr ""
+msgstr "Bevindingenlijst"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Options for dashboard items"
-msgstr ""
+msgstr "Opties voor dashboard-items"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Position up"
-msgstr ""
+msgstr "Verplaats naar boven"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Position down"
-msgstr ""
+msgstr "Verplaats naar beneden"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
+#, fuzzy
 msgid "Delete item"
-msgstr ""
+msgstr "Verwijder item"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
-"objects and findings page."
+"filters on the objects and findings page."
 msgstr ""
+"Er zijn nog geen dashboard-items toegevoegd. Voeg dashboard-items toe via de "
+"filters op de objecten- en bevindingenpagina"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Add objects"
-msgstr ""
+msgstr "Objecten toevoegen"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid "Add findings"
-msgstr ""
+msgstr "Bevindingen toevoegen"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
+#, fuzzy
 msgid ""
 "Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_header.html
-#: rocky/templates/header.html
-msgid "Crisis room"
-msgstr "Crisiscentrum"
+"Dashboard bestaat niet. Kies een bestaand dashboard of maak een nieuw "
+"dashboard aan."
 
 #: crisis_room/templates/organization_crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
+#, fuzzy
 msgid "Add dashboard"
-msgstr ""
+msgstr "Dashboard toevoegen"
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
 #: rocky/templates/findings/finding_list.html
@@ -959,13 +1053,14 @@ msgstr ""
 "betrekking op een object. Klik op een bevinding voor meer informatie."
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
-#, python-format
+#, fuzzy, python-format
 msgid "Showing %(length)s findings"
-msgstr ""
+msgstr "Toon %(length)s bevindingen"
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
+#, fuzzy
 msgid "Go to findings"
-msgstr ""
+msgstr "Naar bevindingen"
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: rocky/templates/findings/finding_list.html
@@ -1089,8 +1184,9 @@ msgstr "%(ooi_type)s tonen"
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: rocky/views/mixins.py
+#, fuzzy
 msgid "Location"
-msgstr ""
+msgstr "Lokatie"
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #, python-format
@@ -1153,13 +1249,14 @@ msgstr ""
 "informatie."
 
 #: crisis_room/templates/partials/dashboard_ooi_list.html
-#, python-format
+#, fuzzy, python-format
 msgid "Showing %(length)s objects"
-msgstr ""
+msgstr "Toon %(length)s objecten"
 
 #: crisis_room/templates/partials/dashboard_ooi_list.html
+#, fuzzy
 msgid "Go to objects"
-msgstr ""
+msgstr "Ga naar objecten"
 
 #: crisis_room/templates/partials/dashboard_ooi_list_table.html
 #: rocky/templates/oois/ooi_list.html
@@ -1167,9 +1264,9 @@ msgid "Objects "
 msgstr "Objecten "
 
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid "Are you sure you want to delete '%(name)s' from this dashboard?"
-msgstr ""
+msgstr "Weet u zeker dat u '%(name)s' van dit dashboard wilt verwijderen?"
 
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
@@ -1183,19 +1280,23 @@ msgid "Delete"
 msgstr "Verwijderen"
 
 #: crisis_room/templates/partials/delete_dashboard_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Are you sure you want to delete dashboard '%(dashboard)s'? All the items on "
 "the dashboard will be deleted as well."
 msgstr ""
+"Weet u zeker dat u dashboard '%(dashboard)s' wilt verwijderen? Alle items op "
+"het dashboard worden eveneens verwijderd."
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#, fuzzy
 msgid "Actions for adding dashboard items"
-msgstr ""
+msgstr "Activiteiten voor het toevoegen van dashboard items"
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#, fuzzy
 msgid "Add item"
-msgstr ""
+msgstr "Item toevoegen"
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
 #: reports/templates/partials/report_ooi_list.html
@@ -1210,27 +1311,36 @@ msgid "Objects"
 msgstr "Objecten"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "            Add %(item_type)s to dashboard\n"
 "        "
 msgstr ""
+"\n"
+"            Voeg %(item_type)s toe aan dashboard\n"
+"        "
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "        Add these %(item_type)s with the selected filters\n"
 "        to the dashboard of your choice.\n"
 "    "
 msgstr ""
+"\n"
+"        Voeg deze %(item_type)s via de geselecteerde filters\n"
+"\n"
+"        toe aan het dashboard van uw keuze.\n"
+"    "
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
+#, fuzzy
 msgid "Add to dashboard"
-msgstr ""
+msgstr "Voeg toe aan dashboard"
 
 #: katalogus/client.py
 msgid ""
@@ -1259,44 +1369,54 @@ msgid "Boefje with this ID already exists."
 msgstr "Boefje met deze ID bestaat al."
 
 #: katalogus/client.py
+#, fuzzy
 msgid "Access to resource not allowed"
-msgstr ""
+msgstr "Toegang tot resource niet toegestaan"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to see plugin settings"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plugin instellingen te zien"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to set plugin settings"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plugin-instellingen aan te passen"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to delete plugin settings"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plugin instellingen te verwijderen"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to view plugin settings"
-msgstr ""
+msgstr "Gebruiker heeftgeen rechten om plugin instellingen te bekijken"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to access the other organization"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om de andere organisatie te benaderen"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to enable plugins"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plugins aan te zetten"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to disable plugins"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plugings uit te zetten"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to create plugins"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plug-ins aan te maken"
 
 #: katalogus/client.py
+#, fuzzy
 msgid "User is not allowed to edit plugins"
-msgstr ""
+msgstr "Gebruiker heeft geen rechten om plug-ins te bewerken"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -1438,11 +1558,15 @@ msgid "Boefje setup"
 msgstr "Boefje instellen"
 
 #: katalogus/templates/boefje_setup.html
+#, fuzzy
 msgid ""
 "You can create a new Boefje. If you want more information on this, you can "
 "check out the <a href=\"https://docs.openkat.nl/developer_documentation/"
 "development_tutorial/creating_a_boefje.html\">documentation</a>."
 msgstr ""
+"U kunt zelf een nieuw boefje maken. Indien u hierover meer informatie wilt, "
+"vindt u deze in de <a href=\"https://docs.openkat.nl/developer_documentation/"
+"development_tutorial/creating_a_boefje.html\">documentation</a>."
 
 #: katalogus/templates/boefje_setup.html
 msgid "Save changes"
@@ -1542,13 +1666,17 @@ msgid "Clone settings"
 msgstr "Instellingen klonen"
 
 #: katalogus/templates/clone_settings.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Use the form below to clone the settings from "
 "<strong>%(current_organization)s</strong> to the selected organization. This "
 "includes both the KAT-alogus settings as well as enabled and disabled "
 "plugins."
 msgstr ""
+"Gebruik onderstand formulier om de instellingen van "
+"<strong>%(current_organization)s</strong> te klonen naar de geselecteerde "
+"organisatie. Dit omvat zowel KAT-alogus settings als enabled/disabled plug-"
+"ins."
 
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone"
@@ -1559,14 +1687,18 @@ msgid "All plugins"
 msgstr "Alle plug-ins"
 
 #: katalogus/templates/katalogus_settings.html
+#, fuzzy
 msgid "KAT-alogus settings"
-msgstr ""
+msgstr "KAT-alogus instellingen"
 
 #: katalogus/templates/katalogus_settings.html
+#, fuzzy
 msgid ""
 "There are currently no settings defined. Add settings at the plugin detail "
 "page."
 msgstr ""
+"Er zijn momenteel geen instellingen gedefinieerd. Voeg instellingen toe op "
+"de plug-in detailspagina."
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/two_factor/core/otp_required.html
@@ -2006,10 +2138,13 @@ msgstr ""
 "verwijderen?"
 
 #: katalogus/templates/plugin_settings_list.html
+#, fuzzy
 msgid ""
 "In the table below the settings for this specific Boefje can be seen. Set or "
 "change the value of the variables by editing the settings."
 msgstr ""
+"In onderstaande tabel vind u de instellingen voor dit specifieke boefje. "
+"Configureer de waarde van de variabele door de instellingen te bewerken."
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Configure Settings"
@@ -2869,11 +3004,15 @@ msgstr ""
 "voor het object."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, fuzzy
 msgid ""
 "OpenKAT has a permission system that allows administrators to configure "
 "which users can set a certain clearance level. The will make sure that only "
 "users that are trusted can start the more aggressive scans."
 msgstr ""
+"OpenKAT heeft een rechtensysteem dat beheerders toestaat in te stellen welke "
+"gebruikers welke vrijwaringsniveaus mogen instellen. Dit borgt dat alleen "
+"vertrouwde gebruikers agressievere scan kunnen starten."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Acknowledge clearance level"
@@ -2904,7 +3043,7 @@ msgid "What is my clearance level?"
 msgstr "Wat is mijn vrijwaringsniveau?"
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Unfortunately you cannot continue the onboarding. </br> Your administrator "
 "has trusted you with a clearance level of <strong>L%(tcl)s</strong>. </br> "
@@ -2913,14 +3052,22 @@ msgid ""
 "<strong>%(ooi)s</strong> </br> Contact your administrator to receive a "
 "higher clearance."
 msgstr ""
+"Helaas kunt u niet verder met de onboarding. </br> Uw beheerder heeft u een "
+"vrijwaringsniveau  <strong>L%(tcl)s</strong> toevertrouwd. </br> U heeft "
+"minimaal vrijwaringsniveau <strong>L%(dns_report_least_clearance_level)s</"
+"strong> nodig om <strong>%(ooi)s</strong> te scannen</br> Neem contact op "
+"met uw beheerder om een hoger vrijwaringsniveau te krijgen."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Your administrator has trusted you with a clearance level of "
 "<strong>L%(tcl)s</strong>. </br> You must first accept this clearance level "
 "to continue."
 msgstr ""
+"Uw beheerder heeft u een vrijwaringsniveau <strong>L%(tcl)s</strong> "
+"toevertrouwd. </br> Accepteer dit vrijwaringsniveau eerst voordat u verder "
+"gaat."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -3508,6 +3655,7 @@ msgid "No CVEs have been found."
 msgstr "Er zijn geen CVE’s gevonden."
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#, fuzzy
 msgid ""
 "\n"
 "                                This chapter contains information about the "
@@ -3515,6 +3663,12 @@ msgid ""
 "                                for this organization.\n"
 "                            "
 msgstr ""
+"\n"
+"                                Dit Hoofdstuk bevat informatie over de "
+"geïdentificeerde bevindingen\n"
+"\n"
+"                                voor deze organisatie.\n"
+"                            "
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
@@ -3664,11 +3818,15 @@ msgstr ""
 "waarborgen."
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
+#, fuzzy
 msgid ""
 "Multiple hostnames that resolve to one IP address where at least one of the "
 "hostnames or the IP address has a declared scan level that is at least L1. "
 "Type systems are web servers, mail servers and name servers (DNS)."
 msgstr ""
+"Meerdere hostnames die naar één IP adres resolven waarbij tenminste één van "
+"de hostnames met dat IP adres een een scan-vrijwaringsniveau van tenminste "
+"L1 heeft. Type systemen zijn web servers, mail servers en name servers (DNS)."
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 msgid ""
@@ -3758,10 +3916,14 @@ msgstr ""
 "betrekking tot veiligheidsmaatregelen ingeschakeld zijn."
 
 #: reports/report_types/dns_report/report.html
+#, fuzzy
 msgid ""
 "<strong>Disclaimer:</strong> Not all DNSRecords are parsed in OpenKAT. DNS "
 "record types that are parsed and could be displayed in the table are:"
 msgstr ""
+"<strong>Disclaimer:</strong> Niet alle DNSRecords worden geparsed in "
+"OpenKAT. DNS record types die worden geparsed en getoond kunnen worden in de "
+"tabel zijn:"
 
 #: reports/report_types/dns_report/report.html
 msgid "All existing DNS record types can be found here:"
@@ -3829,10 +3991,13 @@ msgstr ""
 "potentiële zwakheden."
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid ""
 "The Findings Report contains information about the findings that have been "
 "identified for the selected asset and organization."
 msgstr ""
+"Het bevindingenrapport bevat informatie over de bevindingen die voor de "
+"geselecteerde assets en organisatie zijn gevonden."
 
 #: reports/report_types/findings_report/report.html
 msgid "Findings per organization overview"
@@ -3846,26 +4011,31 @@ msgid "Finding types"
 msgstr "Bevindingstypen"
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid "Highest risk level"
-msgstr ""
+msgstr "Hoogste risiconiveau"
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid "Critical finding types"
-msgstr ""
+msgstr "Kritische bevindingstypes"
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid ""
 "This overview shows the total number of findings per severity that have been "
 "identified for this organization."
 msgstr ""
-"Dit overzicht toont het totaal aantal bevindingen per risiconiveau dat is "
-"gevonden voor deze organisatie."
+"Dit overzicht toont het totaal aantal bevindingen per risiconiveau (ernst) "
+"dat is gevonden voor deze organisatie."
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid "Critical and high findings"
-msgstr ""
+msgstr "Kritieke en hoog-niveau bevindingen"
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid ""
 "\n"
 "                                                This table shows the top 25 "
@@ -3876,14 +4046,27 @@ msgid ""
 "identified findings can be found in the Findings Report.\n"
 "                                            "
 msgstr ""
+"\n"
+"                                                Deze tabel toont de top 25 "
+"kritieke en hoog-niveau bevindingen die\n"
+"\n"
+"                                                voor deze organisatie "
+"gevonden zijn, gegroepeerd per bevindingstype.\n"
+"\n"
+"                                                Een tabel met alle gevinden "
+"bevindingen is te vinden in het Bevindingenrapport.\n"
+"                                            "
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid "No findings have been identified. Check report for more details."
 msgstr ""
+"Er zijn geen bevindingen gevonden. Controleer het rapport voor meer details."
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid "View findings report"
-msgstr ""
+msgstr "Bekijk bevindingenrapport"
 
 #: reports/report_types/findings_report/report.html
 #: reports/templates/report_overview/scheduled_reports_table.html
@@ -3891,6 +4074,7 @@ msgid "Edit report recipe"
 msgstr "Rapportrecept bewerken"
 
 #: reports/report_types/findings_report/report.html
+#, fuzzy
 msgid ""
 "\n"
 "                This table shows the top 25 critical and high findings that "
@@ -3901,6 +4085,16 @@ msgid ""
 "Findings Report.\n"
 "            "
 msgstr ""
+"\n"
+"                Deze tabel toont de top 25 kritieke en hoog-niveau "
+"bevindingen die\n"
+"\n"
+"                voor deze organisatie gevonden zijn, gegroepeerd per "
+"bevindingstype.\n"
+"\n"
+"                Een tabel met alle gevonden bevindingen kan in het "
+"Bevindingenrapport gevonden worden.\n"
+"            "
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -4566,27 +4760,51 @@ msgstr ""
 "org/\" target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/report_overview_header.html
+#: reports/templates/partials/generate_report_header.html
+#: reports/templates/partials/new_report_action_button.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr "Rapport genereren"
+
+#: reports/templates/partials/generate_report_header.html
+#, fuzzy
+msgid "To generate an aggregate report, complete the following steps."
+msgstr "Voer de volgende stappen uit om een geaggregeerd rapport te maken."
+
+#: reports/templates/partials/generate_report_header.html
+#, fuzzy
+msgid "To generate a multi report, complete the following steps."
+msgstr "Voer de volgende stappen uit om een multi-rapport te maken."
+
+#: reports/templates/partials/generate_report_header.html
+#, fuzzy
+msgid "To generate separate report(s), complete the following steps."
+msgstr "Voer de volgende stappen uit om gescheiden rapporten te maken"
 
 #: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
 msgstr "Inhoudsopgave"
 
-#: reports/templates/partials/main_navigation.html
-msgid "Generate a report"
-msgstr "Genereer een rapport"
+#: reports/templates/partials/new_report_action_button.html
+#, fuzzy
+msgid "Actions for creating a new report"
+msgstr "Acties om een nieuw rapport te maken."
 
-#: reports/templates/partials/main_navigation.html
-msgid ""
-"To generate a report you can start by selecting report types or by selecting "
-"objects."
-msgstr ""
-"Om een rapport te genereren begint u met het selecteren van de gewenste "
-"rapporten of objecten."
+#: reports/templates/partials/new_report_action_button.html
+#, fuzzy
+msgid "Separate report(s)"
+msgstr "Gescheiden rapport(en)"
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/aggregate_report.py
+msgid "Aggregate report"
+msgstr "Aggregeer rapport"
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/multi_report.py
+msgid "Multi report"
+msgstr "Multi-rapport"
 
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/partials/report_sidemenu.html
@@ -4617,6 +4835,7 @@ msgid "Ready"
 msgstr "Gereed"
 
 #: reports/templates/partials/report_findings_table.html
+#, fuzzy
 msgid ""
 "\n"
 "            This table provides an overview of the identified findings on "
@@ -4631,27 +4850,50 @@ msgid ""
 "type occurred.\n"
 "        "
 msgstr ""
+"\n"
+"            Deze tabel toont een overzicht van de geïdentificeerde "
+"bevindingen op de gescande\n"
+"\n"
+"            systemen. Voor elk bevindingstype wordt het risiconiveau, het "
+"aantal gebeurtenissen\n"
+"\n"
+"            en de eerstbekende gebeurtenis van de bevinding getoond. Het "
+"getoonde risiconiveau kan afwijken van uw specifieke omgeving.\n"
+"\n"
+"            De details zijn zichtbaar door een rij uit te klappen. Hier "
+"vindt u een beschrijving, de bron, impact en aanbeveling voor de bevinding.\n"
+"\n"
+"            Ook wordt getoond in welk bevinding-type de bevinding "
+"plaatsvond.\n"
+"        "
 
 #: reports/templates/partials/report_findings_table.html
+#, fuzzy
 msgid "First known occurrence"
-msgstr ""
+msgstr "Eerstbekende gebeurtenis"
 
 #: reports/templates/partials/report_findings_table.html
+#, fuzzy
 msgid "Open in report"
-msgstr ""
+msgstr "Open in rapport"
 
 #: reports/templates/partials/report_findings_table.html
+#, fuzzy
 msgid ""
 "No critical and high findings have been identified for this organization."
 msgstr ""
+"Er zijn geen kritieke en hoog-niveau bevindingen voor deze organisatie "
+"gevonden"
 
 #: reports/templates/partials/report_findings_table.html
+#, fuzzy
 msgid "No findings have been identified for this organization."
-msgstr ""
+msgstr "Er zijn geen bevindingen voor deze organisatie gevonden."
 
 #: reports/templates/partials/report_header.html
+#, fuzzy
 msgid "Download as PDF"
-msgstr ""
+msgstr "Download als PDF"
 
 #: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -4659,8 +4901,9 @@ msgid "Download as JSON"
 msgstr "Als JSON downloaden"
 
 #: reports/templates/partials/report_header.html
+#, fuzzy
 msgid "Open asset reports"
-msgstr ""
+msgstr "Open-asset-rapportage"
 
 #: reports/templates/partials/report_header.html
 msgid "This is the OpenKAT report for organization"
@@ -4768,23 +5011,6 @@ msgstr "Maand"
 msgid "Year"
 msgstr "Jaar"
 
-#: reports/templates/partials/report_navigation.html
-msgid "Report Navigation"
-msgstr "Rapportnavigatie"
-
-#: reports/templates/partials/report_navigation.html
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Report"
-msgstr "Rapport genereren"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Aggregate Report"
-msgstr "Rapport aggregeren"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Multi Report"
-msgstr "Multi-rapport"
-
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
 msgstr "Objectselectie"
@@ -4819,15 +5045,13 @@ msgstr ""
 "opnieuw uitgevoerd als query."
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/partials/report_types_selection.html
-msgid "Applied filters:"
-msgstr "Actieve filters:"
-
-#: reports/templates/partials/report_ooi_list.html
+#, fuzzy
 msgid ""
 "Based on the current dataset, your selected filters result in the following "
 "objects."
 msgstr ""
+"Gebaseerd op de huidige dataset resulteert uw geselecteerde filter tot de "
+"volgende objecten."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "objects selected"
@@ -4851,8 +5075,9 @@ msgstr[0] "Selecteer %(total_oois)s object"
 msgstr[1] "Selecteer alle %(total_oois)s objecten"
 
 #: reports/templates/partials/report_ooi_list.html
+#, fuzzy
 msgid "Object name"
-msgstr ""
+msgstr "Objectnaam"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
@@ -4866,11 +5091,15 @@ msgstr ""
 "filter komen."
 
 #: reports/templates/partials/report_ooi_list.html
+#, fuzzy
 msgid ""
 "Reports matching the selected filters will be empty at this moment in time. "
 "Future reports may contain data. It is still possible to generate the "
 "(potentially empty) report."
 msgstr ""
+"Rapporten die voldoen aan de geselecteerde filters zijn momenteel leeg. "
+"Toekomstige rapporten bevatten mogelijk wel data. Het is altijd mogelijk een "
+"(eventueel leeg) rapport te maken."
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Continue with live set"
@@ -4990,10 +5219,12 @@ msgid "There are no optional plugins."
 msgstr "Er zijn geen optionele plug-ins."
 
 #: reports/templates/partials/report_setup_scan.html
+#, fuzzy
 msgid "Enable selected plugins and continue"
-msgstr ""
+msgstr "Schakel de geselecteerde plug-in in en ga verder"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid ""
 "\n"
 "            This overview shows the total number of findings per\n"
@@ -5002,7 +5233,7 @@ msgid ""
 msgstr ""
 "\n"
 "            Dit overzicht toont het totaal aantal bevindingen per\n"
-"risiconiveau dat is gevonden voor deze organisatie\n"
+"risiconiveau (ernst) dat is gevonden voor deze organisatie\n"
 "        "
 
 #: reports/templates/partials/report_severity_totals_table.html
@@ -5010,20 +5241,24 @@ msgid "Total per severity overview"
 msgstr "Overzicht totalen per ernst"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "Critical"
-msgstr ""
+msgstr "Kritiek"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "High"
-msgstr ""
+msgstr "Hoog"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "Medium"
-msgstr ""
+msgstr "Medium"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "Low"
-msgstr ""
+msgstr "Laag"
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
@@ -5031,12 +5266,14 @@ msgid "Pending"
 msgstr "In behandeling"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "Unknown"
-msgstr ""
+msgstr "Onbekend"
 
 #: reports/templates/partials/report_severity_totals_table.html
+#, fuzzy
 msgid "Total"
-msgstr ""
+msgstr "Totaal"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
@@ -5078,22 +5315,29 @@ msgstr[0] "Geselecteerde object (%(total_oois)s)"
 msgstr[1] "Geselecteerde objecten (%(total_oois)s)"
 
 #: reports/templates/partials/report_types_selection.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "You have selected a live set in the previous step. Based on the current "
 "dataset, this live set results in %(total_oois)s objects."
 msgstr ""
+"U heeft een live-set in de voorgaande stap geselecteerd. Gebaseerd op de "
+"huidige dataset, resulteert deze live-set in %(total_oois)s objecten."
 
 #: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
+msgstr "Actieve filters:"
+
+#: reports/templates/partials/report_types_selection.html
+#, fuzzy
 msgid "No filters applied"
-msgstr ""
+msgstr "Geen filters toegepast"
 
 #: reports/templates/partials/report_types_selection.html
-#, python-format
+#, fuzzy, python-format
 msgid "You have selected %(total_oois)s object in the previous step."
 msgid_plural "You have selected %(total_oois)s objects in the previous step."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "U heeft %(total_oois)s object in de vorige stap geselecteerd."
+msgstr[1] "U heeft %(total_oois)s objecten in de vorige stap geselecteerd."
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Change selection"
@@ -5123,19 +5367,28 @@ msgstr "Verwijder de volgende rapport(en):"
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
+#, fuzzy
 msgid ""
 "Deleted reports are removed in the view from the moment of deletion. The "
 "report can still be accessed on timestamps before the deletion. Only the "
 "report is removed from the view, not the data it is based on."
 msgstr ""
+"Verwijderde rapporten zijn niet meer in het overzicht beschikbaar vanaf het "
+"moment van verwijdering. Het rapport kan nog wel worden gevonden met de "
+"timestamp van voor de verwijdering. Alleen het rapport is uit het overzicht "
+"verwijder, niet de data waarop het is gebaseerd."
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/share_modal.html
+#, fuzzy
 msgid ""
 "It is still possible to generate a new report for same date. If the report "
 "is part of a combined report, it will remain available in the combined "
 "report."
 msgstr ""
+"Het is nog steeds mogelijk om een rapport voor dezelfde datum te maken. Als "
+"het rapport onderdeel van een gecombineerd rapport is, is het beschikbaar in "
+"het gecombineerde rapport."
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
@@ -5158,12 +5411,15 @@ msgid "Disable schedule"
 msgstr "Schema uitschakelen"
 
 #: reports/templates/report_overview/modal_partials/enable_disable_schedule_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Are you sure you want to disable the schedule for <strong>%(report_name)s</"
 "strong>? The recipe will still exist and the schedule can be enabled later "
 "on."
 msgstr ""
+"Weet u zeker dat u het schema voor <strong>%(report_name)s</strong> uit wilt "
+"schakelen? Het recept blijft bestaan en het schama kan later weer "
+"ingeschakeld worden."
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
@@ -5179,10 +5435,13 @@ msgid "Rerun the following report(s):"
 msgstr "Genereer de volgende rapport(en) opnieuw:"
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
+#, fuzzy
 msgid ""
 "By submitting you're generating the selected reports again, using the "
 "current data."
 msgstr ""
+"Door indienen produceer je de geselecteerde rapporten opnieuw, met gebruik "
+"van de actuele data."
 
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
 #: reports/templates/report_overview/report_history_table.html
@@ -5218,18 +5477,20 @@ msgstr "Bovenliggende rapportdetails tonen"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "Close asset report object details"
-msgstr ""
+msgstr "Sluit asset-rapport-objectdetails"
 
 #: reports/templates/report_overview/report_history_table.html
+#, fuzzy
 msgid "Open asset report object details"
-msgstr ""
+msgstr "Toon asset-rapport objectdetails"
 
 #: reports/templates/report_overview/report_history_table.html
+#, fuzzy
 msgid "Asset reports details:"
-msgstr ""
+msgstr "Asset-rapportdetails"
 
 #: reports/templates/report_overview/report_history_table.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This report consists of %(counter)s asset report with the following report "
 "type and object:"
@@ -5237,29 +5498,37 @@ msgid_plural ""
 "This report consists of %(counter)s asset reports with the following report "
 "types and objects:"
 msgstr[0] ""
+"Dit rapport bevat %(counter)s asset rapport met het volgende rapporttype en "
+"object:"
 msgstr[1] ""
+"Dit rapport bevat %(counter)s asset rapporten met de volgende rapporttypes "
+"en objecten:"
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "Asset reports"
-msgstr ""
+msgstr "Asset-rapporten"
 
 #: reports/templates/report_overview/report_history_table.html
+#, fuzzy
 msgid "Shows asset report details"
-msgstr ""
+msgstr "Toon asset-rapportdetails"
 
 #: reports/templates/report_overview/report_history_table.html
+#, fuzzy
 msgid "View all asset reports"
-msgstr ""
+msgstr "Toon alle asset-rapporten"
 
 #: reports/templates/report_overview/report_history_table.html
 msgid "No reports have been generated yet."
 msgstr "Er zijn nog geen rapporten gegenereerd."
 
 #: reports/templates/report_overview/report_overview_header.html
+#, fuzzy
 msgid "An overview of reports that are scheduled or have been generated."
-msgstr ""
+msgstr "Overzicht van ingeplande en gegenereerde rapporten"
 
 #: reports/templates/report_overview/report_overview_navigation.html
 msgid "Scheduled"
@@ -5284,9 +5553,9 @@ msgstr ""
 "het genereren van een rapport."
 
 #: reports/templates/report_overview/scheduled_reports_table.html
-#, python-format
+#, fuzzy, python-format
 msgid "Showing %(length)s of %(total)s schedules"
-msgstr ""
+msgstr "Toon %(length)s van %(total)s schemas"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled reports:"
@@ -5301,12 +5570,14 @@ msgid "Schedule status"
 msgstr "Schemastatus"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+#, fuzzy
 msgid "Once"
-msgstr ""
+msgstr "Eenmalig"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
+#, fuzzy
 msgid "Recent reports"
-msgstr ""
+msgstr "Recente rapporten"
 
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Scheduled Reports:"
@@ -5342,30 +5613,36 @@ msgid "Shows report details"
 msgstr "Rapportdetails tonen"
 
 #: reports/templates/report_overview/subreports_table.html
+#, fuzzy
 msgid "Asset reports:"
-msgstr ""
+msgstr "Asset-rapporten"
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/plugin_detail_task_list.html
 msgid "Input Object"
-msgstr "Inputobject"
+msgstr "Invoerbject"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
+#, fuzzy
 msgid "Delete report recipe"
-msgstr ""
+msgstr "Verwijder rapportagerecept"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid "Are you sure you want to delete report recipe \"%(name)s\"?"
-msgstr ""
+msgstr "Weet u zeker dat u rapportagerecept \"%(name)s\" wilt verwijderen?"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
+#, fuzzy
 msgid ""
 "Deleting this report recipe means it will be permanently deleted. It will "
 "not be possible anymore to see or enable the schedule. You will find "
 "previously generated reports in the report history tab."
 msgstr ""
+"Dit rapportagerecept wordt permanent verwijderd. Het is niet meer mogelijk "
+"het schema te bekijken of weer aan te zetten. Eerder gegenereerde rapporten "
+"kunnen in de rapportagegeschiedenis tab gevonden worden."
 
 #: reports/templates/summary/report_asset_overview.html
 msgid ""
@@ -5443,10 +5720,6 @@ msgstr ""
 "Er zijn geen vereiste of optionele plug-ins nodig voor de geselecteerde "
 "rapporttypes."
 
-#: reports/views/aggregate_report.py
-msgid "Aggregate report"
-msgstr "Aggregeer rapport"
-
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select objects"
@@ -5487,39 +5760,43 @@ msgstr ""
 "op %(date)s."
 
 #: reports/views/multi_report.py
-msgid "Multi report"
-msgstr "Multi-rapport"
-
-#: reports/views/multi_report.py
 msgid "View report"
 msgstr "Toon rapport"
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "Not enough permissions"
-msgstr ""
+msgstr "Onvoldoende rechten"
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "Recipe '{}' deleted successfully"
-msgstr ""
+msgstr "Recept '{}' succesvol verwijderd"
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "Recipe not found."
-msgstr ""
+msgstr "Recept niet gevonden"
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "No schedule or recipe selected"
-msgstr ""
+msgstr "Geen schema of recept geselecteerd"
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid ""
 "Schedule disabled successfully. '{}' will not be generated automatically "
 "until the schedule is enabled again."
 msgstr ""
+"Schema succesvol uitgeschakeld. '{}'wordt niet automatisch aangemaakt tenzij "
+"het weer wordt ingeschakeld."
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid ""
 "Schedule enabled successfully. '{}' will be generated according to schedule."
-msgstr ""
+msgstr "Schema succesvol ingeschakeldy. '{}' wordt volgens schema aangemaakt."
 
 #: reports/views/report_overview.py
 msgid "An unexpected error occurred, please check logs for more info."
@@ -5528,31 +5805,39 @@ msgstr ""
 "info."
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid "Other OOI type selected than Report"
-msgstr ""
+msgstr "Ander OOI type geselecteerd dan Rapport"
 
 #: reports/views/report_overview.py
 msgid "Deletion successful."
 msgstr "Met succes verwijderd."
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid ""
 "Multi organization reports cannot be rescheduled. It consists of imported "
 "data from different organizations and is not based on newly generated data."
 msgstr ""
+"Multi organisatierapporten kunnen niet worden herpland. Het bestaat uit "
+"geïmporteerde data van verschillende organisaties en is niet op nieuw "
+"gegenereerde data gebaseerd."
 
 #: reports/views/report_overview.py
+#, fuzzy
 msgid ""
 "Rerun successful. It may take a moment before the new report has been "
 "generated."
-msgstr ""
+msgstr "Rerun succesvol. Het duurt even voor het nieuwe rapport is aangemaakt."
 
 #: reports/views/report_overview.py
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Couldn't rerun %s, since the recipe for this report has been disabled or "
 "deleted."
 msgstr ""
+"Kan %s, niet opnieuw uitvoeren omdat het recept voor dit rapport uitgezet of "
+"verwijderd is."
 
 #: reports/views/report_overview.py
 msgid "Renaming failed. Empty report name found."
@@ -5615,32 +5900,41 @@ msgid "Output mime types"
 msgstr "Uitvoer mimetypes"
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid "Scan type"
-msgstr ""
+msgstr "Scan-type"
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid "Interval amount"
-msgstr ""
+msgstr "Intervalgrootte"
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid ""
 "Specify the scanning interval for this Boefje. The default is 24 hours. For "
 "example: 5 minutes will let the Boefje scan every 5 minutes."
 msgstr ""
+"Specificeer het scan-interval voor dit Boefje. De standaard is 24 uur. "
+"Bijvoorbeeld: 5 minuten laat het Boefje elke 5 minuten scannen."
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid "Interval frequency"
-msgstr ""
+msgstr "Interval-frequentie"
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid "Object creation/change"
-msgstr ""
+msgstr "Objectaanmaak/-wijziging"
 
 #: tools/forms/boefje.py
+#, fuzzy
 msgid ""
 "Choose weather the Boefje should run after creating and/or changing an "
 "object. "
 msgstr ""
+"Kies of het boefje moet runnen na aanmaken en/of wijzigen van een object. "
 
 #: tools/forms/finding_type.py
 msgid "KAT-ID"
@@ -5792,8 +6086,9 @@ msgid "Clearance Level"
 msgstr "Vrijwaringsniveau"
 
 #: tools/forms/ooi.py
+#, fuzzy
 msgid "Next scan"
-msgstr ""
+msgstr "Volgende scan"
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
@@ -5804,8 +6099,9 @@ msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "Toon Boefjes die het vrijwaringsniveau van OOI’s overschrijden."
 
 #: tools/forms/ooi.py
+#, fuzzy
 msgid "Expires by (UTC)"
-msgstr ""
+msgstr "Verloopt op (UTC)"
 
 #: tools/forms/ooi_form.py
 msgid "option"
@@ -6008,10 +6304,14 @@ msgstr ""
 "</p> "
 
 #: tools/forms/settings.py
+#, fuzzy
 msgid ""
 "Choose when this Boefje will scan objects. It can run on a given interval or "
 "it can run every time an object has been created or changed. "
 msgstr ""
+"Geef aan of dit Boefje objecten scant. Het kan runnen met een bepaald "
+"interval of het kan elke keer runnen wanneer een object is gemaakt of "
+"gewijzigd. "
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
@@ -6086,8 +6386,9 @@ msgid "Upload raw file"
 msgstr "Raw-bestand uploaden"
 
 #: tools/forms/upload_raw.py
+#, fuzzy
 msgid "Input or Scan OOI"
-msgstr ""
+msgstr "Invoer of Scan OOI"
 
 #: tools/forms/upload_raw.py
 msgid "Click to select one of the available options, or type one yourself"
@@ -6122,8 +6423,9 @@ msgid "new"
 msgstr "nieuw"
 
 #: tools/templatetags/ooi_extra.py
+#, fuzzy
 msgid "Unknown user"
-msgstr ""
+msgstr "Onbekende gebruiker"
 
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_member_list.html
@@ -6132,8 +6434,9 @@ msgid "Members"
 msgstr "Leden"
 
 #: rocky/forms.py
+#, fuzzy
 msgid "Current status"
-msgstr ""
+msgstr "Huidige status"
 
 #: rocky/forms.py rocky/templates/organizations/organization_member_list.html
 msgid "Active"
@@ -6144,8 +6447,9 @@ msgid "New"
 msgstr "Nieuw"
 
 #: rocky/forms.py
+#, fuzzy
 msgid "Account status"
-msgstr ""
+msgstr "Account status"
 
 #: rocky/forms.py
 msgid "Not blocked"
@@ -6331,6 +6635,10 @@ msgstr "Neem contact op met uw systeembeheerder."
 #: rocky/templates/403.html rocky/templates/404.html
 msgid "You may want to go back to the"
 msgstr "Misschien wilt u terug naar de"
+
+#: rocky/templates/403.html rocky/templates/404.html
+msgid "Crisis Room"
+msgstr "Crisiscentrum"
 
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
@@ -6549,29 +6857,19 @@ msgid "Findings @ "
 msgstr "Bevindingen @ "
 
 #: rocky/templates/findings/finding_list.html
-#, python-format
+#, fuzzy, python-format
 msgid "Showing %(length)s of %(total)s findings"
-msgstr ""
+msgstr "Toon %(length)s van %(total)s bevindingen"
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/mute_findings_modal.html
 msgid "Mute findings"
 msgstr "Bevindingen dempen"
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason:"
-msgstr "Reden:"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Expires by (UTC):"
-msgstr "Verloopt op (UTC):"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Unmute Findings"
-msgstr "Bevindingen dempen opheffen"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Mute Findings"
-msgstr "Bevindingen dempen"
+#, fuzzy
+msgid "Unmute findings"
+msgstr "Hef onderdrukte bevindingen op"
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
@@ -6826,36 +7124,49 @@ msgid "indemnification warning"
 msgstr "Vrijwaringswaarschuwing"
 
 #: rocky/templates/oois/ooi_detail.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "<strong>Warning:</strong> There is no indemnification for this organization. "
 "Go to the <a href=\"%(organization_settings)s\">organization settings page</"
 "a> to add one."
 msgstr ""
+"<strong>Waarschuwing:</strong> Er is geen vrijwaring voor deze organisatie. "
+"Ga naar de <a href=\"%(organization_settings)s\">organisatie "
+"instellingenpagina</a> om deze toe te voegen."
 
 #: rocky/templates/oois/ooi_detail.html
+#, fuzzy
 msgid "Permission warning"
-msgstr ""
+msgstr "Rechten waarschuwing"
 
 #: rocky/templates/oois/ooi_detail.html
+#, fuzzy
 msgid ""
 "<strong>Warning:</strong> You don't have the proper permission at the "
 "organizational level to scan objects. Contact your administrator."
 msgstr ""
+"<strong>Waarschuwing:</strong> U heeft niet de juiste rechten op "
+"organisatieniveau om objecten te scannen. Neem contact op met de beheerder."
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Scan warning"
-msgstr ""
+msgstr "Scan-waarschuwing"
 
 #: rocky/templates/oois/ooi_detail.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "<strong>Warning:</strong> You are not allowed to scan this OOI. Your maximum "
 "clearance level is %(member_clearance_level)s and this OOI has level "
 "%(boefje_scan_level)s. Go to your <a href=\"%(account_details)s\">account "
 "details</a> to manage your clearance level."
 msgstr ""
+"<strong>Warning:</strong> U heeft geen rechten om dit OOI te scannen. Uw "
+"maximale vrijwaringsniveau is %(member_clearance_level)s en dit OOI heeft "
+"niveau %(boefje_scan_level)s. Ga naar uw <a "
+"href=\"%(account_details)s\">account instellingen</a> om uw "
+"vrijwaringsniveau aan te passen."
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Boefjes overview"
@@ -6873,12 +7184,14 @@ msgid "Scan profile"
 msgstr "Scanprofiel"
 
 #: rocky/templates/oois/ooi_detail.html
+#, fuzzy
 msgid "Unable to start scan. See the warning for more details."
-msgstr ""
+msgstr "Niet mogelijke een scan te starten. Zie waarschuwing voor meer details."
 
 #: rocky/templates/oois/ooi_detail.html
+#, fuzzy
 msgid "Start scan"
-msgstr ""
+msgstr "Start scannen"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
@@ -7047,6 +7360,8 @@ msgid "Give a reason below why you want to mute this finding."
 msgstr "Geef hieronder een reden waarom je deze bevinding wilt dempen."
 
 #: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/partials/mute_findings_modal.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute finding"
 msgstr "Bevinding dempen"
 
@@ -7139,12 +7454,15 @@ msgid "Add new organization"
 msgstr "Nieuwe organisatie toevoegen"
 
 #: rocky/templates/organizations/organization_list.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "                            Showing %(total)s organizations\n"
 "                        "
 msgstr ""
+"\n"
+"                            Toon %(total)s organisaties\n"
+"                        "
 
 #: rocky/templates/organizations/organization_list.html
 msgid "Organization overview:"
@@ -7169,22 +7487,28 @@ msgid "Rerun all bits"
 msgstr "Alle bits opnieuw starten"
 
 #: rocky/templates/organizations/organization_member_add.html
+#, fuzzy
 msgid "Change account type"
-msgstr ""
+msgstr "Wijzig accounttype"
 
 #: rocky/templates/organizations/organization_member_add_header.html
 #: rocky/views/organization_member_add.py
+#, fuzzy
 msgid "Add member"
-msgstr ""
+msgstr "Lid toevoegen"
 
 #: rocky/templates/organizations/organization_member_add_header.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Creating a new member of organization <strong>%(organization)s</strong>. For "
 "detailed information about the different account types, check the <a "
 "href=\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" "
 "target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
+"Creëer een nieuw lid voor organisatie <strong>%(organization)s</strong>. "
+"Check de <a href=\"https://docs.openkat.nl/basics/users-and-organisations."
+"html#users\" target=\"_blank\" rel=\"noopener\">documentatie voor "
+"gedetaileerde informatie over de verschillende accounttypes</a>."
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
@@ -7196,9 +7520,9 @@ msgid "Save member"
 msgstr "Lid opslaan"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, python-format
+#, fuzzy, python-format
 msgid "An overview of members of <strong>%(organization_name)s</strong>"
-msgstr ""
+msgstr "Een ledenoverzicht van  <strong>%(organization_name)s</strong>"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -7213,12 +7537,15 @@ msgid "Upload a CSV"
 msgstr "CSV uploaden"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "                        Showing %(total)s members\n"
 "                    "
 msgstr ""
+"\n"
+"                        Toon %(total)s leden\n"
+"                    "
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
@@ -7242,35 +7569,44 @@ msgstr "Supergebruiker"
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/views/organization_member_add.py
+#, fuzzy
 msgid "Add members"
-msgstr ""
+msgstr "Leden toevoegen"
 
 #: rocky/templates/organizations/organization_member_upload.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "To upload multiple members at once, you can upload a CSV file or you can <a "
 "href=\"%(download_url)s\">download the template</a>."
 msgstr ""
+"Om meerdere leden tegelijk toe te voegen kunt u een CSV-file uploaden  of "
+"je  kunt  <a href=\"%(download_url)s\">het template downloaden</a>"
 
 #: rocky/templates/organizations/organization_member_upload.html
+#, fuzzy
 msgid "To create a custom CSV file, make sure it meets the following criteria:"
-msgstr ""
+msgstr "Voldoe aan de volgende criteria om een custom CSV file te maken:"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload"
 msgstr "Uploaden"
 
 #: rocky/templates/organizations/organization_settings.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "An overview of general information and settings for "
 "<strong>%(organization_name)s</strong>."
 msgstr ""
+"Overzicht van algemene informatie en instellingen voor "
+"<strong>%(organization_name)s</strong>."
 
 #: rocky/templates/organizations/organization_settings.html
+#, fuzzy
 msgid ""
 "<strong>Warning:</strong> Indemnification is not set for this organization."
 msgstr ""
+"<strong>Waarschuwing:</strong> Vrijwaring is niet ingesteld voor deze "
+"organisatie."
 
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
@@ -7471,6 +7807,20 @@ msgstr "Volgende pagina"
 msgid "Next"
 msgstr "Volgende"
 
+#: rocky/templates/partials/mute_findings_modal.html
+#, fuzzy
+msgid "You are muting the selected findings."
+msgstr "U muteert de geselecteerde bevindingen."
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Reason:"
+msgstr "Reden:"
+
+#: rocky/templates/partials/mute_findings_modal.html
+#, fuzzy
+msgid "Expires by (UTC):"
+msgstr "Verloopt op (UTC):"
+
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr "Bevestiging:"
@@ -7484,8 +7834,8 @@ msgid "No related object known for"
 msgstr "Geen gerelateerd objecten bekend voor"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Mute Finding"
-msgstr "Bevinding dempen"
+msgid "Generate Report"
+msgstr "Rapport genereren"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 #, python-format
@@ -7493,12 +7843,15 @@ msgid "Edit %(display_type)s"
 msgstr "%(display_type)s bewerken"
 
 #: rocky/templates/partials/ooi_head.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "An overview of \"%(ooi)s\", object type \"%(type)s\". This shows general "
 "information and its related objects. It also gives the possibility to add "
 "additional related objects, or to scan for them."
 msgstr ""
+"Een overzicht van \"%(ooi)s\", objecttype \"%(type)s\". Dit toont algemene "
+"informatie en de gerelateerde objecten. Het biedt tevens de mogelijkheid om "
+"aanvullende gerelateerde objecten toe te voegen, of via scannen op te sporen."
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Scan for objects"
@@ -7625,15 +7978,16 @@ msgid "Current clearance level"
 msgstr "Actuele vrijwaringsniveau"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Declared clearance level explanation"
-msgstr ""
+msgstr "Uitleg gedeclareerd vrijwaringsniveau"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
 msgstr "Verklaard:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "This means that this object will be scanned by Boefjes with scan level "
 "%(scan_level)s and lower. Setting the clearance level from “declared” to "
@@ -7642,76 +7996,105 @@ msgid ""
 "or decrease depending on other declared clearance levels. Clearance levels "
 "of objects that inherit from this clearance level will also be recalculated."
 msgstr ""
+"Dit betekent dat dit object wordt gescand door Boefjes met een "
+"vrijwaringsniveau (scan-level) %(scan_level)s en lager. Het wijzingen van "
+"het vrijwaringsniveau van 'Verklaard' naar \"Geërfd\" betekent dat dit "
+"object het vrijwaringsniveau erft van afgeleide (naastgelegen) objecten. Dit "
+"betekent dat het vrijwaringsniveau hetzelfde, verhoogd, of verminderd wordt, "
+"afhankelijk van andere vrijwaringsniveau. Vrijwaringsniveaus van objecten "
+"die van dit vrijwaringsniveau erven, worden herberekend."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Set clearance level to inherit"
 msgstr "Vrijwaringsniveau op overerving instellen"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Empty clearance level explanation"
-msgstr ""
+msgstr "Lege vrijwaringsniveau toelichting"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty:"
 msgstr "Leeg:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid ""
 "This object has a clearance level of \"L0\". This means that this object "
 "will not be scanned by any Boefje until that Boefje is run manually for this "
 "object again. Objects with a clearance level higher than \"L0\" will be "
 "scanned automatically by Boefjes with corresponding scan levels."
 msgstr ""
+"Dit object heeft een vrijwaringsniveau \"L0\". Dit betekent dat dit object "
+"niet wordt gescand door boefjes tenzij een boefje handmatig opnieuw wordt "
+"gerund voor dit object. Objecten met een vrijwaringsniveau hoger dan \"L0\" "
+"worden automatisch gescand door Boefjes met een gelijkwaardig "
+"vrijwaringsniveau."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Indemnification warning"
-msgstr ""
+msgstr "Vrijwaringswaarschuwing"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Indemnification is not set for this organization."
-msgstr ""
+msgstr "Vrijwaring voor deze organisatie is niet ingesteld."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Go to the"
-msgstr ""
+msgstr "Ga naar"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "organization settings page"
-msgstr ""
+msgstr "organisatie-instellingenpagina"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "to add one."
-msgstr ""
+msgstr "om één toe te voegen"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Set clearance level warning"
-msgstr ""
+msgstr "Stel vrijwaringsniveauwaarschuwing in"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid ""
 "You don't have permissions to set clearance level. Contact your "
 "administrator."
 msgstr ""
+"U heeft geen rechten om een vrijwaringsniveau in te stellen. Neem contact op "
+"met de beheerder."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "You are not allowed to set the clearance level of this OOI. Your maximum "
 "clearance level is %(member_clearance_level)s and this OOI has level "
 "%(boefje_scan_level)s."
 msgstr ""
+"U heeft geen rechten om het vrijwaringsniveau van dit OOI te wijzigen. Uw "
+"maximale vrijwaingsnivea is %(member_clearance_level)s en dit OOI heeft "
+"niveau %(boefje_scan_level)s."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "Go to your"
-msgstr ""
+msgstr "Ga naar uw"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "account details"
-msgstr ""
+msgstr "account-gegevens"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+#, fuzzy
 msgid "to manage your clearance level."
-msgstr ""
+msgstr "Om uw vrijwaringsniveau te beheren"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
@@ -7746,16 +8129,18 @@ msgid "Download meta data"
 msgstr "Meta-gegevens downloaden"
 
 #: rocky/templates/tasks/boefje_task_detail.html
+#, fuzzy
 msgid "Input object"
-msgstr "Inputobject"
+msgstr "Invoerobject"
 
 #: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes."
-msgstr ""
+msgstr "Er zijn geen taken voor boefjes."
 
 #: rocky/templates/tasks/boefjes.html
+#, fuzzy
 msgid "List of tasks for boefjes."
-msgstr ""
+msgstr "Takenlijst voor boefjes."
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/reports.html
 msgid "Organization Code"
@@ -7773,12 +8158,14 @@ msgid "Modified date"
 msgstr "Bewerkte datum"
 
 #: rocky/templates/tasks/normalizers.html
+#, fuzzy
 msgid "There are no tasks for normalizers."
-msgstr ""
+msgstr "Er zijn geen taken voor normalizers."
 
 #: rocky/templates/tasks/normalizers.html
+#, fuzzy
 msgid "List of tasks for normalizers."
-msgstr ""
+msgstr "Takenlijst voor normalizers."
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
@@ -7789,8 +8176,9 @@ msgid "Manually added"
 msgstr "Handmatig toegevoegd"
 
 #: rocky/templates/tasks/ooi_detail_task_list.html
+#, fuzzy
 msgid "There have been no tasks."
-msgstr ""
+msgstr "Er zijn geen taken geweest."
 
 #: rocky/templates/tasks/partials/stats.html
 msgid "Task statistics - Last 24 hours"
@@ -7848,16 +8236,19 @@ msgid "List of tasks for"
 msgstr "Takenlijst voor"
 
 #: rocky/templates/tasks/reports.html
+#, fuzzy
 msgid "There are no tasks for reports."
-msgstr ""
+msgstr "Er zijn geen taken voor rapportage."
 
 #: rocky/templates/tasks/reports.html
+#, fuzzy
 msgid "List of tasks for reports."
-msgstr ""
+msgstr "Tkenlijst voor rapporten."
 
 #: rocky/templates/tasks/reports.html
+#, fuzzy
 msgid "Recipe ID"
-msgstr ""
+msgstr "Recept ID"
 
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Log in"
@@ -8142,6 +8533,7 @@ msgstr ""
 "uploaden."
 
 #: rocky/templates/upload_raw.html
+#, fuzzy
 msgid ""
 "An input OOI can be selected for the normalizer to attach newly yielded OOIs "
 "to. If no input OOI was used for the raw file, a placeholder ExternalScan "
@@ -8149,12 +8541,12 @@ msgid ""
 "When a new version of the raw file is generated, the same ExternalScan OOI "
 "should be chosen to ensure that old results are overwritten."
 msgstr ""
-"Om nieuwe OOI’s aan te hechten kan een invoer-OOI worden geselecteerd voor "
-"de normalizer. Als er geen invoer-OOI werd gebruikt voor het raw-bestand, "
-"kan een plaatshouder ExternalScan OOI worden gebruikt. ExternalScan OOI’s "
-"kunnen op de objectenpagina worden gecreëerd. Als een nieuwe versie van het "
-"raw-bestand wordt gegenereerd, moet dezelfde ExternalScan OOI worden gekozen "
-"om ervoor te zorgen dat oude resultaten worden overschreven."
+"Om nieuwe OOI’s toe te voegen kan een invoer-OOI worden geselecteerd voor de "
+"normalizer. Als er geen invoer-OOI voor het raw-bestand gebruikt wordt, kan "
+"een plaatshouder ExternalScan OOI worden gebruikt. ExternalScan OOI’s kunnen "
+"op de objectenpagina worden gecreëerd. Als een nieuwe versie van het raw-"
+"bestand wordt gegenereerd, moet dezelfde ExternalScan OOI worden gekozen om "
+"ervoor te zorgen dat oude resultaten worden overschreven."
 
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
 msgid "Upload raw"
@@ -8169,16 +8561,18 @@ msgid "Add Finding"
 msgstr "Bevinding toevoegen"
 
 #: rocky/views/finding_list.py
+#, fuzzy
 msgid "You do not have the permission to add items to a dashboard."
-msgstr ""
+msgstr "U heeft geen rechten om items toe te voegen aan een dashboard"
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Unknown action."
 msgstr "Onbekende actie."
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
+#, fuzzy
 msgid "Dashboard item has been added."
-msgstr ""
+msgstr "Dashboard-item toegevoegd."
 
 #: rocky/views/health.py
 msgid "Beautified"
@@ -8202,9 +8596,12 @@ msgid "Add %(ooi_type)s"
 msgstr "%(ooi_type)s toevoegen"
 
 #: rocky/views/ooi_detail.py
+#, fuzzy
 msgid ""
 "Cannot set clearance level. It must be provided and must be a valid number."
 msgstr ""
+"Kan het vrijwaringsniveau niet instellen. Het moet aangegeven worden met een "
+"geldig nummer."
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
@@ -8364,8 +8761,9 @@ msgid "Organization %s successfully updated."
 msgstr "Organisatie %s met succes bijgewerkt."
 
 #: rocky/views/organization_member_add.py
+#, fuzzy
 msgid "Add column titles, followed by each object on a new line."
-msgstr ""
+msgstr "Voeg kolomtitels toe, gevolgd door elk object op een nieuwe regel"
 
 #: rocky/views/organization_member_add.py
 msgid "The columns are: "
@@ -8549,6 +8947,45 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#~ msgid "Crisis Room overview for all organizations."
+#~ msgstr "Crisiscentrum overzicht voor alle organisaties."
+
+#, fuzzy
+#~ msgid ""
+#~ "There are no dashboard items added yet. You can add dashboard items via "
+#~ "the objects and findings page."
+#~ msgstr ""
+#~ "Er zijn nog geen dashboard-items toegevoegd. Voeg dashboard items toe via "
+#~ "de objects- en findings-pagina's."
+
+#~ msgid "Generate a report"
+#~ msgstr "Genereer een rapport"
+
+#~ msgid ""
+#~ "To generate a report you can start by selecting report types or by "
+#~ "selecting objects."
+#~ msgstr ""
+#~ "Om een rapport te genereren begint u met het selecteren van de gewenste "
+#~ "rapporten of objecten."
+
+#~ msgid "Report Navigation"
+#~ msgstr "Rapportnavigatie"
+
+#~ msgid "Aggregate Report"
+#~ msgstr "Rapport aggregeren"
+
+#~ msgid "Multi Report"
+#~ msgstr "Multi-rapport"
+
+#~ msgid "Unmute Findings"
+#~ msgstr "Bevindingen dempen opheffen"
+
+#~ msgid "Mute Findings"
+#~ msgstr "Bevindingen dempen"
+
+#~ msgid "Mute Finding"
+#~ msgstr "Bevinding dempen"
 
 #~ msgid "Account Type"
 #~ msgstr "Accounttype"
