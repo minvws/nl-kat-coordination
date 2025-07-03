@@ -45,7 +45,7 @@ class Octopoes(HTTPService):
         count = 1  # just to get the loop going
 
         # Loop over the paginated results
-        while params["offset"] < count: # type: ignore
+        while params["offset"] < count:  # type: ignore
             try:
                 response = self.get(url, params=params)
             except httpx.HTTPStatusError as e:
@@ -55,7 +55,7 @@ class Octopoes(HTTPService):
 
             list_objects = ListObjectsResponse(**response.json())
             count = list_objects.count
-            params["offset"] = params["offset"] + params["limit"] # type: ignore
+            params["offset"] = params["offset"] + params["limit"]  # type: ignore
             yield from list_objects.items
 
     @exception_handler
