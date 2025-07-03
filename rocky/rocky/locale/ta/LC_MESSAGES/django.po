@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 14:56+0000\n"
+"POT-Creation-Date: 2025-07-02 09:35+0000\n"
 "PO-Revision-Date: 2025-05-29 12:01+0000\n"
 "Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -622,6 +622,7 @@ msgstr "மோடல் மூடு"
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
 #: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/partials/mute_findings_modal.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
 msgstr "ரத்துசெய்"
@@ -737,13 +738,14 @@ msgstr ""
 msgid "Max dashboard items reached."
 msgstr ""
 
-#: crisis_room/templates/crisis_room.html rocky/templates/403.html
-#: rocky/templates/404.html
-msgid "Crisis Room"
+#: crisis_room/templates/crisis_room.html
+#: crisis_room/templates/organization_crisis_room.html
+#: rocky/templates/header.html
+msgid "Crisis room"
 msgstr "நெருக்கடி அறை"
 
 #: crisis_room/templates/crisis_room.html
-msgid "Crisis Room overview for all organizations."
+msgid "Crisis room overview for all organizations."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_dashboards.html
@@ -918,7 +920,7 @@ msgstr ""
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
-"objects and findings page."
+"filters on the objects and findings page."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
@@ -933,11 +935,6 @@ msgstr ""
 msgid ""
 "Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_header.html
-#: rocky/templates/header.html
-msgid "Crisis room"
-msgstr "நெருக்கடி அறை"
 
 #: crisis_room/templates/organization_crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
@@ -4566,27 +4563,46 @@ msgstr ""
 "target=\"_blank\" rel=\"noopener\"> பைதான் ச்ட்ராஃப்டைம் குறியீடு </a>."
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/report_overview_header.html
+#: reports/templates/partials/generate_report_header.html
+#: reports/templates/partials/new_report_action_button.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr "அறிக்கையை உருவாக்குங்கள்"
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate an aggregate report, complete the following steps."
+msgstr ""
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate a multi report, complete the following steps."
+msgstr ""
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate separate report(s), complete the following steps."
+msgstr ""
 
 #: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
 msgstr "உள்ளடக்க அட்டவணை"
 
-#: reports/templates/partials/main_navigation.html
-msgid "Generate a report"
-msgstr "ஒரு அறிக்கையை உருவாக்குங்கள்"
-
-#: reports/templates/partials/main_navigation.html
-msgid ""
-"To generate a report you can start by selecting report types or by selecting "
-"objects."
+#: reports/templates/partials/new_report_action_button.html
+msgid "Actions for creating a new report"
 msgstr ""
-"ஒரு அறிக்கையை உருவாக்க நீங்கள் அறிக்கை வகைகளைத் தேர்ந்தெடுப்பதன் மூலமாகவோ அல்லது "
-"பொருள்களைத் தேர்ந்தெடுப்பதன் மூலமாகவோ தொடங்கலாம்."
+
+#: reports/templates/partials/new_report_action_button.html
+msgid "Separate report(s)"
+msgstr ""
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/aggregate_report.py
+msgid "Aggregate report"
+msgstr "மொத்த அறிக்கை"
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/multi_report.py
+msgid "Multi report"
+msgstr "பல அறிக்கை"
 
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/partials/report_sidemenu.html
@@ -4781,23 +4797,6 @@ msgstr "திங்கள்"
 msgid "Year"
 msgstr "ஆண்டு"
 
-#: reports/templates/partials/report_navigation.html
-msgid "Report Navigation"
-msgstr "வழிசெலுத்தலைப் புகாரளிக்கவும்"
-
-#: reports/templates/partials/report_navigation.html
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Report"
-msgstr "அறிக்கையை உருவாக்குங்கள்"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Aggregate Report"
-msgstr "மொத்த அறிக்கை"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Multi Report"
-msgstr "பல அறிக்கை"
-
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
 msgstr "பொருள் தேர்வு"
@@ -4830,11 +4829,6 @@ msgstr ""
 "இயங்கும். நாளை மேலும் 3 ஓச்ட்பெயர்களைச் சேர்த்தால் (அதே வடிகட்டி அளவுகோல்களுடன்), உங்கள் "
 "அடுத்த திட்டமிடப்பட்ட அறிக்கையில் 5 ஓச்ட்பெயர்கள் இருக்கும். நீங்கள் செல்லும்போது உங்கள் நேரடி "
 "தொகுப்பு புதுப்பிக்கப்படும்."
-
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/partials/report_types_selection.html
-msgid "Applied filters:"
-msgstr "பயன்பாட்டு வடிப்பான்கள்:"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -5100,6 +5094,10 @@ msgstr ""
 "முந்தைய கட்டத்தில் ஒரு நேரடி தொகுப்பை நீங்கள் தேர்ந்தெடுத்துள்ளீர்கள். தற்போதைய "
 "தரவுத்தொகுப்பின் அடிப்படையில், இந்த நேரடி தொகுப்பு %(total_oois)s பொருள்களில் "
 "விளைகிறது."
+
+#: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
+msgstr "பயன்பாட்டு வடிப்பான்கள்:"
 
 #: reports/templates/partials/report_types_selection.html
 msgid "No filters applied"
@@ -5476,10 +5474,6 @@ msgid ""
 msgstr ""
 "தேர்ந்தெடுக்கப்பட்ட அறிக்கை வகைகளுக்கு தேவையான அல்லது விருப்ப செருகுநிரல்கள் தேவையில்லை."
 
-#: reports/views/aggregate_report.py
-msgid "Aggregate report"
-msgstr "மொத்த அறிக்கை"
-
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select objects"
@@ -5516,10 +5510,6 @@ msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
 msgstr "%(date)sு தரவு எதுவும் கிடைக்கவில்லை. பொருள் (கள்) %(தேதி) களில் இல்லை."
-
-#: reports/views/multi_report.py
-msgid "Multi report"
-msgstr "பல அறிக்கை"
 
 #: reports/views/multi_report.py
 msgid "View report"
@@ -6366,6 +6356,10 @@ msgstr "உங்கள் கணினி நிர்வாகியை தொ
 msgid "You may want to go back to the"
 msgstr "நீங்கள் மீண்டும் செல்ல விரும்பலாம்"
 
+#: rocky/templates/403.html rocky/templates/404.html
+msgid "Crisis Room"
+msgstr "நெருக்கடி அறை"
+
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
 msgstr "பிழைக் குறியீடு 404: பக்கம் கிடைக்கவில்லை"
@@ -6584,24 +6578,13 @@ msgid "Showing %(length)s of %(total)s findings"
 msgstr "%(length)sண்டுபிடிப்புகளின் %(total)s"
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/mute_findings_modal.html
 msgid "Mute findings"
 msgstr "முடக்கு கண்டுபிடிப்புகள்"
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason:"
-msgstr "காரணம்:"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Expires by (UTC):"
-msgstr "(UTC) காலாவதியாகிறது:"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Unmute Findings"
-msgstr "ஊடுருவல் கண்டுபிடிப்புகள்"
-
-#: rocky/templates/findings/finding_list.html
-msgid "Mute Findings"
-msgstr "முடக்கு கண்டுபிடிப்புகள்"
+msgid "Unmute findings"
+msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
@@ -7083,6 +7066,8 @@ msgstr ""
 "இந்த கண்டுபிடிப்பை நீங்கள் முடக்க விரும்புகிறீர்கள் என்பதற்கு கீழே ஒரு காரணத்தைக் கூறுங்கள்."
 
 #: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/partials/mute_findings_modal.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute finding"
 msgstr "முடக்கு கண்டுபிடிப்பு"
 
@@ -7516,6 +7501,18 @@ msgstr "அடுத்த பக்கம்"
 msgid "Next"
 msgstr "அடுத்தது"
 
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "You are muting the selected findings."
+msgstr ""
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Reason:"
+msgstr "காரணம்:"
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Expires by (UTC):"
+msgstr "(UTC) காலாவதியாகிறது:"
+
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr "உறுதிப்படுத்தல்:"
@@ -7529,8 +7526,8 @@ msgid "No related object known for"
 msgstr "தொடர்புடைய எந்தப் பொருளும் அறியப்படவில்லை"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Mute Finding"
-msgstr "முடக்கு கண்டுபிடிப்பு"
+msgid "Generate Report"
+msgstr "அறிக்கையை உருவாக்குங்கள்"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 #, python-format
@@ -8590,6 +8587,34 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
+
+#~ msgid "Generate a report"
+#~ msgstr "ஒரு அறிக்கையை உருவாக்குங்கள்"
+
+#~ msgid ""
+#~ "To generate a report you can start by selecting report types or by "
+#~ "selecting objects."
+#~ msgstr ""
+#~ "ஒரு அறிக்கையை உருவாக்க நீங்கள் அறிக்கை வகைகளைத் தேர்ந்தெடுப்பதன் மூலமாகவோ அல்லது "
+#~ "பொருள்களைத் தேர்ந்தெடுப்பதன் மூலமாகவோ தொடங்கலாம்."
+
+#~ msgid "Report Navigation"
+#~ msgstr "வழிசெலுத்தலைப் புகாரளிக்கவும்"
+
+#~ msgid "Aggregate Report"
+#~ msgstr "மொத்த அறிக்கை"
+
+#~ msgid "Multi Report"
+#~ msgstr "பல அறிக்கை"
+
+#~ msgid "Unmute Findings"
+#~ msgstr "ஊடுருவல் கண்டுபிடிப்புகள்"
+
+#~ msgid "Mute Findings"
+#~ msgstr "முடக்கு கண்டுபிடிப்புகள்"
+
+#~ msgid "Mute Finding"
+#~ msgstr "முடக்கு கண்டுபிடிப்பு"
 
 #~ msgid "Account Type"
 #~ msgstr "கணக்கு வகை"
