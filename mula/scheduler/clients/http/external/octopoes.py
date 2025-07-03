@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from datetime import datetime, timezone
 
 import httpx
@@ -26,7 +27,7 @@ class Octopoes(HTTPService):
     @exception_handler
     def get_objects_by_object_types(
         self, organisation_id: str, object_types: list[str], scan_level: list[int]
-    ) -> list[OOI]:
+    ) -> Generator[OOI, None, None]:
         """Get all oois from octopoes"""
         if scan_level is None:
             scan_level = []
