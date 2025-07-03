@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-10 14:56+0000\n"
+"POT-Creation-Date: 2025-07-02 09:35+0000\n"
 "PO-Revision-Date: 2025-04-23 18:03+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -632,6 +632,7 @@ msgstr "Modal slute"
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
 #: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/partials/mute_findings_modal.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
 msgstr "Annulearje"
@@ -748,13 +749,14 @@ msgstr ""
 msgid "Max dashboard items reached."
 msgstr ""
 
-#: crisis_room/templates/crisis_room.html rocky/templates/403.html
-#: rocky/templates/404.html
-msgid "Crisis Room"
-msgstr "Krisissintrum"
+#: crisis_room/templates/crisis_room.html
+#: crisis_room/templates/organization_crisis_room.html
+#: rocky/templates/header.html
+msgid "Crisis room"
+msgstr ""
 
 #: crisis_room/templates/crisis_room.html
-msgid "Crisis Room overview for all organizations."
+msgid "Crisis room overview for all organizations."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_dashboards.html
@@ -915,7 +917,7 @@ msgstr ""
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
-"objects and findings page."
+"filters on the objects and findings page."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
@@ -929,11 +931,6 @@ msgstr ""
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
 "Dashboard does not exist. Choose an existing dashboard or create a new one."
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_header.html
-#: rocky/templates/header.html
-msgid "Crisis room"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -4382,27 +4379,46 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/export_report_settings.html
-#: reports/templates/report_overview/report_overview_header.html
+#: reports/templates/partials/generate_report_header.html
+#: reports/templates/partials/new_report_action_button.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr "Rapport generearje"
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate an aggregate report, complete the following steps."
+msgstr ""
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate a multi report, complete the following steps."
+msgstr ""
+
+#: reports/templates/partials/generate_report_header.html
+msgid "To generate separate report(s), complete the following steps."
+msgstr ""
 
 #: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
 msgstr "Ynhâldsopjefte"
 
-#: reports/templates/partials/main_navigation.html
-msgid "Generate a report"
-msgstr "Generearje in rapport"
-
-#: reports/templates/partials/main_navigation.html
-msgid ""
-"To generate a report you can start by selecting report types or by selecting "
-"objects."
+#: reports/templates/partials/new_report_action_button.html
+msgid "Actions for creating a new report"
 msgstr ""
-"Om in rapport te generearjen begjinne jo mei it selektearjen fan de winske "
-"rapporten of objekten."
+
+#: reports/templates/partials/new_report_action_button.html
+msgid "Separate report(s)"
+msgstr ""
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/aggregate_report.py
+msgid "Aggregate report"
+msgstr "Aggregearje rapport"
+
+#: reports/templates/partials/new_report_action_button.html
+#: reports/views/multi_report.py
+msgid "Multi report"
+msgstr "Multi-rapport"
 
 #: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/partials/report_sidemenu.html
@@ -4582,23 +4598,6 @@ msgstr "Moanne"
 msgid "Year"
 msgstr "Jier"
 
-#: reports/templates/partials/report_navigation.html
-msgid "Report Navigation"
-msgstr "Rapportnavigaasje"
-
-#: reports/templates/partials/report_navigation.html
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate Report"
-msgstr "Rapport generearje"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Aggregate Report"
-msgstr "Rapport aggregearje"
-
-#: reports/templates/partials/report_navigation.html
-msgid "Multi Report"
-msgstr "Multi-rapport"
-
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
 msgstr "Objektseleksje"
@@ -4620,11 +4619,6 @@ msgid ""
 "more hostnames tomorrow (with the same filter criteria), your next scheduled "
 "report will contain 5 hostnames. Your live set will update as you go."
 msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/partials/report_types_selection.html
-msgid "Applied filters:"
-msgstr "Aktive filters:"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid ""
@@ -4864,6 +4858,10 @@ msgid ""
 "You have selected a live set in the previous step. Based on the current "
 "dataset, this live set results in %(total_oois)s objects."
 msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
+msgstr "Aktive filters:"
 
 #: reports/templates/partials/report_types_selection.html
 msgid "No filters applied"
@@ -5216,10 +5214,6 @@ msgstr ""
 "Der binne gjin fereaske of opsjonele ynstekkers nedich foar de selektearre "
 "rapporttypen."
 
-#: reports/views/aggregate_report.py
-msgid "Aggregate report"
-msgstr "Aggregearje rapport"
-
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select objects"
@@ -5256,10 +5250,6 @@ msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
 msgstr ""
-
-#: reports/views/multi_report.py
-msgid "Multi report"
-msgstr "Multi-rapport"
 
 #: reports/views/multi_report.py
 msgid "View report"
@@ -6047,6 +6037,10 @@ msgstr "Nim kontakt op mei jo systeembehearder."
 msgid "You may want to go back to the"
 msgstr ""
 
+#: rocky/templates/403.html rocky/templates/404.html
+msgid "Crisis Room"
+msgstr "Krisissintrum"
+
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
 msgstr ""
@@ -6253,23 +6247,12 @@ msgid "Showing %(length)s of %(total)s findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/partials/mute_findings_modal.html
 msgid "Mute findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason:"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Expires by (UTC):"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Unmute Findings"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-msgid "Mute Findings"
+msgid "Unmute findings"
 msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
@@ -6717,6 +6700,8 @@ msgid "Give a reason below why you want to mute this finding."
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
+#: rocky/templates/partials/mute_findings_modal.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute finding"
 msgstr ""
 
@@ -7134,6 +7119,18 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "You are muting the selected findings."
+msgstr ""
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Reason:"
+msgstr ""
+
+#: rocky/templates/partials/mute_findings_modal.html
+msgid "Expires by (UTC):"
+msgstr ""
+
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr ""
@@ -7147,8 +7144,8 @@ msgid "No related object known for"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Mute Finding"
-msgstr ""
+msgid "Generate Report"
+msgstr "Rapport generearje"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 #, python-format
@@ -8129,6 +8126,25 @@ msgstr "Raw-bestân kin net nei Bytes oplaad wurde: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestân mei sukses tafoege."
+
+#~ msgid "Generate a report"
+#~ msgstr "Generearje in rapport"
+
+#~ msgid ""
+#~ "To generate a report you can start by selecting report types or by "
+#~ "selecting objects."
+#~ msgstr ""
+#~ "Om in rapport te generearjen begjinne jo mei it selektearjen fan de "
+#~ "winske rapporten of objekten."
+
+#~ msgid "Report Navigation"
+#~ msgstr "Rapportnavigaasje"
+
+#~ msgid "Aggregate Report"
+#~ msgstr "Rapport aggregearje"
+
+#~ msgid "Multi Report"
+#~ msgstr "Multi-rapport"
 
 #~ msgid "Account Type"
 #~ msgstr "Accounttype"
