@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
@@ -254,3 +255,24 @@ def create_ooi(
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
+
+
+def create_oois(
+    api_connector: OctopoesAPIConnector,
+    bytes_client: BytesClient,
+    oois: list[OOI],
+    observed_at: datetime,
+    end_valid_time: datetime | None = None,
+) -> None:
+    declarations: list[Declaration] = []
+    raws: list[tuple[uuid.UUID, bytes]] = []
+
+    for ooi in oois:
+        task_id = uuid4()
+        declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=task_id, end_valid_time=end_valid_time)
+        declarations.append(declaration)
+        raws.append((task_id, BytesClient.raw_from_declarations([declaration])))
+
+    bytes_client.add_manual_proofs(raws)
+
+    api_connector.save_many_declarations(declarations)
