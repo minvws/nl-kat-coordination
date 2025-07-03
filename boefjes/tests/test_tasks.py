@@ -10,7 +10,7 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import LocalBoefjeHandler
 from boefjes.worker.interfaces import StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
@@ -78,7 +78,7 @@ def test_handle_boefje_with_exception(mocker):
     mock_session.query.all.return_value = []
 
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-        BoefjeHandler(local_repository, mock_bytes_api_client).handle(task)
+        LocalBoefjeHandler(local_repository, mock_bytes_api_client).handle(task)
 
     mock_bytes_api_client.save_output.assert_called_once()
     raw_call_args = mock_bytes_api_client.save_output.call_args

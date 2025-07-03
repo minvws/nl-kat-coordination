@@ -11,8 +11,8 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, get_octopoes_api_connector
 from boefjes.config import settings
 from boefjes.normalizer_interfaces import NormalizerJobRunner
-from boefjes.worker.boefje_handler import BoefjeHandler
-from boefjes.worker.interfaces import Handler, Task, TaskStatus
+from boefjes.worker.boefje_handler import _copy_raw_files
+from boefjes.worker.interfaces import BoefjeHandler, BoefjeOutput, NormalizerHandler, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta
 from boefjes.worker.repository import _default_mime_types
 from octopoes.api.models import Affirmation, Declaration, Observation
@@ -26,7 +26,7 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-class DockerBoefjeHandler(Handler):
+class DockerBoefjeHandler(BoefjeHandler):
     CACHE_VOLUME_NAME = "openkat_cache"
     CACHE_VOLUME_TARGET = "/home/nonroot/openkat_cache"
 
@@ -35,7 +35,7 @@ class DockerBoefjeHandler(Handler):
         self.scheduler_client = scheduler_client
         self.bytes_api_client = bytes_api_client
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         boefje_meta = task.data
         oci_image = boefje_meta.arguments["oci_image"]
 
@@ -96,8 +96,19 @@ class DockerBoefjeHandler(Handler):
 
         return False
 
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        if output is not False:
+            return  # Output belonged to a regular boefje
 
-class NormalizerHandler(Handler):
+        boefje_meta = self.bytes_api_client.get_boefje_meta(task.data.id)
+        boefje_output = self.bytes_api_client.get_raws(task.data.id)
+
+        _copy_raw_files(self.bytes_api_client, boefje_meta, boefje_output, duplicated_tasks)
+
+
+class LocalNormalizerHandler(NormalizerHandler):
     def __init__(
         self,
         job_runner: NormalizerJobRunner,
@@ -206,7 +217,7 @@ class NormalizerHandler(Handler):
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
 
-class CompositeBoefjeHandler(Handler):
+class CompositeBoefjeHandler(BoefjeHandler):
     """This is a pattern that allows us to use the Handler interface while allowing multiple handlers to be active at
     the same time, depending on the configuration. This way, we don't need to keep the option to delegate in every
     BoefjeHandler instance."""
@@ -215,20 +226,22 @@ class CompositeBoefjeHandler(Handler):
         self.boefje_handler = boefje_handler
         self.docker_handler = docker_handler
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
+        return self.get_handler(task).handle(task)
+
+    def get_handler(self, task: Task) -> BoefjeHandler:
         if not isinstance(task.data, BoefjeMeta):
             raise RuntimeError("Did not receive boefje task")
 
         if self.docker_handler and task.data.arguments["oci_image"]:
-            logger.info(
-                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
-                task.data.boefje.id,
-                str(task.data.id),
-                task.data.arguments["oci_image"],
-            )
-            return self.docker_handler.handle(task)
+            return self.docker_handler
 
         if not self.boefje_handler:
             raise RuntimeError("No handlers defined")
 
-        return self.boefje_handler.handle(task)
+        return self.boefje_handler
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        self.get_handler(task).copy_raw_files(task, output, duplicated_tasks)
