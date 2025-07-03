@@ -6,7 +6,7 @@ from uuid import UUID
 import httpx
 from httpx import Client, HTTPTransport
 
-from .boefje_handler import BoefjeHandler
+from .boefje_handler import LocalBoefjeHandler
 from .interfaces import BoefjeOutput, BoefjeStorageInterface, Task
 from .job_models import BoefjeMeta
 from .repository import LocalPluginRepository
@@ -34,7 +34,7 @@ def run_with_callback(input_url: str):
 
     parsed = urlparse(input_url)
     client = CallbackStorageClient(f"{parsed.scheme}://{parsed.netloc}", boefje_input["output_url"], 30)
-    handler = BoefjeHandler(LocalPluginRepository(Path()), client)
+    handler = LocalBoefjeHandler(LocalPluginRepository(Path()), client)
 
     try:
         handler.handle(task)
