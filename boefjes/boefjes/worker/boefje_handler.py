@@ -75,7 +75,7 @@ class LocalBoefjeHandler(BoefjeHandler):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")
 
             if not boefje_resource.module:
-                raise JobRuntimeError("Not runnable module found")
+                raise JobRuntimeError("No runnable module found")
 
             with TemporaryEnvironment() as temporary_environment:
                 temporary_environment.update(boefje_meta.environment or {})
