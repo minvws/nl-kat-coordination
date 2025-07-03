@@ -73,6 +73,42 @@ class BytesClient:
             )
         )
 
+    def add_manual_proofs(
+        self, raws: list[tuple[uuid.UUID, bytes]], manual_mime_types: Set[str] = frozenset({"manual/ooi"})
+    ) -> None:
+        """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
+
+        self.login()
+
+        boefje_meta = BoefjeMeta(
+            id=uuid.uuid4(),
+            boefje=Boefje(id="manual"),
+            input_ooi=None,
+            arguments={},
+            organization=self.organization,
+            started_at=datetime.now(timezone.utc),
+            ended_at=datetime.now(timezone.utc),
+        )
+
+        self._save_boefje_meta(boefje_meta)
+        all_mime_types = {"boefje/manual"}.union(manual_mime_types)
+        raw_id_per_normalizer = self._save_raws(boefje_meta.id, raws, all_mime_types)
+
+        for normalizer_id, raw_id in raw_id_per_normalizer.items():
+            self._save_normalizer_meta(
+                NormalizerMeta(
+                    id=uuid.UUID(normalizer_id),
+                    raw_data=RawData(
+                        id=uuid.UUID(raw_id),
+                        boefje_meta=boefje_meta,
+                        mime_types=[{"value": mime_type} for mime_type in all_mime_types],
+                    ),
+                    normalizer=Normalizer(id="normalizer/manual"),
+                    started_at=datetime.now(timezone.utc),
+                    ended_at=datetime.now(timezone.utc),
+                )
+            )
+
     def upload_raw(
         self,
         raw: bytes,
@@ -127,6 +163,26 @@ class BytesClient:
         response.raise_for_status()
 
         return response.json()[file_name]
+
+    def _save_raws(
+        self, boefje_meta_id: uuid.UUID, raws: list[tuple[uuid.UUID, bytes]], mime_types: Set[str] = frozenset()
+    ) -> dict[str, str]:
+        files = [
+            {
+                "name": str(normalizer_id),
+                "content": b64encode(raw).decode(),
+                "tags": list(mime_types) + [f"Declaration/{str(normalizer_id)}"],
+            }
+            for normalizer_id, raw in raws
+        ]
+
+        response = self.session.post(
+            "/bytes/raw", json={"files": files}, params={"boefje_meta_id": str(boefje_meta_id)}
+        )
+
+        response.raise_for_status()
+
+        return response.json()
 
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
