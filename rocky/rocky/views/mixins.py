@@ -489,7 +489,6 @@ class SingleOOIMixin(OctopoesView):
         else:
             props.pop("user_id")
         if props["object_type"] == "Question":
-            props["config_object"] = self.ooi.config_pk
             try:
                 props.update(self.get_ooi(self.ooi.config_pk).config)
             except Exception:
