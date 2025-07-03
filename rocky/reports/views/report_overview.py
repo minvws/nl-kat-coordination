@@ -188,12 +188,12 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
     task_type = "report"
 
     def post(self, request, *args, **kwargs):
-        dashboard = self.request.POST.get("dashboard")
         try:
             self.run_bulk_actions()
         except (ObjectNotFoundException, ValidationError):
             messages.error(request, _("An unexpected error occurred, please check logs for more info."))
 
+        dashboard = self.request.POST.get("dashboard")
         if dashboard:
             return redirect(
                 reverse(
