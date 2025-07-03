@@ -488,6 +488,12 @@ class SingleOOIMixin(OctopoesView):
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")
+        if props["object_type"] == "Question":
+            config_pk = "Config|" + "|".join(str(self.ooi).split("|")[::-1][0:-1]).replace("/bit/", "")
+            try:
+                props["current_value"] = ",".join(self.get_ooi(config_pk).config.values())
+            except Exception:
+                props["current_value"] = None
 
         return props
 
