@@ -7,6 +7,7 @@ from opentelemetry import trace
 from typing_extensions import override
 
 from scheduler import clients, context, models
+from scheduler.clients.errors import ExternalServiceResponseError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, queue, rankers
@@ -658,27 +659,20 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def get_oois_for_boefje(self, boefje: models.Plugin, organisation: str) -> list[models.OOI]:
-        oois = []
-
-        oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-            organisation,
-            boefje.consumes,
-            list(range(boefje.scan_level, 5)),  # type: ignore
-        )
-
-        # Filter OOIs based on permission
-        for ooi in oois_by_object_type:
-            if not self.has_boefje_permission_to_run(boefje, ooi):
-                self.logger.debug(
-                    "Boefje not allowed to run on ooi",
-                    boefje_id=boefje.id,
-                    ooi_primary_key=ooi.primary_key,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-            oois.append(ooi)
-
-        return oois
+        if boefje.enabled is False:
+            return []
+        try:
+            # fetch all ooi's from the types in consumes list that have a clearance => the scan level
+            oois = self.ctx.services.octopoes.get_objects_by_object_types(
+                organisation,
+                boefje.consumes,
+                list(range(boefje.scan_level, 5)),  # type: ignore
+            )
+            return oois
+        except (
+            ExternalServiceResponseError
+        ):  # maybe our consumes list does not match the Models, or the organisation does not exists
+            return []
 
     @exception_handler
     def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> list[models.BoefjeTask]:
