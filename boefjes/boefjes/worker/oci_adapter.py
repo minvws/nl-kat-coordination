@@ -6,7 +6,7 @@ from uuid import UUID
 import httpx
 from httpx import Client, HTTPTransport
 
-from .boefje_handler import BoefjeHandler
+from .boefje_handler import LocalBoefjeHandler
 from .interfaces import BoefjeOutput, BoefjeStorageInterface, Task
 from .job_models import BoefjeMeta
 from .repository import LocalPluginRepository
@@ -18,7 +18,7 @@ class CallbackStorageClient(BoefjeStorageInterface):
         self.callback_url = callback_url
 
     def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, UUID]:
-        response = self._session.post(self.callback_url, json=boefje_output.model_dump())
+        response = self._session.post(self.callback_url, json=boefje_output.model_dump(mode="json"))
         response.raise_for_status()
 
         return response.json()
@@ -34,7 +34,7 @@ def run_with_callback(input_url: str):
 
     parsed = urlparse(input_url)
     client = CallbackStorageClient(f"{parsed.scheme}://{parsed.netloc}", boefje_input["output_url"], 30)
-    handler = BoefjeHandler(LocalPluginRepository(Path()), client)
+    handler = LocalBoefjeHandler(LocalPluginRepository(Path()), client)
 
     try:
         handler.handle(task)
