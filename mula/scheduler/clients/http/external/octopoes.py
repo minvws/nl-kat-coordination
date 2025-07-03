@@ -43,10 +43,9 @@ class Octopoes(HTTPService):
 
         pagesize = 1000
         offset = 0
-        count = 1 # just to get the loop going
-        
+        count = 1  # just to get the loop going
+
         # Loop over the paginated results
-        oois = []
         while offset < count:
             params["offset"] = offset
             
@@ -59,9 +58,8 @@ class Octopoes(HTTPService):
 
             list_objects = ListObjectsResponse(**response.json())
             count = list_objects.count
-            oois.extend([ooi for ooi in list_objects.items])
             offset = offset + pagesize
-        return oois
+            yield from list_objects.items
 
     @exception_handler
     def get_random_objects(self, organisation_id: str, n: int, scan_level: list[int]) -> list[OOI]:
