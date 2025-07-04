@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-02 09:35+0000\n"
+"POT-Creation-Date: 2025-07-04 10:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6649,6 +6649,10 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
+msgstr ""
+
+#: rocky/templates/partials/current_config.html
+msgid "Current configuration"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
