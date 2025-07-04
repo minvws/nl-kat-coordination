@@ -145,6 +145,12 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
 
         context["is_question"] = isinstance(self.ooi, Question)
+        if isinstance(self.ooi, Question):
+            try:
+                context["current_config"] = self.get_ooi(self.ooi.config_pk).config
+            except Exception:
+                context["current_config"] = None
+
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])
 
