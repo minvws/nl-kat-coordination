@@ -22,8 +22,9 @@
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
 
                 {% if is_question %}
-                    {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
 
+                    {% include "partials/current_config.html" with config=current_config %}
+                    {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
                 {% endif %}
             </div>
             {% include "oois/ooi_detail_origins_declarations.html" %}

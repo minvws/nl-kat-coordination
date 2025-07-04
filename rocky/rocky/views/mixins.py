@@ -488,11 +488,6 @@ class SingleOOIMixin(OctopoesView):
             props = {"owner" if key == "user_id" else key: value for key, value in props.items()}
         else:
             props.pop("user_id")
-        if props["object_type"] == "Question":
-            try:
-                props.update(self.get_ooi(self.ooi.config_pk).config)
-            except Exception:
-                props["current_value"] = None
 
         return props
 
