@@ -1,10 +1,7 @@
 """Boefje script for scanning wordpress sites using wpscan"""
 
+import subprocess
 from os import getenv
-
-import docker
-
-WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
@@ -29,18 +26,6 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     if wpscan_api_token := getenv("WP_SCAN_API"):
         argv += ["--api-token", wpscan_api_token]
 
-    # update WPScan image
-    client = docker.from_env()
-    client.images.pull(WPSCAN_IMAGE)
-
-    # since WPScan can give positive exit codes on completion, docker-py's run() can fail on this
-    container = client.containers.run(WPSCAN_IMAGE, argv, detach=True)
-
-    try:
-        # wait for container to exit, read its output in the logs and remove container
-        container.wait()
-        output = container.logs()
-    finally:
-        container.remove()
-
-    return [(set(), output)]
+    return [
+        ({"openkat/wp-scan"}, subprocess.run(["/usr/local/bin/wpscan"] + argv, capture_output=True).stdout.decode())
+    ]
