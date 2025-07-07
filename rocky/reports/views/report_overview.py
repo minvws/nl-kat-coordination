@@ -76,6 +76,14 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
             report_recipe = self.get_recipe_ooi(recipe_id)
             reports = self.get_reports(recipe_id)
             schedule_datetime = schedule["deadline_at"]
+            total_oois = len(
+                {
+                    input_ooi.input_ooi if isinstance(input_ooi, AssetReport) else input_ooi
+                    for report in reports
+                    for input_ooi in report.input_oois
+                }
+            )
+
             recipes.append(
                 {
                     "schedule_id": schedule["id"],
@@ -88,9 +96,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
                         else "asap"
                     ),
                     "reports": reports,
-                    "total_oois": len(
-                        {asset_report.input_ooi for report in reports for asset_report in report.input_oois}
-                    ),
+                    "total_oois": total_oois,
                 }
             )
 
@@ -247,7 +253,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
 
                 if updated_all:
                     for asset_report in report_ooi.input_oois:
-                        if not self.rerun_report(asset_report):
+                        if isinstance(asset_report, AssetReport) and not self.rerun_report(asset_report):
                             updated_all = False
                 if not updated_all:
                     not_updated_reports.append(report_ooi.name)
