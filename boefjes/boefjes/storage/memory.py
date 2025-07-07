@@ -134,6 +134,20 @@ class ConfigStorageMemory(ConfigStorage):
             if enabled and "norm" in plugin_id
         ]
 
+    def get_disabled_boefjes(self, organisation_id: str) -> list[str]:
+        return [
+            plugin_id
+            for plugin_id, enabled in self._enabled.get(organisation_id, {}).items()
+            if not enabled and "norm" not in plugin_id
+        ]
+
+    def get_disabled_normalizers(self, organisation_id: str) -> list[str]:
+        return [
+            plugin_id
+            for plugin_id, enabled in self._enabled.get(organisation_id, {}).items()
+            if not enabled and "norm" in plugin_id
+        ]
+
     def get_states_for_organisation(self, organisation_id: str) -> dict[str, bool]:
         return self._enabled.get(organisation_id, {})
 

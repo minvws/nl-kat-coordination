@@ -1,10 +1,11 @@
+import base64
 import multiprocessing
 import time
 import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 import alembic.config
@@ -25,17 +26,21 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage, get_organis
 from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.storage.interfaces import OrganisationNotFound
 from boefjes.storage.memory import ConfigStorageMemory, OrganisationStorageMemory, PluginStorageMemory
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import LocalBoefjeHandler, _copy_raw_files
 from boefjes.worker.interfaces import (
+    BoefjeHandler,
     BoefjeOutput,
     BoefjeStorageInterface,
+    File,
     SchedulerClientInterface,
+    StatusEnum,
     Task,
     TaskPop,
     TaskStatus,
+    WorkerManager,
 )
 from boefjes.worker.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager
 from boefjes.worker.models import Organisation
 from boefjes.worker.repository import (
     LocalPluginRepository,
@@ -78,16 +83,18 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._popped_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
         self._pushed_items: dict[str, list[Task]] = multiprocessing.Manager().dict()
 
-    def pop_items(self, queue: str) -> list[Task] | None:
+    def pop_items(
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
+    ) -> list[Task]:
         time.sleep(self.sleep_time)
 
         try:
-            if WorkerManager.Queue.BOEFJES.value in queue:
+            if queue is WorkerManager.Queue.BOEFJES:
                 response = TypeAdapter(TaskPop).validate_json(self.boefje_responses.pop(0))
-            elif WorkerManager.Queue.NORMALIZERS.value in queue:
+            elif queue is WorkerManager.Queue.NORMALIZERS:
                 response = TypeAdapter(TaskPop).validate_json(self.normalizer_responses.pop(0))
             else:
-                return None
+                return []
 
             p_items = response.results
 
@@ -151,7 +158,7 @@ class MockHandler(BoefjeHandler, NormalizerHandler):
         self.exception = exception
         self.boefje_storage = MockBytesAPIClient()
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         time.sleep(self.sleep_time)
 
         if str(task.id) in ["9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "2071c9fd-2b9f-440f-a524-ef1ca4824fd4"]:
@@ -163,7 +170,20 @@ class MockHandler(BoefjeHandler, NormalizerHandler):
         if task.data.boefje.id == "docker":
             return False
 
-        return task.data, [({"my/mime"}, b"123")]
+        return task.data, BoefjeOutput(
+            status=StatusEnum.COMPLETED,
+            files=[File(name="1", content=base64.b64encode(b"123").decode(), tags={"my/mime"})],
+        )
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        if output is False:
+            return
+
+        boefje_meta, boefje_output = output
+
+        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)
 
     def get_all(self) -> list[Task]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
@@ -184,7 +204,7 @@ def item_handler(tmp_path: Path):
 
 @pytest.fixture
 def mock_boefje_handler(mock_local_repository: LocalPluginRepository, mocker):
-    return BoefjeHandler(mock_local_repository, mocker.MagicMock())
+    return LocalBoefjeHandler(mock_local_repository, mocker.MagicMock())
 
 
 @pytest.fixture

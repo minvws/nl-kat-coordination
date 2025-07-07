@@ -40,7 +40,6 @@ base-image:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-
 # TODO: nikto cannot run as a worker as it uses a custom javascript image. We should differentiate between these images.
 images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
@@ -53,8 +52,9 @@ images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_ssl_certificates/boefje.Dockerfile -t $(REGISTRY)/ssl-certificates:latest  .
 	docker build -f */*/kat_ssl_scan/boefje.Dockerfile -t $(REGISTRY)/ssl-version:latest  .
 	docker build -f */*/kat_testssl_sh_ciphers/boefje.Dockerfile -t $(REGISTRY)/testssl-sh-ciphers:latest  .
-	docker build -f */*/kat_webpage_capture/boefje.Dockerfile -t $(REGISTRY)/webpage-capture:latest  .
+	docker build -f */*/kat_webpage_capture/boefje.Dockerfile -t $(REGISTRY)/webpage-capture:latest  .	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
+
 
 ##
 ##|------------------------------------------------------------------------|

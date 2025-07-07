@@ -8,8 +8,8 @@ import pytest
 
 from boefjes.__main__ import get_runtime_manager
 from boefjes.config import Settings
-from boefjes.worker.interfaces import BoefjeOutput, File, StatusEnum
-from boefjes.worker.manager import SchedulerWorkerManager, WorkerManager
+from boefjes.worker.interfaces import BoefjeOutput, File, StatusEnum, WorkerManager
+from boefjes.worker.manager import SchedulerWorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
 from tests.loading import get_dummy_data
 
@@ -197,6 +197,37 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     }
 
 
+def test_one_process_deduplication_turned_off(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path):
+    manager.scheduler_client = MockSchedulerClient(
+        boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje.json")],
+        normalizer_responses=[],
+        log_path=tmp_path / "patch_task_log",
+    )
+    manager.deduplicate = False
+    with pytest.raises(KeyboardInterrupt):
+        manager.run(WorkerManager.Queue.BOEFJES)
+
+    items = item_handler.get_all()
+
+    # Just one task dispatched
+    assert len(items) == 2
+    assert items[0].data.boefje.id == "dns-records"
+    assert items[1].data.boefje.id == "dns-records"
+
+    patched_tasks = manager.scheduler_client.get_all_patched_tasks()
+
+    # But two tasks marked as completed
+    assert set(patched_tasks) == {
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
+        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
+    }
+
+    bytes_calls = item_handler.boefje_storage.get_all()
+    assert bytes_calls == []
+
+
 def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path):
     manager.scheduler_client = MockSchedulerClient(
         boefje_responses=[get_dummy_data("scheduler/pop_response_duplicated_boefje.json")],
@@ -243,10 +274,7 @@ def test_one_process_deduplication_of_tasks(manager: SchedulerWorkerManager, ite
             "save_raw",
             (
                 UUID("a0da7d4f-f41f-4940-901b-d98a92e9014b"),
-                BoefjeOutput(
-                    status=StatusEnum.COMPLETED,
-                    files=[File(name="0", content="MTIz", tags=["boefje/dns-records", "my/mime"])],
-                ),
+                BoefjeOutput(status=StatusEnum.COMPLETED, files=[File(name="1", content="MTIz", tags={"my/mime"})]),
             ),
         ),
     ]
@@ -276,7 +304,7 @@ def test_one_process_deduplication_exception_puts_duplicated_task_back_on_the_qu
     }
 
 
-def test_one_process_deduplication_do_not_duplicate_docker_boefje_but_fan_tasks_out(
+def test_one_process_deduplication_duplicate_docker_boefje_as_well(
     manager: SchedulerWorkerManager, item_handler: MockHandler, tmp_path
 ):
     manager.scheduler_client = MockSchedulerClient(
@@ -288,13 +316,15 @@ def test_one_process_deduplication_do_not_duplicate_docker_boefje_but_fan_tasks_
         manager.run(WorkerManager.Queue.BOEFJES)
 
     items = item_handler.get_all()
-    assert len(items) == 2
+
+    # Just one task dispatched
+    assert len(items) == 1
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
+    # But two tasks marked as completed
     assert set(patched_tasks) == {
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
-        ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "running"),
         ("a0da7d4f-f41f-4940-901b-d98a92e9014b", "completed"),
     }
 

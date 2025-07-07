@@ -14,7 +14,7 @@ from pydantic import TypeAdapter
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
 from boefjes.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus
+from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus, WorkerManager
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -43,7 +43,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response.raise_for_status()
 
     def pop_items(
-        self, queue_id: str, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
     ) -> list[Task]:
         if not filters:
             filters = {"filters": []}
@@ -56,9 +56,18 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 {"column": "data", "field": "boefje__id", "operator": "in", "value": self.plugins}
             )
 
-        response = self._session.post(
-            f"/schedulers/{queue_id}/pop", json=filters if filters["filters"] else None, params={"limit": limit}
-        )
+        if queue.value == "normalizer":
+            response = self._session.post(
+                "/schedulers/normalizer/pop",
+                json=filters if filters["filters"] else None,
+                params={"limit": limit} if limit else None,
+            )
+        else:
+            response = self._session.post(
+                "/schedulers/boefje/pop",
+                json=filters if filters["filters"] else None,
+                params={"limit": limit} if limit else None,
+            )
         self._verify_response(response)
 
         page = TypeAdapter(TaskPop | None).validate_json(response.content)
@@ -73,6 +82,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return page.results
 
     def push_item(self, p_item: Task) -> None:
+        if p_item.scheduler_id not in ["boefje", "normalizer"]:
+            raise ValueError("Invalid scheduler id")
+
         response = self._session.post(f"/schedulers/{p_item.scheduler_id}/push", content=p_item.model_dump_json())
         self._verify_response(response)
 
@@ -108,8 +120,8 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 boefje_meta.arguments["input"] = ooi.serialize()
             except ObjectNotFoundException:
                 logger.info(
-                    "Can't run boefje because OOI does not exist anymore [reference=%s]",
-                    reference,
+                    "Can't run boefje because OOI does not exist anymore",
+                    reference=reference,
                     boefje_id=boefje_meta.boefje.id,
                     ooi=boefje_meta.input_ooi,
                     task_id=boefje_meta.id,
