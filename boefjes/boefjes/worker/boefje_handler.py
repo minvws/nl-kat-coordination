@@ -1,4 +1,3 @@
-import os
 import traceback
 from base64 import b64encode
 from datetime import datetime, timezone
@@ -13,21 +12,6 @@ from .repository import BoefjeResource, LocalPluginRepository, _default_mime_typ
 logger = structlog.get_logger(__name__)
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
-
-
-class TemporaryEnvironment:
-    """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
-
-    def __init__(self):
-        self._original_environment = os.environ.copy()
-
-    def __enter__(self):
-        os.environ.clear()
-        return os.environ
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.environ.clear()
-        os.environ.update(self._original_environment)
 
 
 def _copy_raw_files(
@@ -77,12 +61,9 @@ class LocalBoefjeHandler(BoefjeHandler):
             if not boefje_resource.module:
                 raise JobRuntimeError("No runnable module found")
 
-            with TemporaryEnvironment() as temporary_environment:
-                temporary_environment.update(boefje_meta.environment or {})
-                # Until we fully switch over to the Boefje API, we need the start and end time here as a fallback.
-                boefje_meta.started_at = datetime.now(timezone.utc)
-                boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
-                boefje_meta.ended_at = datetime.now(timezone.utc)
+            boefje_meta.started_at = datetime.now(timezone.utc)
+            boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
+            boefje_meta.ended_at = datetime.now(timezone.utc)
         except BaseException as e:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_meta.ended_at = datetime.now(timezone.utc)

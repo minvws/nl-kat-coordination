@@ -215,33 +215,3 @@ class LocalNormalizerHandler(NormalizerHandler):
             self.bytes_client.save_normalizer_meta(normalizer_meta)
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
-
-
-class CompositeBoefjeHandler(BoefjeHandler):
-    """This is a pattern that allows us to use the Handler interface while allowing multiple handlers to be active at
-    the same time, depending on the configuration. This way, we don't need to keep the option to delegate in every
-    BoefjeHandler instance."""
-
-    def __init__(self, boefje_handler: BoefjeHandler | None = None, docker_handler: DockerBoefjeHandler | None = None):
-        self.boefje_handler = boefje_handler
-        self.docker_handler = docker_handler
-
-    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
-        return self.get_handler(task).handle(task)
-
-    def get_handler(self, task: Task) -> BoefjeHandler:
-        if not isinstance(task.data, BoefjeMeta):
-            raise RuntimeError("Did not receive boefje task")
-
-        if self.docker_handler and task.data.arguments["oci_image"]:
-            return self.docker_handler
-
-        if not self.boefje_handler:
-            raise RuntimeError("No handlers defined")
-
-        return self.boefje_handler
-
-    def copy_raw_files(
-        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
-    ) -> None:
-        self.get_handler(task).copy_raw_files(task, output, duplicated_tasks)
