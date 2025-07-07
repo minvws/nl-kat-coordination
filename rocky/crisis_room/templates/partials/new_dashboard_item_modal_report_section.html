@@ -56,9 +56,7 @@
 {% if recipe_ooi.cron_expression and add_dashboard_item_form.dashboard|length > 1 %}
     <button type="submit"
             form="new-dashboard-item-form-{{ modal_id }}"
-            class="submit"
-            name="action"
-            value="add_to_dashboard">{% translate "Add to dashboard" %}</button>
+            class="submit">{% translate "Add to dashboard" %}</button>
 {% elif recipe_ooi.cron_expression %}
     <a class="button"
        href="{% url "organization_crisis_room_landing" organization.code %}">{% translate "Go to crisis room" %}</a>
