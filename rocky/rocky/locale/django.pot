@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-25 13:15+0000\n"
+"POT-Creation-Date: 2025-07-04 07:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -825,6 +825,14 @@ msgid "Options for dashboard"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room.html
+msgid "Show all descriptions"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room.html
+msgid "Hide all descriptions"
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
 msgid "Delete dashboard"
 msgstr ""
@@ -858,8 +866,15 @@ msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid ""
-"There are no dashboard items added yet. You can add dashboard items via the "
-"objects and findings page."
+"There are no dashboard items added yet. You can add dashboard items via "
+"filters on the objects and findings page or you can add a report section."
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
+msgid ""
+"To  add a <strong>report section</strong>, open a report, go to the section "
+"that you want to add to your dashboard and press the options button next to "
+"the section name to create a dashboard item."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
@@ -919,7 +934,6 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_findings_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -1137,6 +1151,14 @@ msgid "Options for dashboard items"
 msgstr ""
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Show description"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
+msgid "Hide description"
+msgstr ""
+
+#: crisis_room/templates/partials/dashboard_item_action_button.html
 msgid "Position up"
 msgstr ""
 
@@ -1199,6 +1221,7 @@ msgid "Add item"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -1278,6 +1301,46 @@ msgid ""
 "In order for dashboard information to be updated on a regular basis instead "
 "of showing static data, the report should be scheduled. The frequency of the "
 "schedules recurrence determines how fresh the data on the dashboard will be."
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+msgid "Applied filters"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+msgid "Object types"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+#: katalogus/templates/change_clearance_level.html onboarding/forms.py
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
+#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/explanations.html rocky/views/mixins.py
+msgid "Clearance level"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+msgid "Clearance type"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/report_overview/report_history_table.html
+#: reports/templates/report_overview/scheduled_reports_table.html
+msgid "Input objects"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+msgid "Show all objects"
+msgstr ""
+
+#: crisis_room/templates/partials/report_dashboard_item_filter.html
+#: reports/templates/partials/report_types_selection.html
+msgid "No filters applied"
 msgstr ""
 
 #: crisis_room/templates/partials/report_section_action_button.html
@@ -1549,14 +1612,6 @@ msgstr ""
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
 msgid "Object"
-msgstr ""
-
-#: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html rocky/views/mixins.py
-msgid "Clearance level"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -3195,7 +3250,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/safe_connections.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Safe connections"
@@ -3262,15 +3316,12 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/system_specific_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "System specific"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/rpki.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
-#: reports/report_types/rpki_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Resource Public Key Infrastructure"
 msgstr ""
@@ -3303,7 +3354,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/rpki.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
-#: reports/report_types/rpki_report/report.html
 msgid ""
 "This section contains basic security information about resource public key "
 "infrastructure. If your web server employs RPKI for its IP addresses and "
@@ -3877,6 +3927,15 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
+"This section contains basic security information about Resource Public Key "
+"Infrastructure (RPKI). If your web server employs RPKI for its IP addresses "
+"and associated nameservers, then it enhances visitor protection against "
+"misconfigurations and malicious route intercepts through verified route "
+"announcements, ensuring reliable server access and secure internet traffic."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid ""
 "The RPKI Report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
@@ -3918,7 +3977,7 @@ msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
 msgid ""
-"The secure connections report provides an overview of the performed checks "
+"The Safe Connections report provides an overview of the performed checks "
 "with regard to encrypted communication channels such as HTTPS. The table "
 "below gives an overview of the available checks including whether the system "
 "passed the performed checks. The risk level and reasoning as to why an issue "
@@ -4436,11 +4495,6 @@ msgid "Object name"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
-msgid "Clearance type"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "Report(s) may be empty due to no objects in the selected filters."
 msgstr ""
 
@@ -4638,10 +4692,6 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "No filters applied"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
 #, python-format
 msgid "You have selected %(total_oois)s object in the previous step."
 msgid_plural "You have selected %(total_oois)s objects in the previous step."
@@ -4688,13 +4738,6 @@ msgid ""
 "It is still possible to generate a new report for same date. If the report "
 "is part of a combined report, it will remain available in the combined "
 "report."
-msgstr ""
-
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/report_overview/report_history_table.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Input objects"
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/delete_modal.html
