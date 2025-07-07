@@ -91,6 +91,11 @@ def boefje_output(
     bytes_client.login()
     bytes_client.save_boefje_meta(boefje_meta)
 
+    if boefje_output.status == StatusEnum.COMPLETED:
+        scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)
+    elif boefje_output.status == StatusEnum.FAILED:
+        scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+
     bytes_response = {}
 
     if boefje_output.files:
@@ -100,11 +105,6 @@ def boefje_output(
 
         # when supported, also save file.name to Bytes
         bytes_response = bytes_client.save_raws(task_id, boefje_output)
-
-    if boefje_output.status == StatusEnum.COMPLETED:
-        scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)
-    elif boefje_output.status == StatusEnum.FAILED:
-        scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
     return bytes_response
 

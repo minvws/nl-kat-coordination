@@ -76,17 +76,18 @@ class DockerBoefjeHandler(BoefjeHandler):
                 task_id,
                 e.exit_status,
             )
-
-            # save container log (stderr) to bytes
             self.bytes_api_client.login()
-            boefje_meta.ended_at = datetime.now(timezone.utc)
+
             try:
-                # this boefje_meta might be incomplete, it comes from the scheduler instead of the Boefje I/O API
-                self.bytes_api_client.save_boefje_meta(boefje_meta)
+                self.bytes_api_client.get_boefje_meta(boefje_meta.id)
+                logger.info("Container managed to save its raw data to bytes itself.")
             except HTTPError:
-                logger.error("Failed to save boefje meta to bytes, continuing anyway")
-            self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
-            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+                logger.info("Container did not manage to save its raw data to bytes, saving the container instead.")
+
+                boefje_meta.ended_at = datetime.now(timezone.utc)
+                self.bytes_api_client.save_boefje_meta(boefje_meta)
+                self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
+                self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
         except ImageNotFound:
             logger.error("Docker image %s not found", oci_image)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
