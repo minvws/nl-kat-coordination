@@ -88,7 +88,7 @@ def test_question_detail(
     assert mock_organization_view_octopoes().get_tree.call_count == 1
 
     assertContains(response, "Question")
-    assertContains(response, "Rendered Question Form")
+    assertContains(response, "Fill out this form to answer the Question (again)")
     assertContains(response, "Submit")
 
 
