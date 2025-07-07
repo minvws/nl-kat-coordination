@@ -15,7 +15,5 @@
   ],
   "scan_level": 2,
   "oci_image": "ghcr.io/minvws/openkat/webpage-capture:latest",
-  "oci_arguments": [
-
-  ]
+  "oci_arguments": []
 }

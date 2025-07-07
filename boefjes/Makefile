@@ -46,13 +46,14 @@ images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_nmap_tcp/boefje.Dockerfile -t $(REGISTRY)/nmap:latest -t openkat/nmap .
 	docker build -f */*/kat_export_http/boefje.Dockerfile -t $(REGISTRY)/export-http:latest -t openkat/export-http .
 	docker build -f */*/kat_nikto/boefje.Dockerfile -t $(REGISTRY)/nikto:latest .
-	docker build -f */*/kat_adr_validator/boefje.Dockerfile -t $(REGISTRY)/adr-validator:latest  .
-	docker build -f */*/kat_masscan/boefje.Dockerfile -t $(REGISTRY)/masscan:latest  .
-	docker build -f */*/kat_nuclei_cve/boefje.Dockerfile -t $(REGISTRY)/nuclei:latest  .
-	docker build -f */*/kat_ssl_certificates/boefje.Dockerfile -t $(REGISTRY)/ssl-certificates:latest  .
-	docker build -f */*/kat_ssl_scan/boefje.Dockerfile -t $(REGISTRY)/ssl-version:latest  .
-	docker build -f */*/kat_testssl_sh_ciphers/boefje.Dockerfile -t $(REGISTRY)/testssl-sh-ciphers:latest  .
-	docker build -f */*/kat_webpage_capture/boefje.Dockerfile -t $(REGISTRY)/webpage-capture:latest  .	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
+	docker build -f */*/kat_adr_validator/boefje.Dockerfile -t $(REGISTRY)/adr-validator:latest .
+	docker build -f */*/kat_masscan/boefje.Dockerfile -t $(REGISTRY)/masscan:latest .
+	docker build -f */*/kat_nuclei_cve/boefje.Dockerfile -t $(REGISTRY)/nuclei:latest .
+	docker build -f */*/kat_ssl_certificates/boefje.Dockerfile -t $(REGISTRY)/ssl-certificates:latest .
+	docker build -f */*/kat_ssl_scan/boefje.Dockerfile -t $(REGISTRY)/ssl-version:latest .
+	docker build -f */*/kat_testssl_sh_ciphers/boefje.Dockerfile -t $(REGISTRY)/testssl-sh-ciphers:latest .
+	docker build -f */*/kat_webpage_capture/boefje.Dockerfile -t $(REGISTRY)/webpage-capture:latest .
+	docker build -f */*/kat_wpscan/boefje.Dockerfile -t $(REGISTRY)/wp-scan:latest .
 	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 
