@@ -54,6 +54,7 @@ images: base-image # Build the images for the containerized boefjes
 	docker build -f */*/kat_testssl_sh_ciphers/boefje.Dockerfile -t $(REGISTRY)/testssl-sh-ciphers:latest .
 	docker build -f */*/kat_webpage_capture/boefje.Dockerfile -t $(REGISTRY)/webpage-capture:latest .
 	docker build -f */*/kat_wpscan/boefje.Dockerfile -t $(REGISTRY)/wp-scan:latest .
+	docker build -f */*/kat_pdio_subfinder/boefje.Dockerfile -t $(REGISTRY)/pdio-subfinder:latest .
 	docker build -f */generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 
