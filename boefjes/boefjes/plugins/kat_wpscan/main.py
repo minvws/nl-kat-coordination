@@ -10,7 +10,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     if input_["software"]["name"] != "WordPress":
         return [(info_mimetype, "Not wordpress.")]
-    if "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"].dict():
+    if "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"]:
         return [(info_mimetype, "No hostname available for input OOI.")]
 
     hostname = input_["ooi"]["netloc"]["name"]

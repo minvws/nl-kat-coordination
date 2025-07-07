@@ -5,7 +5,8 @@ RUN apt-get update && \
     add-apt-repository ppa:deadsnakes/ppa -y &&  \
     apt-get update &&  \
     apt-get install python3.13-full -y && \
-    python3.13 -m ensurepip --upgrade
+    python3.13 -m ensurepip --upgrade && \
+    npx playwright install --with-deps chromium
 
 ARG BOEFJES_API=http://boefje:8000
 ENV BOEFJES_API=$BOEFJES_API

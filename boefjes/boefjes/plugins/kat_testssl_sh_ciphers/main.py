@@ -1,6 +1,7 @@
 import os
 import subprocess
 from ipaddress import ip_address
+from pathlib import Path
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
@@ -17,7 +18,8 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     env = os.environ.copy()
 
-    env["OPENSSL_TIMEOUT"] = os.getenv("TIMEOUT", 30)
+    env["OPENSSL_TIMEOUT"] = os.getenv("TIMEOUT", "30")
     env["CONNECT_TIMEOUT"] = env["OPENSSL_TIMEOUT"]
+    subprocess.run(cmd, capture_output=True, env=env)
 
-    return [({"openkat/testssl-sh-ciphers-output"}, subprocess.run(cmd, capture_output=True, env=env).stdout.decode())]
+    return [({"openkat/testssl-sh-ciphers-output"}, Path("/tmp/output.json").read_bytes())]
