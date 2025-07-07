@@ -134,7 +134,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         try:
             boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
         except ValidationError:
-            logger.error("The boefje environment was not set correctly")
+            logger.exception("The boefje environment was not set correctly")
             raise
 
         return boefje_meta
@@ -177,7 +177,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
 
     for key, value in settings_from_katalogus.items():
         if key in allowed_keys:
-            new_env[key] = str(value)
+            new_env[key] = value
 
     # The schema, besides dictating that a boefje cannot run if it is not matched, also provides an extra safeguard:
     # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
@@ -185,7 +185,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
     if schema is not None:
         validate(instance=new_env, schema=schema)
 
-    return new_env
+    return {key: str(value) for key, value in new_env.items()}
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
