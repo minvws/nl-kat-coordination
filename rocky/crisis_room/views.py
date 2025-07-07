@@ -312,7 +312,7 @@ class CrisisRoomView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis Room"}]
+        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis room"}]
         context["dashboard_items"] = self.organizations_findings
         context["organizations_findings_summary"] = self.organizations_findings_summary
         return context
@@ -372,7 +372,7 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
                 "url": reverse(
                     "organization_crisis_room_landing", kwargs={"organization_code": self.organization.code}
                 ),
-                "text": "Crisis Room",
+                "text": "Crisis room",
             }
         ]
         return context
