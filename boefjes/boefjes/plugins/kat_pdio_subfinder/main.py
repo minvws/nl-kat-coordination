@@ -17,7 +17,6 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
             subprocess.run(
                 ["/usr/local/bin/subfinder", "-silent", "-active", "-rate-limit", str(rate_limit), "-d", hostname],
                 capture_output=True,
-                env={"HOME": ""},
             ).stdout.decode(),
         )
     ]
