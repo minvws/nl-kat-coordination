@@ -10,6 +10,7 @@ from typing import Protocol
 
 import structlog
 from jsonschema.exceptions import SchemaError
+from pydantic_core import ValidationError
 
 from .models import Boefje, Normalizer, PluginType
 
@@ -40,10 +41,13 @@ class BoefjeResource:
         self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
         self.boefje.runnable_hash = path_hash
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
-        self.module: Runnable | None = None
 
-        if (path / ENTRYPOINT_BOEFJES).exists():
-            self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+        try:
+            self.module: Runnable | None = get_runnable_module_from_package(
+                package, ENTRYPOINT_BOEFJES, parameter_count=1
+            )
+        except ModuleException:
+            self.module = None  # Most likely an OCI boefje
 
         if (path / SCHEMA_FILE).exists():
             try:
@@ -169,8 +173,8 @@ def _cached_resolve_boefjes(path: Path) -> dict[str, BoefjeResource]:
     for path, package in paths_and_packages:
         try:
             boefje_resources.append(get_boefje_resource(path, package, hash_path(path)))
-        except ModuleException as exc:
-            logger.exception(exc)
+        except (ModuleException, ValidationError):
+            logger.exception("Error getting boefje resource")
 
     return {resource.boefje.id: resource for resource in boefje_resources}
 
@@ -185,8 +189,8 @@ def _cached_resolve_normalizers(path: Path) -> dict[str, NormalizerResource]:
     for path, package in paths_and_packages:
         try:
             normalizer_resources.append(get_normalizer_resource(path, package, hash_path(path)))
-        except ModuleException as exc:
-            logger.exception(exc)
+        except (ModuleException, ValidationError):
+            logger.exception("Error getting normalizer resource")
 
     return {resource.normalizer.id: resource for resource in normalizer_resources}
 

@@ -101,7 +101,10 @@ class BytesAPIClient(BoefjeStorageInterface):
     def save_output(self, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
         self.save_boefje_meta(boefje_meta)
 
-        return self.save_raws(boefje_meta.id, boefje_output)
+        if boefje_output.files:
+            return self.save_raws(boefje_meta.id, boefje_output)
+
+        return {}
 
     @retry_with_login
     def save_raws(self, boefje_meta_id: uuid.UUID, boefje_output: BoefjeOutput) -> dict[str, uuid.UUID]:
@@ -143,6 +146,13 @@ class BytesAPIClient(BoefjeStorageInterface):
         self._verify_response(response)
 
         return response.content
+
+    @retry_with_login
+    def get_raws(self, boefje_meta_id: str) -> BoefjeOutput:
+        response = self._session.get("/bytes/raws", headers=self.headers, params={"boefje_meta_id": boefje_meta_id})
+        self._verify_response(response)
+
+        return BoefjeOutput.model_validate_json(response.content)
 
     @retry_with_login
     def get_raw_meta(self, raw_data_id: str) -> RawDataMeta:
