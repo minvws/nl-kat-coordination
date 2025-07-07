@@ -12,4 +12,4 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip &&  \
     pip install httpx structlog pydantic jsonschema croniter click
 USER nonroot
 
-COPY ./boefjes/plugins/kat_webpage_capture ./kat_webpage_capture
+COPY ./boefjes/plugins/kat_wpscan ./kat_wpscan
