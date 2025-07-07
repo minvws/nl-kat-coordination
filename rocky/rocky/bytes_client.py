@@ -128,26 +128,6 @@ class BytesClient:
 
         return response.json()[file_name]
 
-    def _save_raws(
-        self, boefje_meta_id: uuid.UUID, raws: list[tuple[uuid.UUID, bytes]], mime_types: Set[str] = frozenset()
-    ) -> dict[str, str]:
-        files = [
-            {
-                "name": str(normalizer_id),
-                "content": b64encode(raw).decode(),
-                "tags": list(mime_types) + [f"Declaration/{str(normalizer_id)}"],
-            }
-            for normalizer_id, raw in raws
-        ]
-
-        response = self.session.post(
-            "/bytes/raw", json={"files": files}, params={"boefje_meta_id": str(boefje_meta_id)}
-        )
-
-        response.raise_for_status()
-
-        return response.json()
-
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
 
