@@ -8,6 +8,6 @@ FROM openkat/boefje-base:latest
 ARG OCI_IMAGE=ghcr.io/minvws/openkat/nuclei:latest
 ENV OCI_IMAGE=$OCI_IMAGE
 
+USER root
 COPY --from=build /go/bin/nuclei /usr/local/bin/
-
 COPY ./boefjes/plugins/kat_nuclei_cve ./kat_nuclei_cve
