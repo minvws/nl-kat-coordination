@@ -26,7 +26,7 @@ override_dh_virtualenv:
 	$(DH_VENV_DIR)/bin/python -m uv pip install .
 
 # remove pip and uv to prevent mutation of venv
-	$(DH_VENV_DIR)/bin/python -m pip uninstall --yes pip uv
+	$(DH_VENV_DIR)/bin/python -m uv pip uninstall pip uv
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
