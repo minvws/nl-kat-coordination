@@ -1,6 +1,7 @@
 from django.conf import settings
 from katalogus.client import get_katalogus_client
 from katalogus.exceptions import KATalogusException
+from knox.auth import TokenAuthentication
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -25,6 +26,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
     # to change in an incompatible way, we should enable this when we introduce
     # a new API version.
     pagination_class = None
+    authentication_classes = (TokenAuthentication,)
 
     # Unfortunately django-rest-framework doesn't have support for create only
     # fields so we have to change the serializer class depending on the request

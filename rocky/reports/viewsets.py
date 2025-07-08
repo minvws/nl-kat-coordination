@@ -4,6 +4,7 @@ from uuid import uuid4
 from account.mixins import OrganizationAPIMixin
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
+from knox.auth import TokenAuthentication
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
@@ -29,6 +30,7 @@ class ReportViewSet(OrganizationAPIMixin, viewsets.ReadOnlyModelViewSet):
     # is a member of the requested organization.
     permission_classes = [IsAuthenticated]
     serializer_class = ReportSerializer
+    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         return ReportList(self.octopoes_api_connector, self.valid_time)
@@ -58,6 +60,7 @@ class ReportViewSet(OrganizationAPIMixin, viewsets.ReadOnlyModelViewSet):
 class ReportRecipeViewSet(OrganizationAPIMixin, viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReportRecipeSerializer
+    authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs) -> Response:
         self.paginator.limit = self.paginator.get_limit(request)
