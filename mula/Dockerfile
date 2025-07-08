@@ -1,32 +1,38 @@
 ARG PYTHON_VERSION=3.13
-FROM python:$PYTHON_VERSION-bookworm AS dev
+FROM python:$PYTHON_VERSION-bookworm AS base
 
 EXPOSE 8000
+
+ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
 
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN groupadd --gid "$USER_GID" scheduler
-RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" scheduler
+WORKDIR /app
 
-WORKDIR /app/scheduler
-ENV PATH=/home/scheduler/.local/bin:${PATH}
+COPY pyproject.toml uv.lock ./
 
-# Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
-# dependencies
-ARG ENVIRONMENT
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
-COPY requirements.txt requirements-dev.txt ./
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
+COPY . .
+
+RUN groupadd --gid "$USER_GID" scheduler && \
+    adduser --disabled-password --gecos "" --uid "$USER_UID" --gid "$USER_GID" scheduler
+
+ENV PYTHONPATH=scheduler/
+
+FROM base AS dev
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+     uv sync --frozen --group dev
 
 USER scheduler
 
-CMD ["python", "-m", "scheduler"]
-
-FROM dev
-
-COPY . /app/scheduler
+CMD ["uv", "run", "--module", "scheduler"]
