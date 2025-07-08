@@ -406,7 +406,7 @@ wheels = [
 [[package]]
 name = "django-compressor"
 version = "4.5.1"
-source = { git = "https://github.com/dekkers/django-compressor.git?rev=8cf7a26a24fe621b6b10401dd2a12f1a5cdb3f7d#8cf7a26a24fe621b6b10401dd2a12f1a5cdb3f7d" }
+source = { git = "https://github.com/dekkers/django-compressor.git?rev=csp-nonce#8cf7a26a24fe621b6b10401dd2a12f1a5cdb3f7d" }
 dependencies = [
     { name = "django" },
     { name = "django-appconf" },
@@ -2216,7 +2216,7 @@ requires-dist = [
     { name = "cron-descriptor", specifier = ">=1.4.5,<2" },
     { name = "django", specifier = "==5.1.10" },
     { name = "django-components", specifier = ">=0.88,<0.89" },
-    { name = "django-compressor", git = "https://github.com/dekkers/django-compressor.git?rev=8cf7a26a24fe621b6b10401dd2a12f1a5cdb3f7d" },
+    { name = "django-compressor", git = "https://github.com/dekkers/django-compressor.git?rev=csp-nonce" },
     { name = "django-csp", specifier = "~=4.0" },
     { name = "django-environ", specifier = ">=0.12.0,<0.13" },
     { name = "django-password-validators", specifier = ">=1.7.1,<2" },
