@@ -68,7 +68,11 @@
                                 <div>
                                     <dt>{{ filter|capfirst }}</dt>
                                     <dd>
-                                        {{ value }}
+                                        {% if filter == "ooi_type" %}
+                                            {{ value|join:"," }}
+                                        {% else %}
+                                            {{ value }}
+                                        {% endif %}
                                     </dd>
                                 </div>
                             {% endif %}

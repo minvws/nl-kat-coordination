@@ -143,7 +143,8 @@ class AddObjectListDashboardItemForm(OOIFilterForm, AddDashboardItemForm):
 
     def get_query(self):
         query = super().get_query()
-        sorting_order, order_by = self.cleaned_data.get("order_by", "").split("-", 1)
+        order_by, sorting_order = self.cleaned_data.get("order_by", "").split("-", 1)
+
         limit = int(self.cleaned_data.get("limit", 10))
 
         return {"order_by": order_by, "sorting_order": sorting_order, "limit": limit} | query
