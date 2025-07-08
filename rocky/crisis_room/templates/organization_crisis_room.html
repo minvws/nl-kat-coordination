@@ -30,6 +30,12 @@
                                          role="menu"
                                          aria-labelledby="action-dropdown-button">
                                         <ul role="presentation">
+                                            <li role="option">
+                                                <button type="button" id="toggle-dashboard-button">
+                                                    <span class="toggle-item"><i class="icon ti-eye"></i>{% translate "Show all descriptions" %}</span>
+                                                    <span class="toggle-item" data-show="off"><i class="icon ti-eye-off"></i>{% translate "Hide all descriptions" %}</span>
+                                                </button>
+                                            </li>
                                             <li>
                                                 <a href="#delete-dashboard-modal" class="plain destructive">
                                                     <i class="icon ti-trash"></i>{% translate "Delete dashboard" %}
