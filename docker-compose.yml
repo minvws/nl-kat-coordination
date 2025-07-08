@@ -57,7 +57,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
+    command: uv run uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
       - .env-defaults
       - .env
