@@ -228,16 +228,16 @@ wheels = [
 
 [[package]]
 name = "fastapi-slim"
-version = "0.115.13"
+version = "0.115.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/05/3a088b183696a5900b060496c12e17fb80867e3c841a94b1320cdad6247a/fastapi_slim-0.115.13.tar.gz", hash = "sha256:b2b18fd04bd52b304ae8c0f58e2d3a65775612c9755c3d3ec7732b2e0eb7c262", size = 295695, upload-time = "2025-06-17T11:49:42.279Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/b8/064d0c30574a95107ea3983d8feb721268661148afe9e3e1a3d48e34b99b/fastapi_slim-0.115.14.tar.gz", hash = "sha256:5a42f18d1a0bf8166c6cb4aebe9360816a77a139881996bad8c4f876cc1fa76e", size = 296354, upload-time = "2025-06-26T15:29:27.711Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/70/85e5d76a95daf7fdbd8dd620f08b0f5aa747b23b2caca1b2d5c86c2cb8ed/fastapi_slim-0.115.13-py3-none-any.whl", hash = "sha256:f54d4aacd1928db5a171dc499be84f4f70fa55e297561718d7d162bfb85b4b27", size = 95369, upload-time = "2025-06-17T11:49:40.983Z" },
+    { url = "https://files.pythonhosted.org/packages/88/c8/bc7850854d50babcbcf0c46e38edd7b603f95cef042793c795d3bcc95a8e/fastapi_slim-0.115.14-py3-none-any.whl", hash = "sha256:34ba4a3dff5a86adac92a72d02ac539039be5a21dfc39cac081bb87494c42674", size = 95567, upload-time = "2025-06-26T15:29:26.341Z" },
 ]
 
 [[package]]

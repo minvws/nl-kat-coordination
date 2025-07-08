@@ -267,9 +267,9 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11' \
     --hash=sha256:4d111e6e0c13d0644cad6ddaa7ed0261a0b36971f6d23e7ec9b4b9097da78a10 \
     --hash=sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88
     # via anyio
-fastapi-slim==0.115.13 \
-    --hash=sha256:b2b18fd04bd52b304ae8c0f58e2d3a65775612c9755c3d3ec7732b2e0eb7c262 \
-    --hash=sha256:f54d4aacd1928db5a171dc499be84f4f70fa55e297561718d7d162bfb85b4b27
+fastapi-slim==0.115.14 \
+    --hash=sha256:34ba4a3dff5a86adac92a72d02ac539039be5a21dfc39cac081bb87494c42674 \
+    --hash=sha256:5a42f18d1a0bf8166c6cb4aebe9360816a77a139881996bad8c4f876cc1fa76e
     # via boefjes
 filelock==3.18.0 \
     --hash=sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2 \
