@@ -25,7 +25,7 @@ from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
 from crisis_room.forms import AddDashboardForm
-from crisis_room.models import Dashboard, DashboardItem
+from crisis_room.models import MAX_POSITION, Dashboard, DashboardItem
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel, ScanProfileType
@@ -352,9 +352,11 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
         try:
             self.dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
             dashboard_items = DashboardItem.objects.filter(dashboard=self.dashboard).order_by("position")
-            self.dashboard_items: list[DashboardItemView] | None = self.dashboard_service.get_dashboard_items(
-                dashboard_items
+            items = sorted(
+                self.dashboard_service.get_dashboard_items(dashboard_items),
+                key=lambda x: x.item.position if x.item else MAX_POSITION + 1,
             )
+            self.dashboard_items: list[DashboardItemView] | None = items
 
         except Dashboard.DoesNotExist:
             messages.error(request, "Dashboard does not exist.")
