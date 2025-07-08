@@ -422,9 +422,7 @@ if CSP_HEADER:
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
-    DEFAULT_AUTHENTICATION_CLASSES = [
-        "rest_framework.authentication.SessionAuthentication"
-    ]
+    DEFAULT_AUTHENTICATION_CLASSES = ["rest_framework.authentication.SessionAuthentication"]
     DEFAULT_RENDERER_CLASSES = [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
