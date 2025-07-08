@@ -68,20 +68,15 @@
         {% endfor %}
     </div>
 {% else %}
+    {% include "partials/new_dashboard_item_explanation_modal.html" %}
+
     <div class="centered">
         <img src="{% static "img/fishbone.svg" %}" alt="Fishbone image">
         <p>
             {% blocktranslate trimmed %}
                 There are no dashboard items added yet. You can add
-                dashboard items via filters on the objects and findings page or
+                dashboard items via the filters on the objects and findings page or
                 you can add a report section.
-            {% endblocktranslate %}
-        </p>
-        <p>
-            {% blocktranslate trimmed %}
-                To  add a <strong>report section</strong>, open a report, go to the section that you
-                want to add to your dashboard and press the options button next to the
-                section name to create a dashboard item.
             {% endblocktranslate %}
         </p>
         <div class="button-container">
@@ -89,8 +84,7 @@
                href="{% url "ooi_list" organization_code=organization.code %}">{% translate "Add objects" %}</a>
             <a class="button ghost"
                href="{% url "finding_list" organization_code=organization.code %}">{% translate "Add findings" %}</a>
-            <a class="button ghost"
-               href="{% url "report_history" organization_code=organization.code %}">{% translate "Add report section" %}</a>
+            <a class="button ghost" href="#dashboard-item-explanation-modal">{% translate "Add report section" %}</a>
         </div>
     </div>
 {% endif %}

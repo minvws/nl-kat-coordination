@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 07:34+0000\n"
+"POT-Creation-Date: 2025-07-08 12:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -575,6 +575,7 @@ msgstr ""
 #: components/modal/template.html
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
+#: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
@@ -827,21 +828,8 @@ msgid "Options for dashboard"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room.html
-msgid "Show all descriptions"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room.html
-msgid "Hide all descriptions"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
 msgid "Delete dashboard"
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room.html
-msgid ""
-"Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room.html
@@ -868,15 +856,8 @@ msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid ""
-"There are no dashboard items added yet. You can add dashboard items via "
+"There are no dashboard items added yet. You can add dashboard items via the "
 "filters on the objects and findings page or you can add a report section."
-msgstr ""
-
-#: crisis_room/templates/organization_crisis_room_dashboard_items.html
-msgid ""
-"To  add a <strong>report section</strong>, open a report, go to the section "
-"that you want to add to your dashboard and press the options button next to "
-"the section name to create a dashboard item."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
@@ -1228,6 +1209,21 @@ msgstr ""
 #: rocky/templates/header.html rocky/views/ooi_add.py rocky/views/ooi_list.py
 #: rocky/views/ooi_view.py rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+msgid "Add dashboard item"
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+msgid ""
+"To  add a <strong>report section</strong>, go to the history page and open a "
+"report. Then go to the section that you want to add to your dashboard and "
+"press the options button next to the section name to create a dashboard item."
+msgstr ""
+
+#: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+msgid "Go to report history"
 msgstr ""
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
@@ -4685,6 +4681,10 @@ msgstr[1] ""
 msgid ""
 "You have selected a live set in the previous step. Based on the current "
 "dataset, this live set results in %(total_oois)s objects."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
+msgid "Applied filters:"
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
