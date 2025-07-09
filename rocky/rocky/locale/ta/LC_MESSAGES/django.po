@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-02 09:35+0000\n"
-"PO-Revision-Date: 2025-07-05 07:13+0000\n"
+"PO-Revision-Date: 2025-07-08 16:37+0000\n"
 "Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/ta/>\n"
@@ -630,75 +630,76 @@ msgstr "ரத்துசெய்"
 
 #: crisis_room/forms.py
 msgid "Title on dashboard"
-msgstr ""
+msgstr "டாச்போர்டில் தலைப்பு"
 
 #: crisis_room/forms.py
 msgid "Number of rows in list"
-msgstr ""
+msgstr "பட்டியலில் வரிசைகளின் எண்ணிக்கை"
 
 #: crisis_room/forms.py
 msgid "Dashboard item size"
-msgstr ""
+msgstr "டாச்போர்டு உருப்படி அளவு"
 
 #: crisis_room/forms.py
 msgid "Full width"
-msgstr ""
+msgstr "முழு அகலம்"
 
 #: crisis_room/forms.py
 msgid "Half width"
-msgstr ""
+msgstr "அரை அகலம்"
 
 #: crisis_room/forms.py
 msgid "An item with that name already exists. Try a different title."
 msgstr ""
+"அந்த பெயரைக் கொண்ட ஒரு உருப்படி ஏற்கனவே உள்ளது. வேறு தலைப்பை முயற்சிக்கவும்."
 
 #: crisis_room/forms.py
 msgid "An error occurred while adding dashboard item."
-msgstr ""
+msgstr "டாச்போர்டு உருப்படியைச் சேர்க்கும்போது பிழை ஏற்பட்டது."
 
 #: crisis_room/forms.py
 msgid "List sorting by"
-msgstr ""
+msgstr "வழங்கியவர்"
 
 #: crisis_room/forms.py
 msgid "Type (A-Z)"
-msgstr ""
+msgstr "வகை (A-Z)"
 
 #: crisis_room/forms.py
 msgid "Type (Z-A)"
-msgstr ""
+msgstr "வகை (Z-A)"
 
 #: crisis_room/forms.py
 msgid "Clearance level (Low-High)"
-msgstr ""
+msgstr "இசைவு நிலை (குறைந்த உயர்)"
 
 #: crisis_room/forms.py
 msgid "Clearance level (High-Low)"
-msgstr ""
+msgstr "இசைவு நிலை (உயர்-குறைந்த)"
 
 #: crisis_room/forms.py
 msgid "Show table columns"
-msgstr ""
+msgstr "அட்டவணை நெடுவரிசைகளைக் காட்டு"
 
 #: crisis_room/forms.py
 msgid "Severity (Low-High)"
-msgstr ""
+msgstr "தீவிரம் (குறைந்த உயர்)"
 
 #: crisis_room/forms.py
 msgid "Severity (High-Low)"
-msgstr ""
+msgstr "தீவிரம் (உயர்-குறைந்த)"
 
 #: crisis_room/forms.py
 msgid "Finding (A-Z)"
-msgstr ""
+msgstr "கண்டுபிடிப்பு (A-Z)"
 
 #: crisis_room/forms.py
 msgid "Finding (Z-A)"
-msgstr ""
+msgstr "கண்டுபிடிப்பு (z-a)"
 
 #: crisis_room/models.py
 msgid "Findings Dashboard"
-msgstr ""
+msgstr "கண்டுபிடிப்புகள் டாச்போர்டு"
 
 #: crisis_room/models.py
 msgid ""
@@ -722,24 +723,28 @@ msgstr "அனைத்து நிறுவனங்களுக்கும�
 
 #: crisis_room/models.py
 msgid "Can change position up or down of a dashboard item."
-msgstr ""
+msgstr "டாச்போர்டு உருப்படியின் நிலையை மாற்றலாம்."
 
 #: crisis_room/models.py
 msgid "You have to choose between a recipe or a query, but not both."
 msgstr ""
+"நீங்கள் ஒரு செய்முறை அல்லது வினவலுக்கு இடையில் தேர்வு செய்ய வேண்டும், ஆனால் இரண்டுமே இல்லை."
 
 #: crisis_room/models.py
 msgid "You have set a query and not where it is from. Also set the source."
 msgstr ""
+"நீங்கள் ஒரு வினவலை அமைத்துள்ளீர்கள், அது எங்கிருந்து இல்லை. மூலத்தையும் அமைக்கவும்."
 
 #: crisis_room/models.py
 msgid ""
 "DashboardItem must contain at least a 'recipe' or a 'source' with a 'query'."
 msgstr ""
+"டாச்போர்டிடெமில் குறைந்தது ஒரு 'செய்முறை' அல்லது 'வினவல்' கொண்ட 'மூலத்தை' கொண்டிருக்க "
+"வேண்டும்."
 
 #: crisis_room/models.py
 msgid "Max dashboard items reached."
-msgstr ""
+msgstr "மேக்ச் டாச்போர்டு உருப்படிகள் அடைந்தன."
 
 #: crisis_room/templates/crisis_room.html
 #: crisis_room/templates/organization_crisis_room.html
@@ -891,15 +896,17 @@ msgid ""
 "There are no dashboards yet. Click on \"Add dashboard\" to create a new "
 "dashboard."
 msgstr ""
+"டாச்போர்டுகள் இதுவரை இல்லை. புதிய டாச்போர்டை உருவாக்க \"டாச்போர்டைச் சேர்\" என்பதைக் "
+"சொடுக்கு செய்க."
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Options for dashboard"
-msgstr ""
+msgstr "டாச்போர்டுக்கான விருப்பங்கள்"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
 msgid "Delete dashboard"
-msgstr ""
+msgstr "டாச்போர்டை நீக்கு"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: katalogus/templates/partials/objects_to_scan.html
@@ -910,30 +917,32 @@ msgstr "பொருள் பட்டியல்"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Finding list"
-msgstr ""
+msgstr "பட்டியலைக் கண்டறிதல்"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Options for dashboard items"
-msgstr ""
+msgstr "டாச்போர்டு உருப்படிகளுக்கான விருப்பங்கள்"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Position up"
-msgstr ""
+msgstr "மேல் நிலை"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Position down"
-msgstr ""
+msgstr "கீழே நிலை"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 msgid "Delete item"
-msgstr ""
+msgstr "நீக்கு item"
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
 "filters on the objects and findings page."
 msgstr ""
+"டாச்போர்டு உருப்படிகள் இதுவரை சேர்க்கப்படவில்லை. பொருள்கள் மற்றும் கண்டுபிடிப்புகள் பக்கத்தில் "
+"உள்ள வடிப்பான்கள் வழியாக டாச்போர்டு உருப்படிகளை நீங்கள் சேர்க்கலாம்."
 
 #: crisis_room/templates/organization_crisis_room_dashboards.html
 msgid "Add objects"
@@ -947,11 +956,12 @@ msgstr "கண்டுபிடிப்புகளைச் சேர்"
 msgid ""
 "Dashboard does not exist. Choose an existing dashboard or create a new one."
 msgstr ""
+"டாச்போர்டு இல்லை. ஏற்கனவே உள்ள டாச்போர்டைத் தேர்வுசெய்க அல்லது புதிய ஒன்றை உருவாக்கவும்."
 
 #: crisis_room/templates/organization_crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
 msgid "Add dashboard"
-msgstr ""
+msgstr "டாச்போர்டைச் சேர்க்கவும்"
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
 #: rocky/templates/findings/finding_list.html
@@ -972,7 +982,7 @@ msgstr "%(length)s கண்டுபிடிப்புகளைக் கா
 
 #: crisis_room/templates/partials/dashboard_finding_list.html
 msgid "Go to findings"
-msgstr ""
+msgstr "கண்டுபிடிப்புகளுக்குச் செல்லுங்கள்"
 
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: rocky/templates/findings/finding_list.html
@@ -1175,7 +1185,7 @@ msgstr "பொருள்கள் "
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #, python-format
 msgid "Are you sure you want to delete '%(name)s' from this dashboard?"
-msgstr ""
+msgstr "இந்த டாச்போர்டிலிருந்து '%(name)s' ஐ நீக்க விரும்புகிறீர்களா?"
 
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
@@ -1194,14 +1204,16 @@ msgid ""
 "Are you sure you want to delete dashboard '%(dashboard)s'? All the items on "
 "the dashboard will be deleted as well."
 msgstr ""
+"டாச்போர்டு '%(dashboard)s' நீக்க விரும்புகிறீர்களா? டாச்போர்டில் உள்ள அனைத்து பொருட்களும் "
+"நீக்கப்படும்."
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
 msgid "Actions for adding dashboard items"
-msgstr ""
+msgstr "டாச்போர்டு உருப்படிகளைச் சேர்ப்பதற்கான செயல்கள்"
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
 msgid "Add item"
-msgstr ""
+msgstr "உருப்படியைச் சேர்க்கவும்"
 
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
 #: reports/templates/partials/report_ooi_list.html
@@ -1222,6 +1234,9 @@ msgid ""
 "            Add %(item_type)s to dashboard\n"
 "        "
 msgstr ""
+"\n"
+"            டாச்போர்டில் %(item_type)s சேர்க்கவும்\n"
+"        "
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #, python-format
@@ -1231,12 +1246,16 @@ msgid ""
 "        to the dashboard of your choice.\n"
 "    "
 msgstr ""
+"\n"
+"        தேர்ந்தெடுக்கப்பட்ட வடிப்பான்களுடன் இந்த %(item_type)s சேர்க்கவும் \n"
+"உங்களுக்கு விருப்பமான டாச்போர்டுக்கு.\n"
+"    "
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Add to dashboard"
-msgstr ""
+msgstr "டாச்போர்டில் சேர்க்கவும்"
 
 #: katalogus/client.py
 msgid ""
@@ -1263,43 +1282,43 @@ msgstr "இந்த ஐடியுடன் போஃப்சே ஏற்க
 
 #: katalogus/client.py
 msgid "Access to resource not allowed"
-msgstr ""
+msgstr "வளத்திற்கான அணுகல் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to see plugin settings"
-msgstr ""
+msgstr "சொருகி அமைப்புகளைக் காண பயனருக்கு இசைவு இல்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to set plugin settings"
-msgstr ""
+msgstr "சொருகி அமைப்புகளை அமைக்க பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to delete plugin settings"
-msgstr ""
+msgstr "சொருகி அமைப்புகளை நீக்க பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to view plugin settings"
-msgstr ""
+msgstr "சொருகி அமைப்புகளைக் காண பயனருக்கு இசைவு இல்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to access the other organization"
-msgstr ""
+msgstr "மற்ற நிறுவனத்தை அணுக பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to enable plugins"
-msgstr ""
+msgstr "செருகுநிரல்களை இயக்க பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to disable plugins"
-msgstr ""
+msgstr "செருகுநிரல்களை முடக்க பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to create plugins"
-msgstr ""
+msgstr "செருகுநிரல்களை உருவாக்க பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/client.py
 msgid "User is not allowed to edit plugins"
-msgstr ""
+msgstr "செருகுநிரல்களைத் திருத்த பயனர் அனுமதிக்கப்படவில்லை"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -4591,15 +4610,15 @@ msgstr "அறிக்கையை உருவாக்குங்கள்"
 
 #: reports/templates/partials/generate_report_header.html
 msgid "To generate an aggregate report, complete the following steps."
-msgstr ""
+msgstr "மொத்த அறிக்கையை உருவாக்க, பின்வரும் படிகளை முடிக்கவும்."
 
 #: reports/templates/partials/generate_report_header.html
 msgid "To generate a multi report, complete the following steps."
-msgstr ""
+msgstr "பல அறிக்கையை உருவாக்க, பின்வரும் படிகளை முடிக்கவும்."
 
 #: reports/templates/partials/generate_report_header.html
 msgid "To generate separate report(s), complete the following steps."
-msgstr ""
+msgstr "தனி அறிக்கை (களை) உருவாக்க, பின்வரும் படிகளை முடிக்கவும்."
 
 #: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
@@ -4608,11 +4627,11 @@ msgstr "உள்ளடக்க அட்டவணை"
 
 #: reports/templates/partials/new_report_action_button.html
 msgid "Actions for creating a new report"
-msgstr ""
+msgstr "புதிய அறிக்கையை உருவாக்குவதற்கான நடவடிக்கைகள்"
 
 #: reports/templates/partials/new_report_action_button.html
 msgid "Separate report(s)"
-msgstr ""
+msgstr "தனி அறிக்கை (கள்)"
 
 #: reports/templates/partials/new_report_action_button.html
 #: reports/views/aggregate_report.py
@@ -5406,7 +5425,7 @@ msgstr "அறிக்கை செய்முறையை நீக்கு"
 #: reports/templates/report_schedules/delete_recipe_modal.html
 #, python-format
 msgid "Are you sure you want to delete report recipe \"%(name)s\"?"
-msgstr ""
+msgstr "அறிக்கை செய்முறையை \"%(name)s\" ஐ நீக்க விரும்புகிறீர்களா?"
 
 #: reports/templates/report_schedules/delete_recipe_modal.html
 msgid ""
@@ -5598,6 +5617,8 @@ msgid ""
 "Couldn't rerun %s, since the recipe for this report has been disabled or "
 "deleted."
 msgstr ""
+"இந்த அறிக்கைக்கான செய்முறை முடக்கப்பட்டுள்ளது அல்லது நீக்கப்பட்டது என்பதால் %s மீண்டும் இயக்க "
+"முடியவில்லை."
 
 #: reports/views/report_overview.py
 msgid "Renaming failed. Empty report name found."
@@ -6136,7 +6157,7 @@ msgstr "மூல கோப்பைப் பதிவேற்றவும்"
 
 #: tools/forms/upload_raw.py
 msgid "Input or Scan OOI"
-msgstr ""
+msgstr "உள்ளீடு அல்லது வருடு OOI"
 
 #: tools/forms/upload_raw.py
 msgid "Click to select one of the available options, or type one yourself"
@@ -6184,7 +6205,7 @@ msgstr "உறுப்பினர்கள்"
 
 #: rocky/forms.py
 msgid "Current status"
-msgstr ""
+msgstr "தற்போதைய நிலை"
 
 #: rocky/forms.py rocky/templates/organizations/organization_member_list.html
 msgid "Active"
@@ -6196,7 +6217,7 @@ msgstr "புதிய"
 
 #: rocky/forms.py
 msgid "Account status"
-msgstr ""
+msgstr "கணக்கு நிலை"
 
 #: rocky/forms.py
 msgid "Not blocked"
@@ -7216,7 +7237,7 @@ msgstr "அனைத்து பிட்களையும் மீண்ட�
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid "Change account type"
-msgstr ""
+msgstr "கணக்கு வகையை மாற்றவும்"
 
 #: rocky/templates/organizations/organization_member_add_header.html
 #: rocky/views/organization_member_add.py
@@ -7231,6 +7252,10 @@ msgid ""
 "href=\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" "
 "target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
+"அமைப்பின் புதிய உறுப்பினரை உருவாக்குதல் <strong>%(organization)s </strong>. "
+"வெவ்வேறு கணக்கு வகைகளைப் பற்றிய விரிவான தகவலுக்கு, <a href="
+"\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" target="
+"\"_blank\" rel=\"noopener\">ஆவணங்கள் </a> ஐ சரிபார்."
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
@@ -7300,10 +7325,14 @@ msgid ""
 "To upload multiple members at once, you can upload a CSV file or you can <a "
 "href=\"%(download_url)s\">download the template</a>."
 msgstr ""
+"பல உறுப்பினர்களை ஒரே நேரத்தில் பதிவேற்ற, நீங்கள் ஒரு காபிம கோப்பைப் பதிவேற்றலாம் அல்லது "
+"நீங்கள் <a href = \"%(download_url)s\"> வார்ப்புருவைப் பதிவிறக்கலாம் </a>."
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "To create a custom CSV file, make sure it meets the following criteria:"
 msgstr ""
+"தனிப்பயன் காபிம கோப்பை உருவாக்க, இது பின்வரும் அளவுகோல்களை நிறைவு செய்கிறது என்பதை "
+"உறுதிப்படுத்திக் கொள்ளுங்கள்:"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload"
@@ -7523,7 +7552,7 @@ msgstr "அடுத்தது"
 
 #: rocky/templates/partials/mute_findings_modal.html
 msgid "You are muting the selected findings."
-msgstr ""
+msgstr "நீங்கள் தேர்ந்தெடுக்கப்பட்ட கண்டுபிடிப்புகளை முடக்குகிறீர்கள்."
 
 #: rocky/templates/partials/mute_findings_modal.html
 msgid "Reason:"
@@ -7691,7 +7720,7 @@ msgstr "தற்போதைய இசைவு நிலை"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared clearance level explanation"
-msgstr ""
+msgstr "அறிவிக்கப்பட்ட இசைவு நிலை விளக்கம்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
@@ -7720,7 +7749,7 @@ msgstr "இசைவு அளவை மரபுரிமையாக அமை
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty clearance level explanation"
-msgstr ""
+msgstr "வெற்று இசைவு நிலை விளக்கம்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty:"
@@ -7744,19 +7773,19 @@ msgstr "இழப்பீடு எச்சரிக்கை"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Indemnification is not set for this organization."
-msgstr ""
+msgstr "இந்த அமைப்புக்கு இழப்பீடு அமைக்கப்படவில்லை."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Go to the"
-msgstr ""
+msgstr "செல்லுங்கள்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "organization settings page"
-msgstr ""
+msgstr "அமைப்பு அமைப்புகள் பக்கம்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "to add one."
-msgstr ""
+msgstr "ஒன்றைச் சேர்க்க."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Set clearance level warning"
@@ -7767,6 +7796,7 @@ msgid ""
 "You don't have permissions to set clearance level. Contact your "
 "administrator."
 msgstr ""
+"இசைவு அளவை அமைக்க உங்களுக்கு இசைவு இல்லை. உங்கள் நிர்வாகியைத் தொடர்பு கொள்ளுங்கள்."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -7775,10 +7805,12 @@ msgid ""
 "clearance level is %(member_clearance_level)s and this OOI has level "
 "%(boefje_scan_level)s."
 msgstr ""
+"இந்த OOI இன் இசைவு அளவை அமைக்க உங்களுக்கு இசைவு இல்லை. உங்கள் அதிகபட்ச இசைவு நிலை "
+"%(member_clearance_level)s மற்றும் இந்த OOI நிலை %(boefje_scan_level)s."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Go to your"
-msgstr ""
+msgstr "உங்கள் செல்லவும்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "account details"
@@ -7786,7 +7818,7 @@ msgstr "கணக்கு விவரங்கள்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "to manage your clearance level."
-msgstr ""
+msgstr "உங்கள் இசைவு அளவை நிர்வகிக்க."
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
@@ -8235,7 +8267,7 @@ msgstr "கண்டுபிடிப்பைச் சேர்"
 
 #: rocky/views/finding_list.py
 msgid "You do not have the permission to add items to a dashboard."
-msgstr ""
+msgstr "டாச்போர்டில் உருப்படிகளைச் சேர்க்க உங்களுக்கு இசைவு இல்லை."
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Unknown action."
@@ -8243,7 +8275,7 @@ msgstr "தெரியாத செயல்."
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Dashboard item has been added."
-msgstr ""
+msgstr "டாச்போர்டு உருப்படி சேர்க்கப்பட்டுள்ளது."
 
 #: rocky/views/health.py
 msgid "Beautified"
