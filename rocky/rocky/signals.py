@@ -1,5 +1,6 @@
 import datetime
 
+from crisis_room.management.commands.dashboards import run_findings_dashboard
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
@@ -99,6 +100,7 @@ def organization_pre_save(sender, instance, *args, **kwargs):
         if not katalogus_client.organization_exists(instance.code):
             katalogus_client.create_organization(instance)
     except Exception as e:
+        logger.error("Failed creating organization in the Katalogus: %s", e)
         raise KATalogusException("Failed creating organization in the Katalogus") from e
 
     try:
@@ -113,8 +115,12 @@ def organization_pre_save(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=Organization)
-def organization_post_save(sender, instance, *args, **kwargs):
+def organization_post_save(sender, instance, created, *args, **kwargs):
     octopoes_client = _get_healthy_octopoes(instance.code)
+
+    # will trigger only when new organization is created, not for updating.
+    if created:
+        run_findings_dashboard(instance, octopoes_client)
 
     try:
         valid_time = datetime.datetime.now(datetime.timezone.utc)

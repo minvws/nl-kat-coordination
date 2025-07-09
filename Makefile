@@ -34,7 +34,7 @@ kat: env-if-empty build up
 	@echo "run 'grep 'DJANGO_SUPERUSER_PASSWORD' .env' to find it."
 	@echo
 	@echo "WARNING: This is a development environment, do not use in production!"
-	@echo "See https://docs.openkat.nl/installation-and-deployment/containers.html for production"
+	@echo "See https://docs.openkat.nl/installation-and-deployment/production-docker-environment.html for production"
 	@echo "installation instructions."
 
 # Remove containers, update using git pull and bring up containers
@@ -126,31 +126,19 @@ docs:
 	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:mula/:octopoes/ sphinx-build -b html --fail-on-warning docs/source docs/_build
 
 
-poetry-dependencies:
+requirements:
+	@echo "Generating requirements.txt files for all projects using uv..."
 	files=$$(find . -name pyproject.toml -maxdepth 2); \
 	for path in $$files; do \
 		project_dir=$$(dirname $$path); \
 		echo "Processing $$path..."; \
-		poetry check --lock -C $$project_dir; \
+		uv lock --project $$project_dir --check; \
 		echo "Exporting main dependencies..."; \
-		poetry export -C $$project_dir --only main -f requirements.txt -o $$project_dir/requirements.txt; \
-		if grep -q "tool.poetry.group.dev.dependencies" $$path; then \
+		uv export --project $$project_dir --no-group dev --format requirements.txt -o $$project_dir/requirements.txt; \
+		if grep -q "\[dependency-groups\]" $$path && grep -q "dev =" $$path; then \
 			echo "Exporting dev dependencies..."; \
-			poetry export -C $$project_dir --with dev -f requirements.txt -o $$project_dir/requirements-dev.txt; \
+			uv export --project $$project_dir --group dev --format requirements.txt -o $$project_dir/requirements-dev.txt; \
 		else \
 			echo "No dev group, skipping requirements-dev.txt..."; \
 		fi; \
-	done
-
-fix-poetry-merge-conflict:
-	for path in `git diff --diff-filter=U --name-only | grep "poetry.lock" | cut -d / -f 1`; do \
-		echo $$path; \
-		git restore --staged $$path/poetry.lock $$path/requirements*; \
-		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
-		poetry lock --no-update -C $$path; \
-		poetry export -C $$path --only main -f requirements.txt -o $$path/requirements.txt; \
-		if grep -q "tool.poetry.group.dev.dependencies" $$path/pyproject.toml; then \
-			poetry export -C $$path --with dev -f requirements.txt -o $$path/requirements-dev.txt; \
-		fi; \
-		git add $$path/poetry.lock $$path/requirements*; \
 	done

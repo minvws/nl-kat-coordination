@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Crisis room" %}</h1>
+                {% include "organization_crisis_room_header.html" with active=dashboard.name %}
+
+                {% if dashboards %}
+                    {% include "organization_crisis_room_dashboards.html" %}
+
+                {% else %}
+                    <div class="centered">
+                        <img src="{% static "img/fishbone.svg" %}" alt="Fishbone image">
+                        <p>
+                            {% blocktranslate trimmed %}
+                                There are no dashboards yet.
+                                Click on "Add dashboard" to create a new dashboard.
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

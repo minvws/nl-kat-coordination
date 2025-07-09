@@ -11,11 +11,26 @@ from octopoes.models.persistence import ReferenceField
 
 
 class AlgorithmType(Enum):
+    """Represents the Algorithm Type from TLS certificates.
+
+    Possible values
+    ---------------
+    RSA, ECC
+    """
+
     RSA = "RSA"
     ECC = "ECC"
 
 
 class X509Certificate(OOI):
+    """Represents X509 certificates.
+
+    Possible values
+    ---------------
+    Subject, issuer, valid from, valid intil, PK Algorithm, PK size, PK number, serial number,
+    expires in
+    """
+
     object_type: Literal["X509Certificate"] = "X509Certificate"
 
     subject: str | None = None
@@ -45,12 +60,25 @@ class X509Certificate(OOI):
 
 
 class SubjectAlternativeName(OOI):
+    """Represents alternative subject names in X509 Certificate objects."""
+
     certificate: Reference = ReferenceField(X509Certificate)
 
     _natural_key_attrs = ["certificate"]
 
 
 class SubjectAlternativeNameHostname(SubjectAlternativeName):
+    """Represents subject alternative names for hostnames in X509 Certificate objects.
+
+    Possible values
+    ---------------
+    hostnames
+
+    Example value
+    -------------
+    mispo.es
+    """
+
     object_type: Literal["SubjectAlternativeNameHostname"] = "SubjectAlternativeNameHostname"
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
 
@@ -62,6 +90,17 @@ class SubjectAlternativeNameHostname(SubjectAlternativeName):
 
 
 class SubjectAlternativeNameIP(SubjectAlternativeName):
+    """Represents subject alternative names for IPs in X509 Certificate objects.
+
+    Possible values
+    ---------------
+    IPv4 or IPv6 address
+
+    Example value
+    -------------
+    192.168.1.1
+    """
+
     object_type: Literal["SubjectAlternativeNameIP"] = "SubjectAlternativeNameIP"
     address: Reference = ReferenceField(IPAddress)
 
@@ -73,6 +112,17 @@ class SubjectAlternativeNameIP(SubjectAlternativeName):
 
 
 class SubjectAlternativeNameQualifier(SubjectAlternativeName):
+    """Represents subject alternative names qualifier in X509 Certificate objects.
+
+    Possible values
+    ---------------
+    hostnames
+
+    Example value
+    -------------
+    mispo.es
+    """
+
     object_type: Literal["SubjectAlternativeNameQualifier"] = "SubjectAlternativeNameQualifier"
     name: str
 

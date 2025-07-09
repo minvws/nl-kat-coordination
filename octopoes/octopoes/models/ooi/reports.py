@@ -67,7 +67,7 @@ class Report(BaseReport):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"HydratedReport for recipe {reference.tokenized.report_recipe}"
+        return f"HydratedReport for ReportRecipe|{reference.tokenized.report_recipe.recipe_id}"
 
 
 class HydratedReport(BaseReport):
@@ -80,12 +80,11 @@ class HydratedReport(BaseReport):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"HydratedReport for recipe {reference.tokenized.report_recipe}"
+        return f"HydratedReport for ReportRecipe|{reference.tokenized.report_recipe.recipe_id}"
 
     def to_report(self) -> Report:
         as_dict = self.model_dump(exclude={"input_oois", "object_type"})
         as_dict["input_oois"] = [input_ooi.reference for input_ooi in self.input_oois]
-
         return Report.model_validate(as_dict)
 
 
