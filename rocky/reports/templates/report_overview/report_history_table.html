@@ -6,7 +6,7 @@
 {% load compress %}
 
 {% if reports %}
-    <div class="fifty-fifty">
+    <div class="introduction">
         <p class="de-emphasized">
             {% blocktranslate with length=reports|length total=total_reports trimmed %}
                 Showing {{ length }} of {{ total }} reports
@@ -74,7 +74,7 @@
     </div>
     <div class="horizontal-scroll sticky-column">
         <form class="inline layout-wide">
-            <table class="nowrap">
+            <table>
                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                 <thead>
                     <tr>
@@ -100,7 +100,7 @@
                                        {% if report.id in selected_reports or "all" in selected_reports %}checked{% endif %}
                                        {% if "all" in selected_reports %}disabled{% endif %}>
                             </td>
-                            <td class="report_name">
+                            <td class="report_name nowrap">
                                 <a id="report_name_{{ report.report.reference|slugify }}"
                                    href="{% url "view_report" organization.code %}?report_id={{ report.report.reference }}&observed_at={{ report.report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                    title="{% translate "Shows parent report details" %}">{{ report.report.name }}</a>
@@ -140,7 +140,7 @@
                             </td>
                             <td class="nowrap report_reference_date">{{ report.report.observed_at|date }}</td>
                             <td class="nowrap report_creation_date">{{ report.report.date_generated }}</td>
-                            <td>
+                            <td class="nowrap actions sticky-cell">
                                 {% if report.total_asset_reports >= 1 %}
                                     <button type="button"
                                             class="expando-button icon ti-chevron-down"
