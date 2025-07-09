@@ -26,6 +26,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     if wpscan_api_token := getenv("WP_SCAN_API"):
         argv += ["--api-token", wpscan_api_token]
 
-    return [
-        ({"openkat/wp-scan"}, subprocess.run(["/usr/local/bin/wpscan"] + argv, capture_output=True).stdout.decode())
-    ]
+    output = subprocess.run(["/usr/local/bin/wpscan"] + argv, capture_output=True)
+    output.check_returncode()
+
+    return [({"openkat/wp-scan"}, output.stdout.decode())]

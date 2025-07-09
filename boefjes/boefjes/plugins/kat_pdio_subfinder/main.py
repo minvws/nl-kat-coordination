@@ -11,12 +11,10 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     logging.info("Using subfinder with rate limit %s on %s", rate_limit, hostname)
 
-    return [
-        (
-            {"openkat/pdio-subfinder"},
-            subprocess.run(
-                ["/usr/local/bin/subfinder", "-silent", "-active", "-rate-limit", str(rate_limit), "-d", hostname],
-                capture_output=True,
-            ).stdout.decode(),
-        )
-    ]
+    output = subprocess.run(
+        ["/usr/local/bin/subfinder", "-silent", "-active", "-rate-limit", str(rate_limit), "-d", hostname],
+        capture_output=True,
+    )
+    output.check_returncode()
+
+    return [({"openkat/pdio-subfinder"}, output.stdout.decode())]

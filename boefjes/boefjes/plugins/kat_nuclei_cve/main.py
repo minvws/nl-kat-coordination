@@ -17,4 +17,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     url = verify_hostname_meta(boefje_meta["arguments"]["input"])
     cmd = ["/usr/local/bin/nuclei"] + boefje_meta["arguments"]["oci_arguments"] + ["-u", url]
 
-    return [({"openkat/nuclei-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]
+    output = subprocess.run(cmd, capture_output=True)
+    output.check_returncode()
+
+    return [({"openkat/nuclei-output"}, output.stdout.decode())]

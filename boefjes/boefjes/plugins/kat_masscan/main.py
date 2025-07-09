@@ -19,7 +19,8 @@ def run_masscan(target_ip: str):
         "/tmp/out.json",
         target_ip,
     ]
-    subprocess.run(cmd, capture_output=True)
+    output = subprocess.run(cmd, capture_output=True)
+    output.check_returncode()
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:

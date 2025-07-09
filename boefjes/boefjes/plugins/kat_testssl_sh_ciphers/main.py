@@ -20,6 +20,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     env["OPENSSL_TIMEOUT"] = os.getenv("TIMEOUT", "30")
     env["CONNECT_TIMEOUT"] = env["OPENSSL_TIMEOUT"]
-    subprocess.run(cmd, capture_output=True, env=env)
+    output = subprocess.run(cmd, capture_output=True, env=env)
+    output.check_returncode()
 
     return [({"openkat/testssl-sh-ciphers-output"}, Path("/tmp/output.json").read_bytes())]

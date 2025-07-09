@@ -36,7 +36,8 @@ def run_playwright(webpage: str, browser: str) -> tuple[bytes, bytes, bytes]:
     """Run Playwright in Docker."""
     tmp_path = "/tmp/output"  # noqa: S108
     command = build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)
-    output = subprocess.run(command, capture_output=True).stdout.decode()
+    output = subprocess.run(command, capture_output=True)
+    output.check_returncode()
 
     try:
         image = Path(f"{tmp_path}.png").read_bytes()
@@ -44,7 +45,8 @@ def run_playwright(webpage: str, browser: str) -> tuple[bytes, bytes, bytes]:
         storage = Path(f"{tmp_path}.json").read_bytes()
     except FileNotFoundError:
         raise WebpageCaptureException(
-            "Playwright container did not return expected files, command was: " + " ".join(command), output
+            "Playwright container did not return expected files, command was: " + " ".join(command),
+            output.stdout.decode(),
         )
 
     return image, har, storage

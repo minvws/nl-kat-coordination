@@ -12,4 +12,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     url = f"{scheme}://{hostname}{path}"
     cmd = ["/usr/local/bin/adr-validator", "-format", "json", url]
 
-    return [({"openkat/adr-validator-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]
+    output = subprocess.run(cmd, capture_output=True)
+    output.check_returncode()
+
+    return [({"openkat/adr-validator-output"}, output.stdout.decode())]
