@@ -4,7 +4,7 @@ import subprocess
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
-    """Create image from docker and run subfinder with only active domains output."""
+    """Run subfinder with only active domains output."""
     rate_limit = int(os.getenv("SUBFINDER_RATE_LIMIT", "0"))
     input_ = boefje_meta["arguments"]["input"]
     hostname = input_["name"]

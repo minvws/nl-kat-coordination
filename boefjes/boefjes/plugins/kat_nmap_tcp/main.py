@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import subprocess
-from ipaddress import IPv6Address, IPv6Network, ip_address, IPv4Address, IPv4Network, ip_network, _BaseAddress
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network, _BaseAddress, ip_address, ip_network
 
 TOP_PORTS_DEFAULT = 250
 TOP_PORTS_UDP_DEFAULT = 250
@@ -15,8 +15,7 @@ NMAP_VALID_PORTS = re.compile(
 
 
 class UnacceptedVSLM(Exception):
-    def __init__(self, msg: str):
-        super().__init__(msg)
+    pass
 
 
 def validate_ports(ports: str | None) -> str:
@@ -94,4 +93,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
 
     cmd.extend(["-oX", "-", str(input_ips)])
 
-    return [({"openkat/nmap-output"}, subprocess.run(cmd, capture_output=True).stdout.decode())]
+    output = subprocess.run(cmd, capture_output=True)
+    output.check_returncode()
+
+    return [({"openkat/nmap-output"}, output.stdout.decode())]

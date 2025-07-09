@@ -2,14 +2,6 @@
   "title": "Arguments",
   "type": "object",
   "properties": {
-    "TOP_PORTS_TCP": {
-      "title": "TOP_PORTS_TCP",
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 65535,
-      "default": 250,
-      "description": "Scan TOP_PORTS_TCP most common TCP ports. Defaults to 250."
-    },
     "TOP_PORTS_UDP": {
       "title": "TOP_PORTS_UDP",
       "type": "integer",
