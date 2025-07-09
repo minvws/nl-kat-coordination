@@ -57,7 +57,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uv run uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
+    command: uv run --no-sync uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
       - .env-defaults
       - .env
@@ -179,7 +179,7 @@ services:
     build:
       context: bytes/
       target: dev
-    command: uv run uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
+    command: uv run --no-sync uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
     volumes:
       - ./bytes:/app/bytes
       - bytes-data:/data
@@ -195,7 +195,7 @@ services:
       context: .
       dockerfile: boefjes/Dockerfile
       target: dev
-    command: uv run uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
+    command: uv run --no-sync uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes

@@ -56,9 +56,9 @@ ENV PYTHONPATH=/app/rocky/
 RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="password" \
     BYTES_USERNAME="username" KATALOGUS_API="http://katalogus:8000" \
     OCTOPOES_API="http://octopoes_api:80" SCHEDULER_API="http://scheduler:8000" && \
-    uv run --no-sync rocky/manage.py collectstatic -l && \
-    uv run --no-sync rocky/manage.py compress && \
-    uv run --no-sync rocky/manage.py compilemessages
+    uv run --frozen rocky/manage.py collectstatic -l && \
+    uv run --frozen rocky/manage.py compress && \
+    uv run --frozen rocky/manage.py compilemessages
 
 FROM base AS dev
 
