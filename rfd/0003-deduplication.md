@@ -2,12 +2,11 @@
 authors: Jeroen Dekkers (@dekkers), Donny Peeters (@donnype)
 state: implemented
 discussion: https://github.com/minvws/nl-kat-coordination/pull/4051
-implementation: https://github.com/minvws/nl-kat-coordination/pull/4482,
-https://github.com/minvws/nl-kat-coordination/pull/4554
+implementation: https://github.com/minvws/nl-kat-coordination/pull/4482, https://github.com/minvws/nl-kat-coordination/pull/4554
 labels: boefjes
 ---
 
-# RFD 0004: Deduplication of boefjes tasks between organization
+# RFD 0003: Deduplication of boefjes tasks between organization
 
 The goal of deduplicating boefje tasks is to avoid doing multiple scans in similar organizations for the same
 assets. When a large number of organizations have the same asset, this would prevent scanning the asset too many
@@ -20,7 +19,6 @@ and all the boefje settings.
 
 1. A few boefjes use the organization itself as a parameter, so those boefjes can't be duplicated. Hence, we should
    be able to turn deduplication off per boefje.
-
 2. When doing deduplication between organizations, in general a user should not know for which other organizations
    the task has been deduplicated in the same KAT install. If the user belongs to those organizations this is perhaps not
    a problem, but insights into which tasks have been deduplicated for which organization is considered out of scope.
@@ -155,7 +153,7 @@ The scheduler schedules boefjes and the boefje worker executes them and saves th
 are probably the services that need modification to support deduplication. (Changes to other services could suggest
 this feature has a bigger impact than intended.)
 
-#### Deduplication algorithm: Option 1
+#### Deduplication algorithm: Option 1 (not implemented)
 
 A possible algorithm for deduplication could be:
 
@@ -169,10 +167,10 @@ This could be further optimized by storing information about the configured boef
 organizations have the same settings and which have different settings, we don't have to fetch this information for
 every boefje task.
 
-#### Deduplication algorithm: Option 2
+#### Deduplication algorithm: Option 2 (implemented)
 
 The goal of OpenKAT is to do continuous monitoring. This means that most of the time we are scanning an already
-existing OOI. For deduplication, this means that the common scenario is that a certain OOI might in a large number of
+existing OOI. For deduplication, this means that the common scenario is that a certain OOI might be in a large number of
 organizations. The scenario that a new OOI is added that already exists in another organization is probably less common.
 
 We can take advantage of this by checking all other organizations for the same OOIs either before or after a boefje
