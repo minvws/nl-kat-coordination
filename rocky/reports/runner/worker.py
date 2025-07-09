@@ -9,6 +9,7 @@ from queue import Queue
 
 import structlog
 from django.conf import settings
+from django.db import close_old_connections
 from httpx import HTTPError
 
 from reports.runner.models import ReportRunner, WorkerManager
@@ -205,6 +206,7 @@ def _start_working(
 
     while True:
         p_item = task_queue.get()
+        close_old_connections()  # See https://github.com/minvws/nl-kat-coordination/issues/4632
         status = TaskStatus.FAILED
         handling_tasks[os.getpid()] = str(p_item.id)
 
