@@ -3,7 +3,7 @@
 {% load ooi_extra %}
 
 {% if show_introduction %}
-    <p>
+    <p class="toggle-item" data-show="off">
         {% blocktranslate %}
             This table provides an overview of the identified findings on the scanned
             systems. For each finding type it shows the risk level, the number of occurrences
@@ -23,7 +23,7 @@
                     <th scope="col">{% translate "Finding types" %}</th>
                     <th scope="col">{% translate "Occurrences" %}</th>
                     <th scope="col">{% translate "First known occurrence" %}</th>
-                    {% if is_dashboard_findings %}
+                    {% if is_crisis_room %}
                         <th scope="col">{% translate "Open in report" %}</th>
                     {% else %}
                         <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
@@ -39,7 +39,7 @@
                         <td>{{ info.finding_type.id }}</td>
                         <td>{{ info.occurrences|length }}</td>
                         <td>{{ info.occurrences|get_first_seen }}</td>
-                        {% if is_dashboard_findings %}
+                        {% if is_crisis_room %}
                             <td class="number">
                                 <a href="{% url "view_report" dashboard_item.item.dashboard.organization.code %}?report_id={{ dashboard_item.data.report }}#{{ info.finding_type.id }}"><span class="icon ti-arrow-right"></span></a>
                             </td>
@@ -54,7 +54,7 @@
                             </td>
                         {% endif %}
                     </tr>
-                    {% if not is_dashboard_findings %}
+                    {% if not is_crisis_room %}
                         <tr class="expando-row">
                             <td colspan="5">
                                 <h4 class="heading-normal">{% translate "Description" %}</h4>
@@ -96,7 +96,7 @@
             </tbody>
         </table>
     </div>
-{% elif is_dashboard_findings or is_dashboard %}
+{% elif is_crisis_room or is_dashboard_item %}
     <p>{% translate "No critical and high findings have been identified for this organization." %}</p>
 {% else %}
     <p>{% translate "No findings have been identified for this organization." %}</p>

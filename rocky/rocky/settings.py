@@ -245,12 +245,19 @@ except ImproperlyConfigured:
 DATABASES = {"default": POSTGRES_DB}
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
-    DATABASES["default"]["OPTIONS"] = {
-        "sslmode": env("POSTGRES_SSL_MODE"),
-        "sslrootcert": env.path("POSTGRES_SSL_ROOTCERT"),
-        "sslcert": env.path("POSTGRES_SSL_CERT"),
-        "sslkey": env.path("POSTGRES_SSL_KEY"),
-    }
+    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", "require")}
+
+    POSTGRES_SSL_CERT = env.path("POSTGRES_SSL_CERT", default="")
+    POSTGRES_SSL_KEY = env.path("POSTGRES_SSL_KEY", default="")
+
+    if POSTGRES_SSL_CERT and POSTGRES_SSL_KEY:
+        DATABASES["default"]["OPTIONS"]["sslcert"] = POSTGRES_SSL_CERT
+        DATABASES["default"]["OPTIONS"]["sslkey"] = POSTGRES_SSL_KEY
+
+    POSTGRES_SSL_ROOTCERT = env.path("POSTGRES_SSL_ROOTCERT", default="")
+    if POSTGRES_SSL_ROOTCERT:
+        DATABASES["default"]["OPTIONS"]["sslrootcert"] = POSTGRES_SSL_ROOTCERT
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
