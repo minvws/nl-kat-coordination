@@ -140,9 +140,7 @@ services:
       context: .
       dockerfile: rocky/Dockerfile
       target: dev
-      args:
-        ENVIRONMENT: dev
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: uv run --no-sync rocky/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./rocky:/app/rocky
       - ./octopoes/octopoes:/app/rocky/octopoes
@@ -161,8 +159,6 @@ services:
       context: .
       dockerfile: rocky/Dockerfile
       target: dev
-      args:
-        ENVIRONMENT: dev
     command: worker
     volumes:
       - ./rocky:/app/rocky
