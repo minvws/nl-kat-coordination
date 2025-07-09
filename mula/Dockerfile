@@ -24,7 +24,7 @@ COPY . .
 RUN groupadd --gid "$USER_GID" scheduler && \
     adduser --disabled-password --gecos "" --uid "$USER_UID" --gid "$USER_GID" scheduler
 
-ENV PYTHONPATH=scheduler/
+ENV PYTHONPATH=/app/scheduler/
 
 FROM base AS dev
 

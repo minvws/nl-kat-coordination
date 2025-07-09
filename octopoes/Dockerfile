@@ -24,7 +24,7 @@ COPY . .
 RUN groupadd --gid "$USER_GID" octopoes && \
     adduser --disabled-password --gecos "" --uid "$USER_UID" --gid "$USER_GID" octopoes
 
-ENV PYTHONPATH=octopoes/
+ENV PYTHONPATH=/app/octopoes/
 
 FROM base AS dev
 
