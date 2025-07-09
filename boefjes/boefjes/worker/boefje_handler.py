@@ -79,7 +79,7 @@ class LocalBoefjeHandler(BoefjeHandler):
 
             boefje_meta.started_at = datetime.now(timezone.utc)
 
-            with TemporaryEnvironment(boefje_meta.environment):
+            with TemporaryEnvironment(boefje_meta.environment or {}):
                 boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
 
             boefje_meta.ended_at = datetime.now(timezone.utc)

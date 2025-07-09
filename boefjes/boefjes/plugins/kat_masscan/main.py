@@ -7,7 +7,7 @@ from pathlib import Path
 def run_masscan(target_ip: str):
     # Scan according to arguments.
     port_range = os.getenv("PORTS", "53,80,443")
-    max_rate = os.getenv("MAX_RATE", 100)
+    max_rate = os.getenv("MAX_RATE", "100")
     logging.info("Running masscan...")
     cmd = [
         "/app/boefje/masscan/bin/masscan",
