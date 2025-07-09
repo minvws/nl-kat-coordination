@@ -98,8 +98,6 @@ services:
       context: .
       dockerfile: boefjes/Dockerfile
       target: dev
-      args:
-        ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes
@@ -122,8 +120,6 @@ services:
       context: .
       dockerfile: boefjes/Dockerfile
       target: dev
-      args:
-        ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes
@@ -205,9 +201,7 @@ services:
       context: .
       dockerfile: boefjes/Dockerfile
       target: dev
-      args:
-        ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
+    command: uv run uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes
