@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: uvicorn bytes.api:app --host 0.0.0.0
+    command: uv run uvicorn bytes.api:app --host 0.0.0.0
     depends_on:
       ci_rabbitmq:
         condition: service_healthy
