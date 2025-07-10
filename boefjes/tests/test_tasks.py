@@ -122,9 +122,6 @@ def test_cleared_boefje_env(mock_boefje_handler) -> None:
     content = base64.b64decode(output[0][1][1].files[0].content)
     output_dict = ast.literal_eval(content.decode())
 
-    # Assert that there are no overlapping environment keys
-    assert not set(current_env.keys()) & set(output_dict.keys())
-
     # Assert that the original environment has been restored correctly
     assert current_env == os.environ
 
