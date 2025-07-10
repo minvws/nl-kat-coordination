@@ -4,9 +4,9 @@ from typing import Any
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
-from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
+from tools.forms.ooi_form import FindingFilterForm, OOIFilterForm
 
 from crisis_room.models import FINDINGS_DASHBOARD_NAME, Dashboard, DashboardItem
 from rocky.views.mixins import FINDING_LIST_COLUMNS, OBJECT_LIST_COLUMNS
@@ -21,14 +21,6 @@ class AddDashboardItemForm(BaseRockyForm):
 
     title = forms.CharField(label=_("Title on dashboard"), required=True)
 
-    limit = forms.ChoiceField(
-        label=_("Number of rows in list"),
-        required=True,
-        widget=forms.Select,
-        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
-        initial="20",
-    )
-
     size = forms.ChoiceField(
         label=_("Dashboard item size"),
         required=True,
@@ -41,12 +33,6 @@ class AddDashboardItemForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         self.organization = organization
         self.fields["dashboard"].choices = self.get_dashboard_selection()
-        self.recipe_id = None
-        self.source = ""
-        self.template = ""
-        self.display_in_dashboard = True
-        self.table_columns = {}
-        self.data: QueryDict = kwargs.pop("data")
 
     def clean_title(self):
         """Checks if title is already used as dashboard item name"""
@@ -84,21 +70,7 @@ class AddDashboardItemForm(BaseRockyForm):
         return DashboardItem.objects.filter(dashboard=dashboard, name=name).exists()
 
     def get_query(self) -> dict[str, Any]:
-        sort_by = self.cleaned_data.get("order_by", "").split("-", 1)
-
-        order_by = sort_by[0]
-        sorting_order = sort_by[1]
-        limit = int(self.cleaned_data.get("limit", 10))
-        observed_at = self.data.get("observed_at")
-        search = self.data.get("search", "")
-
-        return {
-            "observed_at": observed_at,
-            "order_by": order_by,
-            "sorting_order": sorting_order,
-            "limit": limit,
-            "search": search,
-        }
+        return {}
 
     def get_settings(self) -> dict[str, Any]:
         size = self.cleaned_data.get("size", "1")
@@ -115,18 +87,20 @@ class AddDashboardItemForm(BaseRockyForm):
     def create_dashboard_item(self) -> bool:
         dashboard = self.get_dashboard()
         name = self.cleaned_data.get("title")
+        recipe_id = self.cleaned_data.get("recipe_id")
+        query = self.get_query()
 
         if dashboard is not None and name is not None:
             try:
                 form_data = {
                     "dashboard": dashboard,
                     "name": name,
-                    "recipe": self.recipe_id,
-                    "source": self.source,
-                    "query": json.dumps(self.get_query()),
-                    "template": self.template,
+                    "recipe": recipe_id,
+                    "source": self.cleaned_data.get("source", ""),
+                    "query": json.dumps(query) if query else "",
+                    "template": self.cleaned_data.get("template", ""),
                     "settings": self.get_settings(),
-                    "display_in_dashboard": self.display_in_dashboard,
+                    "display_in_dashboard": True,
                 }
                 DashboardItem.objects.create(**form_data)
                 return True
@@ -137,7 +111,14 @@ class AddDashboardItemForm(BaseRockyForm):
         return False
 
 
-class AddObjectListDashboardItemForm(AddDashboardItemForm):
+class AddObjectListDashboardItemForm(OOIFilterForm, AddDashboardItemForm):
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -150,31 +131,33 @@ class AddObjectListDashboardItemForm(AddDashboardItemForm):
         ),
         initial="scan_level-desc",
     )
+
     columns = forms.MultipleChoiceField(
         label=_("Show table columns"),
         required=True,
         widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
         choices=((value, name) for value, name in OBJECT_LIST_COLUMNS.items()),
     )
-
-    def __init__(self, organization, *args, **kwargs):
-        super().__init__(organization, *args, **kwargs)
-        self.source = "object_list"
-        self.template = "partials/dashboard_ooi_list.html"
+    source = forms.CharField(initial="object_list", widget=forms.HiddenInput())
+    template = forms.CharField(initial="partials/dashboard_ooi_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
-        default_query = super().get_query()
+        query = super().get_query()
+        order_by, sorting_order = self.cleaned_data.get("order_by", "").split("-", 1)
 
-        query = {
-            "ooi_type": self.data.getlist("ooi_type", []),
-            "clearance_level": self.data.getlist("clearance_level", []),
-            "clearance_type": self.data.getlist("clearance_type", []),
-            "search": self.data.get("search_string", ""),
-        }
-        return default_query | query
+        limit = int(self.cleaned_data.get("limit", 10))
+
+        return {"order_by": order_by, "sorting_order": sorting_order, "limit": limit} | query
 
 
-class AddFindingListDashboardItemForm(AddDashboardItemForm):
+class AddFindingListDashboardItemForm(FindingFilterForm, AddDashboardItemForm):
+    limit = forms.ChoiceField(
+        label=_("Number of rows in list"),
+        required=True,
+        widget=forms.Select,
+        choices=([("5", "5"), ("10", "10"), ("15", "15"), ("20", "20"), ("30", "30")]),
+        initial="20",
+    )
     order_by = forms.ChoiceField(
         label=_("List sorting by"),
         required=True,
@@ -193,18 +176,18 @@ class AddFindingListDashboardItemForm(AddDashboardItemForm):
         widget=forms.CheckboxSelectMultiple(attrs={"checked": True}),
         choices=((value, name) for value, name in FINDING_LIST_COLUMNS.items()),
     )
-
-    def __init__(self, organization, *args, **kwargs):
-        super().__init__(organization, *args, **kwargs)
-        self.source = "finding_list"
-        self.template = "partials/dashboard_finding_list.html"
+    source = forms.CharField(initial="finding_list", widget=forms.HiddenInput())
+    template = forms.CharField(initial="partials/dashboard_finding_list.html", widget=forms.HiddenInput())
 
     def get_query(self):
-        default_query = super().get_query()
+        query = super().get_query()
+        order_by, sorting_order = self.cleaned_data.get("order_by", "").split("-", 1)
+        limit = int(self.cleaned_data.get("limit", 10))
 
-        severities = self.data.getlist("severity", [])
-        muted_findings = self.data.get("muted_findings", "non-muted")
+        return {"order_by": order_by, "sorting_order": sorting_order, "limit": limit} | query
 
-        query = {"severity": severities, "muted_findings": muted_findings}
 
-        return default_query | query
+class AddReportSectionDashboardItemForm(AddDashboardItemForm):
+    recipe_id = forms.CharField(widget=forms.HiddenInput())
+    source = forms.CharField(required=False, widget=forms.HiddenInput())
+    template = forms.CharField(widget=forms.HiddenInput())
