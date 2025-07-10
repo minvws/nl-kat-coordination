@@ -104,6 +104,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
+    working_dir: /app/boefjes
     command: boefje
     env_file:
       - .env-defaults
@@ -125,6 +126,7 @@ services:
       - ./octopoes/octopoes:/app/boefjes/octopoes
     deploy:
       replicas: 1
+    working_dir: /app/boefjes
     command: normalizer
     env_file:
       - .env-defaults
@@ -140,7 +142,7 @@ services:
       context: .
       dockerfile: rocky/Dockerfile
       target: dev
-    command: uv run --no-sync rocky/manage.py runserver 0.0.0.0:8000
+    command: uv run --no-sync manage.py runserver 0.0.0.0:8000
     volumes:
       - ./rocky:/app/rocky
       - ./octopoes/octopoes:/app/rocky/octopoes
@@ -195,6 +197,7 @@ services:
       context: .
       dockerfile: boefjes/Dockerfile
       target: dev
+    working_dir: /app/boefjes
     command: uv run --no-sync uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes

@@ -19,11 +19,11 @@ dashboards:
 
 build-rocky-native:
 	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
-	python3 manage.py migrate
-	-python3 manage.py createsuperuser --no-input
-	python3 manage.py loaddata OOI_database_seed.json
-	python3 manage.py setup_dev_account
-	python3 manage.py compilemessages
+	uv run --no-sync manage.py migrate
+	-uv run --no-sync manage.py createsuperuser --no-input
+	uv run --no-sync manage.py loaddata OOI_database_seed.json
+	uv run --no-sync manage.py setup_dev_account
+	uv run --no-sync manage.py compilemessages
 
 build-rocky-frontend:
 	docker run --rm -v $$PWD:/app/rocky node:20-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
@@ -32,10 +32,10 @@ almost-flush:
 	docker compose run --rm rocky python manage.py almost_flush
 
 run:
-	python3 manage.py runserver
+	uv run --no-sync manage.py runserver
 
 test:
-	python3 manage.py test
+	uv run --no-sync manage.py test
 
 testclean:
 	docker compose -f .ci/docker-compose.yml kill

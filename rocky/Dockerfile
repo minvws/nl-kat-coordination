@@ -19,17 +19,14 @@ ARG USER_GID=1000
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-WORKDIR /app
+WORKDIR /app/rocky
 
-COPY rocky/pyproject.toml rocky/uv.lock ./
+COPY rocky/ ./
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=rocky/uv.lock,target=uv.lock \
     --mount=type=bind,source=rocky/pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-dev
-
-COPY rocky/ rocky/
-COPY rocky/entrypoint.sh .
 
 # Install Octopoes wheel
 COPY octopoes/ /tmp/octopoes
@@ -56,9 +53,9 @@ ENV PYTHONPATH=/app/rocky/
 RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="password" \
     BYTES_USERNAME="username" KATALOGUS_API="http://katalogus:8000" \
     OCTOPOES_API="http://octopoes_api:80" SCHEDULER_API="http://scheduler:8000" && \
-    uv run --frozen rocky/manage.py collectstatic -l && \
-    uv run --frozen rocky/manage.py compress && \
-    uv run --frozen rocky/manage.py compilemessages
+    uv run --frozen manage.py collectstatic -l && \
+    uv run --frozen manage.py compress && \
+    uv run --frozen manage.py compilemessages
 
 FROM base AS dev
 
