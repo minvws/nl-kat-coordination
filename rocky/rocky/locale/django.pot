@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-09 06:46+0000\n"
+"POT-Creation-Date: 2025-07-10 07:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6093,6 +6093,10 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
+#: rocky/templates/forms/json_schema_form.html
+msgid "Fill out this form to answer the Question (again):"
+msgstr ""
+
 #: rocky/templates/graph-d3.html
 msgid ""
 "Click a circle to collapse / expand the tree, click the text to view the "
@@ -6758,6 +6762,10 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
+msgstr ""
+
+#: rocky/templates/partials/current_config.html
+msgid "Current configuration"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
