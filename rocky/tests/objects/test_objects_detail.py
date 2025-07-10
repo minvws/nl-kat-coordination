@@ -70,7 +70,7 @@ def test_ooi_detail(rf, client_member, mock_organization_view_octopoes, mock_sch
     assertContains(response, "Created date")
     assertContains(response, "9, 2022, 11:53 a.m.")
     assertNotContains(response, "Question")
-    assertNotContains(response, "Rendered Question Form")
+    assertNotContains(response, "Fill out this form to answer the Question (again)")
 
 
 def test_question_detail(

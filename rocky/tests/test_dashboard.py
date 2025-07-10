@@ -287,11 +287,11 @@ def test_delete_dashboard_item(rf, redteam_member, dashboard_items):
 
     position_item_1 = item_1.position
     position_item_2 = item_2.position
-
     position_item_4 = item_4.position
 
     request = setup_request(
-        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": item_3.id}), redteam_member.user
+        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": item_3.dashboard_id}),
+        redteam_member.user,
     )
     response = DeleteDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
