@@ -10,6 +10,7 @@ services:
       - .:/app/scheduler
     env_file:
       - .ci/.env.test
+    working_dir: /app/scheduler
     depends_on:
       ci_postgres:
         condition: service_healthy
@@ -25,6 +26,7 @@ services:
       - .:/app/scheduler
     env_file:
       - .ci/.env.test
+    working_dir: /app/scheduler
     depends_on:
       - ci_postgres
       - ci_bytes

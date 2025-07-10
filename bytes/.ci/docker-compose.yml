@@ -7,7 +7,8 @@ services:
         USER_GID: 1001
       context: .
       dockerfile: Dockerfile
-    command: pytest tests/unit
+    working_dir: /app/bytes
+    command: uv run pytest tests/unit
     env_file:
       - .ci/.env.test
     volumes:
@@ -21,7 +22,8 @@ services:
         ENVIRONMENT: dev
         USER_UID: 1001
         USER_GID: 1001
-    command: pytest -vv tests/integration
+    working_dir: /app/bytes
+    command: uv run pytest -vv tests/integration
     depends_on:
       - ci_bytes
     env_file:

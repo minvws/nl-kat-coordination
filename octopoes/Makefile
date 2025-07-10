@@ -43,7 +43,7 @@ check:
 	pre-commit run --all-files --show-diff-on-failure --color always
 
 test:
-	pytest
+	uv run pytest
 
 rtest:
 	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
