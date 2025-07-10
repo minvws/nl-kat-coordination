@@ -121,11 +121,6 @@ class DashboardService:
         if recipes_data:
             # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
-            octopoes_client = OctopoesAPIConnector(
-                settings.OCTOPOES_API,
-                dashboard_item.dashboard.organization.code,
-                timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
-            )
 
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
             for dashboard_item, recipe_id in recipes_data.items():
@@ -135,6 +130,11 @@ class DashboardService:
                     ):  # Report section from aggregate report
                         hydrated_report = reports[recipe_id]
                     else:  # Report section from a normal report
+                        octopoes_client = OctopoesAPIConnector(
+                            settings.OCTOPOES_API,
+                            dashboard_item.dashboard.organization.code,
+                            timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+                        )
                         hydrated_report = octopoes_client.get(
                             Reference.from_str(dashboard_item.source), datetime.now(timezone.utc)
                         )
@@ -149,6 +149,11 @@ class DashboardService:
             # Finally merge all data necessary and create dashboard items to show on the dashboard.
             for dashboard_item, hydrated_report in reports_data.items():
                 item_data = DashboardItemView(dashboard_item, {"report": hydrated_report})
+                octopoes_client = OctopoesAPIConnector(
+                    settings.OCTOPOES_API,
+                    dashboard_item.dashboard.organization.code,
+                    timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+                )
 
                 try:
                     report_data = report_data_from_bytes[hydrated_report.data_raw_id]
@@ -415,13 +420,15 @@ class DeleteDashboardItemView(OrganizationView):
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
         dashboard_item_name = request.POST.get("dashboard_item")
-        dashboard_item_id = request.POST.get("dashboard")
+        dashboard_id = request.POST.get("dashboard")
 
         if not self.organization_member.can_delete_dashboard_item:
             raise PermissionDenied()
 
         try:
-            dashboard_item = DashboardItem.objects.get(id=dashboard_item_id, dashboard__organization=self.organization)
+            dashboard_item = DashboardItem.objects.get(
+                dashboard=dashboard_id, dashboard__organization=self.organization, name=dashboard_item_name
+            )
         except DashboardItem.DoesNotExist:
             messages.error(request, f"Dashboard item '{dashboard_item_name}' not found.")
             return redirect(
