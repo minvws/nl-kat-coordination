@@ -22,7 +22,7 @@ override_dh_virtualenv:
 # empty requirements file and call uv manually..
 	touch /tmp/requirements-empty.txt
 	dh_virtualenv --requirements=/tmp/requirements-empty.txt --skip-install --preinstall "uv"
-	$(DH_VENV_DIR)/bin/python -m uv sync --locked
+	$(DH_VENV_DIR)/bin/python -m uv sync --locked --active
 	$(DH_VENV_DIR)/bin/python -m uv pip install .
 	cd /octopoes && /usr/bin/python3 setup.py bdist_wheel
 	$(DH_VENV_DIR)/bin/python -m uv pip install --no-deps /octopoes/dist/octopoes*.whl
@@ -39,8 +39,8 @@ override_dh_virtualenv:
 	find static -type f -exec install -m 644 -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
 	find components -type f -name *.html -exec install -m 644 -D "{}" "$(DH_VENV_DIR)/lib/`py3versions -d`/site-packages/{}" \;
 
-# TODO: fix broken shebang replacement by setuptools
-	sed -i 's|#!.*|#!$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|' $(DH_VENV_DIR)/bin/manage.py
+# Fix shebang
+	sed -i 's|#!.*$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|#!$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|' $(DH_VENV_DIR)/bin/*
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`

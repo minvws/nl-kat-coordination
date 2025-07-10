@@ -24,12 +24,15 @@ override_dh_virtualenv:
 # empty requirements file and call uv manually..
 	touch /tmp/requirements-empty.txt
 	dh_virtualenv --requirements=/tmp/requirements-empty.txt --skip-install --preinstall "uv"
-	$(DH_VENV_DIR)/bin/python -m uv sync --locked
+	$(DH_VENV_DIR)/bin/python -m uv sync --locked --active
 	$(DH_VENV_DIR)/bin/python -m uv pip install .
 	$(DH_VENV_DIR)/bin/python -m uv pip install gunicorn==23.0.0
 
 # remove pip and uv to prevent mutation of venv
 	$(DH_VENV_DIR)/bin/python -m uv pip uninstall pip uv
+
+# Fix shebang
+	sed -i 's|#!.*$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|#!$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|' $(DH_VENV_DIR)/bin/*
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
