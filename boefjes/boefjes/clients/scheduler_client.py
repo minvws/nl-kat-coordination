@@ -58,11 +58,15 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         if queue.value == "normalizer":
             response = self._session.post(
-                "/schedulers/normalizer/pop", json=filters if filters["filters"] else None, params={"limit": limit}
+                "/schedulers/normalizer/pop",
+                json=filters if filters["filters"] else None,
+                params={"limit": limit} if limit else None,
             )
         else:
             response = self._session.post(
-                "/schedulers/boefje/pop", json=filters if filters["filters"] else None, params={"limit": limit}
+                "/schedulers/boefje/pop",
+                json=filters if filters["filters"] else None,
+                params={"limit": limit} if limit else None,
             )
         self._verify_response(response)
 
