@@ -19,6 +19,7 @@ from csp.constants import NONE, SELF
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+from django.views.debug import SafeExceptionReporterFilter
 
 from rocky.otel import OpenTelemetryHelper
 
@@ -44,6 +45,18 @@ KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 BYTES_API = env.url("BYTES_API").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME")
 BYTES_PASSWORD = env("BYTES_PASSWORD")
+
+# See these Django release notes: https://docs.djangoproject.com/en/dev/releases/3.1/#error-reporting
+HIDDEN_DEFAULT = "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE"
+HIDDEN_ADDITIONAL = "ROCKY|BOEFJES|BYTES|MULA|SCHEDULER|OCTOPOES|RABBITMQ_|_URI"
+
+
+class SaferExceptionReporterFilter(SafeExceptionReporterFilter):
+    hidden_settings = re.compile(f"{HIDDEN_DEFAULT}|{HIDDEN_ADDITIONAL}", flags=re.I)
+
+
+DEFAULT_EXCEPTION_REPORTER_FILTER = "rocky.settings.SaferExceptionReporterFilter"
+
 
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
 
