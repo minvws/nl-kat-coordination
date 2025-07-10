@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 from typing import Any
-from urllib.parse import urlencode
 
 from account.models import KATUser
 from django import template
@@ -117,8 +116,3 @@ def get_user_full_name(ooi: OOI) -> str:
         return KATUser.objects.get(id=ooi.user_id).get_full_name()
     except ObjectDoesNotExist:
         return _("Unknown user")
-
-
-@register.filter
-def urlencode_query(query_string: str) -> str:
-    return urlencode(json.loads(query_string), doseq=True)

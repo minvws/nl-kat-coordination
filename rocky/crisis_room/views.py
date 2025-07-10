@@ -25,10 +25,10 @@ from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES
 from tools.models import Organization, OrganizationMember
 
 from crisis_room.forms import AddDashboardForm
-from crisis_room.models import Dashboard, DashboardItem
+from crisis_room.models import MAX_POSITION, Dashboard, DashboardItem
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.reports import HydratedReport
@@ -121,11 +121,23 @@ class DashboardService:
         if recipes_data:
             # Returns for each recipe id, its Hydrated report.
             reports: dict[UUID, HydratedReport] = self.get_reports(datetime.now(timezone.utc), report_filters)
+            octopoes_client = OctopoesAPIConnector(
+                settings.OCTOPOES_API,
+                dashboard_item.dashboard.organization.code,
+                timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT,
+            )
 
             # After reports are collected, collect data raw ids to fetch data from Bytes later.
             for dashboard_item, recipe_id in recipes_data.items():
                 try:
-                    hydrated_report = reports[recipe_id]
+                    if (
+                        dashboard_item.findings_dashboard or not dashboard_item.source
+                    ):  # Report section from aggregate report
+                        hydrated_report = reports[recipe_id]
+                    else:  # Report section from a normal report
+                        hydrated_report = octopoes_client.get(
+                            Reference.from_str(dashboard_item.source), datetime.now(timezone.utc)
+                        )
                     raw_ids.append(hydrated_report.data_raw_id)
                     reports_data[dashboard_item] = hydrated_report
                 except KeyError:
@@ -144,7 +156,16 @@ class DashboardService:
                     if dashboard_item.findings_dashboard:
                         report_data = self.get_organizations_findings(report_data)
 
-                    item_data.data.update({"report_data": report_data})
+                    report = item_data.data["report"]
+
+                    if dashboard_item.recipe and dashboard_item.source:
+                        parent_report_id = hydrated_report.report_recipe.replace("ReportRecipe", "Report")
+                        parent_report = octopoes_client.get_report(parent_report_id, report.observed_at)
+                        item_data.data.update(
+                            {"parent_report": {"primary_key": parent_report.primary_key, "name": parent_report.name}}
+                        )
+                    recipe = octopoes_client.get(report.report_recipe, report.observed_at)
+                    item_data.data.update({"report_data": report_data, "recipe": recipe})
                     dashboard_items_with_data.append(item_data)
                 except KeyError:
                     continue
@@ -331,9 +352,11 @@ class OrganizationsCrisisRoomView(OrganizationView, TemplateView):
         try:
             self.dashboard = Dashboard.objects.get(id=dashboard_id, organization=self.organization)
             dashboard_items = DashboardItem.objects.filter(dashboard=self.dashboard).order_by("position")
-            self.dashboard_items: list[DashboardItemView] | None = self.dashboard_service.get_dashboard_items(
-                dashboard_items
+            items = sorted(
+                self.dashboard_service.get_dashboard_items(dashboard_items),
+                key=lambda x: x.item.position if x.item else MAX_POSITION + 1,
             )
+            self.dashboard_items: list[DashboardItemView] | None = items
 
         except Dashboard.DoesNotExist:
             messages.error(request, "Dashboard does not exist.")
