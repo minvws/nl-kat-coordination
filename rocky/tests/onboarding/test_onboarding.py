@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from django.test import Client
 from django.urls import reverse
 from httpx import HTTPError
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
@@ -32,13 +33,13 @@ def test_onboarding_redirect(rf, superuser):
     response = c.get("/")
     print(response)
     assert response.status_code == 302
-    assert response.headers["Location"] == reverse("step_introduction_registration")
+    assert response.headers["Location"] == reverse("step_1_introduction_registration")
 
 
 def test_step_1_onboarding_introduction(request, superuser_member, rf):
     superuser_member = request.getfixturevalue(superuser_member)
     response = OnboardingIntroductionRegistrationView.as_view()(
-        setup_request(rf.get("step_introduction"), superuser_member.user),
+        setup_request(rf.get("step_1_introduction_registration"), superuser_member.user),
         organization_code=superuser_member.organization.code,
     )
 
@@ -53,7 +54,8 @@ def test_step_1_onboarding_introduction_forbidden(request, member, rf):
 
     with pytest.raises(PermissionDenied):
         OnboardingIntroductionRegistrationView.as_view()(
-            setup_request(rf.get("step_introduction"), member.user), organization_code=member.organization.code
+            setup_request(rf.get("step_1_introduction_registration"), member.user),
+            organization_code=member.organization.code,
         )
 
 
@@ -69,7 +71,9 @@ def test_step_2a_onboarding_create_organization(rf, superuser_member, mock_model
 
 
 @pytest.mark.parametrize("member", ["admin_member", "redteam_member", "client_member"])
-def test_step_2a_onboarding_create_organization_forbidden(rf, member, mock_models_katalogus):
+def test_step_2a_onboarding_create_organization_forbidden(request, rf, member, mock_models_katalogus):
+    member = request.getfixturevalue(member)
+
     request = setup_request(
         rf.post("step_2a_organization_setup", {"name": "Test Organization", "code": "test"}), member.user
     )
@@ -134,11 +138,13 @@ def test_step_4_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_
     )
 
     assert response.status_code == 200
-    assertContains(response, "OpenKAT introduction")
-    assertContains(response, "Setup scan - OOI clearance for " + url.human_readable)
+    assertContains(response, "Onboarding")
+    assertContains(response, "User clearance level")
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")
+    assertContains(response, "Add URL")
+    assertContains(response, "Skip onboarding")
     assertContains(
         response,
         "Your administrator has <strong>trusted</strong> you with a clearance level of <strong>L"
@@ -224,11 +230,10 @@ def test_step_5_onboarding_setup_scan_detail(request, member, rf):
 
     assert response.status_code == 200
 
-    assertContains(response, "KAT introduction")
-    assertContains(response, "Setup scan")
-    assertContains(response, "Creating an object")
-    assertContains(response, "Dependencies")
-    assertContains(response, "Create object")
+    assertContains(response, "Onboarding")
+    assertContains(response, "Plugins")
+    assertContains(response, "Add an object")
+    assertContains(response, "Related objects")
     assertContains(response, "Skip onboarding")
 
 
@@ -262,9 +267,8 @@ def test_step_6_onboarding_set_clearance_level(
     assert response_redteam.status_code == 200
     assert response_superuser.status_code == 200
 
-    assertContains(response_redteam, "OpenKAT introduction")
-    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.human_readable))
-    assertContains(response_redteam, "Set clearance level")
+    assertContains(response_redteam, "Onboarding")
+    assertContains(response_redteam, "Set object clearance level")
     assertContains(response_redteam, "Skip onboarding")
 
     with pytest.raises(PermissionDenied):
@@ -286,7 +290,7 @@ def test_step_7_onboarding_clearance_level_introduction(rf, redteam_member, mock
     )
 
     assert response.status_code == 200
-    assertContains(response, "OpenKAT introduction")
+    assertContains(response, "Onboarding")
     assertContains(response, "OOI clearance for " + url.human_readable)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
@@ -308,14 +312,14 @@ def test_step_8_onboarding_select_plugins(request, member, rf, mocker, mock_orga
 
     assert response.status_code == 200
 
-    assertContains(response, "Setup scan - Enable plugins")
-    assertContains(response, "Plugins introduction")
+    assertContains(response, "Enabling plugins and start scanning")
+    assertContains(response, "Plugin introduction")
     assertContains(response, "Boefjes")
     assertContains(response, "Normalizers")
     assertContains(response, "Bits")
     assertContains(response, "Required and suggested plugins")
     assertContains(response, "Skip onboarding")
-    assertContains(response, "Enable and start scan")
+    assertContains(response, "Enable and continue")
 
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
@@ -336,13 +340,9 @@ def test_step_9_onboarding_choose_report_type(request, member, rf):
     )
 
     assert response.status_code == 200
-    assertContains(response, "KAT introduction")
-    assertContains(response, "Choose a report - Type")
+    assertContains(response, "Onboarding")
     assertContains(response, "Skip onboarding")
-    assertContains(response, "DNS Report")
-    assertContains(response, "Pentest")
-    assertContains(response, "Mail Report")
-    assertContains(response, "DigiD")
+    assertContains(response, "Generate DNS Report")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
@@ -363,7 +363,7 @@ def test_step_9a_onboarding_ooi_detail_scan(
 
     assert response.status_code == 200
 
-    assertContains(response, "KAT introduction")
+    assertContains(response, "Onboarding")
     assertContains(response, "Setup scan")
     assertContains(response, "Creating an object")
     assertContains(response, "Network")
@@ -406,7 +406,7 @@ def test_step_10_onboarding_scanning_boefjes(
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
     request_url = (
-        reverse("step_report", kwargs={"organization_code": member.organization.code})
+        reverse("step_10_report", kwargs={"organization_code": member.organization.code})
         + f"?report_type=dns-report&ooi={url.primary_key}"
     )
 

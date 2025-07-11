@@ -47,7 +47,7 @@ class OnboardingStart(OrganizationView):
         if request.user.is_superuser:
             return redirect("step_1_introduction_registration")
         if self.organization_member.has_perms(ONBOARDING_PERMISSIONS):
-            return redirect("step_1_introduction", kwargs={"organization_code": self.organization.code})
+            return redirect("step_1a_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
 
