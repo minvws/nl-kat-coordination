@@ -125,7 +125,8 @@ def test_fail_on_wrong_plugin_ids(migration_f9de6eb7824b):
                 "minimum": 0,
                 "maximum": 65535,
                 "default": 250,
-                "description": "Scan TOP_PORTS_UDP most common UDP ports. Defaults to 250 unless we are scanning a NetBlock, in which case we default to 10.",
+                "description": "Scan TOP_PORTS_UDP most common UDP ports. Defaults to 250 unless we are scanning a "
+                "NetBlock, in which case we default to 10.",
             },
             "MIN_VLSM_IPV4": {
                 "title": "MIN_VLSM_IPV4",
@@ -133,7 +134,8 @@ def test_fail_on_wrong_plugin_ids(migration_f9de6eb7824b):
                 "minimum": 0,
                 "maximum": 32,
                 "default": 22,
-                "description": "Minimum variable-length subnet mask for IPv4-ranges. Defaults to 22. Use this value to prevent scanning large ranges.",
+                "description": "Minimum variable-length subnet mask for IPv4-ranges. Defaults to 22. Use this value to"
+                " prevent scanning large ranges.",
             },
             "MIN_VLSM_IPV6": {
                 "title": "MIN_VLSM_IPV6",
@@ -141,7 +143,8 @@ def test_fail_on_wrong_plugin_ids(migration_f9de6eb7824b):
                 "minimum": 0,
                 "maximum": 128,
                 "default": 118,
-                "description": "Minimum variable-length subnet mask for IPv6-ranges. Defaults to 118. Use this value to prevent scanning large ranges.",
+                "description": "Minimum variable-length subnet mask for IPv6-ranges. Defaults to 118. Use this value to"
+                " prevent scanning large ranges.",
             },
         },
         "required": [],
