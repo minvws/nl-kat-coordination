@@ -22,13 +22,13 @@ function main() {
     throw new Error(error);
   }
 
-  Object.assign(process.env, boefje_input["boefje_meta"]["environment"]);
+  Object.assign(process.env, boefje_input["task"]["data"]["environment"]);
 
   let out = undefined;
   let output_url = boefje_input.output_url;
   try {
     // Getting the raw files
-    const raws = run(boefje_input.boefje_meta);
+    const raws = run(boefje_input.task.data);
     out = {
       status: "COMPLETED",
       files: raws.map((x) => ({
