@@ -16,10 +16,10 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-10 07:04+0000\n"
-"PO-Revision-Date: 2025-07-10 21:01+0000\n"
+"PO-Revision-Date: 2025-07-11 14:02+0000\n"
 "Last-Translator: paulvandenbraken <paul.vandenbraken@ezzenz.nl>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -964,12 +964,14 @@ msgid "Options for dashboard"
 msgstr "Opties voor dashboard"
 
 #: crisis_room/templates/organization_crisis_room.html
+#, fuzzy
 msgid "Show all descriptions"
-msgstr ""
+msgstr "Toon alle beschrijvingen"
 
 #: crisis_room/templates/organization_crisis_room.html
+#, fuzzy
 msgid "Hide all descriptions"
-msgstr ""
+msgstr "Verberg alle beschrijvingen"
 
 #: crisis_room/templates/organization_crisis_room.html
 #: crisis_room/templates/partials/delete_dashboard_modal.html
@@ -1000,14 +1002,19 @@ msgstr "Bevindingenlijst"
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
 #: crisis_room/templates/partials/new_dashboard_item_action_button.html
+#, fuzzy
 msgid "Report section"
-msgstr ""
+msgstr "Rapportagesectie"
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
+#, fuzzy
 msgid ""
 "There are no dashboard items added yet. You can add dashboard items via the "
 "filters on the objects and findings page or you can add a report section."
 msgstr ""
+"Er zijn nog geen dashboard-onderdelen toegevoegd. Je kunt deze toevoegen via "
+"de filters op de objecten- en bevindingen pagina of je kunt een "
+"rapportsectie toevoegen."
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
 #, fuzzy
@@ -1020,8 +1027,9 @@ msgid "Add findings"
 msgstr "Bevindingen toevoegen"
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
+#, fuzzy
 msgid "Add report section"
-msgstr ""
+msgstr "Voeg rapportagesectie toe"
 
 #: crisis_room/templates/organization_crisis_room_header.html
 #: crisis_room/templates/partials/new_dashboard_modal.html
@@ -1121,6 +1129,7 @@ msgid "Critical and high findings"
 msgstr "Kritieke en hoog-niveau bevindingen"
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
+#, fuzzy
 msgid ""
 "\n"
 "                                            This table shows the top 25 "
@@ -1131,6 +1140,16 @@ msgid ""
 "findings can be found in the Findings Report.\n"
 "                                        "
 msgstr ""
+"\n"
+"                                            Deze tabel toont de top 25 "
+"kritieke en hoog-niveau bevindeingen die\n"
+"\n"
+"                                            voor deze organisatie gevonden "
+"zijn, gegroepeerd per bevindingstype.\n"
+"\n"
+"                                            Een tabel met alle gevonden "
+"bevindingen kan worden gevonden in de Bevindingenrapportage.\n"
+"                                        "
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
 #, fuzzy
@@ -1293,12 +1312,14 @@ msgid "Options for dashboard items"
 msgstr "Opties voor dashboard-items"
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
+#, fuzzy
 msgid "Show description"
-msgstr ""
+msgstr "Toon beschrijving"
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
+#, fuzzy
 msgid "Hide description"
-msgstr ""
+msgstr "Verberg beschrijving"
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
 #, fuzzy
@@ -1311,8 +1332,9 @@ msgid "Position down"
 msgstr "Verplaats naar beneden"
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
+#, fuzzy
 msgid "Rerun report"
-msgstr ""
+msgstr "Draai Rapportage opnieuw"
 
 #: crisis_room/templates/partials/dashboard_item_action_button.html
 #: crisis_room/templates/partials/delete_dashboard_item_modal.html
@@ -1384,33 +1406,44 @@ msgid "Objects"
 msgstr "Objecten"
 
 #: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+#, fuzzy
 msgid "Add dashboard item"
-msgstr ""
+msgstr "Voeg dashboard-onderdeel toe"
 
 #: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+#, fuzzy
 msgid ""
 "To  add a <strong>report section</strong>, go to the history page and open a "
 "report. Then go to the section that you want to add to your dashboard and "
 "press the options button next to the section name to create a dashboard item."
 msgstr ""
+"Ga naar de historiepagina om een  <strong>rapportagesectie</strong>,  toe te "
+"voegen en open een rapport. Ga vervolgens naar de sectie die u toe wilt "
+"voegen aan uw dashboard en klik de opties-knop naast de sectienaam om het "
+"dashboard-onderdeel aan te maken."
 
 #: crisis_room/templates/partials/new_dashboard_item_explanation_modal.html
+#, fuzzy
 msgid "Go to report history"
-msgstr ""
+msgstr "Ga naar rapportagegeschiedenis"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "    Add %(item_type)s to dashboard\n"
 msgstr ""
+"\n"
+"    Voeg %(item_type)s toe aan het dashboard\n"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Add these %(item_type)s with the selected filters to the dashboard of your "
 "choice."
 msgstr ""
+"Voeg deze %(item_type)s met het geselecteerde filter toe aan het dashboard "
+"van uw keuze."
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
@@ -1424,15 +1457,19 @@ msgstr "toelichting"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid "You do not have a custom dashboard yet"
-msgstr ""
+msgstr "U heeft nog geen maatwerk-dashboard"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "In order to add these %(item_type)s to a dashboard, you first need to create "
 "a dashboard. Please add a dashboard in the crisis room of your organization."
 msgstr ""
+"Om deze %(item_type)s toe te voegen aan het dashboard, maakt u eerst een "
+"dashboard aan. Voeg aub een dashboard toe aan het crisiscentrum van uw "
+"organisatie."
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
@@ -1444,38 +1481,52 @@ msgstr "Voeg toe aan dashboard"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal.html
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid "Go to crisis room"
-msgstr ""
+msgstr "Ga naar het crisiscentrum"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid "Add report section to dashboard"
-msgstr ""
+msgstr "Voeg rapportagesectie aan dashboard toe"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid ""
 "In order to add this report section to a dashboard, you first need to create "
 "a dashboard. Please create a dashboard in the crisis room of your "
 "organization."
 msgstr ""
+"Om deze rapportagesectie aan een dashboard toe te voegen, maakt u eerst een "
+"dashboard aan. Maak aub een dashboard in het crisiscentrum van uw "
+"organisatie aan."
 
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid "Report must be scheduled for dashboard items"
-msgstr ""
+msgstr "Rapportage moet worden gepland voor dashboard-onderdelen"
 
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
+#, fuzzy
 msgid ""
 "In order for dashboard information to be updated on a regular basis instead "
 "of showing static data, the report should be scheduled. The frequency of the "
 "schedules recurrence determines how fresh the data on the dashboard will be."
 msgstr ""
+"Om dashboard informatie op periodieke wijze te verversen in plaats van "
+"eenmalige gegevens te tonen, moet de rapportage ingepland worden. De "
+"frequentie van de planning bepaald hoe actueel de gegevens op het dashboard "
+"zijn."
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
+#, fuzzy
 msgid "Applied filters"
-msgstr ""
+msgstr "Toegepaste filters"
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
+#, fuzzy
 msgid "Object types"
-msgstr ""
+msgstr "Objecttypes"
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
@@ -1501,8 +1552,9 @@ msgid "Input objects"
 msgstr "Invoerobjecten"
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
+#, fuzzy
 msgid "Show all objects"
-msgstr ""
+msgstr "Toon alle objecten"
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
 #: reports/templates/partials/report_types_selection.html
@@ -1511,8 +1563,9 @@ msgid "No filters applied"
 msgstr "Geen filters toegepast"
 
 #: crisis_room/templates/partials/report_section_action_button.html
+#, fuzzy
 msgid "Add section to dashboard"
-msgstr ""
+msgstr "Voeg sectie aan dashboard toe"
 
 #: katalogus/client.py
 msgid ""
@@ -2014,9 +2067,9 @@ msgid ""
 msgstr ""
 "Dit Boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
 "van <strong>(%(scan_level)s)</strong> of hoger. Er is geen vrijwaring voor "
-"dit Boefje om een OOI met een lager scanniveau te scannen "
-"dan<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI’s met een "
-"lagere vrijwaringsniveau te tonen."
+"dit Boefje om een OOI met een lager scanniveau te scannen dan "
+"<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI’s met een lagere "
+"vrijwaringsniveau te tonen."
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "Warning scan level:"
@@ -3700,6 +3753,7 @@ msgid "server"
 msgstr "server"
 
 #: reports/report_types/aggregate_organisation_report/findings.html
+#, fuzzy
 msgid ""
 "\n"
 "                This chapter contains information about the findings that "
@@ -3707,6 +3761,11 @@ msgid ""
 "                for this organization.\n"
 "            "
 msgstr ""
+"\n"
+"                Dit hoofdstuk bevat informatie over de gevonden bevindingen\n"
+"\n"
+"                voor deze organisatie.\n"
+"            "
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3771,6 +3830,7 @@ msgid "Vulnerabilities found are grouped per system."
 msgstr "Gevonden kwetsbaarheden zijn gegroepeerd per systeem."
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#, fuzzy
 msgid ""
 "\n"
 "                                    This chapter contains information about "
@@ -3778,6 +3838,12 @@ msgid ""
 "                                    for this organization.\n"
 "                                "
 msgstr ""
+"\n"
+"                                    Dit hoofdstuk bevat informatie over de "
+"bevindingen die zijn gevonden\n"
+"\n"
+"                                    voor deze organisatie.\n"
+"                                "
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
@@ -4479,6 +4545,7 @@ msgid "Find open ports of IP addresses"
 msgstr "Zoek open poorten op IP-adressen"
 
 #: reports/report_types/rpki_report/report.html
+#, fuzzy
 msgid ""
 "This section contains basic security information about Resource Public Key "
 "Infrastructure (RPKI). If your web server employs RPKI for its IP addresses "
@@ -4486,6 +4553,12 @@ msgid ""
 "misconfigurations and malicious route intercepts through verified route "
 "announcements, ensuring reliable server access and secure internet traffic."
 msgstr ""
+"Deze sectie bevat basisbeveiligingsinformatie over Resource Public Key "
+"Infrastructure (RPKI). Als uw webserver RPKI gebruikt voor zijn IP-adressen "
+"en bijbehorende nameservers, verbetert de bescherming van bezoekers tegen "
+"foutieve configuraties en kwaadwillige route-intercepts. Dit wordt mogelijk "
+"gemaakt door geverifieerde routepublicaties, waardoor betrouwbare "
+"servertoegang en veilig internetverkeer wordt gegarandeerd."
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
@@ -4533,6 +4606,7 @@ msgstr ""
 "IP-adressen en of ze zijn gedekt door een valide RPKI ROA."
 
 #: reports/report_types/safe_connections_report/report.html
+#, fuzzy
 msgid ""
 "The Safe Connections report provides an overview of the performed checks "
 "with regard to encrypted communication channels such as HTTPS. The table "
@@ -4541,6 +4615,12 @@ msgid ""
 "was identified are shown too. The risk level may be different for your "
 "specific environment."
 msgstr ""
+"Het beveiligde-verbindingen-rapport geeft een overzicht van de uitgevoerde "
+"controles met betrekking tot versleutelde communicatiekanalen zoals HTTPS. "
+"De tabel hieronder geeft een overzicht van de beschikbare controles en of "
+"het systeem de uitgevoerde controles heeft doorstaan. Het risiconiveau en "
+"redenen waarom er een bevinding is geïdentificeerd worden ook getoond. Het "
+"risiconiveau kan variëren afhankelijk van uw specifieke omgeving."
 
 #: reports/report_types/safe_connections_report/report.html
 msgid "Safe connections compliance"
@@ -6947,8 +7027,9 @@ msgid "Privacy Statement"
 msgstr "Privacyverklaring"
 
 #: rocky/templates/forms/json_schema_form.html
+#, fuzzy
 msgid "Fill out this form to answer the Question (again):"
-msgstr ""
+msgstr "Vul dit formulier in om de Vraag (opnieuw) te beoordelen:"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -7690,8 +7771,9 @@ msgid "Add indemnification"
 msgstr "Vrijwaring toevoegen"
 
 #: rocky/templates/partials/current_config.html
+#, fuzzy
 msgid "Current configuration"
-msgstr ""
+msgstr "Huidige configuratie"
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 msgid "Observed at"
