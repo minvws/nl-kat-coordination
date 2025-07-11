@@ -51,31 +51,62 @@ class OnboardingStart(OrganizationView):
         return redirect("crisis_room")
 
 
-# REDTEAMER FLOW
-
-
-class OnboardingIntroductionView(
-    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
-):
+class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, TemplateView):
     """
-    1. Start the onboarding wizard. What is OpenKAT and what it does.
+    Step: 1 - Registration introduction
     """
 
     template_name = "step_1_introduction_registration.html"
     current_step = 1
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.add_organizationmember"
 
 
-class OnboardingChooseReportInfoView(
-    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
-):
+class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, CreateView):
     """
-    2a. Introduction into reporting. All the necessities to generate a report.
+    Step 2: Create a new organization
     """
 
-    template_name = "step_2a_choose_report_info.html"
+    model = Organization
+    template_name = "step_2a_organization_setup.html"
+    form_class = OrganizationForm
     current_step = 2
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.add_organization"
+
+    def get(self, request, *args, **kwargs):
+        if member := OrganizationMember.objects.filter(user=self.request.user).first():
+            return redirect(
+                reverse("step_2b_organization_update", kwargs={"organization_code": member.organization.code})
+            )
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except RockyError as e:
+            messages.add_message(request, messages.ERROR, str(e))
+
+        return self.get(request, *args, **kwargs)
+
+    def get_success_url(self) -> str:
+        self.create_first_member(self.object)
+        return reverse_lazy("step_3_indemnification_setup", kwargs={"organization_code": self.object.code})
+
+    def form_valid(self, form):
+        org_name = form.cleaned_data["name"]
+        result = super().form_valid(form)
+        self.add_success_notification(org_name)
+        return result
+
+    def create_first_member(self, organization):
+        member = OrganizationMember.objects.create(user=self.request.user, organization=organization)
+        if member.user.is_superuser:
+            member.trusted_clearance_level = 4
+            member.acknowledged_clearance_level = 4
+            member.save()
+
+    def add_success_notification(self, org_name):
+        success_message = _("{org_name} successfully created.").format(org_name=org_name)
+        messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
 class OnboardingOrganizationUpdateView(
@@ -392,78 +423,6 @@ class OnboardingReportView(
         member.onboarded = True
         member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
-
-
-# account flow
-
-
-class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, TemplateView):
-    """
-    Step: 1 - Registration introduction
-    """
-
-    template_name = "step_1_introduction_registration.html"
-    current_step = 1
-    permission_required = "tools.add_organizationmember"
-
-
-class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, CreateView):
-    """
-    Step 2: Create a new organization
-    """
-
-    model = Organization
-    template_name = "step_2a_organization_setup.html"
-    form_class = OrganizationForm
-    current_step = 2
-    permission_required = "tools.add_organization"
-
-    def get(self, request, *args, **kwargs):
-        if member := OrganizationMember.objects.filter(user=self.request.user).first():
-            return redirect(
-                reverse("step_2b_organization_update", kwargs={"organization_code": member.organization.code})
-            )
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        try:
-            return super().post(request, *args, **kwargs)
-        except RockyError as e:
-            messages.add_message(request, messages.ERROR, str(e))
-
-        return self.get(request, *args, **kwargs)
-
-    def get_success_url(self) -> str:
-        self.create_first_member(self.object)
-        return reverse_lazy("step_3_indemnification_setup", kwargs={"organization_code": self.object.code})
-
-    def form_valid(self, form):
-        org_name = form.cleaned_data["name"]
-        result = super().form_valid(form)
-        self.add_success_notification(org_name)
-        return result
-
-    def create_first_member(self, organization):
-        member = OrganizationMember.objects.create(user=self.request.user, organization=organization)
-        if member.user.is_superuser:
-            member.trusted_clearance_level = 4
-            member.acknowledged_clearance_level = 4
-            member.save()
-
-    def add_success_notification(self, org_name):
-        success_message = _("{org_name} successfully created.").format(org_name=org_name)
-        messages.add_message(self.request, messages.SUCCESS, success_message)
-
-
-class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
-    account_type: str | None = None
-    permission_required = "tools.add_organizationmember"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["organization"] = self.organization
-        kwargs["account_type"] = self.account_type
-        return kwargs
 
 
 class CompleteOnboarding(OrganizationView):

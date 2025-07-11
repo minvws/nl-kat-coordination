@@ -54,7 +54,7 @@ urlpatterns = [
     path(  # Step 9a
         "<organization_code>/step/setup-scan/ooi/detail/",
         views.OnboardingCreateReportRecipe.as_view(),
-        name="step_10_setup_scan_ooi_detail",
+        name="step_9a_setup_scan_ooi_detail",
     ),
     path(  # Step 10
         "<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_10_report"
