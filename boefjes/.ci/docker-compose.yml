@@ -5,7 +5,7 @@ services:
       dockerfile: boefjes/Dockerfile
       args:
         - ENVIRONMENT=dev
-    command: sh -c 'python -m pytest -v tests/integration'
+    command: sh -c 'uv run pytest -v tests/integration'
     depends_on:
       - ci_katalogus-db
       - ci_katalogus
@@ -109,7 +109,7 @@ services:
       dockerfile: boefjes/Dockerfile
       args:
         - ENVIRONMENT=dev
-    command: uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8080
+    command: uv run uvicorn boefjes.katalogus.root:app --host 0.0.0.0 --port 8080
     depends_on:
       - ci_katalogus-db
     env_file:

@@ -5,7 +5,7 @@ set -e
 shopt -s nocasematch
 
 if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
-    python -m alembic --config /app/bytes/bytes/alembic.ini upgrade head
+    (cd /app/bytes/ && uv run alembic --config bytes/alembic.ini upgrade head)
 fi
 
 exec "$@"

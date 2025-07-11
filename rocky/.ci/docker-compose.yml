@@ -8,7 +8,7 @@ services:
         USER_UID: 1001
         USER_GID: 1001
       target: dev
-    command: pytest tests/
+    command: uv run --frozen pytest tests/
     depends_on:
       - ci_rocky-db
     volumes:
@@ -26,7 +26,7 @@ services:
         USER_UID: 1001
         USER_GID: 1001
       target: dev
-    command: pytest tests/integration
+    command: uv run --frozen pytest tests/integration
     depends_on:
       - ci_rocky-db
       - ci_octopoes

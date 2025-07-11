@@ -1,41 +1,40 @@
 ARG PYTHON_VERSION=3.13
-FROM python:$PYTHON_VERSION AS dev
+FROM python:$PYTHON_VERSION-bookworm AS base
+
+ENTRYPOINT ["/app/boefjes/entrypoint.sh"]
 
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-ENTRYPOINT ["/app/boefjes/entrypoint.sh"]
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN groupadd --gid "$USER_GID" nonroot
-RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" nonroot
+WORKDIR /app
 
-WORKDIR /app/boefjes
-ENV PATH=/home/nonroot/.local/bin:${PATH}
+COPY boefjes/pyproject.toml boefjes/uv.lock ./
 
-ARG ENVIRONMENT
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=boefjes/uv.lock,target=uv.lock \
+    --mount=type=bind,source=boefjes/pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
-COPY boefjes/requirements-dev.txt boefjes/requirements.txt .
-
-RUN --mount=type=cache,target=/root/.cache \
-    pip install --upgrade pip \
-    && if [ "$ENVIRONMENT" = "dev" ]; \
-    then \
-    pip install -r requirements-dev.txt; \
-    else \
-    pip install -r requirements.txt; \
-    fi
-
-FROM dev
-
-COPY octopoes/ /tmp/octopoes
-RUN cd /tmp/octopoes && python setup.py bdist_wheel
-RUN pip install /tmp/octopoes/dist/octopoes*.whl
-
+COPY boefjes/boefjes boefjes/
 COPY boefjes/entrypoint.sh .
-COPY boefjes/boefjes ./boefjes
 
-# FIXME: We currently have to run as root to be able to start containers using
-# the docker socket
-#USER nonroot
+# todo: install Octopoes
 
-CMD ["python", "-m", "bin.worker", "boefje"]
+RUN groupadd --gid "$USER_GID" openkat && \
+    adduser --disabled-password --gecos "" --uid "$USER_UID" --gid "$USER_GID" openkat
+
+ENV PYTHONPATH=/app/boefjes/
+
+FROM base AS dev
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=boefjes/uv.lock,target=uv.lock \
+    --mount=type=bind,source=boefjes/pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --group dev
+
+# todo: we currently have to run as root to be able to start containers using the Docker socket
+# USER openkat
+
+CMD ["uv", "run", "--module", "bin.worker", "boefje"]
