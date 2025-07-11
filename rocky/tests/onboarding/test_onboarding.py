@@ -36,8 +36,7 @@ def test_onboarding_redirect(rf, superuser):
     assert response.headers["Location"] == reverse("step_1_introduction_registration")
 
 
-def test_step_1_onboarding_introduction(request, superuser_member, rf):
-    superuser_member = request.getfixturevalue(superuser_member)
+def test_step_1_onboarding_introduction(superuser_member, rf):
     response = OnboardingIntroductionRegistrationView.as_view()(
         setup_request(rf.get("step_1_introduction_registration"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -141,7 +140,7 @@ def test_step_4_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_
     assertContains(response, "Onboarding")
     assertContains(response, "User clearance level")
     assertContains(response, "Trusted clearance level")
-    assertContains(response, "Acknowledge clearance level")
+    assertContains(response, "Accepted clearance level")
     assertContains(response, "What is my clearance level?")
     assertContains(response, "Add URL")
     assertContains(response, "Skip onboarding")
@@ -156,7 +155,6 @@ def test_step_4_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_
         + str(redteam_member.acknowledged_clearance_level)
         + "</strong>."
     )
-    assertContains(response, "Set clearance level")
 
     redteam_member.trusted_clearance_level = 2
     redteam_member.acknowledged_clearance_level = -1
@@ -270,6 +268,7 @@ def test_step_6_onboarding_set_clearance_level(
     assertContains(response_redteam, "Onboarding")
     assertContains(response_redteam, "Set object clearance level")
     assertContains(response_redteam, "Skip onboarding")
+    assertContains(response_redteam, "Set clearance level")
 
     with pytest.raises(PermissionDenied):
         OnboardingSetClearanceLevelView.as_view()(
@@ -291,9 +290,7 @@ def test_step_7_onboarding_clearance_level_introduction(rf, redteam_member, mock
 
     assert response.status_code == 200
     assertContains(response, "Onboarding")
-    assertContains(response, "OOI clearance for " + url.human_readable)
-    assertContains(response, "Introduction")
-    assertContains(response, "How to know required clearance level")
+    assertContains(response, "Plugin introduction")
     assertContains(response, "Fierce")
     assertContains(response, "DNS-Zone")
     assertContains(response, "Skip onboarding")
@@ -313,11 +310,9 @@ def test_step_8_onboarding_select_plugins(request, member, rf, mocker, mock_orga
     assert response.status_code == 200
 
     assertContains(response, "Enabling plugins and start scanning")
-    assertContains(response, "Plugin introduction")
     assertContains(response, "Boefjes")
     assertContains(response, "Normalizers")
     assertContains(response, "Bits")
-    assertContains(response, "Required and suggested plugins")
     assertContains(response, "Skip onboarding")
     assertContains(response, "Enable and continue")
 
@@ -357,18 +352,16 @@ def test_step_9a_onboarding_ooi_detail_scan(
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
     response = OnboardingCreateReportRecipe.as_view()(
-        setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
+        setup_request(rf.get("step_9a_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
         organization_code=member.organization.code,
     )
 
     assert response.status_code == 200
 
     assertContains(response, "Onboarding")
-    assertContains(response, "Setup scan")
-    assertContains(response, "Creating an object")
-    assertContains(response, "Network")
+    assertContains(response, "Generate a report")
     assertContains(response, "Skip onboarding")
-    assertContains(response, "Start scanning")
+    assertContains(response, "Generate DNS Report")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
@@ -383,7 +376,7 @@ def test_step_9a_onboarding_ooi_detail_scan_create_report_schedule(
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
     request_url = (
-        reverse("step_setup_scan_ooi_detail", kwargs={"organization_code": member.organization.code})
+        reverse("step_9a_setup_scan_ooi_detail", kwargs={"organization_code": member.organization.code})
         + f"?report_type=dns-report&ooi={url.primary_key}"
     )
 

@@ -14,17 +14,23 @@ DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1
 
 
 class IntroductionStepsMixin(StepsMixin):
+    """Flow for redteamers/admins added to an organization as a member - needs the organization as a context."""
+
     organization: Organization
 
     def build_steps(self):
         steps = [
             {
                 "text": _("1: Welcome"),
-                "url": reverse_lazy("step_1_introduction_registration") + get_selection(self.request),
+                "url": reverse_lazy("step_1a_introduction", kwargs={"organization_code": self.organization.code})
+                + get_selection(self.request),
             },
             {
                 "text": _("2: Organization setup"),
-                "url": reverse_lazy("step_2a_organization_setup") + get_selection(self.request),
+                "url": reverse_lazy(
+                    "step_4_trusted_acknowledge_clearance_level", kwargs={"organization_code": self.organization.code}
+                )
+                + get_selection(self.request),
             },
             {
                 "text": _("3: Add object"),
@@ -48,6 +54,8 @@ class IntroductionStepsMixin(StepsMixin):
 
 
 class IntroductionRegistrationStepsMixin(StepsMixin):
+    """Flow for new superusers that need to create an organization as well."""
+
     organization: Organization
 
     def build_steps(self):
