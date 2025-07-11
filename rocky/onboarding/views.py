@@ -51,6 +51,18 @@ class OnboardingStart(OrganizationView):
         return redirect("crisis_room")
 
 
+class OnboardingIntroductionView(
+    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
+):
+    """
+    1. Start the onboarding wizard. What is OpenKAT and what it does.
+    """
+
+    template_name = "step_1a_introduction.html"
+    current_step = 1
+    permission_required = "tools.can_scan_organization"
+
+
 class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
@@ -153,10 +165,10 @@ class OnboardingIndemnificationSetupView(IntroductionStepsMixin, Indemnification
 
 
 class OnboardingAcknowledgeClearanceLevelView(
-    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OOIClearanceMixin, OrganizationView, TemplateView
+    IntroductionStepsMixin, OOIClearanceMixin, OrganizationView, TemplateView
 ):
     """
-    4. Explains the user that before setting a clearance level, they must have a permissiom to do so.
+    4. Explains the user that before setting a clearance level, they must have a permission to do so.
     Here they acknowledge the clearance level assigned by their administrator.
     """
 

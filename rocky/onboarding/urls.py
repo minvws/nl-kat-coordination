@@ -21,6 +21,11 @@ urlpatterns = [
         views.OnboardingIndemnificationSetupView.as_view(),
         name="step_3_indemnification_setup",
     ),
+    path(  # Step 1 for admins: introduction
+        "<organization_code>/step/introduction/",
+        views.OnboardingIntroductionView.as_view(),
+        name="step_1a_introduction",
+    ),
     path(  # Step 4
         "<organization_code>/step/acknowledge-clearance-level/",
         views.OnboardingAcknowledgeClearanceLevelView.as_view(),

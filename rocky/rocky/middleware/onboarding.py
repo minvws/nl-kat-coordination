@@ -36,10 +36,7 @@ def OnboardingMiddleware(get_response):
                     ONBOARDING_PERMISSIONS
                 ):
                     return redirect(
-                        reverse(
-                            "step_1_introduction_registration", 
-                                kwargs={"organization_code": member.organization.code}
-                        )
+                        reverse("step_1_introduction", kwargs={"organization_code": member.organization.code})
                     )
 
         return response
