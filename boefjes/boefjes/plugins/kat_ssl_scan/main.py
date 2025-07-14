@@ -8,4 +8,4 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     output = subprocess.run(["/usr/bin/sslscan", "--xml=-", hostname], capture_output=True)
     output.check_returncode()
 
-    return [({"openkat/ssl-version-output"}, output.stdout.decode())]
+    return [({"openkat/ssl-scan-output"}, output.stdout.decode())]

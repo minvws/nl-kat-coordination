@@ -48,7 +48,7 @@ jobs:
           - dockerfile: boefjes/boefjes/plugins/kat_ssl_certificates/boefje.Dockerfile
             image: openkat/ssl-certificates
           - dockerfile: boefjes/boefjes/plugins/kat_ssl_scan/boefje.Dockerfile
-            image: openkat/ssl-version
+            image: openkat/ssl-scan
           - dockerfile: boefjes/boefjes/plugins/kat_testssl_sh_ciphers/boefje.Dockerfile
             image: openkat/testssl-sh-ciphers
           - dockerfile: boefjes/boefjes/plugins/kat_webpage_capture/boefje.Dockerfile
