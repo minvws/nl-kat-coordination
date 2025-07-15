@@ -111,7 +111,10 @@ services:
       - .env-defaults
       - .env
     environment:
-      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
+      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_boefjes
+    networks:
+      - default
+      - boefjes
 
   normalizer:
     restart: unless-stopped
@@ -312,6 +315,13 @@ networks:
         - subnet: fc42:ca7::/64
         - subnet: 172.30.0.0/16
           gateway: 172.30.0.1
+  boefjes:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fc42:ca7:1::/64
+        - subnet: 172.31.0.0/16
+          gateway: 172.31.0.1
 
 volumes:
   postgres-data:
