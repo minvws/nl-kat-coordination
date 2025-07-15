@@ -82,7 +82,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
                 except (ValidationError, ObjectNotFoundException):
                     self.patch_task(task.id, TaskStatus.FAILED)
                     continue
-            results.append(task)                    
+            results.append(task)
 
         return results
 
