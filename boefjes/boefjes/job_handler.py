@@ -76,17 +76,18 @@ class DockerBoefjeHandler(BoefjeHandler):
                 task_id,
                 e.exit_status,
             )
-
-            # save container log (stderr) to bytes
             self.bytes_api_client.login()
-            boefje_meta.ended_at = datetime.now(timezone.utc)
+
             try:
-                # this boefje_meta might be incomplete, it comes from the scheduler instead of the Boefje I/O API
-                self.bytes_api_client.save_boefje_meta(boefje_meta)
+                self.bytes_api_client.get_boefje_meta(boefje_meta.id)
+                logger.info("Container managed to save its raw data to bytes itself.")
             except HTTPError:
-                logger.error("Failed to save boefje meta to bytes, continuing anyway")
-            self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
-            self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+                logger.info("Container did not manage to save its raw data to bytes, saving the container instead.")
+
+                boefje_meta.ended_at = datetime.now(timezone.utc)
+                self.bytes_api_client.save_boefje_meta(boefje_meta)
+                self.bytes_api_client.save_raw(task_id, e.stderr, stderr_mime_types)
+                self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
         except ImageNotFound:
             logger.error("Docker image %s not found", oci_image)
             self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
@@ -215,33 +216,3 @@ class LocalNormalizerHandler(NormalizerHandler):
             self.bytes_client.save_normalizer_meta(normalizer_meta)
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
-
-
-class CompositeBoefjeHandler(BoefjeHandler):
-    """This is a pattern that allows us to use the Handler interface while allowing multiple handlers to be active at
-    the same time, depending on the configuration. This way, we don't need to keep the option to delegate in every
-    BoefjeHandler instance."""
-
-    def __init__(self, boefje_handler: BoefjeHandler | None = None, docker_handler: DockerBoefjeHandler | None = None):
-        self.boefje_handler = boefje_handler
-        self.docker_handler = docker_handler
-
-    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
-        return self.get_handler(task).handle(task)
-
-    def get_handler(self, task: Task) -> BoefjeHandler:
-        if not isinstance(task.data, BoefjeMeta):
-            raise RuntimeError("Did not receive boefje task")
-
-        if self.docker_handler and task.data.arguments["oci_image"]:
-            return self.docker_handler
-
-        if not self.boefje_handler:
-            raise RuntimeError("No handlers defined")
-
-        return self.boefje_handler
-
-    def copy_raw_files(
-        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
-    ) -> None:
-        self.get_handler(task).copy_raw_files(task, output, duplicated_tasks)
