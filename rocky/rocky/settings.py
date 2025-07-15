@@ -19,6 +19,7 @@ from csp.constants import NONE, SELF
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+from django.views.debug import SafeExceptionReporterFilter
 
 from rocky.otel import OpenTelemetryHelper
 
@@ -44,6 +45,18 @@ KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 BYTES_API = env.url("BYTES_API").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME")
 BYTES_PASSWORD = env("BYTES_PASSWORD")
+
+# See these Django release notes: https://docs.djangoproject.com/en/dev/releases/3.1/#error-reporting
+HIDDEN_DEFAULT = "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE"
+HIDDEN_ADDITIONAL = "ROCKY|BOEFJES|BYTES|MULA|SCHEDULER|OCTOPOES|RABBITMQ_|_URI"
+
+
+class SaferExceptionReporterFilter(SafeExceptionReporterFilter):
+    hidden_settings = re.compile(f"{HIDDEN_DEFAULT}|{HIDDEN_ADDITIONAL}", flags=re.I)
+
+
+DEFAULT_EXCEPTION_REPORTER_FILTER = "rocky.settings.SaferExceptionReporterFilter"
+
 
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
 
@@ -171,7 +184,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "rocky.middleware.auth_token.AuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
@@ -245,12 +257,19 @@ except ImproperlyConfigured:
 DATABASES = {"default": POSTGRES_DB}
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
-    DATABASES["default"]["OPTIONS"] = {
-        "sslmode": env("POSTGRES_SSL_MODE"),
-        "sslrootcert": env.path("POSTGRES_SSL_ROOTCERT"),
-        "sslcert": env.path("POSTGRES_SSL_CERT"),
-        "sslkey": env.path("POSTGRES_SSL_KEY"),
-    }
+    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", "require")}
+
+    POSTGRES_SSL_CERT = env.path("POSTGRES_SSL_CERT", default="")
+    POSTGRES_SSL_KEY = env.path("POSTGRES_SSL_KEY", default="")
+
+    if POSTGRES_SSL_CERT and POSTGRES_SSL_KEY:
+        DATABASES["default"]["OPTIONS"]["sslcert"] = POSTGRES_SSL_CERT
+        DATABASES["default"]["OPTIONS"]["sslkey"] = POSTGRES_SSL_KEY
+
+    POSTGRES_SSL_ROOTCERT = env.path("POSTGRES_SSL_ROOTCERT", default="")
+    if POSTGRES_SSL_ROOTCERT:
+        DATABASES["default"]["OPTIONS"]["sslrootcert"] = POSTGRES_SSL_ROOTCERT
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

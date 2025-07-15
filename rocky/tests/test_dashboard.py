@@ -287,11 +287,11 @@ def test_delete_dashboard_item(rf, redteam_member, dashboard_items):
 
     position_item_1 = item_1.position
     position_item_2 = item_2.position
-
     position_item_4 = item_4.position
 
     request = setup_request(
-        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": item_3.id}), redteam_member.user
+        rf.post("delete_dashboard_item", {"dashboard_item": item_3.name, "dashboard": item_3.dashboard_id}),
+        redteam_member.user,
     )
     response = DeleteDashboardItemView.as_view()(request, organization_code=redteam_member.organization.code)
 
@@ -540,9 +540,9 @@ def test_create_dashboard_item_form_findings_list(client_member, dashboard_items
             "limit": "10",
             "size": "2",
             "observed_at": "2025-05-07",
-            "exclude_muted": "True",
-            "only_muted": "False",
+            "muted_findings": "non-muted",
             "source": "finding_list",
+            "template": "partials/dashboard_finding_list.html",
         }
     )
 

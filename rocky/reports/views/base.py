@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import structlog
 from account.mixins import OrganizationView
+from crisis_room.forms import AddReportSectionDashboardItemForm
 from django.conf import settings
 from django.contrib import messages
 from django.forms import Form
@@ -39,7 +40,7 @@ from reports.report_types.helpers import (
 )
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.utils import JSONEncoder, debug_json_keys
-from rocky.views.mixins import ObservedAtMixin, OOIList
+from rocky.views.mixins import AddDashboardItemFormMixin, ObservedAtMixin, OOIList
 from rocky.views.ooi_view import BaseOOIListView, OOIFilterView
 from rocky.views.scheduler import SchedulerView
 
@@ -538,11 +539,13 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
         return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
 
 
-class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
+class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView, AddDashboardItemFormMixin):
     """
     This will display reports using report_id from reports history.
     Will fetch Report OOI and recreate report with data saved in bytes.
     """
+
+    add_dashboard_item_form = AddReportSectionDashboardItemForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -550,6 +553,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         self.report_ooi = self.get_report_ooi()
         self.report_data, self.input_oois, self.report_types, self.plugins = self.get_report_data()
         self.recipe_ooi = self.get_recipe_ooi(self.report_ooi.report_recipe)
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return self.add_to_dashboard()
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
@@ -733,9 +739,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context["report_data"] = self.report_data
         context["report_ooi"] = self.report_ooi
         context["recipe_ooi"] = self.recipe_ooi
-
         context["oois"] = self.input_oois
-
         context["report_types"] = self.report_types
         context["plugins"] = self.plugins
         context["report_download_json_url"] = url_with_querystring(
