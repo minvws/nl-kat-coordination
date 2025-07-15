@@ -144,7 +144,7 @@ class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
         messages.add_message(
             request,
             messages.SUCCESS,
-            _("Successfully set scan profile to %s for %d oois.") % (level.name, len(selected_oois)),
+            _("Successfully set scan profile to %s for %d OOIs.") % (level.name, len(selected_oois)),
         )
         return self.get(request, *args, **kwargs)
 
@@ -169,7 +169,7 @@ class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
             return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
-            request, messages.SUCCESS, _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois)
+            request, messages.SUCCESS, _("Successfully set %d OOI(s) clearance level to inherit.") % len(selected_oois)
         )
         return self.get(request, *args, **kwargs)
 
@@ -184,7 +184,7 @@ class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
             return self.get(request, status=500, *args, **kwargs)
         except ObjectNotFoundException:
             messages.add_message(
-                request, messages.ERROR, _("An error occurred while deleting oois: one of the OOIs doesn't exist.")
+                request, messages.ERROR, _("An error occurred while deleting OOIs: one of the OOIs doesn't exist.")
             )
             return self.get(request, status=404, *args, **kwargs)
 
