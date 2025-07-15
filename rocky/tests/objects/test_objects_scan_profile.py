@@ -4,7 +4,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from tools.models import Indemnification
 
 from octopoes.models.tree import ReferenceTree
-from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
+from rocky.views.scan_profile import ScanProfileDetailView
 from tests.conftest import setup_request
 
 TREE_DATA = {
@@ -47,7 +47,7 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
 
-    assertContains(response, "Set clearance level")
+    assertContains(response, "Edit clearance level")
 
 
 def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
@@ -66,7 +66,7 @@ def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organizati
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
-    assertContains(response, "Clearance level has been set")
+    assertContains(response, "Clearance level has been set.")
 
 
 def test_scan_profile_submit_no_indemnification(
@@ -107,7 +107,7 @@ def test_scan_profile_no_permissions_acknowledged(
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
 
-    assertNotContains(response, "Set clearance level")
+    assertNotContains(response, "Edit clearance level")
 
 
 def test_scan_profile_no_permissions_trusted(
@@ -125,22 +125,21 @@ def test_scan_profile_no_permissions_trusted(
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
 
-    assertNotContains(response, "Set clearance level")
+    assertNotContains(response, "Edit clearance level")
 
 
 def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mocker.patch("account.mixins.OrganizationView.get_katalogus")
 
-    request = setup_request(rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
-    response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
+    request = setup_request(rf.post("scan_profile_reset", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
 
-    assertContains(response, "Set clearance level")
-    assertContains(response, "Yes, set to inherit")
-    assertContains(response, '"declared" to "inherit"')
+    assertContains(response, "Edit clearance level")
+    assertContains(response, 'This object has a clearance level of "empty".')
 
 
 def test_scan_reset_calls_octopoes(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
@@ -154,7 +153,7 @@ def test_scan_reset_calls_octopoes(rf, redteam_member, mock_scheduler, mock_orga
         ),
         redteam_member.user,
     )
-    response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
     assert mock_organization_view_octopoes().get_tree.call_count == 1
