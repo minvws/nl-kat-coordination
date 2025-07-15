@@ -79,9 +79,10 @@ class SchedulerAPIClient(SchedulerClientInterface):
             if isinstance(task.data, BoefjeMeta):
                 try:
                     task.data = self._hydrate_boefje_meta(task.data)
-                    results.append(task)
                 except (ValidationError, ObjectNotFoundException):
                     self.patch_task(task.id, TaskStatus.FAILED)
+                    continue
+            results.append(task)                    
 
         return results
 
