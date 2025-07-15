@@ -62,7 +62,7 @@ FROM base AS dev
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=rocky/uv.lock,target=uv.lock \
     --mount=type=bind,source=rocky/pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --group dev
+    uv sync --inexact --frozen --group dev
 
 USER rocky
 
