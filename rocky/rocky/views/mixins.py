@@ -414,14 +414,15 @@ class ReportList:
 
             enriched_report.report = report
 
-            enriched_report.total_asset_reports = len(report.input_oois)
             if settings.ASSET_REPORTS:
                 asset_reports = cast(list[AssetReport], report.input_oois)
 
+                enriched_report.total_asset_reports = len(report.input_oois)
                 enriched_report.asset_reports = sorted(asset_reports[:5], key=attrgetter("name"))
                 enriched_report.input_oois = list({asset_report.input_ooi for asset_report in asset_reports})
                 enriched_report.report_type_summary = self.report_type_summary(asset_reports)
             else:
+                enriched_report.total_asset_reports = 0
                 enriched_report.input_oois = cast(list[str], report.input_oois)
 
             enriched_report.total_objects = len(enriched_report.input_oois)
