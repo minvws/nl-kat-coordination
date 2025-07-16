@@ -2,7 +2,8 @@
   "id": "kat_nikto_normalize",
   "name": "Nikto",
   "consumes": [
-    "boefje/nikto-output"
+    "boefje/nikto-output",
+    "openkat/nikto-output"
   ],
   "produces": [
     "Software",
