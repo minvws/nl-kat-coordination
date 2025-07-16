@@ -21,7 +21,14 @@ from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
-from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
+from rocky.views.mixins import (
+    OBJECT_LIST_COLUMNS,
+    ConnectorFormMixin,
+    OctopoesView,
+    OOIList,
+    SingleOOIMixin,
+    SingleOOITreeMixin,
+)
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
@@ -120,8 +127,8 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
         context["clearance_types_selection"] = self.clearance_types
         context["active_filters"] = self.get_active_filters()
-        context["active_filters_counter"] = self.count_active_filters
 
+        context["active_filters_counter"] = self.count_active_filters
         return context
 
 
@@ -133,19 +140,11 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_queryset(self) -> OOIList:
         return OOIList(self.octopoes_api_connector, **self.get_queryset_params())
 
-    def get_table_columns(self) -> dict[str, str]:
-        return {
-            "object": _("Object"),
-            "object_type": _("Type"),
-            "clearance_level": _("Clearance level"),
-            "clearance_type": _("Clearance type"),
-        }
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["total_oois"] = len(self.object_list)
-        context["table_columns"] = self.get_table_columns()
+        context["table_columns"] = OBJECT_LIST_COLUMNS
         return context
 
 

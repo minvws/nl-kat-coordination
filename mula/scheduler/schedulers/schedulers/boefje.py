@@ -4,8 +4,10 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry import trace
+from typing_extensions import override
 
 from scheduler import clients, context, models
+from scheduler.clients.errors import ExternalServiceResponseError
 from scheduler.models import MutationOperationType
 from scheduler.models.ooi import RunOn
 from scheduler.schedulers import Scheduler, queue, rankers
@@ -52,11 +54,14 @@ class BoefjeScheduler(Scheduler):
             ctx (context.AppContext): Application context of shared data (e.g.
                 configuration, external services connections).
         """
+        # Note: that we use the BoefjePQ here, which is a custom priority queue
+        # that overrides the pop method to call the `pop_boefje()` method.
         pq = BoefjePQ(
             pq_id=self.ID, maxsize=ctx.config.pq_maxsize, item_type=self.ITEM_TYPE, pq_store=ctx.datastores.pq_store
         )
 
         super().__init__(ctx=ctx, scheduler_id=self.ID, queue=pq, create_schedule=True, auto_calculate_deadline=True)
+
         self.ranker = rankers.BoefjeRankerTimeBased(self.ctx)
 
     def run(self) -> None:
@@ -67,7 +72,8 @@ class BoefjeScheduler(Scheduler):
         - Scan profile mutations; when a scan profile is updated for an ooi
         e.g. the scan level is changed, we need to create new tasks for the
         ooi. We gather all boefjes that can run on the ooi and create tasks
-        for them.
+        for them. We get this event from the RabbitMQ `ScanProfileMutation`
+        client.
 
         - New boefjes; when new boefjes are added or enabled we find the ooi's
         that boefjes can run on, and create tasks for it.
@@ -95,7 +101,7 @@ class BoefjeScheduler(Scheduler):
         """Create tasks for oois that have a scan level change.
 
         Args:
-            mutation: The mutation that was received.
+            body: The mutation that was received.
         """
         # Convert body into a ScanProfileMutation
         mutation = models.ScanProfileMutation.model_validate_json(body)
@@ -200,7 +206,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         boefje_tasks = []
 
-        # TODO: this should be optimized see #3357
+        # TODO: this should be optimized see #3357 and #4191
         orgs = self.ctx.services.katalogus.get_organisations()
 
         for org in orgs:
@@ -445,6 +451,7 @@ class BoefjeScheduler(Scheduler):
                     caller=caller,
                 )
 
+    @override
     def push_item_to_queue(self, item: models.Task, create_schedule: bool = True) -> models.Task:
         """Some boefje scheduler specific logic before pushing the item to the
         queue.
@@ -652,27 +659,20 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def get_oois_for_boefje(self, boefje: models.Plugin, organisation: str) -> list[models.OOI]:
-        oois = []
-
-        oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-            organisation,
-            boefje.consumes,
-            list(range(boefje.scan_level, 5)),  # type: ignore
-        )
-
-        # Filter OOIs based on permission
-        for ooi in oois_by_object_type:
-            if not self.has_boefje_permission_to_run(boefje, ooi):
-                self.logger.debug(
-                    "Boefje not allowed to run on ooi",
-                    boefje_id=boefje.id,
-                    ooi_primary_key=ooi.primary_key,
-                    scheduler_id=self.scheduler_id,
-                )
-                continue
-            oois.append(ooi)
-
-        return oois
+        if boefje.enabled is False:
+            return []
+        try:
+            # fetch all ooi's from the types in consumes list that have a clearance => the scan level
+            oois = self.ctx.services.octopoes.get_objects_by_object_types(
+                organisation,
+                boefje.consumes,
+                list(range(boefje.scan_level, 5)),  # type: ignore
+            )
+            return oois
+        except (
+            ExternalServiceResponseError
+        ):  # maybe our consumes list does not match the Models, or the organisation does not exists
+            return []
 
     @exception_handler
     def is_boefje_in_other_orgs(self, boefje_task: models.BoefjeTask) -> list[models.BoefjeTask]:
@@ -773,6 +773,7 @@ class BoefjeScheduler(Scheduler):
 
         return tasks
 
+    @override
     def calculate_deadline(self, schedule: models.Schedule) -> models.Schedule:
         """Override Scheduler.calculate_deadline() to calculate the deadline
         for a task and based on the boefje interval."""

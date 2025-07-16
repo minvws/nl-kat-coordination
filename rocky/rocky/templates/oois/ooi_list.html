@@ -11,28 +11,24 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
-                <div>
-                    <h1>
-                        {% translate "Object list" %} @
-                        {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
-                    </h1>
-                    <p>
-                        {% blocktranslate trimmed with organization.name as organization_name %}
-                            An overview of objects found for organization <strong>{{ organization_name }}</strong>.
-                            Objects can be added manually or by running Boefjes.
-                            Click an object for additional information.
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="horizontal-view toolbar">
+            <div>
+                <div class="fifty-fifty">
+                    <div>
+                        <h1>
+                            {% translate "Object list" %} @
+                            {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
+                        </h1>
+                        <p>
+                            {% blocktranslate trimmed with organization.name as organization_name %}
+                                An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+                                Objects can be added manually or by running Boefjes.
+                                Click an object for additional information.
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
                     {% include "partials/ooi_list_toolbar.html" %}
 
                 </div>
-            </div>
-            <div>
-                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" query_from="object_list" %}
-
                 <div class="toolbar">
                     {% if organization_member.can_add_dashboard_item and organization_member.can_change_dashboard %}
                         <a href="#new-dashboard-item-modal"
@@ -136,6 +132,7 @@
                     {% endif %}
                 </form>
                 {% include "partials/list_paginator.html" %}
+                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" %}
 
             </div>
         </section>
