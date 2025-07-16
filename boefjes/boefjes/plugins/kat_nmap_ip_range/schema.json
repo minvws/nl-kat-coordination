@@ -10,6 +10,13 @@
       "default": 250,
       "description": "Scan TOP_PORTS most common TCP ports. Defaults to 250."
     },
+    "TOP_PORTS_UDP": {
+      "title": "TOP_PORTS_UDP",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
+      "default": 10
+    },
     "MIN_VLSM_IPV4": {
       "title": "MIN_VLSM_IPV4",
       "type": "integer",
