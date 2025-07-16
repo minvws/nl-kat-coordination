@@ -68,8 +68,11 @@
             </div>
             {% include "report_overview/modal_partials/rerun_modal.html" %}
             {% include "report_overview/modal_partials/rename_modal.html" %}
-            {% include "report_overview/modal_partials/delete_modal.html" %}
 
+            {% if perms.tools.can_delete_oois %}
+                {% include "report_overview/modal_partials/delete_modal.html" %}
+
+            {% endif %}
         </div>
     </div>
     <div class="horizontal-scroll sticky-column">

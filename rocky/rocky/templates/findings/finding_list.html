@@ -24,14 +24,22 @@
                     {% include "partials/findings_list_toolbar.html" %}
 
                 </div>
-                <div class="toolbar">
-                    <a href="#new-dashboard-item-modal"
-                       class="button ghost"
-                       data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
-                </div>
+                {% if organization_member.can_add_dashboard_item and organization_member.can_change_dashboard %}
+                    <div class="toolbar">
+                        <a href="#new-dashboard-item-modal"
+                           class="button ghost"
+                           data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
+                    </div>
+                    {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" %}
+
+                {% endif %}
                 {% include "findings/findings_filter.html" %}
 
-                {% if object_list|length >= 1 and perms.tools.can_mute_findings %}
+                {% if object_list|length >= 1 %}
+                    {% if perms.tools.can_mute_findings %}
+                        {% include "partials/mute_findings_modal.html" %}
+
+                    {% endif %}
                     <form method="post"
                           id="finding-list-form"
                           class="inline layout-wide"
@@ -207,9 +215,6 @@
 
                     </div>
                 </form>
-                {% include "partials/mute_findings_modal.html" %}
-                {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" %}
-
             </div>
         </section>
     </main>

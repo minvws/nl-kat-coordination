@@ -34,6 +34,8 @@
                         <a href="#new-dashboard-item-modal"
                            class="button ghost"
                            data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
+                        {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" %}
+
                     {% endif %}
                 </div>
                 {% include "partials/ooi_list_filters.html" %}
@@ -132,7 +134,6 @@
                     {% endif %}
                 </form>
                 {% include "partials/list_paginator.html" %}
-                {% include "partials/new_dashboard_item_modal.html" with item_type="objects" template="partials/dashboard_ooi_list.html" %}
 
             </div>
         </section>

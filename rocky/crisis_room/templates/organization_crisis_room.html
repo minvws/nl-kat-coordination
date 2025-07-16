@@ -49,8 +49,11 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% if organization_member.can_delete_dashboard %}
+                        {% include "partials/delete_dashboard_modal.html" %}
+
+                    {% endif %}
                     {% include "organization_crisis_room_dashboard_items.html" %}
-                    {% include "partials/delete_dashboard_modal.html" %}
 
                 {% else %}
                     <div class="centered">
