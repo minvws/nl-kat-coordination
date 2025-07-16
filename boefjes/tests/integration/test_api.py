@@ -48,7 +48,7 @@ def test_filter_plugins(test_client, organisation):
     response = test_client.get(
         f"/v1/organisations/{organisation.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
     )
-    assert {x["id"] for x in response.json()} == {"nmap", "nmap-udp", "nmap-ports"}  # Nmap TCP and UDP
+    assert {x["id"] for x in response.json()} == {"nmap", "nmap-ip-range", "nmap-udp", "nmap-ports"}
 
     boefje = Boefje(
         id="test_plugin", name="My test boefje", static=False, oci_image="ghcr.io/minvws/openkat/nmap:latest"
@@ -59,7 +59,7 @@ def test_filter_plugins(test_client, organisation):
     response = test_client.get(
         f"/v1/organisations/{organisation.id}/plugins", params={"oci_image": "ghcr.io/minvws/openkat/nmap:latest"}
     )
-    assert {x["id"] for x in response.json()} == {"nmap", "nmap-udp", "nmap-ports", "test_plugin"}  # Nmap TCP and UDP
+    assert {x["id"] for x in response.json()} == {"nmap", "nmap-ip-range", "nmap-udp", "nmap-ports", "test_plugin"}
 
 
 def test_cannot_add_plugin_reserved_id(test_client, organisation):
