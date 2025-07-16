@@ -2588,6 +2588,10 @@ msgid "Plugins successfully enabled."
 msgstr ""
 
 #: onboarding/views.py
+msgid "Web URL not found."
+msgstr ""
+
+#: onboarding/views.py
 msgid ""
 "Your report is scheduled for generation in about 3 minutes, as we are "
 "waiting for Boefjes to complete. In the meantime get familiar with OpenKAT "

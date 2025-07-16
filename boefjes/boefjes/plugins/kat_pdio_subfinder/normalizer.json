@@ -3,7 +3,8 @@
   "name": "PDIO subfinder",
   "description": "Parses ProjectDiscovery subfinder data for finding subdomains.",
   "consumes": [
-    "boefje/pdio-subfinder"
+    "boefje/pdio-subfinder",
+    "openkat/pdio-subfinder"
   ],
   "produces": [
     "Hostname"
