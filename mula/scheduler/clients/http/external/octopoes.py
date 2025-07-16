@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from datetime import datetime, timezone
 
 import httpx
@@ -26,7 +27,7 @@ class Octopoes(HTTPService):
     @exception_handler
     def get_objects_by_object_types(
         self, organisation_id: str, object_types: list[str], scan_level: list[int]
-    ) -> list[OOI]:
+    ) -> Generator[OOI, None, None]:
         """Get all oois from octopoes"""
         if scan_level is None:
             scan_level = []
@@ -37,24 +38,14 @@ class Octopoes(HTTPService):
             "types": object_types,
             "scan_level": [s for s in scan_level],
             "offset": 0,
-            "limit": 1,
+            "limit": 1000,
             "valid_time": datetime.now(timezone.utc),
         }
 
-        # Get the total count of objects
-        response = self.get(url, params=params)
-        list_objects = ListObjectsResponse(**response.json())
-        count = list_objects.count
-
-        # Update the limit for the paginated results
-        limit = 1000
-        params["limit"] = limit
+        count = 1  # just to get the loop going
 
         # Loop over the paginated results
-        oois = []
-        for offset in range(0, count, limit):
-            params["offset"] = offset
-
+        while params["offset"] < count:  # type: ignore
             try:
                 response = self.get(url, params=params)
             except httpx.HTTPStatusError as e:
@@ -63,9 +54,9 @@ class Octopoes(HTTPService):
                 raise
 
             list_objects = ListObjectsResponse(**response.json())
-            oois.extend([ooi for ooi in list_objects.items])
-
-        return oois
+            count = list_objects.count
+            params["offset"] = params["offset"] + params["limit"]  # type: ignore
+            yield from list_objects.items
 
     @exception_handler
     def get_random_objects(self, organisation_id: str, n: int, scan_level: list[int]) -> list[OOI]:
@@ -96,6 +87,22 @@ class Octopoes(HTTPService):
         except httpx.HTTPStatusError as e:
             if e.response.status_code == httpx.codes.NOT_FOUND:
                 return None
+            raise
+
+    @exception_handler
+    def get_object_clients(self, reference: str, clients: set[str], valid_time: datetime) -> dict[str, OOI]:
+        """Return the clients from the provided list that have the given OOI at the valid_time."""
+        url = f"{self.host}/object-clients"
+
+        try:
+            response = self.get(
+                url, params={"reference": reference, "clients": list(clients), "valid_time": valid_time.isoformat()}
+            )
+
+            return {client: OOI(**data) for client, data in response.json().items()}
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == httpx.codes.NOT_FOUND:
+                return {}
             raise
 
     def is_healthy(self) -> bool:

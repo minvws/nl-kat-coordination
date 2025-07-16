@@ -61,7 +61,7 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
     Select Objects for the 'Aggregate Report' flow.
     """
 
-    template_name = "aggregate_report/select_oois.html"
+    template_name = "generate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
     report_type = AggregateOrganisationReport
@@ -80,7 +80,7 @@ class ReportTypesSelectionAggregateReportView(
     Chooses report types for the 'Aggregate Report' flow.
     """
 
-    template_name = "aggregate_report/select_report_types.html"
+    template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
     report_type = AggregateOrganisationReport
@@ -93,7 +93,7 @@ class SetupScanAggregateReportView(
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
 
-    template_name = "aggregate_report/setup_scan.html"
+    template_name = "generate_report/setup_scan.html"
     breadcrumbs_step = 5
     current_step = 3
     report_type = AggregateOrganisationReport
@@ -106,7 +106,7 @@ class ExportSetupAggregateReportView(
     Shows the export setup page where users can set their export preferences.
     """
 
-    template_name = "aggregate_report/export_setup.html"
+    template_name = "generate_report/export_setup.html"
     breadcrumbs_step = 6
     current_step = 4
     report_type = AggregateOrganisationReport
