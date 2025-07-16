@@ -137,14 +137,14 @@ Category (Action / Sub Folder)
 ========== ================== ====================== =========================================== =====
 Event code Model              Category               Description                                 CRUDE
 ========== ================== ====================== =========================================== =====
-900001     User               login_event            A user logged in.                           E    
-900002     User               login_event            A user logged out.                          E 
+900001     User               login_event            A user logged in.                           E
+900002     User               login_event            A user logged out.                          E
 900003     AuthToken          login_event            A user MFA succeeded.                       E
 900004     AuthToken          login_event            A user MFA failed.                          E
 900005     User               login_event            A user login failed.                        E
-900101     User               account                A user is created.                          C    
-900102     User               account                User data changed.                          U    
-900103     User               account                A user is removed.                          D    
+900101     User               account                A user is created.                          C
+900102     User               account                User data changed.                          U
+900103     User               account                A user is removed.                          D
 900104     KATUser            account                Account status changed (Enabled/Disabled).  U
 900105     KATUser            account                User credential reset is performed.         E
 900106     OrganizationMember account                User organization membership changed.       U
@@ -174,8 +174,8 @@ Event code Model              Category               Description                
 900311     ScheduleRequest    crisis_room            A scheduled task was created.               C
 900312     ScheduleRequest    crisis_room            A scheduled task was updated.               U
 900313     ScheduleRequest    crisis_room            A scheduled task was deleted.               D
-900401     Boefje             katalogus              A boefje was created.                       C        
+900401     Boefje             katalogus              A boefje was created.                       C
 900402     Boefje             katalogus              A boefje was updated.                       U
 900403     Boefje             katalogus              A boefje was deleted.                       D
-900404     Boefje             katalogus              A KATalogus error occured                   E
+900404     Boefje             katalogus              A KATalogus error occurred                  E
 ========== ================== ====================== =========================================== =====
