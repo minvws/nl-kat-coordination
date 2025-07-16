@@ -3,8 +3,6 @@
   "name": "Nmap IP range",
   "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges with 1024 addresses or less (max is a /22). Larger ranges are skipped by default.",
   "consumes": [
-    "IPAddressV4",
-    "IPAddressV6",
     "IPV6NetBlock",
     "IPV4NetBlock"
   ],
