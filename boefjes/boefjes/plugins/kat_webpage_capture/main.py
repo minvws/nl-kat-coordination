@@ -60,7 +60,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     image_png, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
 
     return [
-        ({"openkat/webpage-capture", "image/png"}, image_png),
+        ({"image/png"}, image_png),
         ({"application/zip+json", "application/har+json"}, har_zip),
         ({"application/json", "application/localstorage+json"}, storage_json),
     ]
