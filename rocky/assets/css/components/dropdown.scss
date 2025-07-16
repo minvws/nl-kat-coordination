@@ -158,6 +158,11 @@
   }
 }
 
+.dropdown-list.left {
+  left: auto;
+  right: 0;
+}
+
 .dropdown-list {
   [aria-expanded="true"] + & {
     display: flex;

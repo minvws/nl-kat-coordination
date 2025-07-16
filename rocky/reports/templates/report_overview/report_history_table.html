@@ -14,55 +14,25 @@
         </p>
         <div class="horizontal-view toolbar">
             <div class="dropdown">
-                {% comment %} <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p> {% endcomment %}
-                <button id="action-dropdown-button"
-                        type="button"
-                        aria-label="{{ aria_label_current_language }}"
-                        aria-haspopup="menu"
-                        aria-controls="action-dropdown"
+                <button aria-controls="action-dropdown"
                         aria-expanded="false"
                         class="dropdown-button ghost">
                     {% translate "Actions" %}
-                    <span class="icon ti-chevron-down"></span>
+                    <span aria-hidden="true" class="icon ti-chevron-down"></span>
                 </button>
-                <div id="action-dropdown"
-                     class="dropdown-list"
-                     role="menu"
-                     aria-labelledby="action-dropdown-button">
-                    <ul role="presentation">
+                <div id="action-dropdown" class="dropdown-list left">
+                    <ul>
                         <li>
-                            <a href="#rerun-modal" role="menuitem" data-value="test">
-                                <i class="icon ti-refresh"></i>{% translate "Rerun" %}
-                            </a>
-                        </li>
-                        {% comment %} <li>
-                        <a href="#" role="option" data-value="test">
-                            <i class="icon ti-calendar-event"></i>{% translate "Reschedule" %}
-                        </a>
-                        </li> {% endcomment %}
-                        {% comment %} <li>
-                        <a href="#" role="option" data-value="test">
-                            <i class="icon ti-share"></i>{% translate "Share" %}
-                        </a>
-                        </li> {% endcomment %}
-                        {% comment %} <li>
-                    <a href="#" role="option" data-value="test">
-                        <i class="icon ti-layers-difference"></i>{% translate "Concatenate" %}
-                    </a>
-                        </li> {% endcomment %}
-                        <li>
-                            <a href="#rename-modal" role="menuitem" data-value="test">
-                                <i class="icon ti-edit"></i>{% translate "Rename" %}
-                            </a>
+                            <a href="#rerun-modal"><i class="icon ti-refresh"></i>{% translate "Rerun" %}</a>
                         </li>
                         <li>
-                            <a href="#delete-modal"
-                               class="plain destructive"
-                               role="menuitem"
-                               data-value="test">
-                                <i class="icon ti-trash"></i>{% translate "Delete" %}
-                            </a>
+                            <a href="#rename-modal"><i class="icon ti-edit"></i>{% translate "Rename" %}</a>
                         </li>
+                        {% if perms.tools.can_delete_oois %}
+                            <li>
+                                <a href="#delete-modal" class="destructive"><i class="icon ti-trash"></i>{% translate "Delete" %}</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
