@@ -78,7 +78,7 @@ export default function (boefje_meta) {
   // Reading the file created by nikto
   try {
     var file_contents = fs.readFileSync("./output.json").toString();
-    raws.push([["boefje/nikto-output"], file_contents]);
+    raws.push([["boefje/nikto-output", "openkat/nikto-output"], file_contents]);
   } catch (e) {
     throw new Error(
       "Something went wrong reading the file from the nikto command.\n" + e,
