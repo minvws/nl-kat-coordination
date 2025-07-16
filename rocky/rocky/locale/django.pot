@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-11 11:08+0000\n"
+"POT-Creation-Date: 2025-07-16 14:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -864,9 +864,13 @@ msgid "Report section"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
+msgid "There are no dashboard items added yet."
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid ""
-"There are no dashboard items added yet. You can add dashboard items via the "
-"filters on the objects and findings page or you can add a report section."
+"You can add dashboard items via the filters on the objects and findings page "
+"or you can add a report section."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
@@ -1052,7 +1056,6 @@ msgstr ""
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_findings_table.html
-#: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/views/mixins.py
 msgid "Finding"
@@ -1842,7 +1845,6 @@ msgid "Required settings"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
-#: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr ""
@@ -5623,21 +5625,21 @@ msgid "Organization code missing"
 msgstr ""
 
 #: rocky/templates/finding_type_add.html
-msgid "Add finding type:"
+#: rocky/templates/partials/findings_list_toolbar.html
+#: rocky/views/finding_type_add.py
+msgid "Add finding type"
 msgstr ""
 
 #: rocky/templates/finding_type_add.html
 msgid "Finding Type"
 msgstr ""
 
-#: rocky/templates/finding_type_add.html
-#: rocky/templates/partials/findings_list_toolbar.html
-#: rocky/views/finding_type_add.py
-msgid "Add finding type"
-msgstr ""
-
 #: rocky/templates/findings/finding_add.html
-msgid "Add finding:"
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_findings.html
+#: rocky/templates/partials/findings_list_toolbar.html
+#: rocky/views/finding_add.py
+msgid "Add finding"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5993,12 +5995,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Select an object type to add."
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_findings.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Add finding"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -7204,10 +7200,6 @@ msgstr ""
 
 #: rocky/views/bytes_raw.py
 msgid "Getting raw data failed."
-msgstr ""
-
-#: rocky/views/finding_add.py
-msgid "Add Finding"
 msgstr ""
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
