@@ -24,6 +24,7 @@ RUN groupadd --gid "$USER_GID" rocky
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" rocky
 
 WORKDIR /app/rocky
+ENV PATH="/app/rocky/.venv/bin:$PATH"
 
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
@@ -35,25 +36,22 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # dependencies
 ARG ENVIRONMENT
 
-# This works around https://github.com/pypa/pip/issues/6469 by installing the git
-# requirements separately
-COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
-    pip install --upgrade pip \
-    && if [ "$ENVIRONMENT" = "dev" ]; \
-    then \
-    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin && \
-    grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
+    --mount=type=bind,source=rocky/uv.lock,target=uv.lock \
+    --mount=type=bind,source=rocky/pyproject.toml,target=pyproject.toml \
+    if [ "$ENVIRONMENT" = "dev" ]; then \
+    uv sync --locked --no-install-project ; \
     else \
-    grep -v git+https:// requirements.txt | pip install -r /dev/stdin && \
-    grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
+    uv sync --locked --no-install-project --no-dev ; \
     fi
 
 FROM dev
 
 COPY octopoes/ /tmp/octopoes
-RUN pip install setuptools && cd /tmp/octopoes && python setup.py bdist_wheel
-RUN pip install /tmp/octopoes/dist/octopoes*.whl
+RUN cd /tmp/octopoes && python setup.py bdist_wheel
+RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
+    uv pip install --no-deps /tmp/octopoes/dist/octopoes*.whl
 
 COPY rocky .
 

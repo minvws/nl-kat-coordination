@@ -28,6 +28,5 @@ bytes-data
 Makefile
 packaging
 README.*
-pyproject.toml
 sql_migrations
 .dockerignore

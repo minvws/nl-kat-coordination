@@ -12,7 +12,7 @@ RUN groupadd --gid "$USER_GID" bytes
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" bytes
 
 WORKDIR /app/bytes
-ENV PATH=/home/bytes/.local/bin:${PATH}
+ENV PATH="/app/bytes/.venv/bin:$PATH"
 
 ENV BYTES_DATA_DIR=/data
 RUN mkdir "$BYTES_DATA_DIR" && chown bytes: "$BYTES_DATA_DIR"
@@ -22,10 +22,15 @@ VOLUME /data
 # dependencies
 ARG ENVIRONMENT
 
-COPY requirements.txt requirements-dev.txt ./
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
+RUN --mount=type=cache,target=/root/.cache \
+    --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    if [ "$ENVIRONMENT" = "dev" ]; then \
+    uv sync --locked --no-install-project ; \
+    else \
+    uv sync --locked --no-install-project --no-dev ; \
+    fi
 
 USER bytes
 

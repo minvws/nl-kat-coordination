@@ -6,23 +6,27 @@ EXPOSE 8000
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-WORKDIR /app/octopoes
-
 ENTRYPOINT ["/app/octopoes/entrypoint.sh"]
 
 RUN groupadd --gid "$USER_GID" octopoes
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" octopoes
 
-ENV PATH=/home/octopoes/.local/bin:${PATH}
+WORKDIR /app/octopoes
+ENV PATH="/app/octopoes/.venv/bin:$PATH"
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies
 ARG ENVIRONMENT
 
-COPY requirements.txt requirements-dev.txt ./
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
+RUN --mount=type=cache,target=/root/.cache \
+    --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    if [ "$ENVIRONMENT" = "dev" ]; then \
+    uv sync --locked --no-install-project ; \
+    else \
+    uv sync --locked --no-install-project --no-dev ; \
+    fi
 
 USER octopoes
 
