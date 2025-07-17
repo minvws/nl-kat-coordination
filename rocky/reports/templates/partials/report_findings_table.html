@@ -57,19 +57,21 @@
                     {% if not is_crisis_room %}
                         <tr class="expando-row">
                             <td colspan="5">
-                                <h4 class="heading-normal">{% translate "Description" %}</h4>
+                                <h5>{% translate "Description" %}</h5>
                                 <p>{{ info.finding_type.description }}</p>
-                                <h4 class="heading-normal">{% translate "Source" %}</h4>
+                                <h5>{% translate "Source" %}</h5>
                                 {% if info.finding_type.source %}
                                     <a class="nowrap" href="{{ info.finding_type.source }}">{{ info.finding_type.source }}</a>
                                 {% else %}
                                     <p>{{ info.finding_type.source }}</p>
                                 {% endif %}
-                                <h4 class="heading-normal">{% translate "Impact" %}</h4>
+                                <h5>{% translate "Impact" %}</h5>
                                 <p>{{ info.finding_type.impact }}</p>
-                                <h4 class="heading-normal">{% translate "Recommendation" %}</h4>
+                                <h5>{% translate "Recommendation" %}</h5>
                                 <p>{{ info.finding_type.recommendation }}</p>
-                                <h4 class="heading-normal">{% translate "Findings" %}</h4>
+                                <div>
+                                    <h5>{% translate "Findings" %}</h5>
+                                </div>
                                 <table>
                                     <caption class="visually-hidden">{% translate "Findings overview" %}</caption>
                                     <thead>
