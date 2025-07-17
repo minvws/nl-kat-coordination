@@ -143,10 +143,12 @@
                                             <a class="button ghost"
                                                href="{% ooi_url "ooi_edit" schedule.recipe organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit report recipe" %}</a>
                                         {% endif %}
-                                        {% include "report_schedules/delete_recipe_modal.html" with recipe_id=schedule.recipe.recipe_id|stringformat:"s" recipe_name=schedule.recipe.report_name_format %}
+                                        {% if perms.tools.can_enable_disable_schedule %}
+                                            <a class="button ghost destructive"
+                                               href="#delete-recipe-modal-{{ schedule.recipe.recipe_id }}">{% translate "Delete" %}</a>
+                                            {% include "report_schedules/delete_recipe_modal.html" with recipe_id=schedule.recipe.recipe_id|stringformat:"s" recipe_name=schedule.recipe.report_name_format %}
 
-                                        <a class="button ghost destructive"
-                                           href="#delete-recipe-modal-{{ schedule.recipe.recipe_id }}">{% translate "Delete" %}</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </td>
