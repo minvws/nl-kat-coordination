@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-16 14:07+0000\n"
+"POT-Creation-Date: 2025-07-17 08:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2198,8 +2198,8 @@ msgstr ""
 msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 
-#: onboarding/templates/step_10_report.html
-msgid "OpenKAT introduction"
+#: onboarding/templates/partials/onboarding_header.html
+msgid "Onboarding"
 msgstr ""
 
 #: onboarding/templates/step_10_report.html
@@ -2225,19 +2225,6 @@ msgstr ""
 
 #: onboarding/templates/step_10_report.html
 msgid "Continue to OpenKAT"
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-#: onboarding/templates/step_3_indemnification_setup.html
-#: onboarding/templates/step_5_add_scan_ooi.html
-#: onboarding/templates/step_6_set_clearance_level.html
-#: onboarding/templates/step_7_clearance_level_introduction.html
-#: onboarding/templates/step_8_setup_scan_select_plugins.html
-#: onboarding/templates/step_9_choose_report_type.html
-msgid "Onboarding"
 msgstr ""
 
 #: onboarding/templates/step_1_introduction_registration.html
@@ -2311,10 +2298,6 @@ msgstr ""
 
 #: onboarding/templates/step_3_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
-msgstr ""
-
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-msgid "Onboardingn"
 msgstr ""
 
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
