@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
+from crisis_room.forms import AddObjectListDashboardItemForm
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -24,18 +25,20 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
-from rocky.views.mixins import OctopoesView, OOIList
+from rocky.views.mixins import AddDashboardItemFormMixin, OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
 class PageActions(Enum):
     DELETE = "delete"
     UPDATE_SCAN_PROFILE = "update-scan-profile"
+    ADD_TO_DASHBOARD = "add_to_dashboard"
 
 
-class OOIListView(BaseOOIListView, OctopoesView):
+class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": gettext_lazy("Objects")}]
     template_name = "oois/ooi_list.html"
+    add_dashboard_item_form = AddObjectListDashboardItemForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,11 +65,11 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Perform bulk action on selected oois."""
         selected_oois = request.POST.getlist("ooi")
-        if not selected_oois:
+        action = request.POST.get("action")
+
+        if not selected_oois and action != PageActions.ADD_TO_DASHBOARD.value:
             messages.add_message(request, messages.ERROR, _("No OOIs selected."))
             return self.get(request, status=422, *args, **kwargs)
-
-        action = request.POST.get("action")
 
         if action == PageActions.DELETE.value:
             return self._delete_oois(selected_oois, request, *args, **kwargs)
@@ -79,6 +82,9 @@ class OOIListView(BaseOOIListView, OctopoesView):
             if level.value == "inherit":
                 return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
             return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
+
+        if action == PageActions.ADD_TO_DASHBOARD.value:
+            return self.add_to_dashboard()
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
         return self.get(request, status=404, *args, **kwargs)

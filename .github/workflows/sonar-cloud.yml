@@ -46,9 +46,9 @@ jobs:
       matrix:
         module:
           - name: octopoes
-            prefix_path: "."
+            prefix_path: "octopoes/"
           - name: mula
-            prefix_path: "mula/scheduler/"
+            prefix_path: "mula/"
           - name: bytes
             prefix_path: "bytes/"
           - name: rocky
@@ -66,22 +66,22 @@ jobs:
       - name: Download coverage file
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.module['name'] }}-coverage-unit
-          path: ${{ matrix.module['name'] }}-coverage-unit
+          name: ${{ matrix.module['name'] }}-coverage
+          path: ${{ matrix.module['name'] }}-coverage
 
       - name: Fix coverage report sources
         uses: Mudlet/xmlstarlet-action@9866e85e774e0fb50bc49de15274d005b5a69f0e # master
         with:
-          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module['name'] }}/" "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
       - name: Fix coverage file
-        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage-unit/coverage.xml" "${{ matrix.module['prefix_path'] }}"
+        run: python "${{ github.workspace }}/.github/scripts/coverage_file_fixer.py" "${{ matrix.module['name'] }}-coverage/coverage.xml" "${{ matrix.module['prefix_path'] }}"
 
       - name: Upload fixed coverage file
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.module['name'] }}-coverage-unit-fixed"
-          path: "${{ matrix.module['name'] }}-coverage-unit/coverage.xml"
+          name: "${{ matrix.module['name'] }}-coverage-fixed"
+          path: "${{ matrix.module['name'] }}-coverage/coverage.xml"
 
   sonar-cloud:
     permissions:
@@ -102,9 +102,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: "*-coverage-unit-fixed"
+          pattern: "*-coverage-fixed"
 
       - name: SonarCloud
-        uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5.0.0
+        uses: SonarSource/sonarqube-scan-action@2500896589ef8f7247069a56136f8dc177c27ccf # v5.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

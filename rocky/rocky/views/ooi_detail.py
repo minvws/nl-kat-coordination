@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import Boefje
+from reports.report_types.helpers import get_report_types_for_ooi
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.forms.scheduler import OOIDetailTaskFilterForm
 from tools.ooi_helpers import format_display
@@ -25,18 +26,23 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
     def post(self, request, *args, **kwargs):
         if self.action == self.CHANGE_CLEARANCE_LEVEL:
             self.set_clearance_level()
-        if self.action == self.SUBMIT_ANSWER:
+        elif self.action == self.SUBMIT_ANSWER:
             self.answer_ooi_questions()
-        if self.action == self.START_SCAN:
+        elif self.action == self.START_SCAN:
             self.start_boefje_scan()
         return super().post(request, *args, **kwargs)
 
     def set_clearance_level(self) -> None:
         if not self.indemnification_present:
-            return self.indemnification_error()
-        else:
-            clearance_level = int(self.request.POST.get("level"))
+            self.indemnification_error()
+            return
+        try:
+            clearance_level = int(self.request.POST["level"])
             self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+        except (ValueError, KeyError):
+            messages.error(
+                self.request, _("Cannot set clearance level. It must be provided and must be a valid number.")
+            )
 
     def answer_ooi_questions(self) -> None:
         if not isinstance(self.ooi, Question):
@@ -139,6 +145,12 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
 
         context["is_question"] = isinstance(self.ooi, Question)
+        if isinstance(self.ooi, Question):
+            try:
+                context["current_config"] = self.get_ooi(self.ooi.config_pk).config
+            except Exception:
+                context["current_config"] = None
+
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])
 
@@ -147,6 +159,10 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
 
         context["possible_boefjes_filter_form"] = self.get_boefjes_filter_form()
         context["organization_indemnification"] = self.indemnification_present
+
+        context["possible_reports"] = [
+            report.class_attributes() for report in get_report_types_for_ooi(self.ooi.primary_key)
+        ]
 
         if self.request.GET.get("show_clearance_level_inheritance"):
             clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)

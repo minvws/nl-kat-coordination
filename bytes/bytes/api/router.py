@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from httpx import codes
 from starlette.responses import JSONResponse
 
-from bytes.api.models import BoefjeOutput, File
+from bytes.api.models import BoefjeOutput, File, StatusEnum
 from bytes.auth import authenticate_token
 from bytes.config import get_settings
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
@@ -166,6 +166,7 @@ def create_raw(
 
         if parsed_mime_types in mime_types_by_id.values():
             # Set the id for this file using the precomputed dict that maps existing primary keys to the mime-type set.
+            # We do this since a boefje_meta should have unique raw files based on the mime-types, so this deduplicates.
             raw_ids[raw.name] = list(mime_types_by_id.keys())[list(mime_types_by_id.values()).index(parsed_mime_types)]
 
             continue
@@ -271,9 +272,17 @@ def get_raws(
     )
 
     raws = meta_repository.get_raws(query_filter)
+    status = StatusEnum.COMPLETED
+
+    if len(raws) == 1 and {"error/boefje"} in raws[0][1].mime_types:
+        status = StatusEnum.FAILED
 
     return BoefjeOutput(
-        files=[File(name=raw_id, content=b64encode(raw.value), tags=raw.mime_types) for raw_id, raw in raws]
+        status=status,
+        files=[
+            File(name=str(raw_id), content=b64encode(raw.value).decode(), tags=[m.value for m in raw.mime_types])
+            for raw_id, raw in raws
+        ],
     )
 
 
