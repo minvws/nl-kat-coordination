@@ -12,7 +12,9 @@ RUN groupadd --gid "$USER_GID" bytes
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" bytes
 
 WORKDIR /app/bytes
-ENV PATH="/app/bytes/.venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 ENV BYTES_DATA_DIR=/data
 RUN mkdir "$BYTES_DATA_DIR" && chown bytes: "$BYTES_DATA_DIR"

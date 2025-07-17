@@ -12,7 +12,9 @@ RUN groupadd --gid "$USER_GID" scheduler
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" scheduler
 
 WORKDIR /app/scheduler
-ENV PATH="/app/scheduler/.venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies

@@ -10,7 +10,9 @@ RUN groupadd --gid "$USER_GID" nonroot
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" nonroot
 
 WORKDIR /app/boefjes
-ENV PATH="/app/boefjes/.venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 ARG ENVIRONMENT
 

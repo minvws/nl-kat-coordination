@@ -24,7 +24,9 @@ RUN groupadd --gid "$USER_GID" rocky
 RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" rocky
 
 WORKDIR /app/rocky
-ENV PATH="/app/rocky/.venv/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
