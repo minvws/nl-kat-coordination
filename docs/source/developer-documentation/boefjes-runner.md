@@ -214,32 +214,50 @@ JSON schema:
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://openkat.nl/boefje_output.schema.json",
   "title": "Boefje output",
+  "type": "object",
   "properties": {
     "status": {
-      "type": "string",
-      "enum": ["COMPLETED", "FAILED"]
+      "enum": ["COMPLETED", "FAILED"],
+      "type": "string"
     },
     "files": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+      "anyOf": [
+        {
+          "items": {
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "content": {
+                "contentEncoding": "base64",
+                "type": "string"
+              },
+              "tags": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": ["name", "content"],
+            "type": "object"
           },
-          "content": {
-            "type": "string",
-            "contentEncoding": "base64"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
+          "type": "array"
         },
-        "required": ["content"]
-      }
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": ["status"]
