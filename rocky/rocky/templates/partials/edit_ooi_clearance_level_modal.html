@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load form_extra %}
 
 {% component "modal" modal_id="edit-clearance-level-modal" size="dialog-medium" %}
 {% fill "header" %}
@@ -37,8 +38,26 @@
 
     </form>
 {% else %}
-    {% include "partials/form/fieldset.html" with fields=edit_clearance_level_form %}
+    <form class="help">
+        <fieldset>
+            {% for field in edit_clearance_level_form %}
+                <fieldset>
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+                        {% endif %}
+                    </label>
+                    <div>
+                        {{ field|with_form_attr:"ooi_list_form" }}
+                        {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                        {% include "partials/form/field_input_errors.html" %}
 
+                    </div>
+                </fieldset>
+            {% endfor %}
+        </fieldset>
+    </form>
 {% endif %}
 {% endfill %}
 {% fill "footer_buttons" %}

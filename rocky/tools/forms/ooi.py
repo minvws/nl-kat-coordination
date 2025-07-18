@@ -88,6 +88,7 @@ class SetClearanceLevelForm(forms.Form):
             choices=[("inherited", "Inherited"), ("declared", "Declared")],
             attrs={"class": "radio-choice", "data-choicegroup": "scan_type_selector"},
         ),
+        initial="inherited",
     )
 
     level = forms.IntegerField(

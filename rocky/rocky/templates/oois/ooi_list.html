@@ -124,11 +124,11 @@
                             </tbody>
                         </table>
                     </div>
-                    {% if may_update_clearance_level %}
-                        {% include "partials/edit_ooi_clearance_level_modal.html" with type="ooi_list" %}
-
-                    {% endif %}
                 </form>
+                {% if may_update_clearance_level %}
+                    {% include "partials/edit_ooi_clearance_level_modal.html" with type="ooi_list" %}
+
+                {% endif %}
                 {% include "partials/list_paginator.html" %}
 
                 {% if perms.tools.can_delete_oois %}
