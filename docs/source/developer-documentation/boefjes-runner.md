@@ -1,4 +1,4 @@
-# Design for Boefje OCI images
+# Design considerations for new boefjes runner
 
 The new boefjes runner will run boefjes in a containerized environment. This
 ensures isolation of code and dependencies, and allows for easy distribution
@@ -94,54 +94,112 @@ The input is a JSON object, specified by the following JSON schema:
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://openkat.nl/boefje_input.schema.json",
+  "type": "object",
   "title": "Boefje input",
+  "additionalProperties": false,
   "properties": {
-    "task_id": {
-      "type": "string"
-    },
     "output_url": {
       "type": "string"
     },
-    "boefje_meta": {
-      "type": "object",
+    "task": {
       "properties": {
-        "boefje": {
-          "type": "object",
+        "id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "data": {
           "properties": {
             "id": {
+              "format": "uuid",
               "type": "string"
             },
-            "version": {
+            "boefje": {
+              "properties": {
+                "id": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "version": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "oci_image": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "input_ooi": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "arguments": {
+              "additionalProperties": true,
+              "default": {},
+              "type": "object"
+            },
+            "organization": {
               "type": "string"
+            },
+            "environment": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
             }
-          }
-        },
-        "input_ooi": {
-          "type": "string"
-        },
-        "arguments": {
+          },
+          "required": [
+            "id",
+            "boefje",
+            "organization"
+          ],
           "type": "object"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "environment": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
         }
-      }
-    },
-    "required": [
-      "boefje",
-      "input_ooi",
-      "arguments",
-      "organization",
-      "environment"
-    ]
+      },
+      "required": [
+        "id",
+        "data"
+      ],
+      "type": "object"
+    }
   },
-  "required": ["task_id", "output_url", "boefje_meta"]
+  "required": [
+    "output_url",
+    "task"
+  ]
 }
 ```
 
