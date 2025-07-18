@@ -177,7 +177,7 @@ for. Here is the example we will be using:
      "description": "A simple boefje that can say hello",
      "consumes": ["IPAddressV4", "IPAddressV6"],
      "scan_level": 0,
-     "oci_image": "openkat/hello-katty",
+     "oci_image": "openkat/hello-katty"
    }
 
 -  **``id``**: A unique identifier for the boefje.

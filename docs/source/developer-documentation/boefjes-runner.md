@@ -142,9 +142,7 @@ The input is a JSON object, specified by the following JSON schema:
                   "default": null
                 }
               },
-              "required": [
-                "id"
-              ],
+              "required": ["id"],
               "type": "object"
             },
             "input_ooi": {
@@ -181,25 +179,15 @@ The input is a JSON object, specified by the following JSON schema:
               "default": null
             }
           },
-          "required": [
-            "id",
-            "boefje",
-            "organization"
-          ],
+          "required": ["id", "boefje", "organization"],
           "type": "object"
         }
       },
-      "required": [
-        "id",
-        "data"
-      ],
+      "required": ["id", "data"],
       "type": "object"
     }
   },
-  "required": [
-    "output_url",
-    "task"
-  ]
+  "required": ["output_url", "task"]
 }
 ```
 
