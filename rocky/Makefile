@@ -22,7 +22,6 @@ build-rocky-native:
 	python3 manage.py migrate
 	-python3 manage.py createsuperuser --no-input
 	python3 manage.py loaddata OOI_database_seed.json
-	python3 manage.py setup_dev_account
 	python3 manage.py compilemessages
 
 build-rocky-frontend:
@@ -115,7 +114,6 @@ test-prepare:
 	python3 manage.py migrate
 	DJANGO_SUPERUSER_PASSWORD=robotpassword python3 manage.py createsuperuser --email robot@localhost --noinput
 	python3 manage.py loaddata OOI_database_seed.json
-	python3 manage.py setup_dev_account
 
 test-rf: # Usage: `make test-rf headless=<bool>`
 	pip3 install robotframework robotframework-browser robotframework-debuglibrary robotframework-otp robotframework-postgresqldb
