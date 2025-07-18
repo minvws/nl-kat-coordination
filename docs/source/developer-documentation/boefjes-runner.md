@@ -1,4 +1,4 @@
-# Design considerations for new boefjes runner
+# Design for Boefje OCI images
 
 The new boefjes runner will run boefjes in a containerized environment. This
 ensures isolation of code and dependencies, and allows for easy distribution
