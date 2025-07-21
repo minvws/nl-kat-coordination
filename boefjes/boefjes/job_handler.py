@@ -65,7 +65,7 @@ class DockerBoefjeHandler(BoefjeHandler):
             if task.status == TaskStatus.RUNNING:
                 boefje_meta.ended_at = datetime.now(timezone.utc)
                 self.bytes_api_client.save_boefje_meta(boefje_meta)  # The task didn't create a boefje_meta object
-                self.bytes_api_client.save_raws(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
+                self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
                 self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
 
                 # have to raise exception to prevent _start_working function from setting status to completed
