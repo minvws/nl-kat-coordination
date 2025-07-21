@@ -71,18 +71,16 @@ class DockerBoefjeHandler(BoefjeHandler):
                 # have to raise exception to prevent _start_working function from setting status to completed
                 raise RuntimeError("Boefje did not call output API endpoint")
         except ContainerError as e:
-            logger.error(
-                "Container for task %s failed and returned exit status %d, stderr saved to bytes",
-                task_id,
-                e.exit_status,
-            )
+            logger.error("Container for task %s failed and returned exit status %d", task_id, e.exit_status)
             self.bytes_api_client.login()
 
             try:
                 self.bytes_api_client.get_boefje_meta(boefje_meta.id)
                 logger.info("Container managed to save its raw data to bytes itself.")
             except HTTPError:
-                logger.info("Container did not manage to save its raw data to bytes, saving the container instead.")
+                logger.info(
+                    "Container did not manage to save its raw data to bytes, saving the container stderr instead."
+                )
 
                 boefje_meta.ended_at = datetime.now(timezone.utc)
                 self.bytes_api_client.save_boefje_meta(boefje_meta)

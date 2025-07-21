@@ -56,7 +56,8 @@ class SchedulerView(OctopoesView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.scheduler_client = scheduler_client(self.organization.code)
-        self.scheduler_id = self.task_type
+        if hasattr(self, "task_type"):
+            self.scheduler_id = self.task_type
 
     def get_task_filters(self) -> dict[str, Any]:
         return {
