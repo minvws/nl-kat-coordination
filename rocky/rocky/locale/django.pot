@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-18 12:21+0000\n"
+"POT-Creation-Date: 2025-07-21 10:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
+#: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 #: reports/templates/report_overview/modal_partials/rerun_modal.html
@@ -2425,8 +2426,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_6_set_clearance_level.html
-#: rocky/templates/oois/ooi_list.html
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr ""
@@ -3973,6 +3972,50 @@ msgid ""
 "with the findings for each report."
 msgstr ""
 
+#: reports/templates/partials/report_names_form.html
+msgid "Report names:"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
+#: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
+#: rocky/templates/partials/form/field_input.html
+#: rocky/templates/partials/form/field_input_checkbox.html
+#: rocky/templates/partials/form/field_input_multiselect.html
+#: rocky/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Add reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+#: reports/templates/report_overview/modal_partials/rename_modal.html
+msgid "Reset"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "No reference date"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Day"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Week"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Month"
+msgstr ""
+
+#: reports/templates/partials/report_names_form.html
+msgid "Year"
+msgstr ""
+
 #: reports/templates/partials/report_ooi_list.html
 msgid "Object selection"
 msgstr ""
@@ -4299,10 +4342,6 @@ msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
 msgid "Rename the following report(s):"
-msgstr ""
-
-#: reports/templates/report_overview/modal_partials/rename_modal.html
-msgid "Reset"
 msgstr ""
 
 #: reports/templates/report_overview/modal_partials/rename_modal.html
@@ -5642,16 +5681,6 @@ msgstr ""
 msgid "Fill out this form to answer the Question (again):"
 msgstr ""
 
-#: rocky/templates/forms/widgets/checkbox_group_table.html
-#: rocky/templates/oois/ooi_detail_add_related_object.html
-#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
-#: rocky/templates/partials/form/field_input.html
-#: rocky/templates/partials/form/field_input_checkbox.html
-#: rocky/templates/partials/form/field_input_multiselect.html
-#: rocky/templates/partials/form/field_input_radio.html
-msgid "Required"
-msgstr ""
-
 #: rocky/templates/graph-d3.html
 msgid ""
 "Click a circle to collapse / expand the tree, click the text to view the "
@@ -6724,8 +6753,8 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"This object has a clearance level of \"empty\". This means that this "
-"object ..."
+"This object has a clearance level of \"empty\". This means that this object "
+"has no clearance level."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
