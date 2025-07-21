@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" with view_type="onboarding" %}
+
+    <main id="main-content">
+        <section>
+            {% include "partials/onboarding_header.html" %}
+
+            <div>
+                <h2>{% translate "Organization setup" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Please enter the following organization details.
+                        The organization name can be changed later in the interface.
+                        The organization code cannot be changed as this is used
+                        by the database.
+                    {% endblocktranslate %}
+                </p>
+                <form novalidate method="post" class="help layout-form">
+                    {% csrf_token %}
+                    {% translate "Organization details" as fieldset_legend %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
+                    <button type="submit" class="ghost">{% translate "Submit changes" %}</button>
+                </form>
+                <a class="button"
+                   href="{% url 'step_3_indemnification_setup' organization.code %}">{% translate "Continue" %}</a>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
