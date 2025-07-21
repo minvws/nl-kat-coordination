@@ -9,6 +9,7 @@ from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError
 
 logger = structlog.get_logger(__name__)
 
@@ -17,7 +18,14 @@ class BytesRawView(OrganizationView):
     def get(self, request, **kwargs):
         self.bytes_client.login()
         boefje_meta_id = kwargs["boefje_meta_id"]
-        raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
+        try:
+            raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
+        except HTTPError:
+            msg = _("Getting raw data failed.")
+            logger.exception("Getting raw data failed")
+            messages.add_message(request, messages.ERROR, msg)
+            return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
+
         if not raw_metas:
             msg = _("The task does not have any raw data.")
             messages.add_message(request, messages.ERROR, msg)
