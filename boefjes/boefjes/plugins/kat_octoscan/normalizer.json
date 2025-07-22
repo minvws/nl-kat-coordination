@@ -1,0 +1,19 @@
+{
+  "id": "kat_nmap_normalize",
+  "name": "nmap",
+  "description": "Parses data from all nmap variants into IP-addresses, ports and services.",
+  "consumes": [
+    "boefje/nmap",
+    "boefje/nmap-udp",
+    "boefje/nmap-ports",
+    "boefje/nmap-ip-range",
+    "openkat/nmap-output"
+  ],
+  "produces": [
+    "IPAddressV6",
+    "Service",
+    "IPPort",
+    "IPAddressV4",
+    "IPService"
+  ]
+}
