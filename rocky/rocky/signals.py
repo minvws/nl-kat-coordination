@@ -4,6 +4,7 @@ from crisis_room.management.commands.dashboards import run_findings_dashboard
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.contrib.sessions.models import Session
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from httpx import HTTPError
@@ -18,6 +19,8 @@ from octopoes.models.ooi.network import Network
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 
 logger = get_logger(__name__)
+
+SESSION_EVENT_CODES = {"created": "090001", "updated": "090002", "deleted": "090003"}
 
 
 # Signal sent when a user logs in
@@ -80,6 +83,45 @@ def log_delete(sender, instance, **kwargs) -> None:
     event_codes = getattr(instance, "EVENT_CODES", None)
     if event_codes and "deleted" in event_codes:
         context["event_code"] = event_codes["deleted"]
+    logger.info(
+        "%s %s deleted",
+        instance._meta.object_name,
+        instance,
+        object_type=instance._meta.object_name,
+        object=str(instance),
+        **context,
+    )
+
+
+@receiver(post_save, sender=Session)
+def log_save_session(sender, instance, created, **kwargs) -> None:
+    context = {}
+
+    if created:
+        context["event_code"] = SESSION_EVENT_CODES["created"]
+        logger.info(
+            "%s %s created",
+            instance._meta.object_name,
+            instance,
+            object_type=instance._meta.object_name,
+            object=str(instance),
+            **context,
+        )
+    else:
+        context["event_code"] = SESSION_EVENT_CODES["updated"]
+        logger.info(
+            "%s %s updated",
+            instance._meta.object_name,
+            instance,
+            object_type=instance._meta.object_name,
+            object=str(instance),
+            **context,
+        )
+
+
+@receiver(post_delete, sender=Session)
+def log_delete_session(sender, instance, *args, **kwargs) -> None:
+    context = {"event_code": SESSION_EVENT_CODES["deleted"]}
     logger.info(
         "%s %s deleted",
         instance._meta.object_name,

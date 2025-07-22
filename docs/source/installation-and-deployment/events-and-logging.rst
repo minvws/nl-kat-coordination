@@ -27,9 +27,9 @@ Different routes have different ranges of Event Codes, the ranges are as follows
 ========== ================== ====================== =========================================== ===== =======
 Event code Model              Routing key            Description                                 CRUDE In Code
 ========== ================== ====================== =========================================== ===== =======
-090001     Session            login_event            A session is created.                       C     No
-090002     Session            login_event            A session updated.                          U     No
-090003     Session            login_event            A session is deleted.                       D     No
+090001     Session            login_event            A session is created.                       C     090001
+090002     Session            login_event            A session updated.                          U     090002
+090003     Session            login_event            A session is deleted.                       D     090003
 091111     KATUser            login_event            A user logged in.                           E     No
 092222     KATUser            login_event            A user logged out.                          E     No
 093333     TOTPDevice         login_event            A user MFA failed.                          E     No
