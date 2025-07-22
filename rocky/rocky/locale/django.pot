@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21 10:08+0000\n"
+"POT-Creation-Date: 2025-07-21 13:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7208,6 +7208,10 @@ msgstr ""
 
 #: rocky/views/bytes_raw.py
 msgid "Getting raw data failed."
+msgstr ""
+
+#: rocky/views/bytes_raw.py
+msgid "The task does not have any raw data."
 msgstr ""
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
