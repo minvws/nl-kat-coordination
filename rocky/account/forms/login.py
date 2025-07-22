@@ -1,5 +1,8 @@
+import structlog
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
+
+logger = structlog.get_logger(__name__)
 
 
 class LoginForm(AuthenticationForm):
@@ -16,3 +19,11 @@ class LoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["username"].help_text = _("Insert the email you registered with or got at OpenKAT installation.")
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.is_valid():
+            logger.info("User login failed", event_code="094444", username=self.username)
+
+        return cleaned_data

@@ -30,10 +30,10 @@ Event code Model              Routing key            Description                
 090001     Session            login_event            A session is created.                       C     090001
 090002     Session            login_event            A session updated.                          U     090002
 090003     Session            login_event            A session is deleted.                       D     090003
-091111     KATUser            login_event            A user logged in.                           E     No
-092222     KATUser            login_event            A user logged out.                          E     No
-093333     TOTPDevice         login_event            A user MFA failed.                          E     No
-094444     KATUser            login_event            A user login failed.                        E     No
+091111     KATUser            login_event            A user logged in.                           E     091111
+092222     KATUser            login_event            A user logged out.                          E     092222
+093333     TOTPDevice         login_event            A user MFA failed.                          E     093333
+094444     KATUser            login_event            A user login failed.                        E     094444
 700001     RawData            file_action            A raw file is downloaded.                   E     No
 800001     OOI                ooi_change             An OOI is created.                          C     No
 800002     OOI                ooi_change             An OOI is edited.                           U     No
