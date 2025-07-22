@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21 13:13+0000\n"
+"POT-Creation-Date: 2025-07-22 15:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2288,6 +2288,7 @@ msgstr ""
 
 #: onboarding/templates/step_2b_organization_update.html
 #: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid "Continue"
 msgstr ""
@@ -2362,10 +2363,6 @@ msgstr ""
 msgid ""
 "Your administrator has <strong>trusted</strong> you with a clearance level "
 "of <strong>L%(tcl)s</strong>."
-msgstr ""
-
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-msgid "Add URL"
 msgstr ""
 
 #: onboarding/templates/step_5_add_scan_ooi.html
