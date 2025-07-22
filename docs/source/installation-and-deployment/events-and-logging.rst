@@ -54,8 +54,7 @@ Event code Model              Routing key            Description                
 800091     ReportRecipe       report_recipe_change   A Report Recipe is created.                 C     800091
 900100     KATUser            account_change         A new user created.                         C     900101*
 900101     KATUser            account_change         User data changed.                          U     900102*
-900102     KATUser            account_change         A user role changed.                        U     No
-900104     KATUser            account_change         Account status changed (Enabled/Disabled).  U     No
+900104     KATUser            account_change         Account status changed (Enabled/Disabled).  U     900104
 900105     KATUser            account_change         User credential reset is performed.         E     900105
 900106     OrganizationMember account_change         User organization membership changed.       U     900212*
 900108     Indemnification    account_change         Set trusted clearance level.                U     900108
