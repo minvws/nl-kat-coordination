@@ -35,16 +35,14 @@ Event code Model              Routing key            Description                
 093333     TOTPDevice         login_event            A user MFA failed.                          E     093333
 094444     KATUser            login_event            A user login failed.                        E     094444
 700001     RawData            file_action            A raw file is downloaded.                   E     700001
-800010     Indemnification    ooi_change             An indemnification is (re)declared.         U     No
-800011     Indemnification    ooi_change             A declared indemnification is deleted.      D     No
+800010     ScanProfile        ooi_change             A scan profile is (re)declared.             U     800010
+800011     ScanProfile        ooi_change             A scan profile set to empty.                D     800011
 800021     Plugin             plugin_change          A plugin is enabled.                        U     800021
 800022     Plugin             plugin_change          A plugin is disabled.                       U     800022
 800023     Plugin             plugin_change          Settings of a plugin are updated.           U     800023
 800024     Plugin             plugin_change          Settings of a plugin are deleted.           D     800024
 800025     Plugin             plugin_change          A plugin is created.                        C     800025
 800026     Plugin             plugin_change          A plugin is updated.                        U     800026
-800027     Plugin             plugin_change          A plugin is deleted.                        D     No
-800028     Plugin             plugin_change          The schema of a plugin is updated.          U     No
 800051     Job                job_change             A job is manually created.                  C     800051
 800071     Report             report_change          A report is created.                        C     800071
 800073     Report             report_change          A report is deleted.                        D     800073
