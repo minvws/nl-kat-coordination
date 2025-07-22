@@ -21,18 +21,19 @@ from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesU
 logger = get_logger(__name__)
 
 SESSION_EVENT_CODES = {"created": "090001", "updated": "090002", "deleted": "090003"}
+LOGIN_EVENT_CODES = {"login": "091111", "logout": "092222"}
 
 
 # Signal sent when a user logs in
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
-    logger.info("User logged in", username=user.get_username())
+    logger.info("User logged in", username=user.get_username(), event_code=LOGIN_EVENT_CODES["login"])
 
 
 # Signal sent when a user logs out
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
-    logger.info("User logged out", userername=user.get_username())
+    logger.info("User logged out", userername=user.get_username(), event_code=LOGIN_EVENT_CODES["logout"])
 
 
 # Signal sent when a user login attempt fails
@@ -93,43 +94,36 @@ def log_delete(sender, instance, **kwargs) -> None:
     )
 
 
-@receiver(post_save, sender=Session)
-def log_save_session(sender, instance, created, **kwargs) -> None:
-    context = {}
-
-    if created:
-        context["event_code"] = SESSION_EVENT_CODES["created"]
-        logger.info(
-            "%s %s created",
-            instance._meta.object_name,
-            instance,
-            object_type=instance._meta.object_name,
-            object=str(instance),
-            **context,
-        )
-    else:
-        context["event_code"] = SESSION_EVENT_CODES["updated"]
-        logger.info(
-            "%s %s updated",
-            instance._meta.object_name,
-            instance,
-            object_type=instance._meta.object_name,
-            object=str(instance),
-            **context,
-        )
+def save_log(instance, event_code):
+    logger.info(
+        "%s %s created",
+        instance._meta.object_name,
+        instance,
+        object_type=instance._meta.object_name,
+        object=str(instance),
+        event_code=event_code,
+    )
 
 
-@receiver(post_delete, sender=Session)
-def log_delete_session(sender, instance, *args, **kwargs) -> None:
-    context = {"event_code": SESSION_EVENT_CODES["deleted"]}
+def delete_log(instance, event_code):
     logger.info(
         "%s %s deleted",
         instance._meta.object_name,
         instance,
         object_type=instance._meta.object_name,
         object=str(instance),
-        **context,
+        event_code=event_code,
     )
+
+
+@receiver(post_save, sender=Session)
+def log_save_session(sender, instance, created, **kwargs) -> None:
+    save_log(instance, SESSION_EVENT_CODES["created"] if created else SESSION_EVENT_CODES["updated"])
+
+
+@receiver(post_delete, sender=Session)
+def log_delete_session(sender, instance, *args, **kwargs) -> None:
+    delete_log(instance, SESSION_EVENT_CODES["deleted"])
 
 
 @receiver(pre_save, sender=Organization)
