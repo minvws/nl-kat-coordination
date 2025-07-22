@@ -1,6 +1,9 @@
 INSERT INTO public.django_content_type (app_label, model) VALUES
   ('crisis_room', 'dashboarditem'),
-  ('crisis_room', 'dashboard')
+  ('crisis_room', 'dashboard'),
+  ('tools', 'organizationtag'),
+  ('account', 'katuser'),
+  ('account', 'authtoken')
 ON CONFLICT DO NOTHING;
 
 -- Note: this list was generated with the following query, dumping it here in case we need to dig it up again:
