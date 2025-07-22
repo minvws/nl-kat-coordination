@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 07:14+0000\n"
+"POT-Creation-Date: 2025-07-22 07:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -361,9 +361,12 @@ msgid "OOI clearance"
 msgstr ""
 
 #: account/templates/account_detail.html
+msgid "You don't have any clearance to scan objects."
+msgstr ""
+
+#: account/templates/account_detail.html
 msgid ""
-"You don't have any clearance to scan objects. <br> Get in contact with the "
-"admin to give you the necessary clearance level."
+"Get in contact with the admin to give you the necessary clearance level."
 msgstr ""
 
 #: account/templates/account_detail.html
@@ -5706,7 +5709,11 @@ msgstr ""
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br> Our motto is therefore: I see, I see, what you do not see."
+"analog)."
+msgstr ""
+
+#: rocky/templates/landing_page.html
+msgid "Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
 
 #: rocky/templates/landing_page.html
