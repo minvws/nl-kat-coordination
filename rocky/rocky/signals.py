@@ -21,7 +21,7 @@ from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesU
 logger = get_logger(__name__)
 
 SESSION_EVENT_CODES = {"created": "090001", "updated": "090002", "deleted": "090003"}
-LOGIN_EVENT_CODES = {"login": "091111", "logout": "092222"}
+LOGIN_EVENT_CODES = {"login": "091111", "logout": "092222", "failed": "094444"}
 
 
 # Signal sent when a user logs in
@@ -39,7 +39,7 @@ def user_logged_out_callback(sender, request, user, **kwargs):
 # Signal sent when a user login attempt fails
 @receiver(user_login_failed)
 def user_login_failed_callback(sender, credentials, request, **kwargs):
-    logger.info("User login failed", credentials=credentials)
+    logger.info("User login failed", credentials=credentials, event_code=LOGIN_EVENT_CODES["failed"])
 
 
 # Signal sent when a model is saved
