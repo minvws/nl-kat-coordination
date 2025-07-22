@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 07:42+0000\n"
+"POT-Creation-Date: 2025-07-22 13:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2414,22 +2414,22 @@ msgstr ""
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
 "OpenKAT uses plugins to scan your objects. Each plugin has a scan level to "
-"specify how aggressive the scan is.  Plugins can only scan those objects "
-"with a clearance level that is equal to, or higher than the scan level of "
-"the plugin. Plugin scan level are indicated by the number of cat paws."
+"specify how aggressive the scan is. Plugins can only scan those objects with "
+"a clearance level that is equal to, or higher than the scan level of the "
+"plugin. Plugin scan level are indicated by the number of cat paws."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs "
-"non-intrusive scans which look for publicly available information. It scans "
-"objects with a clearance level of 1 or higher."
+"The plugin <strong>DNS Zone</strong> has a scan level of 1, meaning that it "
+"performs non-intrusive scans which look for publicly available information. "
+"It scans objects with a clearance level of 1 or higher."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>Fierce</b> has a scan level of 3, meaning that it more "
-"aggressive and could potentially break things. It scans objects with a "
+"The plugin <strong>Fierce</strong> has a scan level of 3, meaning that it "
+"more aggressive and could potentially break things. It scans objects with a "
 "clearance level of 3 or higher."
 msgstr ""
 
@@ -2508,10 +2508,6 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "5: Generating report"
-msgstr ""
-
-#: onboarding/view_helpers.py
-msgid "3: Add Object"
 msgstr ""
 
 #: onboarding/views.py
@@ -4347,7 +4343,7 @@ msgid "Open asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Asset reports details:"
+msgid "Asset reports details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4363,6 +4359,7 @@ msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/views/report_overview.py
 msgid "Asset reports"
 msgstr ""
@@ -4465,10 +4462,6 @@ msgstr ""
 #: reports/templates/report_overview/subreports_header.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
-msgstr ""
-
-#: reports/templates/report_overview/subreports_table.html
-msgid "Asset reports:"
 msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
@@ -5048,8 +5041,8 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the Boefje explaining in short what it can do. This will "
-"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+"A description of the Boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page."
 msgstr ""
 
 #: tools/forms/settings.py
@@ -6225,7 +6218,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
