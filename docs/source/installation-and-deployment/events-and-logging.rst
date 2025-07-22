@@ -35,9 +35,6 @@ Event code Model              Routing key            Description                
 093333     TOTPDevice         login_event            A user MFA failed.                          E     093333
 094444     KATUser            login_event            A user login failed.                        E     094444
 700001     RawData            file_action            A raw file is downloaded.                   E     700001
-800001     OOI                ooi_change             An OOI is created.                          C     No
-800002     OOI                ooi_change             An OOI is edited.                           U     No
-800003     OOI                ooi_change             An OOI is deleted.                          D     No
 800010     Indemnification    ooi_change             An indemnification is (re)declared.         U     No
 800011     Indemnification    ooi_change             A declared indemnification is deleted.      D     No
 800021     Plugin             plugin_change          A plugin is enabled.                        U     800021
@@ -48,17 +45,8 @@ Event code Model              Routing key            Description                
 800026     Plugin             plugin_change          A plugin is updated.                        U     800026
 800027     Plugin             plugin_change          A plugin is deleted.                        D     No
 800028     Plugin             plugin_change          The schema of a plugin is updated.          U     No
-800031     Plugin             plugin_change          A plugin (version) is allowed.              U     No
-800032     Plugin             plugin_change          A plugin (version) is disallowed.           U     No
-800033     Plugin             plugin_change          A plugin source is added.                   C     No
-800034     Plugin             plugin_change          A plugin source is updated.                 U     No
-800035     Plugin             plugin_change          A plugin source is removed.                 D     No
-800036     Plugin             plugin_change          Plugin signing key is trusted.              U     No
-800037     Plugin             plugin_change          Plugin signing key is untrusted.            U     No
-800051     Job                job_change             A job is manually created.                  C     No
-800052     Job                job_change             A job is canceled.                          D     No
+800051     Job                job_change             A job is manually created.                  C     800051
 800071     Report             report_change          A report is created.                        C     800071
-800072     Report             report_change          A report is edited.                         U     No
 800073     Report             report_change          A report is deleted.                        D     800073
 800081     Schedule           schedule_change        A schedule is created.                      C     800081
 800082     Schedule           schedule_change        A schedule is edited.                       U     800082
