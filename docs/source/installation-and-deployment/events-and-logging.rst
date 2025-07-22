@@ -54,16 +54,15 @@ Event code Model              Routing key            Description                
 800091     ReportRecipe       report_recipe_change   A Report Recipe is created.                 C     800091
 900100     KATUser            account_change         A new user created.                         C     900101*
 900101     KATUser            account_change         User data changed.                          U     900102*
-900102     KATUser            account_change         An user role changed.                       U     No
+900102     KATUser            account_change         A user role changed.                        U     No
 900104     KATUser            account_change         Account status changed (Enabled/Disabled).  U     No
 900105     KATUser            account_change         User credential reset is performed.         E     900105
 900106     OrganizationMember account_change         User organization membership changed.       U     900212*
-900107     TOTPDevice         account_change         Reset 2FA.                                  E     No
-900108     Indemnification    account_change         Set max allowed indemnification.            U     No
-900109     Indemnification    account_change         Set max accepted indemnification.           U     No
+900108     Indemnification    account_change         Set trusted clearance level.                U     900108
+900109     Indemnification    account_change         Set accepted clearance level.               U     900109
 900110     KATUser            account_change         A user is deleted.                          D     900103*
-900111     TOTPDevice         account_change         2FA is removed.                             D     No
-900112     TOTPDevice         account_change         2FA is updated.                             U     No
+900111     TOTPDevice         account_change         2FA is removed.                             D     900111
+900112     TOTPDevice         account_change         2FA is updated.                             U     900112
 900201     Organization       organization_change    A new organization is created.              C     900201
 900202     Organization       organization_change    Organization information changed.           U     900202
 900203     Organization       organization_change    Organization is removed.                    D     900203

@@ -7,6 +7,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 from django.contrib.sessions.models import Session
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+from django_otp.models import Device
 from httpx import HTTPError
 from katalogus.client import KATalogusClient, get_katalogus_client
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
@@ -21,6 +22,7 @@ from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesU
 logger = get_logger(__name__)
 
 SESSION_EVENT_CODES = {"created": "090001", "updated": "090002", "deleted": "090003"}
+OTP_DEVICE_EVENT_CODES = {"updated": "900112", "deleted": "900111"}
 LOGIN_EVENT_CODES = {"login": "091111", "logout": "092222", "failed": "094444"}
 
 
@@ -116,14 +118,25 @@ def delete_log(instance, event_code):
     )
 
 
-@receiver(post_save, sender=Session)
+@receiver(post_save, sender=Device)
 def log_save_session(sender, instance, created, **kwargs) -> None:
     save_log(instance, SESSION_EVENT_CODES["created"] if created else SESSION_EVENT_CODES["updated"])
 
 
-@receiver(post_delete, sender=Session)
+@receiver(post_delete, sender=Device)
 def log_delete_session(sender, instance, *args, **kwargs) -> None:
     delete_log(instance, SESSION_EVENT_CODES["deleted"])
+
+
+@receiver(post_save, sender=Session)
+def log_update_device(sender, instance, created, **kwargs) -> None:
+    if not created:
+        save_log(instance, OTP_DEVICE_EVENT_CODES["updated"])
+
+
+@receiver(post_delete, sender=Session)
+def log_delete_device(sender, instance, *args, **kwargs) -> None:
+    delete_log(instance, OTP_DEVICE_EVENT_CODES["deleted"])
 
 
 @receiver(pre_save, sender=Organization)
