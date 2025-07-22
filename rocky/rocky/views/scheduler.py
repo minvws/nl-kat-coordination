@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
+import structlog
 from django.contrib import messages
 from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
@@ -33,6 +34,8 @@ from rocky.scheduler import (
 )
 from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
+
+logger = structlog.get_logger(__name__)
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -267,6 +270,12 @@ class SchedulerView(OctopoesView):
             )
 
             self.schedule_task(new_task)
+            logger.info(
+                "Normalizer Task created manually",
+                event_code="800051",
+                boefje=katalogus_normalizer.id,
+                task_id=new_task.id,
+            )
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
@@ -283,7 +292,9 @@ class SchedulerView(OctopoesView):
             )
 
             self.schedule_task(new_task)
-
+            logger.info(
+                "Boefje Task created manually", event_code="800051", boefje=katalogus_boefje.id, task_id=new_task.id
+            )
         except SchedulerError as error:
             messages.error(self.request, error.message)
 

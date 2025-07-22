@@ -90,13 +90,13 @@ Event code Model              Routing key            Description                
 900231     OOIInformation     ooi_change             OOI information is created.                 C     900231
 900232     OOIInformation     ooi_change             OOI information changed.                    U     900232
 900233     OOIInformation     ooi_change             OOI information is removed.                 D     900233
-900301     Dashboard          dashboard_change       A Dashboard is created.                     C     No
-900302     Dashboard          dashboard_change       A Dashboard is edited.                      U     No
-900303     Dashboard          dashboard_change       A Dashboard is deleted.                     D     No
-900307     DashboardData      dashboard_data_change  A Dashboard data is created.                C     No
-900308     DashboardData      dashboard_data_change  A Dashboard data is edited.                 U     No
-900309     DashboardData      dashboard_data_change  A Dashboard data is deleted.                D     No
-900310     DashboardData      dashboard_data_change  A Dashboard data is repositioned.           U     No
+900301     Dashboard          dashboard_change       A Dashboard is created.                     C     900301
+900302     Dashboard          dashboard_change       A Dashboard is edited.                      U     900302
+900303     Dashboard          dashboard_change       A Dashboard is deleted.                     D     900303
+900307     DashboardItem      dashboard_item_change  A Dashboard item is created.                C     900307
+900308     DashboardItem      dashboard_item_change  A Dashboard item is edited.                 U     900308
+900309     DashboardItem      dashboard_item_change  A Dashboard item is deleted.                D     900309
+900310     DashboardItem      dashboard_item_change  A Dashboard item is repositioned.           U     900310
 910000     Organization       organization_change    An organization is cloned.                  C     910000
 920000     Organization       organization_change    Recalculated bits for organizations         U     920000
 100101     Observation        observation_change     An observation is created.                  C     100101
