@@ -34,7 +34,7 @@ Event code Model              Routing key            Description                
 092222     KATUser            login_event            A user logged out.                          E     092222
 093333     TOTPDevice         login_event            A user MFA failed.                          E     093333
 094444     KATUser            login_event            A user login failed.                        E     094444
-700001     RawData            file_action            A raw file is downloaded.                   E     No
+700001     RawData            file_action            A raw file is downloaded.                   E     700001
 800001     OOI                ooi_change             An OOI is created.                          C     No
 800002     OOI                ooi_change             An OOI is edited.                           U     No
 800003     OOI                ooi_change             An OOI is deleted.                          D     No
