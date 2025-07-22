@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 07:09+0000\n"
+"POT-Creation-Date: 2025-07-22 07:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,7 @@ msgid "Please provide username"
 msgstr ""
 
 #: account/forms/account_setup.py
+#: rocky/templates/organizations/organization_member_list.html
 msgid "Email"
 msgstr ""
 
@@ -226,7 +227,7 @@ msgstr ""
 msgid "The organization from which to clone settings."
 msgstr ""
 
-#: account/forms/password_reset.py
+#: account/forms/password_reset.py account/templates/account_detail.html
 msgid "Email address"
 msgstr ""
 
@@ -279,7 +280,7 @@ msgid ""
 msgstr ""
 
 #: account/models.py
-msgid "The Email must be set"
+msgid "The email must be set"
 msgstr ""
 
 #: account/models.py
@@ -339,10 +340,6 @@ msgstr ""
 
 #: account/templates/account_detail.html
 msgid "Full name"
-msgstr ""
-
-#: account/templates/account_detail.html
-msgid "E-mail address"
 msgstr ""
 
 #: account/templates/account_detail.html
@@ -3196,7 +3193,7 @@ msgstr ""
 #: reports/report_types/mail_report/report.html
 msgid ""
 "The Mail Report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
+"with email servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
@@ -6244,10 +6241,6 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
-msgstr ""
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "E-mail"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
