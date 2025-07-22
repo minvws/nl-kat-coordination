@@ -1,3 +1,8 @@
+INSERT INTO public.django_content_type (app_label, model) VALUES
+  ('crisis_room', 'dashboarditem'),
+  ('crisis_room', 'dashboard')
+ON CONFLICT DO NOTHING;
+
 -- Note: this list was generated with the following query, dumping it here in case we need to dig it up again:
 -- SELECT a.name, a.codename, d.app_label, d.model FROM auth_permission a
 -- JOIN django_content_type d ON a.content_type_id = d.id
@@ -8,7 +13,6 @@
 -- 'view_authtoken', 'view_dashboard', 'view_dashboarditem', 'view_organizationtag');
 
 INSERT INTO public.auth_permission (name, content_type_id, codename) VALUES
-
 ('Can add auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'account'),'add_authtoken'),
 ('Can change auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'account'),'change_authtoken'),
 ('Can delete auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'account'),'delete_authtoken'),
@@ -32,5 +36,4 @@ INSERT INTO public.auth_permission (name, content_type_id, codename) VALUES
 ('Can change auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'knox'),'change_authtoken'),
 ('Can delete auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'knox'),'delete_authtoken'),
 ('Can view auth token', (select id from public.django_content_type where model = 'authtoken' and app_label = 'knox'),'view_authtoken')
-
 ON CONFLICT DO NOTHING;
