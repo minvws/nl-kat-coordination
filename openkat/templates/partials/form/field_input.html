@@ -1,0 +1,53 @@
+{% load i18n %}
+
+<div {% if field.field.required %}class="required"{% endif %}>
+    {% if field.field.required %}
+        <label>
+            {{ field.label_tag }} <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+        </label>
+    {% else %}
+        {{ field.label_tag }}
+    {% endif %}
+    <p id="input-description" class="nota-bene">{{ field.field.widget.attrs.description }}</p>
+    {% if form_view != "vertical" %}
+        <div>
+            <div>
+                {% if not field.field.widget.attrs.fixed_paws %}
+                    {{ field }}
+                {% elif field.field.widget.attrs.fixed_paws < 0 %}
+                    {% translate "Not set" %}
+                {% else %}
+                    {% include "partials/scan_level_indicator.html" with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
+
+                {% endif %}
+                {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                {% include "partials/form/field_input_errors.html" %}
+
+            </div>
+            {% if form_name == "login" and field.name == "username" %}
+                <div class="input-link">
+                    <a href="{% url "recover_email" %}">{% translate "Forgot email" %}</a>
+                </div>
+            {% endif %}
+            {% if form_name == "login" and field.name == "password" %}
+                <div class="input-link">
+                    <a href="{% url "password_reset" %}">{% translate "Forgot password" %}</a>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div>
+            {% if field.field.required %}
+                <label>
+                    {{ field.label_tag }} <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+                </label>
+            {% endif %}
+            <div>
+                {{ field }}
+                {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                {% include "partials/form/field_input_errors.html" %}
+
+            </div>
+        </div>
+    {% endif %}
+</div>

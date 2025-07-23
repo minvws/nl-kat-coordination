@@ -1,0 +1,553 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:iana="http://www.iana.org/assignments">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="../_support/iana-registry.css" type="text/css" />
+    <script type="text/javascript" src="../_support/jquery.js"></script>
+    <script type="text/javascript" src="../_support/sort.js"></script>
+    <script type="text/javascript" src="../_support/sort_srv.js"></script>
+    <script type="text/javascript" src="../_support/jsuri.js"></script>
+    <title>Service Name and Transport Protocol Port Number Registry</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <a href="/">
+          <img src="https://www.iana.org/_img/2022/iana-logo-header.svg" alt="Internet Assigned Numbers Authority" />
+        </a>
+      </div>
+    </header>
+    <article>
+      <h1>Service Name and Transport Protocol Port Number Registry</h1>
+      <dl>
+        <dt>Last Updated</dt>
+        <dd>2023-01-04</dd>
+        <dt>Expert(s)</dt>
+        <dd>
+          <pre>TCP/UDP: Joe Touch; Eliot Lear, Kumiko Ono, Wes Eddy, Brian Trammell,
+Jana Iyengar, and Michael Scharf
+SCTP: Michael Tuexen
+DCCP: Eddie Kohler and Yoshifumi Nishida</pre>
+        </dd>
+        <dt>Reference</dt>
+        <dd>[<a href="https://www.iana.org/go/rfc6335">RFC6335</a>]</dd>
+        <dt>Note</dt>
+        <dd>
+          <pre>
+Service names and port numbers are used to distinguish between different
+services that run over transport protocols such as TCP, UDP, DCCP, and
+SCTP.
+
+Service names are assigned on a first-come, first-served process, as
+documented in [<a href="https://www.iana.org/go/rfc6335">RFC6335</a>].
+
+Port numbers are assigned in various ways, based on three ranges: System
+Ports (0-1023), User Ports (1024-49151), and the Dynamic and/or Private
+Ports (49152-65535); the different uses of these ranges are described in
+[<a href="https://www.iana.org/go/rfc6335">RFC6335</a>]. According to Section 8.1.2 of [<a href="https://www.iana.org/go/rfc6335">RFC6335</a>], System Ports are
+assigned by the "IETF Review" or "IESG Approval" procedures described in
+[<a href="https://www.iana.org/go/rfc8126">RFC8126</a>]. User Ports are assigned by IANA using the "IETF Review" process,
+the "IESG Approval" process, or the "Expert Review" process, as per
+[<a href="https://www.iana.org/go/rfc6335">RFC6335</a>]. Dynamic Ports are not assigned.
+
+The registration procedures for service names and port numbers are
+described in [<a href="https://www.iana.org/go/rfc6335">RFC6335</a>].
+
+Assigned ports both System and User ports SHOULD NOT be used without
+or prior to IANA registration.
+
+************************************************************************
+* PLEASE NOTE THE FOLLOWING:                                           *
+*                                                                      *
+* ASSIGNMENT OF A PORT NUMBER DOES NOT IN ANY WAY IMPLY AN             *
+* ENDORSEMENT OF AN APPLICATION OR PRODUCT, AND THE FACT THAT NETWORK  *
+* TRAFFIC IS FLOWING TO OR FROM A REGISTERED PORT DOES NOT MEAN THAT   *
+* IT IS "GOOD" TRAFFIC, NOR THAT IT NECESSARILY CORRESPONDS TO THE     *
+* ASSIGNED SERVICE. FIREWALL AND SYSTEM ADMINISTRATORS SHOULD          *
+* CHOOSE HOW TO CONFIGURE THEIR SYSTEMS BASED ON THEIR KNOWLEDGE OF    *
+* THE TRAFFIC IN QUESTION, NOT WHETHER THERE IS A PORT NUMBER          *
+* REGISTERED OR NOT.                                                   *
+************************************************************************
+
+</pre>
+        </dd>
+        <dt>Request an Assignment</dt>
+        <dd>
+          <pre>
+  [<a href="https://www.iana.org/protocols/apply">https://www.iana.org/protocols/apply</a>]
+
+</pre>
+        </dd>
+        <dt>Available Formats</dt>
+        <dd>
+          <a class="altformat" href="service-names-port-numbers.csv"><img src="/_img/icons/text-csv.png" /><br />CSV</a>
+          <a class="altformat" href="service-names-port-numbers.xml"><img src="/_img/icons/text-xml.png" /><br />XML</a>
+          <a class="altformat" href="service-names-port-numbers.xhtml"><img src="/_img/icons/text-html.png" /><br />HTML</a>
+          <a class="altformat" href="service-names-port-numbers.txt"><img src="/_img/icons/text-plain.png" /><br />Plain text</a>
+        </dd>
+      </dl>
+      <form method="get" action="?search=ssh">
+        <input name="search" size="18" type="text" value="ssh" />
+        <input value="Search" type="submit" />
+      </form>
+      <table id="table-service-names-port-numbers" class="sortable_srv">
+        <thead>
+          <tr>
+            <th>Service Name</th>
+            <th class="sortNumeric">Port Number</th>
+            <th>Transport Protocol</th>
+            <th>Description</th>
+            <th>Assignee</th>
+            <th>Contact</th>
+            <th>Registration Date</th>
+            <th>Modification Date</th>
+            <th>Reference</th>
+            <th>Service Code</th>
+            <th>Unauthorized Use Reported</th>
+            <th>Assignment Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ssh</td>
+            <td align="center">22</td>
+            <td align="center">tcp</td>
+            <td>The Secure Shell (SSH) Protocol</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc4251">RFC4251</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys: u=&lt;username&gt; p=&lt;password&gt;</td>
+          </tr>
+          <tr>
+            <td>ssh</td>
+            <td align="center">22</td>
+            <td align="center">udp</td>
+            <td>The Secure Shell (SSH) Protocol</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc4251">RFC4251</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys: u=&lt;username&gt; p=&lt;password&gt;</td>
+          </tr>
+          <tr>
+            <td>ssh</td>
+            <td align="center">22</td>
+            <td align="center">sctp</td>
+            <td>SSH</td>
+            <td>[<a href="#Randall_Stewart">Randall_Stewart</a>]</td>
+            <td>[<a href="#Randall_Stewart">Randall_Stewart</a>]</td>
+            <td></td>
+            <td>2022-02-07</td>
+            <td>[<a href="https://www.iana.org/go/rfc9260">RFC9260</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys: u=&lt;username&gt; p=&lt;password&gt;</td>
+          </tr>
+          <tr>
+            <td>sshell</td>
+            <td align="center">614</td>
+            <td align="center">tcp</td>
+            <td>SSLshell</td>
+            <td>[<a href="#Simon_J_Gerraty">Simon_J_Gerraty</a>]</td>
+            <td>[<a href="#Simon_J_Gerraty">Simon_J_Gerraty</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>sshell</td>
+            <td align="center">614</td>
+            <td align="center">udp</td>
+            <td>SSLshell</td>
+            <td>[<a href="#Simon_J_Gerraty">Simon_J_Gerraty</a>]</td>
+            <td>[<a href="#Simon_J_Gerraty">Simon_J_Gerraty</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>netconf-ssh</td>
+            <td align="center">830</td>
+            <td align="center">tcp</td>
+            <td>NETCONF over SSH</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc6242">RFC6242</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>netconf-ssh</td>
+            <td align="center">830</td>
+            <td align="center">udp</td>
+            <td>NETCONF over SSH</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc6242">RFC6242</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>enpp</td>
+            <td align="center">2968</td>
+            <td align="center">tcp</td>
+            <td>ENPP</td>
+            <td>[<a href="#Kazuhito_Gassho">Kazuhito_Gassho</a>]</td>
+            <td>[<a href="#Kazuhito_Gassho">Kazuhito_Gassho</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>enpp</td>
+            <td align="center">2968</td>
+            <td align="center">udp</td>
+            <td>ENPP</td>
+            <td>[<a href="#Kazuhito_Gassho">Kazuhito_Gassho</a>]</td>
+            <td>[<a href="#Kazuhito_Gassho">Kazuhito_Gassho</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>sdo-ssh</td>
+            <td align="center">3897</td>
+            <td align="center">tcp</td>
+            <td>Simple Distributed Objects over SSH</td>
+            <td>[<a href="#Alexander_Philippou">Alexander_Philippou</a>]</td>
+            <td>[<a href="#Alexander_Philippou">Alexander_Philippou</a>]</td>
+            <td>2003-10</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>sdo-ssh</td>
+            <td align="center">3897</td>
+            <td align="center">udp</td>
+            <td>Simple Distributed Objects over SSH</td>
+            <td>[<a href="#Alexander_Philippou">Alexander_Philippou</a>]</td>
+            <td>[<a href="#Alexander_Philippou">Alexander_Philippou</a>]</td>
+            <td>2003-10</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>netconf-ch-ssh</td>
+            <td align="center">4334</td>
+            <td align="center">tcp</td>
+            <td>NETCONF Call Home (SSH)</td>
+            <td>[<a href="#IESG">IESG</a>]</td>
+            <td>[<a href="#IETF_Chair">IETF_Chair</a>]</td>
+            <td>2016-01-12</td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc8071">RFC8071</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>snmpssh</td>
+            <td align="center">5161</td>
+            <td align="center">tcp</td>
+            <td>SNMP over SSH Transport Model</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc5592">RFC5592</a>]</td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>snmpssh-trap</td>
+            <td align="center">5162</td>
+            <td align="center">tcp</td>
+            <td>SNMP Notification over SSH Transport Model</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>[<a href="https://www.iana.org/go/rfc5592">RFC5592</a>]</td>
+            <td align="center"></td>
+            <td>Known Unauthorized Use on port 5162</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>tl1-ssh</td>
+            <td align="center">6252</td>
+            <td align="center">tcp</td>
+            <td>TL1 over SSH</td>
+            <td>[<a href="#Jim_Humphreys">Jim_Humphreys</a>]</td>
+            <td>[<a href="#Jim_Humphreys">Jim_Humphreys</a>]</td>
+            <td>2008-01-25</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>tl1-ssh</td>
+            <td align="center">6252</td>
+            <td align="center">udp</td>
+            <td>TL1 over SSH</td>
+            <td>[<a href="#Jim_Humphreys">Jim_Humphreys</a>]</td>
+            <td>[<a href="#Jim_Humphreys">Jim_Humphreys</a>]</td>
+            <td>2008-01-25</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>ssh-mgmt</td>
+            <td align="center">17235</td>
+            <td align="center">tcp</td>
+            <td>SSH Tectia Manager</td>
+            <td>[<a href="#Ville_Laurikari">Ville_Laurikari</a>]</td>
+            <td>[<a href="#Ville_Laurikari">Ville_Laurikari</a>]</td>
+            <td>2005-08</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>ssh-mgmt</td>
+            <td align="center">17235</td>
+            <td align="center">udp</td>
+            <td>SSH Tectia Manager</td>
+            <td>[<a href="#Ville_Laurikari">Ville_Laurikari</a>]</td>
+            <td>[<a href="#Ville_Laurikari">Ville_Laurikari</a>]</td>
+            <td>2005-08</td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>sftp-ssh</td>
+            <td align="center"></td>
+            <td align="center"></td>
+            <td>Secure File Transfer Protocol over SSH</td>
+            <td>[<a href="#Bryan_Cole">Bryan_Cole</a>]</td>
+            <td>[<a href="#Bryan_Cole">Bryan_Cole</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys: u=&lt;username&gt; p=&lt;password&gt; path=&lt;path&gt;</td>
+          </tr>
+          <tr>
+            <td>shifter</td>
+            <td align="center"></td>
+            <td align="center"></td>
+            <td>Window Shifter server protocol</td>
+            <td>[<a href="#Antoine_Martin">Antoine_Martin</a>]</td>
+            <td>[<a href="#Antoine_Martin">Antoine_Martin</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys:   username     The login username to use (optional)
+  ssh_tunnel   Whether an SSH tunnel must be used (required)
+  iface        The network interface the server is on (required - may be empty)
+  version      Software version (required)
+  ID           Server Identifier (requried)</td>
+          </tr>
+          <tr>
+            <td>ssh</td>
+            <td align="center"></td>
+            <td align="center">tcp</td>
+            <td>SSH Remote Login Protocol</td>
+            <td>[<a href="#Tatu_Ylonen">Tatu_Ylonen</a>]</td>
+            <td>[<a href="#Tatu_Ylonen">Tatu_Ylonen</a>]</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td align="center"></td>
+            <td></td>
+            <td>Defined TXT keys:  u=&lt;username&gt; p=&lt;password&gt;</td>
+          </tr>
+        </tbody>
+      </table>
+      <h1 class="people">Contact Information</h1>
+      <table class="sortable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Organization</th>
+            <th>Contact URI</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a name="Alexander_Philippou" id="Alexander_Philippou">[Alexander_Philippou]</a>
+            </td>
+            <td>Alexander Philippou</td>
+            <td></td>
+            <td>
+              <a href="mailto:alex&amp;noemax.com">mailto:alex&amp;noemax.com</a>
+            </td>
+            <td>2003-10</td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Antoine_Martin" id="Antoine_Martin">[Antoine_Martin]</a>
+            </td>
+            <td>Antoine Martin</td>
+            <td></td>
+            <td>
+              <a href="mailto:antoine&amp;nagafix.co.uk">mailto:antoine&amp;nagafix.co.uk</a>
+            </td>
+            <td>2016-10-05</td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Bryan_Cole" id="Bryan_Cole">[Bryan_Cole]</a>
+            </td>
+            <td>Bryan Cole</td>
+            <td></td>
+            <td>
+              <a href="mailto:bryan.cole&amp;teraview.com">mailto:bryan.cole&amp;teraview.com</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="IESG" id="IESG">[IESG]</a>
+            </td>
+            <td></td>
+            <td>IESG</td>
+            <td>
+              <a href="mailto:iesg&amp;ietf.org">mailto:iesg&amp;ietf.org</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="IETF_Chair" id="IETF_Chair">[IETF_Chair]</a>
+            </td>
+            <td>IETF Chair</td>
+            <td>IETF</td>
+            <td>
+              <a href="mailto:chair&amp;ietf.org">mailto:chair&amp;ietf.org</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Jim_Humphreys" id="Jim_Humphreys">[Jim_Humphreys]</a>
+            </td>
+            <td>Jim Humphreys</td>
+            <td></td>
+            <td>
+              <a href="mailto:jhumphre&amp;ciena.com">mailto:jhumphre&amp;ciena.com</a>
+            </td>
+            <td>2008-01-29</td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Kazuhito_Gassho" id="Kazuhito_Gassho">[Kazuhito_Gassho]</a>
+            </td>
+            <td>Kazuhito Gassho</td>
+            <td></td>
+            <td>
+              <a href="mailto:Gassho.Kasuhito&amp;exc.epson.co.jp">mailto:Gassho.Kasuhito&amp;exc.epson.co.jp</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Randall_Stewart" id="Randall_Stewart">[Randall_Stewart]</a>
+            </td>
+            <td>Randall Stewart</td>
+            <td>IETF TSVWG</td>
+            <td>
+              <a href="mailto:rrs&amp;lakerest.net">mailto:rrs&amp;lakerest.net</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Simon_J_Gerraty" id="Simon_J_Gerraty">[Simon_J_Gerraty]</a>
+            </td>
+            <td>Simon J. Gerraty</td>
+            <td></td>
+            <td>
+              <a href="mailto:sjg&amp;quick.com.au">mailto:sjg&amp;quick.com.au</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Tatu_Ylonen" id="Tatu_Ylonen">[Tatu_Ylonen]</a>
+            </td>
+            <td>Tatu Ylonen</td>
+            <td></td>
+            <td>
+              <a href="mailto:ylo&amp;cs.hut.fi">mailto:ylo&amp;cs.hut.fi</a>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>
+              <a name="Ville_Laurikari" id="Ville_Laurikari">[Ville_Laurikari]</a>
+            </td>
+            <td>Ville Laurikari</td>
+            <td></td>
+            <td>
+              <a href="mailto:vlaurika&amp;ssh.com">mailto:vlaurika&amp;ssh.com</a>
+            </td>
+            <td>2005-08</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+    <footer>
+      <div>
+        <a href="https://www.iana.org/help/licensing-terms">Licensing Terms</a>
+      </div>
+    </footer>
+  </body>
+</html>

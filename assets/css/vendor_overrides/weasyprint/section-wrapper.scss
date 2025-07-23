@@ -1,0 +1,15 @@
+/* Weasyprint section-wrapper overrides */
+
+main section div {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+
+  > div {
+    h3:first-child {
+      margin-top: 2rem;
+    }
+  }
+}

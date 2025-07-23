@@ -1,0 +1,9 @@
+{
+  "plugin_id": "certificate-search",
+  "name": "CRT",
+  "description": "Searches for certificates and new hostnames in the transparency logs of crt.sh.",
+  "consumes": [
+    "DNSZone"
+  ],
+  "scan_level": 1
+}

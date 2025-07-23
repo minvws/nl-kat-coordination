@@ -1,0 +1,22 @@
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <main id="main-content">
+        <section>
+            <div class="layout-form">
+                {% if not form %}
+                    <h1>{% translate "The form could not be initialized." %}</h1>
+                {% else %}
+                    <form novalidate method="post" class="help">
+                        {% csrf_token %}
+                        {% translate "Required settings" as fieldset_legend %}
+                        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
+                        <button type="submit">{% translate "Add" %}</button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

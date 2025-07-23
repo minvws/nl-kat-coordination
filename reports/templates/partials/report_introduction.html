@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<section>
+    <div>
+        <h2>{% translate "Introduction" %}</h2>
+        <p>
+            {% blocktranslate trimmed %}
+                This report gives an overview of the current state of security for your organisation for the selected date.
+                The summary section provides an overview of the selected systems (objects), plugins and reports.
+                This is followed with the findings for each report.
+            {% endblocktranslate %}
+        </p>
+    </div>
+</section>

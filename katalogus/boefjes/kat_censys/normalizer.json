@@ -1,0 +1,15 @@
+{
+  "plugin_id": "kat_censys_normalize",
+  "name": "Censys",
+  "description": "Parses Cencys data into objects that can be used by other boefjes and normalizers. Can create ports, certificates, software, websites and headers. Doesn't create findings.",
+  "consumes": [
+    "boefje/censys"
+  ],
+  "produces": [
+    "IPPort",
+    "X509Certificate",
+    "SoftwareInstance",
+    "ResolvedHostname",
+    "HTTPHeader"
+  ]
+}

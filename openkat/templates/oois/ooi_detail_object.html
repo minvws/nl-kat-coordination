@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<h2>{% translate "Object details" %}</h2>
+<div class="horizontal-scroll">
+    <dl>
+        {% for key, value in object_details.items %}
+            <div>
+                <dt>{{ key }}</dt>
+                <dd>
+                    {% if key == "owner" and value.is_inactive %}
+                        <s title="{% translate "Inactive" %}">{{ value }}</s>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </dd>
+            </div>
+        {% endfor %}
+    </dl>
+</div>

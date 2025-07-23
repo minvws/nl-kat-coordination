@@ -1,0 +1,20 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1">
+        <section>
+            <div>
+                <h1>{% translate "Error code 404: Page not found" %}</h1>
+                <p>{% translate "The page you wanted to see or the file you wanted to view was not found." %}</p>
+                <p>
+                    {% translate "You may want to go back to the" %} <a href="{% url 'crisis_room' %}">{% translate "Crisis Room" %}</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

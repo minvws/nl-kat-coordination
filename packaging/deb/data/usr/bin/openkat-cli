@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -ae
+source /usr/lib/kat/openkat.defaults
+source /etc/kat/openkat.conf
+
+/opt/venvs/kat-openkat/bin/manage.py "$@"

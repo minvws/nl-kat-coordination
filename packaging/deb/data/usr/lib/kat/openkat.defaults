@@ -1,0 +1,7 @@
+OCTOPOES_API=http://localhost:8001
+SCHEDULER_API=http://localhost:8004
+KATALOGUS_API=http://localhost:8003
+BYTES_API=http://localhost:8002
+STATIC_ROOT=/usr/share/kat-openkat/static
+GRANIAN_WORKERS=2
+GRANIAN_THREADS=4

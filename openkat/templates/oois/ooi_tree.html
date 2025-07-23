@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                {% include "partials/ooi_head.html" with ooi=ooi view="ooi_tree" %}
+                {% include "partials/ooi_list_filters.html" with ooi_id=ooi.primary_key %}
+
+                {% if tree_view == "table" %}
+                    {% include "partials/elements/ooi_tree_table.html" with list=tree ooi_id=ooi.primary_key %}
+
+                {% else %}
+                    {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree ooi_id=ooi.primary_key %}
+
+                {% endif %}
+                {% include "partials/ooi_tree_toolbar_bottom.html" with ooi_id=ooi.primary_key %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

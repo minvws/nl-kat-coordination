@@ -1,0 +1,26 @@
+#!/bin/bash -e
+
+set -e
+
+if [ "$1" = "configure" ]; then
+    if [ "$2" = "" ]; then
+        # $2 is the previously installed version and empty on fresh installs
+
+        # Set SECRET_KEY if empty
+        key=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 64)
+        sed -i "s/SECRET_KEY= *\$/SECRET_KEY=${key}/" /etc/kat/openkat.conf
+    fi
+
+    # Delete file and directory that was added in 1.13 to use granian only on
+    # new installs.
+    if [ -d /etc/systemd/system/kat-openkat.service.d ]; then
+        rm -f /etc/systemd/system/kat-openkat.service.d/use-granian.conf
+        rmdir --ignore-fail-on-non-empty /etc/systemd/system/kat-openkat.service.d
+    fi
+fi
+
+#DEBHELPER#
+
+if [ "$1" = "configure" ]; then
+    chown -R root:kat /etc/kat
+fi

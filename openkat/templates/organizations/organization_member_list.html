@@ -1,0 +1,150 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Members" %}</h1>
+                    <p>
+                        {% blocktranslate with organization_name=organization.name trimmed %}
+                            An overview of members of <strong>{{ organization_name }}</strong>.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% if perms.openkat.add_organizationmember %}
+                    <div class="horizontal-view toolbar">
+                        <div class="dropdown">
+                            <button aria-controls="add-member" class="dropdown-button ghost">
+                                {% translate "Add member(s)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+                            </button>
+                            <div id="add-member" class="dropdown-list">
+                                <ul>
+                                    <li>
+                                        <a href="{% url "organization_member_add_account_type" organization.code %}"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Manually" %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url "organization_member_upload" organization.code %}"><span class="icon ti-file-type-csv" aria-hidden="true"></span>{% translate "Upload a CSV" %}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div>
+                {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
+
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with total=members.count %}
+                        Showing {{ total }} members
+                    {% endblocktranslate %}
+                    </p>
+                </div>
+                <div class="horizontal-scroll">
+                    <table class="nowrap">
+                        <caption class="visually-hidden">{% translate "Member overview:" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "E-mail" %}</th>
+                                <th>{% translate "Role" %}</th>
+                                <th>{% translate "Status" %}</th>
+                                <th>{% translate "Assigned clearance level" %}</th>
+                                <th>{% translate "Accepted clearance level" %}</th>
+                                <th>{% translate "Edit" %}</th>
+                                <th>{% translate "Blocked" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                                {% if not member.user.is_superuser or request.user.is_superuser %}
+                                    <tr>
+                                        <td>
+                                            {{ member.user.email }}
+                                            <br>
+                                        </td>
+                                        <td>
+                                            {% if member.user.is_superuser %}
+                                                {% translate "Super user" %}
+                                            {% endif %}
+                                            {% for group in member.groups.all %}
+                                                {{ group.name|title }}
+                                                <br>
+                                            {% endfor %}
+                                        </td>
+                                        <td class="nowrap">
+                                            {% if member.user.is_superuser %}
+                                                <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
+                                            {% else %}
+                                                {% if member.blocked %}
+                                                    <span class="icon negative">{% translate "Blocked" %}</span>&nbsp;{% translate "Blocked" %}
+                                                {% else %}
+                                                    {% if member.status == 'active' %}
+                                                        <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
+                                                    {% elif member.status == 'new' %}
+                                                        <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.trusted_clearance_level < 0 %}
+                                                None
+                                            {% else %}
+                                                L{{ member.trusted_clearance_level }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.acknowledged_clearance_level < 0 %}
+                                                None
+                                            {% else %}
+                                                L{{ member.acknowledged_clearance_level }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.user.is_superuser %}
+                                                <button class="icon ti-edit action-button disabled">{% translate "Edit" %}</button>
+                                            {% else %}
+                                                <a href="{% url "organization_member_edit" organization.code member.id %}">
+                                                    <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.blocked %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
+
+                                            {% else %}
+                                                {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
+                                                {% if member.user.is_superuser or member.user.email == request.user.email %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
+
+                                                {% else %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
+
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

@@ -1,0 +1,20 @@
+{% load i18n %}
+
+<section class="page-meta">
+    <div class="{% if request.user.is_authenticated %}logged-in{% endif %}">
+        {% if request.user.is_authenticated %}
+            <div class="login-meta">
+                <p>
+                    {% translate "Logged in as:" %}
+                    {% if organization %}
+                        <a href="{% url "account_detail" organization_code=organization.code %}">{{ request.user }}</a>
+                    {% else %}
+                        {{ request.user }}
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+        {% include "partials/language-switcher.html" %}
+
+    </div>
+</section>

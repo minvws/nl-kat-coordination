@@ -1,0 +1,84 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Organizations" %}</h1>
+                    <p>{% translate "An overview of all organizations you are a member of." %}</p>
+                </div>
+                <div class="horizontal-view toolbar">
+                    {% if perms.openkat.add_organization %}
+                        <a href="{% url 'organization_add' %}" class="button ghost"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add new organization" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="horizontal-scroll">
+                    {% if object_list %}
+                        <div class="toolbar">
+                            <p class="de-emphasized">
+                                {% blocktranslate with total=object_list.count %}
+                            Showing {{ total }} organizations
+                        {% endblocktranslate %}
+                            </p>
+                        </div>
+                        <table>
+                            <caption class="visually-hidden">{% translate "Organization overview:" %}</caption>
+                            <thead>
+                                <tr>
+                                    <th>{% translate "Name" %}</th>
+                                    <th>{% translate "Code" %}</th>
+                                    <th>{% translate "Tags" %}</th>
+                                    <th>{% translate "Settings" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for organization in object_list %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.name }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.code }}</a>
+                                        </td>
+                                        <td>
+                                            {% include "organizations/organization_tags.html" %}
+
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'organization_settings' organization_code=organization.code %}">
+                                                <button class="icon ti-edit action-button">Settings</button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        {% translate "There were no organizations found for your user account" %}.
+                    {% endif %}
+                </div>
+                <div>
+                    <h2>{% translate "Actions" %}</h2>
+                    <p>{% translate "Actions to perform for all of your organizations." %}</p>
+                    {% if perms.openkat.can_recalculate_bits %}
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="dropdown-button ghost"
+                                    name="action"
+                                    value="recalculate">{% translate "Rerun all bits" %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

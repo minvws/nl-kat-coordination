@@ -1,0 +1,13 @@
+{
+  "plugin_id": "kat_masscan_normalize",
+  "name": "masscan",
+  "description": "Parse output from masscan into open ports for each scanned IP.",
+  "consumes": [
+    "boefje/masscan"
+  ],
+  "produces": [
+    "IPAddressV4",
+    "IPAddressV6",
+    "IPPort"
+  ]
+}

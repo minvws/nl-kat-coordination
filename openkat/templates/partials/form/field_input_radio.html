@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<fieldset class="{{ fieldset_class }}">
+    <label>
+        {{ field.label }}
+        {% if field.field.required %}
+            <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+        {% endif %}
+    </label>
+    {% for choice in field %}
+        <div class="radio">
+            <input type="radio" name="{{ field.name }}" value="{{ choice.data.value }}" {% for key, value in choice.data.attrs.items %}{{ key }}="{{ value }}"{% endfor %} {% if field.initial == choice.data.value %}checked="True"{% endif %}>
+            <label for="id_{{ field.name }}_{{ forloop.counter0 }}">
+                {% if choice.data.attrs.radio_paws %}
+                    {% include "partials/scan_level_indicator.html" with value=choice.data.value custom_class=choice.data.attrs.class %}
+
+                {% else %}
+                    {{ choice.choice_label }}
+                {% endif %}
+            </label>
+        </div>
+    {% endfor %}
+    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+    {% include "partials/form/field_input_errors.html" with field=field %}
+
+</fieldset>

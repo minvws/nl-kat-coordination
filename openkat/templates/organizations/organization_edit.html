@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main>
+        <section>
+            <div>
+                <h1>{% translate "Edit organization" %} {{ organization.name }}</h1>
+                <form method="post" class="help">
+                    {% csrf_token %}
+                    <fieldset>
+                        {% for field in form %}
+                            {% include "partials/form/field_input_wrapper.html" %}
+
+                        {% endfor %}
+                    </fieldset>
+                    <div class="button-container">
+                        <button type="submit">{% translate "Save organization" %}</button>
+                        <a class="button ghost"
+                           href="{% url 'organization_settings' organization.code %}">{% translate "Cancel" %}</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

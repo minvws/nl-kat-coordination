@@ -1,0 +1,23 @@
+/* Print */
+
+@media print {
+  /* Removing header from printed version */
+  body > header,
+  .page-header {
+    display: none;
+  }
+
+  /* Removing footer from printed version */
+  body > footer,
+  .page-footer {
+    display: none;
+  }
+
+  /* Removing action buttons from printed version */
+  .toolbar {
+    button,
+    a.button {
+      display: none;
+    }
+  }
+}

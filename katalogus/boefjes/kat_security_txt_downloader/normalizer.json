@@ -1,0 +1,13 @@
+{
+  "plugin_id": "kat_sec_txt_downloader_normalize",
+  "name": "Security.txt downloader",
+  "description": "Parses the downloaded security.txt data from a website.",
+  "consumes": [
+    "boefje/security_txt_downloader"
+  ],
+  "produces": [
+    "SecurityTXT",
+    "Website",
+    "URL"
+  ]
+}

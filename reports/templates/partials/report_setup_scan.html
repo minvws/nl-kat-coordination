@@ -1,0 +1,118 @@
+{% load i18n %}
+{% load static %}
+
+<section>
+    <div>
+        <h2>{% translate "Configuration" %}</h2>
+        <p>{% translate "Set up the required plugins for this report." %}</p>
+        {% if selected_report_types %}
+            {% include "partials/return_button.html" with btn_text="Change selection" %}
+            {% include "partials/plugin_overview_table.html" %}
+
+            <h2>{% translate "Plugins" %}</h2>
+            <p>
+                <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
+            </p>
+            <p>
+                {% blocktranslate trimmed %}
+                    If you choose not to enable a plugin, the data that plugin would
+                    collect or produce will be left out of the report which will then be generated
+                    based on the available data collected by the enabled plugins.
+                {% endblocktranslate %}
+            </p>
+            <p>
+                {% blocktranslate trimmed %}
+                    Some plugins are mandatory as they are crucial for a report type.
+                    Reports that don't have their requirements met will be skipped.
+                {% endblocktranslate %}
+            </p>
+            <p class="warning"
+               role="group"
+               aria-label="{% translate "scan level warning" %}">
+                <span>{% translate "Warning! Before you proceed read the following points:" %}</span>
+                {% blocktranslate trimmed %}
+                    OpenKAT is designed to scan all known objects on a regular basis using the enabled plugins and set clearance levels. This means that scans will run automatically.
+                    Be patient; plugins may take some time before they have collected all their data.
+                    Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
+                {% endblocktranslate %}
+            </p>
+            <h3>{% translate "Required plugins" %}</h3>
+            {% if enabled_plugins.required %}
+                <p>{% translate "Good job! All required plugins are enabled." %}</p>
+            {% elif plugins.required %}
+                <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
+                <a class="toggle-all toggle-on"
+                   data-toggle-target=".required-plugins input[name=plugin]">{% translate "Toggle all required plugins" %}</a>
+                <div class="required-plugin-container">
+                    <div class="toolbar">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-required-plugins">
+                            <label for="checkbox-for-enabled-required-plugins">{% translate "Show enabled plugins" %}</label>
+                        </div>
+                    </div>
+                    <div class="column-4 tiles plugins images-cover required-plugins">
+                        {% for required_plugin in plugins.required|dictsort:"enabled" %}
+                            {% if required_plugin.enabled %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" %}
+
+                            {% else %}
+                                {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" checked="yes" %}
+
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p>{% translate "There are no required plugins." %}</p>
+            {% endif %}
+            <h3>{% translate "Suggested plugins" %}</h3>
+            {% if enabled_plugins.optional %}
+                <p>{% translate "Good job! All suggested plugins are enabled." %}</p>
+            {% elif plugins.optional %}
+                <p>{% translate "The following plugins are optional to generate the report:" %}</p>
+                <a class="toggle-all"
+                   data-toggle-target=".optional-plugins input[name=plugin]">{% translate "Toggle all optional plugins" %}</a>
+                <div class="optional-plugin-container hide-overflow">
+                    <div class="toolbar">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-optional-plugins">
+                            <label for="checkbox-for-enabled-optional-plugins">{% translate "Show enabled plugins" %}</label>
+                        </div>
+                    </div>
+                    <div class="column-4 tiles plugins images-cover optional-plugins">
+                        {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
+                            {% include "partials/plugin_tile.html" with form_id="continue-to-configuration" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin=optional_plugin remove_action_buttons="yes" add_checkbox="yes" %}
+
+                        {% endfor %}
+                    </div>
+                    <div class="toolbar">
+                        <button class="button ghost"
+                                id="more-suggested-plugins"
+                                data-hide-text="{% translate "Hide suggested plugins" %}"
+                                data-show-text="{% translate "Show more suggested plugins" %}"></button>
+                    </div>
+                </div>
+            {% else %}
+                <p>{% translate "There are no optional plugins." %}</p>
+            {% endif %}
+            <form id="continue-to-configuration"
+                  class="inline"
+                  method="post"
+                  action="{{ next }}">
+                {% csrf_token %}
+                {% include "forms/report_form_fields.html" %}
+
+                <button type="submit">
+                    {% translate "Enable selected plugins and continue" %}<span class="icon ti-chevron-right"></span>
+                </button>
+            </form>
+        {% else %}
+            {% include "partials/return_button.html" with btn_text="Go back" %}
+
+        {% endif %}
+    </div>
+</section>

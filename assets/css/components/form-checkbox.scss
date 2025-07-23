@@ -1,0 +1,14 @@
+form {
+  input[type="checkbox"] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    & + label {
+      font-weight: normal;
+    }
+
+    &:disabled {
+      opacity: 1;
+    }
+  }
+}

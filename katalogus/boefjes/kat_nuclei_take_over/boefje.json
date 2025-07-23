@@ -1,0 +1,10 @@
+{
+  "plugin_id": "nuclei-takeover",
+  "name": "Nuclei takeover scan",
+  "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning. This will try to perform a sub sub-domain takeover.",
+  "consumes": [
+    "Hostname",
+    "HostnameHTTPURL"
+  ],
+  "scan_level": 3
+}

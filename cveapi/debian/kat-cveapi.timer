@@ -1,0 +1,11 @@
+[Unit]
+Description=Download CVE API files
+
+[Timer]
+OnActiveSec=0s
+OnBootSec=120s
+OnUnitActiveSec=3600s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

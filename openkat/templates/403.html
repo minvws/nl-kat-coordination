@@ -1,0 +1,24 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1">
+        <section>
+            <div>
+                <h1>{% translate "Error code 403: Unauthorized" %}</h1>
+                <p>
+                    {% translate "Your account is not authorized to access this page or organization." %}
+                    <br>
+                    {% translate "Please contact your system administrator." %}
+                </p>
+                <p>
+                    {% translate "You may want to go back to the" %} <a href="{% url 'crisis_room' %}">{% translate "Crisis Room" %}</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

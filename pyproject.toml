@@ -1,0 +1,222 @@
+[project]
+name = "openkat"
+version = "2.0.0-alpha"
+description = "OpenKAT package"
+requires-python = "~=3.10"
+readme = "README.md"
+license = "EUPL-1.2"
+dependencies = [
+  "beautifulsoup4>=4.11.2",
+  "Django>=5.1.9,<5.2.0",
+  "django-two-factor-auth>=1.17.0",
+  "django-environ>=0.12.0",
+  "jsonschema>=4.17.0",
+  "phonenumbers>=9.0.4",
+  "psycopg2>=2.9.6",
+  "pydantic>=2.7.1",
+  "python-dotenv>=1.0.0",
+  "django-password-validators>=1.7.1",
+  "django-csp>=4.0",
+  "djangorestframework>=3.16.0",
+  "django-tagulous>=2.1.0",
+  "drf-standardized-errors>=0.14.1",
+  "django-compressor",
+  "django-weasyprint>=2.4.0",
+  "strenum>=0.4.15",
+  "django-rest-knox>=5.0.2",
+  # OpenTelemetry
+  "opentelemetry-sdk>=1.32.1",
+  "opentelemetry-exporter-otlp-proto-grpc>=1.32.1",
+  "opentelemetry-instrumentation-django>=0.53b1",
+  "opentelemetry-instrumentation-psycopg2>=0.53b1",
+  "whitenoise[brotli]>=6.5.0",
+  "opentelemetry-instrumentation>=0.53b1",
+  "opentelemetry-instrumentation-fastapi>=0.53b1",
+  "granian>=2.2.6",
+  "django-components==0.88",
+  # These used in octopoes parts that are used by OpenKAT
+  "pyparsing>=3.1.1",
+  "pydantic-settings>=2.0.3",
+  "opentelemetry-instrumentation-httpx>=0.53b1",
+  "httpx>=0.27.0",
+  "opentelemetry-api>=1.32.1",
+  "opentelemetry-exporter-otlp-proto-common>=1.32.1",
+  "opentelemetry-instrumentation-asgi>=0.53b1",
+  "opentelemetry-instrumentation-dbapi>=0.53b1",
+  "opentelemetry-instrumentation-wsgi>=0.53b1",
+  "opentelemetry-proto>=1.32.1",
+  "opentelemetry-semantic-conventions>=0.53b1",
+  "opentelemetry-util-http>=0.53b1",
+  "structlog>=25.3.0",
+  "django-structlog>=9.1.1",
+  "cron-descriptor>=1.4.5",
+  "pyyaml>=6.0.2",
+  "dnspython>=2.7.0",
+  "kombu>=5.5.4",
+  "celery[redis]>=5.5.3",
+  "tldextract>=5.3.0",
+  "link-shorteners>=1.14.1",
+  "click>=8.1.8",
+  "docker>=7.1.0",
+  "pynacl>=1.5.0",
+  "python-dateutil>=2.9.0.post0",
+  "requests>=2.32.3",
+  "pybinaryedge>=0.5",
+  "censys>=2.2.17",
+  "pynetdicom>=3.0.0",
+  "pydicom>=3.0.1",
+  "validators>=0.35.0",
+  "python-libnmap>=0.7.3",
+  "shodan>=1.31.0",
+  "cryptography>=45.0.3",
+  "forcediphttpsadapter>=1.1.0",
+  "urllib3>=2.4.0",
+  "wpscan-out-parse>=1.9.3",
+  "sectxt>=0.9.3",
+  "netaddr>=1.3.0",
+  "defusedxml>=0.7.1",
+  "pillow>=11.2.1",
+  "maxminddb>=2.7.0",
+  "tanimachi>=0.0.6",
+  "cpe>=1.3.1",
+  "croniter>=6.0.0",
+  "cachetools>=6.0.0",
+  "passlib>=1.7.4",
+  "boto3>=1.38.28",
+  "django-storages>=1.14.6",
+]
+
+[dependency-groups]
+dev = [
+    "djlint>=1.32.1,<2",
+    "PyNaCl>=1.5.0,<2",
+    "pytest>=7.4.0,<8",
+    "pytest-cov>=6.0.0,<7",
+    "pytest-django>=4.5.2,<5",
+    "pytest-drf>=1.1.3,<2",
+    "pytest-mock>=3.11.1,<4",
+    "pytest-httpx>=0.30.0,<0.31",
+    "pytest-xdist>=3.7.0",
+    "model-mommy>=2.0.0,<3",
+    "factory-boy>=3.2.1,<4",
+    "django-admin-auto-tests",
+    "pytest-env>=1.1.3",
+    "pre-commit==4.0.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
+django-compressor = { git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce" }
+
+[build-system]
+requires = ["setuptools>=62.2", "wheel"]
+build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.coverage.run]
+relative_files = true
+omit = ["octopoes/*"]
+
+[tool.pytest.ini_options]
+addopts = "-m 'not slow' --durations=10 -n auto --ignore=tests/integration"
+DJANGO_SETTINGS_MODULE = "tests.settings"
+markers = ["slow: marks tests as slow"]
+env = [
+  "D:OPENKAT_DB_HOST=localhost",
+  "D:XTDB_URI=http://localhost:3000",
+]
+
+[tool.djlint]
+max_line_length = 120
+blank_line_after_tag = "load,extends,include"
+# https://www.djlint.com/docs/linter/#rules
+ignore = "H006,H016,H017,H030,H031"
+
+
+[[tool.mypy.overrides]]
+# Following pydantic imports currently gives 2000 errors
+module = ["pydantic.*"]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["bytes.*", "cveapi.*"]
+disallow_any_generics = true
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+disallow_incomplete_defs = true
+no_implicit_reexport = true
+
+[tool.setuptools_scm]
+write_to = "_version.py"
+
+[tool.vulture]
+min_confidence = 90
+exclude = ["tests/", "*venv*", "openkat/migrations"]
+paths = ["."]
+
+
+[tool.ruff]
+fix = true
+
+# Exclude a variety of commonly ignored directories.
+extend-exclude = [
+  "__pycache__"
+]
+
+line-length = 120
+
+# Support Python 3.10 and higher
+target-version = "py310"
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+# Enable classic flake8, pyflakes, eradicate, and tidyimport
+# To be extended with DJ, PT, RUF, C90, D, PL, RET
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
+ignore = [
+  "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+  "SIM103", # Creating long return statements is often less readable
+  "SIM108", # Ternary operator is not always more readable
+  "S101", # Assert use is normal in pytest tests
+  "S104", # Binding to all is normal in containers
+  "S105", # Disabled because of false positives
+  "S106", # Disabled because of false positives
+  "S308", # Mark_safe usage is okay
+  "S324", # Insecure hash functions can still be useful
+  "S603", # Disabled because of false positives
+  "S607", # Disabled because of false positives
+]
+
+# Add "Example" to allowed code comments
+task-tags = ["Example", "todo", "TODO", "FIXME"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401","F403"]
+"whitelist.py" = ["F821", "INP"]
+"*/migrations/*.py" = ["E501"]
+"bits/check_csp_header/check_csp_header.py" = ["ERA001"]
+"katalogus/boefjes/kat_binaryedge/http_web/normalize.py" = ["ERA001"]
+"*/packaging/*" = ["INP"]
+"*/.ci/*" = ["INP"]
+"conf.py" = ["INP", "PTH", "A"]
+"conftest.py" = ["INP"]
+"setup.py" = ["INP"]
+"manage.py" = ["INP"]
+"tests/*" = ["T20"]
+"katalogus/boefjes/*" = ["PTH"]
+"katalogus/images/*" = ["INP001"]
+"scripts/*.py" = ["INP001", "T201"]
+"cveapi/cveapi.py" = ["INP001"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"openkat.settings".msg = "Use django.conf.settings"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.codespell]
+ignore-words-list = 'edn,juxt,assertIn'

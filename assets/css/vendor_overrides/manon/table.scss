@@ -1,0 +1,9 @@
+/* Table overrides */
+
+table i.icon,
+table span.icon {
+  &::before {
+    display: inline-block;
+    line-height: 1.25;
+  }
+}

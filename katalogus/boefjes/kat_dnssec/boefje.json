@@ -1,0 +1,10 @@
+{
+  "plugin_id": "dns-sec",
+  "name": "DNSSEC",
+  "description": "Validates DNSSEC of a hostname by checking the cryptographic signatures.",
+  "consumes": [
+    "Hostname"
+  ],
+  "scan_level": 1,
+  "oci_image": "ghcr.io/minvws/openkat/dns-sec:latest"
+}

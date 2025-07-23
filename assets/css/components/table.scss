@@ -1,0 +1,96 @@
+td,
+tr {
+  .icon {
+    margin-right: 0.5rem;
+    float: unset;
+  }
+
+  &.confirmation {
+    background-color: var(--notification-confirmation-background-color);
+    border-width: var(--notification-confirmation-border-width);
+    border-style: var(--notification-confirmation-border-style);
+    border-color: var(--notification-confirmation-border-color);
+
+    &::before {
+      content: var(--notification-confirmation-icon-before-content);
+    }
+
+    &::after {
+      content: var(--notification-confirmation-icon-after-content);
+    }
+  }
+
+  &.error {
+    background-color: var(--notification-error-background-color);
+    border-width: var(--notification-error-border-width);
+    border-style: var(--notification-error-border-style);
+    border-color: var(--notification-error-border-color);
+
+    &::before {
+      content: var(--notification-error-icon-before-content);
+    }
+
+    &::after {
+      content: var(--notification-error-icon-after-content);
+    }
+  }
+
+  &.warning {
+    background-color: var(--notification-warning-background-color);
+    border-width: var(--notification-warning-border-width);
+    border-style: var(--notification-warning-border-style);
+    border-color: var(--notification-warning-border-color);
+
+    &::before {
+      content: var(--notification-warning-icon-before-content);
+    }
+
+    &::after {
+      content: var(--notification-warning-icon-after-content);
+    }
+  }
+
+  &.explanation {
+    background-color: var(--notification-explanation-background-color);
+    border-width: var(--notification-explanation-border-width);
+    border-style: var(--notification-explanation-border-style);
+    border-color: var(--notification-explanation-border-color);
+
+    &::before {
+      content: var(--notification-explanation-icon-before-content);
+    }
+
+    &::after {
+      content: var(--notification-explanation-icon-after-content);
+    }
+  }
+}
+
+/* table alignment within table expando row */
+table tr.expando-row td {
+  table td {
+    background-color: var(--application-base-background-color);
+    padding: var(--table-cell-padding);
+  }
+}
+
+table:not(.nowrap) tbody td:not(.nowrap) {
+  a:not(.button) {
+    line-break: break-all;
+    display: inline-block; /* Needed to be able to use max-width */
+    max-width: 20rem;
+  }
+
+  vertical-align: top;
+
+  /* Added spacing to align with text */
+  .level-indicator {
+    padding-top: 0.25rem;
+  }
+}
+
+div.horizontal-scroll.nowrap tbody td,
+table.nowrap tbody td,
+table tbody td.nowrap {
+  vertical-align: middle;
+}

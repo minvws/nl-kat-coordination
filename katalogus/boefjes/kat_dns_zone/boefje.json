@@ -1,0 +1,13 @@
+{
+  "plugin_id": "dns-zone",
+  "name": "DNS zone",
+  "description": "Fetch the parent DNS zone of a DNS zone.",
+  "consumes": [
+    "DNSZone"
+  ],
+  "scan_level": 1,
+  "oci_image": "ghcr.io/minvws/openkat/generic:latest",
+  "oci_arguments": [
+    "kat_dns_zone.main"
+  ]
+}

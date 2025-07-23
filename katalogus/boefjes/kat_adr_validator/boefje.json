@@ -1,0 +1,9 @@
+{
+  "plugin_id": "adr-validator",
+  "name": "API Design Rules validator",
+  "description": "Validate if an API conforms to the API Design Rules (ADR).",
+  "consumes": [
+    "RESTAPI"
+  ],
+  "scan_level": 1
+}

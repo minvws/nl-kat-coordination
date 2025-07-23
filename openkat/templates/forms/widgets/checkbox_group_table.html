@@ -1,0 +1,46 @@
+{% load i18n %}
+
+{% with id=widget.attrs.id %}
+    <div {% if id %}id="{{ id }}"{% endif %}
+         class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
+        <table>
+            <caption class="visually-hidden">{% translate "Object list" %}</caption>
+            <thead>
+                <tr>
+                    <th>
+                        {# TODO: data-toggle-target is not model-agnostic like the rest of the table #}
+                        {% if widget.options|length > 1 %}<input class="toggle-all" data-toggle-target="ooi" type="checkbox">{% endif %}
+                    </th>
+                    {% for column_name in widget.column_names %}<th>{{ column_name }}</th>{% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for option in widget.options %}
+                    <tr>
+                        <td>
+                            {% include option.template_name with widget=option %}
+
+                            {% if option.attrs.required %}
+                                <span class="nota-bene">({% translate "Required" %})</span>
+                            {% endif %}
+                        </td>
+                        {% for cell in option.label %}
+                            <td>
+                                <label {% if option.attrs.id %}for="{{ option.attrs.id }}"{% endif %}>
+                                    {% with cell_template=widget.column_templates|index:forloop.counter0 %}
+                                        {% if cell_template %}
+                                            {% include cell_template with value=cell organization_code=widget.attrs.organization_code mandatory_fields=widget.attrs.mandatory_fields %}
+
+                                        {% else %}
+                                            {{ cell }}
+                                        {% endif %}
+                                    {% endwith %}
+                                </label>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endwith %}

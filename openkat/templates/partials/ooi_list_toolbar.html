@@ -1,0 +1,48 @@
+{% load i18n %}
+{% load static %}
+
+{% spaceless %}
+    <div class="horizontal-view toolbar">
+        <div class="dropdown">
+            <button aria-controls="export-add"
+                    aria-expanded="false"
+                    class="dropdown-button ghost">
+                {% translate "Add" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+            </button>
+            <div id="export-add" class="dropdown-list">
+                <ul>
+                    <li>
+                        <a href="{% url 'ooi_add_type_select' organization.code %}"><span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add object" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'scan_list' organization.code %}"><span class="icon ti-eye-plus" aria-hidden="true"></span>{% translate "Scan for objects" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'upload_raw' organization.code %}"><span class="icon ti-file" aria-hidden="true"></span>{% translate "Upload raw file" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'upload_csv' organization.code %}"><span class="icon ti-file-type-csv" aria-hidden="true"></span>{% translate "Upload CSV" %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button aria-controls="export-dropdown"
+                    aria-expanded="false"
+                    class="dropdown-button ghost">
+                {% translate "Export" %}
+                <span aria-hidden="true" class="icon ti-chevron-down"></span>
+            </button>
+            <div id="export-dropdown" class="dropdown-list">
+                <ul>
+                    <li>
+                        <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'json' %}"><span class="icon ti-json"></span>{% translate "Download as JSON" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'csv' %}"><span class="icon ti-file-type-csv"></span>{% translate "Download as CSV" %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endspaceless %}

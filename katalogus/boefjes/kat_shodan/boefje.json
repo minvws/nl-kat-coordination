@@ -1,0 +1,10 @@
+{
+  "plugin_id": "shodan",
+  "name": "Shodan",
+  "description": "Use Shodan to find open ports with vulnerabilities that are found on that port. Requires an API key.",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1
+}

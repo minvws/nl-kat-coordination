@@ -1,0 +1,3 @@
+packaging/deb/data/etc/kat/* etc/kat
+packaging/deb/data/usr/* usr
+openkat/OOI_database_seed.json usr/share/kat-openkat

@@ -1,0 +1,16 @@
+{
+  "Date": "Tue, 03 Jan 2020 16:54:31 GMT",
+  "Content-Length": "35709",
+  "Content-Type": "image/jpeg",
+  "Connection": "keep-alive",
+  "Vary": "IS_SUBREQ,User-Agent, Accept-Encoding",
+  "Cache-Control": "public, max-age=86400",
+  "Expires": "Thu, 31 Dec 2020 20:00:00 GMT",
+  "Access-Control-Allow-Origin": "*",
+  "Last-Modified": "Tue, 03 Jan 2020 08:40:58 GMT",
+  "CF-Cache-Status": "HIT",
+  "Age": "20376",
+  "Accept-Ranges": "bytes",
+  "NEL": "{\"success_fraction\":0,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+  "alt-svc": "h3=\":443\"; ma=86400, h3-29=\":443\"; ma=86400"
+}

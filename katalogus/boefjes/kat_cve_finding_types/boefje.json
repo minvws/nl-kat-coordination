@@ -1,0 +1,10 @@
+{
+  "plugin_id": "cve-finding-types",
+  "name": "CVE Finding Types",
+  "description": "Hydrate information of Common Vulnerabilities and Exposures (CVE) finding types from the CVE API.",
+  "consumes": [
+    "CVEFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
+}

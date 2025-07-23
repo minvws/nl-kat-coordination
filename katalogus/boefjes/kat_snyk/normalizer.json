@@ -1,0 +1,14 @@
+{
+  "plugin_id": "kat_snyk_normalize",
+  "name": "Snyk.io",
+  "description": "Parses Snyk.io data into various findings.",
+  "consumes": [
+    "boefje/snyk"
+  ],
+  "produces": [
+    "Finding",
+    "KATFindingType",
+    "SnykFindingType",
+    "CVEFindingType"
+  ]
+}

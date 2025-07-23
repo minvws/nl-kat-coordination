@@ -1,0 +1,32 @@
+;; Number of trusted keys: 1
+;; Domain: .
+[T] . 172800 IN DNSKEY 256 3 8 ;{id = 5613 (zsk), size = 2048b}
+. 172800 IN DNSKEY 257 3 8 ;{id = 20326 (ksk), size = 2048b}
+Checking if signing key is trusted:
+New key: .	172800	IN	DNSKEY	256 3 8 AwEAAZBALoOFImwcJJg9Iu7Vy7ZyLjhtXfvO1c9k4vHjOpf9i7U1kKtrBvhnwsOni1sb50gkUayRtMDTUQqvljMMf4bpkyEtcE5evCzhHbFLq1coL5QOix3mfJm++FvIMaAt52nOvAdqR/luuI11bA1AmSCIJKAUx147DcfOHYKg3as+dznn3Iah4cWBMVzDe7PPsFS1AO6gU8EpmiRJ9VMNA09fOyDuq9+d6sw8UUnJRMAFAuPLhUFjUAOuWOw74BC9lOtMQpbLMz8pX0CDKdOXDHjyj61nxSSWxPdUjeoxI17lQTpSPRtqRHFn5Fgj2e+9BVwhhWGDQN8kUVSJHZtQiI0= ;{id = 5613 (zsk), size = 2048b}
+	Trusted key: .	86400	IN	DNSKEY	257 3 8 AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kvArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+eoZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwNR1AkUTV74bU= ;{id = 20326 (ksk), size = 2048b}
+	Trusted key: .	172800	IN	DNSKEY	256 3 8 AwEAAZBALoOFImwcJJg9Iu7Vy7ZyLjhtXfvO1c9k4vHjOpf9i7U1kKtrBvhnwsOni1sb50gkUayRtMDTUQqvljMMf4bpkyEtcE5evCzhHbFLq1coL5QOix3mfJm++FvIMaAt52nOvAdqR/luuI11bA1AmSCIJKAUx147DcfOHYKg3as+dznn3Iah4cWBMVzDe7PPsFS1AO6gU8EpmiRJ9VMNA09fOyDuq9+d6sw8UUnJRMAFAuPLhUFjUAOuWOw74BC9lOtMQpbLMz8pX0CDKdOXDHjyj61nxSSWxPdUjeoxI17lQTpSPRtqRHFn5Fgj2e+9BVwhhWGDQN8kUVSJHZtQiI0= ;{id = 5613 (zsk), size = 2048b}
+Key is now trusted!
+	Trusted key: .	172800	IN	DNSKEY	257 3 8 AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kvArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+eoZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwNR1AkUTV74bU= ;{id = 20326 (ksk), size = 2048b}
+[T] org. 86400 IN DS 26974 8 2 4fede294c53f438a158c41d39489cd78a86beb0d8a0aeaff14745c0d16e1de32
+;; Domain: org.
+[T] org. 3600 IN DNSKEY 257 3 8 ;{id = 26974 (ksk), size = 2048b}
+org. 3600 IN DNSKEY 256 3 8 ;{id = 55149 (zsk), size = 1024b}
+org. 3600 IN DNSKEY 256 3 8 ;{id = 3093 (zsk), size = 1024b}
+Checking if signing key is trusted:
+New key: org.	3600	IN	DNSKEY	256 3 8 AwEAAa4FGs7OxYymiv/SIJcOjqjEBmUwW9tHJiKdAfQo4lwNrFUxZQGeOT30wDI8i1/GeeQg22VBSqQVZqe4qGUHbnT0XGlLIDKrBRXOARMymLwFPZszDiWf0jNAbFE+vF3OJbxWD2z95LOfC5QpLw7pYBNLcGSJZvjjnAeuq3/taU/j ;{id = 3093 (zsk), size = 1024b}
+	Trusted key: .	86400	IN	DNSKEY	257 3 8 AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kvArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+eoZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwNR1AkUTV74bU= ;{id = 20326 (ksk), size = 2048b}
+	Trusted key: .	172800	IN	DNSKEY	256 3 8 AwEAAZBALoOFImwcJJg9Iu7Vy7ZyLjhtXfvO1c9k4vHjOpf9i7U1kKtrBvhnwsOni1sb50gkUayRtMDTUQqvljMMf4bpkyEtcE5evCzhHbFLq1coL5QOix3mfJm++FvIMaAt52nOvAdqR/luuI11bA1AmSCIJKAUx147DcfOHYKg3as+dznn3Iah4cWBMVzDe7PPsFS1AO6gU8EpmiRJ9VMNA09fOyDuq9+d6sw8UUnJRMAFAuPLhUFjUAOuWOw74BC9lOtMQpbLMz8pX0CDKdOXDHjyj61nxSSWxPdUjeoxI17lQTpSPRtqRHFn5Fgj2e+9BVwhhWGDQN8kUVSJHZtQiI0= ;{id = 5613 (zsk), size = 2048b}
+	Trusted key: .	172800	IN	DNSKEY	257 3 8 AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexTBAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq7HrxRixHlFlExOLAJr5emLvN7SWXgnLh4+B5xQlNVz8Og8kvArMtNROxVQuCaSnIDdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLrjyBxWezF0jLHwVN8efS3rCj/EWgvIWgb9tarpVUDK/b58Da+sqqls3eNbuv7pr+eoZG+SrDK6nWeL3c6H5Apxz7LjVc1uTIdsIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6+cn8HFRm+2hM8AnXGXws9555KrUB5qihylGa8subX2Nn6UwNR1AkUTV74bU= ;{id = 20326 (ksk), size = 2048b}
+	Trusted key: org.	3600	IN	DNSKEY	257 3 8 AwEAAexZJ/1wfyNCxNPrTZizaG7UlibGhP+AyogR6bqjptKweEgE4gD8GxRQJkt+Fn5pCoNqzmm1ZnEoKqvm93uOYtbKkYQDGH+W69J66MSKpgIyS+mT/4iaXn+lpb5o99l/sf7lHMa975O/fqN6aPUll4hUbN2T1LHv6HzQuQCtNRJA8jHGwX5q0NMmh2Z+yaG6B9cISerje9l5L+ID2ydJ6zXquYteoIUvX2xzqnXCdHPSvD+oL6R/weW+tztdFS1hok/1z3tn5NzmcaOLll9nXniCozEpLFEGPswyvtphWgCYhI8bBTqhUsIwfIwLSBQTEg2oCX7sS5CbXg44OqwhIW8= ;{id = 26974 (ksk), size = 2048b}
+	Trusted key: org.	3600	IN	DNSKEY	256 3 8 AwEAAa+oGr6axy8Mt1NFEA5KoU9ZkKtD3U0A8XQwRwjoBtcrq0QP3I/GsZi3QMpKowUmLFkDVtqwbkY4qgzX/RQ7cZZVDO6ZqHorqtp0p50nlsY+Puq1phi5lroAMJfAQjXuh5Fp+sXtBQ/8ztwzJYpzwsIG88d+7vBK8uvAyJPyeMEd ;{id = 55149 (zsk), size = 1024b}
+	Trusted key: org.	3600	IN	DNSKEY	256 3 8 AwEAAa4FGs7OxYymiv/SIJcOjqjEBmUwW9tHJiKdAfQo4lwNrFUxZQGeOT30wDI8i1/GeeQg22VBSqQVZqe4qGUHbnT0XGlLIDKrBRXOARMymLwFPZszDiWf0jNAbFE+vF3OJbxWD2z95LOfC5QpLw7pYBNLcGSJZvjjnAeuq3/taU/j ;{id = 3093 (zsk), size = 1024b}
+Key is now trusted!
+[T] dnssec-failed.org. 3600 IN DS 106 5 1 4f219dce274f820ea81ea1150638dabe21eb27fc
+dnssec-failed.org. 3600 IN DS 106 5 2 ae3424c9b171af3b202203767e5703426130d76ef6847175f2eed355f86ef1ce
+;; Domain: dnssec-failed.org.
+;; Signature ok but no chain to a trusted key or ds record
+[S] dnssec-failed.org. 3600 IN DNSKEY 257 3 5 ;{id = 29521 (ksk), size = 2048b}
+dnssec-failed.org. 3600 IN DNSKEY 256 3 5 ;{id = 44973 (zsk), size = 1024b}
+[S] dnssec-failed.org.	300	IN	A	96.99.227.255
+;;[S] self sig OK; [B] bogus; [T] trusted; [U] unsigned

@@ -1,0 +1,61 @@
+/* Risk level indicator */
+
+.critical,
+.high,
+.medium,
+.low,
+.informational,
+.recommendation,
+.pending,
+.unknown {
+  --risk-level-critical: var(--colors-red-500);
+  --risk-level-high: var(--colors-orange-300);
+  --risk-level-medium: var(--colors-ochre-150);
+  --risk-level-low: var(--colors-green-150);
+  --risk-level-informational: var(--colors-blue-150);
+  --risk-level-pending: var(--colors-grey-400);
+  --risk-level-unknown: var(--colors-grey-400);
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+
+  &::before {
+    content: "";
+    display: block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    margin: 0;
+  }
+}
+
+.critical::before {
+  background-color: var(--risk-level-critical);
+}
+
+.high::before {
+  background-color: var(--risk-level-high);
+}
+
+.medium::before {
+  background-color: var(--risk-level-medium);
+}
+
+.low::before {
+  background-color: var(--risk-level-low);
+}
+
+.informational::before,
+.recommendation::before {
+  background-color: var(--risk-level-informational);
+}
+
+.pending::before {
+  background-color: var(--risk-level-pending);
+}
+
+.unknown::before {
+  background-color: var(--risk-level-unknown);
+}

@@ -1,0 +1,13 @@
+{
+  "plugin_id": "kat_dns_zone_normalize",
+  "name": "DNS zone",
+  "description": "Parses the parent DNS zone into new hostnames and DNS zones.",
+  "consumes": [
+    "boefje/dns-zone"
+  ],
+  "produces": [
+    "Hostname",
+    "DNSZone",
+    "DNSSOARecord"
+  ]
+}

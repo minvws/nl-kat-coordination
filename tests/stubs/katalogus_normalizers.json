@@ -1,0 +1,99 @@
+[
+  {
+    "id": "kat_adr_finding_types_normalize",
+    "name": "Adr Finding Types Normalize",
+    "version": null,
+    "created": null,
+    "description": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "adr-finding-types",
+      "normalizer/kat_adr_finding_types_normalize"
+    ],
+    "produces": [
+      "ADRFindingType"
+    ]
+  },
+  {
+    "id": "adr-validator",
+    "name": "adr-validator",
+    "version": null,
+    "created": null,
+    "description": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "adr-validator",
+      "normalizer/adr-validator"
+    ],
+    "produces": [
+      "APIDesignRule",
+      "APIDesignRuleResult",
+      "ADRFindingType",
+      "Finding"
+    ]
+  },
+  {
+    "id": "kat_answer_parser",
+    "name": "kat_answer_parser",
+    "version": null,
+    "created": null,
+    "description": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "answer",
+      "normalizer/kat_answer_parser"
+    ],
+    "produces": [
+      "Config"
+    ]
+  },
+  {
+    "id": "kat_binaryedge_containers",
+    "name": "kat_binaryedge_containers",
+    "version": null,
+    "created": null,
+    "description": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "binaryedge",
+      "normalizer/kat_binaryedge_containers"
+    ],
+    "produces": [
+      "KATFindingType",
+      "SoftwareInstance",
+      "Service",
+      "IPPort",
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
+  },
+  {
+    "id": "kat_binaryedge_databases",
+    "name": "kat_binaryedge_databases",
+    "version": null,
+    "created": null,
+    "description": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "binaryedge",
+      "normalizer/kat_binaryedge_databases"
+    ],
+    "produces": [
+      "KATFindingType",
+      "SoftwareInstance",
+      "Service",
+      "IPPort",
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
+  }
+]

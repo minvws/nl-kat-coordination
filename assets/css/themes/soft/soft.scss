@@ -1,0 +1,87 @@
+/* theme: Soft */
+
+/* Fonts */
+@import "assets/css/themes/soft/fonts/fonts";
+
+/* Styling sets. E.g color sets */
+@import "assets/css/themes/soft/fundamentals/body-text-set";
+@import "assets/css/themes/soft/fundamentals/border-radii";
+@import "assets/css/themes/soft/fundamentals/colors";
+@import "assets/css/themes/soft/fundamentals/tag-colors";
+@import "assets/css/themes/soft/fundamentals/tags-6-3";
+@import "assets/css/themes/soft/manon/spot-large";
+@import "assets/css/themes/soft/manon/headings-base-set";
+@import "assets/css/themes/soft/manon/text-colors";
+@import "assets/css/themes/soft/manon/headings";
+
+/* Defining available heading styles */
+@import "assets/css/themes/soft/manon/spacing";
+
+/* Base - Top level styling */
+@import "assets/css/themes/soft/manon/application-base";
+
+/* Layout */
+@import "assets/css/themes/soft/manon/layout-set";
+@import "assets/css/themes/soft/manon/main";
+@import "assets/css/themes/soft/manon/section";
+@import "assets/css/themes/soft/manon/section-content-wrapper";
+@import "assets/css/themes/soft/manon/article";
+@import "assets/css/themes/soft/manon/article-content-wrapper";
+
+/* Manon variables */
+@import "assets/css/themes/soft/manon/manon-variables";
+
+/* Base components */
+@import "assets/css/themes/soft/manon/button";
+@import "assets/css/themes/soft/manon/table";
+@import "assets/css/themes/soft/manon/footer";
+@import "assets/css/themes/soft/manon/form";
+
+/* Button */
+@import "assets/css/themes/soft/manon/button-icon";
+@import "assets/css/themes/soft/manon/button-destructive";
+
+/* Components */
+@import "assets/css/themes/soft/manon/accordion";
+@import "assets/css/themes/soft/manon/breadcrumb-bar";
+@import "assets/css/themes/soft/manon/button-ghost";
+@import "assets/css/themes/soft/manon/checkbox";
+@import "assets/css/themes/soft/manon/collapsible";
+@import "assets/css/themes/soft/manon/code-base";
+@import "assets/css/themes/soft/manon/code-block";
+@import "assets/css/themes/soft/manon/de-emphasized";
+@import "assets/css/themes/soft/manon/emphasized";
+@import "assets/css/themes/soft/manon/expando-rows";
+@import "assets/css/themes/soft/manon/collapsing-element";
+@import "assets/css/themes/soft/manon/filter";
+@import "assets/css/themes/soft/manon/header-navigation";
+@import "assets/css/themes/soft/manon/header-navigation-content-wrapper";
+@import "assets/css/themes/soft/manon/header-navigation-collapsible";
+@import "assets/css/themes/soft/manon/header-navigation-link";
+@import "assets/css/themes/soft/manon/header-navigation-link-active";
+@import "assets/css/themes/soft/manon/notification-colors";
+@import "assets/css/themes/soft/manon/notification-block";
+@import "assets/css/themes/soft/manon/notification-paragraph";
+@import "assets/css/themes/soft/manon/icon";
+@import "assets/css/themes/soft/manon/layout-column-4";
+@import "assets/css/themes/soft/manon/layout-form";
+@import "assets/css/themes/soft/manon/max-line-length";
+@import "assets/css/themes/soft/manon/description-list";
+@import "assets/css/themes/soft/manon/form-fieldset";
+@import "assets/css/themes/soft/manon/form-radio";
+@import "assets/css/themes/soft/manon/form-help";
+@import "assets/css/themes/soft/manon/form-inline";
+@import "assets/css/themes/soft/manon/form-button";
+@import "assets/css/themes/soft/manon/layout";
+@import "assets/css/themes/soft/manon/login-meta";
+@import "assets/css/themes/soft/manon/logo";
+@import "assets/css/themes/soft/manon/link";
+@import "assets/css/themes/soft/manon/navigation";
+@import "assets/css/themes/soft/manon/nota-bene";
+@import "assets/css/themes/soft/manon/tabs";
+@import "assets/css/themes/soft/manon/tags";
+@import "assets/css/themes/soft/manon/sidemenu";
+@import "assets/css/themes/soft/manon/hero";
+@import "assets/css/themes/soft/manon/tile";
+@import "assets/css/themes/soft/manon/language-selector-list";
+@import "assets/css/themes/soft/manon/image-square";

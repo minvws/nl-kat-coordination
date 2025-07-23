@@ -1,0 +1,33 @@
+# Ignore any upstream gitignore pattern for "lib". This is included because "lib" is an important
+# folder in scaffolded `dg` projects, but "lib" is also present in Github's default gitignore file
+# for Python projects.
+!lib
+**/__pycache__
+.env
+.venv
+.idea
+dist
+assts/dist
+
+db.sqlite3
+static
+media
+database.env
+package-lock.json
+.email_logs
+*.sqlite3
+*.sql
+**/kat_rpki/bgp.jsonl
+**/kat_rpki/bgp-meta.json
+**/kat_rpki/rpki.json
+**/kat_rpki/rpki-meta.json
+
+# Translations
+*.mo
+node_modules
+.parcel-cache
+*.egg-info
+.DS_Store
+coverage.xml
+.coverage*
+.python-version

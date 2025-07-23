@@ -1,0 +1,14 @@
+/* Abstracts */
+@import "assets/css/abstracts/alert-colors";
+
+/* Vendors */
+@import "assets/css/vendor_overrides/manon/table";
+@import "assets/css/vendor_overrides/manon/tile";
+@import "assets/css/themes/soft/report";
+
+/* Components */
+@import "assets/css/components/table-state-icons";
+@import "assets/css/components/scan-level-indicator";
+
+/* PDF report specific overrides */
+@import "assets/css/vendor_overrides/weasyprint/pdf-overrides";

@@ -1,0 +1,16 @@
+/* Sticky */
+
+/* For this styling to work. Combine the elements that need to
+appear sticky in a group. e.g div.
+
+Add the following css to the paren
+
+position: relative;
+
+Add the class sticky on the group that should be sticky
+in this example that's the div within the parent element */
+
+.sticky {
+  position: sticky;
+  top: 0;
+}

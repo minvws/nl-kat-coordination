@@ -1,0 +1,23 @@
+{
+  "id": "8ea73acd-3aac-408e-8493-1a3e4fc1a1c9",
+  "boefje": {
+    "plugin_id": "snyk",
+    "version": null,
+    "name": "test"
+  },
+  "organization": "_dev",
+  "input_ooi": "Software|lodash|1.1.0|",
+  "input_ooi_data": {
+    "software": {
+      "pk": "Software|lodash|1.1.0|",
+      "name": "lodash",
+      "version": "1.1.0"
+    }
+  },
+  "dispatches": [
+    {
+      "plugin_id": "kat_snyk_normalize",
+      "version": null
+    }
+  ]
+}

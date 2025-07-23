@@ -1,0 +1,62 @@
+/* Added min height for form buttons */
+
+$breakpoint-filter: 60rem;
+
+form {
+  button,
+  a.button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 2.75rem;
+  }
+
+  .filter-fields-direction {
+    display: flex;
+
+    &.column {
+      flex-direction: column;
+    }
+  }
+
+  .input-icon {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    input {
+      padding-right: 2.5rem;
+
+      &:hover {
+        border-color: var(--colors-grey-700);
+      }
+    }
+
+    .icon {
+      display: block;
+      margin-left: -1.25rem;
+      stroke: var(--colors-blue-600);
+    }
+  }
+
+  @media (min-width: $breakpoint-filter) {
+    .filter-fields-direction {
+      &.row {
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+.indented-form fieldset.indented fieldset {
+  padding-left: 3rem;
+}
+
+.indented-form fieldset div {
+  padding-bottom: 0.5rem;
+}
+
+.indented-form fieldset button {
+  margin-left: 0.5rem;
+}

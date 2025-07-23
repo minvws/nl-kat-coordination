@@ -1,0 +1,105 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Settings" %}</h1>
+                <p>
+                    {% blocktranslate with organization_name=organization.name trimmed %}
+                        An overview of general information and settings for <strong>{{ organization_name }}</strong>.
+                    {% endblocktranslate %}
+                </p>
+                {% if not indemnification_present %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "indemnification warning" %}">
+                        {% url "organization_settings" organization.code as organization_settings %}
+                        {% blocktranslate trimmed %}
+                            <strong>Warning:</strong>
+                            Indemnification is not set for this organization.
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
+            </div>
+            <div>
+                <h2>{% translate "Organization details" %}</h2>
+                <div class="horizontal-scroll">
+                    <table>
+                        <caption class="visually-hidden">{% translate "Organization details" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "Code" %}</th>
+                                <th>{% translate "Tags" %}</th>
+                                {% if perms.openkat.change_organization %}
+                                    <th>{% translate "Edit" %}</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ organization.name }}</td>
+                                <td>{{ organization.code }}</td>
+                                <td>
+                                    {% include "organizations/organization_tags.html" %}
+
+                                </td>
+                                {% if perms.openkat.change_organization %}
+                                    <td>
+                                        {% spaceless %}
+                                            <a href="{% url "organization_edit" organization.code %}">
+                                                <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                            </a>
+                                        {% endspaceless %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Actions" %}</h2>
+                <div class="button-container">
+                    {% if perms.openkat.add_indemnification %}
+                        <a href="{% url "indemnification_add" organization.code %}"
+                           class="button ghost">
+                            <span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add indemnification" %}
+                        </a>
+                    {% endif %}
+                    {% if perms.openkat.can_recalculate_bits %}
+                        <form method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="dropdown-button ghost"
+                                    name="action"
+                                    value="recalculate">{% translate "Rerun all bits" %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% if organization.tags.all %}
+            <section>
+                <div>
+                    <h2>{% translate "Tags" %}</h2>
+                    {% include "organizations/organization_tags.html" %}
+
+                </div>
+            </section>
+        {% endif %}
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

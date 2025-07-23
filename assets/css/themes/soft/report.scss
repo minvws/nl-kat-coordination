@@ -1,0 +1,21 @@
+/* theme: Soft */
+
+/* Fonts */
+@import "assets/css/themes/soft/fonts/fonts";
+
+/* Styling sets. E.g color sets */
+@import "assets/css/themes/soft/fundamentals/colors";
+@import "assets/css/themes/soft/fundamentals/body-text-set";
+
+/* Branding colors */
+@import "assets/css/themes/soft/manon/headings-base-set";
+
+/* Layout */
+@import "assets/css/themes/soft/manon/layout-set";
+@import "assets/css/themes/soft/manon/section";
+
+/* Manon variables */
+@import "assets/css/themes/soft/manon/manon-variables";
+
+/* Base components */
+@import "assets/css/themes/soft/manon/table";

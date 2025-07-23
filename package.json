@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "dev": "node_modules/.bin/parcel watch assets/js/*.js assets/js/**/*.js --dist-dir assets/dist --public-url openkat",
+    "build": "node_modules/.bin/parcel build assets/js/*.js assets/js/**/*.js --dist-dir assets/dist --public-url openkat --no-scope-hoist"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.6.2",
+    "parcel": "2.6.2",
+    "prettier": "^2.7.1"
+  },
+  "dependencies": {
+    "@minvws/manon": "16.1.0",
+    "d3": "^7.4.3"
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

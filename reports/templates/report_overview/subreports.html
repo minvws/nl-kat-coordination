@@ -1,0 +1,27 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "report_overview/subreports_header.html" %}
+
+            <div>
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with length=asset_reports|length total=total_oois trimmed %}
+                            Showing {{ length }} of {{ total }} reports
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% include "report_overview/subreports_table.html" %}
+                {% include "partials/list_paginator.html" %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}

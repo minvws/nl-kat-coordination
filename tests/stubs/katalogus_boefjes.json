@@ -1,0 +1,80 @@
+[
+  {
+    "plugin_id": "binaryedge",
+    "name": "BinaryEdge",
+    "version": null,
+    "created": null,
+    "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
+    "enabled": true,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "IPAddressV6",
+      "IPAddressV4"
+    ],
+    "options": null,
+    "produces": [
+      "KATFindingType",
+      "SoftwareInstance",
+      "Service",
+      "IPPort",
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
+  },
+  {
+    "plugin_id": "ssl-certificates",
+    "name": "SSLCertificates",
+    "version": null,
+    "created": null,
+    "description": "Scan SSL certificates of websites",
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 1,
+    "consumes": [
+      "Website"
+    ],
+    "options": null,
+    "produces": [
+      "X509Certificate"
+    ]
+  },
+  {
+    "plugin_id": "ssl-version",
+    "name": "SSLScan",
+    "version": null,
+    "created": null,
+    "description": "Scan SSL/TLS versions of websites",
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "Website"
+    ],
+    "options": null,
+    "produces": [
+      "KATFindingType",
+      "Finding"
+    ]
+  },
+  {
+    "plugin_id": "wp-scan",
+    "name": "WPScantest",
+    "version": null,
+    "created": null,
+    "description": "Scan wordpress sites",
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "SoftwareInstance"
+    ],
+    "options": null,
+    "produces": [
+      "Finding",
+      "CVEFindingType"
+    ]
+  }
+]

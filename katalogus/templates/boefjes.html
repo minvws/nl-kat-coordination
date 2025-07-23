@@ -1,0 +1,51 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        {% include "partials/no_enabling_permission_message.html" %}
+
+        <section>
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="boefjes" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h2>Boefjes</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Boefjes are used to scan for objects. They detect vulnerabilities,
+                            security issues, and give insight. Each boefje is a separate scan that
+                            can run on a selection of objects.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% if perms.openkat.can_set_katalogus_settings %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost"
+                           href="{% url "boefje_setup" organization_code=organization.code %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Boefje" %}</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                {% include "partials/katalogus_filter.html" with form=form %}
+
+                <div class="fifty-fifty">
+                    <div>
+                        <p>
+                            <strong>{{ object_list|length }}</strong> Boefje{{ object_list|pluralize:"s" }} {% translate "available" %}
+                        </p>
+                    </div>
+                    {% include "partials/katalogus_toolbar.html" %}
+
+                </div>
+                {% include "partials/plugins.html" %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}

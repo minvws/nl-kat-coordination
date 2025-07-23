@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{{ view.kwargs.account_type|capfirst }}{% translate " member account setup" %}</h1>
+                <form novalidate  method="post" class="help">
+                    {% csrf_token %}
+                    {% translate "Member details" as fieldset_legend %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
+                    <button type="submit">{% translate "Submit" %}</button>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

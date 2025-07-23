@@ -1,0 +1,99 @@
+name: Build the containerized boefje images
+
+on:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+    tags:
+      - "*"
+    paths:
+      - katalogus/boefjes/**
+      - katalogus/images/**
+      - .github/workflows/containerized_boefjes.yml
+  pull_request:
+    paths:
+      - katalogus/boefjes/kat_nmap_tcp/**
+      - katalogus/boefjes/kat_nmap_udp/**
+      - katalogus/boefjes/kat_dnssec/**
+      - katalogus/boefjes/kat_nikto/**
+      - katalogus/boefjes/kat_export_http/**
+      - katalogus/images/**
+      - .github/workflows/containerized_boefjes.yml
+
+jobs:
+  build_containerized_boefjes:
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - dockerfile: katalogus/boefjes/kat_nmap_tcp/boefje.Dockerfile
+            image: openkat/nmap
+          - dockerfile: katalogus/boefjes/kat_dnssec/boefje.Dockerfile
+            image: openkat/dns-sec
+          - dockerfile: katalogus/boefjes/kat_export_http/boefje.Dockerfile
+            image: openkat/export-http
+          - dockerfile: katalogus/boefjes/kat_nikto/boefje.Dockerfile
+            image: openkat/nikto
+          - dockerfile: katalogus/images/generic.Dockerfile
+            image: openkat/generic
+    runs-on: ubuntu-24.04
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+        id: buildx
+        with:
+          driver-opts: network=host
+
+      - name: Build the boefje base image for ${{ matrix.image }}
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          file: katalogus/images/base.Dockerfile
+          # We don't push as this is an intermediate image that handles common operations for most boefjes
+          load: true
+          push: true
+          tags: localhost:5000/openkat/boefje-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.TOKEN }}
+
+      - name: Build container image for ${{ matrix.image }}
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          # We don't use git context because that doesn't process .dockerignore
+          # https://github.com/docker/cli/issues/2827
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-contexts: |
+            openkat/boefje-base:latest=docker-image://localhost:5000/openkat/boefje-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

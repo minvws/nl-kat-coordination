@@ -1,0 +1,9 @@
+{
+  "plugin_id": "fierce",
+  "name": "Fierce",
+  "description": "Perform DNS reconnaissance using Fierce. Helps to locate non-contiguous IP space and hostnames against specified hostnames. No exploitation is performed. Beware if your DNS is managed by an external party. This boefjes performs a brute force attack against the name server.",
+  "consumes": [
+    "Hostname"
+  ],
+  "scan_level": 3
+}

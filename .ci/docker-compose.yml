@@ -1,0 +1,56 @@
+services:
+  openkat_tests:
+    build:
+      context: ..
+      args:
+        ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
+      target: dev
+    command: pytest --cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered tests/
+    depends_on:
+      - postgres
+    volumes:
+      - ..:/app/openkat
+    env_file:
+      - .env.test
+
+  openkat_integration:
+    build:
+      context: ..
+      args:
+        ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
+      target: dev
+    command: pytest -n 0 tests/integration
+    depends_on:
+      - postgres
+      - redis
+      - xtdb
+    volumes:
+      - ..:/app/openkat
+    env_file:
+      - .env.test
+
+  postgres:
+    image: docker.io/library/postgres:15
+    env_file:
+      - .env.test
+
+  xtdb:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
+
+  redis:
+    restart: on-failure
+    image: docker.io/library/redis:8.0.3-alpine
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      retries: 4
+    env_file:
+      - .env.test

@@ -1,0 +1,14 @@
+$indent: 4em;
+
+.is-indented {
+  padding-left: $indent;
+  position: relative;
+
+  & > aside {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: $indent;
+  }
+}

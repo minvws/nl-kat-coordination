@@ -1,0 +1,73 @@
+/*
+
+Scan level indicator
+
+Markup:
+<ul class="level-indicator l2">
+    <li></li>
+</ul>
+(L2)
+
+*/
+
+.level-indicator {
+  display: flex;
+  flex-direction: row;
+  line-height: 1rem;
+  gap: var(--spacing-grid-100);
+  background-color: transparent;
+  padding: 0;
+
+  li {
+    display: inline-block;
+    width: 1.125rem;
+    min-width: 1.125rem;
+    height: 1rem;
+    line-height: 1rem;
+    padding: 0;
+
+    &::before {
+      content: "\eff9";
+      font-family: tabler-icons;
+      color: var(--colors-grey-500);
+      font-size: 1.5rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
+  &.l1 li:first-child::before {
+    content: "\f689";
+    color: var(--colors-purrple-500);
+  }
+
+  &.l2 li:nth-child(-n + 2)::before {
+    content: "\f689";
+    color: var(--colors-purrple-600);
+  }
+
+  &.l3 li:nth-child(-n + 3)::before {
+    content: "\f689";
+    color: var(--colors-purrple-700);
+  }
+
+  &.l4 li:nth-child(-n + 4)::before {
+    content: "\f689";
+    color: var(--colors-purrple-800);
+  }
+
+  &-form {
+    margin: 1rem 0;
+  }
+}
+
+form fieldset .level-indicator {
+  box-sizing: border-box;
+  min-height: 1.75rem;
+  display: block;
+  padding: 0.25rem 0;
+
+  li {
+    margin-right: 0.25rem;
+  }
+}

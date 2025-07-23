@@ -1,0 +1,28 @@
+/* DL - Variables */
+main {
+  div,
+  section,
+  article {
+    dl {
+      dt {
+        @media (width >=24rem) {
+          width: 33.33%;
+        }
+      }
+
+      dd {
+        @media (width >=24rem) {
+          width: 66.66%;
+        }
+      }
+
+      > div {
+        padding: 0;
+
+        @media (width >=24rem) {
+          flex-wrap: nowrap;
+        }
+      }
+    }
+  }
+}

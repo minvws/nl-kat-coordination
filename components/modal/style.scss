@@ -1,0 +1,94 @@
+dialog {
+  border: 1px solid var(--colors-grey-200);
+  border-radius: 8px;
+  max-height: calc(100vh - 3rem);
+  padding: 0;
+
+  &.dialog-small {
+    width: 27.5rem;
+
+    .content-wrapper {
+      .header,
+      .footer {
+        border: 0;
+      }
+
+      .content {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  &.dialog-medium {
+    width: 40rem;
+  }
+
+  &.dialog-large {
+    width: 71.25rem;
+  }
+
+  &::backdrop {
+    background-color: rgb(18 21 23 / 50%);
+  }
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    position: relative;
+    gap: 0;
+
+    .header {
+      padding: var(--spacing-grid-300);
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      border-bottom: 1px solid var(--colors-grey-200);
+      position: sticky;
+      background-color: white;
+      top: 0;
+      left: 0;
+      right: 0;
+      gap: var(--spacing-grid-400);
+
+      button {
+        margin-right: -1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .content {
+      padding: var(--spacing-grid-400) var(--spacing-grid-300);
+      flex-grow: 1;
+      overflow: auto;
+      gap: var(--spacing-grid-400);
+
+      > section {
+        gap: var(--spacing-grid-300);
+
+        > div {
+          gap: var(--spacing-grid-100);
+        }
+      }
+    }
+
+    .footer {
+      padding: var(--spacing-grid-300);
+      border-top: 1px solid var(--colors-grey-200);
+      position: sticky;
+      background-color: white;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      gap: var(--spacing-grid-400);
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+    }
+  }
+}

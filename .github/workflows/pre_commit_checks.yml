@@ -1,0 +1,37 @@
+name: Run the pre-commit checks
+
+on:
+  workflow_call:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+    tags:
+      - "*"
+  pull_request:
+
+jobs:
+  pre-commit:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: 3.13
+          cache: pip
+
+      - name: Install pre-commit
+        run: pip install pre-commit==4.0.1
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ steps.setup-python.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run pre-commit
+        run: pre-commit run --all-files --show-diff-on-failure --color always

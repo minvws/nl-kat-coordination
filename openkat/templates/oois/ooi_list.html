@@ -1,0 +1,137 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>
+                        {% translate "Object list" %} @
+                        {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
+                    </h1>
+                    <p>
+                        {% blocktranslate trimmed with organization.name as organization_name %}
+                            An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+                            Objects can be added manually or by running Boefjes.
+                            Click an object for additional information.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% include "partials/ooi_list_toolbar.html" %}
+
+            </div>
+            <div>
+                {% include "partials/ooi_list_filters.html" %}
+
+                <div class="toolbar">
+                    <p class="de-emphasized">
+                        {% blocktranslate with length=ooi_list|length total=total_oois trimmed %}
+                            Showing {{ length }} of {{ total }} objects
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                <form method="post"
+                      id="ooi_list_form"
+                      class="inline layout-wide checkboxes_required">
+                    {% csrf_token %}
+                    <div class="horizontal-scroll">
+                        <table>
+                            <caption class="visually-hidden">
+                                {% translate "Objects " %}
+                                <span class="visually-hidden">, {% translate "column headers with buttons are sortable" %}</span>
+                            </caption>
+                            <thead>
+                                <th>
+                                    <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                                </th>
+                                <th>{% translate "Object" %}</th>
+                                <th scope="col"
+                                    class="sortable"
+                                    {% if order_by == "object_type" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
+                                            value="object_type"
+                                            class="sort">
+                                        {% translate "Type" %}
+                                        <span aria-hidden="true"
+                                              class="icon ti-{% if order_by == "object_type" and sorting_order == "asc" %}chevron-up{% elif order_by == "object_type" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                    </button>
+                                </th>
+                                <th scope="col"
+                                    class="sortable"
+                                    {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                                    <button form="ooi_list_settings"
+                                            name="order_by"
+                                            value="scan_level"
+                                            lass="sort">
+                                        {% translate "Clearance level" %}
+                                        <span aria-hidden="true"
+                                              class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                                    </button>
+                                </th>
+                                <th>{% translate "Clearance type" %}</th>
+                            </thead>
+                            <tbody>
+                                {% for object in ooi_list %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="ooi" value="{{ object.primary_key }}">
+                                        </td>
+                                        <td>
+                                            <a href="{% ooi_url "ooi_detail" object.primary_key organization.code observed_at=observed_at %}">{{ object.human_readable }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ request.path }}?observed_at={{ observed_at|date:"Y-m-d" }}&ooi_type={{ object.ooi_type }}">{{ object.ooi_type }}</a>
+                                        </td>
+                                        <td>
+                                            {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                                        </td>
+                                        <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if ooi_list %}
+                        <fieldset>
+                            <div class="horizontal-view">
+                                {% if may_update_clearance_level %}
+                                    <select id="scan-profiles" name="scan-profile">
+                                        {% for level in scan_levels %}<option value="{{ level }}">{{ level }}</option>{% endfor %}
+                                    </select>
+                                    <button type="submit"
+                                            class="dropdown-button"
+                                            name="action"
+                                            value="update-scan-profile"
+                                            form="ooi_list_form">{% translate "Set clearance level" %}</button>
+                                {% endif %}
+                                {% if perms.openkat.can_delete_oois %}
+                                    <button type="submit"
+                                            class="dropdown-button ghost destructive"
+                                            name="action"
+                                            value="delete">{% translate "Delete object(s)" %}</button>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                    {% endif %}
+                </form>
+                {% include "partials/list_paginator.html" %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

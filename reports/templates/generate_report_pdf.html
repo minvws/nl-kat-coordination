@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{% load static %}
+{% load compress %}
+{% load i18n %}
+
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <title>OpenKAT report</title>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="{% static "img/favicon.svg" %}" />
+        {% compress css %}
+            <link href="{% static "dist/report.css" %}" rel="stylesheet">
+        {% endcompress %}
+    </head>
+    <body>
+        <main id="main-content" tabindex="-1" class="choose-report">
+            {% include "partials/report_header.html" %}
+            {% include "partials/report_introduction.html" %}
+            {% include "summary/report_asset_overview.html" %}
+
+            {% for ooi, report in report_data.items %}
+                {% for report_type, data in report.items %}
+                    {% if data.report_name %}
+                        <section>
+                            <div>
+                                <h2>{{ data.report_name }}</h2>
+                                {% include data.template with data=data.data %}
+
+                            </div>
+                        </section>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </main>
+    </body>
+</html>
