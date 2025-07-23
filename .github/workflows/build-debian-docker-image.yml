@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "main"
+      - "v2"
     paths:
       - "packaging"
       - ".github/workflows/build-debian-docker-image.yml"
