@@ -270,7 +270,7 @@ def docker_boefje(self, organization: str, plugin_id: str, input_ooi: str) -> No
 
     logger.info("dispatching raw files")
 
-    for file in File.objects.filter(task__task_id=self.request.id):
+    for file in File.objects.filter(task_result__task_id=self.request.id):
         app.send_task("openkat.tasks.process_raw", (str(file.id),))
 
     logger.info("Handled containerized boefje [org=%s, plugin_id=%s]", organization, plugin_id)
@@ -289,7 +289,7 @@ def process_raw(raw_file_id: int, handle_error: bool = False) -> None:
     local_repository = get_local_repository()
 
     for normalizer_resource in local_repository.resolve_normalizers().values():
-        if not file.type not in normalizer_resource.normalizer.consumes:
+        if file.type not in normalizer_resource.normalizer.consumes:
             continue
 
         config = NormalizerConfig.objects.filter(
