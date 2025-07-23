@@ -38,7 +38,7 @@ jobs:
           registry: ghcr.io
           image: ghcr.io/minvws/nl-kat-${{ matrix.dist }}-build-image:latest
           username: ${{ github.actor }}
-          password: ${{ secrets.TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           options: -v ${{ github.workspace }}:/app
             -e REPOSITORY=${{ github.repository }}
             -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
