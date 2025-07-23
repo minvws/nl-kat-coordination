@@ -1,6 +1,6 @@
 ---
 authors: Donny Peeters <@donnype>
-state: discussion
+state: implemented
 discussion:
 labels: Data Models, Bytes
 ---

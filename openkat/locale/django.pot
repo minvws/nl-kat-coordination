@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-23 14:10+0000\n"
+"POT-Creation-Date: 2025-07-23 14:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -530,6 +530,11 @@ msgstr ""
 
 #: account/validators.py
 msgid " letters"
+msgstr ""
+
+#: account/validators.py
+msgid ""
+" special characters such as: {str(validators.get('special_characters',''))}"
 msgstr ""
 
 #: account/validators.py
@@ -4607,8 +4612,8 @@ msgstr ""
 
 #: reports/views/mixins.py
 msgid ""
-"No data could be found for %(report_types). Object(s) did not exist on %"
-"(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/multi_report.py
@@ -5069,9 +5074,9 @@ msgid ""
 "used as the basis for a form for the user. When the user enables this Boefje "
 "they can get the option to give extra information. For example, it can "
 "contain an API key that the script requires.</p> <p>More information about "
-"what the schema.json file looks like can be found <a href='https://"
-"docs.openkat.nl/developer_documentation/development_tutorial/"
-"creating_a_boefje.html'> here</a>.</p> "
+"what the schema.json file looks like can be found <a href='https://docs."
+"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
+"html'> here</a>.</p> "
 msgstr ""
 
 #: openkat/forms/settings.py
@@ -5145,16 +5150,7 @@ msgid "Choose a type of which objects are added."
 msgstr ""
 
 #: openkat/forms/upload_raw.py
-msgid "Mime types"
-msgstr ""
-
-#: openkat/forms/upload_raw.py
-msgid ""
-"<p>Add a set of mime types, separated by commas, for example:</"
-"p><p><i>\"text/html, image/jpeg\"</i> or <i>\"boefje/dns-records\"</i>.</"
-"p><p>Mime types are used to match the correct normalizer to a raw file. When "
-"the mime type \"boefje/dns-records\" is added, the normalizer expects the "
-"raw file to contain dns scan information.</p>"
+msgid "File Type"
 msgstr ""
 
 #: openkat/forms/upload_raw.py openkat/templates/partials/ooi_list_toolbar.html
@@ -7415,6 +7411,11 @@ msgstr ""
 #: openkat/views/organization_member_list.py
 #, python-format
 msgid "Unblocked member %s successfully."
+msgstr ""
+
+#: openkat/views/organization_settings.py
+#, python-brace-format
+msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
 msgstr ""
 
 #: openkat/views/page_actions.py

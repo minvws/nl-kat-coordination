@@ -5,8 +5,8 @@ from django.core.files.base import ContentFile
 from django.db import models
 
 
-# Create your models here.
 def raw_file_name(instance, filename: str | None = None):
+    # TODO: implement path from RFD
     if filename:
         return f"raw_files/{datetime.date.today()}/{filename}"
 
