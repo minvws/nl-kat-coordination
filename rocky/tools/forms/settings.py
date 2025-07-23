@@ -57,12 +57,11 @@ BOEFJE_CONTAINER_IMAGE_HELP_TEXT = mark_safe(
     )
 )
 
-BOEFJE_DESCRIPTION_HELP_TEXT = mark_safe(
-    _(
-        "<p>A description of the Boefje explaining in short what it can do. "
-        "This will both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
-    )
+BOEFJE_DESCRIPTION_HELP_TEXT = _(
+    "A description of the Boefje explaining in short what it can do. "
+    "This will both be displayed inside the KAT-alogus and on the Boefje details page."
 )
+
 
 BOEFJE_CONSUMES_HELP_TEXT = _(
     "Select the object type(s) that your Boefje consumes. "
