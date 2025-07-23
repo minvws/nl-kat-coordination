@@ -40,6 +40,7 @@ class DockerBoefjeHandler:
 
         task_id = boefje_meta.id
         task.data["started_at"] = str(datetime.now(timezone.utc))
+        task.save()
 
         try:
             input_url = f"{settings.OPENKAT_HOST}{reverse('boefje-input', args=(task_id,))}"
