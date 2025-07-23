@@ -10,7 +10,6 @@ from account.mixins import OrganizationView
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.findings import KATFindingType
 from openkat.forms.finding_type import FindingTypeAddForm
-from openkat.models import OOIInformation
 from openkat.view_helpers import get_ooi_url
 
 
@@ -37,22 +36,7 @@ class FindingTypeAddView(OrganizationView, FormView):
     def form_valid(self, form):
         self.api_connector = self.octopoes_api_connector
         form_data = form.cleaned_data
-        # set data
         finding_type = KATFindingType(id=form_data["id"])
-        info, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{form_data['id']}")
-        info.data = {
-            "title": form_data["title"],
-            "description": form_data["description"],
-            "risk": form_data["risk"],
-            "solution": form_data["solution"],
-            "references": form_data["references"],
-            "impact_description": form_data["impact_description"],
-            "solution_chance": form_data["solution_chance"],
-            "solution_impact": form_data["solution_impact"],
-            "solution_effort": form_data["solution_effort"],
-        }
-
-        info.save()
 
         task_id = uuid4()
         declaration = Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc), task_id=str(task_id))

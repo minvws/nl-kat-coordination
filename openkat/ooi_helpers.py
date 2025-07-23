@@ -23,7 +23,6 @@ from octopoes.models.ooi.findings import (
 )
 from octopoes.models.tree import ReferenceNode
 from octopoes.models.types import OOI_TYPES, get_relations
-from openkat.models import OOIInformation
 
 User = get_user_model()
 
@@ -45,36 +44,6 @@ def format_display(data: dict, ignore: list | None = None) -> dict[str, str]:
         ignore = []
 
     return {format_attr_name(k): format_value(v) for k, v in data.items() if k not in ignore}
-
-
-def get_knowledge_base_data_for_ooi_store(ooi_store: dict) -> dict[str, dict]:
-    knowledge_base = {}
-
-    for ooi in ooi_store.values():
-        # build knowledge base
-        if ooi.get_information_id() not in knowledge_base:
-            knowledge_base[ooi.get_information_id()] = get_knowledge_base_data_for_ooi(ooi)
-
-    return knowledge_base
-
-
-def get_knowledge_base_data_for_ooi(ooi: OOI) -> dict:
-    knowledge_base_data = {}
-
-    # Knowledge base data
-    information_id = ooi.get_information_id()
-    if information_id != ooi.get_ooi_type():
-        info, created = OOIInformation.objects.get_or_create(id=information_id)
-        if info.description:
-            knowledge_base_data.update(info.data)
-
-    try:
-        info_on_type = OOIInformation.objects.get(id=ooi.get_ooi_type())
-        knowledge_base_data["Information"] = info_on_type.description
-    except OOIInformation.DoesNotExist:
-        pass
-
-    return knowledge_base_data
 
 
 def process_value(value: Any) -> Any:
@@ -123,12 +92,7 @@ def get_tree_meta(tree_node: dict, depth: int, location: str) -> dict:
 
 
 def create_object_tree_item_from_ref(
-    reference_node: ReferenceNode,
-    ooi_store: dict[str, OOI],
-    knowledge_base: dict[str, dict] | None = None,
-    depth: int = 0,
-    position: int = 1,
-    location: str = "loc",
+    reference_node: ReferenceNode, ooi_store: dict[str, OOI], depth: int = 0, position: int = 1, location: str = "loc"
 ) -> dict:
     depth = sum([depth, 1])
     location = location + "-" + str(position)
@@ -136,12 +100,6 @@ def create_object_tree_item_from_ref(
     ooi = ooi_store[str(reference_node.reference)]
 
     item = get_ooi_dict(ooi)
-
-    if not knowledge_base:
-        knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
-
-    if knowledge_base[ooi.get_information_id()]:
-        item.update(knowledge_base[ooi.get_information_id()])
 
     children = []
     child_position = 0
@@ -152,9 +110,7 @@ def create_object_tree_item_from_ref(
             if child.reference == reference_node.reference:
                 continue
             child_position = child_position + 1
-            children.append(
-                create_object_tree_item_from_ref(child, ooi_store, knowledge_base, depth, child_position, location)
-            )
+            children.append(create_object_tree_item_from_ref(child, ooi_store, depth, child_position, location))
 
     if children:
         item["children"] = children

@@ -27,7 +27,6 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
 from openkat.forms.base import ObservedAtForm
 from openkat.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
-from openkat.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from openkat.view_helpers import convert_date_to_datetime, get_ooi_url
 from tasks.models import Task
 
@@ -437,11 +436,6 @@ class SingleOOIMixin(OctopoesView):
     def get_ooi_properties(self, ooi: OOI) -> dict:
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
-
-        knowledge_base = get_knowledge_base_data_for_ooi_store({ooi.primary_key: ooi})
-
-        if knowledge_base[ooi.get_information_id()]:
-            props.update(knowledge_base[ooi.get_information_id()])
 
         props.pop("scan_profile")
         props.pop("primary_key")

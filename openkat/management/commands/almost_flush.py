@@ -24,7 +24,6 @@ class Command(BaseCommand):
         device, first_user, groups, member, indemnification = self.collect_entities()
 
         call_command("flush", interactive=False)
-        call_command("loaddata", "openkat/OOI_database_seed.json")
         call_command("setup_dev_account")
 
         self.save_entities_again(device, first_user, groups, member, indemnification)

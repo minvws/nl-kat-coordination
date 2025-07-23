@@ -17,7 +17,6 @@ from openkat.forms.settings import (
     PIE_SCALE_EFFORT_CHOICES,
     RISK_RATING_CHOICES,
 )
-from openkat.models import OOIInformation
 
 
 class FindingTypeAddForm(BaseOpenKATForm):
@@ -65,17 +64,10 @@ class FindingTypeAddForm(BaseOpenKATForm):
 
     def clean_id(self):
         data = self.cleaned_data["id"]
-        self.check_finding_type_existence(data)
         if not data.startswith(MANUAL_FINDING_ID_PREFIX):
             raise ValidationError(_("ID should start with ") + MANUAL_FINDING_ID_PREFIX)
 
         return data
-
-    def check_finding_type_existence(self, finding_type_id):
-        _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{finding_type_id}")
-
-        if not created:
-            raise ValidationError(_("Finding type already exists"))
 
 
 class FindingAddForm(BaseOpenKATForm):

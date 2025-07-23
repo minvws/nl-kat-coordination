@@ -43,7 +43,6 @@ user:
 
 seed:
 	python manage.py setup_dev_account
-	python manage.py loaddata openkat/OOI_database_seed.json
 
 messages:
 	python manage.py compilemessages

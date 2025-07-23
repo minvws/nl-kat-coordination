@@ -11,7 +11,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from openkat.add_ooi_information import SEPARATOR, InformationUpdateError, get_info
 from openkat.enums import MAX_SCAN_LEVEL
 from openkat.fields import LowerCaseSlugField
 
@@ -200,50 +199,3 @@ class Indemnification(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
     EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
-
-
-class OOIInformation(models.Model):
-    id = models.CharField(max_length=256, primary_key=True)
-    last_updated = models.DateTimeField(auto_now=True)
-    data = models.JSONField(null=True)
-    consult_api = models.BooleanField(default=False)
-
-    EVENT_CODES = {"created": 900231, "updated": 900232, "deleted": 900233}
-
-    def save(self, *args, **kwargs):
-        if self.data is None:
-            self.data = {"description": ""}
-        if self.consult_api:
-            self.consult_api = False
-            self.get_internet_description()
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        if "description" not in self.data:
-            raise ValidationError("Description is missing in data")
-
-    @property
-    def type(self):
-        return self.id.split(SEPARATOR)[0]
-
-    @property
-    def value(self):
-        return SEPARATOR.join(self.id.split(SEPARATOR)[1:])
-
-    @property
-    def description(self):
-        if not self.data["description"]:
-            self.get_internet_description()
-            self.save()
-        return self.data["description"]
-
-    def get_internet_description(self):
-        try:
-            self.data.update(get_info(ooi_type=self.type, natural_key=self.value))
-        except InformationUpdateError:
-            # we keep the old data if we already have some and can't update
-            if not self.data["description"]:
-                self.data = {"description": ""}
-
-    def __str__(self) -> str:
-        return self.id
