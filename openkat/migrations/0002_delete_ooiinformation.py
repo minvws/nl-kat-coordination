@@ -4,13 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+    dependencies = [("openkat", "0001_initial")]
 
-    dependencies = [
-        ('openkat', '0001_initial'),
-    ]
-
-    operations = [
-        migrations.DeleteModel(
-            name='OOIInformation',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="OOIInformation")]
