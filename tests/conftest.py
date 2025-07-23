@@ -21,6 +21,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 
 from crisis_room.models import Dashboard, DashboardData
+from files.models import File, NamedContent
 from katalogus.client import KATalogusClient
 from katalogus.management.commands.sync import sync
 from katalogus.models import Boefje, Normalizer
@@ -48,7 +49,7 @@ from openkat.health import ServiceHealth
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 from reports.report_types.findings_report.report import FindingsReport
 from reports.runner.models import ReportTask
-from tasks.models import NamedContent, RawFile, Schedule, TaskStatus
+from tasks.models import Schedule, TaskStatus
 from tasks.models import Task as TaskDB
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -395,11 +396,7 @@ def bytes_raw_metas():
                 "organization": "test",
                 "environment": {},
             },
-            "mime_types": [
-                {"value": "boefje/dns-sec"},
-                {"value": "boefje/dns-sec-c90404f60aeacf9b254abbd250bd3214e3b1a65b5a883dcbc"},
-                {"value": "dns-sec"},
-            ],
+            "type": "boefje/dns-sec",
         }
     ]
 
@@ -1751,13 +1748,13 @@ def dashboard_data(client_member, client_member_b):
 @pytest.fixture
 def raw_a(client_member, client_member_b, findings_report_bytes_data):
     a, b = findings_report_bytes_data
-    return RawFile.objects.create(file=NamedContent(json.dumps(a)))
+    return File.objects.create(file=NamedContent(json.dumps(a)))
 
 
 @pytest.fixture
 def raw_b(client_member, client_member_b, findings_report_bytes_data):
     a, b = findings_report_bytes_data
-    return RawFile.objects.create(file=NamedContent(json.dumps(b)))
+    return File.objects.create(file=NamedContent(json.dumps(b)))
 
 
 @pytest.fixture

@@ -4,6 +4,7 @@ from typing import cast
 
 import structlog
 
+from files.models import File
 from katalogus.boefjes.models import (
     NormalizerAffirmation,
     NormalizerDeclaration,
@@ -17,7 +18,7 @@ from katalogus.worker.repository import LocalPluginRepository
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
-from tasks.models import RawFile, Task
+from tasks.models import Task
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -41,7 +42,7 @@ class LocalNormalizerHandler(NormalizerHandlerInterface):
 
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
-        raw = RawFile.objects.get(id=normalizer_meta.raw_data.id)
+        raw = File.objects.get(id=normalizer_meta.raw_data.id)
 
         try:
             normalizers = self.local_repository.resolve_normalizers()

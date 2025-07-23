@@ -7,11 +7,9 @@ import structlog
 
 from .interfaces import BoefjeHandler, BoefjeOutput, BoefjeStorageInterface, File, JobRuntimeError, StatusEnum, Task
 from .job_models import BoefjeMeta
-from .repository import BoefjeResource, LocalPluginRepository, _default_mime_types
+from .repository import BoefjeResource, LocalPluginRepository, _default_type
 
 logger = structlog.get_logger(__name__)
-
-MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
 
 class TemporaryEnvironment:
@@ -82,25 +80,24 @@ class LocalBoefjeHandler(BoefjeHandler):
 
         files: list[File] = []
 
-        for boefje_added_mime_types, output in boefje_results:
-            valid_mimetypes = set()
-            for mimetype in boefje_added_mime_types:
-                if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
+        for boefje_added_file_types, output in boefje_results:
+            file_type = _default_type(boefje_meta.boefje)
+
+            for boefje_file_type in boefje_added_file_types:
+                if len(boefje_file_type) <= 0 or "/" not in boefje_file_type:
                     logger.warning(
-                        "Invalid mime-type encountered in output for boefje %s[%s]",
+                        "Invalid file type encountered in output for boefje %s[%s]",
                         boefje_meta.boefje.plugin_id,
                         str(boefje_meta.id),
                     )
                 else:
-                    valid_mimetypes.add(mimetype)
+                    file_type = boefje_file_type
 
             files.append(
                 File(
                     name=str(len(files)),
                     content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
-                    tags=list(
-                        _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
-                    ),  # default mime-types are added through the API
+                    type=file_type,  # default is added in the API
                 )
             )
 

@@ -27,9 +27,7 @@
       },
       "organization": "st"
     },
-    "mime_types": [
-      "boefje/adr-validator"
-    ]
+    "type": "boefje/adr-validator"
   },
   "normalizer": {
     "plugin_id": "adr-validator-normalize",

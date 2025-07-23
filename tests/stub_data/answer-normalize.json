@@ -12,9 +12,7 @@
       "input_ooi_data": {},
       "organization": "tst"
     },
-    "mime_types": [
-      "answer"
-    ]
+    "type": "answer"
   },
   "normalizer": {
     "plugin_id": "kat_answer_parser",

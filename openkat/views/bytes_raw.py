@@ -8,7 +8,7 @@ from django.forms import model_to_dict
 from django.http import FileResponse
 
 from account.mixins import OrganizationView
-from tasks.models import RawFile
+from files.models import File
 
 logger = structlog.get_logger(__name__)
 
@@ -16,7 +16,9 @@ logger = structlog.get_logger(__name__)
 class BytesRawView(OrganizationView):
     def get(self, request, **kwargs):
         boefje_meta_id = kwargs["boefje_meta_id"]
-        raws = RawFile.objects.filter(task__task__id=boefje_meta_id, task__task__organization=self.organization)
+        raws = File.objects.filter(
+            task_result__task__id=boefje_meta_id, task_result__task__organization=self.organization
+        )
 
         return FileResponse(zip_data(raws), filename=f"{boefje_meta_id}.zip")
 
@@ -27,7 +29,7 @@ def zip_data(raws: QuerySet) -> BytesIO:
     with zipfile.ZipFile(zf_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         for raw_file in raws:
             zf.writestr(str(raw_file.id), raw_file.file.read())
-            zf.writestr(f"raw_meta_{raw_file.id}.json", json.dumps(model_to_dict(raw_file.task.task)))
+            zf.writestr(f"raw_meta_{raw_file.id}.json", json.dumps(model_to_dict(raw_file.task_result.task)))
 
     zf_buffer.seek(0)
 

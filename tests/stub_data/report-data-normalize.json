@@ -17,9 +17,7 @@
       "runnable_hash": null,
       "environment": {}
     },
-    "mime_types": [
-      "openkat/report-data"
-    ]
+    "type": "openkat/report-data"
   },
   "normalizer": {
     "plugin_id": "kat_report_data",

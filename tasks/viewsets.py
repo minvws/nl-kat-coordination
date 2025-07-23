@@ -11,9 +11,10 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from structlog import get_logger
 
+from files.models import File, NamedContent
 from katalogus.worker.interfaces import BoefjeInput, BoefjeOutput, StatusEnum
 from katalogus.worker.interfaces import Task as WorkerTask
-from tasks.models import NamedContent, RawFile, Task, TaskResult, TaskStatus
+from tasks.models import Task, TaskResult, TaskStatus
 from tasks.serializers import TaskSerializer
 
 logger = get_logger(__name__)
@@ -45,7 +46,7 @@ class BoefjeOutputViewSet(viewsets.ViewSet):
         result = {}
 
         for file in output.files or []:
-            raw = RawFile.objects.create(file=NamedContent(base64.b64decode(file.content)), tags=file.tags)
+            raw = File.objects.create(file=NamedContent(base64.b64decode(file.content)), type=file.type)
             TaskResult.objects.create(task=task, file=raw)
 
             result[file.name] = raw.id

@@ -96,11 +96,12 @@ This might come at the cost of full control of timestamping logic.
 The core of this proposal is to:
 
 1. Drop the BoefjeMeta and NormalizerMeta models.
-2. Tie RawFiles to Tasks optionally, by introducing an intermediate model: TaskResult.
-3. Replace our custom RawFile logic with a FileField, and configure S3 optionally using 'django-storages'.
-4. Save RawFiles on disk with a more useful directory (partitioning) structure:
+2. Tie a new Files model in a `files` app to Tasks optionally, by introducing an intermediate model: TaskResult.
+3. Replace our custom File logic with a FileField, and configure S3 optionally using 'django-storages'.
+4. Save Files on disk with a more useful directory (partitioning) structure:
    `"raw_files" / {Organization.id | "NO_ORG" } / {date} / {plugin_id | "reports" | ... | "UNKNOWN" } / {file_name}`
-5. Postpone a new timestamping to version 2.1 or 2.2.
+5. Relate files to organizations through a many-to-many relationship
+6. Postpone a new timestamping to version 2.1 or 2.2.
 
 See the proposed model below:
 
@@ -135,10 +136,10 @@ classDiagram
     task_id
     file_id
   }
-  class scheduler_rawfile {
+  class files_file {
     id
     file
-    tags
+    type
     organizations
     created_at
     updated_at
@@ -146,24 +147,24 @@ classDiagram
 
   scheduler_task  -->  scheduler_schedule
   scheduler_taskresult  -->  scheduler_task
-  scheduler_taskresult  -->  scheduler_rawfile
+  scheduler_taskresult  -->  files_file
 ```
 
 ### Functional Requirements (FR)
 
 1. The backend should support both a local storage directory and S3 (compatible) object storage.
-2. Users should be able to find the RawFiles that were the result of a Task.
-3. It should be easy to find RawFiles by name, date, organization and perhaps user provided tags.
-4. We should be able to easily normalize user-provided RawFiles.
-5. It should be possible to normalize RawFiles not tied to a particular organization to solve duplication issues.
+2. Users should be able to find the Files that were the result of a Task.
+3. It should be easy to find Files by name, date, organization and perhaps type.
+4. We should be able to easily normalize user-provided Files.
+5. It should be possible to normalize Files not tied to a particular organization to solve duplication issues.
 
 ### Extensibility (Potential Future Requirements)
 
-1. We probably want to know from whom RawFiles uploaded through the UI came from.
+1. We probably want to know from whom Files uploaded through the UI came from.
 2. It could be the case that we need to delete data for a whole organization.
 3. We might have to consider archival functionality in the future, (re)moving data older than X years.
 4. Perhaps we have to delete all raw files for a specific plugin.
-5. We might want to be able to do full-text search on RawFiles.
+5. We might want to be able to do full-text search on Files.
 
 ### Considerations of File Handling Libraries (FR 1)
 
@@ -183,39 +184,39 @@ Because we do not have a clear use-case for implementing our own backend,
 and it is not difficult to switch to our own File Storage API implementation if we do not have to move the data,
 Django Storages seems to be the best choice for now.
 
-### Relational Diagram for RawFile (FR 2)
+### Relational Diagram for File (FR 2)
 
-To make sure a new RawFile model is extensible and intuitive to use, it should be modeled around generic file storage.
+To make sure a new File model is extensible and intuitive to use, it should be modeled around generic file storage.
 Hence, the model should not require the creation of other models such as Task, as not all files will be found by tasks.
 Nevertheless, it should be possible for files created by tasks to be linked back to their task.
 
 This leaves us with three options:
 
-1. An optional `task_id` foreign key field on the RawFile model.
+1. An optional `task_id` foreign key field on the File model.
 2. A `raw_files` field on the Task model.
-3. An intermediate model such as `TaskResult` with two foreign keys: a `rawfile_id` field and a `task_id` field.
+3. An intermediate model such as `TaskResult` with two foreign keys: a `file_id` field and a `task_id` field.
 
-Option 1 would violate the idea that RawFiles should not be modeled around Tasks slightly.
-Option 2 would mean we are joining RawFiles and Tasks through an array-field. This is usually bad practice and a
+Option 1 would violate the idea that Files should not be modeled around Tasks slightly.
+Option 2 would mean we are joining Files and Tasks through an array-field. This is usually bad practice and a
 scenario where the direction of the relationship needs to be flipped around and turned into a foreign key.
-Option 3 would not touch the Task and RawFile models, but as this construct is used for many-to-many fields as well
-it might suggest that RawFiles can be linked to multiple Tasks. As this is not the case, a `OneToOneField` could be
+Option 3 would not touch the Task and File models, but as this construct is used for many-to-many fields as well
+it might suggest that Files can be linked to multiple Tasks. As this is not the case, a `OneToOneField` could be
 used to overcome this ambiguity. Also using a nullable task_id can lead to questions such as: is `NULL` "not found in
 a task", or "we don’t know yet"?
 
-In terms of performance, queries that require the task data to be linked to a RawFile would perform best with Option 1,
+In terms of performance, queries that require the task data to be linked to a File would perform best with Option 1,
 as this has one join instead of two (Option 3). Joins over arrays generally do not perform well, so Option 2 would
 not be a good choice from a performance perspective either.
 
 In terms of extensibility, a TaskResult model is the only place we would be able to store information on the task a
 file has been found in that does not belong in the Task model. Some examples might be:
 
-- Confidence/Trusted: info about if we consider the RawFile to be trustworthy. Perhaps a feature needed for future
+- Confidence/Trusted: info about if we consider the File to be trustworthy. Perhaps a feature needed for future
   "untrusted" boefjes.
 - Related to the previous point: perhaps some raw files found by tasks would need manual approval before being used
   or available in the interface.
-- Perhaps some RawFiles should not be able to be exported through the UI
-- Found By: information on which specific runner found the RawFile
+- Perhaps some Files should not be able to be exported through the UI
+- Found By: information on which specific runner found the File
 
 All in all, Option 3 might be the safest solution:
 
@@ -229,43 +230,43 @@ classDiagram
   }
 
   scheduler_taskresult  -->  scheduler_task
-  scheduler_taskresult  -->  scheduler_rawfile
+  scheduler_taskresult  -->  files_file
 ```
 
-### Additional RawFile Model Enhancements (FR 3,4,5 & Ex 1,2,3)
+### Additional File Model Enhancements (FR 3,4,5 & Ex 1,2,3)
 
-Functional requirements 3 is achieved by providing additional fields to the RawFile model:
+Functional requirements 3 is achieved by providing additional fields to the File model:
 
 ```mermaid
 classDiagram
 
-  class scheduler_rawfile {
+  class files_file {
     id
     file
-    tags
+    type
     organization NULL
     created_at
   }
 ```
 
-In particular, having a nullable organization field means we can use RawFiles for multiple organizations in the
-future (FR 5). However, we might want to tie RawFiles to a list of organizations. In that case we should implement
+In particular, having a nullable organization field means we can use Files for multiple organizations in the
+future (FR 5). However, we might want to tie Files to a list of organizations. In that case we should implement
 this as a many-to-many:
 
 ```mermaid
 classDiagram
 
-  class scheduler_rawfile {
+  class files_file {
     id
     file
-    tags
+    type
     organizations
     created_at
   }
 ```
 
-The `tags` field can be used for our standard normalizer flow, where users could add the tag `boefje/nmap` (to be
-discussed in a later RFD) to trigger the nmap normalizers on the file for uploaded files as well (FR 4).
+The `type` field can be used for our standard normalizer flow, where users could add a type indicating it contains
+`nmap` output (to be discussed in a later RFD) to trigger the nmap normalizers on the file for uploaded files as well (FR 4).
 
 To argue that this model is extensible, consider the following iteration where we suggested several fields that
 enhance the model and support extensibility concern 1:
@@ -273,10 +274,10 @@ enhance the model and support extensibility concern 1:
 ```mermaid
 classDiagram
 
-  class scheduler_rawfile {
+  class files_file {
     id
     file
-    tags
+    type
     organizations
     created_at
     updated_at
@@ -303,7 +304,7 @@ In this case, some of these structures could be:
 
 Using `"NO_ORG"` or another placeholder makes sure all similar data lives in the same directory layer.
 This makes it easier to search or manipulate data using patterns such as `rm -rf */1970-10-10/*`
-(to delete all data for a particular date). Hence 1 is probably the better solution here over 2.
+(to delete all data for a particular date). Hence, 1 is probably the better solution here over 2.
 
 For easier access to different types of data, such as specific plugins, reports, or miscellaneous types, it is
 probably a good idea to add one extra layer to group the same kind of data together. This directory could live below
@@ -320,8 +321,3 @@ subdirectories.
 Full text search should not be implemented by a relational database such as PostgreSQL or in S3,
 as they are not made for this use-case. As [this post](https://hackernoon.com/an-overview-of-sql-antipatterns)
 mentions, If we need full-text search in the future, we could consider other technologies such as ElasticSearch.
-
-## To Be Discussed
-
-One big discussion point still open is: to which app do we add the `RawFile` model?
-Because the model is inherently not only related to the scheduler and Tasks in general.

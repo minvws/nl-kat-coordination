@@ -6,13 +6,14 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
+from files.models import File, NamedContent
 from katalogus.boefjes.kat_external_db.normalize import run
 from katalogus.boefjes.normalizer_handler import LocalNormalizerHandler
 from katalogus.worker.job_models import NormalizerMeta
 from octopoes.config.settings import Settings
 from octopoes.models import DeclaredScanProfile, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from tasks.models import NamedContent, RawFile, Task
+from tasks.models import Task
 from tests.conftest import get_dummy_data
 
 RAW_DATA = json.dumps(
@@ -51,7 +52,7 @@ def test_job_handler_respects_whitelist(local_repository, organization, mocker):
     octopoes_mock.get.return_value = Hostname(name="test", network=Reference.from_str("Network|test"))
 
     meta = NormalizerMeta.model_validate_json(get_dummy_data("external_db.json"))
-    raw = RawFile.objects.create(file=NamedContent(RAW_DATA))
+    raw = File.objects.create(file=NamedContent(RAW_DATA))
     meta.raw_data.id = raw.id
 
     task = Task(

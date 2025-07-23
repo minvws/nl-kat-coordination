@@ -58,7 +58,7 @@ class StatusEnum(str, Enum):
 class File(BaseModel):
     name: str
     content: str = Field(json_schema_extra={"contentEncoding": "base64"})
-    tags: list[str] = Field(default_factory=list)
+    type: str
 
 
 class BoefjeInput(BaseModel):

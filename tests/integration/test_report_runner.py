@@ -1,11 +1,11 @@
 import json
 
+from files.models import File
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.reports import ReportRecipe
 from reports.runner.models import ReportTask
 from reports.runner.report_runner import LocalReportRunner
-from tasks.models import RawFile
 from tests.integration.conftest import seed_system
 
 
@@ -29,7 +29,7 @@ def test_run_report_task(
     )
     report_runner.run(task)
 
-    raw, raw2, raw3 = (file for file in RawFile.objects.all())
+    raw, raw2, raw3 = (file for file in File.objects.all())
     data = json.load(raw.file)
     data2 = json.load(raw2.file)
     data["input_data"]["plugins"]["required"] = set(data["input_data"]["plugins"]["required"])  # ordering issues

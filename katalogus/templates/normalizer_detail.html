@@ -46,9 +46,9 @@
                     </p>
                     <p>
                         <ul>
-                            {% for mime_type in plugin.consumes %}
+                            {% for type in plugin.consumes %}
                                 <li>
-                                    <a href="{% url "upload_raw_typed" organization_code=organization.code mime_type=mime_type|urlencode:"" %}">{{ mime_type }}</a>
+                                    <a href="{% url "upload_raw_typed" organization_code=organization.code type=type|urlencode:"" %}">{{ type }}</a>
                                 </li>
                             {% endfor %}
                         </ul>

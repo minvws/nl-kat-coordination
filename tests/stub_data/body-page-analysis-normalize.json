@@ -51,9 +51,7 @@
         "redirects_to": "None"
       }
     },
-    "mime_types": [
-      "application/json+har"
-    ]
+    "type": "application/json+har"
   },
   "normalizer": {
     "plugin_id": "kat_wappalyzer_normalize",

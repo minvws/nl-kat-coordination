@@ -185,7 +185,7 @@ def test_dns_normalizer_cname():
                 input_ooi="Hostname|internet|www.example.nl",
                 input_ooi_data={"name": "www.example.nl."},
             ),
-            mime_types=["boefje/dns-records"],
+            type="boefje/dns-records",
         ),
     )
 
@@ -210,7 +210,7 @@ def test_parse_record_null_mx_record():
                 input_ooi="Hostname|internet|english.example.nl",
                 input_ooi_data={"name": "english.example.nl."},
             ),
-            mime_types=["boefje/dns-records"],
+            type="boefje/dns-records",
         ),
     )
 
@@ -293,7 +293,7 @@ def test_parse_cname_soa():
                 input_ooi="Hostname|internet|www.example.com",
                 input_ooi_data={"name": "www.example.com"},
             ),
-            mime_types=["boefje/dns-records"],
+            type="boefje/dns-records",
         ),
     )
 
@@ -362,7 +362,7 @@ def test_find_parent_dns_zone():
                 input_ooi="DnsZone|internet|sub.example.nl",
                 input_ooi_data=input_,
             ),
-            mime_types=["boefje/dns-records"],
+            type="boefje/dns-records",
         ),
     )
     results = LocalNormalizerHandler._parse_results(

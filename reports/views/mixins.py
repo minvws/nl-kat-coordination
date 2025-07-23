@@ -4,6 +4,7 @@ import structlog
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
+from files.models import File, NamedContent
 from octopoes.models import Reference
 from octopoes.models.ooi.reports import Report
 from openkat.ooi_helpers import create_ooi
@@ -13,7 +14,6 @@ from reports.report_types.helpers import REPORTS
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.runner.report_runner import ReportDataDict, aggregate_reports, collect_reports, save_report_data
 from reports.views.base import BaseReportView
-from tasks.models import NamedContent, RawFile
 
 logger = structlog.get_logger(__name__)
 
@@ -96,7 +96,7 @@ class SaveMultiReportMixin(BaseReportView):
         report_data = report_type.post_process_data(
             collect_report_data(self.octopoes_api_connector, self.get_ooi_pks(), self.observed_at)
         )
-        report_data_raw = RawFile.objects.create(
+        report_data_raw = File.objects.create(
             file=NamedContent(ReportDataDict(report_data | self.get_input_data()).model_dump_json())
         )
         report_ooi = Report(

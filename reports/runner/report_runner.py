@@ -6,6 +6,7 @@ import structlog
 from django.conf import settings
 from pydantic import RootModel
 
+from files.models import File, NamedContent
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
@@ -18,7 +19,6 @@ from reports.report_types.definitions import ReportPlugins, report_plugins_union
 from reports.report_types.helpers import get_report_by_id
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.runner.models import ReportRunner, ReportTask
-from tasks.models import NamedContent, RawFile
 
 logger = structlog.get_logger(__name__)
 
@@ -132,9 +132,7 @@ def save_report_data(
             "plugins": plugins,
         }
     }
-    raw = RawFile.objects.create(
-        file=NamedContent(ReportDataDict(input_data | additional_input_data).model_dump_json())
-    )
+    raw = File.objects.create(file=NamedContent(ReportDataDict(input_data | additional_input_data).model_dump_json()))
     report_type_name = str(get_report_by_id(recipe.report_type).name)
     report_name = observed_at.strftime(
         Template(recipe.report_name_format).safe_substitute(oois_count=str(len(oois)), report_type=report_type_name)
@@ -188,7 +186,7 @@ def create_asset_reports(
                     },
                 }
             }
-            asset_raw_file = RawFile.objects.create(
+            asset_raw_file = File.objects.create(
                 file=NamedContent(ReportDataDict({"report_data": data["data"]} | asset_report_input).model_dump_json())
             )
 

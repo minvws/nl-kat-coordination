@@ -9,9 +9,9 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from files.models import File, NamedContent
 from octopoes.models.types import OOI_TYPES
 from openkat.forms.upload_raw import UploadRawForm
-from tasks.models import NamedContent, RawFile
 
 
 class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -24,10 +24,8 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         Returns the initial data to use for forms on this view.
         """
         initial = super().get_initial()
-        if "mime_type" in self.kwargs:
-            initial["mime_types"] = unquote(self.kwargs["mime_type"])
-        elif "mime_types" in self.kwargs:
-            initial["mime_types"] = unquote(self.kwargs["mime_types"])
+        if "type" in self.kwargs:
+            initial["type"] = unquote(self.kwargs["type"])
         return initial
 
     def get_success_url(self):
@@ -59,7 +57,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def process_raw(self, form):
         raw_file = form.cleaned_data["raw_file"]
-        RawFile.objects.create(file=NamedContent(raw_file.file.read()))
+        File.objects.create(file=NamedContent(raw_file.file.read()))
         self.add_success_notification(_("Raw file successfully added."))
 
     def get_form_kwargs(self):

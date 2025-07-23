@@ -1,9 +1,8 @@
-import datetime
 import uuid
 
-from django.contrib.postgres.fields import ArrayField
-from django.core.files.base import ContentFile
 from django.db import models
+
+from files.models import File
 
 
 class TaskStatus(models.TextChoices):
@@ -55,23 +54,6 @@ class Task(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
 
-def raw_file_name(instance, filename: str | None = None):
-    if filename:
-        return f"raw_files/{datetime.date.today()}/{filename}"
-
-    return f"raw_files/{datetime.date.today()}/{instance.id}"
-
-
-class RawFile(models.Model):
-    file = models.FileField(upload_to=raw_file_name)  # the name kwarg will determine the rest of the path
-    tags = ArrayField(models.CharField(max_length=128, blank=True), default=list)
-
-
 class TaskResult(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="results")
-    file = models.OneToOneField(RawFile, on_delete=models.CASCADE, related_name="task")
-
-
-class NamedContent(ContentFile):
-    def __init__(self, content: str | bytes):
-        super().__init__(content, name=str(uuid.uuid4()))
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="task_results")
+    file = models.OneToOneField(File, on_delete=models.CASCADE, related_name="task_result")

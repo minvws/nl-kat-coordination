@@ -7,9 +7,10 @@ from django.conf import settings
 from django.urls import reverse
 from docker.errors import APIError, ContainerError, ImageNotFound
 
+from files.models import File, NamedContent
 from katalogus.worker.interfaces import BoefjeOutput
 from katalogus.worker.job_models import BoefjeMeta
-from tasks.models import NamedContent, RawFile, Task, TaskResult, TaskStatus
+from tasks.models import Task, TaskResult, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -63,7 +64,7 @@ class DockerBoefjeHandler:
                 task.data["ended_at"] = str(datetime.now(timezone.utc))
                 task.status = TaskStatus.FAILED
                 task.save()
-                raw = RawFile.objects.create(file=NamedContent(container_logs))
+                raw = File.objects.create(file=NamedContent(container_logs))
                 TaskResult.objects.create(task=task, file=raw)
 
                 # have to raise exception to prevent _start_working function from setting status to completed
@@ -77,9 +78,7 @@ class DockerBoefjeHandler:
             task.data["ended_at"] = str(datetime.now(timezone.utc))
             task.status = TaskStatus.FAILED
             task.save()
-            raw = RawFile.objects.create(
-                file=NamedContent(e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode())
-            )
+            raw = File.objects.create(file=NamedContent(e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode()))
             TaskResult.objects.create(task=task, file=raw)
         except ImageNotFound:
             logger.error("Docker image %s not found", boefje_meta.boefje.oci_image)

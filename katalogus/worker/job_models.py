@@ -36,7 +36,7 @@ class BoefjeMeta(BaseModel):
 class RawData(BaseModel):
     id: int
     boefje_meta: BoefjeMeta
-    mime_types: list[str]
+    type: str
 
 
 class NormalizerMeta(BaseModel):

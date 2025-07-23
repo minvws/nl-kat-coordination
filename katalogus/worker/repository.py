@@ -39,7 +39,7 @@ class BoefjeResource:
         self.path = path
         self.boefje: Boefje = Boefje.model_validate_json(path.joinpath(BOEFJE_DEFINITION_FILE).read_text())
         self.boefje.runnable_hash = path_hash
-        self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
+        self.boefje.produces = self.boefje.produces.union(set(_default_type(self.boefje)))
         self.package = package
 
         if (path / SCHEMA_FILE).exists():
@@ -259,10 +259,5 @@ def hash_path(path: Path) -> str:
     return folder_hash.hexdigest()
 
 
-def _default_mime_types(boefje: Boefje) -> set:
-    mime_types = {f"boefje/{boefje.plugin_id}"}
-
-    if boefje.version is not None:
-        mime_types = mime_types.union({f"boefje/{boefje.plugin_id}-{boefje.version}"})
-
-    return mime_types
+def _default_type(boefje: Boefje) -> set:
+    return {f"boefje/{boefje.plugin_id}"}

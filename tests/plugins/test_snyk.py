@@ -72,7 +72,7 @@ def test_snyk_html_parser(mocker):
 
     mock_get.side_effect = [mock_first_get] + [mock_second_get] + [mock_third_get] * 7
 
-    mime_types, result = run_boefje(boefje_meta.input_ooi_data, boefje_meta.boefje.model_dump(mode="json"))[0]
+    _, result = run_boefje(boefje_meta.input_ooi_data, boefje_meta.boefje.model_dump(mode="json"))[0]
 
     output = json.loads(result)
 

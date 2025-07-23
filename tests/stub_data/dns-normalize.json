@@ -20,9 +20,7 @@
         }
       ]
     },
-    "mime_types": [
-      "boefje/dns-records"
-    ]
+    "type": "boefje/dns-records"
   },
   "normalizer": {
     "plugin_id": "kat_dns_normalize",

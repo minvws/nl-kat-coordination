@@ -18,6 +18,7 @@ from django.views.generic import FormView, TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 
 from account.mixins import OrganizationView
+from files.models import File
 from katalogus.client import KATalogus, KATalogusError, Plugin
 from katalogus.models import Boefje, Normalizer
 from octopoes.models import OOI, Reference
@@ -43,7 +44,6 @@ from reports.report_types.helpers import (
 )
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.utils import JSONEncoder, debug_json_keys
-from tasks.models import RawFile
 
 REPORTS_PRE_SELECTION = {"clearance_level": ["2", "3", "4"], "clearance_type": "declared"}
 
@@ -642,7 +642,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        raw = RawFile.objects.get(id=self.report_ooi.data_raw_id)
+        raw = File.objects.get(id=self.report_ooi.data_raw_id)
         report_data = json.loads(raw.file.read())
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
@@ -664,7 +664,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     ) -> tuple[
         dict[str, dict[str, dict[str, Any]]], list[AssetReport], list[dict[str, Any]], list[dict[str, list[Plugin]]]
     ]:
-        raw = RawFile.objects.get(id=self.report_ooi.data_raw_id)
+        raw = File.objects.get(id=self.report_ooi.data_raw_id)
         report_data = json.loads(raw.file.read())
         report_types = self.get_report_types(report_data["input_data"]["report_types"])
         plugins = self.get_plugins(report_data["input_data"]["plugins"])
@@ -680,7 +680,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         asset_reports = self.get_asset_reports()
-        raws = RawFile.objects.filter(id__in=[r.data_raw_id for r in asset_reports])
+        raws = File.objects.filter(id__in=[r.data_raw_id for r in asset_reports])
         bytes_datas = {raw.id: json.loads(raw.file.read()) for raw in raws}
         ooi_pks = set()
 
@@ -696,7 +696,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_type_ids = {child_report.report_type for child_report in asset_reports}
         report_types = self.get_report_types(report_type_ids)
 
-        raw = json.loads(RawFile.objects.get(id=self.report_ooi.data_raw_id).file.read())
+        raw = json.loads(File.objects.get(id=self.report_ooi.data_raw_id).file.read())
         plugins = self.get_plugins(raw["input_data"]["plugins"])
 
         return report_data, oois, report_types, plugins

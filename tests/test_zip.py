@@ -1,19 +1,20 @@
 import zipfile
 
+from files.models import File, NamedContent
 from openkat.views.bytes_raw import zip_data
-from tasks.models import NamedContent, RawFile, TaskResult
+from tasks.models import TaskResult
 
 
 def test_zip_data(organization, task_db):
-    raw1 = RawFile.objects.create(file=NamedContent(b"1234"))
-    raw2 = RawFile.objects.create(file=NamedContent(b"4321"))
-    raw3 = RawFile.objects.create(file=NamedContent(b"asd              ss"))
+    raw1 = File.objects.create(file=NamedContent(b"1234"))
+    raw2 = File.objects.create(file=NamedContent(b"4321"))
+    raw3 = File.objects.create(file=NamedContent(b"asd              ss"))
 
     TaskResult.objects.create(task=task_db, file=raw1)
     TaskResult.objects.create(task=task_db, file=raw2)
     TaskResult.objects.create(task=task_db, file=raw3)
 
-    raws = RawFile.objects.all()
+    raws = File.objects.all()
     z_file = zip_data(raws)
     assert zipfile.is_zipfile(z_file)
 

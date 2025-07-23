@@ -11,6 +11,7 @@ from django.conf import settings as openkat_settings
 from django.db import transaction
 from pydantic import TypeAdapter
 
+from files.models import File, NamedContent
 from katalogus.boefjes.boefje_handler import DockerBoefjeHandler
 from katalogus.boefjes.normalizer_handler import LocalNormalizerHandler
 from katalogus.models import BoefjeConfig, NormalizerConfig
@@ -33,7 +34,7 @@ from openkat.models import Organization
 from openkat.scheduler import scheduler_client
 from reports.runner.models import ReportTask
 from reports.runner.report_runner import LocalReportRunner
-from tasks.models import NamedContent, RawFile, Schedule, Task, TaskResult, TaskStatus
+from tasks.models import Schedule, Task, TaskResult, TaskStatus
 
 settings = Settings()
 logger = structlog.get_logger(__name__)
@@ -84,7 +85,7 @@ class SimpleBoefjeStorageInterface(BoefjeStorageInterface):
 
         with transaction.atomic():
             for file in boefje_output.files:
-                raw_file = RawFile.objects.create(file=NamedContent(base64.b64decode(file.content)), tags=file.tags)
+                raw_file = File.objects.create(file=NamedContent(base64.b64decode(file.content)), type=file.type)
                 ids[file.name] = raw_file.id
                 TaskResult.objects.create(task_id=boefje_meta.id, file=raw_file)
 
@@ -269,7 +270,7 @@ def docker_boefje(self, organization: str, plugin_id: str, input_ooi: str) -> No
 
     logger.info("dispatching raw files")
 
-    for file in RawFile.objects.filter(task__task_id=self.request.id):
+    for file in File.objects.filter(task__task_id=self.request.id):
         app.send_task("openkat.tasks.process_raw", (str(file.id),))
 
     logger.info("Handled containerized boefje [org=%s, plugin_id=%s]", organization, plugin_id)
@@ -278,21 +279,22 @@ def docker_boefje(self, organization: str, plugin_id: str, input_ooi: str) -> No
 @app.task
 def process_raw(raw_file_id: int, handle_error: bool = False) -> None:
     logger.info("Handling raw file %s", raw_file_id)
-    file = RawFile.objects.get(id=raw_file_id)
+    file = File.objects.get(id=raw_file_id)
 
-    if "error/boefje" in file.tags and not handle_error:
+    if file.type == "error/boefje" and not handle_error:
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", raw_file_id)
         return
 
-    scheduler = scheduler_client(file.task.task.organization)
+    scheduler = scheduler_client(file.task_result.task.organization)
     local_repository = get_local_repository()
 
     for normalizer_resource in local_repository.resolve_normalizers().values():
-        if not set(normalizer_resource.normalizer.consumes).intersection(set(file.tags)):
+        if not file.type not in normalizer_resource.normalizer.consumes:
             continue
 
         config = NormalizerConfig.objects.filter(
-            normalizer__plugin_id=normalizer_resource.normalizer.plugin_id, organization=file.task.task.organization
+            normalizer__plugin_id=normalizer_resource.normalizer.plugin_id,
+            organization=file.task_result.task.organization,
         ).first()
 
         if not config:
@@ -307,7 +309,7 @@ def process_raw(raw_file_id: int, handle_error: bool = False) -> None:
         task = Task.objects.create(
             id=task_id,
             type="normalizer",
-            organization=file.task.task.organization,
+            organization=file.task_result.task.organization,
             data=NormalizerMeta(
                 id=task_id,
                 normalizer=Normalizer(
@@ -317,7 +319,7 @@ def process_raw(raw_file_id: int, handle_error: bool = False) -> None:
                     version=normalizer_db.version,
                 ),
                 raw_data=RawData(
-                    id=raw_file_id, boefje_meta=BoefjeMeta.model_validate(file.task.task.data), mime_types=file.tags
+                    id=raw_file_id, boefje_meta=BoefjeMeta.model_validate(file.task_result.task.data), type=file.type
                 ),
             ).model_dump(mode="json"),
         )

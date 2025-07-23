@@ -2,9 +2,9 @@ import pytest
 from django.http import Http404
 from pytest_django.asserts import assertContains
 
+from files.models import File, NamedContent
 from openkat.views.bytes_raw import BytesRawView
 from openkat.views.tasks import BoefjesTaskListView
-from tasks.models import NamedContent, RawFile
 from tests.conftest import setup_request
 
 
@@ -71,7 +71,7 @@ def test_download_task_other_org_from_other_org_url(rf, client_member, organizat
 
 
 def test_download_task_same_org(rf, client_member, bytes_raw_metas, bytes_get_raw):
-    raw = RawFile.objects.create(file=NamedContent(bytes_get_raw))
+    raw = File.objects.create(file=NamedContent(bytes_get_raw))
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 
     response = BytesRawView.as_view()(request, organization_code=client_member.organization.code, boefje_meta_id=raw.id)

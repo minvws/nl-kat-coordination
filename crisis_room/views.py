@@ -12,11 +12,11 @@ from httpx import HTTPStatusError
 
 from crisis_room.management.commands.dashboards import FINDINGS_DASHBOARD_NAME
 from crisis_room.models import DashboardData
+from files.models import File
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.reports import HydratedReport
 from openkat.models import Organization, OrganizationMember
 from reports.report_types.findings_report.report import SEVERITY_OPTIONS
-from tasks.models import RawFile
 
 logger = structlog.get_logger(__name__)
 
@@ -67,7 +67,7 @@ class DashboardService:
 
         raw_ids = [hydrated_report.data_raw_id for _, hydrated_report in reports.items() if hydrated_report]
         report_data_from_bytes = {
-            str(raw.id): json.loads(raw.file.read()) for raw in RawFile.objects.filter(id__in=raw_ids)
+            str(raw.id): json.loads(raw.file.read()) for raw in File.objects.filter(id__in=raw_ids)
         }
 
         for _, hydrated_report in reports.items():
