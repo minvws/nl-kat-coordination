@@ -78,7 +78,9 @@ class DockerBoefjeHandler:
             task.data["ended_at"] = str(datetime.now(timezone.utc))
             task.status = TaskStatus.FAILED
             task.save()
-            raw = File.objects.create(file=NamedContent(e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode()), type="boefje/error")
+            raw = File.objects.create(
+                file=NamedContent(e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode()), type="boefje/error"
+            )
             TaskResult.objects.create(task=task, file=raw)
         except ImageNotFound:
             logger.error("Docker image %s not found", boefje_meta.boefje.oci_image)
