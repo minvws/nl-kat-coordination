@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from typing import Any
 
-import structlog
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
@@ -12,8 +11,6 @@ from tools.view_helpers import get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile, ScanProfileType
 from rocky.views.ooi_detail import OOIDetailView
-
-logger = structlog.get_logger(__name__)
 
 
 class ScanProfileDetailView(FormView, OOIDetailView):

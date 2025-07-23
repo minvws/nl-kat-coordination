@@ -19,7 +19,7 @@ from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
-from octopoes.models import EmptyScanProfile, Reference
+from octopoes.models import EmptyScanProfile, Reference, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
@@ -80,7 +80,7 @@ class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
             scan_type = request.POST.get("clearance_type")
             # Mypy doesn't understand that CUSTOM_SCAN_LEVEL is an enum without
             # the Django type hints
-            if scan_type == "inherited":
+            if scan_type == ScanProfileType.INHERITED.value:
                 return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
             level = SCAN_LEVEL(int(request.POST.get("level")))  # type: ignore[misc, valid-type]
             return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
