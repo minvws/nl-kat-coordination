@@ -549,6 +549,9 @@ DEFAULT_OFFSET = 0
 GATHER_BIT_METRICS = False
 
 QUEUE_NAME_OCTOPOES = "octopoes"
+QUEUE_NAME_SCHEDULE = "schedule"
+QUEUE_NAME_REPORTS = "reports"
+
 CELERY = {
     "broker_url": env.str("REDIS_QUEUE_URI"),
     "result_backend": env.str("REDIS_QUEUE_URI"),

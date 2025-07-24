@@ -103,7 +103,7 @@ def next_run(expression: str, start_time: datetime | None = None) -> datetime:
     return cron.get_next(datetime)  # type: ignore
 
 
-@app.task
+@app.task(queue=settings.QUEUE_NAME_SCHEDULE)
 def schedule():
     for schedule in Schedule.objects.filter(deadline_at__lte=datetime.now(timezone.utc), enabled=True):
         scheduler = scheduler_client(schedule.organization)
@@ -208,7 +208,7 @@ def reschedule(
     logger.info("Finished scheduling %s boefjes", count)
 
 
-@app.task(bind=True)
+@app.task(bind=True, queue=settings.QUEUE_NAME_REPORTS)
 def report(self, organization: str, report_recipe_id: str) -> None:
     logger.info("Creating report [org=%s]", organization)
 

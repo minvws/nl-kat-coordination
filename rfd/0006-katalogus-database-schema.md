@@ -96,16 +96,24 @@ classDiagram
     created_at
   }
 
-  class katalogus_pluginconfig {
+  class katalogus_pluginsettings {
     id
-    enabled
     settings
     plugin_id
-    organization_id NULL
+    organizations
+  }
+
+  class katalogus_pluginenabled {
+    id
+    enabled
+    plugin_id
+    organization
   }
 
   katalogus_pluginconfig --> katalogus_plugin
   katalogus_pluginconfig --> tools_organization
+  tools_organization --> katalogus_pluginconfig
+  katalogus_pluginenabled --> tools_organization 
 ```
 
 ### Functional Requirements (FR)
