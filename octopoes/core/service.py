@@ -6,17 +6,12 @@ from time import perf_counter
 from typing import Literal, overload
 
 import structlog
+from django.conf import settings
 from pydantic import TypeAdapter
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
-from octopoes.config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_OFFSET,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    Settings,
-)
+from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET
 from octopoes.events.events import DBEvent, OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent
 from octopoes.models import (
     OOI,
@@ -48,7 +43,6 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 
 logger = structlog.get_logger("octopoes-core-service")
-settings = Settings()
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
@@ -206,8 +200,8 @@ class OctopoesService:
             self.save_origin(origin, [], valid_time)
             return
 
-        is_disabled = bit_definition.id in settings.bits_disabled or (
-            not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
+        is_disabled = bit_definition.id in settings.BITS_DISABLED or (
+            not bit_definition.default_enabled and bit_definition.id not in settings.BITS_ENABLED
         )
 
         if is_disabled:

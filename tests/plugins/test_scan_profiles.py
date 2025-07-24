@@ -1,16 +1,11 @@
 import json
-import os
 import uuid
 from datetime import datetime
-
-import pytest
-from pydantic import ValidationError
 
 from files.models import File, NamedContent
 from katalogus.boefjes.kat_external_db.normalize import run
 from katalogus.boefjes.normalizer_handler import LocalNormalizerHandler
 from katalogus.worker.job_models import NormalizerMeta
-from octopoes.config.settings import Settings
 from octopoes.models import DeclaredScanProfile, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from tasks.models import Task
@@ -63,13 +58,6 @@ def test_job_handler_respects_whitelist(local_repository, organization, mocker):
         modified_at=datetime.now(),
         data=meta.model_dump(mode="json"),
     )
-    os.environ["OCTOPOES_SCAN_PROFILE_WHITELIST"] = '{"x": 5}'
-    with pytest.raises(ValidationError):
-        Settings()
-
-    os.environ["OCTOPOES_SCAN_PROFILE_WHITELIST"] = '{"x": -1}'
-    with pytest.raises(ValidationError):
-        Settings()
 
     LocalNormalizerHandler(local_repository, octopoes_mock, {"x": 3}).handle(task)
     assert octopoes_mock.save_many_scan_profiles.call_count == 0

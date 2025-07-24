@@ -12,12 +12,7 @@ from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
 
 from bits.definitions import BitDefinition
-from octopoes.config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_OFFSET,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-)
+from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, EmptyScanProfile, Reference, ScanLevel, ScanProfileType

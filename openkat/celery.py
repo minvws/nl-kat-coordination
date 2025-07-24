@@ -4,8 +4,6 @@ from celery import Celery
 from celery.signals import setup_logging
 from django.conf import settings
 
-from octopoes.config.settings import Settings as OctopoesSettings
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openkat.settings")
 app = Celery()
 app.config_from_object(settings.CELERY)
@@ -23,17 +21,17 @@ def config_loggers(*args, **kwargs):
 app.conf.beat_schedule = {
     "schedule-scan-profile-recalculations": {
         "task": "openkat.tasks.schedule_scan_profile_recalculations",
-        "schedule": OctopoesSettings().scan_level_recalculation_interval,
+        "schedule": settings.SCAN_LEVEL_RECALCULATION_INTERVAL,
         "args": tuple(),
     },
     "schedule-boefjes": {
         "task": "openkat.tasks.schedule",
-        "schedule": OctopoesSettings().schedule_interval,
+        "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
     },
     "reschedule-boefjes": {
         "task": "openkat.tasks.reschedule",
-        "schedule": OctopoesSettings().schedule_interval,
+        "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
     },
 }

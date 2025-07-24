@@ -10,7 +10,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 
-from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
+from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe

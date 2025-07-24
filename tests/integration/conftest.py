@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 from ipaddress import ip_address
 
 import pytest
+from django.conf import settings
 
 from octopoes.api.models import Declaration, Observation
-from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
@@ -64,22 +64,17 @@ def report_runner(valid_time) -> LocalReportRunner:
 
 
 @pytest.fixture
-def app_settings():
-    return Settings()
-
-
-@pytest.fixture
-def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
+def xtdb_http_client() -> XTDBHTTPClient:
     test_node = "test"
-    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
+    client = get_xtdb_client(settings.XTDB_URI, test_node)
 
     return client
 
 
 @pytest.fixture
-def xtdb_http_client_2(app_settings: Settings) -> XTDBHTTPClient:
+def xtdb_http_client_2() -> XTDBHTTPClient:
     test_node = "test 2"
-    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
+    client = get_xtdb_client(settings.XTDB_URI, test_node)
 
     return client
 
@@ -181,13 +176,13 @@ def xtdb_octopoes_service(
 
 
 @pytest.fixture
-def xtdb_octopoes_api_connector(xtdb_session: XTDBSession, app_settings) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(xtdb_session.client.client, app_settings)
+def xtdb_octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
+    return OctopoesAPIConnector(xtdb_session.client.client, settings.XTDB_URI)
 
 
 @pytest.fixture
-def xtdb_octopoes_api_connector_2(xtdb_session_2: XTDBSession, app_settings) -> OctopoesAPIConnector:
-    return OctopoesAPIConnector(xtdb_session_2.client.client, app_settings)
+def xtdb_octopoes_api_connector_2(xtdb_session_2: XTDBSession) -> OctopoesAPIConnector:
+    return OctopoesAPIConnector(xtdb_session_2.client.client, settings.XTDB_URI)
 
 
 def seed_system_with_xtdb(

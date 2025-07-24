@@ -1,6 +1,6 @@
 import structlog
 
-from octopoes.config.settings import GATHER_BIT_METRICS, QUEUE_NAME_OCTOPOES
+from openkat.settings import QUEUE_NAME_OCTOPOES, GATHER_BIT_METRICS
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.repositories.ooi_repository import XTDBOOIRepository

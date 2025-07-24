@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+from __future__ import annotations
 
 import re
 from pathlib import Path
@@ -21,8 +22,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from kombu import Queue
 
-from octopoes.config.settings import QUEUE_NAME_OCTOPOES
-from octopoes.config.settings import Settings as OctopoesSettings
+from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from openkat.otel import OpenTelemetryHelper
 
 env = environ.Env()
@@ -68,6 +69,7 @@ LOGGING = {
         "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO").upper()},
         "celery": {"handlers": ["console"], "level": "INFO", "propagate": False},
         "celery.worker": {"handlers": ["console"], "level": "WARN", "propagate": False},
+        "celery.app.trace": {"handlers": ["console"], "level": "WARN", "propagate": False},
         "pika": {"handlers": ["console"], "level": "WARN", "propagate": False},
         "httpx": {"handlers": ["console"], "level": "WARN", "propagate": False},
     },
@@ -522,17 +524,28 @@ SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
 OPENKAT_OUTGOING_REQUEST_TIMEOUT = env.int("OPENKAT_OUTGOING_REQUEST_TIMEOUT", default=30)
 
-octopoes_settings = OctopoesSettings()
-
+XTDB_URI = env.str("XTDB_URI")
+GRACE_PERIOD = env.int("GRACE_PERIOD", default=1440)
+WORKERS = env.int("WORKERS", default=4)
+SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL", default=60)
+SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
+OUTGOING_REQUEST_TIMEOUT = env.int("OUTGOING_REQUEST_TIMEOUT", default=30)
 
 def OCTOPOES_FACTORY(organization: str):
     from octopoes.connector.octopoes import OctopoesAPIConnector
 
-    return OctopoesAPIConnector(organization, octopoes_settings)
+    return OctopoesAPIConnector(organization, XTDB_URI)
 
+BITS_DISABLED = set(env.list("BITS_DISABLED", default=[]))
+BITS_ENABLED = set(env.list("BITS_ENABLED", default=[]))
+DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
+DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
+DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
+DEFAULT_LIMIT = 50
+DEFAULT_OFFSET = 0
+GATHER_BIT_METRICS = False
 
-XTDB_URI = str(octopoes_settings.xtdb_uri)
-
+QUEUE_NAME_OCTOPOES = "octopoes"
 CELERY = {
     "broker_url": env.str("REDIS_QUEUE_URI"),
     "result_backend": env.str("REDIS_QUEUE_URI"),
@@ -542,5 +555,5 @@ CELERY = {
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_accept_content": ["application/json", "application/x-python-serialize"],
     "task_queues": (Queue("celery"), Queue(QUEUE_NAME_OCTOPOES)),
-    "worker_concurrency": octopoes_settings.workers,
+    "worker_concurrency": WORKERS,
 }

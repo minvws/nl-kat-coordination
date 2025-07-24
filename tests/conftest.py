@@ -26,12 +26,7 @@ from katalogus.client import KATalogusClient
 from katalogus.management.commands.sync import sync
 from katalogus.models import Boefje, Normalizer
 from katalogus.worker.repository import get_local_repository
-from octopoes.config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_OFFSET,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-)
+from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity

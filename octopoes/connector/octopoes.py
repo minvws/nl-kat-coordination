@@ -11,14 +11,8 @@ from django.conf import settings
 from pydantic import TypeAdapter
 
 from octopoes.api.models import Affirmation, Declaration, Observation
-from octopoes.config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_OFFSET,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    QUEUE_NAME_OCTOPOES,
-    Settings,
-)
+from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET, \
+    QUEUE_NAME_OCTOPOES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileType
@@ -52,9 +46,9 @@ class OctopoesAPIConnector:
         - connector.RemoteException if an error occurs inside Octopoes API
     """
 
-    def __init__(self, client: str, settings: Settings):
-        self.settings = settings
-        self.xtdb_session = XTDBSession(get_xtdb_client(str(self.settings.xtdb_uri), client))
+    def __init__(self, client: str, xtdb_uri: str):
+        self.xtdb_uri = xtdb_uri
+        self.xtdb_session = XTDBSession(get_xtdb_client(self.xtdb_uri, client))
         self.octopoes = bootstrap_octopoes(client, self.xtdb_session)
 
     def list_objects(
@@ -309,7 +303,7 @@ class OctopoesAPIConnector:
         """
 
         # See list_reports() for some of the reasoning behind the below code
-        xtdb_http_client = get_xtdb_client(str(self.settings.xtdb_uri), "")
+        xtdb_http_client = get_xtdb_client(str(self.settings.XTDB_URI), "")
         session = XTDBSession(xtdb_http_client)
 
         octopoes = bootstrap_octopoes("null", session)

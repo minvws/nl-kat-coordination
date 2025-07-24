@@ -15,9 +15,8 @@ structlog.configure(cache_logger_on_first_use=False)
 
 
 def OCTOPOES_FACTORY(organization: str):  # type: ignore
-    from octopoes.config.settings import Settings
     from octopoes.connector.octopoes import OctopoesAPIConnector
 
     with patch("octopoes.core.app.EventManager") as manager:
         manager().client = organization
-        return OctopoesAPIConnector(organization, Settings())
+        return OctopoesAPIConnector(organization, XTDB_URI)

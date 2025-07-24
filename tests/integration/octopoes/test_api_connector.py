@@ -4,10 +4,10 @@ from datetime import datetime, timezone
 from ipaddress import ip_address
 
 import pytest
+from django.conf import settings
 
 from bits.port_classification_ip.bit import BIT
 from octopoes.api.models import Declaration, Observation
-from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanLevel
@@ -89,12 +89,12 @@ def test_bulk_operations(xtdb_octopoes_api_connector: OctopoesAPIConnector, vali
         assert bulk_hostnames[hostname.reference].scan_profile is not None
 
 
-def test_bulk_reports(app_settings: Settings, xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+def test_bulk_reports(xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     filters = []
     reports = []
 
     for client in ["test1", "test2", "test3"]:
-        xtdb_client = get_xtdb_client(str(app_settings.xtdb_uri), client)
+        xtdb_client = get_xtdb_client(settings.xtdb_uri, client)
         xtdb_client.create_node()
 
         xtdb_octopoes_api_connector.xtdb_session.client.client = client
@@ -139,12 +139,10 @@ def test_bulk_reports(app_settings: Settings, xtdb_octopoes_api_connector: Octop
     assert result[recipe_ids[2]].to_report() == reports[2]
 
 
-def test_list_object_clients(
-    app_settings: Settings, xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime
-):
+def test_list_object_clients(xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     clients = ["test1", "test2", "test3", "test4"]
     for client in clients:
-        xtdb_client = get_xtdb_client(str(app_settings.xtdb_uri), client)
+        xtdb_client = get_xtdb_client(settings.xtdb_uri, client)
         xtdb_client.create_node()
 
     network = Network(name="test")

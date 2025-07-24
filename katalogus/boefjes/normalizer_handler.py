@@ -65,8 +65,6 @@ class LocalNormalizerHandler(NormalizerHandlerInterface):
 
             results = self._parse_results(normalizer_meta, results)
 
-            logger.info("Obtained results %s", str(results))
-
             for observation in results.observations:
                 for ooi in observation.results:
                     if ooi.primary_key == observation.input_ooi:

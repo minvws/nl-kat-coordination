@@ -7,7 +7,7 @@ from typing import Any
 
 import structlog
 from croniter import croniter
-from django.conf import settings as openkat_settings
+from django.conf import settings
 from django.db import transaction
 from pydantic import TypeAdapter
 
@@ -22,10 +22,10 @@ from katalogus.worker.interfaces import Task as WorkerTask
 from katalogus.worker.job_models import BoefjeMeta, NormalizerMeta, RawData
 from katalogus.worker.models import Boefje, Normalizer
 from katalogus.worker.repository import get_local_repository
-from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
+from openkat.settings import QUEUE_NAME_OCTOPOES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.events.events import DBEvent, DBEventType
-from octopoes.models import ScanLevel
+from octopoes.models import ScanLevel, OOI
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from octopoes.xtdb.client import XTDBSession
@@ -36,7 +36,6 @@ from reports.runner.models import ReportTask
 from reports.runner.report_runner import LocalReportRunner
 from tasks.models import Schedule, Task, TaskResult, TaskStatus
 
-settings = Settings()
 logger = structlog.get_logger(__name__)
 
 
@@ -45,7 +44,7 @@ def handle_event(event: dict) -> None:
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
-        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client))
+        session = XTDBSession(get_xtdb_client(settings.XTDB_URI, parsed_event.client))
         bootstrap_octopoes(parsed_event.client, session).process_event(parsed_event)
         session.commit()
     except Exception:
@@ -66,7 +65,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
-    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org))
+    session = XTDBSession(get_xtdb_client(settings.XTDB_URI, org))
     octopoes = bootstrap_octopoes(org, session)
     timer = timeit.default_timer()
 
@@ -117,27 +116,28 @@ def schedule():
         schedule.save()
 
 
-@app.task
-def reschedule(
+def get_expired_boefjes(
     boefje_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
-) -> None:
-    logger.info("Scheduling boefjes")
-    count = 0
+) -> list[tuple[OOI, BoefjeConfig]]:
     recent_tasks = Task.objects.filter(
-        created_at__gte=datetime.now(timezone.utc) - timedelta(hours=settings.grace_period), type="boefje"
+        created_at__gte=datetime.now(timezone.utc) - timedelta(minutes=settings.GRACE_PERIOD), type="boefje"
     ).all()
     configs = BoefjeConfig.objects.filter(enabled=True)
+
+    if organization:
+        configs = configs.filter(organization__code=organization)
+
     oois = None
+    expired: list[tuple[OOI, BoefjeConfig]] = []
 
     if boefje_id:
         configs = configs.filter(boefje__plugin_id=boefje_id)
-    if input_oois and organization:
-        connector = openkat_settings.OCTOPOES_FACTORY(organization)
+    if input_oois is not None and organization:
+        connector = settings.OCTOPOES_FACTORY(organization)
         oois = connector.load_objects_bulk(set(input_oois), datetime.now(timezone.utc)).values()
 
     for config in configs:
-        connector = openkat_settings.OCTOPOES_FACTORY(config.organization.code)
-        scheduler = scheduler_client(config.organization)
+        connector = settings.OCTOPOES_FACTORY(config.organization.code)
         consumes = set()
 
         for type_name in config.boefje.consumes:
@@ -157,7 +157,7 @@ def reschedule(
             if recent_tasks.filter(
                 data__input_ooi=ooi.primary_key,
                 organization=config.organization,
-                data__boefje__id=config.boefje.plugin_id,
+                data__boefje__id=config.boefje.id,
             ).exists():
                 logger.debug(
                     "Recent task found, skipping dispatch or boefje %s for %s on %s",
@@ -167,29 +167,41 @@ def reschedule(
                 )
                 continue
 
-            task_id = uuid.uuid4()
-            task = Task.objects.create(
+            expired.append((ooi, config))
+
+    return expired
+
+
+@app.task
+def reschedule(
+    boefje_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
+) -> None:
+    logger.info("Scheduling boefjes")
+    count = 0
+    for ooi, config in get_expired_boefjes(boefje_id, input_oois, organization):
+        task_id = uuid.uuid4()
+        task = Task.objects.create(
+            id=task_id,
+            type="boefje",
+            organization=config.organization,
+            status=TaskStatus.QUEUED,
+            data=BoefjeMeta(
                 id=task_id,
-                type="boefje",
-                organization=config.organization,
-                status=TaskStatus.QUEUED,
-                data=BoefjeMeta(
-                    id=task_id,
-                    boefje=Boefje(
-                        id=config.boefje.id,
-                        plugin_id=config.boefje.plugin_id,
-                        name=config.boefje.name,
-                        version=config.boefje.version,
-                        oci_image=config.boefje.oci_image,
-                        oci_arguments=config.boefje.oci_arguments,
-                    ),
-                    input_ooi=ooi.primary_key,
-                    input_ooi_data=ooi.serialize(),
-                    organization=config.organization.code,
-                ).model_dump(mode="json"),
-            )
-            scheduler.push_task(task)
-            count += 1
+                boefje=Boefje(
+                    id=config.boefje.id,
+                    plugin_id=config.boefje.plugin_id,
+                    name=config.boefje.name,
+                    version=config.boefje.version,
+                    oci_image=config.boefje.oci_image,
+                    oci_arguments=config.boefje.oci_arguments,
+                ),
+                input_ooi=ooi.primary_key,
+                input_ooi_data=ooi.serialize(),
+                organization=config.organization.code,
+            ).model_dump(mode="json"),
+        )
+        scheduler_client(config.organization).push_task(task)
+        count += 1
 
     logger.info("Finished scheduling %s boefjes", count)
 
@@ -328,10 +340,10 @@ def process_raw(raw_file_id: int, handle_error: bool = False) -> None:
 
 @app.task(bind=True)
 def normalizer(self, organization: str, plugin_id: str, raw_file_id: str | uuid.UUID) -> None:
-    logger.info("Handling normalizer [org=%s, plugin_id=%s, raw_file_id=%s]", organization, plugin_id, raw_file_id)
+    logger.info("Starting normalizer [org=%s, plugin_id=%s, raw_file_id=%s]", organization, plugin_id, raw_file_id)
 
     local_repository = get_local_repository()
-    connector = openkat_settings.OCTOPOES_FACTORY(organization)
+    connector = settings.OCTOPOES_FACTORY(organization)
 
     handler = LocalNormalizerHandler(local_repository, connector)
     config = NormalizerConfig.objects.filter(normalizer__plugin_id=plugin_id, organization__code=organization).first()
