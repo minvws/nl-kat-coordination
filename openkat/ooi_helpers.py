@@ -199,3 +199,20 @@ def create_ooi(
     task_id = uuid4()
     declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=task_id, end_valid_time=end_valid_time)
     api_connector.save_declaration(declaration)
+
+
+def create_oois(
+    api_connector: OctopoesAPIConnector,
+    oois: list[OOI],
+    observed_at: datetime,
+    end_valid_time: datetime | None = None,
+) -> None:
+    declarations: list[Declaration] = []
+    task_id = uuid4()
+
+    for ooi in oois:
+        declarations.append(
+            Declaration(ooi=ooi, valid_time=observed_at, task_id=task_id, end_valid_time=end_valid_time)
+        )
+
+    api_connector.save_many_declarations(declarations)

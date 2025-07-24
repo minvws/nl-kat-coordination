@@ -1,0 +1,15 @@
+include LICENSE
+
+recursive-include openkat/templates *.html
+recursive-include openkat/templates *.txt
+recursive-include openkat/locale *.mo
+recursive-include openkat/locale *.po
+recursive-include katalogus/templates *.html
+recursive-include katalogus/templates *.txt
+recursive-include account/templates *.html
+recursive-include account/templates *.txt
+recursive-include onboarding/templates *.html
+recursive-include onboarding/templates *.txt
+recursive-include reports *.html
+recursive-include crisis_room *.html
+recursive-include crisis_room *.json

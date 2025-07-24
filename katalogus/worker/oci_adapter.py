@@ -5,6 +5,7 @@ from uuid import UUID
 
 import httpx
 from httpx import Client, HTTPTransport
+from pydantic import ValidationError
 
 from .boefje_handler import LocalBoefjeHandler
 from .interfaces import BoefjeInput, BoefjeOutput, BoefjeStorageInterface
@@ -26,10 +27,17 @@ class CallbackStorageClient(BoefjeStorageInterface):
 
 def run_with_callback(input_url: str):
     try:
-        boefje_input = BoefjeInput.model_validate_json(httpx.get(input_url).content)
+        response = httpx.get(input_url)
+        response.raise_for_status()
     except httpx.HTTPError as e:
         # sys.exit will print the message on stderr and return with exit code 1
         sys.exit(f"Failed to get input from boefje API (at {input_url}): {e}")
+
+    try:
+        boefje_input = BoefjeInput.model_validate_json(response.content)
+    except ValidationError as e:
+        # sys.exit will print the message on stderr and return with exit code 1
+        sys.exit(f"Failed to parse input from boefje API (at {input_url}): {e}")
 
     parsed = urlparse(input_url)
     client = CallbackStorageClient(f"{parsed.scheme}://{parsed.netloc}", boefje_input.output_url, 30)

@@ -21,6 +21,7 @@ from csp.constants import NONE, SELF
 from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+from django.views.debug import SafeExceptionReporterFilter
 from kombu import Queue
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -47,6 +48,18 @@ DEBUG = env.bool("DEBUG", False)
 
 # Logging format ("text" or "json")
 LOGGING_FORMAT = env("LOGGING_FORMAT", default="text")
+
+# See these Django release notes: https://docs.djangoproject.com/en/dev/releases/3.1/#error-reporting
+HIDDEN_DEFAULT = "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE"
+HIDDEN_ADDITIONAL = "REDIS_|_URI"
+
+
+class SaferExceptionReporterFilter(SafeExceptionReporterFilter):
+    hidden_settings = re.compile(f"{HIDDEN_DEFAULT}|{HIDDEN_ADDITIONAL}", flags=re.I)
+
+
+DEFAULT_EXCEPTION_REPORTER_FILTER = "rocky.settings.SaferExceptionReporterFilter"
+
 
 LOGGING = {
     "version": 1,
@@ -173,7 +186,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "openkat.middleware.auth_token.AuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
