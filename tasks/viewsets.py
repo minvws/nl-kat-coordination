@@ -11,7 +11,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request
 from structlog import get_logger
 
-from files.models import File, NamedContent
+from files.models import File, PluginContent
 from katalogus.worker.interfaces import BoefjeInput, BoefjeOutput, StatusEnum
 from katalogus.worker.interfaces import Task as WorkerTask
 from tasks.models import Task, TaskResult, TaskStatus
@@ -46,7 +46,9 @@ class BoefjeOutputViewSet(viewsets.ViewSet):
         result = {}
 
         for file in output.files or []:
-            raw = File.objects.create(file=NamedContent(base64.b64decode(file.content)), type=file.type)
+            raw = File.objects.create(
+                file=PluginContent(base64.b64decode(file.content), task.data["boefje"]["plugin_id"]), type=file.type
+            )
             TaskResult.objects.create(task=task, file=raw)
 
             result[file.name] = raw.id

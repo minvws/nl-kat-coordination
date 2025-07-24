@@ -2,7 +2,7 @@ import json
 
 from pytest_django.asserts import assertContains
 
-from files.models import File, NamedContent
+from files.models import File, ReportContent
 from katalogus.models import Boefje
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
@@ -290,7 +290,7 @@ def test_save_aggregate_report_view_scheduled(
 def test_json_download_aggregate_report(
     rf, client_member, get_aggregate_report_ooi, get_aggregate_report_from_bytes, octopoes_api_connector
 ):
-    get_aggregate_report_ooi.data_raw_id = File.objects.create(file=NamedContent(get_aggregate_report_from_bytes)).id
+    get_aggregate_report_ooi.data_raw_id = File.objects.create(file=ReportContent(get_aggregate_report_from_bytes)).id
     octopoes_api_connector.get_report.return_value = get_aggregate_report_ooi
     request = setup_request(
         rf.get("view_report_json", {"json": "true", "report_id": f"{get_aggregate_report_ooi.primary_key}"}),

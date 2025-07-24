@@ -21,7 +21,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 
 from crisis_room.models import Dashboard, DashboardData
-from files.models import File, NamedContent
+from files.models import File, GenericContent
 from katalogus.client import KATalogusClient
 from katalogus.management.commands.sync import sync
 from katalogus.models import Boefje, Normalizer
@@ -1742,13 +1742,13 @@ def dashboard_data(client_member, client_member_b):
 @pytest.fixture
 def raw_a(client_member, client_member_b, findings_report_bytes_data):
     a, b = findings_report_bytes_data
-    return File.objects.create(file=NamedContent(json.dumps(a)))
+    return File.objects.create(file=GenericContent(json.dumps(a)))
 
 
 @pytest.fixture
 def raw_b(client_member, client_member_b, findings_report_bytes_data):
     a, b = findings_report_bytes_data
-    return File.objects.create(file=NamedContent(json.dumps(b)))
+    return File.objects.create(file=GenericContent(json.dumps(b)))
 
 
 @pytest.fixture

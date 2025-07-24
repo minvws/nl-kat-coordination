@@ -7,7 +7,7 @@ from django.conf import settings
 from django.urls import reverse
 from docker.errors import APIError, ContainerError, ImageNotFound
 
-from files.models import File, NamedContent
+from files.models import File, PluginContent
 from katalogus.worker.interfaces import BoefjeOutput
 from katalogus.worker.job_models import BoefjeMeta
 from tasks.models import Task, TaskResult, TaskStatus
@@ -65,7 +65,9 @@ class DockerBoefjeHandler:
                 task.data["ended_at"] = str(datetime.now(timezone.utc))
                 task.status = TaskStatus.FAILED
                 task.save()
-                raw = File.objects.create(file=NamedContent(container_logs), type="boefje/error")
+                raw = File.objects.create(
+                    file=PluginContent(container_logs, boefje_meta.boefje.plugin_id), type="boefje/error"
+                )
                 TaskResult.objects.create(task=task, file=raw)
 
                 # have to raise exception to prevent _start_working function from setting status to completed
@@ -80,7 +82,10 @@ class DockerBoefjeHandler:
             task.status = TaskStatus.FAILED
             task.save()
             raw = File.objects.create(
-                file=NamedContent(e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode()), type="boefje/error"
+                file=PluginContent(
+                    e.stderr if isinstance(e.stderr, bytes) else e.stderr.encode(), boefje_meta.boefje.plugin_id
+                ),
+                type="boefje/error",
             )
             TaskResult.objects.create(task=task, file=raw)
         except ImageNotFound:

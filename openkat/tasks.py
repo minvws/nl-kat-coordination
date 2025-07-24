@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db import transaction
 from pydantic import TypeAdapter
 
-from files.models import File, NamedContent
+from files.models import File, PluginContent
 from katalogus.boefjes.boefje_handler import DockerBoefjeHandler
 from katalogus.boefjes.normalizer_handler import LocalNormalizerHandler
 from katalogus.models import BoefjeConfig, NormalizerConfig
@@ -86,7 +86,9 @@ class SimpleBoefjeStorageInterface(BoefjeStorageInterface):
 
         with transaction.atomic():
             for file in boefje_output.files:
-                raw_file = File.objects.create(file=NamedContent(base64.b64decode(file.content)), type=file.type)
+                raw_file = File.objects.create(
+                    file=PluginContent(base64.b64decode(file.content), boefje_meta.boefje.plugin_id), type=file.type
+                )
                 ids[file.name] = raw_file.id
                 TaskResult.objects.create(task_id=boefje_meta.id, file=raw_file)
 

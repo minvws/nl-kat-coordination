@@ -1,16 +1,11 @@
 import datetime
-import uuid
 
 from django.core.files.base import ContentFile
 from django.db import models
 
 
-def raw_file_name(instance, filename: str | None = None):
-    # TODO: implement path from RFD
-    if filename:
-        return f"raw_files/{datetime.date.today()}/{filename}"
-
-    return f"raw_files/{datetime.date.today()}/{instance.id}"
+def raw_file_name(instance, directory: str | None = None):
+    return f"files/{datetime.date.today()}/{directory}/{instance.id}"
 
 
 class File(models.Model):
@@ -20,6 +15,16 @@ class File(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class NamedContent(ContentFile):
+class GenericContent(ContentFile):
     def __init__(self, content: str | bytes):
-        super().__init__(content, name=str(uuid.uuid4()))
+        super().__init__(content, name="data")
+
+
+class PluginContent(ContentFile):
+    def __init__(self, content: str | bytes, plugin_id: str):
+        super().__init__(content, name=plugin_id)
+
+
+class ReportContent(ContentFile):
+    def __init__(self, content: str | bytes):
+        super().__init__(content, name="reports")

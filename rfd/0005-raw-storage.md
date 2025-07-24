@@ -99,7 +99,7 @@ The core of this proposal is to:
 2. Tie a new Files model in a `files` app to Tasks optionally, by introducing an intermediate model: TaskResult.
 3. Replace our custom File logic with a FileField, and configure S3 optionally using 'django-storages'.
 4. Save Files on disk with a more useful directory (partitioning) structure:
-   `"raw_files" / {Organization.id | "NO_ORG" } / {date} / {plugin_id | "reports" | ... | "UNKNOWN" } / {file_name}`
+   `"raw_files" / {date} / {plugin_id | "reports" | ... | "data" } / {file_name}`
 5. Relate files to organizations through a many-to-many relationship
 6. Postpone a new timestamping to version 2.1 or 2.2.
 
@@ -286,7 +286,7 @@ classDiagram
   }
 ```
 
-Here we either link a file to a nullable owner, or allow files to be owned by multiple users.
+Here we either link a file to a nullable `owner` or allow files to be owned by multiple users.
 
 To easily delete data for a whole organization or over a time range (Ex 2, 3 and 4), we do not have to adjust the
 database model. But we do need to consider that we also need to delete the files from the object storage.
@@ -296,15 +296,14 @@ In this case, some of these structures could be:
 1. `"raw_files" / {Organization.id | "NO_ORG" } / {date} / {file_name}`
 2. - For generic raw files: `"raw_files" / {date} / {file_name}`
    - For raw files of an organization: `"raw_files" / {Organization.id} / {date} / {file_name}`
-
 3. - Both options from 1 or 2, but with an intermediate directory that can be used for the type of data:
-     `" ...org_path / {date} / {plugin_id | "reports" | ... | "UNKNOWN" } / {file_name}`
+     `...org_path / {date} / {plugin_id | "reports" | ... | "data" } / {file_name}`
 4. - Same as option 3 but the intermediate directory lives one level higher:
-   - `...org_path / {plugin_id | "reports" | ... | "UNKNOWN" } / {date} / {file_name}`
+   - `...org_path / {plugin_id | "reports" | ... | "data" } / {date} / {file_name}`
 
 Using `"NO_ORG"` or another placeholder makes sure all similar data lives in the same directory layer.
 This makes it easier to search or manipulate data using patterns such as `rm -rf */1970-10-10/*`
-(to delete all data for a particular date). Hence, 1 is probably the better solution here over 2.
+(to delete all data for a particular date). Hence, option 1 is probably the better solution here over option 2.
 
 For easier access to different types of data, such as specific plugins, reports, or miscellaneous types, it is
 probably a good idea to add one extra layer to group the same kind of data together. This directory could live below
@@ -314,7 +313,15 @@ see old, disabled plugins always in the hierarchy as you are going through recen
 issues it is more likely that users know the date (range) the issues happened than knowing which plugins or reports
 were ran. With the date as the first "filter" layer, seeing for which plugins or reports data is available is also a
 useful indicator, instead of figuring out which data is available for a particular date by going plugin/report
-subdirectories.
+subdirectories. Therefore, option 3 will be chosen over option 4, and is currently the best candidate.
+
+### Update after discussion
+
+Since we decided that the many-to-many field to `Organization` is a good idea,
+the top directory cannot refer to the organization anymore.
+Hence, the `...org_path` from option 3 will be replaced with `"raw_files"`:
+
+`" "raw_files" / {date} / {plugin_id | "reports" | ... | "data" } / {file_name}`
 
 ### Full-Text Search (Ex 5)
 

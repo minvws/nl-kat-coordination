@@ -9,7 +9,7 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
-from files.models import File, NamedContent
+from files.models import File, GenericContent
 from octopoes.models.types import OOI_TYPES
 from openkat.forms.upload_raw import UploadRawForm
 
@@ -57,7 +57,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def process_raw(self, form):
         raw_file = form.cleaned_data["raw_file"]
-        File.objects.create(file=NamedContent(raw_file.file.read()))
+        File.objects.create(file=GenericContent(raw_file.file.read()))
         self.add_success_notification(_("Raw file successfully added."))
 
     def get_form_kwargs(self):

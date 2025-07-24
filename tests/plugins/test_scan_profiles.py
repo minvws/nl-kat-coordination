@@ -2,7 +2,7 @@ import json
 import uuid
 from datetime import datetime
 
-from files.models import File, NamedContent
+from files.models import File, PluginContent
 from katalogus.boefjes.kat_external_db.normalize import run
 from katalogus.boefjes.normalizer_handler import LocalNormalizerHandler
 from katalogus.worker.job_models import NormalizerMeta
@@ -47,7 +47,7 @@ def test_job_handler_respects_whitelist(local_repository, organization, mocker):
     octopoes_mock.get.return_value = Hostname(name="test", network=Reference.from_str("Network|test"))
 
     meta = NormalizerMeta.model_validate_json(get_dummy_data("external_db.json"))
-    raw = File.objects.create(file=NamedContent(RAW_DATA))
+    raw = File.objects.create(file=PluginContent(RAW_DATA, meta.raw_data.boefje_meta.boefje.plugin_id))
     meta.raw_data.id = raw.id
 
     task = Task(
