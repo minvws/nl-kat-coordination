@@ -94,7 +94,7 @@ def test_bulk_reports(xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_t
     reports = []
 
     for client in ["test1", "test2", "test3"]:
-        xtdb_client = get_xtdb_client(settings.xtdb_uri, client)
+        xtdb_client = get_xtdb_client(settings.XTDB_URI, client)
         xtdb_client.create_node()
 
         xtdb_octopoes_api_connector.xtdb_session.client.client = client
@@ -142,7 +142,7 @@ def test_bulk_reports(xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_t
 def test_list_object_clients(xtdb_octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     clients = ["test1", "test2", "test3", "test4"]
     for client in clients:
-        xtdb_client = get_xtdb_client(settings.xtdb_uri, client)
+        xtdb_client = get_xtdb_client(settings.XTDB_URI, client)
         xtdb_client.create_node()
 
     network = Network(name="test")
