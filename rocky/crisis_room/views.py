@@ -419,15 +419,15 @@ class DeleteDashboardItemView(OrganizationView):
     """Delete the selected dashboard item."""
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
-        dashboard_item_name = request.POST.get("dashboard_item")
-        dashboard_id = request.POST.get("dashboard")
+        dashboard_item_name = request.POST.get("dashboard_item_name")
+        dashboard_item_id = request.POST.get("dashboard_item_id")
 
         if not self.organization_member.can_delete_dashboard_item:
             raise PermissionDenied()
 
         try:
             dashboard_item = DashboardItem.objects.get(
-                dashboard=dashboard_id, dashboard__organization=self.organization, name=dashboard_item_name
+                id=dashboard_item_id, dashboard__organization=self.organization, name=dashboard_item_name
             )
         except DashboardItem.DoesNotExist:
             messages.error(request, f"Dashboard item '{dashboard_item_name}' not found.")

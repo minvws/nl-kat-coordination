@@ -33,7 +33,7 @@ PIE_SCALE_EFFORT_CHOICES: Choices = [
 PIE_SCALE_CHOICES: Choices = [BLANK_CHOICE, ("low", _("low")), ("medium", _("medium")), ("high", _("high"))]
 
 CLEARANCE_TYPE_CHOICES = [("declared", _("Declared")), ("inherited", _("Inherited")), ("empty", _("Empty"))]
-SCAN_LEVEL_CHOICES = [BLANK_CHOICE] + SCAN_LEVEL.choices
+SCAN_LEVEL_CHOICES = SCAN_LEVEL.choices
 
 MANUAL_FINDING_ID_PREFIX = "KAT-"
 
