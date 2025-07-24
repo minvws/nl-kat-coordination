@@ -11,7 +11,6 @@ from pydantic import TypeAdapter
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
-from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET
 from octopoes.events.events import DBEvent, OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent
 from octopoes.models import (
     OOI,
@@ -121,10 +120,10 @@ class OctopoesService:
         self,
         types: set[type[OOI]],
         valid_time: datetime,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
-        scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
-        scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
+        scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: set[ScanProfileType] = settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
         order_by: Literal["scan_level", "object_type"] = "object_type",
         asc_desc: Literal["asc", "desc"] = "asc",
@@ -529,7 +528,7 @@ class OctopoesService:
         self._run_inferences(event)
 
     def list_random_ooi(
-        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER
     ) -> list[OOI]:
         oois = self.ooi_repository.list_random(valid_time, amount, scan_levels)
         self._populate_scan_profiles(oois, valid_time)

@@ -11,8 +11,6 @@ from django.conf import settings
 from pydantic import TypeAdapter
 
 from octopoes.api.models import Affirmation, Declaration, Observation
-from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET, \
-    QUEUE_NAME_OCTOPOES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileType
@@ -55,10 +53,10 @@ class OctopoesAPIConnector:
         self,
         types: set[type[OOI]] | set[str],
         valid_time: datetime,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
-        scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
-        scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
+        scan_level: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_type: set[ScanProfileType] = settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
         order_by: Literal["scan_level", "object_type"] = "object_type",
         asc_desc: Literal["asc", "desc"] = "asc",
@@ -107,8 +105,8 @@ class OctopoesAPIConnector:
     def list_origins(
         self,
         valid_time: datetime,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
         source: Reference | None = None,
         result: Reference | None = None,
         method: str | list[str] | None = None,
@@ -246,8 +244,8 @@ class OctopoesAPIConnector:
         valid_time: datetime,
         exclude_muted: bool = True,
         only_muted: bool = False,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
         search_string: str | None = None,
         order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",
@@ -259,8 +257,8 @@ class OctopoesAPIConnector:
     def list_reports(
         self,
         valid_time: datetime,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
         recipe_id: UUID | None = None,
     ) -> Paginated[HydratedReport]:
         return self.octopoes.ooi_repository.list_reports(valid_time, offset, limit, recipe_id)
@@ -277,7 +275,7 @@ class OctopoesAPIConnector:
         # clients works because the event manager is only used in callbacks triggered on a `commit()`, while these
         # queries are read-only and hence don't need a `commit()` as no events would be triggered. (A cleaner solution
         # would perhaps be to extract an interface and pass a new NullManager.)
-        event_manager = EventManager("null", "", QUEUE_NAME_OCTOPOES)
+        event_manager = EventManager("null", "", settings.QUEUE_NAME_OCTOPOES)
 
         # The xtdb_http_client is also created outside the loop and the `_client` property changed inside the loop
         # instead, to reuse the httpx Session for all requests.
@@ -303,7 +301,7 @@ class OctopoesAPIConnector:
         """
 
         # See list_reports() for some of the reasoning behind the below code
-        xtdb_http_client = get_xtdb_client(str(self.settings.XTDB_URI), "")
+        xtdb_http_client = get_xtdb_client(self.xtdb_uri, "")
         session = XTDBSession(xtdb_http_client)
 
         octopoes = bootstrap_octopoes("null", session)
@@ -338,8 +336,8 @@ class OctopoesAPIConnector:
         path: str,
         valid_time: datetime,
         source: OOI | Reference | str | None = None,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
     ) -> list[OOI]:
         object_path = Path.parse(path)
         xtdb_query = Query.from_path(object_path).offset(offset).limit(limit)

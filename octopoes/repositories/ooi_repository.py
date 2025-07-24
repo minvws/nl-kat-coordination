@@ -8,11 +8,11 @@ from typing import Any, Literal, cast
 from uuid import UUID
 
 import structlog
+from django.conf import settings
 from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
 
 from bits.definitions import BitDefinition
-from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, DEFAULT_LIMIT, DEFAULT_OFFSET
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, EmptyScanProfile, Reference, ScanLevel, ScanProfileType
@@ -91,8 +91,8 @@ class OOIRepository(Repository):
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
-        scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: set[ScanProfileType] = settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
         order_by: Literal["scan_level", "object_type"] = "object_type",
         asc_desc: Literal["asc", "desc"] = "asc",
@@ -103,7 +103,7 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def list_random(
-        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER
     ) -> list[OOI]:
         raise NotImplementedError
 
@@ -136,8 +136,8 @@ class OOIRepository(Repository):
         valid_time: datetime,
         exclude_muted: bool = False,
         only_muted: bool = False,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
         search_string: str | None = None,
         order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",
@@ -315,8 +315,8 @@ class XTDBOOIRepository(OOIRepository):
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
-        scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: set[ScanProfileType] = settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         search_string: str | None = None,
         order_by: Literal["scan_level", "object_type"] = "object_type",
         asc_desc: Literal["asc", "desc"] = "asc",
@@ -402,7 +402,7 @@ class XTDBOOIRepository(OOIRepository):
         return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
 
     def list_random(
-        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = settings.DEFAULT_SCAN_LEVEL_FILTER
     ) -> list[OOI]:
         query = """
             {{
@@ -721,8 +721,8 @@ class XTDBOOIRepository(OOIRepository):
         valid_time: datetime,
         exclude_muted: bool = False,
         only_muted: bool = False,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        offset: int = settings.DEFAULT_OFFSET,
+        limit: int = settings.DEFAULT_LIMIT,
         search_string: str | None = None,
         order_by: Literal["score", "finding_type"] = "score",
         asc_desc: Literal["asc", "desc"] = "desc",

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+
 from __future__ import annotations
 
 import re
@@ -531,10 +532,12 @@ SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL",
 SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
 OUTGOING_REQUEST_TIMEOUT = env.int("OUTGOING_REQUEST_TIMEOUT", default=30)
 
+
 def OCTOPOES_FACTORY(organization: str):
     from octopoes.connector.octopoes import OctopoesAPIConnector
 
     return OctopoesAPIConnector(organization, XTDB_URI)
+
 
 BITS_DISABLED = set(env.list("BITS_DISABLED", default=[]))
 BITS_ENABLED = set(env.list("BITS_ENABLED", default=[]))

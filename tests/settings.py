@@ -3,6 +3,7 @@ from unittest.mock import patch
 import structlog
 
 from openkat.settings import *  # noqa: F401, F403, TID251
+from openkat.settings import XTDB_URI  # noqa: F401, F403, TID251
 
 STORAGES = {
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},

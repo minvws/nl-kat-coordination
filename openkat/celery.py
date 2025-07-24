@@ -24,14 +24,6 @@ app.conf.beat_schedule = {
         "schedule": settings.SCAN_LEVEL_RECALCULATION_INTERVAL,
         "args": tuple(),
     },
-    "schedule-boefjes": {
-        "task": "openkat.tasks.schedule",
-        "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-    },
-    "reschedule-boefjes": {
-        "task": "openkat.tasks.reschedule",
-        "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-    },
+    "schedule-boefjes": {"task": "openkat.tasks.schedule", "schedule": settings.SCHEDULE_INTERVAL, "args": tuple()},
+    "reschedule-boefjes": {"task": "openkat.tasks.reschedule", "schedule": settings.SCHEDULE_INTERVAL, "args": tuple()},
 }

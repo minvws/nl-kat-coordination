@@ -1,6 +1,6 @@
 import structlog
+from django.conf import settings
 
-from openkat.settings import QUEUE_NAME_OCTOPOES, GATHER_BIT_METRICS
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -20,14 +20,14 @@ def get_xtdb_client(base_uri: str, client: str) -> XTDBHTTPClient:
 
 
 def bootstrap_octopoes(client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(client, celery_app, QUEUE_NAME_OCTOPOES)
+    event_manager = EventManager(client, celery_app, settings.QUEUE_NAME_OCTOPOES)
 
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session)
     origin_param_repository = XTDBOriginParameterRepository(event_manager, xtdb_session)
     scan_profile_repository = XTDBScanProfileRepository(event_manager, xtdb_session)
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session, scan_profile_repository)
 
-    if GATHER_BIT_METRICS:
+    if settings.GATHER_BIT_METRICS:
         return OctopoesService(
             ooi_repository, origin_repository, origin_param_repository, scan_profile_repository, xtdb_session
         )

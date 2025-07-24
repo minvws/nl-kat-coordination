@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Literal
 
+from django.conf import settings
 from django.forms import Form
 from django.http import Http404
 from django.shortcuts import redirect
@@ -10,7 +11,6 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 
-from openkat.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
@@ -32,8 +32,8 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
     ooi_types = get_collapsed_types().difference(
         {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
     )
-    scan_levels = DEFAULT_SCAN_LEVEL_FILTER
-    scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
+    scan_levels = settings.DEFAULT_SCAN_LEVEL_FILTER
+    scan_profile_types = settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

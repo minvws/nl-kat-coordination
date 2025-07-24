@@ -22,10 +22,9 @@ from katalogus.worker.interfaces import Task as WorkerTask
 from katalogus.worker.job_models import BoefjeMeta, NormalizerMeta, RawData
 from katalogus.worker.models import Boefje, Normalizer
 from katalogus.worker.repository import get_local_repository
-from openkat.settings import QUEUE_NAME_OCTOPOES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.events.events import DBEvent, DBEventType
-from octopoes.models import ScanLevel, OOI
+from octopoes.models import OOI, ScanLevel
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from octopoes.xtdb.client import XTDBSession
@@ -39,7 +38,7 @@ from tasks.models import Schedule, Task, TaskResult, TaskStatus
 logger = structlog.get_logger(__name__)
 
 
-@app.task(queue=QUEUE_NAME_OCTOPOES)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def handle_event(event: dict) -> None:
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
@@ -52,18 +51,21 @@ def handle_event(event: dict) -> None:
         raise
 
 
-@app.task(queue=QUEUE_NAME_OCTOPOES)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     orgs = Organization.objects.all()
     logger.info("Scheduling scan profile recalculation for %s organizations", len(orgs))
 
     for org in orgs:
         app.send_task(
-            "openkat.tasks.recalculate_scan_profiles", (org.code,), queue=QUEUE_NAME_OCTOPOES, task_id=str(uuid.uuid4())
+            "openkat.tasks.recalculate_scan_profiles",
+            (org.code,),
+            queue=settings.QUEUE_NAME_OCTOPOES,
+            task_id=str(uuid.uuid4()),
         )
 
 
-@app.task(queue=QUEUE_NAME_OCTOPOES)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
     session = XTDBSession(get_xtdb_client(settings.XTDB_URI, org))
     octopoes = bootstrap_octopoes(org, session)
@@ -155,9 +157,7 @@ def get_expired_boefjes(
 
         for ooi in oois:
             if recent_tasks.filter(
-                data__input_ooi=ooi.primary_key,
-                organization=config.organization,
-                data__boefje__id=config.boefje.id,
+                data__input_ooi=ooi.primary_key, organization=config.organization, data__boefje__id=config.boefje.id
             ).exists():
                 logger.debug(
                     "Recent task found, skipping dispatch or boefje %s for %s on %s",
@@ -363,5 +363,8 @@ def normalizer(self, organization: str, plugin_id: str, raw_file_id: str | uuid.
     logger.info("Handled normalizer [org=%s, plugin_id=%s]", organization, plugin_id)
 
     app.send_task(
-        "openkat.tasks.recalculate_scan_profiles", (organization,), queue=QUEUE_NAME_OCTOPOES, task_id=str(uuid.uuid4())
+        "openkat.tasks.recalculate_scan_profiles",
+        (organization,),
+        queue=settings.QUEUE_NAME_OCTOPOES,
+        task_id=str(uuid.uuid4()),
     )
