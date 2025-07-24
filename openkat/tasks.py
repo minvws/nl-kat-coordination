@@ -108,7 +108,7 @@ def schedule():
     for schedule in Schedule.objects.filter(deadline_at__lte=datetime.now(timezone.utc), enabled=True):
         scheduler = scheduler_client(schedule.organization)
         task = Task.objects.create(
-            id=uuid.uuid4(), type=schedule.type, organization=schedule.organization.code, data=schedule.data
+            id=uuid.uuid4(), type=schedule.type, organization=schedule.organization, data=schedule.data
         )
         scheduler.push_task(task)
 
