@@ -9,7 +9,7 @@ from django.views.generic import FormView
 from account.mixins import OrganizationPermissionRequiredMixin
 from octopoes.models.ooi.findings import MutedFinding
 from openkat.forms.ooi import MuteFindingForm
-from openkat.ooi_helpers import create_ooi, create_oois
+from openkat.ooi_helpers import create_oois
 from openkat.views.mixins import SingleOOIMixin
 from openkat.views.ooi_view import BaseOOIDetailView
 
@@ -62,9 +62,7 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
                 self.ooi_class.model_validate({"finding": finding, "reason": reason}) for finding in selected_findings
             ]
 
-            create_oois(
-                self.octopoes_api_connector, oois, datetime.now(timezone.utc), end_valid_time
-            )
+            create_oois(self.octopoes_api_connector, oois, datetime.now(timezone.utc), end_valid_time)
 
             messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
