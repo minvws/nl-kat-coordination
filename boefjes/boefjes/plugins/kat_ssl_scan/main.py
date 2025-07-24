@@ -3,10 +3,11 @@ import subprocess
 TLS_CAPABLE_SERVICES = ("https", "ftps", "smtp", "smtps", "imaps", "pop3s", "ssh", "rpd")
 STARTTLS_CAPABLE_SERVICES = ("pop3", "ftp", "imap", "smtp", "mysql", "ldap", "xmpp")
 
+
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta["arguments"]["input"]
     hostname = None
-    if "hostname" in input.keys():
+    if "hostname" in input_:
         # we are dealing with a website
         hostname = input_["hostname"]["name"]
         ip = input_["ip_service"]["ip_port"]["address"]["address"]
@@ -14,29 +15,29 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
         port = input_["ip_service"]["ip_port"]["ip"]
         servicename = input_["ip_service"]["service"]["name"]
     else:
-        # we are dealing with an IP-service        
+        # we are dealing with an IP-service
         ip = input_["ip_port"]["address"]["address"]
         ipfamily = input_["ip_port"]["address"]["object_type"]
-        port = input_["ip_port"]["ip"]        
+        port = input_["ip_port"]["ip"] 
         servicename = input_["service"]["name"]
-    
+
     if servicename not in TLS_CAPABLE_SERVICES + STARTTLS_CAPABLE_SERVICES:
         return [({"info/boefje"}, "Skipping check due to non-TLS/STARTTLS service")]
 
     command = ["/usr/bin/sslscan", "--no-colour", "--show-sigs"]
     if servicename in STARTTLS_CAPABLE_SERVICES:
-        command.append("-starttls-%s" % servicename)
+        command.append(f"-starttls-{servicename}")
     elif servicename == "rpd":
         command.append("-rdp")
 
     if hostname:
         command.extend(["--sni-name=", hostname])
 
-    target = "%s:%i" % (ip, port)
-    if input_ooi == "IPAddressV6":
-        target = "[%s]:%i" % (ip, port)
+    target = f"{ip}:{port}" % (ip, port)
+    if ipfamily == "IPAddressV6":
+        target = f"[{ip}]:{port}" % (ip, port)
 
-    command.extend([ "--xml=-", target])
+    command.extend(["--xml=-", target])
     output = subprocess.run(command, capture_output=True)
     output.check_returncode()
 
