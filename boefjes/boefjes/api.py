@@ -88,18 +88,22 @@ def boefje_output(
     boefje_meta.started_at = task.modified_at
     boefje_meta.ended_at = datetime.now(timezone.utc)
 
-    bytes_client.login()
-    bytes_client.save_boefje_meta(boefje_meta)
+    try:
+        bytes_client.login()
+        bytes_client.save_boefje_meta(boefje_meta)
 
-    bytes_response = {}
+        bytes_response = {}
 
-    if boefje_output.files:
-        mime_types = _default_mime_types(boefje_meta.boefje)
-        for file in boefje_output.files:
-            file.tags = set(mime_types.union(file.tags)) if file.tags else set(mime_types)
+        if boefje_output.files:
+            mime_types = _default_mime_types(boefje_meta.boefje)
+            for file in boefje_output.files:
+                file.tags = set(mime_types.union(file.tags)) if file.tags else set(mime_types)
 
-        # when supported, also save file.name to Bytes
-        bytes_response = bytes_client.save_raws(task_id, boefje_output)
+            # when supported, also save file.name to Bytes
+            bytes_response = bytes_client.save_raws(task_id, boefje_output)
+    except HTTPError:
+        scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+        return {}
 
     if boefje_output.status == StatusEnum.COMPLETED:
         scheduler_client.patch_task(task_id, TaskStatus.COMPLETED)

@@ -6,7 +6,9 @@ ENV PYTHONPATH=/app/boefje:/app
 
 WORKDIR /app/boefje
 RUN adduser --disabled-password --gecos '' nonroot
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx structlog pydantic jsonschema croniter click
+
+COPY ./images/requirements.txt ./requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install -r requirements.txt
 
 USER nonroot
 
