@@ -681,7 +681,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         asset_reports = self.get_asset_reports()
         raws = File.objects.filter(id__in=[r.data_raw_id for r in asset_reports])
-        bytes_datas = {raw.id: json.loads(raw.file.read()) for raw in raws}
+        bytes_datas = {str(raw.id): json.loads(raw.file.read()) for raw in raws}
         ooi_pks = set()
 
         for report in asset_reports:

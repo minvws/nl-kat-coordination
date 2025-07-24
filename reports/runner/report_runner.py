@@ -200,7 +200,7 @@ def create_asset_reports(
                 organization_code=organization.code,
                 organization_name=organization.name,
                 organization_tags=[tag.name for tag in organization.tags.all()],
-                data_raw_id=str(asset_raw_file),
+                data_raw_id=str(asset_raw_file.id),
                 date_generated=now,
                 reference_date=observed_at,
                 input_ooi=reference,
