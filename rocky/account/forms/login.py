@@ -1,8 +1,5 @@
-import structlog
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-
-logger = structlog.get_logger(__name__)
 
 
 class LoginForm(AuthenticationForm):
