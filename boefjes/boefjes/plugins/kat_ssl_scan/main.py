@@ -1,6 +1,7 @@
 import subprocess
 
-TLS_CAPABLE_SERVICES = ("https", "ftp", "ftps", "smtps", "xmpp", "imaps", "pop3s", "pop3", "ldap", "mysql", "ssh", "rpd")
+TLS_CAPABLE_SERVICES = ("https", "ftps", "smtp", "smtps", "imaps", "pop3s", "ssh", "rpd")
+STARTTLS_CAPABLE_SERVICES = ("pop3", "ftp", "imap", "smtp", "mysql", "ldap", "xmpp")
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta["arguments"]["input"]
@@ -9,28 +10,33 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
         # we are dealing with a website
         hostname = input_["hostname"]["name"]
         ip = input_["ip_service"]["ip_port"]["address"]["address"]
+        ipfamily = input_["ip_service"]["ip_port"]["address"]["object_type"]
         port = input_["ip_service"]["ip_port"]["ip"]
         servicename = input_["ip_service"]["service"]["name"]
     else:
-        # we are dealing with an IP-servive        
+        # we are dealing with an IP-service        
         ip = input_["ip_port"]["address"]["address"]
+        ipfamily = input_["ip_port"]["address"]["object_type"]
         port = input_["ip_port"]["ip"]        
         servicename = input_["service"]["name"]
     
-    if servicename not in TLS_CAPABLE_SERVICES:
-        return [({"info/boefje"}, "Skipping check due to non-TLS service")]
+    if servicename not in TLS_CAPABLE_SERVICES + STARTTLS_CAPABLE_SERVICES:
+        return [({"info/boefje"}, "Skipping check due to non-TLS/STARTTLS service")]
 
     command = ["/usr/bin/sslscan", "--no-colour", "--show-sigs"]
-    if servicename in ("pop3", "ftp", "mysql"):
-        command.append("-starttls")
-    elif servicename == "ldap":
-        command.append("--starttls-ldap")
+    if servicename in STARTTLS_CAPABLE_SERVICES:
+        command.append("-starttls-%s" % servicename)
     elif servicename == "rpd":
         command.append("-rdp")
-    elif servicename == "https" and hostname:
+
+    if hostname:
         command.extend(["--sni-name=", hostname])
 
-    command.extend([ "--xml=-", ip])
+    target = "%s:%i" % (ip, port)
+    if input_ooi == "IPAddressV6":
+        target = "[%s]:%i" % (ip, port)
+
+    command.extend([ "--xml=-", target])
     output = subprocess.run(command, capture_output=True)
     output.check_returncode()
 
