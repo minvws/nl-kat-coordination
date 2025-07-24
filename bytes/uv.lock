@@ -195,7 +195,7 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.35.15,<2" },
     { name = "cachetools", specifier = ">=5.3.1,<6" },
     { name = "cryptography", specifier = ">=44.0.1,<45" },
-    { name = "fastapi-slim", specifier = ">=0.115.2,<0.116" },
+    { name = "fastapi-slim", specifier = ">=0.115.2" },
     { name = "httpx", specifier = ">=0.28.1,<0.29" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp-proto-common" },
@@ -519,16 +519,16 @@ wheels = [
 
 [[package]]
 name = "fastapi-slim"
-version = "0.115.14"
+version = "0.116.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/b8/064d0c30574a95107ea3983d8feb721268661148afe9e3e1a3d48e34b99b/fastapi_slim-0.115.14.tar.gz", hash = "sha256:5a42f18d1a0bf8166c6cb4aebe9360816a77a139881996bad8c4f876cc1fa76e", size = 296354, upload-time = "2025-06-26T15:29:27.711Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/80/2540fb851fe4b407856ba1cad8b27e48d511413c18a082aafc86f182fb1c/fastapi_slim-0.116.1.tar.gz", hash = "sha256:5dca6046d3a3e35eb733188649a9f883c9d49474b9b3255ecb8ec52a820fbb9f", size = 296505, upload-time = "2025-07-11T16:22:29.079Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/88/c8/bc7850854d50babcbcf0c46e38edd7b603f95cef042793c795d3bcc95a8e/fastapi_slim-0.115.14-py3-none-any.whl", hash = "sha256:34ba4a3dff5a86adac92a72d02ac539039be5a21dfc39cac081bb87494c42674", size = 95567, upload-time = "2025-06-26T15:29:26.341Z" },
+    { url = "https://files.pythonhosted.org/packages/03/0c/94090f4ba0ae3b3117d50e3964311f34232ee379814585cbca042b1f2a0a/fastapi_slim-0.116.1-py3-none-any.whl", hash = "sha256:37517a302492c30014979cff8d85f42ae5fbdbe4f8b5d0ceed81745bb3b23149", size = 95683, upload-time = "2025-07-11T16:22:27.379Z" },
 ]
 
 [[package]]
@@ -1440,14 +1440,15 @@ wheels = [
 
 [[package]]
 name = "starlette"
-version = "0.46.2"
+version = "0.47.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ce/20/08dfcd9c983f6a6f4a1000d934b9e6d626cff8d2eeb77a89a68eef20a2b7/starlette-0.46.2.tar.gz", hash = "sha256:7f7361f34eed179294600af672f565727419830b54b7b084efe44bb82d2fccd5", size = 2580846, upload-time = "2025-04-13T13:56:17.942Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/57/d062573f391d062710d4088fa1369428c38d51460ab6fedff920efef932e/starlette-0.47.2.tar.gz", hash = "sha256:6ae9aa5db235e4846decc1e7b79c4f346adf41e9777aebeb49dfd09bbd7023d8", size = 2583948, upload-time = "2025-07-20T17:31:58.522Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/0c/9d30a4ebeb6db2b25a841afbb80f6ef9a854fc3b41be131d249a977b4959/starlette-0.46.2-py3-none-any.whl", hash = "sha256:595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35", size = 72037, upload-time = "2025-04-13T13:56:16.21Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/1f/b876b1f83aef204198a42dc101613fefccb32258e5428b5f9259677864b4/starlette-0.47.2-py3-none-any.whl", hash = "sha256:c5847e96134e5c5371ee9fac6fdf1a67336d5815e09eb2a01fdb57a351ef915b", size = 72984, upload-time = "2025-07-20T17:31:56.738Z" },
 ]
 
 [[package]]
