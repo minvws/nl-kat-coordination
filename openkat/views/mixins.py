@@ -61,7 +61,7 @@ class OriginData(BaseModel):
         if (observation_date := self.normalizer.get("raw_data", {}).get("boefje_meta", {}).get("ended_at")) is None:
             raise ValueError("Observation date is missing in normalizer meta")
 
-        observation_date = observation_date.replace(tzinfo=timezone.utc)
+        observation_date = datetime.fromisoformat(observation_date).replace(tzinfo=timezone.utc)
 
         return observation_date < datetime.now(timezone.utc) - time_delta
 
@@ -141,8 +141,8 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             task = Task.objects.get(id=origin.origin.task_id)
             origin.normalizer = task.data
 
-            if task.data["boefje_meta"]["boefje"]["id"] != "manual":
-                origin.boefje = katalogus.get_plugin(task.data["boefje_meta"]["boefje"]["id"])
+            if task.data["raw_data"]["boefje_meta"]["boefje"]["id"] != "manual":
+                origin.boefje = katalogus.get_plugin(task.data["raw_data"]["boefje_meta"]["boefje"]["id"])
             observations.append(origin)
 
         return results
