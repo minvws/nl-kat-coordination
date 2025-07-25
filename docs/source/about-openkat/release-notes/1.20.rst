@@ -36,7 +36,7 @@ Bug fixes
 =========
 
 * Make it possible to use SSL with PostgreSQL without a client certificate.
-* Fixed handling of boefje task that fails.
+* Fixed handling of a boefje task that fails.
 * Fixed dnssec false positives with cnames.
 * Fixed bug that report runner would lose the database connection and not reconnect.
 * Fixed AttributeError in onboarding when WebURL could not be found.
