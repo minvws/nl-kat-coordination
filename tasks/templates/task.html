@@ -1,0 +1,24 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="two-thirds-one-third">
+                <div>
+                    <h1>Task: {{ task.id }}</h1>
+                    <p class="emphasized">{{ task.organization.code }}</p>
+                    <p class="emphasized">{{ task.type }}</p>
+                    <p class="emphasized">{{ task.status }}</p>
+                    <p class="emphasized">{{ task.created_at }}</p>
+                    <p class="emphasized">{{ task.modified_at }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

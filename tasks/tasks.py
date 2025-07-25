@@ -263,7 +263,7 @@ def boefje(self, organization: str, plugin_id: str, input_ooi: str) -> None:
 @app.task(bind=True)
 def docker_boefje(self, organization: str, plugin_id: str, input_ooi: str) -> None:
     logger.info(
-        "Starting task %s for ontainerized boefje [org=%s, plugin_id=%s]", self.request.id, organization, plugin_id
+        "Starting task %s for containerized boefje [org=%s, plugin_id=%s]", self.request.id, organization, plugin_id
     )
 
     handler = DockerBoefjeHandler()
