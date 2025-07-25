@@ -20,7 +20,7 @@ of objects.
 New Features
 ============
 
-* Report sections can be added to the dashboard.
+* Report sections can be added to a dashboard.
 * Organizations are ordered by name everywhere in the web interface.
 * Added warnings when you don't have permissions to set clearance level or indemnification is missing.
 * A number of design / style issues have been fixed / improved in the web interface.
