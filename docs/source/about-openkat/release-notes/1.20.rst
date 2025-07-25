@@ -13,7 +13,7 @@ enabled by setting `BOEFJES_DEDUPLICATE`.
 In 1.20 we finished the containerization of all boefjes. All boefjes are run
 sandboxed as containers now.
 
-Asset reports have been made optional and can be disabled by settings
+Asset reports have been made optional and can be disabled by setting
 `ASSET_REPORTS`. This is advised when you are creating reports on a large number
 of objects.
 
