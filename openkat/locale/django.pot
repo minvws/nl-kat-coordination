@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-25 08:16+0000\n"
+"POT-Creation-Date: 2025-07-25 19:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -774,6 +774,8 @@ msgstr ""
 #: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: plugins/templates/enabled_plugin_form.html
+#: plugins/templates/new_enable_disable_plugin.html
 #: reports/report_types/dns_report/report.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 msgid "Enabled"
@@ -783,6 +785,8 @@ msgstr ""
 #: katalogus/templates/partials/enable_disable_plugin.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: plugins/templates/enabled_plugin_form.html
+#: plugins/templates/new_enable_disable_plugin.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Disabled"
@@ -810,10 +814,12 @@ msgstr ""
 
 #: katalogus/templates/about_plugins.html
 #: katalogus/templates/partials/plugins_navigation.html
+#: plugins/templates/about_plugins.html
 msgid "About plugins"
 msgstr ""
 
 #: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+#: plugins/templates/about_plugins.html plugins/templates/plugin_list.html
 msgid ""
 "Plugins gather data, objects and insight. Each plugin has its own focus area "
 "and strengths and may be able to work with other plugins to gain even more "
@@ -821,6 +827,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
+#: plugins/templates/about_plugins.html
 msgid ""
 "Boefjes are used to scan for objects. They detect vulnerabilities, security "
 "issues, and give insight. Each boefje is a separate scan that can run on a "
@@ -828,12 +835,13 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
+#: plugins/templates/about_plugins.html
 msgid ""
 "Normalizers analyze the information and turn it into objects for the data "
 "model in Octopoes."
 msgstr ""
 
-#: katalogus/templates/about_plugins.html
+#: katalogus/templates/about_plugins.html plugins/templates/about_plugins.html
 msgid ""
 "Bits are business rules that look for insight within the current dataset and "
 "search for specific insight and draw conclusions."
@@ -842,21 +850,22 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/partials/plugin_tile_modal.html
 #: katalogus/templates/plugin_container_image.html
+#: plugins/templates/plugin.html
 msgid "Scan level"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
+#: katalogus/templates/normalizer_detail.html plugins/templates/plugin.html
 msgid "Consumes"
 msgstr ""
 
-#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/boefje_detail.html plugins/templates/plugin.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
+#: katalogus/templates/normalizer_detail.html plugins/templates/plugin.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr ""
@@ -930,7 +939,7 @@ msgid "Add Boefje"
 msgstr ""
 
 #: katalogus/templates/boefjes.html katalogus/templates/katalogus.html
-#: katalogus/templates/normalizers.html
+#: katalogus/templates/normalizers.html plugins/templates/plugin_list.html
 msgid "available"
 msgstr ""
 
@@ -1008,7 +1017,7 @@ msgstr ""
 msgid "Clone"
 msgstr ""
 
-#: katalogus/templates/katalogus.html
+#: katalogus/templates/katalogus.html plugins/templates/plugin_list.html
 msgid "All plugins"
 msgstr ""
 
@@ -1083,10 +1092,14 @@ msgid "See details"
 msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
+#: plugins/templates/enabled_plugin_form.html
+#: plugins/templates/new_enable_disable_plugin.html
 msgid "Enable"
 msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
+#: plugins/templates/enabled_plugin_form.html
+#: plugins/templates/new_enable_disable_plugin.html
 #: openkat/templates/two_factor/profile/disable.html
 msgid "Disable"
 msgstr ""
@@ -1134,6 +1147,7 @@ msgid "KAT-alogus"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_header.html
+#: plugins/templates/plugin_list.html
 msgid "An overview of all available plugins."
 msgstr ""
 
@@ -1262,10 +1276,12 @@ msgid "Go to boefje detail page"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: plugins/templates/plugin_table.html
 msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: plugins/templates/plugin_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin name"
 msgstr ""
@@ -1276,11 +1292,13 @@ msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: plugins/templates/plugin_table.html
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin description"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: plugins/templates/plugin_table.html
 #: reports/templates/partials/report_header.html
 #: reports/templates/report_overview/report_history_table.html
 #: openkat/templates/organizations/organization_list.html
@@ -1289,6 +1307,7 @@ msgid "Actions"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: plugins/templates/plugin_table.html
 msgid "Detail page"
 msgstr ""
 
@@ -1357,6 +1376,7 @@ msgstr ""
 #: katalogus/templates/plugin_container_image.html
 #: reports/report_types/tls_report/report.html
 #: reports/templates/partials/plugin_overview_table.html
+#: tasks/templates/task_list.html
 #: openkat/templates/organizations/organization_member_list.html
 #: openkat/templates/tasks/boefjes.html
 #: openkat/templates/tasks/normalizers.html
@@ -1398,7 +1418,7 @@ msgstr ""
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: openkat/templates/findings/finding_list.html
+#: tasks/templates/task_list.html openkat/templates/findings/finding_list.html
 #: openkat/templates/organizations/organization_crisis_room.html
 #: openkat/templates/tasks/boefjes.html
 #: openkat/templates/tasks/normalizers.html
@@ -1414,7 +1434,7 @@ msgstr ""
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: openkat/templates/findings/finding_list.html
+#: tasks/templates/task_list.html openkat/templates/findings/finding_list.html
 #: openkat/templates/organizations/organization_crisis_room.html
 #: openkat/templates/tasks/boefjes.html
 #: openkat/templates/tasks/normalizers.html
@@ -2456,6 +2476,16 @@ msgstr ""
 msgid "{name} successfully created."
 msgstr ""
 
+#: plugins/templates/plugin_list.html plugins/views.py
+#: reports/templates/partials/report_setup_scan.html
+#: reports/templates/summary/selected_plugins.html tasks/views.py
+msgid "Plugins"
+msgstr ""
+
+#: plugins/views.py tasks/views.py
+msgid "Plugin Detail"
+msgstr ""
+
 #: reports/forms.py openkat/forms/ooi_form.py
 msgid "Filter by OOI types"
 msgstr ""
@@ -3057,7 +3087,7 @@ msgstr ""
 #: reports/templates/partials/report_findings_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
 #: reports/templates/summary/selected_plugins.html
-#: openkat/templates/findings/finding_list.html
+#: tasks/templates/task_list.html openkat/templates/findings/finding_list.html
 #: openkat/templates/organizations/organization_crisis_room.html
 #: openkat/templates/partials/ooi_report_findings_block_table.html
 #: openkat/templates/tasks/boefjes.html
@@ -4065,11 +4095,6 @@ msgid "Set up the required plugins for this report."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-#: reports/templates/summary/selected_plugins.html
-msgid "Plugins"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "KAT will be able to generate a full report when all the required and "
 "suggested boefjes are enabled."
@@ -4708,6 +4733,45 @@ msgstr ""
 
 #: reports/views/view_helpers.py
 msgid "3: Export setup"
+msgstr ""
+
+#: tasks/templates/task_list.html tasks/views.py openkat/templates/header.html
+#: openkat/templates/tasks/ooi_detail_task_list.html
+#: openkat/templates/tasks/partials/tasks_overview_header.html
+#: openkat/templates/tasks/plugin_detail_task_list.html
+#: openkat/views/task_detail.py openkat/views/tasks.py
+msgid "Tasks"
+msgstr ""
+
+#: tasks/templates/task_list.html
+msgid "There are no tasks."
+msgstr ""
+
+#: tasks/templates/task_list.html
+msgid "List of tasks."
+msgstr ""
+
+#: tasks/templates/task_list.html
+#: openkat/templates/oois/ooi_detail_origins_observations.html
+msgid "Task ID"
+msgstr ""
+
+#: tasks/templates/task_list.html openkat/templates/tasks/boefjes.html
+#: openkat/templates/tasks/reports.html
+msgid "Organization Code"
+msgstr ""
+
+#: tasks/templates/task_list.html openkat/templates/tasks/boefjes.html
+#: openkat/templates/tasks/normalizers.html
+#: openkat/templates/tasks/ooi_detail_task_list.html
+#: openkat/templates/tasks/plugin_detail_task_list.html
+msgid "Created date"
+msgstr ""
+
+#: tasks/templates/task_list.html openkat/templates/tasks/boefjes.html
+#: openkat/templates/tasks/normalizers.html
+#: openkat/templates/tasks/reports.html
+msgid "Modified date"
 msgstr ""
 
 #: openkat/forms/base.py
@@ -5688,14 +5752,6 @@ msgid "Crisis room"
 msgstr ""
 
 #: openkat/templates/header.html
-#: openkat/templates/tasks/ooi_detail_task_list.html
-#: openkat/templates/tasks/partials/tasks_overview_header.html
-#: openkat/templates/tasks/plugin_detail_task_list.html
-#: openkat/views/task_detail.py openkat/views/tasks.py
-msgid "Tasks"
-msgstr ""
-
-#: openkat/templates/header.html
 #: openkat/templates/organizations/organization_member_list.html
 #: openkat/view_helpers.py openkat/views/organization_member_edit.py
 msgid "Members"
@@ -6042,10 +6098,6 @@ msgstr ""
 
 #: openkat/templates/oois/ooi_detail_origins_observations.html
 msgid "Last observed by"
-msgstr ""
-
-#: openkat/templates/oois/ooi_detail_origins_observations.html
-msgid "Task ID"
 msgstr ""
 
 #: openkat/templates/oois/ooi_detail_origins_observations.html
@@ -6798,23 +6850,6 @@ msgstr ""
 
 #: openkat/templates/tasks/boefjes.html
 msgid "List of tasks for boefjes."
-msgstr ""
-
-#: openkat/templates/tasks/boefjes.html openkat/templates/tasks/reports.html
-msgid "Organization Code"
-msgstr ""
-
-#: openkat/templates/tasks/boefjes.html
-#: openkat/templates/tasks/normalizers.html
-#: openkat/templates/tasks/ooi_detail_task_list.html
-#: openkat/templates/tasks/plugin_detail_task_list.html
-msgid "Created date"
-msgstr ""
-
-#: openkat/templates/tasks/boefjes.html
-#: openkat/templates/tasks/normalizers.html
-#: openkat/templates/tasks/reports.html
-msgid "Modified date"
 msgstr ""
 
 #: openkat/templates/tasks/normalizers.html
