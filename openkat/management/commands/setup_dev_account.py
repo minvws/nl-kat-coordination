@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         redteamer_permissions = [
             "can_scan_organization",
-            "can_enable_disable_boefje",
+            "can_enable_disable_plugin",
             "can_add_boefje",
             "can_set_clearance_level",
             "can_delete_oois",

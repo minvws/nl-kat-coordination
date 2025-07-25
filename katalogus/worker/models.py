@@ -35,6 +35,7 @@ class Plugin(BaseModel):
     created: datetime.datetime | None = None
     description: str | None = None
     enabled: bool = False
+    recurrences: str | None = None
     static: bool = True  # We need to differentiate between local and remote plugins to know which ones can be deleted
 
     def __str__(self):
@@ -91,6 +92,7 @@ class BoefjeConfig(BaseModel):
 
 class Normalizer(Plugin):
     type: Literal["normalizer"] = "normalizer"
+    scan_level: int = 0
     consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
     produces: list[str] = Field(default_factory=list)  # oois
     enabled: bool = True

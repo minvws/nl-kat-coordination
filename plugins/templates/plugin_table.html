@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load static %}
+
+<div class="horizontal-scroll sticky-column">
+    <table class="plugins">
+        <caption>{% translate "Plugins overview:" %}</caption>
+        <thead>
+            <tr>
+                <th>{% translate "Plugin name" %}</th>
+                <th>{% translate "Plugin description" %}</th>
+                <th>{% translate "Actions" %}</th>
+                <th class="visually-hidden">{% translate "Detail page" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plugin in object_list %}
+                <tr id="plugin_{{ plugin.id|slugify }}">
+                    <td scope="row">{{ plugin.name }}</td>
+                    <td>
+                        <span class="plugin-description">{{ plugin.description }}</span>
+                    </td>
+                    <td>
+                        {% include "new_enable_disable_plugin.html" with plugin=plugin %}
+
+                    </td>
+                    <td class="sticky-cell">
+                        <a href="{% url "plugin_detail" pk=plugin.id %}"
+                           class="nowrap icon-only">
+                            {% translate "Detail page" %}
+                            <span class="icon ti-chevron-right" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

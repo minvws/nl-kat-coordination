@@ -117,7 +117,7 @@ class ExportSetupAggregateReportView(
         if not selected_plugins:
             return super().post(request, *args, **kwargs)
 
-        if not self.organization_member.has_perm("openkat.can_enable_disable_boefje"):
+        if not self.organization_member.has_perm("openkat.can_enable_disable_plugin"):
             messages.error(request, _("You do not have the required permissions to enable plugins."))
             return PostRedirect(self.get_previous())
 

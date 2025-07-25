@@ -264,7 +264,7 @@ class OnboardingSetupScanSelectPluginsView(
     """
 
     template_name = "step_3g_setup_scan_select_plugins.html"
-    permission_required = "openkat.can_enable_disable_boefje"
+    permission_required = "openkat.can_enable_disable_plugin"
     current_step = 3
     plugins: ReportPlugins = DNSReport.plugins
 

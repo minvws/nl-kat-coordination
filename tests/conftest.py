@@ -139,7 +139,7 @@ def add_redteam_group_permissions(member):
         Permission.objects.filter(
             codename__in=[
                 "can_scan_organization",
-                "can_enable_disable_boefje",
+                "can_enable_disable_plugin",
                 "can_set_clearance_level",
                 "can_delete_oois",
                 "can_mute_findings",
@@ -1699,7 +1699,6 @@ def aggregate_report_with_sub_reports():
 def reports_task_list_db(organization):
     task_a = TaskDB.objects.create(
         organization=organization,
-        priority=1738747928,
         status=TaskStatus.FAILED.value,
         type="report",
         data=ReportTask(
@@ -1708,7 +1707,6 @@ def reports_task_list_db(organization):
     )
     task_b = TaskDB.objects.create(
         organization=organization,
-        priority=1738684879,
         status=TaskStatus.COMPLETED.value,
         type="report",
         data=ReportTask(

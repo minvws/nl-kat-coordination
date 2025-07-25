@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_wappalyzer_normalize",
-  "name": "Wappalyzer",
+  "name": "Wappalyzer normalizer",
   "description": "Checks HTTP responses for Software versions.",
   "consumes": [
     "application/json+har"

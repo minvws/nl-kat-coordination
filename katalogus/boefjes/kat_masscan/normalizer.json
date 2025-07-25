@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_masscan_normalize",
-  "name": "masscan",
+  "name": "masscan normalizer",
   "description": "Parse output from masscan into open ports for each scanned IP.",
   "consumes": [
     "boefje/masscan"

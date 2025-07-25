@@ -1,6 +1,6 @@
 {
   "plugin_id": "adr-validator-normalize",
-  "name": "API Design Rules validator",
+  "name": "API Design Rules validator normalizer",
   "description": "Parses and validates the API Design Rules (ADR). https://www.forumstandaardisatie.nl/open-standaarden/rest-api-design-rules",
   "consumes": [
     "boefje/adr-validator"

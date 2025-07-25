@@ -333,19 +333,19 @@ class KATalogus:
         return self._katalogus_client.get_boefjes(self._member.organization.code)
 
     def enable_plugin(self, plugin: Boefje | Normalizer) -> None:
-        if not self._member.has_perm("openkat.can_enable_disable_boefje"):
+        if not self._member.has_perm("openkat.can_enable_disable_plugin"):
             raise KATalogusNotAllowedError(_("User is not allowed to enable plugins"))
 
         return self._katalogus_client.enable_plugin(self._member.organization.code, plugin)
 
     def enable_boefje_by_id(self, boefje_id: int) -> None:
-        if not self._member.has_perm("openkat.can_enable_disable_boefje"):
+        if not self._member.has_perm("openkat.can_enable_disable_plugin"):
             raise KATalogusNotAllowedError(_("User is not allowed to enable plugins"))
 
         return self._katalogus_client.enable_boefje_by_id(self._member.organization.code, boefje_id)
 
     def disable_plugin(self, plugin: Boefje | Normalizer) -> None:
-        if not self._member.has_perm("openkat.can_enable_disable_boefje"):
+        if not self._member.has_perm("openkat.can_enable_disable_plugin"):
             raise KATalogusNotAllowedError(_("User is not allowed to disable plugins"))
 
         return self._katalogus_client.disable_plugin(self._member.organization.code, plugin)

@@ -46,7 +46,6 @@ class Task(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name="tasks", null=True)
     organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True)
     type = models.CharField(max_length=32)
-    priority = models.IntegerField(default=1)
     data = models.JSONField(default=dict)
     status = models.CharField(max_length=16, choices=TaskStatus.choices, default=TaskStatus.PENDING)
 

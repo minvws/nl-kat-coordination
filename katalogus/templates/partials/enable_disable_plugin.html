@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if perms.openkat.can_enable_disable_boefje %}
+{% if perms.openkat.can_enable_disable_plugin %}
     <form action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
           method="post"
           class="inline">

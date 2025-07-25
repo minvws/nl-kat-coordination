@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_ssl_certificates_normalize",
-  "name": "SSL certificates",
+  "name": "SSL certificates normalizer",
   "description": "Parses SSL certificates data into X509 certificates.",
   "consumes": [
     "boefje/ssl-certificates"

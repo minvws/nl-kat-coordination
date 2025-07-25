@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_snyk_normalize",
-  "name": "Snyk.io",
+  "name": "Snyk.io normalizer",
   "description": "Parses Snyk.io data into various findings.",
   "consumes": [
     "boefje/snyk"

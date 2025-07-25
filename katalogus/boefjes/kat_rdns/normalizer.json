@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_rdns_normalize",
-  "name": "Reverse DNS",
+  "name": "Reverse DNS normalizer",
   "description": "Parses reverse DNS data into PTR records.",
   "consumes": [
     "boefje/rdns"

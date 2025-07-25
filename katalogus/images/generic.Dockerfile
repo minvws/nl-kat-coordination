@@ -14,7 +14,6 @@ COPY --chown=nonroot katalogus/boefjes/kat_censys boefjes/plugins/kat_censys
 COPY --chown=nonroot katalogus/boefjes/kat_crt_sh boefjes/plugins/kat_crt_sh
 COPY --chown=nonroot katalogus/boefjes/kat_cve_2023_34039 boefjes/plugins/kat_cve_2023_34039
 COPY --chown=nonroot katalogus/boefjes/kat_cve_2023_35078 boefjes/plugins/kat_cve_2023_35078
-COPY --chown=nonroot katalogus/boefjes/kat_cve_finding_types boefjes/plugins/kat_cve_finding_types
 COPY --chown=nonroot katalogus/boefjes/kat_cwe_finding_types boefjes/plugins/kat_cwe_finding_types
 COPY --chown=nonroot katalogus/boefjes/kat_dicom boefjes/plugins/kat_dicom
 COPY --chown=nonroot katalogus/boefjes/kat_dns boefjes/plugins/kat_dns

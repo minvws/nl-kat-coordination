@@ -26,7 +26,6 @@ from kombu import Queue
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from openkat.otel import OpenTelemetryHelper
 
 env = environ.Env()
 
@@ -109,10 +108,6 @@ TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", not REMOTE_USER_HEADER)
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
 
-SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT", default=None)
-if SPAN_EXPORT_GRPC_ENDPOINT is not None:
-    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
-
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
@@ -168,6 +163,7 @@ INSTALLED_APPS = [
     "katalogus",
     "tasks",
     "files",
+    "plugins",
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",
@@ -199,9 +195,6 @@ MIDDLEWARE += [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "openkat.middleware.onboarding.OnboardingMiddleware",
 ]
-
-if SPAN_EXPORT_GRPC_ENDPOINT is not None:
-    MIDDLEWARE += ["openkat.middleware.otel.OTELInstrumentTemplateMiddleware"]
 
 ROOT_URLCONF = "openkat.urls"
 

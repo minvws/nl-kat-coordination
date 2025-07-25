@@ -28,7 +28,6 @@ class Task(BaseModel):
     id: uuid.UUID
     schedule_id: str | None
     organization: str
-    priority: int
     status: TaskStatus
     type: str
     data: BoefjeMeta | NormalizerMeta
@@ -41,7 +40,6 @@ class Task(BaseModel):
             id=task.id,
             schedule_id=task.schedule_id,
             organization=task.organization.code,
-            priority=task.priority,
             status=task.status,
             type=task.type,
             data=task.data,

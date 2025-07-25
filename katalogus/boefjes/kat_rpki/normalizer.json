@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_rpki_normalize",
-  "name": "RPKI",
+  "name": "RPKI normalizer",
   "description": "Parses RPKI data into findings.",
   "consumes": [
     "rpki/results"

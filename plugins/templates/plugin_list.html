@@ -1,0 +1,41 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        {% include "partials/no_enabling_permission_message.html" %}
+
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Plugins" %}</h1>
+                    <p>{% translate "An overview of all available plugins." %}</p>
+                </div>
+            </div>
+            <div class="fifty-fifty">
+                <div>
+                    <h2>{% translate "All plugins" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Plugins gather data, objects and insight. Each plugin has its own focus area
+                            and strengths and may be able to work with other plugins to gain even more insights.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <div class="fifty-fifty">
+                    <p>
+                        <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
+                    </p>
+                </div>
+                {% include "plugin_table.html" %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}

@@ -8,7 +8,7 @@ from reports.views.base import get_selection
 ONBOARDING_PERMISSIONS = (
     "openkat.can_scan_organization",
     "openkat.can_set_clearance_level",
-    "openkat.can_enable_disable_boefje",
+    "openkat.can_enable_disable_plugin",
 )
 
 DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1

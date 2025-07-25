@@ -36,7 +36,7 @@ dashboards:
 docker_init: build
 	docker compose run --rm openkat make -j 4 init
 
-init: user seed messages sync
+init: user seed messages sync nsync
 
 user:
 	-python manage.py createsuperuser --no-input
@@ -49,6 +49,9 @@ messages:
 
 sync:
 	-python manage.py sync
+
+nsync:
+	-python manage.py nsync
 
 frontend:
 	docker run --rm -v $$PWD:/app/openkat node:20-bookworm sh -c "cd /app/openkat && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"

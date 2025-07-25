@@ -1,6 +1,6 @@
 {
   "plugin_id": "kat_dnssec_normalize",
-  "name": "DNS records",
+  "name": "DNSSEC normalizer",
   "description": "Parses DNSSEC data into findings.",
   "consumes": [
     "boefje/dns-sec",
