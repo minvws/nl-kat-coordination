@@ -28,6 +28,7 @@ New Features
 * Number of calls from mula to octopoes have been optimized.
 * More settings and env variables are hidden in debug mode to prevent logging of credentials
 * Auth token can only be used to in the API tokens, not in the other views.
+* The boefje containers can only talk to the boefje API now, not to the other services.
 * The question object has been changed to also show the current answer.
 * The onboarding has been improved and simplified.
 
