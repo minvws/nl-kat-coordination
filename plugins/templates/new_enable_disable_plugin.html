@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if perms.openkat.can_enable_disable_plugin %}
-    <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_plugin_enabled" pk=plugin.enabled_id %} {% endif %}"
+    <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
           method="post"
           class="inline">
         {% csrf_token %}
