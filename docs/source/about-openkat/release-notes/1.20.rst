@@ -54,12 +54,13 @@ or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
 Boefje container images
 -----------------------
 
-The boefje container images of 1.19 are not compatible with 1.20. You need to
-pull the updates images:
+The boefje container images of 1.19 are not compatible with 1.20. The simplest
+way to use the latest boefje images is to delete them and let docker download
+the latest version:
 
-```shell
-docker image rm ghcr.io/minvws/openkat/dns-sec:latest ghcr.io/minvws/openkat/export-http:latest ghcr.io/minvws/openkat/nmap:latest
-```
+.. code-block:: sh
+
+    docker image rm ghcr.io/minvws/openkat/dns-sec:latest ghcr.io/minvws/openkat/export-http:latest ghcr.io/minvws/openkat/nmap:latest
 
 
 Full Changelog
