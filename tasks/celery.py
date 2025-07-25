@@ -20,19 +20,19 @@ def config_loggers(*args, **kwargs):
 
 app.conf.beat_schedule = {
     "schedule-scan-profile-recalculations": {
-        "task": "openkat.tasks.schedule_scan_profile_recalculations",
+        "task": "tasks.tasks.schedule_scan_profile_recalculations",
         "schedule": settings.SCAN_LEVEL_RECALCULATION_INTERVAL,
         "args": tuple(),
         "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},
     },
     "schedule-boefjes": {
-        "task": "openkat.tasks.schedule",
+        "task": "tasks.tasks.schedule",
         "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
         "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},
     },
     "reschedule-boefjes": {
-        "task": "openkat.tasks.reschedule",
+        "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
         "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},

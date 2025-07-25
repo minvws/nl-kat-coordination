@@ -28,7 +28,7 @@ from octopoes.models import OOI, ScanLevel
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from octopoes.xtdb.client import XTDBSession
-from openkat.celery import app
+from tasks.celery import app
 from openkat.models import Organization
 from openkat.scheduler import scheduler_client
 from reports.runner.models import ReportTask
@@ -58,7 +58,7 @@ def schedule_scan_profile_recalculations():
 
     for org in orgs:
         app.send_task(
-            "openkat.tasks.recalculate_scan_profiles",
+            "tasks.tasks.recalculate_scan_profiles",
             (org.code,),
             queue=settings.QUEUE_NAME_OCTOPOES,
             task_id=str(uuid.uuid4()),
@@ -254,7 +254,7 @@ def boefje(self, organization: str, plugin_id: str, input_ooi: str) -> None:
 
     for file in boefje_output.files:
         raw_file_id = raw_file_ids[file.name]
-        app.send_task("openkat.tasks.process_raw", (raw_file_id,))
+        app.send_task("tasks.tasks.process_raw", (raw_file_id,))
 
     gc.collect()
     logger.info("Handled boefje [org=%s, plugin_id=%s]", organization, plugin_id)
@@ -285,7 +285,7 @@ def docker_boefje(self, organization: str, plugin_id: str, input_ooi: str) -> No
     logger.info("dispatching raw files")
 
     for file in File.objects.filter(task_result__task_id=self.request.id):
-        app.send_task("openkat.tasks.process_raw", (str(file.id),))
+        app.send_task("tasks.tasks.process_raw", (str(file.id),))
 
     logger.info("Handled containerized boefje [org=%s, plugin_id=%s]", organization, plugin_id)
 
@@ -365,7 +365,7 @@ def normalizer(self, organization: str, plugin_id: str, raw_file_id: str | uuid.
     logger.info("Handled normalizer [org=%s, plugin_id=%s]", organization, plugin_id)
 
     app.send_task(
-        "openkat.tasks.recalculate_scan_profiles",
+        "tasks.tasks.recalculate_scan_profiles",
         (organization,),
         queue=settings.QUEUE_NAME_OCTOPOES,
         task_id=str(uuid.uuid4()),

@@ -6,7 +6,7 @@ from typing import Any
 import structlog
 from django.utils.translation import gettext_lazy as _
 
-from openkat.celery import app
+from tasks.celery import app
 from openkat.models import Organization
 from tasks.models import Schedule, Task
 
@@ -37,25 +37,25 @@ class SchedulerClient:
         if task.type == "boefje":
             if task.data["boefje"]["oci_image"]:
                 app.send_task(
-                    "openkat.tasks.docker_boefje",
+                    "tasks.tasks.docker_boefje",
                     (task.organization.code, task.data["boefje"]["plugin_id"], task.data["input_ooi"]),
                     task_id=str(task.id),
                 )
             else:
                 app.send_task(
-                    "openkat.tasks.boefje",
+                    "tasks.tasks.boefje",
                     (task.organization.code, task.data["boefje"]["plugin_id"], task.data["input_ooi"]),
                     task_id=str(task.id),
                 )
         if task.type == "normalizer":
             app.send_task(
-                "openkat.tasks.normalizer",
+                "tasks.tasks.normalizer",
                 (task.organization.code, task.data["normalizer"]["plugin_id"], task.data["raw_data"]["id"]),
                 task_id=str(task.id),
             )
         if task.type == "report":
             app.send_task(
-                "openkat.tasks.report", (task.organization.code, task.data["report_recipe_id"]), task_id=str(task.id)
+                "tasks.tasks.report", (task.organization.code, task.data["report_recipe_id"]), task_id=str(task.id)
             )
 
     def get_task_stats(self, scheduler_id: str, organisation_id: str | None = None) -> dict[str, int]:

@@ -71,7 +71,7 @@ services:
     volumes:
       - ./:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
-    command: python manage.py celery_reload_worker "celery -A openkat worker -B -s /tmp/celerybeat-schedule --loglevel=INFO"
+    command: python manage.py celery_reload_worker "celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=INFO"
     env_file:
       - .env
     environment:

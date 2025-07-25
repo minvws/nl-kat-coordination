@@ -27,7 +27,7 @@ class EventManager:
     def _publish(self, event: DBEvent) -> None:
         # schedule celery event processor
         self.celery_app.send_task(
-            "openkat.tasks.handle_event",
+            "tasks.tasks.handle_event",
             (json.loads(event.model_dump_json()),),
             queue=self.celery_queue_name,
             task_id=str(uuid.uuid4()),

@@ -9,7 +9,7 @@ SyslogIdentifier=kat-openkat-worker
 WorkingDirectory=/opt/venvs/kat-openkat/
 EnvironmentFile=/usr/lib/kat/openkat.defaults
 EnvironmentFile=/etc/kat/openkat.conf
-ExecStart=/opt/venvs/kat-openkat/bin/python -m celery -A openkat worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
+ExecStart=/opt/venvs/kat-openkat/bin/python -m celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
 Restart=on-failure
 RestartSec=3s
 KillMode=mixed

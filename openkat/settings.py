@@ -565,6 +565,6 @@ CELERY = {
     "event_serializer": "json",
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_accept_content": ["application/json", "application/x-python-serialize"],
-    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_OCTOPOES)),
+    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_OCTOPOES), Queue(QUEUE_NAME_SCHEDULE), Queue(QUEUE_NAME_REPORTS)),
     "worker_concurrency": WORKERS,
 }

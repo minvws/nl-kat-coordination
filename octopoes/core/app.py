@@ -8,7 +8,7 @@ from octopoes.repositories.origin_parameter_repository import XTDBOriginParamete
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
-from openkat.celery import app as celery_app
+from tasks.celery import app as celery_app
 
 logger = structlog.get_logger(__name__)
 
