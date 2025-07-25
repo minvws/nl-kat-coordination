@@ -257,7 +257,7 @@ except ImproperlyConfigured:
 DATABASES = {"default": POSTGRES_DB}
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
-    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", "require")}
+    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", default="require")}
 
     POSTGRES_SSL_CERT = env.path("POSTGRES_SSL_CERT", default="")
     POSTGRES_SSL_KEY = env.path("POSTGRES_SSL_KEY", default="")
