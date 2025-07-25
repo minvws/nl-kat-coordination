@@ -110,9 +110,9 @@ classDiagram
     organization
   }
 
-  katalogus_pluginconfig --> katalogus_plugin
-  katalogus_pluginconfig --> tools_organization
-  tools_organization --> katalogus_pluginconfig
+  katalogus_pluginsettings --> katalogus_plugin
+  katalogus_pluginsettings --> tools_organization
+  katalogus_pluginenabled --> katalogus_plugin
   katalogus_pluginenabled --> tools_organization
 ```
 
