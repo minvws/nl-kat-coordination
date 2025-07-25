@@ -8,6 +8,10 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta["arguments"]["input"]
     ip_port = input_["ip_port"]["port"]
     address = input_["ip_port"]["address"]["address"]
+    scheme = input_["service"]["name"]
+
+    if scheme != "https":
+        return [({"info/boefje"}, "Skipping check due to non-TLS scheme")]
 
     if ip_address(address).version == 6:
         cmd = (
