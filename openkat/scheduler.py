@@ -6,8 +6,8 @@ from typing import Any
 import structlog
 from django.utils.translation import gettext_lazy as _
 
-from tasks.celery import app
 from openkat.models import Organization
+from tasks.celery import app
 from tasks.models import Schedule, Task
 
 logger = structlog.get_logger(__name__)

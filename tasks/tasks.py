@@ -28,11 +28,11 @@ from octopoes.models import OOI, ScanLevel
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from octopoes.xtdb.client import XTDBSession
-from tasks.celery import app
 from openkat.models import Organization
 from openkat.scheduler import scheduler_client
 from reports.runner.models import ReportTask
 from reports.runner.report_runner import LocalReportRunner
+from tasks.celery import app
 from tasks.models import Schedule, Task, TaskResult, TaskStatus
 
 logger = structlog.get_logger(__name__)

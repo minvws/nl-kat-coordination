@@ -23,18 +23,18 @@ app.conf.beat_schedule = {
         "task": "tasks.tasks.schedule_scan_profile_recalculations",
         "schedule": settings.SCAN_LEVEL_RECALCULATION_INTERVAL,
         "args": tuple(),
-        "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},
+        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
     "schedule-boefjes": {
         "task": "tasks.tasks.schedule",
         "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
-        "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},
+        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
     "reschedule-boefjes": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,
         "args": tuple(),
-        "options": {"queue" : settings.QUEUE_NAME_SCHEDULE},
+        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
 }

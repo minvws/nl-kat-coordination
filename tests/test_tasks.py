@@ -4,8 +4,8 @@ from katalogus.models import BoefjeConfig
 from katalogus.worker.job_models import BoefjeMeta
 from katalogus.worker.models import Boefje
 from octopoes.models.pagination import Paginated
-from tasks.tasks import get_expired_boefjes
 from tasks.models import Task
+from tasks.tasks import get_expired_boefjes
 
 
 def test_expired_boefjes(organization, dns_records, katalogus_client, octopoes_api_connector, hostname):
