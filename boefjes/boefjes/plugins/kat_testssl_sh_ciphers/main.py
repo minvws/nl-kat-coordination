@@ -3,10 +3,19 @@ import subprocess
 from ipaddress import ip_address
 from pathlib import Path
 
-
 TLS_CAPABLE_SERVICES = ("https",)
 STARTTLS_CAPABLE_SERVICES = (
-    "ftp", "smtp", "lmtp", "pop3", "imap", "xmpp", "telnet", "ldap", "nntp", "postgres", "mysql"
+    "ftp",
+    "smtp",
+    "lmtp",
+    "pop3",
+    "imap",
+    "xmpp",
+    "telnet",
+    "ldap",
+    "nntp",
+    "postgres",
+    "mysql",
 )
 
 
