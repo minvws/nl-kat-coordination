@@ -15,11 +15,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21 13:13+0000\n"
+"POT-Creation-Date: 2025-07-22 13:42+0000\n"
 "PO-Revision-Date: 2025-07-22 14:02+0000\n"
 "Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,6 +63,7 @@ msgid "Please provide username"
 msgstr "Voer een gebruikersnaam in"
 
 #: account/forms/account_setup.py
+#: rocky/templates/organizations/organization_member_list.html
 msgid "Email"
 msgstr "E-mailadres"
 
@@ -244,7 +245,7 @@ msgstr "Organisaties"
 msgid "The organization from which to clone settings."
 msgstr "De organisatie waarvan de instellingen worden gekloond."
 
-#: account/forms/password_reset.py
+#: account/forms/password_reset.py account/templates/account_detail.html
 msgid "Email address"
 msgstr "E-mailadres"
 
@@ -307,8 +308,8 @@ msgstr ""
 "op uw profielpagina om verder te gaan."
 
 #: account/models.py
-msgid "The Email must be set"
-msgstr "Het e-mailadres moet worden ingevuld"
+msgid "The email must be set"
+msgstr ""
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
@@ -372,10 +373,6 @@ msgid "Full name"
 msgstr "Voor- en achternaam"
 
 #: account/templates/account_detail.html
-msgid "E-mail address"
-msgstr "E-mailadres"
-
-#: account/templates/account_detail.html
 msgid "Member type"
 msgstr "Soort lid"
 
@@ -394,13 +391,13 @@ msgid "OOI clearance"
 msgstr "OOI-vrijwaringsniveau"
 
 #: account/templates/account_detail.html
-#, fuzzy
-msgid ""
-"You don't have any clearance to scan objects. <br> Get in contact with the "
-"admin to give you the necessary clearance level."
+msgid "You don't have any clearance to scan objects."
 msgstr ""
-"U hebt geen vrijwaring om objecten te scannen. <br> Neem contact op met de "
-"beheerder om de juiste vrijwaring te verkrijgen."
+
+#: account/templates/account_detail.html
+msgid ""
+"Get in contact with the admin to give you the necessary clearance level."
+msgstr ""
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -582,7 +579,8 @@ msgstr " letters"
 #: account/validators.py
 msgid ""
 " special characters such as: {str(validators.get('special_characters',''))}"
-msgstr " speciale karakters als: {str(validators.get('special_characters',''))}"
+msgstr ""
+" speciale karakters als: {str(validators.get('special_characters',''))}"
 
 #: account/validators.py
 msgid " lower case letters"
@@ -806,20 +804,10 @@ msgid "Dashboards"
 msgstr "Dashboards"
 
 #: crisis_room/templates/crisis_room_dashboards.html
-#, fuzzy
 msgid ""
-"\n"
-"                        On this page you can see an overview of the "
-"dashboards for all organizations.\n"
-"                        **More context can be written here**\n"
-"                    "
+"On this page you can see an overview of the dashboards for all "
+"organizations. **More context can be written here**"
 msgstr ""
-"\n"
-"                        Op deze pagina ziet u een overzicht van de "
-"dashboards voor alle organisaties.\n"
-"\n"
-"                        **Meer context kan hier worden gegeven**\n"
-"                    "
 
 #: crisis_room/templates/crisis_room_dashboards.html
 #, fuzzy
@@ -865,63 +853,24 @@ msgid "Findings per organization"
 msgstr "Bevindingen per organisatie"
 
 #: crisis_room/templates/crisis_room_findings.html
-#, fuzzy
 msgid ""
-"\n"
-"                            This table shows the findings that have been "
-"identiefied for each organization,\n"
-"                            sorted by the finding types and grouped by "
-"organizations.\n"
-"                            This data is based on the latest Crisis Room "
-"Findings Report\n"
-"                            of each organization.\n"
-"                        "
+"This table shows the findings that have been identiefied for each "
+"organization, sorted by the finding types and grouped by organizations. This "
+"data is based on the latest Crisis Room Findings Report of each organization."
 msgstr ""
-"\n"
-"                            Deze tabel toont de bevindingen die zijn "
-"gevonden voor elke organisatie,\n"
-"\n"
-"                            gesorteerd op bevindingstype en gegroepeerd per "
-"organisatie.\n"
-"\n"
-"                            De data is gebaseerd op de meest recente "
-"Crisiscentrum bevindingenrapportage\n"
-"\n"
-"                            van elke organisatie.\n"
-"                        "
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
-#, fuzzy
 msgid ""
-"\n"
-"                    No findings have been identified yet. As soon as they "
-"have been\n"
-"                    identified, they will be shown on this page.\n"
-"                "
+"No findings have been identified yet. As soon as they have been identified, "
+"they will be shown on this page."
 msgstr ""
-"\n"
-"                    Er zijn nog geen bevindingen gevonden. Zodra deze "
-"gevonden worden,\n"
-"\n"
-"                    worden ze op deze pagina getoond.\n"
-"                "
 
 #: crisis_room/templates/crisis_room_findings.html
-#, fuzzy
 msgid ""
-"\n"
-"                There are no organizations yet. After creating an "
-"organization,\n"
-"                the identified findings will be shown here.\n"
-"            "
+"There are no organizations yet. After creating an organization, the "
+"identified findings will be shown here."
 msgstr ""
-"\n"
-"                Er zijn nog geen organisaties. Na het aanmaken van een "
-"organisatie,\n"
-"\n"
-"                worden de gevonden bevindingen hier getoond.\n"
-"            "
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -1128,27 +1077,12 @@ msgid "Critical and high findings"
 msgstr "Kritieke en hoog-niveau bevindingen"
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
-#, fuzzy
+#: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                                            This table shows the top 25 "
-"critical and high findings that have\n"
-"                                            been identified for this "
-"organization, grouped by finding types.\n"
-"                                            A table with all the identified "
-"findings can be found in the Findings Report.\n"
-"                                        "
+"This table shows the top 25 critical and high findings that have been "
+"identified for this organization, grouped by finding types. A table with all "
+"the identified findings can be found in the Findings Report."
 msgstr ""
-"\n"
-"                                            Deze tabel toont de top 25 "
-"kritieke en hoog-niveau bevindeingen die\n"
-"\n"
-"                                            voor deze organisatie gevonden "
-"zijn, gegroepeerd per bevindingstype.\n"
-"\n"
-"                                            Een tabel met alle gevonden "
-"bevindingen kan worden gevonden in de Bevindingenrapportage.\n"
-"                                        "
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
 #, fuzzy
@@ -2501,6 +2435,41 @@ msgstr "Voer een geldige URL in beginnend met ‘http://’ of ‘https://’."
 msgid "Onboarding"
 msgstr "Onboarding"
 
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "Welcome to OpenKAT!"
+msgstr "Welkom bij OpenKAT!"
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
+"set everything up."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"At the end of this onboarding you have added your first object, created your "
+"first DNS report and learned about some basic concepts used within OpenKAT."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "The full documentation for OpenKAT can be found at:"
+msgstr ""
+
+#: onboarding/templates/partials/step_2_organization_text.html
+#: rocky/templates/organizations/organization_add.html
+msgid "Organization setup"
+msgstr "Organisatie-instellingen"
+
+#: onboarding/templates/partials/step_2_organization_text.html
+msgid ""
+"Please enter the following organization details. The organization name can "
+"be changed later in the interface. The organization code cannot be changed "
+"as this is used by the database."
+msgstr ""
+"Voer de volgende organisatiegegevens in. De organisatienaam kan later in de "
+"interface worden gewijzigd. De organisatiecode kan niet worden gewijzigd, "
+"omdat deze door de database wordt gebruikt."
+
 #: onboarding/templates/step_10_report.html
 #: reports/report_types/concatenated_report/report.py
 msgid "Report"
@@ -2532,41 +2501,8 @@ msgstr "Ga verder naar OpenKAT"
 
 #: onboarding/templates/step_1_introduction_registration.html
 #: onboarding/templates/step_1a_introduction.html
-msgid "Welcome to OpenKAT!"
-msgstr "Welkom bij OpenKAT!"
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
-msgid ""
-"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
-"set everything up. <p> At the end of this onboarding you have added your "
-"first object, created your first DNS report and learned about some basic "
-"concepts used within OpenKAT. </p> <p> The full documentation for OpenKAT "
-"can be found at: <a href=\"https://docs.openkat.nl\">https://docs.openkat."
-"nl</a>."
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
 msgid "Let's get started"
 msgstr "Begin hier"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-#: rocky/templates/organizations/organization_add.html
-msgid "Organization setup"
-msgstr "Organisatie-instellingen"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-msgid ""
-"Please enter the following organization details. The organization name can "
-"be changed later in the interface. The organization code cannot be changed "
-"as this is used by the database."
-msgstr ""
-"Voer de volgende organisatiegegevens in. De organisatienaam kan later in de "
-"interface worden gewijzigd. De organisatiecode kan niet worden gewijzigd, "
-"omdat deze door de database wordt gebruikt."
 
 #: onboarding/templates/step_2a_organization_setup.html
 #: onboarding/templates/step_2b_organization_update.html
@@ -2616,8 +2552,8 @@ msgid ""
 "and the maximum clearance level you can assign to objects (e.g. a URL)."
 msgstr ""
 "Het vrijwaringsniveau bepaalt het maximale scanniveau voor beveiligingsscans "
-"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten ("
-"bijvoorbeeld een URL)."
+"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten "
+"(bijvoorbeeld een URL)."
 
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -2774,22 +2710,22 @@ msgstr "Plugin introductie"
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
 "OpenKAT uses plugins to scan your objects. Each plugin has a scan level to "
-"specify how aggressive the scan is.  Plugins can only scan those objects "
-"with a clearance level that is equal to, or higher than the scan level of "
-"the plugin. Plugin scan level are indicated by the number of cat paws."
+"specify how aggressive the scan is. Plugins can only scan those objects with "
+"a clearance level that is equal to, or higher than the scan level of the "
+"plugin. Plugin scan level are indicated by the number of cat paws."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs "
-"non-intrusive scans which look for publicly available information. It scans "
-"objects with a clearance level of 1 or higher."
+"The plugin <strong>DNS Zone</strong> has a scan level of 1, meaning that it "
+"performs non-intrusive scans which look for publicly available information. "
+"It scans objects with a clearance level of 1 or higher."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>Fierce</b> has a scan level of 3, meaning that it more "
-"aggressive and could potentially break things. It scans objects with a "
+"The plugin <strong>Fierce</strong> has a scan level of 3, meaning that it "
+"more aggressive and could potentially break things. It scans objects with a "
 "clearance level of 3 or higher."
 msgstr ""
 
@@ -2881,10 +2817,6 @@ msgstr "4: Plugins"
 #: onboarding/view_helpers.py
 msgid "5: Generating report"
 msgstr "5: Rapport genereren"
-
-#: onboarding/view_helpers.py
-msgid "3: Add Object"
-msgstr "3: Object toevoegen"
 
 #: onboarding/views.py
 #, python-brace-format
@@ -3182,19 +3114,11 @@ msgid "server"
 msgstr "server"
 
 #: reports/report_types/aggregate_organisation_report/findings.html
-#, fuzzy
+#: reports/report_types/aggregate_organisation_report/report.html
 msgid ""
-"\n"
-"                This chapter contains information about the findings that "
-"have been identified\n"
-"                for this organization.\n"
-"            "
+"This chapter contains information about the findings that have been "
+"identified for this organization."
 msgstr ""
-"\n"
-"                Dit hoofdstuk bevat informatie over de gevonden bevindingen\n"
-"\n"
-"                voor deze organisatie.\n"
-"            "
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3257,22 +3181,6 @@ msgstr "Kwetsbaarheden"
 #: reports/report_types/aggregate_organisation_report/vulnerabilities.html
 msgid "Vulnerabilities found are grouped per system."
 msgstr "Gevonden kwetsbaarheden zijn gegroepeerd per systeem."
-
-#: reports/report_types/aggregate_organisation_report/report.html
-#, fuzzy
-msgid ""
-"\n"
-"                                    This chapter contains information about "
-"the findings that have been identified\n"
-"                                    for this organization.\n"
-"                                "
-msgstr ""
-"\n"
-"                                    Dit hoofdstuk bevat informatie over de "
-"bevindingen die zijn gevonden\n"
-"\n"
-"                                    voor deze organisatie.\n"
-"                                "
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
@@ -3646,29 +3554,6 @@ msgstr ""
 "Het bevindingenrapport bevat informatie over de bevindingen die voor de "
 "geselecteerde assets en organisatie zijn gevonden."
 
-#: reports/report_types/findings_report/report.html
-#, fuzzy
-msgid ""
-"\n"
-"                This table shows the top 25 critical and high findings that "
-"have\n"
-"                been identified for this organization, grouped by finding "
-"types.\n"
-"                A table with all the identified findings can be found in the "
-"Findings Report.\n"
-"            "
-msgstr ""
-"\n"
-"                Deze tabel toont de top 25 kritieke en hoog-niveau "
-"bevindingen die\n"
-"\n"
-"                voor deze organisatie gevonden zijn, gegroepeerd per "
-"bevindingstype.\n"
-"\n"
-"                Een tabel met alle gevonden bevindingen kan in het "
-"Bevindingenrapport gevonden worden.\n"
-"            "
-
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
 msgstr "Bevindingenrapport"
@@ -3710,18 +3595,12 @@ msgstr "Controleer of hostnamen naar IPv6-adressen verwijzen."
 #: reports/report_types/mail_report/report.html
 msgid ""
 "The Mail Report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
+"with email servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"Het mailrapport geeft een overzicht van de compliancecontroles geassocieerd "
-"met e-mailservers. De huidige compliancecontroles controleren de "
-"aanwezigheid van SPF, DKIM en DMARC. De tabel hieronder toont hoeveel van de "
-"geïdentificeerde mailservers compliant zijn, en indien van toepassing, een "
-"beschrijving van het complianceprobleem en risiconiveau. Het risiconiveau "
-"kan verschillen voor uw specifieke omgeving."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -4429,37 +4308,15 @@ msgid "Ready"
 msgstr "Gereed"
 
 #: reports/templates/partials/report_findings_table.html
-#, fuzzy
 msgid ""
-"\n"
-"            This table provides an overview of the identified findings on "
-"the scanned\n"
-"            systems. For each finding type it shows the risk level, the "
-"number of occurrences\n"
-"            and the first known occurrence of the finding. The risk level "
-"may be different for your specific environment.\n"
-"            The details can be seen when expanding a row. A description, the "
-"source, impact and recommendation of the finding\n"
-"            can be found here. It also shows in which findings the finding "
-"type occurred.\n"
-"        "
+"This table provides an overview of the identified findings on the scanned "
+"systems. For each finding type it shows the risk level, the number of "
+"occurrences and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment. The details can be seen when "
+"expanding a row. A description, the source, impact and recommendation of the "
+"finding can be found here. It also shows in which findings the finding type "
+"occurred."
 msgstr ""
-"\n"
-"            Deze tabel toont een overzicht van de geïdentificeerde "
-"bevindingen op de gescande\n"
-"\n"
-"            systemen. Voor elk bevindingstype wordt het risiconiveau, het "
-"aantal gebeurtenissen\n"
-"\n"
-"            en de eerstbekende gebeurtenis van de bevinding getoond. Het "
-"getoonde risiconiveau kan afwijken van uw specifieke omgeving.\n"
-"\n"
-"            De details zijn zichtbaar door een rij uit te klappen. Hier "
-"vindt u een beschrijving, de bron, impact en aanbeveling voor de bevinding.\n"
-"\n"
-"            Ook wordt getoond in welk bevinding-type de bevinding "
-"plaatsvond.\n"
-"        "
 
 #: reports/templates/partials/report_findings_table.html
 #, fuzzy
@@ -5066,9 +4923,8 @@ msgid "Open asset report object details"
 msgstr "Toon asset-rapport objectdetails"
 
 #: reports/templates/report_overview/report_history_table.html
-#, fuzzy
-msgid "Asset reports details:"
-msgstr "Asset-rapportdetails"
+msgid "Asset reports details"
+msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 #, fuzzy, python-format
@@ -5087,6 +4943,7 @@ msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/views/report_overview.py
 #, fuzzy
 msgid "Asset reports"
@@ -5199,11 +5056,6 @@ msgstr "Een overzicht van alle onderliggende rapporten van"
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
 msgstr "Rapportdetails tonen"
-
-#: reports/templates/report_overview/subreports_table.html
-#, fuzzy
-msgid "Asset reports:"
-msgstr "Asset-rapporten"
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
@@ -5837,11 +5689,9 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the Boefje explaining in short what it can do. This will "
-"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+"A description of the Boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page."
 msgstr ""
-"<p>Een beschrijving van dit Boefje die uitlegt wat het kan doen. Dit wordt "
-"zowel in de KAT-alogus als op de Boefje-detailspagina getoond.</p> "
 
 #: tools/forms/settings.py
 msgid ""
@@ -6582,11 +6432,12 @@ msgstr "OpenKAT ziet"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br> Our motto is therefore: I see, I see, what you do not see."
+"analog)."
 msgstr ""
-"In OpenKAT zijn tientallen tools geïntegreerd om de wereld te bekijken "
-"(digitaal en analoog). <br> Ons motto is dan ook: ik zie, ik zie, wat jij "
-"niet ziet."
+
+#: rocky/templates/landing_page.html
+msgid "Our motto is therefore: I see, I see, what you do not see."
+msgstr ""
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
@@ -7146,9 +6997,9 @@ msgid "Save member"
 msgstr "Lid opslaan"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
-msgstr "Een ledenoverzicht van  <strong>%(organization_name)s</strong>"
+#, python-format
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgstr "Een overzicht van leden van <strong>%(organization_name)s</strong>."
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -7176,10 +7027,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
 msgstr "Ledenoverzicht:"
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "E-mail"
-msgstr "E-mailadres"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
@@ -8582,6 +8429,247 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
 
+#~ msgid "The Email must be set"
+#~ msgstr "Het e-mailadres moet worden ingevuld"
+
+#~ msgid "E-mail address"
+#~ msgstr "E-mailadres"
+
+#, fuzzy
+#~ msgid ""
+#~ "You don't have any clearance to scan objects. <br> Get in contact with "
+#~ "the admin to give you the necessary clearance level."
+#~ msgstr ""
+#~ "U hebt geen vrijwaring om objecten te scannen. <br> Neem contact op met "
+#~ "de beheerder om de juiste vrijwaring te verkrijgen."
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                        On this page you can see an overview of the "
+#~ "dashboards for all organizations.\n"
+#~ "                        **More context can be written here**\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        Op deze pagina ziet u een overzicht van de "
+#~ "dashboards voor alle organisaties.\n"
+#~ "\n"
+#~ "                        **Meer context kan hier worden gegeven**\n"
+#~ "                    "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                            This table shows the findings that have been "
+#~ "identiefied for each organization,\n"
+#~ "                            sorted by the finding types and grouped by "
+#~ "organizations.\n"
+#~ "                            This data is based on the latest Crisis Room "
+#~ "Findings Report\n"
+#~ "                            of each organization.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            Deze tabel toont de bevindingen die zijn "
+#~ "gevonden voor elke organisatie,\n"
+#~ "\n"
+#~ "                            gesorteerd op bevindingstype en gegroepeerd "
+#~ "per organisatie.\n"
+#~ "\n"
+#~ "                            De data is gebaseerd op de meest recente "
+#~ "Crisiscentrum bevindingenrapportage\n"
+#~ "\n"
+#~ "                            van elke organisatie.\n"
+#~ "                        "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                    No findings have been identified yet. As soon as they "
+#~ "have been\n"
+#~ "                    identified, they will be shown on this page.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    Er zijn nog geen bevindingen gevonden. Zodra deze "
+#~ "gevonden worden,\n"
+#~ "\n"
+#~ "                    worden ze op deze pagina getoond.\n"
+#~ "                "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                There are no organizations yet. After creating an "
+#~ "organization,\n"
+#~ "                the identified findings will be shown here.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                Er zijn nog geen organisaties. Na het aanmaken van een "
+#~ "organisatie,\n"
+#~ "\n"
+#~ "                worden de gevonden bevindingen hier getoond.\n"
+#~ "            "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                                            This table shows the top 25 "
+#~ "critical and high findings that have\n"
+#~ "                                            been identified for this "
+#~ "organization, grouped by finding types.\n"
+#~ "                                            A table with all the "
+#~ "identified findings can be found in the Findings Report.\n"
+#~ "                                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                                            Deze tabel toont de top 25 "
+#~ "kritieke en hoog-niveau bevindeingen die\n"
+#~ "\n"
+#~ "                                            voor deze organisatie "
+#~ "gevonden zijn, gegroepeerd per bevindingstype.\n"
+#~ "\n"
+#~ "                                            Een tabel met alle gevonden "
+#~ "bevindingen kan worden gevonden in de Bevindingenrapportage.\n"
+#~ "                                        "
+
+#~ msgid "3: Add Object"
+#~ msgstr "3: Object toevoegen"
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                This chapter contains information about the findings that "
+#~ "have been identified\n"
+#~ "                for this organization.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                Dit hoofdstuk bevat informatie over de gevonden "
+#~ "bevindingen\n"
+#~ "\n"
+#~ "                voor deze organisatie.\n"
+#~ "            "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                                    This chapter contains information "
+#~ "about the findings that have been identified\n"
+#~ "                                    for this organization.\n"
+#~ "                                "
+#~ msgstr ""
+#~ "\n"
+#~ "                                    Dit hoofdstuk bevat informatie over "
+#~ "de bevindingen die zijn gevonden\n"
+#~ "\n"
+#~ "                                    voor deze organisatie.\n"
+#~ "                                "
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "                This table shows the top 25 critical and high findings "
+#~ "that have\n"
+#~ "                been identified for this organization, grouped by finding "
+#~ "types.\n"
+#~ "                A table with all the identified findings can be found in "
+#~ "the Findings Report.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                Deze tabel toont de top 25 kritieke en hoog-niveau "
+#~ "bevindingen die\n"
+#~ "\n"
+#~ "                voor deze organisatie gevonden zijn, gegroepeerd per "
+#~ "bevindingstype.\n"
+#~ "\n"
+#~ "                Een tabel met alle gevonden bevindingen kan in het "
+#~ "Bevindingenrapport gevonden worden.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "The Mail Report provides an overview of the compliance checks associated "
+#~ "with e-mail servers. The current compliance checks the presence of SPF, "
+#~ "DKIM and DMARC records. The table below shows for each of these checks "
+#~ "how many of the identified mail servers are compliant, and if applicable "
+#~ "a compliance issue description and risk level. The risk level may be "
+#~ "different for your specific environment."
+#~ msgstr ""
+#~ "Het mailrapport geeft een overzicht van de compliancecontroles "
+#~ "geassocieerd met e-mailservers. De huidige compliancecontroles "
+#~ "controleren de aanwezigheid van SPF, DKIM en DMARC. De tabel hieronder "
+#~ "toont hoeveel van de geïdentificeerde mailservers compliant zijn, en "
+#~ "indien van toepassing, een beschrijving van het complianceprobleem en "
+#~ "risiconiveau. Het risiconiveau kan verschillen voor uw specifieke "
+#~ "omgeving."
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "            This table provides an overview of the identified findings on "
+#~ "the scanned\n"
+#~ "            systems. For each finding type it shows the risk level, the "
+#~ "number of occurrences\n"
+#~ "            and the first known occurrence of the finding. The risk level "
+#~ "may be different for your specific environment.\n"
+#~ "            The details can be seen when expanding a row. A description, "
+#~ "the source, impact and recommendation of the finding\n"
+#~ "            can be found here. It also shows in which findings the "
+#~ "finding type occurred.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "            Deze tabel toont een overzicht van de geïdentificeerde "
+#~ "bevindingen op de gescande\n"
+#~ "\n"
+#~ "            systemen. Voor elk bevindingstype wordt het risiconiveau, het "
+#~ "aantal gebeurtenissen\n"
+#~ "\n"
+#~ "            en de eerstbekende gebeurtenis van de bevinding getoond. Het "
+#~ "getoonde risiconiveau kan afwijken van uw specifieke omgeving.\n"
+#~ "\n"
+#~ "            De details zijn zichtbaar door een rij uit te klappen. Hier "
+#~ "vindt u een beschrijving, de bron, impact en aanbeveling voor de "
+#~ "bevinding.\n"
+#~ "\n"
+#~ "            Ook wordt getoond in welk bevinding-type de bevinding "
+#~ "plaatsvond.\n"
+#~ "        "
+
+#, fuzzy
+#~ msgid "Asset reports details:"
+#~ msgstr "Asset-rapportdetails"
+
+#, fuzzy
+#~ msgid "Asset reports:"
+#~ msgstr "Asset-rapporten"
+
+#~ msgid ""
+#~ "<p>A description of the Boefje explaining in short what it can do. This "
+#~ "will both be displayed inside the KAT-alogus and on the Boefje details "
+#~ "page.</p> "
+#~ msgstr ""
+#~ "<p>Een beschrijving van dit Boefje die uitlegt wat het kan doen. Dit "
+#~ "wordt zowel in de KAT-alogus als op de Boefje-detailspagina getoond.</p> "
+
+#~ msgid ""
+#~ "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#~ "analog). <br> Our motto is therefore: I see, I see, what you do not see."
+#~ msgstr ""
+#~ "In OpenKAT zijn tientallen tools geïntegreerd om de wereld te bekijken "
+#~ "(digitaal en analoog). <br> Ons motto is dan ook: ik zie, ik zie, wat jij "
+#~ "niet ziet."
+
+#, fuzzy, python-format
+#~ msgid "An overview of members of <strong>%(organization_name)s</strong>"
+#~ msgstr "Een ledenoverzicht van  <strong>%(organization_name)s</strong>"
+
+#~ msgid "E-mail"
+#~ msgstr "E-mailadres"
+
 #, python-brace-format
 #~ msgid "A unique code of {code_length} characters."
 #~ msgstr "Een unieke code van {code_length} tekens."
@@ -9470,10 +9558,6 @@ msgstr "Raw-bestand met succes toegevoegd."
 
 #~ msgid "Account type details"
 #~ msgstr "Accounttypedetails"
-
-#, python-format
-#~ msgid "An overview of members of <strong>%(organization_name)s</strong>."
-#~ msgstr "Een overzicht van leden van <strong>%(organization_name)s</strong>."
 
 #~ msgid "Upload a csv file with members for organisation"
 #~ msgstr "Upload een CSV-bestand met leden voor uw organisatie"
