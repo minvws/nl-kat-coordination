@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
-          path: ${{matrix.package}}/build/${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.package == 'cveapi' && 'all' || 'amd64' }}.deb
+          path: ${{matrix.package}}/build/${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_amd64.deb
 
   add-debian-packages-to-release:
     permissions:
@@ -80,9 +80,6 @@ jobs:
           merge-multiple: true
           pattern: kat-*_ubuntu22.04.deb
 
-      - name: Move cve-api asset to add it as a separate artifact
-        run: mv kat-debian12-${{ env.RELEASE_VERSION }}/kat-cveapi_${{ env.RELEASE_VERSION }}_all.deb .
-
       - name: Bundle assets
         run: |
           tar -cvzf kat-debian12-${{ env.RELEASE_VERSION }}.tar.gz -C kat-debian12-${{ env.RELEASE_VERSION }} .
@@ -95,4 +92,3 @@ jobs:
           files: |
             kat-debian12-${{ env.RELEASE_VERSION }}.tar.gz
             kat-ubuntu22.04-${{ env.RELEASE_VERSION }}.tar.gz
-            kat-cveapi_${{ env.RELEASE_VERSION }}_all.deb
