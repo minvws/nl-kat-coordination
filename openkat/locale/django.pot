@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-23 14:58+0000\n"
+"POT-Creation-Date: 2025-07-25 08:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,11 +79,7 @@ msgid "--- Please select one of the available options ----"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Account Type"
-msgstr ""
-
-#: account/forms/account_setup.py
-msgid "Every member of OpenKAT must be part of an account type."
+msgid "Account type"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -158,9 +154,8 @@ msgstr ""
 msgid "Acknowledged to change Clearance Levels."
 msgstr ""
 
-#: account/forms/account_setup.py
+#: account/forms/account_setup.py openkat/forms/members.py
 #: openkat/templates/organizations/organization_member_list.html
-#: openkat/views/organization_member_list.py
 msgid "Blocked"
 msgstr ""
 
@@ -4905,6 +4900,28 @@ msgstr ""
 msgid "Object ID contains (case sensitive)"
 msgstr ""
 
+#: openkat/forms/members.py
+msgid "Current status"
+msgstr ""
+
+#: openkat/forms/members.py
+#: openkat/templates/organizations/organization_member_list.html
+msgid "Active"
+msgstr ""
+
+#: openkat/forms/members.py
+#: openkat/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
+#: openkat/forms/members.py
+msgid "Account status"
+msgstr ""
+
+#: openkat/forms/members.py
+msgid "Not blocked"
+msgstr ""
+
 #: openkat/forms/ooi.py
 msgid "Filter types"
 msgstr ""
@@ -4923,6 +4940,10 @@ msgstr ""
 
 #: openkat/forms/ooi.py
 msgid "Show Boefjes that exceed the objects clearance level."
+msgstr ""
+
+#: openkat/forms/ooi.py
+msgid "Expires by (UTC)"
 msgstr ""
 
 #: openkat/forms/ooi_form.py
@@ -5156,6 +5177,10 @@ msgstr ""
 #: openkat/forms/upload_raw.py openkat/templates/partials/ooi_list_toolbar.html
 #: openkat/templates/upload_raw.html
 msgid "Upload raw file"
+msgstr ""
+
+#: openkat/forms/upload_raw.py
+msgid "Input or Scan OOI"
 msgstr ""
 
 #: openkat/forms/upload_raw.py
@@ -5811,7 +5836,10 @@ msgid "Add %(display_type)s"
 msgstr ""
 
 #: openkat/templates/oois/ooi_add_type_select.html
-msgid "Manual creation"
+#: openkat/templates/oois/ooi_detail_add_related_object.html
+#: openkat/templates/partials/elements/ooi_add_type_select_form.html
+#: openkat/templates/partials/ooi_list_toolbar.html openkat/views/ooi_add.py
+msgid "Add object"
 msgstr ""
 
 #: openkat/templates/oois/ooi_add_type_select.html
@@ -5935,7 +5963,6 @@ msgstr ""
 
 #: openkat/templates/oois/ooi_detail_add_related_object.html
 #: openkat/templates/oois/ooi_detail_object.html
-#: openkat/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Object details"
 msgstr ""
 
@@ -5952,12 +5979,6 @@ msgstr ""
 #: openkat/templates/oois/ooi_detail_add_related_object.html
 #: openkat/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Select an object type to add."
-msgstr ""
-
-#: openkat/templates/oois/ooi_detail_add_related_object.html
-#: openkat/templates/partials/elements/ooi_add_type_select_form.html
-#: openkat/templates/partials/ooi_list_toolbar.html openkat/views/ooi_add.py
-msgid "Add object"
 msgstr ""
 
 #: openkat/templates/oois/ooi_detail_findings_list.html
@@ -6262,23 +6283,21 @@ msgid "Rerun all bits"
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_add.html
-msgid " member account setup"
+msgid "Change account type"
 msgstr ""
 
-#: openkat/templates/organizations/organization_member_add.html
-msgid "Member details"
+#: openkat/templates/organizations/organization_member_add_header.html
+#: openkat/views/organization_member_add.py
+msgid "Add member"
 msgstr ""
 
-#: openkat/templates/organizations/organization_member_add_account_type.html
-msgid "Member account type setup"
-msgstr ""
-
-#: openkat/templates/organizations/organization_member_add_account_type.html
-msgid "Choose an account type for this new member."
-msgstr ""
-
-#: openkat/templates/organizations/organization_member_add_account_type.html
-msgid "Account type details"
+#: openkat/templates/organizations/organization_member_add_header.html
+#, python-format
+msgid ""
+"Creating a new member of organization <strong>%(organization)s</strong>. For "
+"detailed information about the different account types, check the <a "
+"href=\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" "
+"target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_edit.html
@@ -6292,7 +6311,7 @@ msgstr ""
 
 #: openkat/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgid "An overview of members of <strong>%(organization_name)s</strong>"
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_list.html
@@ -6311,8 +6330,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        Showing %(total)s members\n"
-"                    "
+"                            Showing %(total)s members\n"
+"                        "
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_list.html
@@ -6335,29 +6354,20 @@ msgstr ""
 msgid "Super user"
 msgstr ""
 
-#: openkat/templates/organizations/organization_member_list.html
-msgid "Active"
-msgstr ""
-
-#: openkat/templates/organizations/organization_member_list.html
-msgid "New"
+#: openkat/templates/organizations/organization_member_upload.html
+#: openkat/views/organization_member_add.py
+msgid "Add members"
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_upload.html
-msgid "Upload a csv file with members for organisation"
+#, python-format
+msgid ""
+"To upload multiple members at once, you can upload a CSV file or you can <a "
+"href=\"%(download_url)s\">download the template</a>."
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_upload.html
-msgid "Download the template"
-msgstr ""
-
-#: openkat/templates/organizations/organization_member_upload.html
-msgid "or create a csv file with the following criteria"
-msgstr ""
-
-#: openkat/templates/organizations/organization_member_upload.html
-#: openkat/templates/upload_csv.html
-msgid "These are the criteria for CSV upload:"
+msgid "To create a custom CSV file, make sure it meets the following criteria:"
 msgstr ""
 
 #: openkat/templates/organizations/organization_member_upload.html
@@ -6651,14 +6661,6 @@ msgstr ""
 
 #: openkat/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
-msgstr ""
-
-#: openkat/templates/partials/organization_member_list_filters.html
-msgid "Shown status types"
-msgstr ""
-
-#: openkat/templates/partials/organization_member_list_filters.html
-msgid "Blocked status"
 msgstr ""
 
 #: openkat/templates/partials/organization_member_list_filters.html
@@ -7132,6 +7134,10 @@ msgstr ""
 msgid "Automate the creation of multiple objects by uploading a CSV file."
 msgstr ""
 
+#: openkat/templates/upload_csv.html
+msgid "These are the criteria for CSV upload:"
+msgstr ""
+
 #: openkat/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
 msgstr ""
@@ -7171,10 +7177,6 @@ msgstr ""
 
 #: openkat/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
-msgstr ""
-
-#: openkat/views/ooi_add.py
-msgid "Type select"
 msgstr ""
 
 #: openkat/views/ooi_add.py
@@ -7324,12 +7326,12 @@ msgstr ""
 msgid "Organization %s successfully updated."
 msgstr ""
 
-#: openkat/views/organization_member_add.py openkat/views/upload_csv.py
-msgid "Add column titles. Followed by each object on a new line."
-msgstr ""
-
 #: openkat/views/organization_member_add.py
 msgid "The columns are: "
+msgstr ""
+
+#: openkat/views/organization_member_add.py openkat/views/upload_csv.py
+msgid "Add column titles. Followed by each object on a new line."
 msgstr ""
 
 #: openkat/views/organization_member_add.py
@@ -7341,15 +7343,7 @@ msgid "Account type can be one of: "
 msgstr ""
 
 #: openkat/views/organization_member_add.py
-msgid "Add Account Type"
-msgstr ""
-
-#: openkat/views/organization_member_add.py
 msgid "Member added successfully."
-msgstr ""
-
-#: openkat/views/organization_member_add.py
-msgid "Add Member"
 msgstr ""
 
 #: openkat/views/organization_member_add.py
@@ -7397,10 +7391,6 @@ msgstr ""
 msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
-msgstr ""
-
-#: openkat/views/organization_member_list.py
-msgid "Not blocked"
 msgstr ""
 
 #: openkat/views/organization_member_list.py
