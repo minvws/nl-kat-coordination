@@ -58,7 +58,7 @@ class SaferExceptionReporterFilter(SafeExceptionReporterFilter):
     hidden_settings = re.compile(f"{HIDDEN_DEFAULT}|{HIDDEN_ADDITIONAL}", flags=re.I)
 
 
-DEFAULT_EXCEPTION_REPORTER_FILTER = "rocky.settings.SaferExceptionReporterFilter"
+DEFAULT_EXCEPTION_REPORTER_FILTER = "openkat.settings.SaferExceptionReporterFilter"
 
 
 LOGGING = {
