@@ -22,7 +22,7 @@ class PluginListView(ListView):
             .filter(Q(enabled_plugins__organization=self.get_organization()) | Q(enabled_plugins__isnull=True))
             .annotate(
                 enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
-            )
+            ).order_by("name")
         )
 
     def get_context_data(self, **kwargs):
