@@ -1,0 +1,69 @@
+{% load static %}
+{% load i18n %}
+
+<header id="page-header">
+    {% include "partials/skip-to-content.html" %}
+
+    <nav data-open-label="{% translate "Menu" %}"
+         data-close-label="{% translate "Close menu" %}"
+         data-media="(min-width: 70rem)"
+         aria-label="{% translate "Main navigation" %}"
+         class="collapsible">
+        <div>
+            <a href="{% url "landing_page" %}"
+               class="logo"
+               title="OpenKAT"
+               aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
+                <img src="{% static 'img/kat_logo.png' %}" alt="{% translate "OpenKAT" %}" />
+                Kwetsbaarheden Analyse Tool
+            </a>
+            {% if request.user.is_authenticated %}
+                {% if not view_type == "onboarding" %}
+                    {% include "partials/organizations_menu_dropdown.html" %}
+
+                {% endif %}
+            {% endif %}
+            <div class="collapsing-element">
+                <ul>
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            {% url "task_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
+                        </li>
+                        {% url "plugin_list" as index_url %}
+                        <li>
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div>
+                    {% include "partials/language-switcher.html" %}
+                    {% include "partials/secondary-menu.html" %}
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% if breadcrumbs %}
+        <nav class="breadcrumb-bar" aria-label="{% translate "Breadcrumbs" %}">
+            <div>
+                <ul>
+                    {% for breadcrumb in breadcrumbs %}
+                        {% if forloop.last %}
+                            <li>
+                                <a aria-current="true" href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </nav>
+    {% endif %}
+</header>
+{% include "partials/notifications_block.html" %}

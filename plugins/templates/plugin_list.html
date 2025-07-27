@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block content %}
-    {% include "header.html" %}
+    {% include "new_header.html" %}
 
     <main id="main-content" tabindex="-1" class="katalogus">
         {% include "partials/no_enabling_permission_message.html" %}
@@ -13,12 +13,6 @@
             <div class="fifty-fifty">
                 <div>
                     <h1>{% translate "Plugins" %}</h1>
-                    <p>{% translate "An overview of all available plugins." %}</p>
-                </div>
-            </div>
-            <div class="fifty-fifty">
-                <div>
-                    <h2>{% translate "All plugins" %}</h2>
                     <p>
                         {% blocktranslate trimmed %}
                             Plugins gather data, objects and insight. Each plugin has its own focus area
