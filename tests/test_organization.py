@@ -93,7 +93,6 @@ def test_add_organization_page(rf, superuser_member):
 @pytest.mark.skip("This test is too flaky for now.")
 def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
     mocker.patch("katalogus.client.KATalogusClient")
-    mocker.patch("openkat.bytes_client.get_bytes_client")
 
     request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)

@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from katalogus.worker.repository import get_local_repository
 from plugins.models import EnabledPlugin, Plugin
 
 
@@ -68,9 +69,13 @@ class PluginCoverImageView(View):
     """Get the cover image of a plugin."""
 
     def get(self, request, plugin_id: str, *args, **kwargs):
-        if (settings.BASE_DIR / "katalogus" / "boefjes" / plugin_id / "cover.jpg").exists():
-            file = FileResponse((settings.BASE_DIR / "katalogus" / "boefjes" / plugin_id / "cover.jpg").open("rb"))
-        else:
+        try:
+            plugin = get_local_repository().by_id(plugin_id)
+            if (plugin.path / "cover.jpg").exists():
+                file = FileResponse((settings.BASE_DIR / "katalogus" / "boefjes" / "cover.jpg").open("rb"))
+            else:
+                file = FileResponse((settings.BASE_DIR / "katalogus" / "boefjes" / "cover.jpg").open("rb"))
+        except KeyError:
             file = FileResponse((settings.BASE_DIR / "katalogus" / "boefjes" / "cover.jpg").open("rb"))
 
         file.headers["Cache-Control"] = "max-age=604800"
