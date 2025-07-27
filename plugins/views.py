@@ -20,7 +20,7 @@ class PluginListView(ListView):
         return (
             super()
             .get_queryset()
-            .filter(Q(enabled_plugins__organization=self.get_organization()) | Q(enabled_plugins__isnull=True))
+            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
             .annotate(
                 enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
             )
@@ -33,13 +33,20 @@ class PluginListView(ListView):
 
         return context
 
-    def get_organization(self):  # TODO
-        return None
-
 
 class PluginDetailView(DetailView):
     template_name = "plugin.html"
     model = Plugin
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
+            .annotate(
+                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
+            )
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

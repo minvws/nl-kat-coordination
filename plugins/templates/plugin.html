@@ -32,40 +32,5 @@
                 </div>
             </div>
         </section>
-        {% if plugin.oci_image %}
-            <section>
-                {% include "plugin_container_image.html" %}
-
-            </section>
-        {% endif %}
-        <section>
-            <div>
-                <h2>{% translate "Consumes" %}</h2>
-                {% if plugin.consumes %}
-                    <p>
-                        {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to scan the following object types:
-                        {% endblocktranslate %}
-                    </p>
-                    <p>
-                        {% for ooi_type in plugin.consumes %}
-                            {{ ooi_type }}
-                            {% if not forloop.last %}-{% endif %}
-                        {% endfor %}
-                    </p>
-                {% else %}
-                    {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} does not need any input objects.
-                    {% endblocktranslate %}
-                {% endif %}
-            </div>
-        </section>
     </main>
 {% endblock content %}
-{% block html_at_end_body %}
-    {{ block.super }}
-    {% compress js %}
-        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    {% endcompress %}
-{% endblock html_at_end_body %}
