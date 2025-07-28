@@ -1,4 +1,4 @@
-FROM python:3.13-slim as base
+FROM python:3.13-slim AS base
 
 ARG BOEFJES_API=http://boefje:8000
 ENV BOEFJES_API=$BOEFJES_API
