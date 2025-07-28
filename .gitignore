@@ -21,6 +21,7 @@ package-lock.json
 **/kat_rpki/bgp-meta.json
 **/kat_rpki/rpki.json
 **/kat_rpki/rpki-meta.json
+plugins/plugins/entrypoint/main
 
 # Translations
 *.mo

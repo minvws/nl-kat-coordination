@@ -6,9 +6,6 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-# Do not turn on OpenTelemetry when building OpenKAT
-unexport SPAN_EXPORT_GRPC_ENDPOINT
-
 kat:
 	make kat_parallel -j 4
 
@@ -61,7 +58,10 @@ base-image:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-images: dns-sec nmap export-http nikto generic
+images: dns-sec nmap export-http nikto generic entrypoint
+
+entrypoint:
+	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
 
 dns-sec: base-image
 	docker build -f katalogus/boefjes/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
