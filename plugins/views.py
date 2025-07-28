@@ -80,9 +80,8 @@ class EnabledPluginView(CreateView):
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")
 
-        if redirect_url:
-            if url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-                return redirect_url
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
 
         return reverse_lazy("plugin_list")
 
@@ -98,9 +97,8 @@ class EnabledPluginUpdateView(UpdateView):
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")
 
-        if redirect_url:
-            if url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-                return redirect_url
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
 
         return reverse_lazy("plugin_list")
 

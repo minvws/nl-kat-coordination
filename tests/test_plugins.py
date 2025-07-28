@@ -35,7 +35,7 @@ def test_plugin_list(rf, superuser_member):
     Plugin.objects.create(name="testing plugins 2", plugin_id="testt 2")
     response = PluginListView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, f'<form action=" /en/plugins/enabled-plugin ')
+    assertContains(response, '<form action=" /en/plugins/enabled-plugin ')
     assertContains(response, f'<form action=" /en/plugins/enabled-plugin/{enabled_plugin.id}')
 
 
@@ -64,10 +64,7 @@ def test_enable_plugins(rf, superuser_member):
     enabled_plugin.refresh_from_db()
     assert enabled_plugin.enabled is False
 
-    request = setup_request(
-        rf.post("plugin_enabled", {"enabled": False, "plugin": plugin.id}), superuser_member.user
-    )
+    request = setup_request(rf.post("plugin_enabled", {"enabled": False, "plugin": plugin.id}), superuser_member.user)
     response = EnabledPluginUpdateView.as_view()(request, pk=enabled_plugin.id)
     assert response.status_code == 302
     assert response.headers["Location"] == "/en/plugins/"
-
