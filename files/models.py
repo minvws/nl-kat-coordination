@@ -1,11 +1,12 @@
 import datetime
+import uuid
 
 from django.core.files.base import ContentFile
 from django.db import models
 
 
 def raw_file_name(instance, directory: str | None = None):
-    return f"files/{datetime.date.today()}/{directory}/{instance.id}"
+    return f"files/{datetime.date.today()}/{directory}/{uuid.uuid4()}"
 
 
 class File(models.Model):
