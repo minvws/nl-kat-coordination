@@ -26,7 +26,6 @@
                                 <th scope="col">{% translate "Status" %}</th>
                                 <th scope="col">{% translate "Created date" %}</th>
                                 <th scope="col">{% translate "Modified date" %}</th>
-                                <th scope="col" class="visually-hidden actions">{% translate "Details" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,25 +40,8 @@
                                     <td>
                                         <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
                                     </td>
-                                    <td>
-                                        <i class="icon {{ task.status }}"></i>{{ task.created_at }}
-                                    </td>
+                                    <td>{{ task.created_at }}</td>
                                     <td>{{ task.modified_at }}</td>
-                                    <td class="actions sticky-cell">
-                                        <button type="button"
-                                                class="expando-button boefjes-task-list-table-row"
-                                                data-icon-open-class="icon ti-chevron-down"
-                                                data-icon-close-class="icon ti-chevron-up"
-                                                data-close-label="{% translate "Close details" %}">
-                                            {% translate "Open details" %}
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="expando-row">
-                                    <td colspan="{% if not organization.code %}7{% else %}6{% endif %}">
-                                        {% include "tasks/partials/task_actions.html" %}
-
-                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

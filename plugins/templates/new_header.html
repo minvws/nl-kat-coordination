@@ -27,14 +27,14 @@
                 <ul>
                     {% if request.user.is_authenticated %}
                         <li>
+                            {% url "plugin_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
+                        </li>
+                        <li>
                             {% url "task_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
-                        </li>
-                        {% url "plugin_list" as index_url %}
-                        <li>
-                            <a href="{{ index_url }}"
-                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
                         </li>
                     {% endif %}
                 </ul>
