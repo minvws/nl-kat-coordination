@@ -7,7 +7,7 @@ import tagulous.models.models
 from django.conf import settings
 from django.db import migrations, models
 
-import openkat.fields
+import openkat.models
 
 
 class Migration(migrations.Migration):
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(help_text="The name of the organisation", max_length=126, unique=True)),
                 (
                     "code",
-                    openkat.fields.LowerCaseSlugField(
+                    openkat.models.LowerCaseSlugField(
                         allow_unicode=True,
                         help_text="A slug containing only lower-case unicode letters, numbers, hyphens or underscores that will be used in URLs and paths",
                         max_length=32,

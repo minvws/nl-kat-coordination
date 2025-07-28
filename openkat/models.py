@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from openkat.enums import MAX_SCAN_LEVEL
-from openkat.fields import LowerCaseSlugField
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -47,6 +46,13 @@ DENY_ORGANIZATION_CODES = [
     "octopoes",
     "openkat",
 ]
+
+
+class LowerCaseSlugField(models.SlugField):
+    def to_python(self, value):
+        if value is None:
+            return None
+        return value.lower()
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):

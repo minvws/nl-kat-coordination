@@ -7,7 +7,7 @@ from account.models import AuthToken
 from openkat.models import Organization
 
 mommy.generators.add("account.models.LowercaseEmailField", random_gen.gen_email)
-mommy.generators.add("openkat.fields.LowerCaseSlugField", random_gen.gen_slug)
+mommy.generators.add("openkat.models.LowerCaseSlugField", random_gen.gen_slug)
 
 
 class OrganizationAdminTestCase(ModelAdminTestCase):

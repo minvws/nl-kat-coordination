@@ -22,7 +22,6 @@ from openkat.exceptions import (
     TrustedClearanceLevelTooLowException,
 )
 from openkat.models import Indemnification, Organization, OrganizationMember
-from openkat.scheduler import SchedulerClient, scheduler_client
 
 
 # There are modified versions of PermLookupDict and PermWrapper from
@@ -254,10 +253,6 @@ class OrganizationAPIMixin:
     @cached_property
     def octopoes_api_connector(self) -> OctopoesAPIConnector:
         return settings.OCTOPOES_FACTORY(self.organization.code)
-
-    @cached_property
-    def scheduler_client(self) -> SchedulerClient:
-        return scheduler_client(self.organization)
 
     @cached_property
     def valid_time(self) -> datetime:

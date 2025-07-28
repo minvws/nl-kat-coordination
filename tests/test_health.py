@@ -1,5 +1,4 @@
-from openkat.health import ServiceHealth
-from openkat.views.health import flatten_health
+from openkat.views.health import ServiceHealth, flatten_health
 
 
 def test_flatten_health_simple():

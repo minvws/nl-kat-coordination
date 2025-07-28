@@ -39,8 +39,8 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from openkat.health import ServiceHealth
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
+from openkat.views.health import ServiceHealth
 from reports.report_types.findings_report.report import FindingsReport
 from reports.runner.models import ReportTask
 from tasks.models import Schedule, TaskStatus

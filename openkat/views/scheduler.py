@@ -112,12 +112,7 @@ class SchedulerView(OctopoesView):
         return self.scheduler_client.get_scheduled_reports()
 
     def get_task_statistics(self) -> dict[Any, Any]:
-        stats = {}
-        try:
-            stats = self.scheduler_client.get_task_stats(self.task_type)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return stats
+        return self.scheduler_client.get_task_stats(self.task_type)
 
     def get_output_oois(self, task: Task):
         try:
@@ -125,9 +120,6 @@ class SchedulerView(OctopoesView):
                 valid_time=datetime.fromisoformat(task.data["raw_data"]["boefje_meta"]["ended_at"]), task_id=task.id
             )[0].result
         except IndexError:
-            return []
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
             return []
 
     def get_json_task_details(self) -> JsonResponse:
@@ -190,37 +182,27 @@ class SchedulerView(OctopoesView):
             raise Http404()
 
     def run_boefje(self, boefje: Boefje, ooi: OOI | None) -> None:
-        try:
-            boefje_task = BoefjeMeta(
-                boefje=boefje.for_task(),
-                input_ooi=ooi.reference if ooi else None,
-                input_ooi_data=ooi.serialize() if ooi else {},
-                organization=self.organization.code,
-            )
+        boefje_task = BoefjeMeta(
+            boefje=boefje.for_task(),
+            input_ooi=ooi.reference if ooi else None,
+            input_ooi_data=ooi.serialize() if ooi else {},
+            organization=self.organization.code,
+        )
 
-            new_task = Task.objects.create(
-                id=boefje_task.id,
-                data=boefje_task.model_dump(mode="json"),
-                type="boefje",
-                organization=self.organization,
-            )
+        new_task = Task.objects.create(
+            id=boefje_task.id, data=boefje_task.model_dump(mode="json"), type="boefje", organization=self.organization
+        )
 
-            self.schedule_task(new_task)
-
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
+        self.schedule_task(new_task)
 
     def run_boefje_for_oois(self, boefje: Boefje, oois: list[OOI]) -> None:
-        try:
-            if not oois and not boefje.consumes:
-                self.run_boefje(boefje, None)
+        if not oois and not boefje.consumes:
+            self.run_boefje(boefje, None)
 
-            for ooi in oois:
-                if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
-                    self.can_raise_clearance_level(ooi, boefje.scan_level)
-                self.run_boefje(boefje, ooi)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
+        for ooi in oois:
+            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
+                self.can_raise_clearance_level(ooi, boefje.scan_level)
+            self.run_boefje(boefje, ooi)
 
     def convert_recurrence_to_cron_expressions(self, recurrence: str, start_date_time: datetime) -> str:
         """

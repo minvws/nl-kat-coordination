@@ -5,10 +5,10 @@ from django.http import HttpRequest, JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
+from pydantic import BaseModel, Field
 
 from account.mixins import OrganizationView
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from openkat.health import ServiceHealth
 from openkat.version import __version__
 
 logger = structlog.get_logger(__name__)
@@ -21,13 +21,19 @@ class Health(OrganizationView, View):
         return JsonResponse(openkat_health.model_dump())
 
 
+class ServiceHealth(BaseModel):
+    service: str
+    healthy: bool = False
+    version: str | None = None
+    additional: Any = None
+    results: list["ServiceHealth"] = Field(default_factory=list)
+
+
+ServiceHealth.update_forward_refs()
+
+
 def get_openkat_health(organization_code: str, octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
-    services = [
-        ServiceHealth(service="octopoes", healthy=True),
-        ServiceHealth(service="katalogus", healthy=True),
-        ServiceHealth(service="scheduler", healthy=True),
-        ServiceHealth(service="bytes", healthy=True),
-    ]
+    services = [ServiceHealth(service="octopoes", healthy=True)]
 
     services_healthy = all(service.healthy for service in services)
     additional = None

@@ -15,12 +15,15 @@
         <tbody>
             {% for plugin in object_list %}
                 <tr id="plugin_{{ plugin.id|slugify }}">
-                    <td><a href="{% url "plugin_detail" pk=plugin.id %}">{{ plugin.name }}</a></td>
+                    <td>
+                        <a href="{% url "plugin_detail" pk=plugin.id %}">{{ plugin.name }}</a>
+                    </td>
                     <td>
                         <span class="plugin-description">{{ plugin.description }}</span>
                     </td>
                     <td>
                         {% include "new_enable_disable_plugin.html" with plugin=plugin %}
+
                     </td>
                 </tr>
             {% endfor %}
