@@ -18,13 +18,7 @@
                         <button form="plugin_list" name="order_by" value="name" class="sort">
                             {% translate "Name" %}
                             <span aria-hidden="true"
-                                  class="{% if order_by == "name" and sorting_order == "asc" %}
-                                  icon ti-chevron-up
-                                  {% elif order_by == "name" and sorting_order == "desc" %}
-                                  icon ti-chevron-down
-                                  {% else %}
-                                  icon ti-direction
-                                  {% endif %}"></span>
+                                  class="{% if order_by == "name" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "name" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                         </button>
                     </th>
                     <th>{% translate "Consumes" %}</th>
@@ -34,13 +28,7 @@
                         <button form="plugin_list" name="order_by" value="oci_image" class="sort">
                             {% translate "Image" %}
                             <span aria-hidden="true"
-                                  class="{% if order_by == "oci_image" and sorting_order == "asc" %}
-                                  icon ti-chevron-up
-                                  {% elif order_by == "oci_image" and sorting_order == "desc" %}
-                                  icon ti-chevron-down
-                                  {% else %}
-                                  icon ti-direction
-                                  {% endif %}"></span>
+                                  class="{% if order_by == "oci_image" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "oci_image" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                         </button>
                     </th>
                     <th>{% translate "Arguments" %}</th>
@@ -50,13 +38,7 @@
                         <button form="plugin_list" name="order_by" value="enabled" class="sort">
                             {% translate "State" %}
                             <span aria-hidden="true"
-                                  class="{% if order_by == "enabled" and sorting_order == "asc" %}
-                                  icon ti-chevron-up
-                                  {% elif order_by == "enabled" and sorting_order == "desc" %}
-                                  icon ti-chevron-down
-                                  {% else %}
-                                  icon ti-direction
-                                  {% endif %}"></span>
+                                  class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                         </button>
                     </th>
                     <th class="visually-hidden">{% translate "Detail page" %}</th>

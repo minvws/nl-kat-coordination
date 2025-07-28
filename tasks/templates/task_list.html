@@ -16,16 +16,8 @@
                     <h2>{% translate "Tasks" %}</h2>
                     <p>{% translate "There are no tasks." %}</p>
                 </div>
-                {% include "tasks/partials/task_filter.html" %}
-
             {% else %}
-                <div>
-                    <h2>{% translate "Tasks" %}</h2>
-                    <p>{% translate "List of tasks." %}</p>
-                </div>
                 <div class="horizontal-scroll sticky-column">
-                    {% include "tasks/partials/task_filter.html" %}
-
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
