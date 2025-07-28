@@ -2,7 +2,9 @@ from django.conf import settings
 from django.db.models import Q
 from django.db.models.functions import Coalesce
 from django.http import FileResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -71,14 +73,36 @@ class EnabledPluginView(CreateView):
     model = EnabledPlugin
     fields = ["enabled", "plugin", "organization"]
     template_name = "new_enable_disable_plugin.html"
-    success_url = reverse_lazy("plugin_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("plugin_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url:
+            if url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+                return redirect_url
+
+        return reverse_lazy("plugin_list")
 
 
 class EnabledPluginUpdateView(UpdateView):
     model = EnabledPlugin
     fields = ["enabled", "plugin", "organization"]
     template_name = "new_enable_disable_plugin.html"
-    success_url = reverse_lazy("plugin_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("plugin_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url:
+            if url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+                return redirect_url
+
+        return reverse_lazy("plugin_list")
 
 
 class PluginCoverImageView(View):
