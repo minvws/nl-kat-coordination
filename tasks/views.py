@@ -9,15 +9,13 @@ class TaskListView(ListView):
     template_name = "task_list.html"
     fields = ["enabled_plugins"]
     model = Task
+    ordering = ["-created_at"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("plugin_list"), "text": _("Tasks")}]
 
         return context
-
-    def get_organization(self):  # TODO
-        return None
 
 
 class TaskDetailView(DetailView):
