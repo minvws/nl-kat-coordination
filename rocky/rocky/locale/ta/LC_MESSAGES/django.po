@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-10 07:04+0000\n"
+"POT-Creation-Date: 2025-07-22 13:42+0000\n"
 "PO-Revision-Date: 2025-07-08 16:37+0000\n"
 "Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -57,6 +57,7 @@ msgid "Please provide username"
 msgstr "பயனர்பெயரை வழங்கவும்"
 
 #: account/forms/account_setup.py
+#: rocky/templates/organizations/organization_member_list.html
 msgid "Email"
 msgstr "மின்னஞ்சல்"
 
@@ -89,7 +90,7 @@ msgid "Please select an account type to proceed."
 msgstr "தொடர ஒரு கணக்கு வகையைத் தேர்ந்தெடுக்கவும்."
 
 #: account/forms/account_setup.py
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
 msgstr "நம்பகமான இசைவு நிலை"
 
@@ -101,7 +102,7 @@ msgstr "இந்த உறுப்பினரை நீங்கள் நம
 msgid "Please select a clearance level to proceed."
 msgstr "தொடர இசைவு நிலையைத் தேர்ந்தெடுக்கவும்."
 
-#: account/forms/account_setup.py
+#: account/forms/account_setup.py tools/models.py
 msgid "The name of the organization."
 msgstr "அமைப்பின் பெயர்."
 
@@ -111,8 +112,8 @@ msgstr "விளக்கம்-அமைப்பு-பெயர்"
 
 #: account/forms/account_setup.py
 #, python-brace-format
-msgid "A unique code of {code_length} characters."
-msgstr "{code_length} எழுத்துக்களின் தனித்துவமான குறியீடு."
+msgid "A unique code of maximum {code_length} characters in length."
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-code"
@@ -138,21 +139,15 @@ msgstr "உங்கள் நிறுவனத்திற்கான மற�
 msgid ""
 "I declare that OpenKAT may scan the assets of my organization and that I "
 "have permission to scan these assets. I am aware of the implications a scan "
-"with a higher scan level brings on my systems."
+"(with a higher scan level) brings on my systems."
 msgstr ""
-"ஓபன்காட் எனது அமைப்பின் சொத்துக்களை ச்கேன் செய்யலாம் என்றும் இந்த சொத்துக்களை ச்கேன் செய்ய "
-"எனக்கு இசைவு உள்ளது என்றும் அறிவிக்கிறேன். எனது கணினிகளில் அதிக ச்கேன் அளவைக் கொண்ட "
-"ச்கேன் ஒரு ச்கேன் தாக்கங்களை நான் அறிவேன்."
 
 #: account/forms/account_setup.py
 msgid ""
-"I declare that I am authorized to give this indemnification within my "
+"I declare that I am authorized to give this indemnification on behalf of my "
 "organization. I have the experience and knowledge to know what the "
 "consequences might be and can be held responsible for them."
 msgstr ""
-"எனது நிறுவனத்திற்குள் இந்த இழப்பீடு வழங்க எனக்கு அதிகாரம் உண்டு என்று அறிவிக்கிறேன். "
-"விளைவுகள் என்னவாக இருக்கும் என்பதை அறிய எனக்கு அனுபவமும் அறிவும் உள்ளது, மேலும் "
-"அவர்களுக்கு பொறுப்பேற்க முடியும்."
 
 #: account/forms/account_setup.py
 msgid "Trusted to change Clearance Levels."
@@ -175,6 +170,7 @@ msgstr ""
 "உறுப்பினர்களின் அந்தச்தைத் தடுக்கவும், எனவே அவர்களுக்கு இனி நிறுவனத்திற்கு அணுகல் இல்லை."
 
 #: account/forms/account_setup.py
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Accepted clearance level"
 msgstr "ஏற்றுக்கொள்ளப்பட்ட இசைவு நிலை"
@@ -234,7 +230,7 @@ msgstr "நிறுவனங்கள்"
 msgid "The organization from which to clone settings."
 msgstr "அமைப்புகளை நகலி செய்யும் அமைப்பு."
 
-#: account/forms/password_reset.py
+#: account/forms/password_reset.py account/templates/account_detail.html
 msgid "Email address"
 msgstr "மின்னஞ்சல் முகவரி"
 
@@ -293,8 +289,8 @@ msgstr ""
 "ஒப்புக்கொண்டீர்கள். தொடர உங்கள் சுயவிவரப் பக்கத்தில் இசைவு அளவை முதலில் ஏற்றுக்கொள்ளுங்கள்."
 
 #: account/models.py
-msgid "The Email must be set"
-msgstr "மின்னஞ்சல் அமைக்கப்பட வேண்டும்"
+msgid "The email must be set"
+msgstr ""
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
@@ -358,10 +354,6 @@ msgid "Full name"
 msgstr "முழு பெயர்"
 
 #: account/templates/account_detail.html
-msgid "E-mail address"
-msgstr "மின்னஞ்சல் முகவரி"
-
-#: account/templates/account_detail.html
 msgid "Member type"
 msgstr "உறுப்பினர் வகை"
 
@@ -380,12 +372,13 @@ msgid "OOI clearance"
 msgstr "OOI இசைவு"
 
 #: account/templates/account_detail.html
-msgid ""
-"You don't have any clearance to scan objects. <br> Get in contact with the "
-"admin to give you the necessary clearance level."
+msgid "You don't have any clearance to scan objects."
 msgstr ""
-"பொருள்களை வருடு செய்ய உங்களுக்கு எந்த இசைவு இல்லை. <br> தேவையான இசைவு அளவை "
-"உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்."
+
+#: account/templates/account_detail.html
+msgid ""
+"Get in contact with the admin to give you the necessary clearance level."
+msgstr ""
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -425,7 +418,7 @@ msgstr ""
 "கொள்ளுங்கள்: <strong> பெரும் சக்தியுடன் பெரும் பொறுப்பு வருகிறது. </strong>"
 
 #: account/templates/account_detail.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid "Accept level L%(tcl)s clearance and responsibility"
 msgstr "நிலை L%(tcl)s இசைவு மற்றும் பொறுப்பை ஏற்றுக்கொள்ளுங்கள்"
@@ -762,17 +755,9 @@ msgstr "டாச்போர்டுகள்"
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid ""
-"\n"
-"                        On this page you can see an overview of the "
-"dashboards for all organizations.\n"
-"                        **More context can be written here**\n"
-"                    "
+"On this page you can see an overview of the dashboards for all "
+"organizations. **More context can be written here**"
 msgstr ""
-"\n"
-"                        இந்த பக்கத்தில் நீங்கள் அனைத்து நிறுவனங்களுக்கும் டாச்போர்டுகளின் "
-"கண்ணோட்டத்தைக் காணலாம். \n"
-"** மேலும் சூழலை இங்கே எழுதலாம் **\n"
-"                    "
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "dashboards"
@@ -816,51 +801,23 @@ msgstr "ஒரு நிறுவனத்திற்கு கண்டுப�
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                            This table shows the findings that have been "
-"identiefied for each organization,\n"
-"                            sorted by the finding types and grouped by "
-"organizations.\n"
-"                            This data is based on the latest Crisis Room "
-"Findings Report\n"
-"                            of each organization.\n"
-"                        "
+"This table shows the findings that have been identiefied for each "
+"organization, sorted by the finding types and grouped by organizations. This "
+"data is based on the latest Crisis Room Findings Report of each organization."
 msgstr ""
-"\n"
-"                            இந்த அட்டவணை ஒவ்வொரு நிறுவனத்திற்கும் அடையாளம் காணப்பட்ட "
-"கண்டுபிடிப்புகளைக் காட்டுகிறது, \n"
-"கண்டுபிடிப்பு வகைகளால் வரிசைப்படுத்தப்பட்டு நிறுவனங்களால் தொகுக்கப்பட்டுள்ளது. \n"
-"இந்த தரவு அண்மைக் கால நெருக்கடி அறை கண்டுபிடிப்புகள் அறிக்கையை அடிப்படையாகக் கொண்டது \n"
-"ஒவ்வொரு அமைப்பிலும்.\n"
-"                        "
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                    No findings have been identified yet. As soon as they "
-"have been\n"
-"                    identified, they will be shown on this page.\n"
-"                "
+"No findings have been identified yet. As soon as they have been identified, "
+"they will be shown on this page."
 msgstr ""
-"\n"
-"                    கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை. அவர்கள் "
-"இருந்தவுடன் \n"
-"                    அடையாளம் காணப்பட்ட, அவை இந்தப் பக்கத்தில் காண்பிக்கப்படும்.\n"
-"                "
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                There are no organizations yet. After creating an "
-"organization,\n"
-"                the identified findings will be shown here.\n"
-"            "
+"There are no organizations yet. After creating an organization, the "
+"identified findings will be shown here."
 msgstr ""
-"\n"
-"                இதுவரை எந்த அமைப்புகளும் இல்லை. ஒரு அமைப்பை உருவாக்கியபிறகு, \n"
-"                    அடையாளம் காணப்பட்ட கண்டுபிடிப்புகள் இங்கே காண்பிக்கப்படும்.\n"
-"            "
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -935,9 +892,13 @@ msgid "Report section"
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
+msgid "There are no dashboard items added yet."
+msgstr ""
+
+#: crisis_room/templates/organization_crisis_room_dashboard_items.html
 msgid ""
-"There are no dashboard items added yet. You can add dashboard items via the "
-"filters on the objects and findings page or you can add a report section."
+"You can add dashboard items via the filters on the objects and findings page "
+"or you can add a report section."
 msgstr ""
 
 #: crisis_room/templates/organization_crisis_room_dashboard_items.html
@@ -1045,15 +1006,11 @@ msgid "Critical and high findings"
 msgstr "முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகள்"
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                                            This table shows the top 25 "
-"critical and high findings that have\n"
-"                                            been identified for this "
-"organization, grouped by finding types.\n"
-"                                            A table with all the identified "
-"findings can be found in the Findings Report.\n"
-"                                        "
+"This table shows the top 25 critical and high findings that have been "
+"identified for this organization, grouped by finding types. A table with all "
+"the identified findings can be found in the Findings Report."
 msgstr ""
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
@@ -1127,7 +1084,6 @@ msgstr "தீவிரம்"
 #: crisis_room/templates/partials/dashboard_finding_list_table.html
 #: reports/report_types/dns_report/report.html
 #: reports/templates/partials/report_findings_table.html
-#: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/views/mixins.py
 msgid "Finding"
@@ -1955,7 +1911,6 @@ msgid "Required settings"
 msgstr "தேவையான அமைப்புகள்"
 
 #: katalogus/templates/partials/plugin_settings_required.html
-#: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
 msgstr "கூட்டு"
@@ -2311,13 +2266,11 @@ msgstr ""
 "செருகுநிரலுக்கான அமைப்புகளை நீக்குவதில் தோல்வியுற்றது {}. மேலும் தகவலுக்கு கட்டாலோகச் "
 "பதிவுகளை சரிபார்க்கவும்."
 
-#: onboarding/forms.py tools/forms/ooi.py
+#: onboarding/forms.py
 msgid ""
-"Boefjes that has a scan level below or equal to the clearance level, is "
-"permitted to scan an object."
+"The clearance level determines how aggressive the object can be scanned by "
+"plugins. A higher clearance level means more aggressive scans are allowed."
 msgstr ""
-"கீழே அல்லது இசைவு நிலைக்கு சமமான ச்கேன் அளவைக் கொண்ட போஃப்செச், ஒரு பொருளை ச்கேன் செய்ய "
-"அனுமதிக்கப்படுகிறது."
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid "explanation-clearance-level"
@@ -2328,93 +2281,81 @@ msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 "'Http: //' அல்லது 'https: //' உடன் தொடங்கும் செல்லுபடியாகும் முகவரி ஐ உள்ளிடவும்."
 
-#: onboarding/templates/account/step_1_registration_intro.html
-msgid "Register"
-msgstr "பதிவு செய்யுங்கள்"
-
-#: onboarding/templates/account/step_1_registration_intro.html
-msgid "Create a new account for your organization"
-msgstr "உங்கள் நிறுவனத்திற்கு புதிய கணக்கை உருவாக்கவும்"
-
-#: onboarding/templates/account/step_1_registration_intro.html
-msgid ""
-"All user  accounts are part of an organization. So if you’re new and your "
-"company is also new to OpenKAT you can register here to create a OpenKAT "
-"account for your company including an admin account for you. If you like a "
-"user account that is connected to an already existing organization within "
-"OpenKAT you can ask the admin to create an account for you."
+#: onboarding/templates/partials/onboarding_header.html
+msgid "Onboarding"
 msgstr ""
-"அனைத்து பயனர் கணக்குகளும் ஒரு நிறுவனத்தின் ஒரு பகுதியாகும். எனவே நீங்கள் புதியவராக "
-"இருந்தால், உங்கள் நிறுவனமும் OpenKAT க்கு புதியதாக இருந்தால், உங்களுக்கான நிர்வாகக் "
-"கணக்கு உட்பட உங்கள் நிறுவனத்திற்கு OpenKAT கணக்கை உருவாக்க இங்கே பதிவு செய்யலாம். "
-"OpenKAT க்குள் ஏற்கனவே இருக்கும் நிறுவனத்துடன் இணைக்கப்பட்டுள்ள பயனர் கணக்கை நீங்கள் "
-"விரும்பினால், உங்களுக்காக ஒரு கணக்கை உருவாக்க நிர்வாகியிடம் கேட்கலாம்."
 
-#: onboarding/templates/account/step_1_registration_intro.html
-#: onboarding/templates/step_1_introduction.html
-msgid "Let's get started"
-msgstr "தொடங்குவோம்"
-
-#: onboarding/templates/account/step_1_registration_intro.html
-#: onboarding/templates/step_1_introduction.html
-msgid "How does OpenKAT work"
-msgstr "ஓபன்காட் எவ்வாறு செயல்படுகிறது"
-
-#: onboarding/templates/account/step_1_registration_intro.html
-msgid ""
-"OpenKAT is able to give insight into security risks on your online objects. "
-"For example, your websites, mailservers or online data. OpenKAT uses scans "
-"to find and assess the area's that might be at risk and reports these back "
-"to you. As a user you decide which insight you would like and OpenKAT guides "
-"you to through the process. During this introduction you will be guided "
-"through the steps to create a report."
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "Welcome to OpenKAT!"
 msgstr ""
-"உங்கள் நிகழ்நிலை பொருள்களில் பாதுகாப்பு அபாயங்கள் குறித்த நுண்ணறிவை ஓபன்காட் வழங்க "
-"முடியும். எடுத்துக்காட்டாக, உங்கள் வலைத்தளங்கள், மெயில்சர்வர்கள் அல்லது நிகழ்நிலை தரவு. "
-"ஆபத்தில் இருக்கும் பகுதியைக் கண்டுபிடித்து மதிப்பிடுவதற்கு ஓபன்காட் ச்கேன்களைப் "
-"பயன்படுத்துகிறது, மேலும் இவற்றை உங்களிடம் தெரிவிக்கிறது. ஒரு பயனராக நீங்கள் எந்த "
-"நுண்ணறிவை விரும்புகிறீர்கள் என்பதை தீர்மானிக்கிறீர்கள், மேலும் OpenKat இந்த செயல்முறையின் "
-"மூலம் உங்களை வழிநடத்துகிறது. இந்த அறிமுகத்தின் போது நீங்கள் ஒரு அறிக்கையை "
-"உருவாக்குவதற்கான படிகள் மூலம் வழிநடத்தப்படுவீர்கள்."
 
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
-#: onboarding/templates/account/step_2b_indemnification_setup.html
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "OpenKAT setup"
-msgstr "OpenKAT அமைப்பு"
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
+"set everything up."
+msgstr ""
 
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"At the end of this onboarding you have added your first object, created your "
+"first DNS report and learned about some basic concepts used within OpenKAT."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "The full documentation for OpenKAT can be found at:"
+msgstr ""
+
+#: onboarding/templates/partials/step_2_organization_text.html
 #: rocky/templates/organizations/organization_add.html
 msgid "Organization setup"
 msgstr "நிறுவன அமைப்பு"
 
-#: onboarding/templates/account/step_2a_organization_setup.html
+#: onboarding/templates/partials/step_2_organization_text.html
 msgid ""
-"Please enter the following organization details. These details can be edited "
-"within the organization page within OpenKAT when necessary. Adding a new "
-"organization requires a new database."
+"Please enter the following organization details. The organization name can "
+"be changed later in the interface. The organization code cannot be changed "
+"as this is used by the database."
 msgstr ""
-"பின்வரும் நிறுவன விவரங்களை உள்ளிடவும். இந்த விவரங்களை தேவைப்படும்போது OpenKAT க்குள் "
-"உள்ள நிறுவன பக்கத்திற்குள் திருத்தலாம். புதிய அமைப்பைச் சேர்ப்பதற்கு புதிய தரவுத்தளம் தேவை."
 
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
+#: onboarding/templates/step_10_report.html
+#: reports/report_types/concatenated_report/report.py
+msgid "Report"
+msgstr "அறிக்கை"
+
+#: onboarding/templates/step_10_report.html
+msgid "Boefjes are scanning"
+msgstr "போஃப்செச் ச்கேன் செய்கிறார்"
+
+#: onboarding/templates/step_10_report.html
+msgid ""
+"The enabled Boefjes are running in the background to gather the data for "
+"your DNS Report. This may take a few minutes."
+msgstr ""
+
+#: onboarding/templates/step_10_report.html
+msgid ""
+"In the meantime you can explore OpenKAT and view your DNS Report on the "
+"Reports page once it has been generated."
+msgstr ""
+
+#: onboarding/templates/step_10_report.html
+msgid "Continue to OpenKAT"
+msgstr ""
+
+#: onboarding/templates/step_1_introduction_registration.html
+#: onboarding/templates/step_1a_introduction.html
+msgid "Let's get started"
+msgstr "தொடங்குவோம்"
+
+#: onboarding/templates/step_2a_organization_setup.html
+#: onboarding/templates/step_2b_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization details"
 msgstr "அமைப்பு விவரங்கள்"
 
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
+#: onboarding/templates/step_2a_organization_setup.html
 #: rocky/templates/forms/json_schema_form.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_member_add.html
@@ -2426,657 +2367,53 @@ msgstr "அமைப்பு விவரங்கள்"
 msgid "Submit"
 msgstr "சமர்ப்பிக்கவும்"
 
-#: onboarding/templates/account/step_2a_organization_update.html
-#: rocky/templates/organizations/organization_add.html
-msgid ""
-"Please enter the following organization details. These details can be edited "
-"within the organization page within OpenKAT when necessary."
-msgstr ""
-"பின்வரும் நிறுவன விவரங்களை உள்ளிடவும். இந்த விவரங்களை தேவைப்படும்போது OpenKAT க்குள் "
-"உள்ள நிறுவன பக்கத்திற்குள் திருத்தலாம்."
-
-#: onboarding/templates/account/step_2a_organization_update.html
+#: onboarding/templates/step_2b_organization_update.html
 msgid "Submit changes"
 msgstr "மாற்றங்களை சமர்ப்பிக்கவும்"
 
-#: onboarding/templates/account/step_2a_organization_update.html
-#: onboarding/templates/account/step_2b_indemnification_setup.html
-#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_2b_organization_update.html
+#: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
 msgid "Continue"
 msgstr "தொடரவும்"
 
-#: onboarding/templates/account/step_2b_indemnification_setup.html
+#: onboarding/templates/step_3_indemnification_setup.html
 msgid "Indemnification setup"
 msgstr "இழப்பீட்டு அமைப்பு"
 
-#: onboarding/templates/account/step_2b_indemnification_setup.html
+#: onboarding/templates/step_3_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
 msgstr "அமைப்பு மீதான இழப்பீடு ஏற்கனவே உள்ளது."
 
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "Account setup"
-msgstr "கணக்கு அமைப்பு"
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Organization setup with separate accounts:"
-msgstr "தனி கணக்குகளுடன் அமைப்பு அமைப்பு:"
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid ""
-"Within OpenKAT it is possible to create separate user accounts with the "
-"specific roles. Each with their own functionalities and permissions. This is "
-"useful when multiple people will be working with the same OpenKAT-setup. You "
-"can choose to create the separate accounts during this introduction or when "
-"you’re ready from the OpenKAT users page."
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
+msgid "User clearance level"
 msgstr ""
-"OpenKAT க்குள் குறிப்பிட்ட பாத்திரங்களுடன் தனி பயனர் கணக்குகளை உருவாக்க முடியும். "
-"ஒவ்வொன்றும் அவற்றின் சொந்த செயல்பாடுகள் மற்றும் அனுமதிகளுடன். பல நபர்கள் ஒரே ஓபன்காட்-"
-"செட்டப்புடன் பணிபுரியும் போது இது பயனுள்ளதாக இருக்கும். இந்த அறிமுகத்தின் போது அல்லது "
-"நீங்கள் OpenKat பயனர்கள் பக்கத்திலிருந்து தயாராக இருக்கும்போது தனி கணக்குகளை உருவாக்க "
-"நீங்கள் தேர்வு செய்யலாம்."
 
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Single account setup:"
-msgstr "ஒற்றை கணக்கு அமைப்பு:"
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
-"Alternatively it is also an option to run OpenKAT from a single user "
-"account. Which is useful when you are the only user in the account. You will "
-"be able to access the functionality of the different roles from your "
-"account. You can always add additional user accounts If you’re team expands "
-"in the future."
+"The user clearance level specifies the maximum scan level for security scans "
+"and the maximum clearance level you can assign to objects (e.g. a URL)."
 msgstr ""
-"மாற்றாக இது ஒரு பயனர் கணக்கிலிருந்து OpenKAT ஐ இயக்குவதற்கான ஒரு விருப்பமாகும். "
-"கணக்கில் நீங்கள் மட்டுமே பயனராக இருக்கும்போது இது பயனுள்ளதாக இருக்கும். உங்கள் "
-"கணக்கிலிருந்து வெவ்வேறு பாத்திரங்களின் செயல்பாட்டை நீங்கள் அணுக முடியும். எதிர்காலத்தில் "
-"நீங்கள் குழு விரிவடைந்தால் கூடுதல் பயனர் கணக்குகளை எப்போதும் சேர்க்கலாம்."
 
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Create separate accounts"
-msgstr "தனி கணக்குகளை உருவாக்கவும்"
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Continue with this account, onboard me!"
-msgstr "இந்த கணக்கைத் தொடரவும், என்னைத் தொடங்குங்கள்!"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "Users"
-msgstr "பயனர்கள்"
-
-#: onboarding/templates/account/step_3_account_user_type.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
-"Within OpenKAT there are three types of user accounts. Each has its own "
-"functions."
+"The administrator assigns a maximum user clearance level to each user. This "
+"will make sure that only trusted users can start more aggressive scans."
 msgstr ""
-"OpenKAT க்குள் மூன்று வகையான பயனர் கணக்குகள் உள்ளன. ஒவ்வொன்றும் அதன் சொந்த செயல்பாடுகளைக் "
-"கொண்டுள்ளன."
 
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-msgid "Admin"
-msgstr "நிர்வாகி"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
-"Each organization must have an admin. The admin can create and manage user "
-"accounts as well as organization details."
+"A user must accept a clearance level, before they perform actions in "
+"OpenKAT. Here you may accept the maximum trusted clearance level, as "
+"assigned by your administrator. On your user settings page you can choose to "
+"lower your accepted clearance level after completing the onboarding."
 msgstr ""
-"ஒவ்வொரு நிறுவனத்திற்கும் ஒரு நிர்வாகி இருக்க வேண்டும். நிர்வாகி பயனர் கணக்குகள் மற்றும் "
-"நிறுவன விவரங்களை உருவாக்கி நிர்வகிக்க முடியும்."
 
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer"
-msgstr "சிவப்பு டீமர்"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "A red teamer account can run scans and generate reports."
-msgstr "ஒரு ரெட் டீமர் கணக்கு ச்கேன்களை இயக்கலாம் மற்றும் அறிக்கைகளை உருவாக்கலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Client account"
-msgstr "வாங்கி கணக்கு"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "A client account can access reports."
-msgstr "கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid ""
-"Each organization requires at least one admin and one red teamer account to "
-"function. This introduction will guide you through the setup of both. After "
-"that you can choose to add a client account as well."
-msgstr ""
-"ஒவ்வொரு நிறுவனத்திற்கும் செயல்பட குறைந்தபட்சம் ஒரு நிர்வாகி மற்றும் ஒரு சிவப்பு டீமர் "
-"கணக்கு தேவைப்படுகிறது. இந்த அறிமுகம் இரண்டையும் அமைப்பதன் மூலம் உங்களுக்கு வழிகாட்டும். "
-"அதன் பிறகு கிளையன்ட் கணக்கையும் சேர்க்க நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "Let's add accounts"
-msgstr "கணக்குகளைச் சேர்ப்போம்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-msgid "Admin account setup"
-msgstr "நிர்வாக கணக்கு அமைப்பு"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-msgid "Admin details"
-msgstr "நிர்வாக விவரங்கள்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
-msgstr "இந்த படியைத் தவிர்க்கவும்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
-msgstr "முந்தைய படிக்குச் செல்லுங்கள்"
-
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer account setup"
-msgstr "ரெட் டீமர் கணக்கு அமைப்பு"
-
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer details"
-msgstr "சிவப்பு அணியின் விவரங்கள்"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Client account setup (optional)"
-msgstr "கிளையன்ட் கணக்கு அமைவு (விரும்பினால்)"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid ""
-"A client account can access reports. Adding a client account to the "
-"organization is optional."
-msgstr ""
-"கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம். நிறுவனத்தில் கிளையன்ட் கணக்கைச் சேர்ப்பது "
-"விருப்பமானது."
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "User details"
-msgstr "பயனர் விவரங்கள்"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Finish organization setup"
-msgstr "அமைப்பு அமைப்பை முடிக்கவும்"
-
-#: onboarding/templates/step_1_introduction.html
-#: rocky/templates/landing_page.html
-msgid "Welcome to OpenKAT"
-msgstr "OpenKat க்கு வருக"
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
-"Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
-"and Sport to make your and our world a safer place."
-msgstr ""
-"OpenKAT என்பது \"KWETSBAARHEDEN ANALYSE TOOLURE\" (பாதிப்புகள் பகுப்பாய்வு கருவி) "
-"ஆகும். உங்களுடைய மற்றும் எங்கள் உலகத்தை பாதுகாப்பான இடமாக மாற்ற சுகாதார, நலன்புரி "
-"மற்றும் விளையாட்டு அமைச்சகம் உருவாக்கிய திறந்த மூல-திட்டம்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT is able to give insight into security risks on your online objects. "
-"For example, your websites, mailservers or online data."
-msgstr ""
-"உங்கள் நிகழ்நிலை பொருள்களில் பாதுகாப்பு அபாயங்கள் குறித்த நுண்ணறிவை ஓபன்காட் வழங்க "
-"முடியும். எடுத்துக்காட்டாக, உங்கள் வலைத்தளங்கள், மெயில்சர்வர்கள் அல்லது நிகழ்நிலை தரவு."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT uses plugins to find and assess the area's that might be at risk and "
-"reports these back to you. Each plugin has its own skillset which could be "
-"scanning, normalizing or analyzing data. As a user you decide which areas "
-"you would like to monitor or scan and which insight you would like to "
-"receive."
-msgstr ""
-"ஆபத்தில் இருக்கும் பகுதியைக் கண்டுபிடித்து மதிப்பிடுவதற்கு ஓபன்காட் செருகுநிரல்களைப் "
-"பயன்படுத்துகிறது, மேலும் இவற்றை உங்களிடம் தெரிவிக்கிறது. ஒவ்வொரு சொருகி அதன் சொந்த "
-"திறனைக் கொண்டுள்ளது, இது தரவை ச்கேன் செய்வது, இயல்பாக்குதல் அல்லது பகுப்பாய்வு செய்வது. "
-"ஒரு பயனராக நீங்கள் எந்த பகுதிகளை கண்காணிக்க அல்லது ச்கேன் செய்ய விரும்புகிறீர்கள், எந்த "
-"நுண்ணறிவைப் பெற விரும்புகிறீர்கள் என்பதை நீங்கள் தீர்மானிக்கிறீர்கள்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"Within OpenKAT you can view the insights as well as all the data OpenKAT has "
-"found. You can choose to browse through the data or view reports."
-msgstr ""
-"OpenKAT க்குள் நீங்கள் நுண்ணறிவுகளையும், OpenKat ஐக் கண்டறிந்த அனைத்து தரவுகளையும் "
-"காணலாம். தரவு மூலம் உலவ அல்லது அறிக்கைகளைக் காண நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"During this introduction you will be guided through the steps to create a "
-"report."
-msgstr ""
-"இந்த அறிமுகத்தின் போது நீங்கள் ஒரு அறிக்கையை உருவாக்குவதற்கான படிகள் மூலம் "
-"வழிநடத்தப்படுவீர்கள்."
-
-#: onboarding/templates/step_1_introduction.html
-#: onboarding/templates/step_2a_choose_report_info.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_3f_set_clearance_level.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/partials/form/boefje_tiles_form.html
-msgid "Skip onboarding"
-msgstr "ஆன் போர்டிங் தவிர்க்கவும்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
-msgid "OpenKAT introduction"
-msgstr "OpenKat அறிமுகம்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Choose a report - Introduction"
-msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - அறிமுகம்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: reports/templates/report_overview/report_overview_header.html
-#: reports/views/base.py rocky/templates/header.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-#: rocky/templates/tasks/reports.html rocky/views/tasks.py
-msgid "Reports"
-msgstr "அறிக்கைகள்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"Reports within OpenKAT contain an overview of the scanned objects, issues "
-"found within them and known security risks that the object might be "
-"vulnerable to. Each report gives a high overview of the state of the object "
-"as well as detailed information on what OpenKAT found and possible solutions."
-msgstr ""
-"OpenKat க்குள் உள்ள அறிக்கைகள் ச்கேன் செய்யப்பட்ட பொருள்களின் கண்ணோட்டத்தைக் கொண்டிருக்கின்றன, "
-"அவற்றில் காணப்படும் சிக்கல்கள் மற்றும் பொருள் பாதிக்கப்படக்கூடிய பாதுகாப்பு அபாயங்கள். "
-"ஒவ்வொரு அறிக்கையும் பொருளின் நிலையைப் பற்றிய உயர் கண்ணோட்டத்தையும், ஓபன்காட் என்ன "
-"கண்டுபிடித்தது என்பதையும், சாத்தியமான தீர்வுகள் பற்றிய விரிவான தகவல்களையும் தருகிறது."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: reports/report_types/dns_report/report.html
-msgid "Data"
-msgstr "தகவல்கள்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"OpenKAT can scan and analyze by using plugins. Each plugin has it's unique "
-"skillset and will collect specific data or give specific insights. You "
-"manage the plugins within your account which let's OpenKAT know which "
-"plugins to run and on which objects or areas."
-msgstr ""
-"செருகுநிரல்களைப் பயன்படுத்தி OpenKAT ச்கேன் செய்து பகுப்பாய்வு செய்யலாம். ஒவ்வொரு சொருகி "
-"அதன் தனித்துவமான திறனைக் கொண்டுள்ளது மற்றும் குறிப்பிட்ட தரவைச் சேகரிக்கும் அல்லது "
-"குறிப்பிட்ட நுண்ணறிவுகளைத் தரும். உங்கள் கணக்கிற்குள் உள்ள செருகுநிரல்களை நீங்கள் "
-"நிர்வகிக்கிறீர்கள், இது எந்த செருகுநிரல்களை இயக்க வேண்டும், எந்த பொருள்கள் அல்லது பகுதிகள் "
-"என்பதை ஓபன்காட் அறிந்து கொள்வோம்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Generating a report"
-msgstr "ஒரு அறிக்கையை உருவாக்குதல்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"When you choose a report type OpenKAT will guide you through the setup. "
-"OpenKAT will ask the necessary questions based on the input the report "
-"needs, as well as asks for permission to run plugins that you haven’t "
-"enabled yet but are needed to collect or analyze the data."
-msgstr ""
-"நீங்கள் ஒரு அறிக்கை வகையைத் தேர்வுசெய்யும்போது, திறப்பது அமைப்பின் மூலம் உங்களுக்கு "
-"வழிகாட்டும். அறிக்கைக்குத் தேவையான உள்ளீட்டின் அடிப்படையில் தேவையான கேள்விகளை ஓபன்காட் "
-"கேட்கும், அத்துடன் நீங்கள் இதுவரை இயக்காத ஆனால் தரவைச் சேகரிக்க அல்லது பகுப்பாய்வு செய்ய "
-"வேண்டிய செருகுநிரல்களை இயக்க இசைவு கேட்கிறது."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"You can also choose to look at the collected data directly or generate your "
-"own report by selecting and running plugins on objects of your choice. "
-"OpenKAT will present the results."
-msgstr ""
-"நீங்கள் விரும்பும் பொருள்களில் செருகுநிரல்களைத் தேர்ந்தெடுத்து இயக்குவதன் மூலம் சேகரிக்கப்பட்ட "
-"தரவைப் பார்க்க அல்லது உங்கள் சொந்த அறிக்கையை உருவாக்கவும் நீங்கள் தேர்வு செய்யலாம். ஓபன்காட் "
-"முடிவுகளை வழங்கும்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Permission"
-msgstr "இசைவு"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"Plugins can be provided by OpenKAT but they can also come from the "
-"community. Before a plugin can run, you need to give it permission by "
-"enabling it."
-msgstr ""
-"செருகுநிரல்களை ஓபன்காட் வழங்க முடியும், ஆனால் அவை சமூகத்திலிருந்தும் வரலாம். ஒரு "
-"சொருகி இயங்குவதற்கு முன், அதை இயக்குவதன் மூலம் அதற்கு இசைவு வழங்க வேண்டும்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"When you generate a report. OpenKAT will let you know which plugins it "
-"requires or suggests so you can choose to enable them."
-msgstr ""
-"நீங்கள் ஒரு அறிக்கையை உருவாக்கும்போது. எந்த செருகுநிரல்கள் தேவை அல்லது பரிந்துரைக்கின்றன "
-"என்பதை ஓபன்காட் உங்களுக்குத் தெரிவிக்கும், எனவே அவற்றை இயக்க நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Let's choose a report"
-msgstr "ஒரு அறிக்கையைத் தேர்ந்தெடுப்போம்"
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "Choose a report - Type"
-msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - தட்டச்சு செய்க"
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid ""
-"Within OpenKAT you can view reports for each of your current objects. For "
-"specific reports you can choose one of the available report types and "
-"generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
-"some examples."
-msgstr ""
-"OpenKAT க்குள் உங்கள் தற்போதைய ஒவ்வொரு பொருளுக்கும் அறிக்கைகளைக் காணலாம். குறிப்பிட்ட "
-"அறிக்கைகளுக்கு நீங்கள் கிடைக்கக்கூடிய அறிக்கை வகைகளில் ஒன்றைத் தேர்ந்தெடுத்து அறிக்கையை "
-"உருவாக்கலாம். பென்டெச்ட், டி.என்.எச்-அறிக்கை அல்லது சில எடுத்துக்காட்டுகளை வழங்க ஒரு அஞ்சல் "
-"அறிக்கை போன்றவை."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "For this tutorial we will create a DNS-report to get you started."
-msgstr "இந்த டுடோரியலுக்காக நீங்கள் தொடங்குவதற்கு டி.என்.எச்-அறிக்கையை உருவாக்குவோம்."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid ""
-"When you start to generate this report. OpenKAT will guide you through the "
-"necessary steps."
-msgstr ""
-"இந்த அறிக்கையை நீங்கள் உருவாக்கத் தொடங்கும் போது. அவுட்காட் தேவையான படிகள் மூலம் உங்களுக்கு "
-"வழிகாட்டும்."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-#: reports/report_types/dns_report/report.py
-msgid "DNS Report"
-msgstr "டிஎன்எச் அறிக்கை"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Setup scan"
-msgstr "அமைவு ச்கேன்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Let OpenKAT know what object to scan"
-msgstr "ச்கேன் செய்ய எந்த பொருளை OpenKat க்கு தெரியப்படுத்துங்கள்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Plugins scan and analyze objects. OpenKAT needs to know which object(s) you "
-"would like to scan and analyze for the DNS-report. So it can tell you which "
-"plugins are available for the chosen object."
-msgstr ""
-"செருகுநிரல்கள் பொருள்களை ச்கேன் செய்து பகுப்பாய்வு செய்கின்றன. டி.என்.எச்-அறிக்கைக்கு நீங்கள் "
-"எந்த பொருளை (களை) ச்கேன் செய்து பகுப்பாய்வு செய்ய விரும்புகிறீர்கள் என்பதை ஓபன்காட் அறிந்து "
-"கொள்ள வேண்டும். எனவே தேர்ந்தெடுக்கப்பட்ட பொருளுக்கு எந்த செருகுநிரல்கள் உள்ளன என்பதை இது "
-"உங்களுக்குக் கூறலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Understanding objects"
-msgstr "பொருள்களைப் புரிந்துகொள்வது"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
-"name a few.  While these objects can be related to each other they are all "
-"objects within OpenKAT that can be scanned to gain valuable insight."
-msgstr ""
-"ஓபன்காட்டின் எல்லைக்குள் நிறைய விசயங்கள் ஒரு பொருளாக இருக்கலாம். எடுத்துக்காட்டாக, ஒரு "
-"மெயில்சர்வர், ஒரு ஐபி முகவரி, ஒரு முகவரி, ஒரு டிஎன்எச் பதிவு, ஒரு ஓச்ட்பெயர் அல்லது "
-"ஒரு சில பெயர்களைக் குறிப்பிடுவதற்கு பிணையம். இந்த பொருள்கள் ஒருவருக்கொருவர் "
-"தொடர்புடையதாக இருக்கும்போது, அவை அனைத்தும் OpenKAT க்குள் உள்ள பொருள்கள், அவை "
-"மதிப்புமிக்க நுண்ணறிவைப் பெற ச்கேன் செய்யப்படலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Creating, adding and editing objects"
-msgstr "பொருள்களை உருவாக்குதல், சேர்ப்பது மற்றும் திருத்துதல்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Within OpenKAT you can view, add and edit objects from the organization’s "
-"object page."
-msgstr ""
-"OpenKat க்குள் நீங்கள் நிறுவனத்தின் பொருள் பக்கத்திலிருந்து பொருட்களைக் காணலாம், சேர்க்கலாம் "
-"மற்றும் திருத்தலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Let’s add an object to scan for the DNS-Report. For this introduction we "
-"suggest adding a URL."
-msgstr ""
-"டி.என்.எச்-அறிக்கைக்கு ச்கேன் செய்ய ஒரு பொருளைச் சேர்ப்போம். இந்த அறிமுகத்திற்கு முகவரி ஐ "
-"சேர்க்க பரிந்துரைக்கிறோம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Add URL"
-msgstr "முகவரி ஐச் சேர்க்கவும்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html onboarding/views.py
-msgid "Creating an object"
-msgstr "ஒரு பொருளை உருவாக்குதல்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Create your first object, a URL by filling out the form below."
-msgstr "கீழே உள்ள படிவத்தை நிரப்புவதன் மூலம் உங்கள் முதல் பொருளை, முகவரி ஐ உருவாக்கவும்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"Additional details and examples can be found by pressing on the help button "
-"next to the input field."
-msgstr ""
-"உள்ளீட்டு புலத்திற்கு அடுத்த உதவி பொத்தானை அழுத்துவதன் மூலம் கூடுதல் விவரங்கள் மற்றும் "
-"எடுத்துக்காட்டுகளைக் காணலாம்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Dependencies"
-msgstr "சார்புநிலைகள்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"Most objects have dependencies on the existence of other objects. For "
-"example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and IP address. OpenKAT collects these additional "
-"object automatically when possible. By running plugins to collect or extract "
-"this data."
-msgstr ""
-"பெரும்பாலான பொருள்கள் மற்ற பொருட்களின் இருப்பைப் பற்றிய சார்புகளைக் கொண்டுள்ளன. "
-"எடுத்துக்காட்டாக, ஒரு முகவரி ஐ ஒரு பிணையம், ஓச்ட்பெயர், FQDN (முழு தகுதி வாய்ந்த "
-"டொமைன் பெயர்) மற்றும் ஐபி முகவரியுடன் இணைக்க வேண்டும். ஓபன்காட் இந்த கூடுதல் பொருளை "
-"முடிந்தவரை தானாக சேகரிக்கிறது. இந்தத் தரவை சேகரிக்க அல்லது பிரித்தெடுக்க "
-"செருகுநிரல்களை இயக்குவதன் மூலம்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"The additional objects that OpenKAT created will be added to your object "
-"list as separate objects. If OpenKAT can’t add them automatically it will "
-"guide you through the process of creating them manually."
-msgstr ""
-"OpenKAT உருவாக்கிய கூடுதல் பொருள்கள் உங்கள் பொருள் பட்டியலில் தனி பொருள்களாக "
-"சேர்க்கப்படும். ஓபன்காட் அவற்றை தானாகவே சேர்க்க முடியாவிட்டால், அவற்றை கைமுறையாக "
-"உருவாக்கும் செயல்முறையின் மூலம் அது உங்களுக்கு வழிகாட்டும்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Create object"
-msgstr "பொருளை உருவாக்கவும்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid ""
-"Based on the url you provided OpenKAT added the necessary additional objects "
-"to create a url object."
-msgstr ""
-"நீங்கள் வழங்கிய முகவரி இன் அடிப்படையில் OpenKAT ஒரு முகவரி பொருளை உருவாக்க தேவையான "
-"கூடுதல் பொருள்களைச் சேர்த்தது."
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "URL"
-msgstr "முகவரி"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/mixins.py
-msgid "Type"
-msgstr "வகை"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Owner"
-msgstr "உரிமையாளர்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Path"
-msgstr "பாதை"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Hostname"
-msgstr "புரவலன்பெயர்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "scheme"
-msgstr "திட்டம்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Network"
-msgstr "பிணையம்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Start scanning"
-msgstr "ச்கேன் செய்யத் தொடங்குங்கள்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_3f_set_clearance_level.html
-msgid "OpenKAT Introduction"
-msgstr "OpenKat அறிமுகம்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid "Setup scan - OOI clearance for"
-msgstr "அமைவு ச்கேன் - OOI இசைவு"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: reports/templates/partials/report_introduction.html
-msgid "Introduction"
-msgstr "அறிமுகம்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-msgid ""
-"Some scans are lightweight while others might be a bit more aggressive with "
-"their scanning. OpenKAT requires you to set a clearance level for each "
-"object to prevent you from unintentionally running aggressive scans. For "
-"example you might have the right to run any type of scan on your own server "
-"but you probably don’t have the right to do so for objects owned by other "
-"people of companies."
-msgstr ""
-"சில ச்கேன் இலகுரக, மற்றவர்கள் தங்கள் ச்கேனிங்கில் சற்று ஆக்ரோசமாக இருக்கலாம். தற்செயலாக "
-"இயங்கும் வன்கவர்வு ச்கேன்களைத் தடுக்க ஒவ்வொரு பொருளுக்கும் இசைவு அளவை அமைக்க OpenKat "
-"தேவைப்படுகிறது. எடுத்துக்காட்டாக, உங்கள் சொந்த சேவையகத்தில் எந்தவொரு ச்கேன் இயக்குவதற்கும் "
-"உங்களுக்கு உரிமை இருக்கலாம், ஆனால் பிற நிறுவனங்களின் சொந்த பொருட்களுக்கு அவ்வாறு செய்ய "
-"உங்களுக்கு உரிமை இல்லை."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid "How to know required clearance level"
-msgstr "தேவையான இசைவு அளவை எவ்வாறு அறிவது"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"Each plugin that scans will have a scan intensity score. The intensity of "
-"the scan must be equal to or below the clearance level you set for your "
-"object. If the scan has an intensity level that is too high, OpenKAT will "
-"notify you before running it. Visually clearance levels and intensity scores "
-"are indicated with little cat paws."
-msgstr ""
-"ச்கேன் செய்யும் ஒவ்வொரு சொருகி ச்கேன் தீவிர மதிப்பெண் கொண்டிருக்கும். ச்கேனின் தீவிரம் உங்கள் "
-"பொருளுக்கு நீங்கள் நிர்ணயித்த இசைவு நிலைக்கு சமமாக அல்லது கீழே இருக்க வேண்டும். ச்கேன் மிக "
-"அதிகமாக இருக்கும் ஒரு தீவிர நிலை இருந்தால், அதை இயக்குவதற்கு முன்பு ஓபன்காட் உங்களுக்கு "
-"அறிவிக்கும். பார்வை இசைவு நிலைகள் மற்றும் தீவிர மதிப்பெண்கள் சிறிய பூனை பாதங்களுடன் "
-"குறிக்கப்படுகின்றன."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"This scan has a scan intensity score of 1, requiring a level 1 clearance "
-"level to be run. This means that the scan does not touch the object itself, "
-"but only searches for information about the object."
-msgstr ""
-"ச்கேன் தீவிரம் மதிப்பெண் 1 ஐ இந்த ச்கேன் கொண்டுள்ளது, இது நிலை 1 இசைவு நிலை இயக்கப்பட "
-"வேண்டும். இதன் பொருள் ச்கேன் பொருளைத் தொடாது, ஆனால் பொருளைப் பற்றிய தகவல்களை மட்டுமே "
-"தேடுகிறது."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"An example of a more aggressive scan. Which has a scan intensity score of 3. "
-"Meaning it requires at least a level 3 clearance level to be set on your "
-"object."
-msgstr ""
-"மிகவும் ஆக்ரோசமான ச்கேனின் எடுத்துக்காட்டு. இது ச்கேன் தீவிரம் மதிப்பெண் 3 ஐக் கொண்டுள்ளது. "
-"இதன் பொருள் உங்கள் பொருளில் குறைந்தபட்சம் ஒரு நிலை 3 இசைவு நிலை அமைக்கப்பட வேண்டும்."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid ""
-"OpenKAT has a permission system that allows administrators to configure "
-"which users can set a certain clearance level. The will make sure that only "
-"users that are trusted can start the more aggressive scans."
-msgstr ""
-"OpenKAT ஒரு இசைவு முறையைக் கொண்டுள்ளது, இது எந்தப் பயனர்கள் ஒரு குறிப்பிட்ட இசைவு "
-"அளவை அமைக்க முடியும் என்பதை உள்ளமைக்க நிர்வாகிகளை அனுமதிக்கிறது. நம்பகமான பயனர்கள் "
-"மட்டுமே மிகவும் ஆக்ரோசமான ச்கேன்களைத் தொடங்க முடியும் என்பதை உறுதி செய்யும்."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid "Acknowledge clearance level"
-msgstr "இசைவு அளவை ஒப்புக் கொள்ளுங்கள்"
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid ""
-"Before a member is granted the ability to set clearance levels on an object, "
-"they must first acknowledge and accept the clearance level set by the "
-"administrators. The maximum scanning level permitted for a member is aligned "
-"with the trusted clearance level. By acknowledging the trusted clearance "
-"level, this member formally agrees to abide by this permission and gains the "
-"capability to perform scans only up to this trusted clearance level. This "
-"two-step process ensures that the member operates within authorized "
-"boundaries."
-msgstr ""
-"ஒரு பொருளின் மீது இசைவு நிலைகளை நிர்ணயிக்கும் திறன் ஒரு உறுப்பினருக்கு வழங்கப்படுவதற்கு "
-"முன்பு, அவர்கள் முதலில் நிர்வாகிகள் நிர்ணயித்த இசைவு அளவை ஒப்புக் கொண்டு ஏற்றுக்கொள்ள "
-"வேண்டும். ஒரு உறுப்பினருக்கு அனுமதிக்கப்பட்ட அதிகபட்ச ச்கேனிங் நிலை நம்பகமான இசைவு "
-"மட்டத்துடன் ஒத்துப்போகிறது. நம்பகமான இசைவு அளவை ஒப்புக்கொள்வதன் மூலம், இந்த உறுப்பினர் இந்த "
-"அனுமதியைக் கடைப்பிடிக்க முறையாக ஒப்புக்கொள்கிறார், மேலும் இந்த நம்பகமான இசைவு நிலைவரை "
-"மட்டுமே வருடு செய்யும் திறனைப் பெறுகிறார். இந்த இரண்டு-படி செயல்முறை உறுப்பினர் "
-"அங்கீகரிக்கப்பட்ட எல்லைகளுக்குள் செயல்படுவதை உறுதி செய்கிறது."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
 msgstr "எனது இசைவு நிலை என்ன?"
 
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
 "Unfortunately you cannot continue the onboarding. </br> Your administrator "
@@ -3092,7 +2429,17 @@ msgstr ""
 "எல்%(dns_report_least_clearance_level)s </strong> வருடு செய்ய <strong>%(ooi)s "
 "</strong> </br> அதிக அனுமதியைப் பெற உங்கள் நிர்வாகியைத் தொடர்பு கொள்ளவும்."
 
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_5_add_scan_ooi.html
+#: onboarding/templates/step_6_set_clearance_level.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
+#: onboarding/templates/step_9_choose_report_type.html
+#: rocky/templates/partials/form/boefje_tiles_form.html
+msgid "Skip onboarding"
+msgstr "ஆன் போர்டிங் தவிர்க்கவும்"
+
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
 "Your administrator has trusted you with a clearance level of "
@@ -3102,192 +2449,189 @@ msgstr ""
 "உங்கள் நிர்வாகி <strong> எல்%(tcl)s </strong> இன் இசைவு மட்டத்துடன் உங்களை "
 "நம்பியுள்ளார். </br> தொடர இந்த இசைவு அளவை நீங்கள் முதலில் ஏற்றுக்கொள்ள வேண்டும்."
 
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #, python-format
 msgid ""
 "Your administrator has <strong>trusted</strong> you with a clearance level "
-"of <strong>L%(tcl)s</strong>. </br> You have also <strong>acknowledged</"
-"strong> to use this clearance level of <strong>L%(acl)s</strong>."
+"of <strong>L%(tcl)s</strong>."
 msgstr ""
-"உங்கள் நிர்வாகி <strong> நம்பகமான </strong> <strong> எல்%(tcl)s</strong> இன் இசைவு "
-"அளவைக் கொண்டுள்ளது. </br> <strong> ஒப்புக் கொள்ளப்பட்ட </strong> இந்த இசைவு அளவைப் "
-"பயன்படுத்த <strong> எல்%(acl)s </strong>."
 
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_3f_set_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
+msgid "Add URL"
+msgstr "முகவரி ஐச் சேர்க்கவும்"
+
+#: onboarding/templates/step_5_add_scan_ooi.html
+msgid "Add an object"
+msgstr ""
+
+#: onboarding/templates/step_5_add_scan_ooi.html
+msgid ""
+"OpenKAT uses various kinds of objects, like IP addresses, hostnames and "
+"URLs. In the onboarding we will add an URL object, such as our vulnerable "
+"OpenKAT website: https://mispo.es."
+msgstr ""
+
+#: onboarding/templates/step_5_add_scan_ooi.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+msgid "Related objects"
+msgstr "தொடர்புடைய பொருள்கள்"
+
+#: onboarding/templates/step_5_add_scan_ooi.html
+msgid ""
+"Most objects have dependencies on the existence of related objects. For "
+"example a URL needs to be connected to a network, hostname, fqdn (fully "
+"qualified domain name) and IP address. When possible OpenKAT automatically "
+"collects and adds these related objects by running scans. Objects can also "
+"be manually added."
+msgstr ""
+
+#: onboarding/templates/step_5_add_scan_ooi.html
+msgid "Create object"
+msgstr "பொருளை உருவாக்கவும்"
+
+#: onboarding/templates/step_6_set_clearance_level.html
+msgid "Set object clearance level"
+msgstr ""
+
+#: onboarding/templates/step_6_set_clearance_level.html
+msgid ""
+"After creating a new object you can set a clearance level for this object. A "
+"clearance level determines how aggressive the object can be scanned. A "
+"higher clearance level, means that more aggressive scans are allowed. "
+"Clearance levels can always be adjusted later on."
+msgstr ""
+
+#: onboarding/templates/step_6_set_clearance_level.html
+#, python-format
+msgid ""
+"For the onboarding we use a clearance level of "
+"L%(dns_report_least_clearance_level)s, meaning only informational scans are "
+"allowed."
+msgstr ""
+
+#: onboarding/templates/step_6_set_clearance_level.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr "இசைவு அளவை அமைக்கவும்"
 
-#: onboarding/templates/step_3f_set_clearance_level.html
-msgid "Setup scan - Set clearance level for"
-msgstr "அமைவு ச்கேன் - இசைவு அளவை அமைக்கவும்"
+#: onboarding/templates/step_7_clearance_level_introduction.html
+msgid "Plugin introduction"
+msgstr ""
 
-#: onboarding/templates/step_3f_set_clearance_level.html
-#, python-format
+#: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"After creating a new object OpenKAT will ask you to set a clearance level. "
-"On the object detail page you can always change the clearance level. For the "
-"onboarding we will suggest to set the clearance level to "
-"L%(dns_report_least_clearance_level)s."
+"OpenKAT uses plugins to scan your objects. Each plugin has a scan level to "
+"specify how aggressive the scan is. Plugins can only scan those objects with "
+"a clearance level that is equal to, or higher than the scan level of the "
+"plugin. Plugin scan level are indicated by the number of cat paws."
 msgstr ""
-"ஒரு புதிய பொருளை உருவாக்கிய பிறகு, ஓபன்காட் ஒரு இசைவு அளவை அமைக்கும்படி கேட்கும். "
-"பொருள் விவரம் பக்கத்தில் நீங்கள் எப்போதும் இசைவு அளவை மாற்றலாம். ஆன் போர்டிங்கிற்கு இசைவு "
-"அளவை l%(dns_report_least_clearance_level)s என அமைக்க பரிந்துரைக்கிறோம்."
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Setup scan - Enable plugins"
-msgstr "அமைவு ச்கேன் - செருகுநிரல்களை இயக்கவும்"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Plugins introduction"
-msgstr "செருகுநிரல்கள் அறிமுகம்"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a "
-"specific skillset that will help to generate your report. There are three "
-"types of plugins."
+"The plugin <strong>DNS Zone</strong> has a scan level of 1, meaning that it "
+"performs non-intrusive scans which look for publicly available information. "
+"It scans objects with a clearance level of 1 or higher."
 msgstr ""
-"ச்கேன் செய்ய, சரிபார்க்க மற்றும் பகுப்பாய்வு செய்ய ஓபன்காட் செருகுநிரல்களைப் "
-"பயன்படுத்துகிறது. ஒவ்வொரு சொருகி ஒரு குறிப்பிட்ட திறனைக் கொண்டுவரும், இது உங்கள் "
-"அறிக்கையை உருவாக்க உதவும். மூன்று வகையான செருகுநிரல்கள் உள்ளன."
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Boefjes:"
-msgstr "போஃப்செச்:"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"Scan objects for data. Each boefje has a scan intensity score to prevent "
-"invasive scanning on objects where you don’t have the clearance to do so."
+"The plugin <strong>Fierce</strong> has a scan level of 3, meaning that it "
+"more aggressive and could potentially break things. It scans objects with a "
+"clearance level of 3 or higher."
 msgstr ""
-"தரவுகளுக்கான பொருள்களை ச்கேன் செய்யுங்கள். ஒவ்வொரு போஃப்சேவுக்கும் ச்கேன் தீவிரம் மதிப்பெண் "
-"உள்ளது, அவ்வாறு செய்ய உங்களுக்கு இசைவு இல்லாத பொருள்களில் வன்கவர்வு ச்கேன் செய்வதைத் தடுக்க."
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Normalizers:"
-msgstr "இயல்பானவை:"
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
+msgid "Enabling plugins and start scanning"
+msgstr ""
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
 msgid ""
-"Check the data for specific objects and add these object to your object list."
+"OpenKAT uses plugins to scan, check and analyze. There are three types of "
+"plugins."
 msgstr ""
-"குறிப்பிட்ட பொருள்களுக்கான தரவைச் சரிபார்த்து, இந்த பொருளை உங்கள் பொருள் பட்டியலில் "
-"சேர்க்கவும்."
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Bits:"
-msgstr "பிட்கள்:"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Analyze the available data to come to insights and conclusions."
-msgstr "நுண்ணறிவு மற்றும் முடிவுகளுக்கு வர கிடைக்கக்கூடிய தரவை பகுப்பாய்வு செய்யுங்கள்."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
 msgid ""
-"OpenKAT will be able to generate a full report when all the required and "
-"suggested plugins are enabled. If you choose not to give a plugin permission "
-"to run, the data that plugin would collect or produce will be left out of "
-"the report which will then be generated based on the available data "
-"collected by the enabled plugins. Below are the suggested and required "
-"plugins for this report."
+"The first plugin are <b>Boefjes</b>, which scan objects for data. These are "
+"security tools like nmap, LeakIX and WPscan. </p>"
 msgstr ""
-"தேவையான மற்றும் பரிந்துரைக்கப்பட்ட செருகுநிரல்கள் அனைத்தும் இயக்கப்பட்டிருக்கும் போது "
-"ஓபன்காட் ஒரு முழு அறிக்கையை உருவாக்க முடியும். இயக்க ஒரு சொருகி இசைவு வழங்க வேண்டாம் "
-"என்று நீங்கள் தேர்வுசெய்தால், சொருகி சேகரிக்கும் அல்லது விளைவாக்கம் செய்யும் தரவு "
-"அறிக்கையிலிருந்து விடப்படும், பின்னர் அது இயக்கப்பட்ட செருகுநிரல்களால் சேகரிக்கப்பட்ட "
-"தரவுகளின் அடிப்படையில் உருவாக்கப்படும். இந்த அறிக்கைக்கு பரிந்துரைக்கப்பட்ட மற்றும் தேவையான "
-"செருகுநிரல்கள் கீழே உள்ளன."
 
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Let’s setup your scan by enabling the plugins of your choice below."
-msgstr ""
-"உங்களுக்கு விருப்பமான செருகுநிரல்களை கீழே செயல்படுத்துவதன் மூலம் உங்கள் ச்கேன் அமைப்போம்."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Required and suggested plugins"
-msgstr "தேவையான மற்றும் பரிந்துரைக்கப்பட்ட செருகுநிரல்கள்"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-msgid "Enable and start scan"
-msgstr "ச்கேன் இயக்கவும் தொடங்கவும்"
-
-#: onboarding/templates/step_4_report.html
-#: reports/report_types/concatenated_report/report.py
-msgid "Report"
-msgstr "அறிக்கை"
-
-#: onboarding/templates/step_4_report.html
-msgid "Boefjes are scanning"
-msgstr "போஃப்செச் ச்கேன் செய்கிறார்"
-
-#: onboarding/templates/step_4_report.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
 msgid ""
-"The enabled boefjes are collecting the data needed to generate the DNS-"
-"report. This may take some time based on the type of scans and the number of "
-"objects found. For the current scan we expect boefjes to take about 3 "
-"minutes."
+"The other two plugins are <b>Normalizers</b> and <b>Bits</b>, which are used "
+"to process the output of Boefjes. They can create findings and related "
+"objects. Bits are also used to create organization specific findings, based "
+"on policy requirements. </p>"
 msgstr ""
-"இயக்கப்பட்ட போஃப்செச் டிஎன்எச்-அறிக்கையை உருவாக்க தேவையான தரவை சேகரிக்கிறது. ச்கேன் வகை "
-"மற்றும் காணப்படும் பொருட்களின் எண்ணிக்கையின் அடிப்படையில் இதற்கு சிறிது நேரம் ஆகலாம். "
-"தற்போதைய ச்கேனுக்கு போஃப்செச் சுமார் 3 நிமிடங்கள் ஆகும் என்று எதிர்பார்க்கிறோம்."
 
-#: onboarding/templates/step_4_report.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
 msgid ""
-"During this introduction we ask you to wait till the scan is ready. After "
-"which you can view the report."
+"For the onboarding we will enable the Boefjes shown below. Once enabled "
+"these Boefjes gather publicly available information on suitable objects with "
+"a clearance level of 1 or higher. Normalizers and Bits are enabled by "
+"default."
 msgstr ""
-"இந்த அறிமுகத்தின் போது ச்கேன் தயாராக இருக்கும் வரை காத்திருக்கும்படி கேட்டுக்கொள்கிறோம். "
-"அதன் பிறகு நீங்கள் அறிக்கையைக் காணலாம்."
 
-#: onboarding/templates/step_4_report.html
+#: onboarding/templates/step_8_setup_scan_select_plugins.html
+msgid "Enable and continue"
+msgstr ""
+
+#: onboarding/templates/step_9_choose_report_type.html
+msgid "Generate a report"
+msgstr "ஒரு அறிக்கையை உருவாக்குங்கள்"
+
+#: onboarding/templates/step_9_choose_report_type.html
 msgid ""
-"After the onboarding, boefjes run in the background. This enables you to use "
-"OpenKAT in the meantime without waiting for scans to finish. When you would "
-"like to see the status of a scan you can open the \"tasks\" page."
+"Reports can be used to gain more insights in your organizations assets. You "
+"can generate different types of reports in OpenKAT. Each report may require "
+"one or more plugins that provide the input for the report."
 msgstr ""
-"ஆன் போர்டிங் செய்த பிறகு, போஃப்செச் பின்னணியில் இயங்குகிறார். ச்கேன் முடிக்கக் "
-"காத்திருக்காமல் இதற்கிடையில் ஓபன்கேட்டைப் பயன்படுத்த இது உங்களுக்கு உதவுகிறது. நீங்கள் ஒரு "
-"ச்கேன் நிலையைப் பார்க்க விரும்பினால், நீங்கள் \"பணிகள்\" பக்கத்தைத் திறக்கலாம்."
 
-#: onboarding/templates/step_4_report.html
-msgid "Open my DNS-report"
-msgstr "எனது டி.என்.எச்-அறிக்கையைத் திறக்கவும்"
+#: onboarding/templates/step_9_choose_report_type.html
+msgid ""
+"For the onboarding we will generate a DNS report for your added URL. In the "
+"previous step you enabled the required plugins for this report."
+msgstr ""
+
+#: onboarding/templates/step_9_choose_report_type.html
+msgid "Generate DNS Report"
+msgstr ""
 
 #: onboarding/view_helpers.py
-msgid "1: Introduction"
-msgstr "1: அறிமுகம்"
-
-#: onboarding/view_helpers.py
-msgid "2: Choose a report"
-msgstr "2: அறிக்கையைத் தேர்வுசெய்க"
-
-#: onboarding/view_helpers.py
-msgid "3: Setup scan"
-msgstr "3: அமைவு ச்கேன்"
-
-#: onboarding/view_helpers.py
-msgid "4: Open report"
-msgstr "4: திறந்த அறிக்கை"
+msgid "1: Welcome"
+msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "2: Organization setup"
 msgstr "2: நிறுவன அமைப்பு"
 
 #: onboarding/view_helpers.py
-msgid "3: Indemnification"
-msgstr "3: இழப்பீடு"
+msgid "3: Add object"
+msgstr ""
 
 #: onboarding/view_helpers.py
-msgid "4: Account setup"
-msgstr "4: கணக்கு அமைவு"
+msgid "4: Plugins"
+msgstr ""
 
 #: onboarding/view_helpers.py
-msgid "OpenKAT Setup"
-msgstr "OpenKAT அமைப்பு"
+msgid "5: Generating report"
+msgstr ""
+
+#: onboarding/views.py
+#, python-brace-format
+msgid "{org_name} successfully created."
+msgstr "{org_name} வெற்றிகரமாக உருவாக்கப்பட்டது."
+
+#: onboarding/views.py
+#, python-brace-format
+msgid "{org_name} successfully updated."
+msgstr "{org_name} வெற்றிகரமாக புதுப்பிக்கப்பட்டது."
+
+#: onboarding/views.py
+msgid "Creating an object"
+msgstr "ஒரு பொருளை உருவாக்குதல்"
 
 #: onboarding/views.py
 msgid "Fetch the parent DNS zone of a hostname"
@@ -3315,19 +2659,15 @@ msgid "Plugins successfully enabled."
 msgstr "செருகுநிரல்கள் வெற்றிகரமாக இயக்கப்பட்டன."
 
 #: onboarding/views.py
-#, python-brace-format
-msgid "{org_name} successfully created."
-msgstr "{org_name} வெற்றிகரமாக உருவாக்கப்பட்டது."
+msgid "Web URL not found."
+msgstr ""
 
 #: onboarding/views.py
-#, python-brace-format
-msgid "{org_name} successfully updated."
-msgstr "{org_name} வெற்றிகரமாக புதுப்பிக்கப்பட்டது."
-
-#: onboarding/views.py
-#, python-brace-format
-msgid "{name} successfully created."
-msgstr "{name} வெற்றிகரமாக உருவாக்கப்பட்டது."
+msgid ""
+"Your report is scheduled for generation in about 3 minutes, as we are "
+"waiting for Boefjes to complete. In the meantime get familiar with OpenKAT "
+"and visit the Reports History tab later."
+msgstr ""
 
 #: reports/forms.py tools/forms/ooi_form.py
 msgid "Filter by OOI types"
@@ -3570,12 +2910,10 @@ msgid "server"
 msgstr "சேவையகம்"
 
 #: reports/report_types/aggregate_organisation_report/findings.html
+#: reports/report_types/aggregate_organisation_report/report.html
 msgid ""
-"\n"
-"                This chapter contains information about the findings that "
-"have been identified\n"
-"                for this organization.\n"
-"            "
+"This chapter contains information about the findings that have been "
+"identified for this organization."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -3639,15 +2977,6 @@ msgstr "பாதிப்புகள்"
 #: reports/report_types/aggregate_organisation_report/vulnerabilities.html
 msgid "Vulnerabilities found are grouped per system."
 msgstr "காணப்படும் பாதிப்புகள் ஒரு அமைப்புக்கு தொகுக்கப்பட்டுள்ளன."
-
-#: reports/report_types/aggregate_organisation_report/report.html
-msgid ""
-"\n"
-"                                    This chapter contains information about "
-"the findings that have been identified\n"
-"                                    for this organization.\n"
-"                                "
-msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
@@ -3944,6 +3273,10 @@ msgid "TTL"
 msgstr "Ttl"
 
 #: reports/report_types/dns_report/report.html
+msgid "Data"
+msgstr "தகவல்கள்"
+
+#: reports/report_types/dns_report/report.html
 msgid "No records have been found."
 msgstr "பதிவுகள் எதுவும் கிடைக்கவில்லை."
 
@@ -3958,6 +3291,19 @@ msgid ""
 msgstr ""
 "டிஎன்எச் பதிவுகளின் உள்ளடக்கங்களின் அடிப்படையில் பாதுகாப்பு நடவடிக்கைகள் தொடர்பான டிஎன்எச் "
 "இயக்கப்பட்டிருப்பதை கீழே உள்ள பாதுகாப்பு நடவடிக்கைகள் அட்டவணை காட்டுகிறது."
+
+#: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/report_overview/modal_partials/delete_modal.html
+#: reports/templates/report_overview/modal_partials/rerun_modal.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/partials/ooi_detail_related_object.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/views/mixins.py
+msgid "Type"
+msgstr "வகை"
 
 #: reports/report_types/dns_report/report.html
 msgid "Yes"
@@ -3977,6 +3323,10 @@ msgid "Findings information"
 msgstr "கண்டுபிடிப்புகள் செய்தி"
 
 #: reports/report_types/dns_report/report.py
+msgid "DNS Report"
+msgstr "டிஎன்எச் அறிக்கை"
+
+#: reports/report_types/dns_report/report.py
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
@@ -3991,26 +3341,6 @@ msgid ""
 msgstr ""
 "கண்டுபிடிப்புகள் அறிக்கையில் தேர்ந்தெடுக்கப்பட்ட சொத்து மற்றும் அமைப்புக்காக அடையாளம் "
 "காணப்பட்ட கண்டுபிடிப்புகள் பற்றிய தகவல்கள் உள்ளன."
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                This table shows the top 25 critical and high findings that "
-"have\n"
-"                been identified for this organization, grouped by finding "
-"types.\n"
-"                A table with all the identified findings can be found in the "
-"Findings Report.\n"
-"            "
-msgstr ""
-"\n"
-"                இந்த அட்டவணை முதல் 25 முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகளைக் "
-"காட்டுகிறது \n"
-"                இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் மூலம் "
-"தொகுக்கப்பட்டுள்ளது. \n"
-"                அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு அட்டவணையைக் "
-"கண்டுபிடிப்புகள் அறிக்கையில் காணலாம்.\n"
-"            "
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -4052,18 +3382,12 @@ msgstr "ஓச்ட்பேம்ச் ஐபிவி 6 முகவரி�
 #: reports/report_types/mail_report/report.html
 msgid ""
 "The Mail Report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
+"with email servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"அஞ்சல் அறிக்கை மின்னஞ்சல் சேவையகங்களுடன் தொடர்புடைய இணக்க காசோலைகளின் கண்ணோட்டத்தை "
-"வழங்குகிறது. தற்போதைய இணக்கம் SPF, DKIM மற்றும் DMARC பதிவுகளின் இருப்பை "
-"சரிபார்க்கிறது. இந்த ஒவ்வொன்றிற்கும் கீழேயுள்ள அட்டவணை காட்டுகிறது, அடையாளம் காணப்பட்ட "
-"அஞ்சல் சேவையகங்கள் எத்தனை இணக்கமானவை என்பதை சரிபார்க்கிறது, மேலும் பொருந்தினால் இணக்க "
-"சிக்கல் விளக்கம் மற்றும் இடர் நிலை. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
-"வேறுபட்டிருக்கலாம்."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -4745,31 +4069,14 @@ msgstr "ஆயத்தம்"
 
 #: reports/templates/partials/report_findings_table.html
 msgid ""
-"\n"
-"            This table provides an overview of the identified findings on "
-"the scanned\n"
-"            systems. For each finding type it shows the risk level, the "
-"number of occurrences\n"
-"            and the first known occurrence of the finding. The risk level "
-"may be different for your specific environment.\n"
-"            The details can be seen when expanding a row. A description, the "
-"source, impact and recommendation of the finding\n"
-"            can be found here. It also shows in which findings the finding "
-"type occurred.\n"
-"        "
+"This table provides an overview of the identified findings on the scanned "
+"systems. For each finding type it shows the risk level, the number of "
+"occurrences and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment. The details can be seen when "
+"expanding a row. A description, the source, impact and recommendation of the "
+"finding can be found here. It also shows in which findings the finding type "
+"occurred."
 msgstr ""
-"\n"
-"            இந்த அட்டவணை வருடு செய்யப்பட்ட கண்டறிந்த கண்டுபிடிப்புகளின் கண்ணோட்டத்தை "
-"வழங்குகிறது \n"
-"அமைப்புகள். ஒவ்வொரு கண்டுபிடிப்பு வகைக்கும் இது இடர் நிலை, நிகழ்வுகளின் எண்ணிக்கை "
-"ஆகியவற்றைக் காட்டுகிறது \n"
-"கண்டுபிடிப்பின் முதல் அறியப்பட்ட நிகழ்வு. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
-"வேறுபட்டிருக்கலாம். \n"
-"ஒரு வரிசையை விரிவுபடுத்தும்போது விவரங்களைக் காணலாம். ஒரு விளக்கம், கண்டுபிடிப்பின் "
-"மூல, தாக்கம் மற்றும் பரிந்துரை \n"
-"இங்கே காணலாம். கண்டுபிடிப்பு வகை எந்த கண்டுபிடிப்புகள் நிகழ்ந்தன என்பதையும் இது "
-"காட்டுகிறது.\n"
-"        "
 
 #: reports/templates/partials/report_findings_table.html
 msgid "First known occurrence"
@@ -4851,6 +4158,10 @@ msgstr "அடிப்படை பாதுகாப்பு மதிப்�
 #, python-format
 msgid "A total of %(total)s critical vulnerabilities have been identified."
 msgstr "மொத்தம் %(total)s முக்கியமான பாதிப்புகள் அடையாளம் காணப்பட்டுள்ளன."
+
+#: reports/templates/partials/report_introduction.html
+msgid "Introduction"
+msgstr "அறிமுகம்"
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
@@ -5344,8 +4655,8 @@ msgid "Open asset report object details"
 msgstr "திறந்த சொத்து அறிக்கை பொருள் விவரங்கள்"
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Asset reports details:"
-msgstr "சொத்து விவரிக்கிறது விவரங்கள்:"
+msgid "Asset reports details"
+msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
@@ -5364,6 +4675,7 @@ msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/views/report_overview.py
 msgid "Asset reports"
 msgstr "சொத்து அறிக்கைகள்"
@@ -5379,6 +4691,13 @@ msgstr "அனைத்து சொத்து அறிக்கைகளை�
 #: reports/templates/report_overview/report_history_table.html
 msgid "No reports have been generated yet."
 msgstr "இதுவரை எந்த அறிக்கையும் உருவாக்கப்படவில்லை."
+
+#: reports/templates/report_overview/report_overview_header.html
+#: reports/views/base.py rocky/templates/header.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+#: rocky/templates/tasks/reports.html rocky/views/tasks.py
+msgid "Reports"
+msgstr "அறிக்கைகள்"
 
 #: reports/templates/report_overview/report_overview_header.html
 msgid "An overview of reports that are scheduled or have been generated."
@@ -5463,10 +4782,6 @@ msgstr "அனைத்து அடிப்படை அறிக்கைக�
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
 msgstr "அறிக்கை விவரங்களைக் காட்டுகிறது"
-
-#: reports/templates/report_overview/subreports_table.html
-msgid "Asset reports:"
-msgstr "சொத்து அறிக்கைகள்:"
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
@@ -5932,6 +5247,14 @@ msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "பொருள்களின் இசைவு அளவை மீறும் போஃப்ச்களைக் காட்டு."
 
 #: tools/forms/ooi.py
+msgid ""
+"Boefjes that has a scan level below or equal to the clearance level, is "
+"permitted to scan an object."
+msgstr ""
+"கீழே அல்லது இசைவு நிலைக்கு சமமான ச்கேன் அளவைக் கொண்ட போஃப்செச், ஒரு பொருளை ச்கேன் செய்ய "
+"அனுமதிக்கப்படுகிறது."
+
+#: tools/forms/ooi.py
 msgid "Expires by (UTC)"
 msgstr "(UTC) இல் காலாவதியாகிறது"
 
@@ -6072,11 +5395,9 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the Boefje explaining in short what it can do. This will "
-"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+"A description of the Boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page."
 msgstr ""
-"<p> போஃப்சேவின் விளக்கம் என்ன செய்ய முடியும் என்பதை சுருக்கமாக விளக்குகிறது. இது "
-"இரண்டும் கேட்-அலோகச் மற்றும் போஃப்சே விவரங்கள் பக்கத்தில் காண்பிக்கப்படும். </p> "
 
 #: tools/forms/settings.py
 msgid ""
@@ -6226,16 +5547,10 @@ msgid "OOI doesn't exist, try another valid time"
 msgstr "OOI இல்லை, மற்றொரு செல்லுபடியாகும் நேரத்தை முயற்சிக்கவும்"
 
 #: tools/models.py
-msgid "The name of the organisation"
-msgstr "அமைப்பின் பெயர்"
-
-#: tools/models.py
 msgid ""
-"A slug containing only lower-case unicode letters, numbers, hyphens or "
-"underscores that will be used in URLs and paths"
+"A short code containing only lower-case unicode letters, numbers, hyphens or "
+"underscores that will be used in URLs and paths."
 msgstr ""
-"முகவரி கள் மற்றும் பாதைகளில் பயன்படுத்தப்படும் லோயர்-கேச் யூனிகோட் எழுத்துக்கள், எண்கள், "
-"ஐபன்கள் அல்லது அடிக்கோடிட்டுக் காட்டும் ஒரு ச்லக்"
 
 #: tools/models.py
 msgid ""
@@ -6648,22 +5963,22 @@ msgid "Organization code missing"
 msgstr "நிறுவன குறியீடு இல்லை"
 
 #: rocky/templates/finding_type_add.html
-msgid "Add finding type:"
-msgstr "கண்டுபிடிப்பு வகையைச் சேர்க்கவும்:"
-
-#: rocky/templates/finding_type_add.html
-msgid "Finding Type"
-msgstr "வகை கண்டுபிடிப்பு"
-
-#: rocky/templates/finding_type_add.html
 #: rocky/templates/partials/findings_list_toolbar.html
 #: rocky/views/finding_type_add.py
 msgid "Add finding type"
 msgstr "கண்டுபிடிப்பு வகையைச் சேர்க்கவும்"
 
+#: rocky/templates/finding_type_add.html
+msgid "Finding Type"
+msgstr "வகை கண்டுபிடிப்பு"
+
 #: rocky/templates/findings/finding_add.html
-msgid "Add finding:"
-msgstr "கண்டுபிடிப்பைச் சேர்க்கவும்:"
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_findings.html
+#: rocky/templates/partials/findings_list_toolbar.html
+#: rocky/views/finding_add.py
+msgid "Add finding"
+msgstr "கண்டுபிடிப்பைச் சேர்க்கவும்"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Findings @ "
@@ -6773,6 +6088,10 @@ msgid "Go to"
 msgstr "செல்"
 
 #: rocky/templates/landing_page.html
+msgid "Welcome to OpenKAT"
+msgstr "OpenKat க்கு வருக"
+
+#: rocky/templates/landing_page.html
 msgid "Kwetsbaarheden Analyse Tool"
 msgstr "பாதிப்புகள் பகுப்பாய்வு கருவி"
 
@@ -6797,11 +6116,12 @@ msgstr "ஓபன்காட் பார்க்கிறது"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br> Our motto is therefore: I see, I see, what you do not see."
+"analog)."
 msgstr ""
-"உலகைக் காண (டிசிட்டல் மற்றும் அனலாக்) டசன் கணக்கான கருவிகள் ஓபன்காட்டில் "
-"ஒருங்கிணைக்கப்பட்டுள்ளன. <br> எனவே எங்கள் குறிக்கோள்: நீங்கள் பார்க்காததை நான் காண்கிறேன், "
-"நான் பார்க்கிறேன்."
+
+#: rocky/templates/landing_page.html
+msgid "Our motto is therefore: I see, I see, what you do not see."
+msgstr ""
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
@@ -7052,12 +6372,6 @@ msgid "Select an object type to add."
 msgstr "சேர்க்க ஒரு பொருள் வகையைத் தேர்ந்தெடுக்கவும்."
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_findings.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Add finding"
-msgstr "கண்டுபிடிப்பைச் சேர்க்கவும்"
-
-#: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Overview of findings for"
 msgstr "கண்டுபிடிப்புகளின் கண்ணோட்டம்"
 
@@ -7268,6 +6582,14 @@ msgstr "இதனுடைய"
 msgid "shows the same objects."
 msgstr "அதே பொருள்களைக் காட்டுகிறது."
 
+#: rocky/templates/organizations/organization_add.html
+msgid ""
+"Please enter the following organization details. These details can be edited "
+"within the organization page within OpenKAT when necessary."
+msgstr ""
+"பின்வரும் நிறுவன விவரங்களை உள்ளிடவும். இந்த விவரங்களை தேவைப்படும்போது OpenKAT க்குள் "
+"உள்ள நிறுவன பக்கத்திற்குள் திருத்தலாம்."
+
 #: rocky/templates/organizations/organization_edit.html
 msgid "Edit organization"
 msgstr "அமைப்பைத் திருத்து"
@@ -7350,8 +6672,8 @@ msgstr "உறுப்பினரை சேமிக்கவும்"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
-msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்"
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்."
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -7379,10 +6701,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
 msgstr "உறுப்பினர் கண்ணோட்டம்:"
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "E-mail"
-msgstr "மின்னஞ்சல்"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
@@ -7572,22 +6890,23 @@ msgid "Explanation:"
 msgstr "விளக்கம்:"
 
 #: rocky/templates/partials/form/indemnification_add_form.html
-msgid "Here, an indemnification can be given on behalf of your organization:"
-msgstr "இங்கே, உங்கள் நிறுவனத்தின் சார்பாக ஒரு இழப்பீடு வழங்கப்படலாம்:"
+msgid ""
+"Performing security scans against assets is generally only allowed if you "
+"have permission to scan those assets. Certain scans might also have a "
+"negative impact on (your) assets. Therefore it is important to know and be "
+"aware of the impact of security scans."
+msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid ""
-"Before you're able to add assets to OpenKAT and to assign clearance levels, "
-"you have to give indemnification on the organization and declare that you as "
-"a person can be held accountable."
+"An organization indemnification is required before you can use OpenKAT. With "
+"the indemnification you declare that you, as a person, can be held "
+"accountable."
 msgstr ""
-"நீங்கள் OpenKat இல் சொத்துக்களைச் சேர்க்கவும், இசைவு நிலைகளை ஒதுக்கவும் முன், நீங்கள் "
-"நிறுவனத்தின் மீது இழப்பீடு வழங்க வேண்டும், மேலும் ஒரு நபராக நீங்கள் பொறுப்புக்கூற முடியும் "
-"என்று அறிவிக்க வேண்டும்."
 
 #: rocky/templates/partials/form/indemnification_add_form.html
-msgid "Register an indemnification"
-msgstr "இழப்பீடு பதிவு செய்யுங்கள்"
+msgid "Set an indemnification"
+msgstr ""
 
 #: rocky/templates/partials/hyperlink_ooi_type.html
 #, python-format
@@ -7650,10 +6969,6 @@ msgstr "(UTC) காலாவதியாகிறது:"
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation:"
 msgstr "உறுதிப்படுத்தல்:"
-
-#: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Related objects"
-msgstr "தொடர்புடைய பொருள்கள்"
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related object known for"
@@ -8345,9 +7660,9 @@ msgstr "பச்சையாக பதிவேற்றவும்"
 msgid "Getting raw data failed."
 msgstr "மூல தரவைப் பெறுவது தோல்வியடைந்தது."
 
-#: rocky/views/finding_add.py
-msgid "Add Finding"
-msgstr "கண்டுபிடிப்பைச் சேர்"
+#: rocky/views/bytes_raw.py
+msgid "The task does not have any raw data."
+msgstr ""
 
 #: rocky/views/finding_list.py rocky/views/ooi_list.py
 msgid "Unknown action."
@@ -8725,6 +8040,879 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
 
+#~ msgid "The Email must be set"
+#~ msgstr "மின்னஞ்சல் அமைக்கப்பட வேண்டும்"
+
+#~ msgid "E-mail address"
+#~ msgstr "மின்னஞ்சல் முகவரி"
+
+#~ msgid ""
+#~ "You don't have any clearance to scan objects. <br> Get in contact with "
+#~ "the admin to give you the necessary clearance level."
+#~ msgstr ""
+#~ "பொருள்களை வருடு செய்ய உங்களுக்கு எந்த இசைவு இல்லை. <br> தேவையான இசைவு அளவை "
+#~ "உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்."
+
+#~ msgid ""
+#~ "\n"
+#~ "                        On this page you can see an overview of the "
+#~ "dashboards for all organizations.\n"
+#~ "                        **More context can be written here**\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        இந்த பக்கத்தில் நீங்கள் அனைத்து நிறுவனங்களுக்கும் "
+#~ "டாச்போர்டுகளின் கண்ணோட்டத்தைக் காணலாம். \n"
+#~ "** மேலும் சூழலை இங்கே எழுதலாம் **\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                            This table shows the findings that have been "
+#~ "identiefied for each organization,\n"
+#~ "                            sorted by the finding types and grouped by "
+#~ "organizations.\n"
+#~ "                            This data is based on the latest Crisis Room "
+#~ "Findings Report\n"
+#~ "                            of each organization.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            இந்த அட்டவணை ஒவ்வொரு நிறுவனத்திற்கும் அடையாளம் "
+#~ "காணப்பட்ட கண்டுபிடிப்புகளைக் காட்டுகிறது, \n"
+#~ "கண்டுபிடிப்பு வகைகளால் வரிசைப்படுத்தப்பட்டு நிறுவனங்களால் தொகுக்கப்பட்டுள்ளது. \n"
+#~ "இந்த தரவு அண்மைக் கால நெருக்கடி அறை கண்டுபிடிப்புகள் அறிக்கையை அடிப்படையாகக் "
+#~ "கொண்டது \n"
+#~ "ஒவ்வொரு அமைப்பிலும்.\n"
+#~ "                        "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    No findings have been identified yet. As soon as they "
+#~ "have been\n"
+#~ "                    identified, they will be shown on this page.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை. அவர்கள் "
+#~ "இருந்தவுடன் \n"
+#~ "                    அடையாளம் காணப்பட்ட, அவை இந்தப் பக்கத்தில் காண்பிக்கப்படும்.\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                There are no organizations yet. After creating an "
+#~ "organization,\n"
+#~ "                the identified findings will be shown here.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                இதுவரை எந்த அமைப்புகளும் இல்லை. ஒரு அமைப்பை உருவாக்கியபிறகு, \n"
+#~ "                    அடையாளம் காணப்பட்ட கண்டுபிடிப்புகள் இங்கே காண்பிக்கப்படும்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "\n"
+#~ "                This table shows the top 25 critical and high findings "
+#~ "that have\n"
+#~ "                been identified for this organization, grouped by finding "
+#~ "types.\n"
+#~ "                A table with all the identified findings can be found in "
+#~ "the Findings Report.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                இந்த அட்டவணை முதல் 25 முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகளைக் "
+#~ "காட்டுகிறது \n"
+#~ "                இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் "
+#~ "மூலம் தொகுக்கப்பட்டுள்ளது. \n"
+#~ "                அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு "
+#~ "அட்டவணையைக் கண்டுபிடிப்புகள் அறிக்கையில் காணலாம்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "The Mail Report provides an overview of the compliance checks associated "
+#~ "with e-mail servers. The current compliance checks the presence of SPF, "
+#~ "DKIM and DMARC records. The table below shows for each of these checks "
+#~ "how many of the identified mail servers are compliant, and if applicable "
+#~ "a compliance issue description and risk level. The risk level may be "
+#~ "different for your specific environment."
+#~ msgstr ""
+#~ "அஞ்சல் அறிக்கை மின்னஞ்சல் சேவையகங்களுடன் தொடர்புடைய இணக்க காசோலைகளின் கண்ணோட்டத்தை "
+#~ "வழங்குகிறது. தற்போதைய இணக்கம் SPF, DKIM மற்றும் DMARC பதிவுகளின் இருப்பை "
+#~ "சரிபார்க்கிறது. இந்த ஒவ்வொன்றிற்கும் கீழேயுள்ள அட்டவணை காட்டுகிறது, அடையாளம் காணப்பட்ட "
+#~ "அஞ்சல் சேவையகங்கள் எத்தனை இணக்கமானவை என்பதை சரிபார்க்கிறது, மேலும் பொருந்தினால் இணக்க "
+#~ "சிக்கல் விளக்கம் மற்றும் இடர் நிலை. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
+#~ "வேறுபட்டிருக்கலாம்."
+
+#~ msgid ""
+#~ "\n"
+#~ "            This table provides an overview of the identified findings on "
+#~ "the scanned\n"
+#~ "            systems. For each finding type it shows the risk level, the "
+#~ "number of occurrences\n"
+#~ "            and the first known occurrence of the finding. The risk level "
+#~ "may be different for your specific environment.\n"
+#~ "            The details can be seen when expanding a row. A description, "
+#~ "the source, impact and recommendation of the finding\n"
+#~ "            can be found here. It also shows in which findings the "
+#~ "finding type occurred.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "            இந்த அட்டவணை வருடு செய்யப்பட்ட கண்டறிந்த கண்டுபிடிப்புகளின் கண்ணோட்டத்தை "
+#~ "வழங்குகிறது \n"
+#~ "அமைப்புகள். ஒவ்வொரு கண்டுபிடிப்பு வகைக்கும் இது இடர் நிலை, நிகழ்வுகளின் எண்ணிக்கை "
+#~ "ஆகியவற்றைக் காட்டுகிறது \n"
+#~ "கண்டுபிடிப்பின் முதல் அறியப்பட்ட நிகழ்வு. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
+#~ "வேறுபட்டிருக்கலாம். \n"
+#~ "ஒரு வரிசையை விரிவுபடுத்தும்போது விவரங்களைக் காணலாம். ஒரு விளக்கம், கண்டுபிடிப்பின் "
+#~ "மூல, தாக்கம் மற்றும் பரிந்துரை \n"
+#~ "இங்கே காணலாம். கண்டுபிடிப்பு வகை எந்த கண்டுபிடிப்புகள் நிகழ்ந்தன என்பதையும் இது "
+#~ "காட்டுகிறது.\n"
+#~ "        "
+
+#~ msgid "Asset reports details:"
+#~ msgstr "சொத்து விவரிக்கிறது விவரங்கள்:"
+
+#~ msgid "Asset reports:"
+#~ msgstr "சொத்து அறிக்கைகள்:"
+
+#~ msgid ""
+#~ "<p>A description of the Boefje explaining in short what it can do. This "
+#~ "will both be displayed inside the KAT-alogus and on the Boefje details "
+#~ "page.</p> "
+#~ msgstr ""
+#~ "<p> போஃப்சேவின் விளக்கம் என்ன செய்ய முடியும் என்பதை சுருக்கமாக விளக்குகிறது. இது "
+#~ "இரண்டும் கேட்-அலோகச் மற்றும் போஃப்சே விவரங்கள் பக்கத்தில் காண்பிக்கப்படும். </p> "
+
+#~ msgid ""
+#~ "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#~ "analog). <br> Our motto is therefore: I see, I see, what you do not see."
+#~ msgstr ""
+#~ "உலகைக் காண (டிசிட்டல் மற்றும் அனலாக்) டசன் கணக்கான கருவிகள் ஓபன்காட்டில் "
+#~ "ஒருங்கிணைக்கப்பட்டுள்ளன. <br> எனவே எங்கள் குறிக்கோள்: நீங்கள் பார்க்காததை நான் காண்கிறேன், "
+#~ "நான் பார்க்கிறேன்."
+
+#, python-format
+#~ msgid "An overview of members of <strong>%(organization_name)s</strong>"
+#~ msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்"
+
+#~ msgid "E-mail"
+#~ msgstr "மின்னஞ்சல்"
+
+#, python-brace-format
+#~ msgid "A unique code of {code_length} characters."
+#~ msgstr "{code_length} எழுத்துக்களின் தனித்துவமான குறியீடு."
+
+#~ msgid ""
+#~ "I declare that OpenKAT may scan the assets of my organization and that I "
+#~ "have permission to scan these assets. I am aware of the implications a "
+#~ "scan with a higher scan level brings on my systems."
+#~ msgstr ""
+#~ "ஓபன்காட் எனது அமைப்பின் சொத்துக்களை ச்கேன் செய்யலாம் என்றும் இந்த சொத்துக்களை ச்கேன் செய்ய "
+#~ "எனக்கு இசைவு உள்ளது என்றும் அறிவிக்கிறேன். எனது கணினிகளில் அதிக ச்கேன் அளவைக் கொண்ட "
+#~ "ச்கேன் ஒரு ச்கேன் தாக்கங்களை நான் அறிவேன்."
+
+#~ msgid ""
+#~ "I declare that I am authorized to give this indemnification within my "
+#~ "organization. I have the experience and knowledge to know what the "
+#~ "consequences might be and can be held responsible for them."
+#~ msgstr ""
+#~ "எனது நிறுவனத்திற்குள் இந்த இழப்பீடு வழங்க எனக்கு அதிகாரம் உண்டு என்று அறிவிக்கிறேன். "
+#~ "விளைவுகள் என்னவாக இருக்கும் என்பதை அறிய எனக்கு அனுபவமும் அறிவும் உள்ளது, மேலும் "
+#~ "அவர்களுக்கு பொறுப்பேற்க முடியும்."
+
+#~ msgid "Register"
+#~ msgstr "பதிவு செய்யுங்கள்"
+
+#~ msgid "Create a new account for your organization"
+#~ msgstr "உங்கள் நிறுவனத்திற்கு புதிய கணக்கை உருவாக்கவும்"
+
+#~ msgid ""
+#~ "All user  accounts are part of an organization. So if you’re new and your "
+#~ "company is also new to OpenKAT you can register here to create a OpenKAT "
+#~ "account for your company including an admin account for you. If you like "
+#~ "a user account that is connected to an already existing organization "
+#~ "within OpenKAT you can ask the admin to create an account for you."
+#~ msgstr ""
+#~ "அனைத்து பயனர் கணக்குகளும் ஒரு நிறுவனத்தின் ஒரு பகுதியாகும். எனவே நீங்கள் புதியவராக "
+#~ "இருந்தால், உங்கள் நிறுவனமும் OpenKAT க்கு புதியதாக இருந்தால், உங்களுக்கான நிர்வாகக் "
+#~ "கணக்கு உட்பட உங்கள் நிறுவனத்திற்கு OpenKAT கணக்கை உருவாக்க இங்கே பதிவு செய்யலாம். "
+#~ "OpenKAT க்குள் ஏற்கனவே இருக்கும் நிறுவனத்துடன் இணைக்கப்பட்டுள்ள பயனர் கணக்கை நீங்கள் "
+#~ "விரும்பினால், உங்களுக்காக ஒரு கணக்கை உருவாக்க நிர்வாகியிடம் கேட்கலாம்."
+
+#~ msgid "How does OpenKAT work"
+#~ msgstr "ஓபன்காட் எவ்வாறு செயல்படுகிறது"
+
+#~ msgid ""
+#~ "OpenKAT is able to give insight into security risks on your online "
+#~ "objects. For example, your websites, mailservers or online data. OpenKAT "
+#~ "uses scans to find and assess the area's that might be at risk and "
+#~ "reports these back to you. As a user you decide which insight you would "
+#~ "like and OpenKAT guides you to through the process. During this "
+#~ "introduction you will be guided through the steps to create a report."
+#~ msgstr ""
+#~ "உங்கள் நிகழ்நிலை பொருள்களில் பாதுகாப்பு அபாயங்கள் குறித்த நுண்ணறிவை ஓபன்காட் வழங்க "
+#~ "முடியும். எடுத்துக்காட்டாக, உங்கள் வலைத்தளங்கள், மெயில்சர்வர்கள் அல்லது நிகழ்நிலை தரவு. "
+#~ "ஆபத்தில் இருக்கும் பகுதியைக் கண்டுபிடித்து மதிப்பிடுவதற்கு ஓபன்காட் ச்கேன்களைப் "
+#~ "பயன்படுத்துகிறது, மேலும் இவற்றை உங்களிடம் தெரிவிக்கிறது. ஒரு பயனராக நீங்கள் எந்த "
+#~ "நுண்ணறிவை விரும்புகிறீர்கள் என்பதை தீர்மானிக்கிறீர்கள், மேலும் OpenKat இந்த செயல்முறையின் "
+#~ "மூலம் உங்களை வழிநடத்துகிறது. இந்த அறிமுகத்தின் போது நீங்கள் ஒரு அறிக்கையை "
+#~ "உருவாக்குவதற்கான படிகள் மூலம் வழிநடத்தப்படுவீர்கள்."
+
+#~ msgid "OpenKAT setup"
+#~ msgstr "OpenKAT அமைப்பு"
+
+#~ msgid ""
+#~ "Please enter the following organization details. These details can be "
+#~ "edited within the organization page within OpenKAT when necessary. Adding "
+#~ "a new organization requires a new database."
+#~ msgstr ""
+#~ "பின்வரும் நிறுவன விவரங்களை உள்ளிடவும். இந்த விவரங்களை தேவைப்படும்போது OpenKAT க்குள் "
+#~ "உள்ள நிறுவன பக்கத்திற்குள் திருத்தலாம். புதிய அமைப்பைச் சேர்ப்பதற்கு புதிய தரவுத்தளம் "
+#~ "தேவை."
+
+#~ msgid "Account setup"
+#~ msgstr "கணக்கு அமைப்பு"
+
+#~ msgid "Organization setup with separate accounts:"
+#~ msgstr "தனி கணக்குகளுடன் அமைப்பு அமைப்பு:"
+
+#~ msgid ""
+#~ "Within OpenKAT it is possible to create separate user accounts with the "
+#~ "specific roles. Each with their own functionalities and permissions. This "
+#~ "is useful when multiple people will be working with the same OpenKAT-"
+#~ "setup. You can choose to create the separate accounts during this "
+#~ "introduction or when you’re ready from the OpenKAT users page."
+#~ msgstr ""
+#~ "OpenKAT க்குள் குறிப்பிட்ட பாத்திரங்களுடன் தனி பயனர் கணக்குகளை உருவாக்க முடியும். "
+#~ "ஒவ்வொன்றும் அவற்றின் சொந்த செயல்பாடுகள் மற்றும் அனுமதிகளுடன். பல நபர்கள் ஒரே ஓபன்காட்-"
+#~ "செட்டப்புடன் பணிபுரியும் போது இது பயனுள்ளதாக இருக்கும். இந்த அறிமுகத்தின் போது "
+#~ "அல்லது நீங்கள் OpenKat பயனர்கள் பக்கத்திலிருந்து தயாராக இருக்கும்போது தனி கணக்குகளை "
+#~ "உருவாக்க நீங்கள் தேர்வு செய்யலாம்."
+
+#~ msgid "Single account setup:"
+#~ msgstr "ஒற்றை கணக்கு அமைப்பு:"
+
+#~ msgid ""
+#~ "Alternatively it is also an option to run OpenKAT from a single user "
+#~ "account. Which is useful when you are the only user in the account. You "
+#~ "will be able to access the functionality of the different roles from your "
+#~ "account. You can always add additional user accounts If you’re team "
+#~ "expands in the future."
+#~ msgstr ""
+#~ "மாற்றாக இது ஒரு பயனர் கணக்கிலிருந்து OpenKAT ஐ இயக்குவதற்கான ஒரு விருப்பமாகும். "
+#~ "கணக்கில் நீங்கள் மட்டுமே பயனராக இருக்கும்போது இது பயனுள்ளதாக இருக்கும். உங்கள் "
+#~ "கணக்கிலிருந்து வெவ்வேறு பாத்திரங்களின் செயல்பாட்டை நீங்கள் அணுக முடியும். எதிர்காலத்தில் "
+#~ "நீங்கள் குழு விரிவடைந்தால் கூடுதல் பயனர் கணக்குகளை எப்போதும் சேர்க்கலாம்."
+
+#~ msgid "Create separate accounts"
+#~ msgstr "தனி கணக்குகளை உருவாக்கவும்"
+
+#~ msgid "Continue with this account, onboard me!"
+#~ msgstr "இந்த கணக்கைத் தொடரவும், என்னைத் தொடங்குங்கள்!"
+
+#~ msgid "Users"
+#~ msgstr "பயனர்கள்"
+
+#~ msgid ""
+#~ "Within OpenKAT there are three types of user accounts. Each has its own "
+#~ "functions."
+#~ msgstr ""
+#~ "OpenKAT க்குள் மூன்று வகையான பயனர் கணக்குகள் உள்ளன. ஒவ்வொன்றும் அதன் சொந்த "
+#~ "செயல்பாடுகளைக் கொண்டுள்ளன."
+
+#~ msgid "Admin"
+#~ msgstr "நிர்வாகி"
+
+#~ msgid ""
+#~ "Each organization must have an admin. The admin can create and manage "
+#~ "user accounts as well as organization details."
+#~ msgstr ""
+#~ "ஒவ்வொரு நிறுவனத்திற்கும் ஒரு நிர்வாகி இருக்க வேண்டும். நிர்வாகி பயனர் கணக்குகள் மற்றும் "
+#~ "நிறுவன விவரங்களை உருவாக்கி நிர்வகிக்க முடியும்."
+
+#~ msgid "Red teamer"
+#~ msgstr "சிவப்பு டீமர்"
+
+#~ msgid "A red teamer account can run scans and generate reports."
+#~ msgstr "ஒரு ரெட் டீமர் கணக்கு ச்கேன்களை இயக்கலாம் மற்றும் அறிக்கைகளை உருவாக்கலாம்."
+
+#~ msgid "Client account"
+#~ msgstr "வாங்கி கணக்கு"
+
+#~ msgid "A client account can access reports."
+#~ msgstr "கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம்."
+
+#~ msgid ""
+#~ "Each organization requires at least one admin and one red teamer account "
+#~ "to function. This introduction will guide you through the setup of both. "
+#~ "After that you can choose to add a client account as well."
+#~ msgstr ""
+#~ "ஒவ்வொரு நிறுவனத்திற்கும் செயல்பட குறைந்தபட்சம் ஒரு நிர்வாகி மற்றும் ஒரு சிவப்பு டீமர் "
+#~ "கணக்கு தேவைப்படுகிறது. இந்த அறிமுகம் இரண்டையும் அமைப்பதன் மூலம் உங்களுக்கு "
+#~ "வழிகாட்டும். அதன் பிறகு கிளையன்ட் கணக்கையும் சேர்க்க நீங்கள் தேர்வு செய்யலாம்."
+
+#~ msgid "Let's add accounts"
+#~ msgstr "கணக்குகளைச் சேர்ப்போம்"
+
+#~ msgid "Admin account setup"
+#~ msgstr "நிர்வாக கணக்கு அமைப்பு"
+
+#~ msgid "Admin details"
+#~ msgstr "நிர்வாக விவரங்கள்"
+
+#~ msgid "Skip this step"
+#~ msgstr "இந்த படியைத் தவிர்க்கவும்"
+
+#~ msgid "Go back to previous step"
+#~ msgstr "முந்தைய படிக்குச் செல்லுங்கள்"
+
+#~ msgid "Red teamer account setup"
+#~ msgstr "ரெட் டீமர் கணக்கு அமைப்பு"
+
+#~ msgid "Red teamer details"
+#~ msgstr "சிவப்பு அணியின் விவரங்கள்"
+
+#~ msgid "Client account setup (optional)"
+#~ msgstr "கிளையன்ட் கணக்கு அமைவு (விரும்பினால்)"
+
+#~ msgid ""
+#~ "A client account can access reports. Adding a client account to the "
+#~ "organization is optional."
+#~ msgstr ""
+#~ "கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம். நிறுவனத்தில் கிளையன்ட் கணக்கைச் சேர்ப்பது "
+#~ "விருப்பமானது."
+
+#~ msgid "User details"
+#~ msgstr "பயனர் விவரங்கள்"
+
+#~ msgid "Finish organization setup"
+#~ msgstr "அமைப்பு அமைப்பை முடிக்கவும்"
+
+#~ msgid ""
+#~ "OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
+#~ "Tool). An Open-Source-project developed by the Ministry of Health, "
+#~ "Welfare and Sport to make your and our world a safer place."
+#~ msgstr ""
+#~ "OpenKAT என்பது \"KWETSBAARHEDEN ANALYSE TOOLURE\" (பாதிப்புகள் பகுப்பாய்வு "
+#~ "கருவி) ஆகும். உங்களுடைய மற்றும் எங்கள் உலகத்தை பாதுகாப்பான இடமாக மாற்ற சுகாதார, "
+#~ "நலன்புரி மற்றும் விளையாட்டு அமைச்சகம் உருவாக்கிய திறந்த மூல-திட்டம்."
+
+#~ msgid ""
+#~ "OpenKAT is able to give insight into security risks on your online "
+#~ "objects. For example, your websites, mailservers or online data."
+#~ msgstr ""
+#~ "உங்கள் நிகழ்நிலை பொருள்களில் பாதுகாப்பு அபாயங்கள் குறித்த நுண்ணறிவை ஓபன்காட் வழங்க "
+#~ "முடியும். எடுத்துக்காட்டாக, உங்கள் வலைத்தளங்கள், மெயில்சர்வர்கள் அல்லது நிகழ்நிலை தரவு."
+
+#~ msgid ""
+#~ "OpenKAT uses plugins to find and assess the area's that might be at risk "
+#~ "and reports these back to you. Each plugin has its own skillset which "
+#~ "could be scanning, normalizing or analyzing data. As a user you decide "
+#~ "which areas you would like to monitor or scan and which insight you would "
+#~ "like to receive."
+#~ msgstr ""
+#~ "ஆபத்தில் இருக்கும் பகுதியைக் கண்டுபிடித்து மதிப்பிடுவதற்கு ஓபன்காட் செருகுநிரல்களைப் "
+#~ "பயன்படுத்துகிறது, மேலும் இவற்றை உங்களிடம் தெரிவிக்கிறது. ஒவ்வொரு சொருகி அதன் சொந்த "
+#~ "திறனைக் கொண்டுள்ளது, இது தரவை ச்கேன் செய்வது, இயல்பாக்குதல் அல்லது பகுப்பாய்வு "
+#~ "செய்வது. ஒரு பயனராக நீங்கள் எந்த பகுதிகளை கண்காணிக்க அல்லது ச்கேன் செய்ய "
+#~ "விரும்புகிறீர்கள், எந்த நுண்ணறிவைப் பெற விரும்புகிறீர்கள் என்பதை நீங்கள் தீர்மானிக்கிறீர்கள்."
+
+#~ msgid ""
+#~ "Within OpenKAT you can view the insights as well as all the data OpenKAT "
+#~ "has found. You can choose to browse through the data or view reports."
+#~ msgstr ""
+#~ "OpenKAT க்குள் நீங்கள் நுண்ணறிவுகளையும், OpenKat ஐக் கண்டறிந்த அனைத்து தரவுகளையும் "
+#~ "காணலாம். தரவு மூலம் உலவ அல்லது அறிக்கைகளைக் காண நீங்கள் தேர்வு செய்யலாம்."
+
+#~ msgid ""
+#~ "During this introduction you will be guided through the steps to create a "
+#~ "report."
+#~ msgstr ""
+#~ "இந்த அறிமுகத்தின் போது நீங்கள் ஒரு அறிக்கையை உருவாக்குவதற்கான படிகள் மூலம் "
+#~ "வழிநடத்தப்படுவீர்கள்."
+
+#~ msgid "OpenKAT introduction"
+#~ msgstr "OpenKat அறிமுகம்"
+
+#~ msgid "Choose a report - Introduction"
+#~ msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - அறிமுகம்"
+
+#~ msgid ""
+#~ "Reports within OpenKAT contain an overview of the scanned objects, issues "
+#~ "found within them and known security risks that the object might be "
+#~ "vulnerable to. Each report gives a high overview of the state of the "
+#~ "object as well as detailed information on what OpenKAT found and possible "
+#~ "solutions."
+#~ msgstr ""
+#~ "OpenKat க்குள் உள்ள அறிக்கைகள் ச்கேன் செய்யப்பட்ட பொருள்களின் கண்ணோட்டத்தைக் "
+#~ "கொண்டிருக்கின்றன, அவற்றில் காணப்படும் சிக்கல்கள் மற்றும் பொருள் பாதிக்கப்படக்கூடிய "
+#~ "பாதுகாப்பு அபாயங்கள். ஒவ்வொரு அறிக்கையும் பொருளின் நிலையைப் பற்றிய உயர் "
+#~ "கண்ணோட்டத்தையும், ஓபன்காட் என்ன கண்டுபிடித்தது என்பதையும், சாத்தியமான தீர்வுகள் பற்றிய "
+#~ "விரிவான தகவல்களையும் தருகிறது."
+
+#~ msgid ""
+#~ "OpenKAT can scan and analyze by using plugins. Each plugin has it's "
+#~ "unique skillset and will collect specific data or give specific insights. "
+#~ "You manage the plugins within your account which let's OpenKAT know which "
+#~ "plugins to run and on which objects or areas."
+#~ msgstr ""
+#~ "செருகுநிரல்களைப் பயன்படுத்தி OpenKAT ச்கேன் செய்து பகுப்பாய்வு செய்யலாம். ஒவ்வொரு "
+#~ "சொருகி அதன் தனித்துவமான திறனைக் கொண்டுள்ளது மற்றும் குறிப்பிட்ட தரவைச் சேகரிக்கும் "
+#~ "அல்லது குறிப்பிட்ட நுண்ணறிவுகளைத் தரும். உங்கள் கணக்கிற்குள் உள்ள செருகுநிரல்களை நீங்கள் "
+#~ "நிர்வகிக்கிறீர்கள், இது எந்த செருகுநிரல்களை இயக்க வேண்டும், எந்த பொருள்கள் அல்லது "
+#~ "பகுதிகள் என்பதை ஓபன்காட் அறிந்து கொள்வோம்."
+
+#~ msgid "Generating a report"
+#~ msgstr "ஒரு அறிக்கையை உருவாக்குதல்"
+
+#~ msgid ""
+#~ "When you choose a report type OpenKAT will guide you through the setup. "
+#~ "OpenKAT will ask the necessary questions based on the input the report "
+#~ "needs, as well as asks for permission to run plugins that you haven’t "
+#~ "enabled yet but are needed to collect or analyze the data."
+#~ msgstr ""
+#~ "நீங்கள் ஒரு அறிக்கை வகையைத் தேர்வுசெய்யும்போது, திறப்பது அமைப்பின் மூலம் உங்களுக்கு "
+#~ "வழிகாட்டும். அறிக்கைக்குத் தேவையான உள்ளீட்டின் அடிப்படையில் தேவையான கேள்விகளை ஓபன்காட் "
+#~ "கேட்கும், அத்துடன் நீங்கள் இதுவரை இயக்காத ஆனால் தரவைச் சேகரிக்க அல்லது பகுப்பாய்வு செய்ய "
+#~ "வேண்டிய செருகுநிரல்களை இயக்க இசைவு கேட்கிறது."
+
+#~ msgid ""
+#~ "You can also choose to look at the collected data directly or generate "
+#~ "your own report by selecting and running plugins on objects of your "
+#~ "choice. OpenKAT will present the results."
+#~ msgstr ""
+#~ "நீங்கள் விரும்பும் பொருள்களில் செருகுநிரல்களைத் தேர்ந்தெடுத்து இயக்குவதன் மூலம் "
+#~ "சேகரிக்கப்பட்ட தரவைப் பார்க்க அல்லது உங்கள் சொந்த அறிக்கையை உருவாக்கவும் நீங்கள் தேர்வு "
+#~ "செய்யலாம். ஓபன்காட் முடிவுகளை வழங்கும்."
+
+#~ msgid "Permission"
+#~ msgstr "இசைவு"
+
+#~ msgid ""
+#~ "Plugins can be provided by OpenKAT but they can also come from the "
+#~ "community. Before a plugin can run, you need to give it permission by "
+#~ "enabling it."
+#~ msgstr ""
+#~ "செருகுநிரல்களை ஓபன்காட் வழங்க முடியும், ஆனால் அவை சமூகத்திலிருந்தும் வரலாம். ஒரு "
+#~ "சொருகி இயங்குவதற்கு முன், அதை இயக்குவதன் மூலம் அதற்கு இசைவு வழங்க வேண்டும்."
+
+#~ msgid ""
+#~ "When you generate a report. OpenKAT will let you know which plugins it "
+#~ "requires or suggests so you can choose to enable them."
+#~ msgstr ""
+#~ "நீங்கள் ஒரு அறிக்கையை உருவாக்கும்போது. எந்த செருகுநிரல்கள் தேவை அல்லது "
+#~ "பரிந்துரைக்கின்றன என்பதை ஓபன்காட் உங்களுக்குத் தெரிவிக்கும், எனவே அவற்றை இயக்க நீங்கள் "
+#~ "தேர்வு செய்யலாம்."
+
+#~ msgid "Let's choose a report"
+#~ msgstr "ஒரு அறிக்கையைத் தேர்ந்தெடுப்போம்"
+
+#~ msgid "Choose a report - Type"
+#~ msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - தட்டச்சு செய்க"
+
+#~ msgid ""
+#~ "Within OpenKAT you can view reports for each of your current objects. For "
+#~ "specific reports you can choose one of the available report types and "
+#~ "generate a report. Such as a pentest, a DNS-report or a Mail Report to "
+#~ "give some examples."
+#~ msgstr ""
+#~ "OpenKAT க்குள் உங்கள் தற்போதைய ஒவ்வொரு பொருளுக்கும் அறிக்கைகளைக் காணலாம். குறிப்பிட்ட "
+#~ "அறிக்கைகளுக்கு நீங்கள் கிடைக்கக்கூடிய அறிக்கை வகைகளில் ஒன்றைத் தேர்ந்தெடுத்து அறிக்கையை "
+#~ "உருவாக்கலாம். பென்டெச்ட், டி.என்.எச்-அறிக்கை அல்லது சில எடுத்துக்காட்டுகளை வழங்க ஒரு "
+#~ "அஞ்சல் அறிக்கை போன்றவை."
+
+#~ msgid "For this tutorial we will create a DNS-report to get you started."
+#~ msgstr "இந்த டுடோரியலுக்காக நீங்கள் தொடங்குவதற்கு டி.என்.எச்-அறிக்கையை உருவாக்குவோம்."
+
+#~ msgid ""
+#~ "When you start to generate this report. OpenKAT will guide you through "
+#~ "the necessary steps."
+#~ msgstr ""
+#~ "இந்த அறிக்கையை நீங்கள் உருவாக்கத் தொடங்கும் போது. அவுட்காட் தேவையான படிகள் மூலம் "
+#~ "உங்களுக்கு வழிகாட்டும்."
+
+#~ msgid "Setup scan"
+#~ msgstr "அமைவு ச்கேன்"
+
+#~ msgid "Let OpenKAT know what object to scan"
+#~ msgstr "ச்கேன் செய்ய எந்த பொருளை OpenKat க்கு தெரியப்படுத்துங்கள்"
+
+#~ msgid ""
+#~ "Plugins scan and analyze objects. OpenKAT needs to know which object(s) "
+#~ "you would like to scan and analyze for the DNS-report. So it can tell you "
+#~ "which plugins are available for the chosen object."
+#~ msgstr ""
+#~ "செருகுநிரல்கள் பொருள்களை ச்கேன் செய்து பகுப்பாய்வு செய்கின்றன. டி.என்.எச்-அறிக்கைக்கு "
+#~ "நீங்கள் எந்த பொருளை (களை) ச்கேன் செய்து பகுப்பாய்வு செய்ய விரும்புகிறீர்கள் என்பதை "
+#~ "ஓபன்காட் அறிந்து கொள்ள வேண்டும். எனவே தேர்ந்தெடுக்கப்பட்ட பொருளுக்கு எந்த செருகுநிரல்கள் "
+#~ "உள்ளன என்பதை இது உங்களுக்குக் கூறலாம்."
+
+#~ msgid "Understanding objects"
+#~ msgstr "பொருள்களைப் புரிந்துகொள்வது"
+
+#~ msgid ""
+#~ "A lot of things can be an object within the scope of OpenKAT. For example "
+#~ "a mailserver, an IP address, a URL, a DNS record, a hostname or a network "
+#~ "to name a few.  While these objects can be related to each other they are "
+#~ "all objects within OpenKAT that can be scanned to gain valuable insight."
+#~ msgstr ""
+#~ "ஓபன்காட்டின் எல்லைக்குள் நிறைய விசயங்கள் ஒரு பொருளாக இருக்கலாம். எடுத்துக்காட்டாக, ஒரு "
+#~ "மெயில்சர்வர், ஒரு ஐபி முகவரி, ஒரு முகவரி, ஒரு டிஎன்எச் பதிவு, ஒரு ஓச்ட்பெயர் "
+#~ "அல்லது ஒரு சில பெயர்களைக் குறிப்பிடுவதற்கு பிணையம். இந்த பொருள்கள் ஒருவருக்கொருவர் "
+#~ "தொடர்புடையதாக இருக்கும்போது, அவை அனைத்தும் OpenKAT க்குள் உள்ள பொருள்கள், அவை "
+#~ "மதிப்புமிக்க நுண்ணறிவைப் பெற ச்கேன் செய்யப்படலாம்."
+
+#~ msgid "Creating, adding and editing objects"
+#~ msgstr "பொருள்களை உருவாக்குதல், சேர்ப்பது மற்றும் திருத்துதல்"
+
+#~ msgid ""
+#~ "Within OpenKAT you can view, add and edit objects from the organization’s "
+#~ "object page."
+#~ msgstr ""
+#~ "OpenKat க்குள் நீங்கள் நிறுவனத்தின் பொருள் பக்கத்திலிருந்து பொருட்களைக் காணலாம், "
+#~ "சேர்க்கலாம் மற்றும் திருத்தலாம்."
+
+#~ msgid ""
+#~ "Let’s add an object to scan for the DNS-Report. For this introduction we "
+#~ "suggest adding a URL."
+#~ msgstr ""
+#~ "டி.என்.எச்-அறிக்கைக்கு ச்கேன் செய்ய ஒரு பொருளைச் சேர்ப்போம். இந்த அறிமுகத்திற்கு முகவரி "
+#~ "ஐ சேர்க்க பரிந்துரைக்கிறோம்."
+
+#~ msgid "Create your first object, a URL by filling out the form below."
+#~ msgstr ""
+#~ "கீழே உள்ள படிவத்தை நிரப்புவதன் மூலம் உங்கள் முதல் பொருளை, முகவரி ஐ உருவாக்கவும்."
+
+#~ msgid ""
+#~ "Additional details and examples can be found by pressing on the help "
+#~ "button next to the input field."
+#~ msgstr ""
+#~ "உள்ளீட்டு புலத்திற்கு அடுத்த உதவி பொத்தானை அழுத்துவதன் மூலம் கூடுதல் விவரங்கள் மற்றும் "
+#~ "எடுத்துக்காட்டுகளைக் காணலாம்."
+
+#~ msgid "Dependencies"
+#~ msgstr "சார்புநிலைகள்"
+
+#~ msgid ""
+#~ "Most objects have dependencies on the existence of other objects. For "
+#~ "example a URL needs to be connected to a network, hostname, fqdn (fully "
+#~ "qualified domain name) and IP address. OpenKAT collects these additional "
+#~ "object automatically when possible. By running plugins to collect or "
+#~ "extract this data."
+#~ msgstr ""
+#~ "பெரும்பாலான பொருள்கள் மற்ற பொருட்களின் இருப்பைப் பற்றிய சார்புகளைக் கொண்டுள்ளன. "
+#~ "எடுத்துக்காட்டாக, ஒரு முகவரி ஐ ஒரு பிணையம், ஓச்ட்பெயர், FQDN (முழு தகுதி வாய்ந்த "
+#~ "டொமைன் பெயர்) மற்றும் ஐபி முகவரியுடன் இணைக்க வேண்டும். ஓபன்காட் இந்த கூடுதல் பொருளை "
+#~ "முடிந்தவரை தானாக சேகரிக்கிறது. இந்தத் தரவை சேகரிக்க அல்லது பிரித்தெடுக்க "
+#~ "செருகுநிரல்களை இயக்குவதன் மூலம்."
+
+#~ msgid ""
+#~ "The additional objects that OpenKAT created will be added to your object "
+#~ "list as separate objects. If OpenKAT can’t add them automatically it will "
+#~ "guide you through the process of creating them manually."
+#~ msgstr ""
+#~ "OpenKAT உருவாக்கிய கூடுதல் பொருள்கள் உங்கள் பொருள் பட்டியலில் தனி பொருள்களாக "
+#~ "சேர்க்கப்படும். ஓபன்காட் அவற்றை தானாகவே சேர்க்க முடியாவிட்டால், அவற்றை கைமுறையாக "
+#~ "உருவாக்கும் செயல்முறையின் மூலம் அது உங்களுக்கு வழிகாட்டும்."
+
+#~ msgid ""
+#~ "Based on the url you provided OpenKAT added the necessary additional "
+#~ "objects to create a url object."
+#~ msgstr ""
+#~ "நீங்கள் வழங்கிய முகவரி இன் அடிப்படையில் OpenKAT ஒரு முகவரி பொருளை உருவாக்க "
+#~ "தேவையான கூடுதல் பொருள்களைச் சேர்த்தது."
+
+#~ msgid "URL"
+#~ msgstr "முகவரி"
+
+#~ msgid "Owner"
+#~ msgstr "உரிமையாளர்"
+
+#~ msgid "Path"
+#~ msgstr "பாதை"
+
+#~ msgid "Hostname"
+#~ msgstr "புரவலன்பெயர்"
+
+#~ msgid "scheme"
+#~ msgstr "திட்டம்"
+
+#~ msgid "Network"
+#~ msgstr "பிணையம்"
+
+#~ msgid "Start scanning"
+#~ msgstr "ச்கேன் செய்யத் தொடங்குங்கள்"
+
+#~ msgid "OpenKAT Introduction"
+#~ msgstr "OpenKat அறிமுகம்"
+
+#~ msgid "Setup scan - OOI clearance for"
+#~ msgstr "அமைவு ச்கேன் - OOI இசைவு"
+
+#~ msgid ""
+#~ "Some scans are lightweight while others might be a bit more aggressive "
+#~ "with their scanning. OpenKAT requires you to set a clearance level for "
+#~ "each object to prevent you from unintentionally running aggressive scans. "
+#~ "For example you might have the right to run any type of scan on your own "
+#~ "server but you probably don’t have the right to do so for objects owned "
+#~ "by other people of companies."
+#~ msgstr ""
+#~ "சில ச்கேன் இலகுரக, மற்றவர்கள் தங்கள் ச்கேனிங்கில் சற்று ஆக்ரோசமாக இருக்கலாம். தற்செயலாக "
+#~ "இயங்கும் வன்கவர்வு ச்கேன்களைத் தடுக்க ஒவ்வொரு பொருளுக்கும் இசைவு அளவை அமைக்க OpenKat "
+#~ "தேவைப்படுகிறது. எடுத்துக்காட்டாக, உங்கள் சொந்த சேவையகத்தில் எந்தவொரு ச்கேன் "
+#~ "இயக்குவதற்கும் உங்களுக்கு உரிமை இருக்கலாம், ஆனால் பிற நிறுவனங்களின் சொந்த "
+#~ "பொருட்களுக்கு அவ்வாறு செய்ய உங்களுக்கு உரிமை இல்லை."
+
+#~ msgid "How to know required clearance level"
+#~ msgstr "தேவையான இசைவு அளவை எவ்வாறு அறிவது"
+
+#~ msgid ""
+#~ "Each plugin that scans will have a scan intensity score. The intensity of "
+#~ "the scan must be equal to or below the clearance level you set for your "
+#~ "object. If the scan has an intensity level that is too high, OpenKAT will "
+#~ "notify you before running it. Visually clearance levels and intensity "
+#~ "scores are indicated with little cat paws."
+#~ msgstr ""
+#~ "ச்கேன் செய்யும் ஒவ்வொரு சொருகி ச்கேன் தீவிர மதிப்பெண் கொண்டிருக்கும். ச்கேனின் தீவிரம் "
+#~ "உங்கள் பொருளுக்கு நீங்கள் நிர்ணயித்த இசைவு நிலைக்கு சமமாக அல்லது கீழே இருக்க வேண்டும். "
+#~ "ச்கேன் மிக அதிகமாக இருக்கும் ஒரு தீவிர நிலை இருந்தால், அதை இயக்குவதற்கு முன்பு "
+#~ "ஓபன்காட் உங்களுக்கு அறிவிக்கும். பார்வை இசைவு நிலைகள் மற்றும் தீவிர மதிப்பெண்கள் சிறிய "
+#~ "பூனை பாதங்களுடன் குறிக்கப்படுகின்றன."
+
+#~ msgid ""
+#~ "This scan has a scan intensity score of 1, requiring a level 1 clearance "
+#~ "level to be run. This means that the scan does not touch the object "
+#~ "itself, but only searches for information about the object."
+#~ msgstr ""
+#~ "ச்கேன் தீவிரம் மதிப்பெண் 1 ஐ இந்த ச்கேன் கொண்டுள்ளது, இது நிலை 1 இசைவு நிலை இயக்கப்பட "
+#~ "வேண்டும். இதன் பொருள் ச்கேன் பொருளைத் தொடாது, ஆனால் பொருளைப் பற்றிய தகவல்களை மட்டுமே "
+#~ "தேடுகிறது."
+
+#~ msgid ""
+#~ "An example of a more aggressive scan. Which has a scan intensity score of "
+#~ "3. Meaning it requires at least a level 3 clearance level to be set on "
+#~ "your object."
+#~ msgstr ""
+#~ "மிகவும் ஆக்ரோசமான ச்கேனின் எடுத்துக்காட்டு. இது ச்கேன் தீவிரம் மதிப்பெண் 3 ஐக் "
+#~ "கொண்டுள்ளது. இதன் பொருள் உங்கள் பொருளில் குறைந்தபட்சம் ஒரு நிலை 3 இசைவு நிலை "
+#~ "அமைக்கப்பட வேண்டும்."
+
+#~ msgid ""
+#~ "OpenKAT has a permission system that allows administrators to configure "
+#~ "which users can set a certain clearance level. The will make sure that "
+#~ "only users that are trusted can start the more aggressive scans."
+#~ msgstr ""
+#~ "OpenKAT ஒரு இசைவு முறையைக் கொண்டுள்ளது, இது எந்தப் பயனர்கள் ஒரு குறிப்பிட்ட இசைவு "
+#~ "அளவை அமைக்க முடியும் என்பதை உள்ளமைக்க நிர்வாகிகளை அனுமதிக்கிறது. நம்பகமான பயனர்கள் "
+#~ "மட்டுமே மிகவும் ஆக்ரோசமான ச்கேன்களைத் தொடங்க முடியும் என்பதை உறுதி செய்யும்."
+
+#~ msgid "Acknowledge clearance level"
+#~ msgstr "இசைவு அளவை ஒப்புக் கொள்ளுங்கள்"
+
+#~ msgid ""
+#~ "Before a member is granted the ability to set clearance levels on an "
+#~ "object, they must first acknowledge and accept the clearance level set by "
+#~ "the administrators. The maximum scanning level permitted for a member is "
+#~ "aligned with the trusted clearance level. By acknowledging the trusted "
+#~ "clearance level, this member formally agrees to abide by this permission "
+#~ "and gains the capability to perform scans only up to this trusted "
+#~ "clearance level. This two-step process ensures that the member operates "
+#~ "within authorized boundaries."
+#~ msgstr ""
+#~ "ஒரு பொருளின் மீது இசைவு நிலைகளை நிர்ணயிக்கும் திறன் ஒரு உறுப்பினருக்கு "
+#~ "வழங்கப்படுவதற்கு முன்பு, அவர்கள் முதலில் நிர்வாகிகள் நிர்ணயித்த இசைவு அளவை ஒப்புக் "
+#~ "கொண்டு ஏற்றுக்கொள்ள வேண்டும். ஒரு உறுப்பினருக்கு அனுமதிக்கப்பட்ட அதிகபட்ச ச்கேனிங் நிலை "
+#~ "நம்பகமான இசைவு மட்டத்துடன் ஒத்துப்போகிறது. நம்பகமான இசைவு அளவை ஒப்புக்கொள்வதன் மூலம், "
+#~ "இந்த உறுப்பினர் இந்த அனுமதியைக் கடைப்பிடிக்க முறையாக ஒப்புக்கொள்கிறார், மேலும் இந்த "
+#~ "நம்பகமான இசைவு நிலைவரை மட்டுமே வருடு செய்யும் திறனைப் பெறுகிறார். இந்த இரண்டு-படி "
+#~ "செயல்முறை உறுப்பினர் அங்கீகரிக்கப்பட்ட எல்லைகளுக்குள் செயல்படுவதை உறுதி செய்கிறது."
+
+#, python-format
+#~ msgid ""
+#~ "Your administrator has <strong>trusted</strong> you with a clearance "
+#~ "level of <strong>L%(tcl)s</strong>. </br> You have also "
+#~ "<strong>acknowledged</strong> to use this clearance level of "
+#~ "<strong>L%(acl)s</strong>."
+#~ msgstr ""
+#~ "உங்கள் நிர்வாகி <strong> நம்பகமான </strong> <strong> எல்%(tcl)s</strong> இன் "
+#~ "இசைவு அளவைக் கொண்டுள்ளது. </br> <strong> ஒப்புக் கொள்ளப்பட்ட </strong> இந்த இசைவு "
+#~ "அளவைப் பயன்படுத்த <strong> எல்%(acl)s </strong>."
+
+#~ msgid "Setup scan - Set clearance level for"
+#~ msgstr "அமைவு ச்கேன் - இசைவு அளவை அமைக்கவும்"
+
+#, python-format
+#~ msgid ""
+#~ "After creating a new object OpenKAT will ask you to set a clearance "
+#~ "level. On the object detail page you can always change the clearance "
+#~ "level. For the onboarding we will suggest to set the clearance level to "
+#~ "L%(dns_report_least_clearance_level)s."
+#~ msgstr ""
+#~ "ஒரு புதிய பொருளை உருவாக்கிய பிறகு, ஓபன்காட் ஒரு இசைவு அளவை அமைக்கும்படி "
+#~ "கேட்கும். பொருள் விவரம் பக்கத்தில் நீங்கள் எப்போதும் இசைவு அளவை மாற்றலாம். ஆன் "
+#~ "போர்டிங்கிற்கு இசைவு அளவை l%(dns_report_least_clearance_level)s என அமைக்க "
+#~ "பரிந்துரைக்கிறோம்."
+
+#~ msgid "Setup scan - Enable plugins"
+#~ msgstr "அமைவு ச்கேன் - செருகுநிரல்களை இயக்கவும்"
+
+#~ msgid "Plugins introduction"
+#~ msgstr "செருகுநிரல்கள் அறிமுகம்"
+
+#~ msgid ""
+#~ "OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a "
+#~ "specific skillset that will help to generate your report. There are three "
+#~ "types of plugins."
+#~ msgstr ""
+#~ "ச்கேன் செய்ய, சரிபார்க்க மற்றும் பகுப்பாய்வு செய்ய ஓபன்காட் செருகுநிரல்களைப் "
+#~ "பயன்படுத்துகிறது. ஒவ்வொரு சொருகி ஒரு குறிப்பிட்ட திறனைக் கொண்டுவரும், இது உங்கள் "
+#~ "அறிக்கையை உருவாக்க உதவும். மூன்று வகையான செருகுநிரல்கள் உள்ளன."
+
+#~ msgid "Boefjes:"
+#~ msgstr "போஃப்செச்:"
+
+#~ msgid ""
+#~ "Scan objects for data. Each boefje has a scan intensity score to prevent "
+#~ "invasive scanning on objects where you don’t have the clearance to do so."
+#~ msgstr ""
+#~ "தரவுகளுக்கான பொருள்களை ச்கேன் செய்யுங்கள். ஒவ்வொரு போஃப்சேவுக்கும் ச்கேன் தீவிரம் "
+#~ "மதிப்பெண் உள்ளது, அவ்வாறு செய்ய உங்களுக்கு இசைவு இல்லாத பொருள்களில் வன்கவர்வு ச்கேன் "
+#~ "செய்வதைத் தடுக்க."
+
+#~ msgid "Normalizers:"
+#~ msgstr "இயல்பானவை:"
+
+#~ msgid ""
+#~ "Check the data for specific objects and add these object to your object "
+#~ "list."
+#~ msgstr ""
+#~ "குறிப்பிட்ட பொருள்களுக்கான தரவைச் சரிபார்த்து, இந்த பொருளை உங்கள் பொருள் பட்டியலில் "
+#~ "சேர்க்கவும்."
+
+#~ msgid "Bits:"
+#~ msgstr "பிட்கள்:"
+
+#~ msgid "Analyze the available data to come to insights and conclusions."
+#~ msgstr ""
+#~ "நுண்ணறிவு மற்றும் முடிவுகளுக்கு வர கிடைக்கக்கூடிய தரவை பகுப்பாய்வு செய்யுங்கள்."
+
+#~ msgid ""
+#~ "OpenKAT will be able to generate a full report when all the required and "
+#~ "suggested plugins are enabled. If you choose not to give a plugin "
+#~ "permission to run, the data that plugin would collect or produce will be "
+#~ "left out of the report which will then be generated based on the "
+#~ "available data collected by the enabled plugins. Below are the suggested "
+#~ "and required plugins for this report."
+#~ msgstr ""
+#~ "தேவையான மற்றும் பரிந்துரைக்கப்பட்ட செருகுநிரல்கள் அனைத்தும் இயக்கப்பட்டிருக்கும் போது "
+#~ "ஓபன்காட் ஒரு முழு அறிக்கையை உருவாக்க முடியும். இயக்க ஒரு சொருகி இசைவு வழங்க "
+#~ "வேண்டாம் என்று நீங்கள் தேர்வுசெய்தால், சொருகி சேகரிக்கும் அல்லது விளைவாக்கம் செய்யும் "
+#~ "தரவு அறிக்கையிலிருந்து விடப்படும், பின்னர் அது இயக்கப்பட்ட செருகுநிரல்களால் "
+#~ "சேகரிக்கப்பட்ட தரவுகளின் அடிப்படையில் உருவாக்கப்படும். இந்த அறிக்கைக்கு "
+#~ "பரிந்துரைக்கப்பட்ட மற்றும் தேவையான செருகுநிரல்கள் கீழே உள்ளன."
+
+#~ msgid "Let’s setup your scan by enabling the plugins of your choice below."
+#~ msgstr ""
+#~ "உங்களுக்கு விருப்பமான செருகுநிரல்களை கீழே செயல்படுத்துவதன் மூலம் உங்கள் ச்கேன் அமைப்போம்."
+
+#~ msgid "Required and suggested plugins"
+#~ msgstr "தேவையான மற்றும் பரிந்துரைக்கப்பட்ட செருகுநிரல்கள்"
+
+#~ msgid "Enable and start scan"
+#~ msgstr "ச்கேன் இயக்கவும் தொடங்கவும்"
+
+#~ msgid ""
+#~ "The enabled boefjes are collecting the data needed to generate the DNS-"
+#~ "report. This may take some time based on the type of scans and the number "
+#~ "of objects found. For the current scan we expect boefjes to take about 3 "
+#~ "minutes."
+#~ msgstr ""
+#~ "இயக்கப்பட்ட போஃப்செச் டிஎன்எச்-அறிக்கையை உருவாக்க தேவையான தரவை சேகரிக்கிறது. ச்கேன் "
+#~ "வகை மற்றும் காணப்படும் பொருட்களின் எண்ணிக்கையின் அடிப்படையில் இதற்கு சிறிது நேரம் "
+#~ "ஆகலாம். தற்போதைய ச்கேனுக்கு போஃப்செச் சுமார் 3 நிமிடங்கள் ஆகும் என்று எதிர்பார்க்கிறோம்."
+
+#~ msgid ""
+#~ "During this introduction we ask you to wait till the scan is ready. After "
+#~ "which you can view the report."
+#~ msgstr ""
+#~ "இந்த அறிமுகத்தின் போது ச்கேன் தயாராக இருக்கும் வரை காத்திருக்கும்படி "
+#~ "கேட்டுக்கொள்கிறோம். அதன் பிறகு நீங்கள் அறிக்கையைக் காணலாம்."
+
+#~ msgid ""
+#~ "After the onboarding, boefjes run in the background. This enables you to "
+#~ "use OpenKAT in the meantime without waiting for scans to finish. When you "
+#~ "would like to see the status of a scan you can open the \"tasks\" page."
+#~ msgstr ""
+#~ "ஆன் போர்டிங் செய்த பிறகு, போஃப்செச் பின்னணியில் இயங்குகிறார். ச்கேன் முடிக்கக் "
+#~ "காத்திருக்காமல் இதற்கிடையில் ஓபன்கேட்டைப் பயன்படுத்த இது உங்களுக்கு உதவுகிறது. நீங்கள் "
+#~ "ஒரு ச்கேன் நிலையைப் பார்க்க விரும்பினால், நீங்கள் \"பணிகள்\" பக்கத்தைத் திறக்கலாம்."
+
+#~ msgid "Open my DNS-report"
+#~ msgstr "எனது டி.என்.எச்-அறிக்கையைத் திறக்கவும்"
+
+#~ msgid "1: Introduction"
+#~ msgstr "1: அறிமுகம்"
+
+#~ msgid "2: Choose a report"
+#~ msgstr "2: அறிக்கையைத் தேர்வுசெய்க"
+
+#~ msgid "3: Setup scan"
+#~ msgstr "3: அமைவு ச்கேன்"
+
+#~ msgid "4: Open report"
+#~ msgstr "4: திறந்த அறிக்கை"
+
+#~ msgid "3: Indemnification"
+#~ msgstr "3: இழப்பீடு"
+
+#~ msgid "4: Account setup"
+#~ msgstr "4: கணக்கு அமைவு"
+
+#~ msgid "OpenKAT Setup"
+#~ msgstr "OpenKAT அமைப்பு"
+
+#, python-brace-format
+#~ msgid "{name} successfully created."
+#~ msgstr "{name} வெற்றிகரமாக உருவாக்கப்பட்டது."
+
+#~ msgid "The name of the organisation"
+#~ msgstr "அமைப்பின் பெயர்"
+
+#~ msgid ""
+#~ "A slug containing only lower-case unicode letters, numbers, hyphens or "
+#~ "underscores that will be used in URLs and paths"
+#~ msgstr ""
+#~ "முகவரி கள் மற்றும் பாதைகளில் பயன்படுத்தப்படும் லோயர்-கேச் யூனிகோட் எழுத்துக்கள், எண்கள், "
+#~ "ஐபன்கள் அல்லது அடிக்கோடிட்டுக் காட்டும் ஒரு ச்லக்"
+
+#~ msgid "Add finding type:"
+#~ msgstr "கண்டுபிடிப்பு வகையைச் சேர்க்கவும்:"
+
+#~ msgid "Add finding:"
+#~ msgstr "கண்டுபிடிப்பைச் சேர்க்கவும்:"
+
+#~ msgid ""
+#~ "Here, an indemnification can be given on behalf of your organization:"
+#~ msgstr "இங்கே, உங்கள் நிறுவனத்தின் சார்பாக ஒரு இழப்பீடு வழங்கப்படலாம்:"
+
+#~ msgid ""
+#~ "Before you're able to add assets to OpenKAT and to assign clearance "
+#~ "levels, you have to give indemnification on the organization and declare "
+#~ "that you as a person can be held accountable."
+#~ msgstr ""
+#~ "நீங்கள் OpenKat இல் சொத்துக்களைச் சேர்க்கவும், இசைவு நிலைகளை ஒதுக்கவும் முன், நீங்கள் "
+#~ "நிறுவனத்தின் மீது இழப்பீடு வழங்க வேண்டும், மேலும் ஒரு நபராக நீங்கள் பொறுப்புக்கூற "
+#~ "முடியும் என்று அறிவிக்க வேண்டும்."
+
+#~ msgid "Register an indemnification"
+#~ msgstr "இழப்பீடு பதிவு செய்யுங்கள்"
+
+#~ msgid "Add Finding"
+#~ msgstr "கண்டுபிடிப்பைச் சேர்"
+
 #~ msgid ""
 #~ "There are no dashboard items added yet. You can add dashboard items via "
 #~ "the filters on the objects and findings page."
@@ -8813,9 +9001,6 @@ msgstr "மூல கோப்பு வெற்றிகரமாக சேர
 #~ "நிலை மற்றும் பகுத்தறிவு கூட காட்டப்பட்டுள்ளது. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
 #~ "வேறுபட்டிருக்கலாம்."
 
-#~ msgid "Generate a report"
-#~ msgstr "ஒரு அறிக்கையை உருவாக்குங்கள்"
-
 #~ msgid ""
 #~ "To generate a report you can start by selecting report types or by "
 #~ "selecting objects."
@@ -8868,10 +9053,6 @@ msgstr "மூல கோப்பு வெற்றிகரமாக சேர
 
 #~ msgid "Account type details"
 #~ msgstr "கணக்கு வகை விவரங்கள்"
-
-#, python-format
-#~ msgid "An overview of members of <strong>%(organization_name)s</strong>."
-#~ msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்."
 
 #~ msgid "Upload a csv file with members for organisation"
 #~ msgstr "நிறுவனத்திற்கான உறுப்பினர்களுடன் காபிம கோப்பை பதிவேற்றவும்"
