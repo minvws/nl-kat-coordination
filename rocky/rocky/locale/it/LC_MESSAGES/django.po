@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21 13:13+0000\n"
+"POT-Creation-Date: 2025-07-22 13:42+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -53,6 +53,7 @@ msgid "Please provide username"
 msgstr ""
 
 #: account/forms/account_setup.py
+#: rocky/templates/organizations/organization_member_list.html
 msgid "Email"
 msgstr "E-mail"
 
@@ -230,7 +231,7 @@ msgstr "Organizzazioni"
 msgid "The organization from which to clone settings."
 msgstr "L'organizzazione da cui clonare le impostazioni."
 
-#: account/forms/password_reset.py
+#: account/forms/password_reset.py account/templates/account_detail.html
 msgid "Email address"
 msgstr "Indirizzo email"
 
@@ -291,8 +292,8 @@ msgstr ""
 "autorizzazione nella tua pagina del profilo per procedere."
 
 #: account/models.py
-msgid "The Email must be set"
-msgstr "L'indirizzo email deve essere impostato"
+msgid "The email must be set"
+msgstr ""
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
@@ -357,10 +358,6 @@ msgid "Full name"
 msgstr "Nome completo"
 
 #: account/templates/account_detail.html
-msgid "E-mail address"
-msgstr "Indirizzo e-mail"
-
-#: account/templates/account_detail.html
 msgid "Member type"
 msgstr "Tipo di membro"
 
@@ -379,9 +376,12 @@ msgid "OOI clearance"
 msgstr "Autorizzazione OOI"
 
 #: account/templates/account_detail.html
+msgid "You don't have any clearance to scan objects."
+msgstr ""
+
+#: account/templates/account_detail.html
 msgid ""
-"You don't have any clearance to scan objects. <br> Get in contact with the "
-"admin to give you the necessary clearance level."
+"Get in contact with the admin to give you the necessary clearance level."
 msgstr ""
 
 #: account/templates/account_detail.html
@@ -752,11 +752,8 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid ""
-"\n"
-"                        On this page you can see an overview of the "
-"dashboards for all organizations.\n"
-"                        **More context can be written here**\n"
-"                    "
+"On this page you can see an overview of the dashboards for all "
+"organizations. **More context can be written here**"
 msgstr ""
 
 #: crisis_room/templates/crisis_room_dashboards.html
@@ -794,34 +791,22 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                            This table shows the findings that have been "
-"identiefied for each organization,\n"
-"                            sorted by the finding types and grouped by "
-"organizations.\n"
-"                            This data is based on the latest Crisis Room "
-"Findings Report\n"
-"                            of each organization.\n"
-"                        "
+"This table shows the findings that have been identiefied for each "
+"organization, sorted by the finding types and grouped by organizations. This "
+"data is based on the latest Crisis Room Findings Report of each organization."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                    No findings have been identified yet. As soon as they "
-"have been\n"
-"                    identified, they will be shown on this page.\n"
-"                "
+"No findings have been identified yet. As soon as they have been identified, "
+"they will be shown on this page."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                There are no organizations yet. After creating an "
-"organization,\n"
-"                the identified findings will be shown here.\n"
-"            "
+"There are no organizations yet. After creating an organization, the "
+"identified findings will be shown here."
 msgstr ""
 
 #: crisis_room/templates/crisis_room_header.html
@@ -1007,15 +992,11 @@ msgid "Critical and high findings"
 msgstr ""
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                                            This table shows the top 25 "
-"critical and high findings that have\n"
-"                                            been identified for this "
-"organization, grouped by finding types.\n"
-"                                            A table with all the identified "
-"findings can be found in the Findings Report.\n"
-"                                        "
+"This table shows the top 25 critical and high findings that have been "
+"identified for this organization, grouped by finding types. A table with all "
+"the identified findings can be found in the Findings Report."
 msgstr ""
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
@@ -2288,6 +2269,38 @@ msgstr ""
 msgid "Onboarding"
 msgstr ""
 
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "Welcome to OpenKAT!"
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
+"set everything up."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"At the end of this onboarding you have added your first object, created your "
+"first DNS report and learned about some basic concepts used within OpenKAT."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "The full documentation for OpenKAT can be found at:"
+msgstr ""
+
+#: onboarding/templates/partials/step_2_organization_text.html
+#: rocky/templates/organizations/organization_add.html
+msgid "Organization setup"
+msgstr "Configurazione dell'organizzazione"
+
+#: onboarding/templates/partials/step_2_organization_text.html
+msgid ""
+"Please enter the following organization details. The organization name can "
+"be changed later in the interface. The organization code cannot be changed "
+"as this is used by the database."
+msgstr ""
+
 #: onboarding/templates/step_10_report.html
 #: reports/report_types/concatenated_report/report.py
 msgid "Report"
@@ -2315,38 +2328,8 @@ msgstr ""
 
 #: onboarding/templates/step_1_introduction_registration.html
 #: onboarding/templates/step_1a_introduction.html
-msgid "Welcome to OpenKAT!"
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
-msgid ""
-"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
-"set everything up. <p> At the end of this onboarding you have added your "
-"first object, created your first DNS report and learned about some basic "
-"concepts used within OpenKAT. </p> <p> The full documentation for OpenKAT "
-"can be found at: <a href=\"https://docs.openkat.nl\">https://docs.openkat."
-"nl</a>."
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
 msgid "Let's get started"
 msgstr "Cominciamo"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-#: rocky/templates/organizations/organization_add.html
-msgid "Organization setup"
-msgstr "Configurazione dell'organizzazione"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-msgid ""
-"Please enter the following organization details. The organization name can "
-"be changed later in the interface. The organization code cannot be changed "
-"as this is used by the database."
-msgstr ""
 
 #: onboarding/templates/step_2a_organization_setup.html
 #: onboarding/templates/step_2b_organization_update.html
@@ -2517,22 +2500,22 @@ msgstr ""
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
 "OpenKAT uses plugins to scan your objects. Each plugin has a scan level to "
-"specify how aggressive the scan is.  Plugins can only scan those objects "
-"with a clearance level that is equal to, or higher than the scan level of "
-"the plugin. Plugin scan level are indicated by the number of cat paws."
+"specify how aggressive the scan is. Plugins can only scan those objects with "
+"a clearance level that is equal to, or higher than the scan level of the "
+"plugin. Plugin scan level are indicated by the number of cat paws."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs "
-"non-intrusive scans which look for publicly available information. It scans "
-"objects with a clearance level of 1 or higher."
+"The plugin <strong>DNS Zone</strong> has a scan level of 1, meaning that it "
+"performs non-intrusive scans which look for publicly available information. "
+"It scans objects with a clearance level of 1 or higher."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>Fierce</b> has a scan level of 3, meaning that it more "
-"aggressive and could potentially break things. It scans objects with a "
+"The plugin <strong>Fierce</strong> has a scan level of 3, meaning that it "
+"more aggressive and could potentially break things. It scans objects with a "
 "clearance level of 3 or higher."
 msgstr ""
 
@@ -2611,10 +2594,6 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "5: Generating report"
-msgstr ""
-
-#: onboarding/view_helpers.py
-msgid "3: Add Object"
 msgstr ""
 
 #: onboarding/views.py
@@ -2902,12 +2881,10 @@ msgid "server"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/findings.html
+#: reports/report_types/aggregate_organisation_report/report.html
 msgid ""
-"\n"
-"                This chapter contains information about the findings that "
-"have been identified\n"
-"                for this organization.\n"
-"            "
+"This chapter contains information about the findings that have been "
+"identified for this organization."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -2968,15 +2945,6 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/vulnerabilities.html
 msgid "Vulnerabilities found are grouped per system."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
-msgid ""
-"\n"
-"                                    This chapter contains information about "
-"the findings that have been identified\n"
-"                                    for this organization.\n"
-"                                "
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
@@ -3276,18 +3244,6 @@ msgid ""
 "identified for the selected asset and organization."
 msgstr ""
 
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                This table shows the top 25 critical and high findings that "
-"have\n"
-"                been identified for this organization, grouped by finding "
-"types.\n"
-"                A table with all the identified findings can be found in the "
-"Findings Report.\n"
-"            "
-msgstr ""
-
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
 msgstr ""
@@ -3324,7 +3280,7 @@ msgstr ""
 #: reports/report_types/mail_report/report.html
 msgid ""
 "The Mail Report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
+"with email servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
@@ -3948,18 +3904,13 @@ msgstr ""
 
 #: reports/templates/partials/report_findings_table.html
 msgid ""
-"\n"
-"            This table provides an overview of the identified findings on "
-"the scanned\n"
-"            systems. For each finding type it shows the risk level, the "
-"number of occurrences\n"
-"            and the first known occurrence of the finding. The risk level "
-"may be different for your specific environment.\n"
-"            The details can be seen when expanding a row. A description, the "
-"source, impact and recommendation of the finding\n"
-"            can be found here. It also shows in which findings the finding "
-"type occurred.\n"
-"        "
+"This table provides an overview of the identified findings on the scanned "
+"systems. For each finding type it shows the risk level, the number of "
+"occurrences and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment. The details can be seen when "
+"expanding a row. A description, the source, impact and recommendation of the "
+"finding can be found here. It also shows in which findings the finding type "
+"occurred."
 msgstr ""
 
 #: reports/templates/partials/report_findings_table.html
@@ -4478,7 +4429,7 @@ msgid "Open asset report object details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Asset reports details:"
+msgid "Asset reports details"
 msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
@@ -4494,6 +4445,7 @@ msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/views/report_overview.py
 msgid "Asset reports"
 msgstr ""
@@ -4596,10 +4548,6 @@ msgstr ""
 #: reports/templates/report_overview/subreports_header.html
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
-msgstr ""
-
-#: reports/templates/report_overview/subreports_table.html
-msgid "Asset reports:"
 msgstr ""
 
 #: reports/templates/report_overview/subreports_table.html
@@ -5188,8 +5136,8 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the Boefje explaining in short what it can do. This will "
-"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+"A description of the Boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page."
 msgstr ""
 
 #: tools/forms/settings.py
@@ -5878,11 +5826,12 @@ msgstr "OpenKAT vede"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br> Our motto is therefore: I see, I see, what you do not see."
+"analog)."
 msgstr ""
-"Decine di strumenti sono integrati in OpenKAT per visualizzare il mondo "
-"(digitale e analogico). <br> Il nostro motto è quindi: Io vedo, io vedo, ciò "
-"che tu non vedi."
+
+#: rocky/templates/landing_page.html
+msgid "Our motto is therefore: I see, I see, what you do not see."
+msgstr ""
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
@@ -6431,7 +6380,7 @@ msgstr "Salva membro"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -6457,10 +6406,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
 msgstr "Panoramica dei membri:"
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "E-mail"
-msgstr "E-mail"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
@@ -7789,6 +7734,23 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
+
+#~ msgid "The Email must be set"
+#~ msgstr "L'indirizzo email deve essere impostato"
+
+#~ msgid "E-mail address"
+#~ msgstr "Indirizzo e-mail"
+
+#~ msgid ""
+#~ "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#~ "analog). <br> Our motto is therefore: I see, I see, what you do not see."
+#~ msgstr ""
+#~ "Decine di strumenti sono integrati in OpenKAT per visualizzare il mondo "
+#~ "(digitale e analogico). <br> Il nostro motto è quindi: Io vedo, io vedo, "
+#~ "ciò che tu non vedi."
+
+#~ msgid "E-mail"
+#~ msgstr "E-mail"
 
 #, python-brace-format
 #~ msgid "A unique code of {code_length} characters."
