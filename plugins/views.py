@@ -17,19 +17,28 @@ class PluginListView(ListView):
     model = Plugin
 
     def get_queryset(self):
-        return (
+        plugins = (
             super()
             .get_queryset()
             .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
             .annotate(
                 enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
             )
-            .order_by("name")
         )
+        order_by = self.request.GET.get("order_by", "name")
+        sorting_order = self.request.GET.get("sorting_order", "asc")
+
+        if order_by and sorting_order == "desc":
+            return plugins.order_by(f"-{order_by}")
+
+        return plugins.order_by(order_by)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("plugin_list"), "text": _("Plugins")}]
+        context["order_by"] = self.request.GET.get("order_by")
+        context["sorting_order"] = self.request.GET.get("sorting_order", "asc")
+        context["sorting_order_class"] = "ascending" if context["sorting_order"] == "asc" else "descending"
 
         return context
 
