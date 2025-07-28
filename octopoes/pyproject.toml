@@ -34,7 +34,7 @@ dependencies = [
     "opentelemetry-proto",
     "opentelemetry-semantic-conventions",
     "opentelemetry-util-http",
-    "fastapi-slim>=0.115.2,<0.116",
+    "fastapi-slim>=0.115.2",
     "structlog>=25.2.0,<26",
     "asgiref>=3.8.1,<4",
     "setuptools>=78.1.1,<79",
