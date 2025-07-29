@@ -143,8 +143,8 @@ The final step is generating a report. During the onboarding, we will create a D
 
 This is the last page, after which you can start exploring OpenKAT. The Boefjes are currently running to collect data about your URL. Your DNS Report will be generated in 3 minutes, so the Boefjes have some time to complete. In the meantime you can explore OpenKAT. Go back to the Report History page to view your DNS Report after a couple of minutes.
 
-.. image:: img/10-onboarding-dns-report.png
-  :alt: DNS Report is being generated.
+.. image:: img/10-onboarding-boefjes-loading.png
+  :alt: Boefjes are scanning.
 
 After three minutes, you can open your DNS Report on the Report History page. Here is your very first DNS report! Congrats.
 
