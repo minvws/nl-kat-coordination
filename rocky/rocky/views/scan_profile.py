@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any
 
+import structlog
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
@@ -11,6 +12,8 @@ from tools.view_helpers import Breadcrumb, get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.views.ooi_detail import OOIDetailView
+
+logger = structlog.get_logger(__name__)
 
 
 class ScanProfileDetailView(FormView, OOIDetailView):
@@ -58,6 +61,8 @@ class ScanProfileResetView(OOIDetailView):
         self.octopoes_api_connector.save_scan_profile(
             EmptyScanProfile(reference=self.ooi.reference), valid_time=datetime.now(timezone.utc)
         )
+        logger.info("Scan profiles set to empty", event_code="800011", ooi=self.ooi.reference)
+
         return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:

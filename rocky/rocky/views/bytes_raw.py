@@ -32,8 +32,10 @@ class BytesRawView(OrganizationView):
             return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
         raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
+        response = FileResponse(zip_data(raws, raw_metas), filename=f"{boefje_meta_id}.zip")
+        logger.info("Raw files have been downloaded", boefje_meta_id=boefje_meta_id, event_code="700001")
 
-        return FileResponse(zip_data(raws, raw_metas), filename=f"{boefje_meta_id}.zip")
+        return response
 
 
 def zip_data(raws: dict[str, bytes], raw_metas: list[dict]) -> BytesIO:

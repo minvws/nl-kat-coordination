@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-21 13:13+0000\n"
+"POT-Creation-Date: 2025-07-22 13:42+0000\n"
 "PO-Revision-Date: 2025-07-08 16:37+0000\n"
 "Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -57,6 +57,7 @@ msgid "Please provide username"
 msgstr "பயனர்பெயரை வழங்கவும்"
 
 #: account/forms/account_setup.py
+#: rocky/templates/organizations/organization_member_list.html
 msgid "Email"
 msgstr "மின்னஞ்சல்"
 
@@ -229,7 +230,7 @@ msgstr "நிறுவனங்கள்"
 msgid "The organization from which to clone settings."
 msgstr "அமைப்புகளை நகலி செய்யும் அமைப்பு."
 
-#: account/forms/password_reset.py
+#: account/forms/password_reset.py account/templates/account_detail.html
 msgid "Email address"
 msgstr "மின்னஞ்சல் முகவரி"
 
@@ -288,8 +289,8 @@ msgstr ""
 "ஒப்புக்கொண்டீர்கள். தொடர உங்கள் சுயவிவரப் பக்கத்தில் இசைவு அளவை முதலில் ஏற்றுக்கொள்ளுங்கள்."
 
 #: account/models.py
-msgid "The Email must be set"
-msgstr "மின்னஞ்சல் அமைக்கப்பட வேண்டும்"
+msgid "The email must be set"
+msgstr ""
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
@@ -353,10 +354,6 @@ msgid "Full name"
 msgstr "முழு பெயர்"
 
 #: account/templates/account_detail.html
-msgid "E-mail address"
-msgstr "மின்னஞ்சல் முகவரி"
-
-#: account/templates/account_detail.html
 msgid "Member type"
 msgstr "உறுப்பினர் வகை"
 
@@ -375,12 +372,13 @@ msgid "OOI clearance"
 msgstr "OOI இசைவு"
 
 #: account/templates/account_detail.html
-msgid ""
-"You don't have any clearance to scan objects. <br> Get in contact with the "
-"admin to give you the necessary clearance level."
+msgid "You don't have any clearance to scan objects."
 msgstr ""
-"பொருள்களை வருடு செய்ய உங்களுக்கு எந்த இசைவு இல்லை. <br> தேவையான இசைவு அளவை "
-"உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்."
+
+#: account/templates/account_detail.html
+msgid ""
+"Get in contact with the admin to give you the necessary clearance level."
+msgstr ""
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level"
@@ -757,17 +755,9 @@ msgstr "டாச்போர்டுகள்"
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid ""
-"\n"
-"                        On this page you can see an overview of the "
-"dashboards for all organizations.\n"
-"                        **More context can be written here**\n"
-"                    "
+"On this page you can see an overview of the dashboards for all "
+"organizations. **More context can be written here**"
 msgstr ""
-"\n"
-"                        இந்த பக்கத்தில் நீங்கள் அனைத்து நிறுவனங்களுக்கும் டாச்போர்டுகளின் "
-"கண்ணோட்டத்தைக் காணலாம். \n"
-"** மேலும் சூழலை இங்கே எழுதலாம் **\n"
-"                    "
 
 #: crisis_room/templates/crisis_room_dashboards.html
 msgid "dashboards"
@@ -811,51 +801,23 @@ msgstr "ஒரு நிறுவனத்திற்கு கண்டுப�
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                            This table shows the findings that have been "
-"identiefied for each organization,\n"
-"                            sorted by the finding types and grouped by "
-"organizations.\n"
-"                            This data is based on the latest Crisis Room "
-"Findings Report\n"
-"                            of each organization.\n"
-"                        "
+"This table shows the findings that have been identiefied for each "
+"organization, sorted by the finding types and grouped by organizations. This "
+"data is based on the latest Crisis Room Findings Report of each organization."
 msgstr ""
-"\n"
-"                            இந்த அட்டவணை ஒவ்வொரு நிறுவனத்திற்கும் அடையாளம் காணப்பட்ட "
-"கண்டுபிடிப்புகளைக் காட்டுகிறது, \n"
-"கண்டுபிடிப்பு வகைகளால் வரிசைப்படுத்தப்பட்டு நிறுவனங்களால் தொகுக்கப்பட்டுள்ளது. \n"
-"இந்த தரவு அண்மைக் கால நெருக்கடி அறை கண்டுபிடிப்புகள் அறிக்கையை அடிப்படையாகக் கொண்டது \n"
-"ஒவ்வொரு அமைப்பிலும்.\n"
-"                        "
 
 #: crisis_room/templates/crisis_room_findings.html
 #: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                    No findings have been identified yet. As soon as they "
-"have been\n"
-"                    identified, they will be shown on this page.\n"
-"                "
+"No findings have been identified yet. As soon as they have been identified, "
+"they will be shown on this page."
 msgstr ""
-"\n"
-"                    கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை. அவர்கள் "
-"இருந்தவுடன் \n"
-"                    அடையாளம் காணப்பட்ட, அவை இந்தப் பக்கத்தில் காண்பிக்கப்படும்.\n"
-"                "
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"\n"
-"                There are no organizations yet. After creating an "
-"organization,\n"
-"                the identified findings will be shown here.\n"
-"            "
+"There are no organizations yet. After creating an organization, the "
+"identified findings will be shown here."
 msgstr ""
-"\n"
-"                இதுவரை எந்த அமைப்புகளும் இல்லை. ஒரு அமைப்பை உருவாக்கியபிறகு, \n"
-"                    அடையாளம் காணப்பட்ட கண்டுபிடிப்புகள் இங்கே காண்பிக்கப்படும்.\n"
-"            "
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -1044,15 +1006,11 @@ msgid "Critical and high findings"
 msgstr "முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகள்"
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
+#: reports/report_types/findings_report/report.html
 msgid ""
-"\n"
-"                                            This table shows the top 25 "
-"critical and high findings that have\n"
-"                                            been identified for this "
-"organization, grouped by finding types.\n"
-"                                            A table with all the identified "
-"findings can be found in the Findings Report.\n"
-"                                        "
+"This table shows the top 25 critical and high findings that have been "
+"identified for this organization, grouped by finding types. A table with all "
+"the identified findings can be found in the Findings Report."
 msgstr ""
 
 #: crisis_room/templates/partials/crisis_room_findings_table.html
@@ -2327,6 +2285,38 @@ msgstr ""
 msgid "Onboarding"
 msgstr ""
 
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "Welcome to OpenKAT!"
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
+"set everything up."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid ""
+"At the end of this onboarding you have added your first object, created your "
+"first DNS report and learned about some basic concepts used within OpenKAT."
+msgstr ""
+
+#: onboarding/templates/partials/step_1_introduction_text.html
+msgid "The full documentation for OpenKAT can be found at:"
+msgstr ""
+
+#: onboarding/templates/partials/step_2_organization_text.html
+#: rocky/templates/organizations/organization_add.html
+msgid "Organization setup"
+msgstr "நிறுவன அமைப்பு"
+
+#: onboarding/templates/partials/step_2_organization_text.html
+msgid ""
+"Please enter the following organization details. The organization name can "
+"be changed later in the interface. The organization code cannot be changed "
+"as this is used by the database."
+msgstr ""
+
 #: onboarding/templates/step_10_report.html
 #: reports/report_types/concatenated_report/report.py
 msgid "Report"
@@ -2354,38 +2344,8 @@ msgstr ""
 
 #: onboarding/templates/step_1_introduction_registration.html
 #: onboarding/templates/step_1a_introduction.html
-msgid "Welcome to OpenKAT!"
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
-msgid ""
-"Welcome to the onboarding of OpenKAT. We will walk you through some steps to "
-"set everything up. <p> At the end of this onboarding you have added your "
-"first object, created your first DNS report and learned about some basic "
-"concepts used within OpenKAT. </p> <p> The full documentation for OpenKAT "
-"can be found at: <a href=\"https://docs.openkat.nl\">https://docs.openkat."
-"nl</a>."
-msgstr ""
-
-#: onboarding/templates/step_1_introduction_registration.html
-#: onboarding/templates/step_1a_introduction.html
 msgid "Let's get started"
 msgstr "தொடங்குவோம்"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-#: rocky/templates/organizations/organization_add.html
-msgid "Organization setup"
-msgstr "நிறுவன அமைப்பு"
-
-#: onboarding/templates/step_2a_organization_setup.html
-#: onboarding/templates/step_2b_organization_update.html
-msgid ""
-"Please enter the following organization details. The organization name can "
-"be changed later in the interface. The organization code cannot be changed "
-"as this is used by the database."
-msgstr ""
 
 #: onboarding/templates/step_2a_organization_setup.html
 #: onboarding/templates/step_2b_organization_update.html
@@ -2563,22 +2523,22 @@ msgstr ""
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
 "OpenKAT uses plugins to scan your objects. Each plugin has a scan level to "
-"specify how aggressive the scan is.  Plugins can only scan those objects "
-"with a clearance level that is equal to, or higher than the scan level of "
-"the plugin. Plugin scan level are indicated by the number of cat paws."
+"specify how aggressive the scan is. Plugins can only scan those objects with "
+"a clearance level that is equal to, or higher than the scan level of the "
+"plugin. Plugin scan level are indicated by the number of cat paws."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>DNS Zone</b> has a scan level of 1, meaning that it performs "
-"non-intrusive scans which look for publicly available information. It scans "
-"objects with a clearance level of 1 or higher."
+"The plugin <strong>DNS Zone</strong> has a scan level of 1, meaning that it "
+"performs non-intrusive scans which look for publicly available information. "
+"It scans objects with a clearance level of 1 or higher."
 msgstr ""
 
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid ""
-"The plugin <b>Fierce</b> has a scan level of 3, meaning that it more "
-"aggressive and could potentially break things. It scans objects with a "
+"The plugin <strong>Fierce</strong> has a scan level of 3, meaning that it "
+"more aggressive and could potentially break things. It scans objects with a "
 "clearance level of 3 or higher."
 msgstr ""
 
@@ -2657,10 +2617,6 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "5: Generating report"
-msgstr ""
-
-#: onboarding/view_helpers.py
-msgid "3: Add Object"
 msgstr ""
 
 #: onboarding/views.py
@@ -2954,12 +2910,10 @@ msgid "server"
 msgstr "சேவையகம்"
 
 #: reports/report_types/aggregate_organisation_report/findings.html
+#: reports/report_types/aggregate_organisation_report/report.html
 msgid ""
-"\n"
-"                This chapter contains information about the findings that "
-"have been identified\n"
-"                for this organization.\n"
-"            "
+"This chapter contains information about the findings that have been "
+"identified for this organization."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -3023,15 +2977,6 @@ msgstr "பாதிப்புகள்"
 #: reports/report_types/aggregate_organisation_report/vulnerabilities.html
 msgid "Vulnerabilities found are grouped per system."
 msgstr "காணப்படும் பாதிப்புகள் ஒரு அமைப்புக்கு தொகுக்கப்பட்டுள்ளன."
-
-#: reports/report_types/aggregate_organisation_report/report.html
-msgid ""
-"\n"
-"                                    This chapter contains information about "
-"the findings that have been identified\n"
-"                                    for this organization.\n"
-"                                "
-msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Aggregate Organisation Report"
@@ -3397,26 +3342,6 @@ msgstr ""
 "கண்டுபிடிப்புகள் அறிக்கையில் தேர்ந்தெடுக்கப்பட்ட சொத்து மற்றும் அமைப்புக்காக அடையாளம் "
 "காணப்பட்ட கண்டுபிடிப்புகள் பற்றிய தகவல்கள் உள்ளன."
 
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                This table shows the top 25 critical and high findings that "
-"have\n"
-"                been identified for this organization, grouped by finding "
-"types.\n"
-"                A table with all the identified findings can be found in the "
-"Findings Report.\n"
-"            "
-msgstr ""
-"\n"
-"                இந்த அட்டவணை முதல் 25 முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகளைக் "
-"காட்டுகிறது \n"
-"                இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் மூலம் "
-"தொகுக்கப்பட்டுள்ளது. \n"
-"                அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு அட்டவணையைக் "
-"கண்டுபிடிப்புகள் அறிக்கையில் காணலாம்.\n"
-"            "
-
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
 msgstr "கண்டுபிடிப்புகள் அறிக்கை"
@@ -3457,18 +3382,12 @@ msgstr "ஓச்ட்பேம்ச் ஐபிவி 6 முகவரி�
 #: reports/report_types/mail_report/report.html
 msgid ""
 "The Mail Report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
+"with email servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"அஞ்சல் அறிக்கை மின்னஞ்சல் சேவையகங்களுடன் தொடர்புடைய இணக்க காசோலைகளின் கண்ணோட்டத்தை "
-"வழங்குகிறது. தற்போதைய இணக்கம் SPF, DKIM மற்றும் DMARC பதிவுகளின் இருப்பை "
-"சரிபார்க்கிறது. இந்த ஒவ்வொன்றிற்கும் கீழேயுள்ள அட்டவணை காட்டுகிறது, அடையாளம் காணப்பட்ட "
-"அஞ்சல் சேவையகங்கள் எத்தனை இணக்கமானவை என்பதை சரிபார்க்கிறது, மேலும் பொருந்தினால் இணக்க "
-"சிக்கல் விளக்கம் மற்றும் இடர் நிலை. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
-"வேறுபட்டிருக்கலாம்."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -4150,31 +4069,14 @@ msgstr "ஆயத்தம்"
 
 #: reports/templates/partials/report_findings_table.html
 msgid ""
-"\n"
-"            This table provides an overview of the identified findings on "
-"the scanned\n"
-"            systems. For each finding type it shows the risk level, the "
-"number of occurrences\n"
-"            and the first known occurrence of the finding. The risk level "
-"may be different for your specific environment.\n"
-"            The details can be seen when expanding a row. A description, the "
-"source, impact and recommendation of the finding\n"
-"            can be found here. It also shows in which findings the finding "
-"type occurred.\n"
-"        "
+"This table provides an overview of the identified findings on the scanned "
+"systems. For each finding type it shows the risk level, the number of "
+"occurrences and the first known occurrence of the finding. The risk level "
+"may be different for your specific environment. The details can be seen when "
+"expanding a row. A description, the source, impact and recommendation of the "
+"finding can be found here. It also shows in which findings the finding type "
+"occurred."
 msgstr ""
-"\n"
-"            இந்த அட்டவணை வருடு செய்யப்பட்ட கண்டறிந்த கண்டுபிடிப்புகளின் கண்ணோட்டத்தை "
-"வழங்குகிறது \n"
-"அமைப்புகள். ஒவ்வொரு கண்டுபிடிப்பு வகைக்கும் இது இடர் நிலை, நிகழ்வுகளின் எண்ணிக்கை "
-"ஆகியவற்றைக் காட்டுகிறது \n"
-"கண்டுபிடிப்பின் முதல் அறியப்பட்ட நிகழ்வு. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
-"வேறுபட்டிருக்கலாம். \n"
-"ஒரு வரிசையை விரிவுபடுத்தும்போது விவரங்களைக் காணலாம். ஒரு விளக்கம், கண்டுபிடிப்பின் "
-"மூல, தாக்கம் மற்றும் பரிந்துரை \n"
-"இங்கே காணலாம். கண்டுபிடிப்பு வகை எந்த கண்டுபிடிப்புகள் நிகழ்ந்தன என்பதையும் இது "
-"காட்டுகிறது.\n"
-"        "
 
 #: reports/templates/partials/report_findings_table.html
 msgid "First known occurrence"
@@ -4753,8 +4655,8 @@ msgid "Open asset report object details"
 msgstr "திறந்த சொத்து அறிக்கை பொருள் விவரங்கள்"
 
 #: reports/templates/report_overview/report_history_table.html
-msgid "Asset reports details:"
-msgstr "சொத்து விவரிக்கிறது விவரங்கள்:"
+msgid "Asset reports details"
+msgstr ""
 
 #: reports/templates/report_overview/report_history_table.html
 #, python-format
@@ -4773,6 +4675,7 @@ msgstr[1] ""
 
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/subreports_header.html
+#: reports/templates/report_overview/subreports_table.html
 #: reports/views/report_overview.py
 msgid "Asset reports"
 msgstr "சொத்து அறிக்கைகள்"
@@ -4879,10 +4782,6 @@ msgstr "அனைத்து அடிப்படை அறிக்கைக�
 #: reports/templates/report_overview/subreports_table.html
 msgid "Shows report details"
 msgstr "அறிக்கை விவரங்களைக் காட்டுகிறது"
-
-#: reports/templates/report_overview/subreports_table.html
-msgid "Asset reports:"
-msgstr "சொத்து அறிக்கைகள்:"
 
 #: reports/templates/report_overview/subreports_table.html
 #: rocky/templates/tasks/boefjes.html
@@ -5496,11 +5395,9 @@ msgstr ""
 
 #: tools/forms/settings.py
 msgid ""
-"<p>A description of the Boefje explaining in short what it can do. This will "
-"both be displayed inside the KAT-alogus and on the Boefje details page.</p> "
+"A description of the Boefje explaining in short what it can do. This will "
+"both be displayed inside the KAT-alogus and on the Boefje details page."
 msgstr ""
-"<p> போஃப்சேவின் விளக்கம் என்ன செய்ய முடியும் என்பதை சுருக்கமாக விளக்குகிறது. இது "
-"இரண்டும் கேட்-அலோகச் மற்றும் போஃப்சே விவரங்கள் பக்கத்தில் காண்பிக்கப்படும். </p> "
 
 #: tools/forms/settings.py
 msgid ""
@@ -6219,11 +6116,12 @@ msgstr "ஓபன்காட் பார்க்கிறது"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br> Our motto is therefore: I see, I see, what you do not see."
+"analog)."
 msgstr ""
-"உலகைக் காண (டிசிட்டல் மற்றும் அனலாக்) டசன் கணக்கான கருவிகள் ஓபன்காட்டில் "
-"ஒருங்கிணைக்கப்பட்டுள்ளன. <br> எனவே எங்கள் குறிக்கோள்: நீங்கள் பார்க்காததை நான் காண்கிறேன், "
-"நான் பார்க்கிறேன்."
+
+#: rocky/templates/landing_page.html
+msgid "Our motto is therefore: I see, I see, what you do not see."
+msgstr ""
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
@@ -6774,8 +6672,8 @@ msgstr "உறுப்பினரை சேமிக்கவும்"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
-msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்"
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்."
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -6803,10 +6701,6 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
 msgstr "உறுப்பினர் கண்ணோட்டம்:"
-
-#: rocky/templates/organizations/organization_member_list.html
-msgid "E-mail"
-msgstr "மின்னஞ்சல்"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
@@ -8146,6 +8040,167 @@ msgstr "மூல கோப்பை பைட்டுகளில் பதி
 msgid "Raw file successfully added."
 msgstr "மூல கோப்பு வெற்றிகரமாக சேர்க்கப்பட்டது."
 
+#~ msgid "The Email must be set"
+#~ msgstr "மின்னஞ்சல் அமைக்கப்பட வேண்டும்"
+
+#~ msgid "E-mail address"
+#~ msgstr "மின்னஞ்சல் முகவரி"
+
+#~ msgid ""
+#~ "You don't have any clearance to scan objects. <br> Get in contact with "
+#~ "the admin to give you the necessary clearance level."
+#~ msgstr ""
+#~ "பொருள்களை வருடு செய்ய உங்களுக்கு எந்த இசைவு இல்லை. <br> தேவையான இசைவு அளவை "
+#~ "உங்களுக்கு வழங்க நிர்வாகியுடன் தொடர்பு கொள்ளுங்கள்."
+
+#~ msgid ""
+#~ "\n"
+#~ "                        On this page you can see an overview of the "
+#~ "dashboards for all organizations.\n"
+#~ "                        **More context can be written here**\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        இந்த பக்கத்தில் நீங்கள் அனைத்து நிறுவனங்களுக்கும் "
+#~ "டாச்போர்டுகளின் கண்ணோட்டத்தைக் காணலாம். \n"
+#~ "** மேலும் சூழலை இங்கே எழுதலாம் **\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                            This table shows the findings that have been "
+#~ "identiefied for each organization,\n"
+#~ "                            sorted by the finding types and grouped by "
+#~ "organizations.\n"
+#~ "                            This data is based on the latest Crisis Room "
+#~ "Findings Report\n"
+#~ "                            of each organization.\n"
+#~ "                        "
+#~ msgstr ""
+#~ "\n"
+#~ "                            இந்த அட்டவணை ஒவ்வொரு நிறுவனத்திற்கும் அடையாளம் "
+#~ "காணப்பட்ட கண்டுபிடிப்புகளைக் காட்டுகிறது, \n"
+#~ "கண்டுபிடிப்பு வகைகளால் வரிசைப்படுத்தப்பட்டு நிறுவனங்களால் தொகுக்கப்பட்டுள்ளது. \n"
+#~ "இந்த தரவு அண்மைக் கால நெருக்கடி அறை கண்டுபிடிப்புகள் அறிக்கையை அடிப்படையாகக் "
+#~ "கொண்டது \n"
+#~ "ஒவ்வொரு அமைப்பிலும்.\n"
+#~ "                        "
+
+#~ msgid ""
+#~ "\n"
+#~ "                    No findings have been identified yet. As soon as they "
+#~ "have been\n"
+#~ "                    identified, they will be shown on this page.\n"
+#~ "                "
+#~ msgstr ""
+#~ "\n"
+#~ "                    கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை. அவர்கள் "
+#~ "இருந்தவுடன் \n"
+#~ "                    அடையாளம் காணப்பட்ட, அவை இந்தப் பக்கத்தில் காண்பிக்கப்படும்.\n"
+#~ "                "
+
+#~ msgid ""
+#~ "\n"
+#~ "                There are no organizations yet. After creating an "
+#~ "organization,\n"
+#~ "                the identified findings will be shown here.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                இதுவரை எந்த அமைப்புகளும் இல்லை. ஒரு அமைப்பை உருவாக்கியபிறகு, \n"
+#~ "                    அடையாளம் காணப்பட்ட கண்டுபிடிப்புகள் இங்கே காண்பிக்கப்படும்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "\n"
+#~ "                This table shows the top 25 critical and high findings "
+#~ "that have\n"
+#~ "                been identified for this organization, grouped by finding "
+#~ "types.\n"
+#~ "                A table with all the identified findings can be found in "
+#~ "the Findings Report.\n"
+#~ "            "
+#~ msgstr ""
+#~ "\n"
+#~ "                இந்த அட்டவணை முதல் 25 முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகளைக் "
+#~ "காட்டுகிறது \n"
+#~ "                இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் "
+#~ "மூலம் தொகுக்கப்பட்டுள்ளது. \n"
+#~ "                அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு "
+#~ "அட்டவணையைக் கண்டுபிடிப்புகள் அறிக்கையில் காணலாம்.\n"
+#~ "            "
+
+#~ msgid ""
+#~ "The Mail Report provides an overview of the compliance checks associated "
+#~ "with e-mail servers. The current compliance checks the presence of SPF, "
+#~ "DKIM and DMARC records. The table below shows for each of these checks "
+#~ "how many of the identified mail servers are compliant, and if applicable "
+#~ "a compliance issue description and risk level. The risk level may be "
+#~ "different for your specific environment."
+#~ msgstr ""
+#~ "அஞ்சல் அறிக்கை மின்னஞ்சல் சேவையகங்களுடன் தொடர்புடைய இணக்க காசோலைகளின் கண்ணோட்டத்தை "
+#~ "வழங்குகிறது. தற்போதைய இணக்கம் SPF, DKIM மற்றும் DMARC பதிவுகளின் இருப்பை "
+#~ "சரிபார்க்கிறது. இந்த ஒவ்வொன்றிற்கும் கீழேயுள்ள அட்டவணை காட்டுகிறது, அடையாளம் காணப்பட்ட "
+#~ "அஞ்சல் சேவையகங்கள் எத்தனை இணக்கமானவை என்பதை சரிபார்க்கிறது, மேலும் பொருந்தினால் இணக்க "
+#~ "சிக்கல் விளக்கம் மற்றும் இடர் நிலை. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
+#~ "வேறுபட்டிருக்கலாம்."
+
+#~ msgid ""
+#~ "\n"
+#~ "            This table provides an overview of the identified findings on "
+#~ "the scanned\n"
+#~ "            systems. For each finding type it shows the risk level, the "
+#~ "number of occurrences\n"
+#~ "            and the first known occurrence of the finding. The risk level "
+#~ "may be different for your specific environment.\n"
+#~ "            The details can be seen when expanding a row. A description, "
+#~ "the source, impact and recommendation of the finding\n"
+#~ "            can be found here. It also shows in which findings the "
+#~ "finding type occurred.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "            இந்த அட்டவணை வருடு செய்யப்பட்ட கண்டறிந்த கண்டுபிடிப்புகளின் கண்ணோட்டத்தை "
+#~ "வழங்குகிறது \n"
+#~ "அமைப்புகள். ஒவ்வொரு கண்டுபிடிப்பு வகைக்கும் இது இடர் நிலை, நிகழ்வுகளின் எண்ணிக்கை "
+#~ "ஆகியவற்றைக் காட்டுகிறது \n"
+#~ "கண்டுபிடிப்பின் முதல் அறியப்பட்ட நிகழ்வு. உங்கள் குறிப்பிட்ட சூழலுக்கு இடர் நிலை "
+#~ "வேறுபட்டிருக்கலாம். \n"
+#~ "ஒரு வரிசையை விரிவுபடுத்தும்போது விவரங்களைக் காணலாம். ஒரு விளக்கம், கண்டுபிடிப்பின் "
+#~ "மூல, தாக்கம் மற்றும் பரிந்துரை \n"
+#~ "இங்கே காணலாம். கண்டுபிடிப்பு வகை எந்த கண்டுபிடிப்புகள் நிகழ்ந்தன என்பதையும் இது "
+#~ "காட்டுகிறது.\n"
+#~ "        "
+
+#~ msgid "Asset reports details:"
+#~ msgstr "சொத்து விவரிக்கிறது விவரங்கள்:"
+
+#~ msgid "Asset reports:"
+#~ msgstr "சொத்து அறிக்கைகள்:"
+
+#~ msgid ""
+#~ "<p>A description of the Boefje explaining in short what it can do. This "
+#~ "will both be displayed inside the KAT-alogus and on the Boefje details "
+#~ "page.</p> "
+#~ msgstr ""
+#~ "<p> போஃப்சேவின் விளக்கம் என்ன செய்ய முடியும் என்பதை சுருக்கமாக விளக்குகிறது. இது "
+#~ "இரண்டும் கேட்-அலோகச் மற்றும் போஃப்சே விவரங்கள் பக்கத்தில் காண்பிக்கப்படும். </p> "
+
+#~ msgid ""
+#~ "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#~ "analog). <br> Our motto is therefore: I see, I see, what you do not see."
+#~ msgstr ""
+#~ "உலகைக் காண (டிசிட்டல் மற்றும் அனலாக்) டசன் கணக்கான கருவிகள் ஓபன்காட்டில் "
+#~ "ஒருங்கிணைக்கப்பட்டுள்ளன. <br> எனவே எங்கள் குறிக்கோள்: நீங்கள் பார்க்காததை நான் காண்கிறேன், "
+#~ "நான் பார்க்கிறேன்."
+
+#, python-format
+#~ msgid "An overview of members of <strong>%(organization_name)s</strong>"
+#~ msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்"
+
+#~ msgid "E-mail"
+#~ msgstr "மின்னஞ்சல்"
+
 #, python-brace-format
 #~ msgid "A unique code of {code_length} characters."
 #~ msgstr "{code_length} எழுத்துக்களின் தனித்துவமான குறியீடு."
@@ -8998,10 +9053,6 @@ msgstr "மூல கோப்பு வெற்றிகரமாக சேர
 
 #~ msgid "Account type details"
 #~ msgstr "கணக்கு வகை விவரங்கள்"
-
-#, python-format
-#~ msgid "An overview of members of <strong>%(organization_name)s</strong>."
-#~ msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்."
 
 #~ msgid "Upload a csv file with members for organisation"
 #~ msgstr "நிறுவனத்திற்கான உறுப்பினர்களுடன் காபிம கோப்பை பதிவேற்றவும்"
