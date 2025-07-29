@@ -120,6 +120,8 @@ classDiagram
 
 With respect to plugin management:
 
+<!-- 1. I would personally split number 1 into three requirements -->
+<!-- 2. Completely agree that they should be pinned. However, updating automatically is more of a technical requirement. I also think that we should make it a bit easier for us, by not enforcing an automatic version number, but validating that there's different/higher version number if the plugin changes or something like a content hash
 1. Users should be able to enable/disable plugins and configure them per organization and globally.
 2. Plugin versions should be pinned, and we should update them automatically instead of providing a "latest" option.
 3. Users should be able to trigger plugins on demand for one or more organizations on one or more input oois.
@@ -127,6 +129,7 @@ With respect to plugin management:
 
 With respect to a discussion about the existence of the boefje-normalizer-bit relationship:
 
+<!-- 5. I'm not sure yet if this is a valid functional requirement, but I think it's a valid discussion point. Personally I would leave this out and do better gate keeping at the review process -->
 5. Some plugins should only run in containers and perhaps not be allowed to directly create OOIs.
 6. We need to be able to do attribution of OOIs through plugins properly.
 7. Maybe we shouldn't allow all plugins to write models to the database.
@@ -135,11 +138,14 @@ With respect to a discussion about the existence of the boefje-normalizer-bit re
 
 #### Related to the Plugins themselves
 
+<!-- 1. If we implement this then NR 1, specifically the part that mentions "configure globally", is not needed anymore --->
 1. Perhaps plugin configuration should be manageable for a selection of organizations as well.
 2. We should be able to import multiple plugins at once from external repositories
 
 #### Related to scanning in general
 
+<!-- 3. Would be nice if we could 'query' on a combination of e.g. object type, file/mime type, tags, the plugin that produces it, attributes of input/ output objects, etc. -->
+<!-- 6. How would this work? --> 
 3. Normalizers should be allowed to run on multiple raw files
 4. One Boefje should be able to run on multiple OOIs
 5. One Boefje should be able to run on multiple OOIs of different object_types
@@ -207,7 +213,7 @@ Moreover, this would allow us to tackle more of the Extensibility Requirements:
 - **Ex 3**: If we allow tasks to pull in arbitrary RawFiles or define multiple RawFiles as their input, this is
   definitely possible as we are not restricted to the old plugin flow.
 - **Ex 4**: The same holds for this requirement.
-- **Ex 4**: And this one. We should simply update the way the `consumes` field works and improve the boefje signatures.
+- **Ex 5**: And this one. We should simply update the way the `consumes` field works and improve the boefje signatures.
 - **Ex 6**: As long as the attribution is logged properly, because we only look at the output data we don't care
   what sources were used once we fix deletion propagation.
 - **Ex 7**: When we move to XTDB 2.0, we can implement a lot of Bits (hopefully) as `UPDATE WHERE` statements doing
