@@ -34,7 +34,7 @@ dependencies = [
     "opentelemetry-semantic-conventions",
     "opentelemetry-util-http",
     "pyjwt>=2.8.0,<3",
-    "fastapi-slim>=0.115.2,<0.116",
+    "fastapi-slim>=0.115.2",
     "structlog>=25.2.0,<26",
     "cryptography>=44.0.1,<45",
     "boto3>=1.35.15,<2",
