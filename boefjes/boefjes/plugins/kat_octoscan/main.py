@@ -18,7 +18,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     # Code 128 means that the repository does not exist or ls-remote has failed
     # In that case, we return an empty list
     if git_check_result.returncode == 128:
-        return [({"openkat/nmap-output"}, "[]")]
+        return [({"openkat/octoscan-output"}, "[]")]
     git_check_result.check_returncode()
 
     org, repo = url.split("/")[-2:]
@@ -52,4 +52,4 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
             f"STDIN: {scan_output.stdout.decode()}"
         )
 
-    return [({"openkat/nmap-output"}, scan_output.stdout.decode())]
+    return [({"openkat/octoscan-output"}, scan_output.stdout.decode())]
