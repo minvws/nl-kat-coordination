@@ -2,10 +2,12 @@ FROM openkat/boefje-base:latest
 
 COPY --from=golang:1.13-alpine /usr/local/go/ /usr/local/go/
 
-ARG OCI_IMAGE=ghcr.io/minvws/cynalytics/octoscan:latest
+ARG OCI_IMAGE=ghcr.io/minvws/openkat/octoscan:latest
 ENV OCI_IMAGE=$OCI_IMAGE
 
 USER root
-RUN apt-get update
+RUN apt-get update && apt-get install -y git
 
-COPY ./boefjes/plugins/kat_nmap_tcp ./kat_nmap_tcp
+RUN git clone https://github.com/sullo/nikto
+
+COPY ./boefjes/plugins/kat_octoscan ./kat_octoscan

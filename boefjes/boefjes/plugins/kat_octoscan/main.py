@@ -4,7 +4,14 @@ import subprocess
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     hostname = str(boefje_meta["arguments"]["input"]["netloc"])
-    git_check_cmd = ["git", "ls-remote", hostname]
+
+    # Creating the URL to check
+    input_ooi = boefje_meta["arguments"]["input"]
+    port = f":{input_ooi['port']}" if input_ooi["port"] else ""
+    url = f"{input_ooi['scheme']}://{input_ooi['netloc']['name']}{port}{input_ooi['path']}"
+
+    # TODO: Is it okay to use human_readable here?
+    git_check_cmd = ["git", "ls-remote", url]
 
     # See if hostname is a git repository
     subprocess.run(git_check_cmd, capture_output=True, env={"GIT_TERMINAL_PROMPT": "0"}).check_returncode()
