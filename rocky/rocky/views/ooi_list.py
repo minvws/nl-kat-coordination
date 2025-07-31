@@ -82,7 +82,8 @@ class OOIListView(BaseOOIListView, OctopoesView, AddDashboardItemFormMixin):
             # the Django type hints
             if scan_type == ScanProfileType.INHERITED.value:
                 return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
-            level = SCAN_LEVEL(int(request.POST.get("level")))  # type: ignore[misc, valid-type]
+            level = int(request.POST["level"])
+            level = SCAN_LEVEL(level)
             return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
 
         if action == PageActions.ADD_TO_DASHBOARD.value:
