@@ -9,6 +9,7 @@ Contains documentation for developers and contributors.
 
    install
    production-docker-environment
+   separate-boefje-workers
    production-debian-environment
    developer-environment
    scripts

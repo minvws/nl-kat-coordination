@@ -82,7 +82,7 @@ The boefje calling Shodan gives a good first impression of its capabilities. The
 boefje.json
 ***********
 
-boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the object-types and the findings that the combination of boefje and normalizer can deliver.
+boefje.json is the definition of the boefje, including information about its scan level and the object-types it consumes.
 
 An example:
 
@@ -91,29 +91,25 @@ An example:
     {
         "id": "shodan",
         "name": "Shodan",
-        "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
+        "description": "Use Shodan to find open ports with vulnerabilities that are found on that port. Requires an API key.",
         "consumes": [
             "IPAddressV4",
             "IPAddressV6"
         ],
-        "produces": [
-            "Finding",
-            "IPPort",
-            "CVEFindingType"
+        "oci_image": "ghcr.io/minvws/openkat/generic:latest",
+        "oci_arguments": [
+            "kat_shodan.main"
         ],
         "scan_level": 1
     }
 
-The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.*
-
 This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
-Using the template as a base, you can create a boefje.json for your own boefje. Just change the *name* and *id* to the name your boefje.
 
-NOTE: If your boefje needs object-types that do not exist, you will need to create those. This will be described later in the document.
-
-The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use environment variables or KATalogus settings for this. The schema.json file defines the metadata for these fields.
-
+This boefje uses an OCI image from our container registry: *ghcr.io/minvws/openkat/generic:latest* to run the code.
+See :doc:`/developer-documentation/boefjes-runner` for a specification for the OCI images OpenKAT can run.
+In this case, Shodan has been bundled in our generic image that contains several boefjes. The ``oci_arguments`` field
+makes sure we target Shodan. For the ``dns-records`` boefje, this field reads ``kat_dns.main``.
 
 schema.json
 ***********
@@ -136,6 +132,9 @@ It must conform to the https://json-schema.org/ standard, see for example the sc
     }
   },
   "required": [
+    "SHODAN_API"
+  ],
+  "secret": [
     "SHODAN_API"
   ]
  }
@@ -161,39 +160,43 @@ Schema validation happens right before spawning a boefje, meaning your tasks wil
 main.py
 *******
 
-The boefje itself imports the shodan api module, assigns an IP address to it and accepts the output. This output goes to Bytes and is analyzed by one (or more) normalizers. The link between the normalizer and the byte is made via the mime-type, which you can give in the ``set`` function in the byte. The code block below also contains a check, to prevent you from asking for non-public IP addresses.
+The boefje itself imports the shodan api module, assigns an IP address to it and accepts the output.
+This output goes to Bytes and is analyzed by one (or more) normalizers.
+The link between the normalizer and the byte is made via the mime-types of the output, which you can provide in the ``set`` below in the return statement.
+By default, OpenKAT adds a mime-type of the form ``boefje/{boefje_id}`` to the output of all boefjes, so if your
+normalizer only needs to pare output of the shodan boefje, you do not have to provide your own mime-type.
+
+The code block below also contains a check, to prevent you from asking for non-public IP addresses.
 
 .. code-block:: python
 
-	import json
-	import logging
-	from typing import Tuple, Union, List
+    import json
+    import logging
+    from typing import Tuple, Union, List
 
-	import shodan
+    import shodan
 
-	from os import getenv
-	from ipaddress import ip_address
-
-	from boefjes.worker.job_models import BoefjeMeta
+    from os import getenv
+    from ipaddress import ip_address
 
 
-	def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-	    api = shodan.Shodan(getenv("SHODAN_API"))
-	    input_ = boefje_meta.arguments["input"]
-	    ip = input_["address"]
-	    results = {}
+    def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
+        api = shodan.Shodan(getenv("SHODAN_API"))
+        input_ = boefje_meta["arguments"]["input"]
+        ip = input_["address"]
+        results = {}
 
-	    if ip_address(ip).is_private:
-	        logging.info("Private IP requested, I will not forward this to Shodan.")
-	    else:
-	        try:
-	            results = api.host(ip)
-	        except shodan.APIError as e:
-	            if e.args[0] != "No information available for that IP.":
-	                raise
-	            logging.info(e)
+        if ip_address(ip).is_private:
+            logging.info("Private IP requested, I will not forward this to Shodan.")
+        else:
+            try:
+                results = api.host(ip)
+            except shodan.APIError as e:
+                if e.args[0] != "No information available for that IP.":
+                    raise
+                logging.info(e)
 
-	    return [(set(), json.dumps(results))]
+        return [(set(), json.dumps(results))]
 
 Normalizers
 -----------
@@ -211,27 +214,31 @@ The normalizers translate the output of a boefje into objects that fit the data 
 Each normalizer defines what input it accepts and what object-types it provides.
 In the case of the Shodan normalizer,
 it involves the entire output of the Shodan boefje (created based on IP address),
-where findings and ports come out. The `normalizer.json` defines these:
+where findings and ports come out. This is defined by setting the ``consumes`` to the mime-type unique to the Shodan
+boefje as defined above: ``boefje/shodan``.
+The `normalizer.json` defines these:
 
 .. code-block:: json
 
-	{
-	    "id": "kat_shodan_normalize",
-	    "consumes": [
-	        "shodan"
-	    ],
-	    "produces": [
-	        "Finding",
-	        "IPPort",
-	        "CVEFindingType"
-	    ]
-	}
+    {
+      "id": "kat_shodan_normalize",
+      "name": "Shodan",
+      "description": "Parses Shodan data into (CVE) findings and ports.",
+      "consumes": [
+        "boefje/shodan"
+      ],
+      "produces": [
+        "Finding",
+        "IPPort",
+        "CVEFindingType"
+      ]
+    }
 
 normalize.py
 ************
 
 The file `normalize.py` contains the actual normalizer: Its only job is to parse raw data and create,
-fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
+fill and yield actual objects of interest (OOIs), such as ``IPPort`` and ``Finding``.
 
 
 .. code-block:: python
@@ -531,13 +538,11 @@ Storing the configs in the graph is a bit more complex than just using a config 
 
 In the future, one goal is to have 'profiles' with a specific configuration that can be deployed automagically. Another wish is to add scope to these question objects, relating them to specific objects or for instance network segments.
 
-Add Boefjes
-===========
+Adding Boefjes
+==============
 
 There are a number of ways to add your new boefje to OpenKAT.
 
-- Put your boefje in the local folder with the other boefjes
-- Do a commit of your code, after review it can be included
-- Add an image server in the KAT catalog config file ``*``
-
-``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the GitHub CI.
+- Put your boefje in the local folder with the other boefjes, as described in :doc:`/developer-documentation/development-tutorial/creating-boefje`
+- Contribute to the project
+- Create and release your own OCI image, as described in :doc:`/developer-documentation/development-tutorial/creating-boefje`, and add your boefje in the KAT catalog.
