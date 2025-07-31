@@ -11,7 +11,7 @@ export function openDialogFromUrl() {
   if (id) {
     showModalBasedOnAnchor(id);
 
-    let dialog = document.querySelector("#" + id);
+    let dialog = document.getElementById(id);
 
     if (window.location.hash === "#" + id && dialog.open) {
       dialog.close();
