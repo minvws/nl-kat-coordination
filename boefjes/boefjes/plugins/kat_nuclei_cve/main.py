@@ -1,6 +1,4 @@
-import docker
-
-NUCLEI_IMAGE = "projectdiscovery/nuclei:v3.2.4"
+import subprocess
 
 
 def verify_hostname_meta(input_ooi):
@@ -15,12 +13,11 @@ def verify_hostname_meta(input_ooi):
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
-    client = docker.from_env()
-
     # Checks if the url is of object HostnameHTTPURL or Hostname
     url = verify_hostname_meta(boefje_meta["arguments"]["input"])
-    output = client.containers.run(
-        NUCLEI_IMAGE, ["-t", "/root/nuclei-templates/http/cves/", "-u", url, "-jsonl"], remove=True
-    )
+    cmd = ["/usr/local/bin/nuclei"] + boefje_meta["arguments"]["oci_arguments"] + ["-u", url]
 
-    return [(set(), output)]
+    output = subprocess.run(cmd, capture_output=True)
+    output.check_returncode()
+
+    return [({"openkat/nuclei-output"}, output.stdout.decode())]

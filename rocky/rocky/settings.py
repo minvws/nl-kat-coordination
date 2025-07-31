@@ -257,7 +257,7 @@ except ImproperlyConfigured:
 DATABASES = {"default": POSTGRES_DB}
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
-    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", "require")}
+    DATABASES["default"]["OPTIONS"] = {"sslmode": env("POSTGRES_SSL_MODE", default="require")}
 
     POSTGRES_SSL_CERT = env.path("POSTGRES_SSL_CERT", default="")
     POSTGRES_SSL_KEY = env.path("POSTGRES_SSL_KEY", default="")
@@ -524,3 +524,5 @@ WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
 ROCKY_OUTGOING_REQUEST_TIMEOUT = env.int("ROCKY_OUTGOING_REQUEST_TIMEOUT", default=30)
+
+ASSET_REPORTS = env.bool("ASSET_REPORTS", default=True)
