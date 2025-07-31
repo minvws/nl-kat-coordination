@@ -8,16 +8,16 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def scan_octoscan_output(data: list[dict[str, Any]], ooi_ref: Reference) -> Iterable[NormalizerOutput]:
-    for vuln in data:
+    if data:
         finding_type = KATFindingType(id="KAT-VULNERABLE-GH-WORKFLOW")
         yield finding_type
-        yield Finding(
-            finding_type=finding_type.reference,
-            ooi=ooi_ref,
-            description=f"Workflow inside {vuln['filepath']} on line {vuln['line']} "
-            f"is potentially vulnerable: {vuln['message']}\n"
-            f"Snippet: \n {vuln['snippet']}\n",
-        )
+
+    description = "Found vulnerabilities in GitHub workflow files.\n"
+
+    for vuln in data:
+        description += f"{vuln['message']}\nInside file {vuln['filepath']} on line {vuln['line']}\n\n"
+
+    yield Finding(finding_type=finding_type.reference, ooi=ooi_ref, description=description)
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
