@@ -2,11 +2,12 @@ Creating a Boefje
 =================
 
 There are two ways to create a Boefje:
+
 - Existing boefjes can be duplicated from their detail page using the “Add variant” button, in
-which case you can use an existing OCI image for your new Boefje.
+  which case you can use an existing OCI image for your new Boefje.
 - New Boefjes with a custom OCI image can be added from the KAT-alogus using the
-“Add Boefje” button. In this case you need to provide your own OCI image
-that is compatible with the Input and Output specification as defined in :doc:`/developer-documentation/boefjes-runner`.
+  “Add Boefje” button. In this case you need to provide your own OCI image
+  that is compatible with the Input and Output specification as defined in :doc:`/developer-documentation/boefjes-runner`.
 
 Creating a Boefje Variant
 -------------------------
