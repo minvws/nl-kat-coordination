@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 13:42+0000\n"
+"POT-Creation-Date: 2025-07-31 15:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6311,9 +6311,8 @@ msgstr ""
 
 #: rocky/templates/partials/delete_ooi_modal.html
 msgid ""
-"Are you sure you want to delete all the selected objects? The history will "
-"still be saved in the graph data base and there will not be any new data "
-"after the moment of deletion."
+"Are you sure you want to delete all the selected objects? The history of the "
+"deleted objects will still be available."
 msgstr ""
 
 #: rocky/templates/partials/edit_ooi_clearance_level_modal.html
@@ -6706,10 +6705,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Current clearance level"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Indemnification warning"
 msgstr ""
 
@@ -6735,7 +6730,7 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"You don't have permissions to set clearance level. Contact your "
+"You don't have permissions to set the clearance level. Contact your "
 "administrator."
 msgstr ""
 
@@ -6757,6 +6752,10 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "to manage your clearance level."
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Current clearance level"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
