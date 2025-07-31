@@ -103,6 +103,11 @@ class Settings(BaseSettings):
     api_host: str = Field("0.0.0.0", description="Host address of the Boefje API server")
     api_port: int = Field(8000, description="Host port of the Boefje API server")
     docker_network: str = Field("bridge", description="Docker network to run Boefjes in")
+    docker_internal_host: bool = Field(
+        False,
+        description='Add "host.docker.internal:host-gateway" to extra_hosts when running boefje. '
+        "This is enabled by default in the Debian package.",
+    )
     bytes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
     )
