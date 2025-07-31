@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any
 
+import structlog
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
@@ -11,6 +12,8 @@ from tools.view_helpers import get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile, ScanProfileType
 from rocky.views.ooi_detail import OOIDetailView
+
+logger = structlog.get_logger(__name__)
 
 
 class ScanProfileDetailView(FormView, OOIDetailView):
@@ -44,6 +47,7 @@ class ScanProfileDetailView(FormView, OOIDetailView):
                 self.octopoes_api_connector.save_scan_profile(
                     EmptyScanProfile(reference=self.ooi.reference), valid_time=datetime.now(timezone.utc)
                 )
+                logger.info("Scan profiles set to empty", event_code="800011", ooi=self.ooi.reference)
         except (ValueError, KeyError):
             messages.error(
                 self.request, _("Cannot set clearance level. The clearance type must be inherited or declared.")
