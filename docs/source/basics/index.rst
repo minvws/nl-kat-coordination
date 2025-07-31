@@ -17,5 +17,5 @@ Contains references to the documentations of the Basics of OpenKAT
    normalizers
    questions-and-configs
    users-and-organisations
-   make-your-own
+   boefjes-whiskers-bits
    verify-timestamps
