@@ -3,13 +3,7 @@ import subprocess
 from ipaddress import ip_address
 from pathlib import Path
 
-TLS_CAPABLE_SERVICES = (
-    "https",
-    "ftps",
-    "smtps",
-    "imaps",
-    "pops",
-)
+TLS_CAPABLE_SERVICES = ("https", "ftps", "smtps", "imaps", "pops")
 STARTTLS_CAPABLE_SERVICES = (
     "ftp",
     "smtp",
