@@ -35,8 +35,8 @@ Additionally, you could start the process with a filter on specific plugin ids, 
     1970-17-28T15:26:16.334501 [info] Started listening for tasks from worker pid=17
     HTTP Request: POST http://boefje:8000/api/v0/scheduler/boefje/pop?limit=1 "HTTP/1.1 200 OK"
 
-Note that to start a container in "worker-mode", i
-t needs access to the network of the boefje API. This may have a
+Note that to start a container in "worker-mode", it
+needs access to the network of the boefje API. This may have a
 different name for your installation based on your compose project.
 
 This provides a potential performance boost when starting and stopping Docker images for each tasks gives a lot of overhead.
