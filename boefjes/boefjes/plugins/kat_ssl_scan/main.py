@@ -1,6 +1,6 @@
 import subprocess
 
-TLS_CAPABLE_SERVICES = ("https", "ftps", "smtp", "smtps", "imaps", "pop3s", "ssh", "rpd")
+TLS_CAPABLE_SERVICES = ("https", "ftps", "smtp", "smtps", "imaps", "pop3s", "ms-wbt-server")
 STARTTLS_CAPABLE_SERVICES = ("pop3", "ftp", "imap", "smtp", "mysql", "ldap", "xmpp")
 
 
