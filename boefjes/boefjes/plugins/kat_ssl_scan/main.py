@@ -16,8 +16,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     else:
         # we are dealing with an IP-service
         ip = input_["ip_port"]["address"]["address"]
-        ipfamily = input_["ip_port"]["address"]["object_type"]
-        port = input_["ip_port"]["ip"]
+        port = input_["ip_port"]["port"]
         servicename = input_["service"]["name"]
 
     if servicename not in TLS_CAPABLE_SERVICES + STARTTLS_CAPABLE_SERVICES:
