@@ -4,6 +4,7 @@ from uuid import UUID
 
 import structlog
 from account.mixins import OrganizationPermissionRequiredMixin
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -134,6 +135,7 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_report_schedules"] = len(self.object_list)
+        context["asset_reports_enabled"] = settings.ASSET_REPORTS
         return context
 
 
@@ -336,6 +338,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, SchedulerView, OctopoesVi
         context = super().get_context_data(**kwargs)
         context["total_reports"] = len(self.object_list)
         context["selected_reports"] = self.request.GET.getlist("report", [])
+        context["asset_reports_enabled"] = settings.ASSET_REPORTS
         return context
 
 
