@@ -2279,6 +2279,7 @@ msgstr ""
 
 #: onboarding/templates/step_2b_organization_update.html
 #: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid "Continue"
 msgstr ""
@@ -2353,10 +2354,6 @@ msgstr ""
 msgid ""
 "Your administrator has <strong>trusted</strong> you with a clearance level "
 "of <strong>L%(tcl)s</strong>."
-msgstr ""
-
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-msgid "Add URL"
 msgstr ""
 
 #: onboarding/templates/step_5_add_scan_ooi.html

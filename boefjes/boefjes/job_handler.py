@@ -48,6 +48,11 @@ class DockerBoefjeHandler(BoefjeHandler):
 
         try:
             input_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
+            if settings.docker_internal_host:
+                kwargs = {"extra_hosts": {"host.docker.internal": "host-gateway"}}
+            else:
+                kwargs = {}
+
             container_logs = self.docker_client.containers.run(
                 image=oci_image,
                 name="kat_boefje_" + str(task_id),
@@ -57,6 +62,7 @@ class DockerBoefjeHandler(BoefjeHandler):
                 remove=True,
                 network=settings.docker_network,
                 volumes=[f"{self.CACHE_VOLUME_NAME}:{self.CACHE_VOLUME_TARGET}"],
+                **kwargs,
             )
 
             task = self.scheduler_client.get_task(task_id)
