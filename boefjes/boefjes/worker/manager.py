@@ -161,7 +161,7 @@ class SchedulerWorkerManager(WorkerManager):
         handling_task_id = self.handling_tasks[worker.pid]
 
         try:
-            task = self.scheduler_client.get_task(handling_task_id)
+            task = self.scheduler_client.get_task(handling_task_id, hydrate=False)
 
             if task.status is TaskStatus.DISPATCHED or task.status is TaskStatus.RUNNING:
                 try:
@@ -249,7 +249,7 @@ def _start_working(
         finally:
             duration = (datetime.now() - start_time).total_seconds()
             try:
-                if scheduler_client.get_task(p_item.id).status == TaskStatus.RUNNING:
+                if scheduler_client.get_task(p_item.id, hydrate=False).status == TaskStatus.RUNNING:
                     # The docker runner could have handled this already
                     scheduler_client.patch_task(p_item.id, status)  # Note that implicitly, we have p_item.id == task_id
                     logger.info(
