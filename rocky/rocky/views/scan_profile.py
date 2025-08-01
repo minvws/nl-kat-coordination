@@ -32,7 +32,8 @@ class ScanProfileDetailView(FormView, OOIDetailView):
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["clearance_type"] = self.ooi.scan_profile.scan_profile_type
+        if self.ooi.scan_profile:
+            initial["clearance_type"] = self.ooi.scan_profile.scan_profile_type
 
         if self.ooi.scan_profile and not isinstance(self.ooi.scan_profile, InheritedScanProfile):
             initial["level"] = self.ooi.scan_profile.level
