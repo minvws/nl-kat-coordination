@@ -31,9 +31,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     if hostname:
         command.extend(["--sni-name=", hostname])
 
-    target = f"{ip}:{port}" % (ip, port)
-    if ipfamily == "IPAddressV6":
-        target = f"[{ip}]:{port}" % (ip, port)
+    target = f"[{ip}]:{port}"
 
     command.extend(["--xml=-", target])
     output = subprocess.run(command, capture_output=True)
