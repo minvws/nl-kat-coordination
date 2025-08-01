@@ -179,7 +179,7 @@ class OrganizationView(ContextMixin, View):
     def can_raise_clearance_level(self, ooi: OOI, level: int) -> bool:
         try:
             self.raise_clearance_level(ooi.reference, level)
-            messages.success(self.request, _("Clearance level has been set"))
+            messages.success(self.request, _("Clearance level has been set."))
             return True
         except IndemnificationNotPresentException:
             messages.error(
