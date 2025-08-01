@@ -13,8 +13,8 @@
 </p>
 <form class="hidden" id={{ form_id }} method="post" action="{% url "delete_dashboard_item" organization_code=organization.code %}">
     {% csrf_token %}
-    <input type="hidden" name="dashboard_item" value="{{ name }}">
-    <input type="hidden" name="dashboard" value="{{ item_id }}">
+    <input type="hidden" name="dashboard_item_name" value="{{ name }}">
+    <input type="hidden" name="dashboard_item_id" value="{{ item_id }}">
 </form>
 {% endfill %}
 {% fill "footer_buttons" %}
