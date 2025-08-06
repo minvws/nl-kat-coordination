@@ -8,6 +8,8 @@ This page contains all the data on how to navigate around in the OpenKAT user in
    :caption: Contents
 
    introduction
+   scan-levels-and-indemnification
+   working-with-objects
    crisis-room
    katalogus
    findings
@@ -17,3 +19,4 @@ This page contains all the data on how to navigate around in the OpenKAT user in
    members
    settings
    user-profile
+   glossary/index

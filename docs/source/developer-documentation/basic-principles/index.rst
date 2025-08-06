@@ -1,5 +1,5 @@
-Basics
-######
+Basic principles
+################
 
 Contains references to the documentations of the Basics of OpenKAT
 
@@ -9,13 +9,10 @@ Contains references to the documentations of the Basics of OpenKAT
 
    introduction
    modules
-   scan-levels-and-indemnification
-   objects
    boefjes
    origin-types
    bits
    normalizers
    questions-and-configs
-   users-and-organisations
    boefjes-whiskers-bits
    verify-timestamps
