@@ -9,3 +9,5 @@ This page contains all the data on how to navigate around in the OpenKAT user in
 
    introduction
    onboarding
+   create-object
+   generate-report
