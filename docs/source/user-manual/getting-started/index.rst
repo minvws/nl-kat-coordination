@@ -1,5 +1,5 @@
-User manual
-###########
+Getting started
+###############
 
 This page contains all the data on how to navigate around in the OpenKAT user interface.
 
@@ -7,7 +7,5 @@ This page contains all the data on how to navigate around in the OpenKAT user in
    :maxdepth: 4
    :caption: Contents
 
-   getting-started/index
-   basic-concepts/index
-   navigation/index
-   glossary
+   introduction
+   onboarding

@@ -1,63 +1,6 @@
-===========
-Quick start
-===========
-
-Installation
-************
-This quick start guides will help you to get OpenKAT started on Ubuntu using the Docker setup. The steps below were performed on a clean Ubuntu 22.04 LTS virtual machine. This quick start assumes you have a working Ubuntu installation ready. Please note that these steps help you to setup a playground/developer environment for OpenKAT, this means you should not use it as a production environment. If you do, you do so at your own risk.
-
-Do *not* install Docker directly from the default Ubuntu repositories. This version is older and OpenKAT generally uses newer features. Using the Ubuntu repository version will likely break your OpenKAT install (at some point).
-
-
-#. Follow the Docker installation steps as mentioned here: `Docker Ubuntu Installation steps <https://docs.docker.com/engine/install/ubuntu/#installation-methods>`_. This tutorial followed the installation steps using the `apt` repository. Make sure that you can run the `hello-world` Docker image.
-
-#. Follow the Post-installations steps as described here: `Docker Post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user>`_. Make sure that the Docker `hello-world` image can run as a normal (non-root) user.
-
-#. Install missing Ubuntu packages.
-
-.. code-block:: sh
-
-    sudo apt install make
-..
-
-#. Decide if you want to install the latest stable version of OpenKAT or if you want to run `main`. Clone the OpenKAT repository to a location of your choice as shown below.
-
-.. code-block:: sh
-
-    $ git clone https://github.com/minvws/nl-kat-coordination.git
-..
-
-#. Change into the cloned repository.
-
-.. code-block:: sh
-
-    $ cd nl-kat-coordination/
-..
-
-#. Create the environment file and run kat.
-
-.. code-block:: sh
-
-    $ make env
-    $ make kat
-..
-
-#. Pet your cat while you wait for all the containers to be built.
-
-#. Get your password from the `.env` file. An example of what this looks like is shown below.
-
-.. code-block:: sh
-
-    $ cat .env | grep DJANGO
-    DJANGO_SUPERUSER_PASSWORD=83d0ddac75c3fed23d2fc3a607affe432f9916d0f9dcc12680
-..
-
-#. Open your browser and go to: `http://localhost:8000/en/login`. Login using the username `superuser@localhost` and the password that you found using the previous step (everything after the equal sign `=`).
-
-#. Meowlations! You just installed OpenKAT. As this is your first time using OpenKAT, you will have to walk through the onboarding. This is explained further below.
-
+==========
 Onboarding
-**********
+==========
 
 If you are using OpenKAT for the first time you can go through the onboarding flow. The onboarding flow helps you to perform your very first scan. The onboarding flow introduces the basic concepts of adding an object, setting a clearance level, enabling boefjes in order to gather data and perform various scans and the creation of your first report.
 
@@ -77,7 +20,7 @@ The onboarding consists of the following steps:
 5. Generating report
 
 
-Login & Registration
+Login & registration
 ====================
 
 Once you login you will see the screen for setting up 2 factor authentication (2FA). You have to scan the QR code with an authenticator application on your phone, the application on your phone will generate a token that you have to type in as a response. Every time you want to login, you have to enter your username, password and 2FA token. You can disable 2FA in the `.env` file if necessary.
@@ -92,6 +35,10 @@ Once you have successfully setup 2FA you will see the following screen.
   :alt: Successful setup of 2 factor authentication.
 
 After this, continue to the onboarding. The onboarding starts with the registration process, which let's you create your very first organization. The first page of the onboarding shows a quick introduction of how OpenKAT works.
+
+
+Step-by-step onboarding
+=======================
 
 .. image:: img/1-onboarding-welcome.png
   :alt: Onboarding welcome page.

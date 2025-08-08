@@ -24,8 +24,8 @@ Central to OpenKAT are objects and the data model. Objects (or 'Objects Of Inter
 
 The data model helps in the search for more information, through the logical coherence of objects. Object types are defined in the data model. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
-Objects, the data model and recursivity
-***************************************
+Objects, the data model and recursion
+*************************************
 
 The information collected by OpenKAT is stored as objects. For example, an object is "an IP address" or "a hostname". If there is a hostname, based on the data model, OpenKAT also expects an IP address and possible open ports.
 

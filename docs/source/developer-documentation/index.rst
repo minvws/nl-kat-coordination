@@ -8,7 +8,7 @@ Contains documentation for developers and contributors.
    :caption: Contents
 
    contributor/index
-   quick-start/quick-start
+   quick-start
    basic-principles/index
    rocky
    mula

@@ -1,10 +1,7 @@
-Main interface
-==============
+Overview of pages
+=================
 
 This manual covers the day-to-day use of OpenKAT in the user interface. If you are looking for how to navigate around in OpenKAT, you are at the right place.
-
-Pages
-*****
 
 The user interface of OpenKAT consists of the following pages (or top tabs), which provide access to various functionality and data:
 

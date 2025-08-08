@@ -41,6 +41,46 @@ OpenKAT is built to monitor a larger number of systems, such as the IT systems d
 The nicest playground for OpenKAT is a situation where many systems are active. In the user group around OpenKAT we see larger organizations from the non-profit sector, their service providers, hosting providers, auditors and others involved in information security.
 
 
+Which problem does OpenKAT solve?
+=================================
+OpenKAT was created as a monitoring tool with automation, flexibility and traceability in mind. Being a modular framework based on a datamodel, it has plugins for datacollection, automatic scanning, businessrules for analysis, external timestamps on all original data and practical reports.
+
+
+Framework
+---------
+The open structure allows you to modify, tweak and add tools for scanning, storage, analysis and reports. With such flexibility and separation of tasks, the bits almost fall out. It allows for easy adaptation to new developments.
+
+
+Plugins for scanning
+--------------------
+Plugins do the scanning, ranging from a small script to external tools with a wide range of inputs. New threat around the corner? Build your own plugin to catch it, and as all data is stored you might be able to find vulnerable systems right away.
+
+
+External timestamps
+-------------------
+All output from the scans is stored, with its meta data, hashed and timestamped by an external server. This allows you to 'prove' which information was collected, how and when.
+
+
+Datamodel
+---------
+To combine information from several sources OpenKAT uses an extendable datamodel with objects. An IP address is such an object, and can be found through different tools and through logical relations in the datamodel.
+
+
+Automatic scanning
+------------------
+OpenKAT will scan for new information, using the logic in the datamodel. The results of the scans spark new actions, just as time passing starts new scans to refresh and check the state of the systems in the OpenKAT database.
+
+
+Indemnity per user and organisation
+-----------------------------------
+The intensity of a scan can be set in the system, by giving it indemnity for a certain level of intrusion. OpenKAT can be set to a level where it might bring down a system so it needs an “OK” from the user for such steps.
+
+
+Findings and reports
+--------------------
+Results of the analysis are available for easy viewing in the frontend, per PDF or through the API. The findings can be collected into different kind of reports. These reports can be scheduled, so they will be generated automicatically for you.
+
+
 Security concept
 ================
 
@@ -62,7 +102,7 @@ Where do I start with OpenKAT?
 
 Start by reading the :doc:`/user-manual/index`, which explains how OpenKAT works. After that, if you want to read more about how the system works on a technical level and what the main principles are, check the :doc:`/developer-documentation/index`.
 
-The documentation gives an impression, but trying OpenKAT yourself is the best way to find out how it works. In :doc:`/installation-and-deployment/index`, you will find all the information about installing OpenKAT on your system.
+The documentation gives an impression, but trying OpenKAT yourself is the best way to find out how it works. In :doc:`/installation-and-deployment/index`, you can find all the information about installing OpenKAT on your system.
 
 The easiest way to get to know the system is a local installation. If you don't have a debian or ubuntu machine (yet), try the Gitpod test environment. :doc:`/installation-and-deployment/install` has a comprehensive roadmap for creating a local installation. In addition to the documentation, read `the README from the general repository <https://github.com/minvws/nl-kat-coordination>`_.
 
