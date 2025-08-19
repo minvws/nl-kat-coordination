@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG PYTHON_VERSION=3.13
-FROM node:20-bookworm AS node_builder
+FROM node:24-trixie AS node_builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY components components
 
 RUN yarn --ignore-engines && yarn build
 
-FROM python:$PYTHON_VERSION-bookworm AS dev
+FROM python:$PYTHON_VERSION-trixie AS dev
 
 ENV GRANIAN_WORKERS=2
 ENV GRANIAN_THREADS=4
