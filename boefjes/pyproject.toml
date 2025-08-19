@@ -29,7 +29,7 @@ dependencies = [
     "tldextract>=3.4.4,<4",
     "validators==0.20.0",
     "python-libnmap==0.7.3",
-    "cryptography>=44.0.1,<45",
+    "cryptography>45",
     "forcediphttpsadapter==1.1.0",
     "urllib3>=2.1.0,<3",
     "wpscan-out-parse==1.9.3",
