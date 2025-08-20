@@ -55,7 +55,7 @@
 
                         {% elif dashboard_item.item.recipe %}
                             {% include "partials/report_dashboard_item_filter.html" with type="report-section" recipe=dashboard_item.data.recipe input_oois=dashboard_item.data.recipe.input_recipe.input_oois %}
-                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data %}
+                            {% include dashboard_item.item.template with dashboard_item=dashboard_item.item data=dashboard_item.data.report_data aggregate_dashboard_item="yes" %}
 
                         {% else %}
                             {% include "partials/report_dashboard_item_filter.html" %}
