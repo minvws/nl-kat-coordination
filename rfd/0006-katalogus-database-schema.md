@@ -130,6 +130,7 @@ With respect to plugin management:
 With respect to a discussion about the existence of the boefje-normalizer-bit relationship:
 
 <!-- 5. I'm not sure yet if this is a valid functional requirement, but I think it's a valid discussion point. Personally I would leave this out and do better gate keeping at the review process -->
+
 5. Some plugins should only run in containers and perhaps not be allowed to directly create OOIs.
 6. We need to be able to do attribution of OOIs through plugins properly.
 7. Maybe we shouldn't allow all plugins to write models to the database.
@@ -139,13 +140,15 @@ With respect to a discussion about the existence of the boefje-normalizer-bit re
 #### Related to the Plugins themselves
 
 <!-- 1. If we implement this then NR 1, specifically the part that mentions "configure globally", is not needed anymore --->
+
 1. Perhaps plugin configuration should be manageable for a selection of organizations as well.
 2. We should be able to import multiple plugins at once from external repositories
 
 #### Related to scanning in general
 
 <!-- 3. Would be nice if we could 'query' on a combination of e.g. object type, file/mime type, tags, the plugin that produces it, attributes of input/ output objects, etc. -->
-<!-- 6. How would this work? --> 
+<!-- 6. How would this work? -->
+
 3. Normalizers should be allowed to run on multiple raw files
 4. One Boefje should be able to run on multiple OOIs
 5. One Boefje should be able to run on multiple OOIs of different object_types

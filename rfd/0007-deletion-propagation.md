@@ -46,7 +46,7 @@ Hence, we could re-implement the trigger system using Django Signals and trigger
 To still relate OOIs to Tasks, OOIs should get a new `attribution_id` string field that is either:
 
 - A `task_id` pointing to a Task
-- A `user_id'` pointing to a User that manually created the OOI
+- A `user_id` pointing to a User that manually created the OOI
 - Any future attribution identifiers
 
 ### Functional Requirements (FR)
