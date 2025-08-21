@@ -1,13 +1,25 @@
 [
   {
-    "plugin_id": "dns-records-2",
-    "name": "DNS Records 2",
+    "plugin_id": "dig",
+    "name": "Dig",
     "description": "Scan DNS records.",
     "scan_level": 1,
     "oci_image": "tutum/dnsutils",
     "oci_arguments": [
       "dig",
+      "+nocomments",
+      "+noquestion",
+      "+nostats",
       "@{nameserver}",
+      "A",
+      "{hostname}",
+      "AAAA",
+      "{hostname}",
+      "CNAME",
+      "{hostname}",
+      "TXT",
+      "{hostname}",
+      "MX",
       "{hostname}"
     ]
   },

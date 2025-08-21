@@ -39,9 +39,14 @@ def nsync() -> list[Plugin]:
 
     for normalizer_id, resource in get_local_repository().resolve_normalizers().items():
         plugin = Plugin(
-            plugin_id=normalizer_id, name=resource.normalizer.name, scan_level=resource.normalizer.scan_level,
-                   description=resource.normalizer.description, consumes=list(resource.normalizer.consumes),
-                   recurrences=resource.normalizer.recurrences, version=resource.normalizer.version, )
+            plugin_id=normalizer_id,
+            name=resource.normalizer.name,
+            scan_level=resource.normalizer.scan_level,
+            description=resource.normalizer.description,
+            consumes=list(resource.normalizer.consumes),
+            recurrences=resource.normalizer.recurrences,
+            version=resource.normalizer.version,
+        )
         plugins.append(plugin)
         enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 

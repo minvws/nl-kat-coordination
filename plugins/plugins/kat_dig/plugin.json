@@ -1,0 +1,8 @@
+{
+  "plugin_id": "kat_dig_normalize",
+  "name": "Dig normalizer",
+  "description": "Parses dig output.",
+  "consumes": [
+    "file:dig"
+  ]
+}

@@ -14,7 +14,6 @@ from octopoes.models.ooi.network import Network
 from octopoes.xtdb.exceptions import XTDBException
 from openkat.exceptions import OctopoesException
 from openkat.models import Organization
-from tasks.celery import app
 from tasks.new_tasks import process_raw_file
 
 logger = get_logger(__name__)

@@ -7,10 +7,6 @@ from django.db.models import Q
 from django.db.models.functions import Coalesce
 
 from files.models import File
-from katalogus.models import NormalizerConfig, Normalizer as NormalizerDB
-from katalogus.worker.job_models import NormalizerMeta, RawData, BoefjeMeta
-from katalogus.worker.models import Normalizer
-from katalogus.worker.repository import get_local_repository
 from octopoes.models import OOI, ScanLevel
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
@@ -118,7 +114,10 @@ def run_plugin(self, organization: str, plugin_id: str, input_ooi: str) -> None:
 
     plugin = (
         Plugin.objects.filter(plugin_id=plugin_id)
-        .filter(Q(enabled_plugins__organization=Organization.objects.get(code=organization)) | Q(enabled_plugins__isnull=True))
+        .filter(
+            Q(enabled_plugins__organization=Organization.objects.get(code=organization))
+            | Q(enabled_plugins__isnull=True)
+        )
         .annotate(enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None))
         .first()
     )
@@ -160,6 +159,11 @@ def process_raw_file(file: File, handle_error: bool = False):
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
         return
 
+    if file.task_result:
+        pass
+
+    if file.type == "?":  # TODO
+        pass
     # TODO:
     #  - Find enabled Plugins that should be triggered based on new trigger fields/logic
     #  - Run fast scripts directly with: run_plugin.apply(...)

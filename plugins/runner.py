@@ -48,10 +48,7 @@ class PluginRunner:
         return docker.from_env().containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
-            command=[
-                arg.format_map(format_map)
-                for arg in plugin.oci_arguments
-            ],
+            command=[arg.format_map(format_map) for arg in plugin.oci_arguments],
             stdout=use_stdout,
             stderr=True,
             remove=True,
