@@ -1,0 +1,12 @@
+{
+  "plugin_id": "dns-records",
+  "name": "DNS Records",
+  "description": "Scan DNS records.",
+  "scan_level": 1,
+  "oci_image": "tutum/dnsutils",
+  "oci_arguments": [
+    "dig",
+    "@{nameserver}",
+    "{hostname}"
+  ]
+}

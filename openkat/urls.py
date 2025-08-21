@@ -5,6 +5,7 @@ from django.views.generic.base import TemplateView
 from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
+from files.viewsets import FileViewSet
 from katalogus.viewsets import BoefjeViewSet
 from openkat.views.bytes_raw import BytesRawView
 from openkat.views.finding_add import FindingAddView
@@ -63,6 +64,7 @@ router.register(r"report", ReportViewSet, basename="report")
 router.register(r"report-recipe", ReportRecipeViewSet, basename="report-recipe")
 router.register(r"boefje", BoefjeViewSet, basename="boefje")
 router.register(r"task", TaskViewSet, basename="task")
+router.register(r"file", FileViewSet, basename="file")
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),

@@ -58,6 +58,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
+    networks:
+      - default
+      - plugins
 
   worker:
     restart: unless-stopped
@@ -85,6 +88,13 @@ networks:
         - subnet: 2001:db8:d0ca::/64
         - subnet: 172.29.0.0/16
           gateway: 172.29.0.1
+  plugins:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:db8:d0cb::/64
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
 
 volumes:
   postgres-data:

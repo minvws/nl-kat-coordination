@@ -1,4 +1,4 @@
-.PHONY: build build-openkat build-openkat-frontend run test export_migrations debian clean
+.PHONY: build build-openkat build-openkat-frontend run test export_migrations debian clean entrypoint
 
 UNAME := $(shell uname)
 
@@ -60,8 +60,10 @@ export REGISTRY=ghcr.io/minvws/openkat
 
 images: dns-sec nmap export-http nikto generic entrypoint
 
-entrypoint:
+plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
+
+entrypoint: plugins/plugins/entrypoint/main
 
 dns-sec: base-image
 	docker build -f katalogus/boefjes/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
@@ -85,13 +87,16 @@ testclean:
 
 utest: testclean ## Run the unit tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_tests
+	docker compose -f .ci/docker-compose.yml stop
 
 itest: testclean ## Run the integration tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration
+	docker compose -f .ci/docker-compose.yml stop
 
 bench: testclean ## Run the report benchmark.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration \
 	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
+	docker compose -f .ci/docker-compose.yml stop
 
 languages:
 # Extracts strings to `.pot` file which should be translated

@@ -10,7 +10,7 @@ import (
 	"os/exec"
 )
 
-var defaultURL = "" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
+var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
 
 //Example usage:
 //docker run --network nl-kat-coordination_default -v path/to/main:/bin/main --entrypoint=/bin/main projectdiscovery/nuclei nuclei -h
@@ -19,6 +19,8 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: go run main.go <command> [args...]")
 	}
+
+	pluginId := os.Getenv("PLUGIN_ID") // TODO: force plugin id?
 
 	// Get upload URL from environment or use default
 	uploadURL := os.Getenv("UPLOAD_URL")
@@ -33,6 +35,7 @@ func main() {
 		log.Fatalf("Failed to get stdout: %v", err)
 	}
 	stderrPipe, err := cmd.StderrPipe()
+
 	if err != nil {
 		log.Fatalf("Failed to get stderr: %v", err)
 	}
@@ -45,33 +48,44 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to read stdout: %v", err)
 	}
+
 	stderrBytes, err := io.ReadAll(stderrPipe)
 	if err != nil {
 		log.Fatalf("Failed to read stderr: %v", err)
 	}
 
-	if err := cmd.Wait(); err != nil {
-		log.Printf("Command exited with error: %v", err)
-	}
-
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 
-	stdoutFile, err := writer.CreateFormFile("stdout", "stdout.txt")
-	if err != nil {
-		log.Fatalf("Failed to create stdout part: %v", err)
-	}
-	stdoutFile.Write(stdoutBytes)
+	if err := cmd.Wait(); err != nil {
+		log.Printf("Command exited with error: %v", err)
 
-	stderrFile, err := writer.CreateFormFile("stderr", "stderr.txt")
-	if err != nil {
-		log.Fatalf("Failed to create stderr part: %v", err)
+		stderrFile, err := writer.CreateFormFile("file", pluginId)
+		if err != nil {
+			log.Fatalf("Failed to create stderr part: %v", err)
+		}
+		stderrFile.Write(stderrBytes)
+
+		err = writer.WriteField("type", "stderr")
+		if err != nil {
+			log.Fatalf("Failed to create type part: %v", err)
+		}
+	} else {
+		stdoutFile, err := writer.CreateFormFile("file", pluginId)
+		if err != nil {
+			log.Fatalf("Failed to create stdout part: %v", err)
+		}
+		stdoutFile.Write(stdoutBytes)
+
+		err = writer.WriteField("type", "stdout")
+		if err != nil {
+			log.Fatalf("Failed to create type part: %v", err)
+		}
 	}
-	stderrFile.Write(stderrBytes)
 
 	writer.Close()
 
-	resp, err := http.Post("http://openkat:8000/upload", writer.FormDataContentType(), &body)
+	resp, err := http.Post(uploadURL, writer.FormDataContentType(), &body)
 	if err != nil {
 		log.Fatalf("Upload failed: %v", err)
 	}
