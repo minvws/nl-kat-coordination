@@ -55,7 +55,9 @@
                         <span class="plugin-oci-image">{{ plugin.oci_image }}</span>
                     </td>
                     <td>
-                        <span class="plugin-oci-arguments">{% for argument in plugin.oci_arguments %}{{ argument }} {% endfor %}</span>
+                        <span class="plugin-oci-arguments">
+                            {% for argument in plugin.oci_arguments %}{{ argument }}{% endfor %}
+                        </span>
                     </td>
                     <td>
                         {% include "new_enable_disable_plugin.html" with plugin=plugin %}

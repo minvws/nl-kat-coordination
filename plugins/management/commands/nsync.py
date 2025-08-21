@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from django.core.management.base import BaseCommand
-from pydantic import Field, BaseModel, TypeAdapter
-
 from django.conf import settings
+from django.core.management.base import BaseCommand
+from pydantic import BaseModel, Field, TypeAdapter
+
 from katalogus.worker.repository import get_local_repository
 from plugins.models import Plugin
 
@@ -13,6 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         nsync()
+
 
 class NewPlugin(BaseModel):
     plugin_id: str
@@ -27,6 +28,7 @@ class NewPlugin(BaseModel):
 
     def __str__(self):
         return f"{self.plugin_id}:{self.version}"
+
 
 plugins_type_adapter = TypeAdapter(list[NewPlugin])
 

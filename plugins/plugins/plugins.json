@@ -30,7 +30,7 @@
       "-sS",
       "-oX",
       "-",
-      "{ip_address}"
+      "{ip_address|hostname}"
     ]
   }
 ]
