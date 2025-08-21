@@ -11,7 +11,7 @@ def OnboardingMiddleware(get_response):
         if request.user.is_authenticated:
             member_onboarded = list(filter(lambda o: o.onboarded, request.user.organization_members))
 
-            # do not redirect itself, otherwise it will endup in endless loop
+            # do not redirect itself, otherwise it will end up in endless loop
             # with too many redirects
             # exclude admin urls
             if (

@@ -8,11 +8,14 @@ from django.dispatch import receiver
 from structlog import get_logger
 
 from crisis_room.management.commands.dashboards import get_or_create_default_dashboard
+from files.models import File
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.network import Network
 from octopoes.xtdb.exceptions import XTDBException
 from openkat.exceptions import OctopoesException
 from openkat.models import Organization
+from tasks.celery import app
+from tasks.new_tasks import process_raw_file
 
 logger = get_logger(__name__)
 
@@ -111,3 +114,9 @@ def organization_post_save(sender, instance, created, *args, **kwargs):
         octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
     except Exception:
         logger.exception("Could not seed internet for organization %s", sender)
+
+
+@receiver(post_save, sender=File)
+def file_post_save(sender, instance, created, *args, **kwargs):
+    if created:
+        process_raw_file(instance)

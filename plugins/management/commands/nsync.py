@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from pydantic import BaseModel, Field, TypeAdapter
 
 from katalogus.worker.repository import get_local_repository
-from plugins.models import Plugin
+from plugins.models import EnabledPlugin, Plugin
 
 
 class Command(BaseCommand):
@@ -35,19 +35,15 @@ plugins_type_adapter = TypeAdapter(list[NewPlugin])
 
 def nsync() -> list[Plugin]:
     plugins = []
+    enabled_plugins = []
 
     for normalizer_id, resource in get_local_repository().resolve_normalizers().items():
-        plugins.append(
-            Plugin(
-                plugin_id=normalizer_id,
-                name=resource.normalizer.name,
-                scan_level=resource.normalizer.scan_level,
-                description=resource.normalizer.description,
-                consumes=list(resource.normalizer.consumes),
-                recurrences=resource.normalizer.recurrences,
-                version=resource.normalizer.version,
-            )
-        )
+        plugin = Plugin(
+            plugin_id=normalizer_id, name=resource.normalizer.name, scan_level=resource.normalizer.scan_level,
+                   description=resource.normalizer.description, consumes=list(resource.normalizer.consumes),
+                   recurrences=resource.normalizer.recurrences, version=resource.normalizer.version, )
+        plugins.append(plugin)
+        enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
     for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
@@ -80,5 +76,6 @@ def nsync() -> list[Plugin]:
             "version",
         ],
     )
+    EnabledPlugin.objects.bulk_create(enabled_plugins, ignore_conflicts=True)
 
     return created_plugins

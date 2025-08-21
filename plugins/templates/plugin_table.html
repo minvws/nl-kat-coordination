@@ -52,11 +52,17 @@
                         <a href="{% url "plugin_detail" pk=plugin.id %}">{{ plugin.name }}</a>
                     </td>
                     <td>
-                        <span class="plugin-oci-image">{{ plugin.oci_image }}</span>
+                        <span class="plugin-oci-image">
+                        {% if plugin.oci_image %}
+                            <strong>{{ plugin.oci_image }}</strong>
+                        {% else %}
+                            No Image
+                        {% endif %}
+                        </span>
                     </td>
                     <td>
                         <span class="plugin-oci-arguments">
-                            {% for argument in plugin.oci_arguments %}{{ argument }}{% endfor %}
+                            {% for argument in plugin.oci_arguments %}{{ argument }}{{ ' ' }}{% endfor %}
                         </span>
                     </td>
                     <td>

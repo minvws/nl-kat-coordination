@@ -32,7 +32,7 @@
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
                         </li>
                         <li>
-                            {% url "task_list" as index_url %}
+                            {% url "new_task_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                         </li>
