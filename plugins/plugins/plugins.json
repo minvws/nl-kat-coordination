@@ -1,0 +1,36 @@
+[
+  {
+    "plugin_id": "dns-records-2",
+    "name": "DNS Records 2",
+    "description": "Scan DNS records.",
+    "scan_level": 1,
+    "oci_image": "tutum/dnsutils",
+    "oci_arguments": [
+      "dig",
+      "@{nameserver}",
+      "{hostname}"
+    ]
+  },
+  {
+    "plugin_id": "nmap-2",
+    "name": "Nmap TCP 2",
+    "description": "Defaults to top 250 TCP ports. Includes service detection.",
+    "scan_level": 2,
+    "oci_image": "instrumentisto/nmap",
+    "oci_arguments": [
+      "nmap",
+      "--open",
+      "--top-ports",
+      "5",
+      "-T4",
+      "-Pn",
+      "-r",
+      "-v10",
+      "-sV",
+      "-sS",
+      "-oX",
+      "-",
+      "{ip_address}"
+    ]
+  }
+]

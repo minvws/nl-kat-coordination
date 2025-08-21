@@ -1,4 +1,5 @@
-import json
+import datetime
+from datetime import timezone
 
 import docker
 from django.conf import settings
@@ -13,29 +14,19 @@ class Command(BaseCommand):
     PLUGINS_DIR = settings.BASE_DIR / "plugins" / "plugins"
 
     def add_arguments(self, parser):
-        parser.add_argument("plugin", type=str)
-        parser.add_argument("inputs", type=str)
+        parser.add_argument("plugin_id", type=str)
+        parser.add_argument("target", type=str)
         parser.add_argument("--output", "-o", dest="output", type=str, default="file")
 
-    def handle(self, plugin, inputs, output, *args, **options):
+    def handle(self, plugin_id, target, output, *args, **options):
         use_stdout = str(output) == "-"
-
-        dns = json.load((self.PLUGINS_DIR / "dns_records.json").open())
-        definition = Plugin(
-            plugin_id=dns["plugin_id"],
-            name=dns["name"],
-            description=dns["description"],
-            scan_level=dns["scan_level"],
-            oci_image=dns["oci_image"],
-            oci_arguments=dns["oci_arguments"],
-        )
-
+        plugin = Plugin.objects.get(plugin_id=plugin_id)
         docker_client = docker.from_env()
 
         callback_kwargs = (
             {
                 "entrypoint": self.OVERRIDE_ENTRYPOINT,
-                "environment": {"PLUGIN_ID": definition.plugin_id},
+                "environment": {"PLUGIN_ID": plugin.plugin_id},
                 "network": settings.DOCKER_NETWORK,
                 "volumes": [f'{(self.PLUGINS_DIR / "entrypoint" / "main").absolute()}:{self.OVERRIDE_ENTRYPOINT}'],
             }
@@ -44,12 +35,12 @@ class Command(BaseCommand):
         )
 
         logs = docker_client.containers.run(
-            image=definition.oci_image,
-            name=definition.plugin_id,
+            image=plugin.oci_image,
+            name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
             command=[
                 # TODO: add nameserver through configuration later
-                arg.format_map({"hostname": inputs, "nameserver": "1.1.1.1"})
-                for arg in definition.oci_arguments
+                arg.format_map({"hostname": target, "nameserver": "1.1.1.1", "ip_address": target})
+                for arg in plugin.oci_arguments
             ],
             stdout=use_stdout,
             stderr=True,

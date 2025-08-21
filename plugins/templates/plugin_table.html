@@ -23,7 +23,6 @@
                               class="{% if order_by == "name" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "name" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                <th>{% translate "Consumes" %}</th>
                 <th scope="col"
                     class="sortable"
                     {% if order_by == "oci_image" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
@@ -53,17 +52,10 @@
                         <a href="{% url "plugin_detail" pk=plugin.id %}">{{ plugin.name }}</a>
                     </td>
                     <td>
-                        {% for consume in plugin.consumes %}
-                            <div>
-                                <span class="plugin-consume">{{ consume }}</span>
-                            </div>
-                        {% endfor %}
-                    </td>
-                    <td>
                         <span class="plugin-oci-image">{{ plugin.oci_image }}</span>
                     </td>
                     <td>
-                        <span class="plugin-oci-arguments">{{ plugin.oci_arguments }}</span>
+                        <span class="plugin-oci-arguments">{% for argument in plugin.oci_arguments %}{{ argument }} {% endfor %}</span>
                     </td>
                     <td>
                         {% include "new_enable_disable_plugin.html" with plugin=plugin %}

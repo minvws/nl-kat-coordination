@@ -1,5 +1,9 @@
-from django.core.management.base import BaseCommand
+from pathlib import Path
 
+from django.core.management.base import BaseCommand
+from pydantic import Field, BaseModel, TypeAdapter
+
+from django.conf import settings
 from katalogus.worker.repository import get_local_repository
 from plugins.models import Plugin
 
@@ -10,24 +14,25 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         nsync()
 
+class NewPlugin(BaseModel):
+    plugin_id: str
+    name: str
+    description: str | None = None
+    scan_level: int = 1
+    consumes: set[str] = Field(default_factory=set)
+    recurrences: str | None = None
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
+    version: str | None = None
+
+    def __str__(self):
+        return f"{self.plugin_id}:{self.version}"
+
+plugins_type_adapter = TypeAdapter(list[NewPlugin])
+
 
 def nsync() -> list[Plugin]:
     plugins = []
-
-    for boefje_id, resource in get_local_repository().resolve_boefjes().items():
-        plugins.append(
-            Plugin(
-                plugin_id=boefje_id,
-                name=resource.boefje.name,
-                description=resource.boefje.description,
-                scan_level=resource.boefje.scan_level,
-                consumes=list(resource.boefje.consumes),
-                recurrences=resource.boefje.recurrences,
-                oci_image=resource.boefje.oci_image,
-                oci_arguments=list(resource.boefje.oci_arguments),
-                version=resource.boefje.version,
-            )
-        )
 
     for normalizer_id, resource in get_local_repository().resolve_normalizers().items():
         plugins.append(
@@ -39,6 +44,22 @@ def nsync() -> list[Plugin]:
                 consumes=list(resource.normalizer.consumes),
                 recurrences=resource.normalizer.recurrences,
                 version=resource.normalizer.version,
+            )
+        )
+
+    plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
+    for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
+        plugins.append(
+            Plugin(
+                plugin_id=plugin.plugin_id,
+                name=plugin.name,
+                scan_level=plugin.scan_level,
+                description=plugin.description,
+                consumes=list(plugin.consumes),
+                recurrences=plugin.recurrences,
+                oci_image=plugin.oci_image,
+                oci_arguments=plugin.oci_arguments,
+                version=plugin.version,
             )
         )
 
