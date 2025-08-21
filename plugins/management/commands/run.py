@@ -32,21 +32,24 @@ class Command(BaseCommand):
 
         docker_client = docker.from_env()
 
-        callback_kwargs = {
-            "entrypoint": self.OVERRIDE_ENTRYPOINT,
-            "environment": {"PLUGIN_ID": definition.plugin_id},
-            "network": settings.DOCKER_NETWORK,
-            "volumes": [
-                f'{(self.PLUGINS_DIR / "entrypoint" / "main").absolute()}:{self.OVERRIDE_ENTRYPOINT}'
-            ],
-        } if not use_stdout else {}
+        callback_kwargs = (
+            {
+                "entrypoint": self.OVERRIDE_ENTRYPOINT,
+                "environment": {"PLUGIN_ID": definition.plugin_id},
+                "network": settings.DOCKER_NETWORK,
+                "volumes": [f'{(self.PLUGINS_DIR / "entrypoint" / "main").absolute()}:{self.OVERRIDE_ENTRYPOINT}'],
+            }
+            if not use_stdout
+            else {}
+        )
 
         logs = docker_client.containers.run(
             image=definition.oci_image,
             name=definition.plugin_id,
             command=[
                 # TODO: add nameserver through configuration later
-                arg.format_map({"hostname": inputs, "nameserver": "1.1.1.1"}) for arg in definition.oci_arguments
+                arg.format_map({"hostname": inputs, "nameserver": "1.1.1.1"})
+                for arg in definition.oci_arguments
             ],
             stdout=use_stdout,
             stderr=True,
