@@ -85,27 +85,28 @@ def configure_logging(logging_settings):
     else:
         logging.config.dictConfig(logging_settings)
 
-    structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.processors.add_log_level,
-            structlog.processors.StackInfoRenderer(),
-            structlog.dev.set_exc_info,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.TimeStamper("iso", utc=False),
-            (
-                structlog.dev.ConsoleRenderer(
-                    colors=True, pad_level=False, exception_formatter=structlog.dev.plain_traceback
-                )
-                if LOGGING_FORMAT == "text"
-                else structlog.processors.JSONRenderer()
-            ),
-        ],
-        context_class=dict,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        wrapper_class=structlog.stdlib.BoundLogger,
-        cache_logger_on_first_use=True,
-    )
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.dev.set_exc_info,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper("iso", utc=False),
+        (
+            structlog.dev.ConsoleRenderer(
+                colors=True, pad_level=False, exception_formatter=structlog.dev.plain_traceback
+            )
+            if LOGGING_FORMAT == "text"
+            else structlog.processors.JSONRenderer()
+        ),
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
 
 
 LOGGING_CONFIG = "rocky.settings.configure_logging"
