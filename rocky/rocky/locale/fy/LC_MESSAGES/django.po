@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/fy/>\n"
 "Language: fy\n"
@@ -423,8 +423,8 @@ msgid ""
 msgstr ""
 "Jo krije frijwarring foar nivo L%(tcl)s fan jo behearder. Eardat jo OOI-"
 "frijwarringsnivo’s wizigje kinne oant dit nivo, moatte jo dizze tastimming "
-"akseptearje. Unthâld: <strong>mei grutte macht komt grutte ferantwurdlikheid."
-"</strong>"
+"akseptearje. Unthâld: <strong>mei grutte macht komt grutte "
+"ferantwurdlikheid.</strong>"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
@@ -714,8 +714,7 @@ msgstr ""
 
 #: crisis_room/models.py
 msgid "Will be displayed on the general crisis room, for all organizations."
-msgstr ""
-"Sil toand wurde op it algemiene krisissintrum, foar alle organisaasjes."
+msgstr "Sil toand wurde op it algemiene krisissintrum, foar alle organisaasjes."
 
 #: crisis_room/models.py
 msgid "Will be displayed on a single organization dashboard"
@@ -1886,9 +1885,9 @@ msgid ""
 "Add objects with a complying clearance level, or alter the clearance level "
 "of existing objects."
 msgstr ""
-"Jo hawwe op dit stuit gjin objekten dy’t foldogge oan it scannivo fan "
-"%(name)s. Foegje objekten ta mei in foldwaand frijwarringsnivo, of wizigje "
-"it frijwarringsnivo fan besteande objekten."
+"Jo hawwe op dit stuit gjin objekten dy’t foldogge oan it scannivo fan %(name)"
+"s. Foegje objekten ta mei in foldwaand frijwarringsnivo, of wizigje it "
+"frijwarringsnivo fan besteande objekten."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
