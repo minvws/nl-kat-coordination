@@ -12,8 +12,8 @@ msgstr ""
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-07-08 16:37+0000\n"
 "Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
-"Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/ta/>\n"
+"Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/ta/>\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -702,8 +702,8 @@ msgid ""
 "Where on the dashboard do you want to show the data? Position {} is the most "
 "top level and the max position is {}."
 msgstr ""
-"டாச்போர்டில் நீங்கள் தரவைக் காட்ட விரும்புகிறீர்கள்? நிலை {} மிக உயர்ந்த நிலை மற்றும் அதிகபட்"
-"ச நிலை {} ஆகும்."
+"டாச்போர்டில் நீங்கள் தரவைக் காட்ட விரும்புகிறீர்கள்? நிலை {} மிக உயர்ந்த நிலை மற்றும் "
+"அதிகபட்ச நிலை {} ஆகும்."
 
 #: crisis_room/models.py
 msgid "Will be displayed on the general crisis room, for all organizations."
@@ -814,21 +814,12 @@ msgid ""
 "No findings have been identified yet. As soon as they have been identified, "
 "they will be shown on this page."
 msgstr ""
-"\n"
-"                    கண்டுபிடிப்புகள் இதுவரை அடையாளம் காணப்படவில்லை. அவர்கள் இருந்தவுடன்"
-" \n"
-"                    அடையாளம் காணப்பட்ட, அவை இந்தப் பக்கத்தில் காண்பிக்கப்படும்.\n"
-"                "
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
 "There are no organizations yet. After creating an organization, the "
 "identified findings will be shown here."
 msgstr ""
-"\n"
-"                இதுவரை எந்த அமைப்புகளும் இல்லை. ஒரு அமைப்பை உருவாக்கியபிறகு, \n"
-"                    அடையாளம் காணப்பட்ட கண்டுபிடிப்புகள் இங்கே காண்பிக்கப்படும்.\n"
-"            "
 
 #: crisis_room/templates/crisis_room_header.html
 #: crisis_room/templates/organization_crisis_room_header.html
@@ -2427,552 +2418,7 @@ msgid ""
 "lower your accepted clearance level after completing the onboarding."
 msgstr ""
 
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer"
-msgstr "சிவப்பு டீமர்"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "A red teamer account can run scans and generate reports."
-msgstr "ஒரு ரெட் டீமர் கணக்கு ச்கேன்களை இயக்கலாம் மற்றும் அறிக்கைகளை உருவாக்கலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Client account"
-msgstr "வாங்கி கணக்கு"
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "A client account can access reports."
-msgstr "கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid ""
-"Each organization requires at least one admin and one red teamer account to "
-"function. This introduction will guide you through the setup of both. After "
-"that you can choose to add a client account as well."
-msgstr ""
-"ஒவ்வொரு நிறுவனத்திற்கும் செயல்பட குறைந்தபட்சம் ஒரு நிர்வாகி மற்றும் ஒரு சிவப்பு டீமர் "
-"கணக்கு தேவைப்படுகிறது. இந்த அறிமுகம் இரண்டையும் அமைப்பதன் மூலம் உங்களுக்கு வழிகாட்டும். "
-"அதன் பிறகு கிளையன்ட் கணக்கையும் சேர்க்க நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/account/step_3_account_user_type.html
-msgid "Let's add accounts"
-msgstr "கணக்குகளைச் சேர்ப்போம்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-msgid "Admin account setup"
-msgstr "நிர்வாக கணக்கு அமைப்பு"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-msgid "Admin details"
-msgstr "நிர்வாக விவரங்கள்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
-msgstr "இந்த படியைத் தவிர்க்கவும்"
-
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
-msgstr "முந்தைய படிக்குச் செல்லுங்கள்"
-
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer account setup"
-msgstr "ரெட் டீமர் கணக்கு அமைப்பு"
-
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Red teamer details"
-msgstr "சிவப்பு அணியின் விவரங்கள்"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Client account setup (optional)"
-msgstr "கிளையன்ட் கணக்கு அமைவு (விரும்பினால்)"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid ""
-"A client account can access reports. Adding a client account to the "
-"organization is optional."
-msgstr ""
-"கிளையன்ட் கணக்கு அறிக்கைகளை அணுகலாம். நிறுவனத்தில் கிளையன்ட் கணக்கைச் சேர்ப்பது "
-"விருப்பமானது."
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "User details"
-msgstr "பயனர் விவரங்கள்"
-
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Finish organization setup"
-msgstr "அமைப்பு அமைப்பை முடிக்கவும்"
-
-#: onboarding/templates/step_1_introduction.html
-#: rocky/templates/landing_page.html
-msgid "Welcome to OpenKAT"
-msgstr "OpenKat க்கு வருக"
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
-"Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
-"and Sport to make your and our world a safer place."
-msgstr ""
-"OpenKAT என்பது \"KWETSBAARHEDEN ANALYSE TOOLURE\" (பாதிப்புகள் பகுப்பாய்வு கருவி) "
-"ஆகும். உங்களுடைய மற்றும் எங்கள் உலகத்தை பாதுகாப்பான இடமாக மாற்ற சுகாதார, நலன்புரி "
-"மற்றும் விளையாட்டு அமைச்சகம் உருவாக்கிய திறந்த மூல-திட்டம்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT is able to give insight into security risks on your online objects. "
-"For example, your websites, mailservers or online data."
-msgstr ""
-"உங்கள் நிகழ்நிலை பொருள்களில் பாதுகாப்பு அபாயங்கள் குறித்த நுண்ணறிவை ஓபன்காட் வழங்க "
-"முடியும். எடுத்துக்காட்டாக, உங்கள் வலைத்தளங்கள், மெயில்சர்வர்கள் அல்லது நிகழ்நிலை தரவு."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"OpenKAT uses plugins to find and assess the area's that might be at risk and "
-"reports these back to you. Each plugin has its own skillset which could be "
-"scanning, normalizing or analyzing data. As a user you decide which areas "
-"you would like to monitor or scan and which insight you would like to "
-"receive."
-msgstr ""
-"ஆபத்தில் இருக்கும் பகுதியைக் கண்டுபிடித்து மதிப்பிடுவதற்கு ஓபன்காட் செருகுநிரல்களைப் "
-"பயன்படுத்துகிறது, மேலும் இவற்றை உங்களிடம் தெரிவிக்கிறது. ஒவ்வொரு சொருகி அதன் சொந்த "
-"திறனைக் கொண்டுள்ளது, இது தரவை ச்கேன் செய்வது, இயல்பாக்குதல் அல்லது பகுப்பாய்வு செய்வது. "
-"ஒரு பயனராக நீங்கள் எந்த பகுதிகளை கண்காணிக்க அல்லது ச்கேன் செய்ய விரும்புகிறீர்கள், எந்த "
-"நுண்ணறிவைப் பெற விரும்புகிறீர்கள் என்பதை நீங்கள் தீர்மானிக்கிறீர்கள்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"Within OpenKAT you can view the insights as well as all the data OpenKAT has "
-"found. You can choose to browse through the data or view reports."
-msgstr ""
-"OpenKAT க்குள் நீங்கள் நுண்ணறிவுகளையும், OpenKat ஐக் கண்டறிந்த அனைத்து தரவுகளையும் "
-"காணலாம். தரவு மூலம் உலவ அல்லது அறிக்கைகளைக் காண நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/step_1_introduction.html
-msgid ""
-"During this introduction you will be guided through the steps to create a "
-"report."
-msgstr ""
-"இந்த அறிமுகத்தின் போது நீங்கள் ஒரு அறிக்கையை உருவாக்குவதற்கான படிகள் மூலம் "
-"வழிநடத்தப்படுவீர்கள்."
-
-#: onboarding/templates/step_1_introduction.html
-#: onboarding/templates/step_2a_choose_report_info.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_3f_set_clearance_level.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/partials/form/boefje_tiles_form.html
-msgid "Skip onboarding"
-msgstr "ஆன் போர்டிங் தவிர்க்கவும்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: onboarding/templates/step_2b_choose_report_type.html
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
-msgid "OpenKAT introduction"
-msgstr "OpenKat அறிமுகம்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Choose a report - Introduction"
-msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - அறிமுகம்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: reports/templates/report_overview/report_overview_header.html
-#: reports/views/base.py rocky/templates/header.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-#: rocky/templates/tasks/reports.html rocky/views/tasks.py
-msgid "Reports"
-msgstr "அறிக்கைகள்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"Reports within OpenKAT contain an overview of the scanned objects, issues "
-"found within them and known security risks that the object might be "
-"vulnerable to. Each report gives a high overview of the state of the object "
-"as well as detailed information on what OpenKAT found and possible solutions."
-msgstr ""
-"OpenKat க்குள் உள்ள அறிக்கைகள் ச்கேன் செய்யப்பட்ட பொருள்களின் கண்ணோட்டத்தைக் கொண்டிருக்கின்றன, "
-"அவற்றில் காணப்படும் சிக்கல்கள் மற்றும் பொருள் பாதிக்கப்படக்கூடிய பாதுகாப்பு அபாயங்கள். "
-"ஒவ்வொரு அறிக்கையும் பொருளின் நிலையைப் பற்றிய உயர் கண்ணோட்டத்தையும், ஓபன்காட் என்ன "
-"கண்டுபிடித்தது என்பதையும், சாத்தியமான தீர்வுகள் பற்றிய விரிவான தகவல்களையும் தருகிறது."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-#: reports/report_types/dns_report/report.html
-msgid "Data"
-msgstr "தகவல்கள்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"OpenKAT can scan and analyze by using plugins. Each plugin has it's unique "
-"skillset and will collect specific data or give specific insights. You "
-"manage the plugins within your account which let's OpenKAT know which "
-"plugins to run and on which objects or areas."
-msgstr ""
-"செருகுநிரல்களைப் பயன்படுத்தி OpenKAT ச்கேன் செய்து பகுப்பாய்வு செய்யலாம். ஒவ்வொரு சொருகி "
-"அதன் தனித்துவமான திறனைக் கொண்டுள்ளது மற்றும் குறிப்பிட்ட தரவைச் சேகரிக்கும் அல்லது "
-"குறிப்பிட்ட நுண்ணறிவுகளைத் தரும். உங்கள் கணக்கிற்குள் உள்ள செருகுநிரல்களை நீங்கள் "
-"நிர்வகிக்கிறீர்கள், இது எந்த செருகுநிரல்களை இயக்க வேண்டும், எந்த பொருள்கள் அல்லது பகுதிகள் "
-"என்பதை ஓபன்காட் அறிந்து கொள்வோம்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Generating a report"
-msgstr "ஒரு அறிக்கையை உருவாக்குதல்"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"When you choose a report type OpenKAT will guide you through the setup. "
-"OpenKAT will ask the necessary questions based on the input the report "
-"needs, as well as asks for permission to run plugins that you haven’t "
-"enabled yet but are needed to collect or analyze the data."
-msgstr ""
-"நீங்கள் ஒரு அறிக்கை வகையைத் தேர்வுசெய்யும்போது, திறப்பது அமைப்பின் மூலம் உங்களுக்கு "
-"வழிகாட்டும். அறிக்கைக்குத் தேவையான உள்ளீட்டின் அடிப்படையில் தேவையான கேள்விகளை ஓபன்காட் "
-"கேட்கும், அத்துடன் நீங்கள் இதுவரை இயக்காத ஆனால் தரவைச் சேகரிக்க அல்லது பகுப்பாய்வு செய்ய "
-"வேண்டிய செருகுநிரல்களை இயக்க இசைவு கேட்கிறது."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"You can also choose to look at the collected data directly or generate your "
-"own report by selecting and running plugins on objects of your choice. "
-"OpenKAT will present the results."
-msgstr ""
-"நீங்கள் விரும்பும் பொருள்களில் செருகுநிரல்களைத் தேர்ந்தெடுத்து இயக்குவதன் மூலம் சேகரிக்கப்பட்ட "
-"தரவைப் பார்க்க அல்லது உங்கள் சொந்த அறிக்கையை உருவாக்கவும் நீங்கள் தேர்வு செய்யலாம். ஓபன்காட் "
-"முடிவுகளை வழங்கும்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Permission"
-msgstr "இசைவு"
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"Plugins can be provided by OpenKAT but they can also come from the "
-"community. Before a plugin can run, you need to give it permission by "
-"enabling it."
-msgstr ""
-"செருகுநிரல்களை ஓபன்காட் வழங்க முடியும், ஆனால் அவை சமூகத்திலிருந்தும் வரலாம். ஒரு "
-"சொருகி இயங்குவதற்கு முன், அதை இயக்குவதன் மூலம் அதற்கு இசைவு வழங்க வேண்டும்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid ""
-"When you generate a report. OpenKAT will let you know which plugins it "
-"requires or suggests so you can choose to enable them."
-msgstr ""
-"நீங்கள் ஒரு அறிக்கையை உருவாக்கும்போது. எந்த செருகுநிரல்கள் தேவை அல்லது பரிந்துரைக்கின்றன "
-"என்பதை ஓபன்காட் உங்களுக்குத் தெரிவிக்கும், எனவே அவற்றை இயக்க நீங்கள் தேர்வு செய்யலாம்."
-
-#: onboarding/templates/step_2a_choose_report_info.html
-msgid "Let's choose a report"
-msgstr "ஒரு அறிக்கையைத் தேர்ந்தெடுப்போம்"
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "Choose a report - Type"
-msgstr "ஒரு அறிக்கையைத் தேர்வுசெய்க - தட்டச்சு செய்க"
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid ""
-"Within OpenKAT you can view reports for each of your current objects. For "
-"specific reports you can choose one of the available report types and "
-"generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
-"some examples."
-msgstr ""
-"OpenKAT க்குள் உங்கள் தற்போதைய ஒவ்வொரு பொருளுக்கும் அறிக்கைகளைக் காணலாம். குறிப்பிட்ட "
-"அறிக்கைகளுக்கு நீங்கள் கிடைக்கக்கூடிய அறிக்கை வகைகளில் ஒன்றைத் தேர்ந்தெடுத்து அறிக்கையை "
-"உருவாக்கலாம். பென்டெச்ட், டி.என்.எச்-அறிக்கை அல்லது சில எடுத்துக்காட்டுகளை வழங்க ஒரு அஞ்சல் "
-"அறிக்கை போன்றவை."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "For this tutorial we will create a DNS-report to get you started."
-msgstr "இந்த டுடோரியலுக்காக நீங்கள் தொடங்குவதற்கு டி.என்.எச்-அறிக்கையை உருவாக்குவோம்."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid ""
-"When you start to generate this report. OpenKAT will guide you through the "
-"necessary steps."
-msgstr ""
-"இந்த அறிக்கையை நீங்கள் உருவாக்கத் தொடங்கும் போது. அவுட்காட் தேவையான படிகள் மூலம் உங்களுக்கு "
-"வழிகாட்டும்."
-
-#: onboarding/templates/step_2b_choose_report_type.html
-#: reports/report_types/dns_report/report.py
-msgid "DNS Report"
-msgstr "டிஎன்எச் அறிக்கை"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Setup scan"
-msgstr "அமைவு ச்கேன்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Let OpenKAT know what object to scan"
-msgstr "ச்கேன் செய்ய எந்த பொருளை OpenKat க்கு தெரியப்படுத்துங்கள்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Plugins scan and analyze objects. OpenKAT needs to know which object(s) you "
-"would like to scan and analyze for the DNS-report. So it can tell you which "
-"plugins are available for the chosen object."
-msgstr ""
-"செருகுநிரல்கள் பொருள்களை ச்கேன் செய்து பகுப்பாய்வு செய்கின்றன. டி.என்.எச்-அறிக்கைக்கு நீங்கள் "
-"எந்த பொருளை (களை) ச்கேன் செய்து பகுப்பாய்வு செய்ய விரும்புகிறீர்கள் என்பதை ஓபன்காட் அறிந்து "
-"கொள்ள வேண்டும். எனவே தேர்ந்தெடுக்கப்பட்ட பொருளுக்கு எந்த செருகுநிரல்கள் உள்ளன என்பதை இது "
-"உங்களுக்குக் கூறலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Understanding objects"
-msgstr "பொருள்களைப் புரிந்துகொள்வது"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
-"name a few.  While these objects can be related to each other they are all "
-"objects within OpenKAT that can be scanned to gain valuable insight."
-msgstr ""
-"ஓபன்காட்டின் எல்லைக்குள் நிறைய விசயங்கள் ஒரு பொருளாக இருக்கலாம். எடுத்துக்காட்டாக, ஒரு "
-"மெயில்சர்வர், ஒரு ஐபி முகவரி, ஒரு முகவரி, ஒரு டிஎன்எச் பதிவு, ஒரு ஓச்ட்பெயர் அல்லது "
-"ஒரு சில பெயர்களைக் குறிப்பிடுவதற்கு பிணையம். இந்த பொருள்கள் ஒருவருக்கொருவர் "
-"தொடர்புடையதாக இருக்கும்போது, அவை அனைத்தும் OpenKAT க்குள் உள்ள பொருள்கள், அவை "
-"மதிப்புமிக்க நுண்ணறிவைப் பெற ச்கேன் செய்யப்படலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Creating, adding and editing objects"
-msgstr "பொருள்களை உருவாக்குதல், சேர்ப்பது மற்றும் திருத்துதல்"
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Within OpenKAT you can view, add and edit objects from the organization’s "
-"object page."
-msgstr ""
-"OpenKat க்குள் நீங்கள் நிறுவனத்தின் பொருள் பக்கத்திலிருந்து பொருட்களைக் காணலாம், சேர்க்கலாம் "
-"மற்றும் திருத்தலாம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid ""
-"Let’s add an object to scan for the DNS-Report. For this introduction we "
-"suggest adding a URL."
-msgstr ""
-"டி.என்.எச்-அறிக்கைக்கு ச்கேன் செய்ய ஒரு பொருளைச் சேர்ப்போம். இந்த அறிமுகத்திற்கு முகவரி ஐ "
-"சேர்க்க பரிந்துரைக்கிறோம்."
-
-#: onboarding/templates/step_3a_setup_scan_ooi_info.html
-msgid "Add URL"
-msgstr "முகவரி ஐச் சேர்க்கவும்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html onboarding/views.py
-msgid "Creating an object"
-msgstr "ஒரு பொருளை உருவாக்குதல்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Create your first object, a URL by filling out the form below."
-msgstr "கீழே உள்ள படிவத்தை நிரப்புவதன் மூலம் உங்கள் முதல் பொருளை, முகவரி ஐ உருவாக்கவும்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"Additional details and examples can be found by pressing on the help button "
-"next to the input field."
-msgstr ""
-"உள்ளீட்டு புலத்திற்கு அடுத்த உதவி பொத்தானை அழுத்துவதன் மூலம் கூடுதல் விவரங்கள் மற்றும் "
-"எடுத்துக்காட்டுகளைக் காணலாம்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Dependencies"
-msgstr "சார்புநிலைகள்"
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"Most objects have dependencies on the existence of other objects. For "
-"example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and IP address. OpenKAT collects these additional "
-"object automatically when possible. By running plugins to collect or extract "
-"this data."
-msgstr ""
-"பெரும்பாலான பொருள்கள் மற்ற பொருட்களின் இருப்பைப் பற்றிய சார்புகளைக் கொண்டுள்ளன. "
-"எடுத்துக்காட்டாக, ஒரு முகவரி ஐ ஒரு பிணையம், ஓச்ட்பெயர், FQDN (முழு தகுதி வாய்ந்த "
-"டொமைன் பெயர்) மற்றும் ஐபி முகவரியுடன் இணைக்க வேண்டும். ஓபன்காட் இந்த கூடுதல் பொருளை "
-"முடிந்தவரை தானாக சேகரிக்கிறது. இந்தத் தரவை சேகரிக்க அல்லது பிரித்தெடுக்க "
-"செருகுநிரல்களை இயக்குவதன் மூலம்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid ""
-"The additional objects that OpenKAT created will be added to your object "
-"list as separate objects. If OpenKAT can’t add them automatically it will "
-"guide you through the process of creating them manually."
-msgstr ""
-"OpenKAT உருவாக்கிய கூடுதல் பொருள்கள் உங்கள் பொருள் பட்டியலில் தனி பொருள்களாக "
-"சேர்க்கப்படும். ஓபன்காட் அவற்றை தானாகவே சேர்க்க முடியாவிட்டால், அவற்றை கைமுறையாக "
-"உருவாக்கும் செயல்முறையின் மூலம் அது உங்களுக்கு வழிகாட்டும்."
-
-#: onboarding/templates/step_3b_setup_scan_ooi_add.html
-msgid "Create object"
-msgstr "பொருளை உருவாக்கவும்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid ""
-"Based on the url you provided OpenKAT added the necessary additional objects "
-"to create a url object."
-msgstr ""
-"நீங்கள் வழங்கிய முகவரி இன் அடிப்படையில் OpenKAT ஒரு முகவரி பொருளை உருவாக்க தேவையான "
-"கூடுதல் பொருள்களைச் சேர்த்தது."
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "URL"
-msgstr "முகவரி"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/report_types/dns_report/report.html
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/report_overview/modal_partials/delete_modal.html
-#: reports/templates/report_overview/modal_partials/rerun_modal.html
-#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
-#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
-#: rocky/templates/partials/explanations.html
-#: rocky/templates/partials/ooi_detail_related_object.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/views/mixins.py
-msgid "Type"
-msgstr "வகை"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Owner"
-msgstr "உரிமையாளர்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Path"
-msgstr "பாதை"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Hostname"
-msgstr "புரவலன்பெயர்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "scheme"
-msgstr "திட்டம்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Network"
-msgstr "பிணையம்"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "Start scanning"
-msgstr "ச்கேன் செய்யத் தொடங்குங்கள்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_3f_set_clearance_level.html
-msgid "OpenKAT Introduction"
-msgstr "OpenKat அறிமுகம்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid "Setup scan - OOI clearance for"
-msgstr "அமைவு ச்கேன் - OOI இசைவு"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: reports/templates/partials/report_introduction.html
-msgid "Introduction"
-msgstr "அறிமுகம்"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-msgid ""
-"Some scans are lightweight while others might be a bit more aggressive with "
-"their scanning. OpenKAT requires you to set a clearance level for each "
-"object to prevent you from unintentionally running aggressive scans. For "
-"example you might have the right to run any type of scan on your own server "
-"but you probably don’t have the right to do so for objects owned by other "
-"people of companies."
-msgstr ""
-"சில ச்கேன் இலகுரக, மற்றவர்கள் தங்கள் ச்கேனிங்கில் சற்று ஆக்ரோசமாக இருக்கலாம். தற்செயலாக "
-"இயங்கும் வன்கவர்வு ச்கேன்களைத் தடுக்க ஒவ்வொரு பொருளுக்கும் இசைவு அளவை அமைக்க OpenKat "
-"தேவைப்படுகிறது. எடுத்துக்காட்டாக, உங்கள் சொந்த சேவையகத்தில் எந்தவொரு ச்கேன் இயக்குவதற்கும் "
-"உங்களுக்கு உரிமை இருக்கலாம், ஆனால் பிற நிறுவனங்களின் சொந்த பொருட்களுக்கு அவ்வாறு செய்ய "
-"உங்களுக்கு உரிமை இல்லை."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid "How to know required clearance level"
-msgstr "தேவையான இசைவு அளவை எவ்வாறு அறிவது"
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"Each plugin that scans will have a scan intensity score. The intensity of "
-"the scan must be equal to or below the clearance level you set for your "
-"object. If the scan has an intensity level that is too high, OpenKAT will "
-"notify you before running it. Visually clearance levels and intensity scores "
-"are indicated with little cat paws."
-msgstr ""
-"ச்கேன் செய்யும் ஒவ்வொரு சொருகி ச்கேன் தீவிர மதிப்பெண் கொண்டிருக்கும். ச்கேனின் தீவிரம் உங்கள் "
-"பொருளுக்கு நீங்கள் நிர்ணயித்த இசைவு நிலைக்கு சமமாக அல்லது கீழே இருக்க வேண்டும். ச்கேன் மிக "
-"அதிகமாக இருக்கும் ஒரு தீவிர நிலை இருந்தால், அதை இயக்குவதற்கு முன்பு ஓபன்காட் உங்களுக்கு "
-"அறிவிக்கும். பார்வை இசைவு நிலைகள் மற்றும் தீவிர மதிப்பெண்கள் சிறிய பூனை பாதங்களுடன் "
-"குறிக்கப்படுகின்றன."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"This scan has a scan intensity score of 1, requiring a level 1 clearance "
-"level to be run. This means that the scan does not touch the object itself, "
-"but only searches for information about the object."
-msgstr ""
-"ச்கேன் தீவிரம் மதிப்பெண் 1 ஐ இந்த ச்கேன் கொண்டுள்ளது, இது நிலை 1 இசைவு நிலை இயக்கப்பட "
-"வேண்டும். இதன் பொருள் ச்கேன் பொருளைத் தொடாது, ஆனால் பொருளைப் பற்றிய தகவல்களை மட்டுமே "
-"தேடுகிறது."
-
-#: onboarding/templates/step_3d_clearance_level_introduction.html
-msgid ""
-"An example of a more aggressive scan. Which has a scan intensity score of 3. "
-"Meaning it requires at least a level 3 clearance level to be set on your "
-"object."
-msgstr ""
-"மிகவும் ஆக்ரோசமான ச்கேனின் எடுத்துக்காட்டு. இது ச்கேன் தீவிரம் மதிப்பெண் 3 ஐக் கொண்டுள்ளது. "
-"இதன் பொருள் உங்கள் பொருளில் குறைந்தபட்சம் ஒரு நிலை 3 இசைவு நிலை அமைக்கப்பட வேண்டும்."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid ""
-"OpenKAT has a permission system that allows administrators to configure "
-"which users can set a certain clearance level. The will make sure that only "
-"users that are trusted can start the more aggressive scans."
-msgstr ""
-"OpenKAT ஒரு இசைவு முறையைக் கொண்டுள்ளது, இது எந்தப் பயனர்கள் ஒரு குறிப்பிட்ட இசைவு அளவை"
-" அமைக்க முடியும் என்பதை உள்ளமைக்க நிர்வாகிகளை அனுமதிக்கிறது. நம்பகமான பயனர்கள் மட்டுமே "
-"மிகவும் ஆக்ரோசமான ச்கேன்களைத் தொடங்க முடியும் என்பதை உறுதி செய்யும்."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid "Acknowledge clearance level"
-msgstr "இசைவு அளவை ஒப்புக் கொள்ளுங்கள்"
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid ""
-"Before a member is granted the ability to set clearance levels on an object, "
-"they must first acknowledge and accept the clearance level set by the "
-"administrators. The maximum scanning level permitted for a member is aligned "
-"with the trusted clearance level. By acknowledging the trusted clearance "
-"level, this member formally agrees to abide by this permission and gains the "
-"capability to perform scans only up to this trusted clearance level. This "
-"two-step process ensures that the member operates within authorized "
-"boundaries."
-msgstr ""
-"ஒரு பொருளின் மீது இசைவு நிலைகளை நிர்ணயிக்கும் திறன் ஒரு உறுப்பினருக்கு வழங்கப்படுவதற்கு "
-"முன்பு, அவர்கள் முதலில் நிர்வாகிகள் நிர்ணயித்த இசைவு அளவை ஒப்புக் கொண்டு ஏற்றுக்கொள்ள "
-"வேண்டும். ஒரு உறுப்பினருக்கு அனுமதிக்கப்பட்ட அதிகபட்ச ச்கேனிங் நிலை நம்பகமான இசைவு "
-"மட்டத்துடன் ஒத்துப்போகிறது. நம்பகமான இசைவு அளவை ஒப்புக்கொள்வதன் மூலம், இந்த உறுப்பினர் இந்த "
-"அனுமதியைக் கடைப்பிடிக்க முறையாக ஒப்புக்கொள்கிறார், மேலும் இந்த நம்பகமான இசைவு நிலைவரை "
-"மட்டுமே வருடு செய்யும் திறனைப் பெறுகிறார். இந்த இரண்டு-படி செயல்முறை உறுப்பினர் "
-"அங்கீகரிக்கப்பட்ட எல்லைகளுக்குள் செயல்படுவதை உறுதி செய்கிறது."
-
-#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
 msgstr "எனது இசைவு நிலை என்ன?"
 
@@ -3891,92 +3337,6 @@ msgid ""
 msgstr ""
 "கண்டுபிடிப்புகள் அறிக்கையில் தேர்ந்தெடுக்கப்பட்ட சொத்து மற்றும் அமைப்புக்காக அடையாளம் "
 "காணப்பட்ட கண்டுபிடிப்புகள் பற்றிய தகவல்கள் உள்ளன."
-
-#: reports/report_types/findings_report/report.html
-msgid "Findings per organization overview"
-msgstr "ஒரு நிறுவன கண்ணோட்டத்திற்கு கண்டுபிடிப்புகள்"
-
-#: reports/report_types/findings_report/report.html
-#: reports/templates/partials/report_findings_table.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: tools/forms/finding_type.py
-msgid "Finding types"
-msgstr "வகைகளைக் கண்டறிதல்"
-
-#: reports/report_types/findings_report/report.html
-msgid "Highest risk level"
-msgstr "அதிக இடர் நிலை"
-
-#: reports/report_types/findings_report/report.html
-msgid "Critical finding types"
-msgstr "முக்கியமான கண்டுபிடிப்பு வகைகள்"
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"This overview shows the total number of findings per severity that have been "
-"identified for this organization."
-msgstr ""
-"இந்த கண்ணோட்டம் இந்த நிறுவனத்திற்கு அடையாளம் காணப்பட்ட தீவிரத்தன்மைக்கு மொத்த "
-"கண்டுபிடிப்புகளின் எண்ணிக்கையைக் காட்டுகிறது."
-
-#: reports/report_types/findings_report/report.html
-msgid "Critical and high findings"
-msgstr "முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகள்"
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                                                This table shows the top 25 "
-"critical and high findings that have\n"
-"                                                been identified for this "
-"organization, grouped by finding types.\n"
-"                                                A table with all the "
-"identified findings can be found in the Findings Report.\n"
-"                                            "
-msgstr ""
-"\n"
-"                                                இந்த அட்டவணை முதல் 25 முக்கியமான "
-"மற்றும் உயர் கண்டுபிடிப்புகளைக் காட்டுகிறது \n"
-"இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் மூலம் "
-"தொகுக்கப்பட்டுள்ளது. \n"
-"அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு அட்டவணையை கண்டுபிடிப்புகள் "
-"அறிக்கையில் காணலாம்.\n"
-"                                            "
-
-#: reports/report_types/findings_report/report.html
-msgid "No findings have been identified. Check report for more details."
-msgstr ""
-"கண்டுபிடிப்புகள் எதுவும் அடையாளம் காணப்படவில்லை. மேலும் விவரங்களுக்கு அறிக்கையை "
-"சரிபார்க்கவும்."
-
-#: reports/report_types/findings_report/report.html
-msgid "View findings report"
-msgstr "கண்டுபிடிப்புகள் அறிக்கையைக் காண்க"
-
-#: reports/report_types/findings_report/report.html
-#: reports/templates/report_overview/scheduled_reports_table.html
-msgid "Edit report recipe"
-msgstr "அறிக்கை செய்முறையைத் திருத்து"
-
-#: reports/report_types/findings_report/report.html
-msgid ""
-"\n"
-"                This table shows the top 25 critical and high findings that "
-"have\n"
-"                been identified for this organization, grouped by finding "
-"types.\n"
-"                A table with all the identified findings can be found in the "
-"Findings Report.\n"
-"            "
-msgstr ""
-"\n"
-"                இந்த அட்டவணை முதல் 25 முக்கியமான மற்றும் உயர் கண்டுபிடிப்புகளைக் "
-"காட்டுகிறது \n"
-"                இந்த அமைப்புக்காக அடையாளம் காணப்பட்டது, வகைகளைக் கண்டுபிடிப்பதன் மூலம் "
-"தொகுக்கப்பட்டுள்ளது. \n"
-"                அடையாளம் காணப்பட்ட அனைத்து கண்டுபிடிப்புகளையும் கொண்ட ஒரு அட்டவணையைக் "
-"கண்டுபிடிப்புகள் அறிக்கையில் காணலாம்.\n"
-"            "
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
@@ -5887,8 +5247,10 @@ msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "பொருள்களின் இசைவு அளவை மீறும் போஃப்ச்களைக் காட்டு."
 
 #: tools/forms/ooi.py
-msgid "Expires by (UTC)"
-msgstr "(UTC) இல் காலாவதியாகிறது"
+msgid ""
+"All the boefjes with a scan level below or equal to the clearance level will "
+"be allowed to scan this object."
+msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Expires by (UTC)"
@@ -7308,8 +6670,8 @@ msgstr "உறுப்பினரை சேமிக்கவும்"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
-msgid "An overview of members of <strong>%(organization_name)s</strong>"
-msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்"
+msgid "An overview of members of <strong>%(organization_name)s</strong>."
+msgstr "<strong>%(organization_name)s </strong> உறுப்பினர்களின் கண்ணோட்டம்."
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
@@ -7787,16 +7149,6 @@ msgid ""
 "This means that the clearance level might stay the same, increase or "
 "decrease, depending on other declared clearance levels."
 msgstr ""
-"இதன் பொருள் இந்தப் பொருள் போஃப்செசால் வருடு நிலை %(scan_level)s மற்றும் அதற்கும் குறைவா"
-"க வருடு செய்யப்படும். இசைவு அளவை “அறிவிக்கப்பட்ட” இலிருந்து “பரம்பரை” வரை அமைப்பது "
-"என்பது இந்தப் பொருள் அதன் நிலையை அண்டை பொருட்களிலிருந்து பெறும் என்பதாகும். இதன் பொருள், "
-"பிற அறிவிக்கப்பட்ட இசைவு நிலைகளைப் பொறுத்து இசைவு நிலை அப்படியே இருக்கலாம், "
-"அதிகரிக்கலாம் அல்லது குறையக்கூடும். இந்த இசைவு மட்டத்திலிருந்து பெறும் பொருட்களின் இசைவு "
-"நிலைகளும் மீண்டும் கணக்கிடப்படும்."
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level to inherit"
-msgstr "இசைவு அளவை மரபுரிமையாக அமைக்கவும்"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty clearance level explanation"
@@ -7811,10 +7163,6 @@ msgid ""
 "This object has a clearance level of \"empty\". This means that this object "
 "has no clearance level."
 msgstr ""
-"இந்தப் பொருள் \"L0\" இன் இசைவு அளவைக் கொண்டுள்ளது. இந்தப் பொருளுக்கு மீண்டும் இந்தப் "
-"பொருளுக்குக் கைமுறையாக இயங்கும் வரை இந்தப் பொருள் எந்த போஃப்சீயால் வருடு செய்யப்படாது "
-"என்பதே இதன் பொருள். \"L0\" ஐ விட அதிகமான இசைவு அளவைக் கொண்ட பொருள்கள் தொடர்புடைய "
-"வருடு அளவுகளுடன் போஃப்செசால் தானாகவே வருடு செய்யப்படும்."
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Indemnification warning"
