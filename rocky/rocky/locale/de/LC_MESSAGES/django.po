@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# alster <alsternerd@users.noreply.hosted.weblate.org>, 2024.
+# alster <alsternerd@users.noreply.hosted.weblate.org>, 2024, 2025.
 # LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2024, 2025.
 # Ettore Atalan <atalanttore@googlemail.com>, 2025.
 #: reports/forms.py
@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: alster <alsternerd@users.noreply.hosted.weblate.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/de/>\n"
 "Language: de\n"
@@ -425,8 +425,8 @@ msgid ""
 msgstr ""
 "You are granted clearance for level F%(tcl)s by your admin. Before you can "
 "change OOI clearance levels up to this level, you need to accept this "
-"permission. Remember: <strong>with great power comes great responsibility.</"
-"strong>"
+"permission. Remember: <strong>with great power comes great "
+"responsibility.</strong>"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
