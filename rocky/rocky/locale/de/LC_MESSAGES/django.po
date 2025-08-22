@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# alster <alsternerd@users.noreply.hosted.weblate.org>, 2024.
+# alster <alsternerd@users.noreply.hosted.weblate.org>, 2024, 2025.
 # LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2024, 2025.
 # Ettore Atalan <atalanttore@googlemail.com>, 2025.
 #: reports/forms.py
@@ -10,16 +10,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
-"PO-Revision-Date: 2025-07-27 00:16+0000\n"
+"PO-Revision-Date: 2025-08-22 09:39+0000\n"
 "Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
-"Language-Team: German <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/de/>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13-dev\n"
+"X-Generator: Weblate 5.13\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -425,8 +425,8 @@ msgid ""
 msgstr ""
 "You are granted clearance for level F%(tcl)s by your admin. Before you can "
 "change OOI clearance levels up to this level, you need to accept this "
-"permission. Remember: <strong>with great power comes great responsibility.</"
-"strong>"
+"permission. Remember: <strong>with great power comes great "
+"responsibility.</strong>"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
