@@ -4,14 +4,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2025-08-22 09:39+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Papiamento <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/pap/>\n"
 "Language: pap\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.13\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -5209,11 +5211,11 @@ msgid ""
 "the mime type \"boefje/dns-records\" is added, the normalizer expects the "
 "raw file to contain dns scan information.</p>"
 msgstr ""
-"<p>Agregá un grupo di mime types, separá ku komas, por ehèmpel:</"
-"p><p><i>\"text/html, image/jpeg\"</i> òf <i>\"boefje/dns-records\"</i>.</"
-"p><p>Tipo mime ta wordu usá pa activa e normalizador korekto na un arkivo "
-"Ora e tipo mime \"boefje/dns-records\" ta wordu agregá, e normalizador ta "
-"spera ku e arkivo ta kontené informashon di skaneo di dns.</p>"
+"<p>Agregá un grupo di mime types, separá ku komas, por ehèmpel:</p><p><i>"
+"\"text/html, image/jpeg\"</i> òf <i>\"boefje/dns-records\"</i>.</p><p>Tipo "
+"mime ta wordu usá pa activa e normalizador korekto na un arkivo Ora e tipo "
+"mime \"boefje/dns-records\" ta wordu agregá, e normalizador ta spera ku e "
+"arkivo ta kontené informashon di skaneo di dns.</p>"
 
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
@@ -5818,8 +5820,7 @@ msgstr "OpenKAT ta sigurá"
 msgid ""
 "Forensically secured storage of evidence is one of the basic ingredients of "
 "OpenKAT."
-msgstr ""
-"Evidensia forénsiko sigurá ta un di e íngredientenan basiko di OpenKAT."
+msgstr "Evidensia forénsiko sigurá ta un di e íngredientenan basiko di OpenKAT."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT is sweet"
@@ -5864,9 +5865,10 @@ msgid ""
 msgstr ""
 "OpenKAT is dedicated to protecting the confidentiality and privacy of "
 "information entrusted to it. As part of this fundamental obligation, OpenKAT "
-"is committed to the appropriate protection and use of personal information "
-"(sometimes referred to as \"personal data\", \"personally identifiable "
-"information\" or \"PII\") that has been collected online."
+"is committed to the appropriate protection and use of personal information ("
+"sometimes referred to as \"personal data\", "
+"\"personally identifiable information\" or \"PII\") that has been collected "
+"online."
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
@@ -5937,8 +5939,7 @@ msgstr "Kita %(display_type)s"
 
 #: rocky/templates/oois/ooi_delete.html
 msgid "Deletion not possible for types: KATFindingType and CVEFindingType"
-msgstr ""
-"Kitamentu no ta posibel pa e tiponan: KATFindingType and CVEFindingType"
+msgstr "Kitamentu no ta posibel pa e tiponan: KATFindingType and CVEFindingType"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "using boefjes"
@@ -7267,8 +7268,7 @@ msgstr "Bo OTP token ta %(token)s"
 
 #: rocky/templates/upload_csv.html
 msgid "Automate the creation of multiple objects by uploading a CSV file."
-msgstr ""
-"Automatisá a kreashon di diferente ophetonan dor di upload un CSV file."
+msgstr "Automatisá a kreashon di diferente ophetonan dor di upload un CSV file."
 
 #: rocky/templates/upload_csv.html
 msgid "These are the criteria for CSV upload:"
