@@ -1,5 +1,5 @@
 # Brenno de Winter <brenno@dewinter.com>, 2023.
-# Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
+# Darwinkel <Darwinkel@users.noreply.github.com>, 2023, 2025.
 # jan klopper <jan@underdark.nl>, 2023, 2024, 2025.
 # LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023, 2024, 2025.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023, 2024, 2025.
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: 跨性别 <github@lgbt.sh>\n"
+"Last-Translator: Darwinkel <Darwinkel@users.noreply.github.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
 "Language: nl\n"
