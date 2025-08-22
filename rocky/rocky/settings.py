@@ -78,7 +78,7 @@ LOGGING = {
 
 
 def configure_logging(logging_settings):
-    log_cfg = env("ROCKY_LOG_CFG", default="")
+    log_cfg = env.path("ROCKY_LOG_CFG", default="")
     if log_cfg:
         with Path(log_cfg).open() as f:
             logging.config.dictConfig(json.load(f))
