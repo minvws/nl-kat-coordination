@@ -3,22 +3,28 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from functools import cached_property
 from operator import attrgetter
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, cast
 
 import structlog
 from account.mixins import OrganizationView
 from account.models import KATUser
+from django import forms
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.http import Http404, HttpRequest
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
+from django.views.generic.edit import FormMixin
 from httpx import HTTPError
 from katalogus.client import Boefje
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
-from tools.models import Organization
+from tools.models import Organization, OrganizationMember
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
@@ -120,6 +126,8 @@ class ObservedAtMixin:
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):
+    add_object_to_dashboard_form = None
+
     def get_single_ooi(self, pk: str) -> OOI:
         try:
             ref = Reference.from_str(pk)
@@ -351,6 +359,7 @@ class EnrichedReport:
     total_asset_reports: int
     total_objects: int
     report_type_summary: dict[str, int]
+    input_oois: list[str]
 
 
 class ReportList:
@@ -365,7 +374,11 @@ class ReportList:
         self.asset_reports = None
 
         if self.report_id and self.report_id is not None:
-            asset_reports = self.octopoes_connector.get_report(self.report_id, self.valid_time).input_oois
+            asset_reports = [
+                report
+                for report in self.octopoes_connector.get_report(self.report_id, self.valid_time).input_oois
+                if isinstance(report, AssetReport)
+            ]
             self.asset_reports = sorted(asset_reports, key=lambda x: (x.report_type, x.input_ooi))
 
     @cached_property
@@ -400,10 +413,19 @@ class ReportList:
             enriched_report = EnrichedReport()
 
             enriched_report.report = report
-            enriched_report.asset_reports = sorted(report.input_oois[:5], key=attrgetter("name"))
-            enriched_report.total_asset_reports = len(report.input_oois)
-            enriched_report.total_objects = len({asset_report.input_ooi for asset_report in report.input_oois})
-            enriched_report.report_type_summary = self.report_type_summary(report.input_oois)
+
+            if settings.ASSET_REPORTS:
+                asset_reports = cast(list[AssetReport], report.input_oois)
+
+                enriched_report.total_asset_reports = len(report.input_oois)
+                enriched_report.asset_reports = sorted(asset_reports[:5], key=attrgetter("name"))
+                enriched_report.input_oois = list({asset_report.input_ooi for asset_report in asset_reports})
+                enriched_report.report_type_summary = self.report_type_summary(asset_reports)
+            else:
+                enriched_report.total_asset_reports = 0
+                enriched_report.input_oois = cast(list[str], report.input_oois)
+
+            enriched_report.total_objects = len(enriched_report.input_oois)
 
             # We want to show only 5 children reports
             enriched_reports.append(enriched_report)
@@ -533,3 +555,56 @@ class SeveritiesMixin:
                 messages.error(self.request, _(str(e)))
 
         return severities
+
+
+class AddDashboardItemFormMixin(FormMixin):
+    add_dashboard_item_form: type[forms.Form] | None = None
+    organization: Organization
+    template_name: str
+    organization_member: OrganizationMember
+    request: HttpRequest
+
+    def get_form_class(self):
+        """Specific naming for forms, so that it does not interferre with other forms."""
+        if self.add_dashboard_item_form is None:
+            raise ImproperlyConfigured(f"{self.__class__.__name__} requires 'dashboard_form_class' to be set.")
+        return self.add_dashboard_item_form
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = self.organization
+        return kwargs
+
+    def get_initial(self):
+        """This will initiate all filters set by GET request parameters."""
+        initial = {}
+        for key in self.request.GET:
+            values = self.request.GET.getlist(key)
+            initial[key] = values if len(values) > 1 else values[0]
+        return initial
+
+    def add_to_dashboard(self) -> HttpResponse:
+        if not self.organization_member.can_add_dashboard_item:
+            messages.error(self.request, _("You do not have the permission to add items to a dashboard."))
+            raise PermissionDenied
+
+        form = self.get_form()
+        if form.is_valid():
+            dashboard_id = form.cleaned_data.get("dashboard")
+            messages.success(self.request, _("Dashboard item has been added."))
+            return redirect(
+                reverse(
+                    "organization_crisis_room", kwargs={"organization_code": self.organization.code, "id": dashboard_id}
+                )
+            )
+
+        # If this mixin is used together with ListView, they will clash,
+        # it must return invalid form with get_queryset from ListView so they can work together.
+        if isinstance(self, ListView):
+            self.object_list = self.get_queryset()
+        return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["add_dashboard_item_form"] = self.get_form()
+        return context

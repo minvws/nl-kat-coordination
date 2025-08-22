@@ -7,13 +7,12 @@ from typing import Any
 import httpx
 import structlog
 from httpx import Client, HTTPError, HTTPTransport, Response
-from jsonschema.exceptions import ValidationError
+from jsonschema import ValidationError
 from jsonschema.validators import validate
 from pydantic import TypeAdapter
 
 from boefjes.config import settings
 from boefjes.dependencies.plugins import PluginService
-from boefjes.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.worker.interfaces import SchedulerClientInterface, Task, TaskPop, TaskStatus, WorkerManager
 from boefjes.worker.job_models import BoefjeMeta
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -75,11 +74,17 @@ class SchedulerAPIClient(SchedulerClientInterface):
         if page is None:
             return []
 
+        results = []
         for task in page.results:
             if isinstance(task.data, BoefjeMeta):
-                task.data = self._hydrate_boefje_meta(task.data)
+                try:
+                    task.data = self._hydrate_boefje_meta(task.data)
+                except (ValidationError, ObjectNotFoundException):
+                    self.patch_task(task.id, TaskStatus.FAILED)
+                    continue
+            results.append(task)
 
-        return page.results
+        return results
 
     def push_item(self, p_item: Task) -> None:
         if p_item.scheduler_id not in ["boefje", "normalizer"]:
@@ -92,13 +97,13 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-    def get_task(self, task_id: uuid.UUID) -> Task:
+    def get_task(self, task_id: uuid.UUID, hydrate: bool = True) -> Task:
         response = self._session.get(f"/tasks/{task_id}")
         self._verify_response(response)
 
         task = Task.model_validate_json(response.content)
 
-        if isinstance(task.data, BoefjeMeta):
+        if hydrate and isinstance(task.data, BoefjeMeta):
             task.data = self._hydrate_boefje_meta(task.data)
 
         return task
@@ -127,8 +132,11 @@ class SchedulerAPIClient(SchedulerClientInterface):
                     task_id=boefje_meta.id,
                 )
                 raise
-
-        boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
+        try:
+            boefje_meta.environment = get_environment_settings(boefje_meta, plugin.boefje_schema)
+        except ValidationError:
+            logger.exception("The boefje environment was not set correctly")
+            raise
 
         return boefje_meta
 
@@ -176,12 +184,9 @@ def get_environment_settings(boefje_meta: BoefjeMeta, schema: dict | None = None
     # it is possible to inject code if arguments are passed that "escape" the call to a tool. Hence, we should enforce
     # the schema somewhere and make the schema as strict as possible.
     if schema is not None:
-        try:
-            validate(instance=new_env, schema=schema)
-        except ValidationError as e:
-            raise SettingsNotConformingToSchema(boefje_meta.boefje.id, e.message) from e
+        validate(instance=new_env, schema=schema)
 
-    return new_env
+    return {key: str(value) for key, value in new_env.items()}
 
 
 def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:

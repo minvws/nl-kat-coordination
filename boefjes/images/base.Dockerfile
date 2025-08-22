@@ -1,4 +1,4 @@
-FROM python:3.13-slim as base
+FROM python:3.13-slim AS base
 
 ARG BOEFJES_API=http://boefje:8000
 ENV BOEFJES_API=$BOEFJES_API
@@ -6,7 +6,9 @@ ENV PYTHONPATH=/app/boefje:/app
 
 WORKDIR /app/boefje
 RUN adduser --disabled-password --gecos '' nonroot
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx structlog pydantic jsonschema croniter click
+
+COPY ./images/requirements.txt ./requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install -r requirements.txt
 
 USER nonroot
 

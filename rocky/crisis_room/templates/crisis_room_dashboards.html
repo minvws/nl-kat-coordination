@@ -11,7 +11,7 @@
             <div>
                 <h2>{% translate "Dashboards" %}</h2>
                 <p>
-                    {% blocktranslate %}
+                    {% blocktranslate trimmed %}
                         On this page you can see an overview of the dashboards for all organizations.
                         **More context can be written here**
                     {% endblocktranslate %}
@@ -28,7 +28,7 @@
                                         <section>
                                             <div>
                                                 <h4 id="dashboard_{{ dashboard_item|slugify }}">{{ dashboard_item }}</h4>
-                                                {% include dashboard_item.template with data=report.1 is_dashboard="yes" %}
+                                                {% include dashboard_item.template with data=report.1 is_dashboard_item="yes" %}
 
                                             </div>
                                         </section>

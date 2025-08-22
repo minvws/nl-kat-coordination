@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
       packages: write
@@ -50,12 +50,6 @@ jobs:
 
       - name: Octopoes copy project to run location.
         run: cp -rv * /var/www/html
-        working-directory: ./octopoes
-
-      - name: Octopoes Build whl package
-        run: |
-          python${{ matrix.python_version }} -m pip install build
-          python${{ matrix.python_version }} -m build
         working-directory: ./octopoes
 
       - name: Octopoes Create env
@@ -93,7 +87,7 @@ jobs:
         run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
-        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install --no-deps ${{ github.workspace }}/octopoes/dist/octopoes*.whl
 
       - name: Rocky Create rocky_venv tarball
         run: tar -zcvf ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}_python${{ matrix.python_version }}.tar.gz -C /var/www/html/ .venv
@@ -192,7 +186,7 @@ jobs:
         run: python${{ matrix.python_version }} -m venv /var/www/html/.venv
 
       - name: Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install --no-deps ${{ github.workspace }}/octopoes/dist/octopoes*.whl
         working-directory: /var/www/html
 
       - name: Create archive

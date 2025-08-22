@@ -5,5 +5,7 @@
   "consumes": [
     "RESTAPI"
   ],
-  "scan_level": 1
+  "scan_level": 1,
+  "oci_image": "ghcr.io/minvws/openkat/adr-validator:latest",
+  "oci_arguments": []
 }

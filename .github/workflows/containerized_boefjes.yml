@@ -39,6 +39,24 @@ jobs:
             image: openkat/nikto
           - dockerfile: boefjes/images/generic.Dockerfile
             image: openkat/generic
+          - dockerfile: boefjes/boefjes/plugins/kat_adr_validator/boefje.Dockerfile
+            image: openkat/adr-validator
+          - dockerfile: boefjes/boefjes/plugins/kat_masscan/boefje.Dockerfile
+            image: openkat/masscan
+          - dockerfile: boefjes/boefjes/plugins/kat_nuclei_cve/boefje.Dockerfile
+            image: openkat/nuclei
+          - dockerfile: boefjes/boefjes/plugins/kat_ssl_certificates/boefje.Dockerfile
+            image: openkat/ssl-certificates
+          - dockerfile: boefjes/boefjes/plugins/kat_ssl_scan/boefje.Dockerfile
+            image: openkat/ssl-scan
+          - dockerfile: boefjes/boefjes/plugins/kat_testssl_sh_ciphers/boefje.Dockerfile
+            image: openkat/testssl-sh-ciphers
+          - dockerfile: boefjes/boefjes/plugins/kat_webpage_capture/boefje.Dockerfile
+            image: openkat/webpage-capture
+          - dockerfile: boefjes/boefjes/plugins/kat_wpscan/boefje.Dockerfile
+            image: openkat/wp-scan
+          - dockerfile: boefjes/boefjes/plugins/kat_pdio_subfinder/boefje.Dockerfile
+            image: openkat/pdio-subfinder
     runs-on: ubuntu-24.04
     services:
       registry:
@@ -69,7 +87,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}

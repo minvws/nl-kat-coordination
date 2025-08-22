@@ -10,6 +10,12 @@ export function openDialogFromUrl() {
   let id = window.location.hash.slice(1);
   if (id) {
     showModalBasedOnAnchor(id);
+
+    let dialog = document.getElementById(id);
+
+    if (window.location.hash === "#" + id && dialog.open) {
+      dialog.close();
+    }
   }
 }
 
@@ -55,8 +61,8 @@ export function initDialog(modal) {
 
 export function removeDialogAnchor() {
   // Remove the anchor from the URL when closing the modal
-  let baseUrl = window.location.toString().split("#")[0];
-  window.history.pushState("", "Base URL", baseUrl);
+  let baseUrl = window.location.href.split("#")[0];
+  window.history.replaceState(null, "", baseUrl);
 }
 
 export function showModalBasedOnAnchor(id) {

@@ -9,6 +9,7 @@ Contains documentation for developers and contributors.
 
    install
    production-docker-environment
+   separate-boefje-workers
    production-debian-environment
    developer-environment
    scripts
@@ -19,6 +20,7 @@ Contains documentation for developers and contributors.
    adding-proxy-to-openkat
    s3-buckets
    debugging-troubleshooting
+   events-and-logging
    environment-settings/index
    external-authentication
    cveapi
