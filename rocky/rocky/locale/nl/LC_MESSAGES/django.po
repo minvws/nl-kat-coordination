@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: jan klopper <jan@underdark.nl>\n"
+"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
 "Language: nl\n"
@@ -434,8 +434,8 @@ msgid ""
 msgstr ""
 "U krijgt vrijwaring voor niveau L%(tcl)s van uw beheerder. Voordat u OOI-"
 "vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
-"accepteren. Onthoud: <strong>met grote macht komt grote verantwoordelijkheid."
-"</strong>"
+"accepteren. Onthoud: <strong>met grote macht komt grote "
+"verantwoordelijkheid.</strong>"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
@@ -579,8 +579,7 @@ msgstr " letters"
 #: account/validators.py
 msgid ""
 " special characters such as: {str(validators.get('special_characters',''))}"
-msgstr ""
-" speciale karakters als: {str(validators.get('special_characters',''))}"
+msgstr " speciale karakters als: {str(validators.get('special_characters',''))}"
 
 #: account/validators.py
 msgid " lower case letters"
@@ -2561,8 +2560,8 @@ msgid ""
 "and the maximum clearance level you can assign to objects (e.g. a URL)."
 msgstr ""
 "Het vrijwaringsniveau bepaalt het maximale scanniveau voor beveiligingsscans "
-"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten "
-"(bijvoorbeeld een URL)."
+"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten ("
+"bijvoorbeeld een URL)."
 
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -4229,8 +4228,9 @@ msgstr ""
 "placeholder die kan worden gebruikt is '${ooi}', die de naam van het object "
 "weergeeft als er maar één object is. Je kunt de naam ook aanpassen door "
 "voorvoegsels, achtervoegsels of andere notaties toe te voegen, zoals '%%W' "
-"voor het weeknummer, door opties te gebruiken van <a href=\"https://strftime."
-"org/\" target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
+"voor het weeknummer, door opties te gebruiken van <a href="
+"\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python strftime "
+"code</a>."
 
 #: reports/templates/partials/export_report_settings.html
 #: reports/templates/partials/generate_report_header.html
