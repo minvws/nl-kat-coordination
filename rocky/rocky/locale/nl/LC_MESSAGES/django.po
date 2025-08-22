@@ -16,16 +16,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
-"PO-Revision-Date: 2025-07-22 14:02+0000\n"
-"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"PO-Revision-Date: 2025-08-22 09:39+0000\n"
+"Last-Translator: paulvandenbraken <paul.vandenbraken@ezzenz.nl>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13-dev\n"
+"X-Generator: Weblate 5.13\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -6623,9 +6623,8 @@ msgid ""
 msgstr ""
 "<strong>Warning:</strong> U heeft geen rechten om dit OOI te scannen. Uw "
 "maximale vrijwaringsniveau is %(member_clearance_level)s en dit OOI heeft "
-"niveau %(boefje_scan_level)s. Ga naar uw <a "
-"href=\"%(account_details)s\">account instellingen</a> om uw "
-"vrijwaringsniveau aan te passen."
+"niveau %(boefje_scan_level)s. Ga naar uw <a href=\"%(account_details)s\""
+">account instellingen</a> om uw vrijwaringsniveau aan te passen."
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Boefjes overview"
@@ -6645,8 +6644,7 @@ msgstr "Scanprofiel"
 #: rocky/templates/oois/ooi_detail.html
 #, fuzzy
 msgid "Unable to start scan. See the warning for more details."
-msgstr ""
-"Niet mogelijke een scan te starten. Zie waarschuwing voor meer details."
+msgstr "Niet mogelijke een scan te starten. Zie waarschuwing voor meer details."
 
 #: rocky/templates/oois/ooi_detail.html
 #, fuzzy
@@ -6981,9 +6979,10 @@ msgid ""
 "target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
 "Creëer een nieuw lid voor organisatie <strong>%(organization)s</strong>. "
-"Check de <a href=\"https://docs.openkat.nl/basics/users-and-organisations."
-"html#users\" target=\"_blank\" rel=\"noopener\">documentatie voor "
-"gedetaileerde informatie over de verschillende accounttypes</a>."
+"Check de <a href="
+"\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" target="
+"\"_blank\" rel=\"noopener\">documentatie voor gedetaileerde informatie over "
+"de verschillende accounttypes</a>."
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
