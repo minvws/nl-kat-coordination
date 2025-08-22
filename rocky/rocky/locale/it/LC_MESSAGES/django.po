@@ -1,4 +1,4 @@
-# Brenno de Winter <brenno@dewinter.com>, 2023.
+# Brenno de Winter <brenno@dewinter.com>, 2023, 2025.
 # Luca Racchetti <razzo1987@gmail.com>, 2023.
 #: reports/forms.py
 msgid ""
@@ -7,7 +7,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Last-Translator: Brenno de Winter <brenno@dewinter.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/it/>\n"
 "Language: it\n"
