@@ -6,16 +6,16 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
-"PO-Revision-Date: 2023-11-16 20:05+0000\n"
-"Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
-"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/it/>\n"
+"PO-Revision-Date: 2025-08-22 09:39+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.2\n"
+"X-Generator: Weblate 5.13\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -590,8 +590,7 @@ msgstr "Autenticazione a due fattori"
 
 #: account/views/password_reset.py
 msgid "We couldn't send a password reset link. Contact "
-msgstr ""
-"Non siamo riusciti a inviare un link di reset della password. Contatta "
+msgstr "Non siamo riusciti a inviare un link di reset della password. Contatta "
 
 #: account/views/password_reset.py
 msgid ""
@@ -1637,9 +1636,9 @@ msgid ""
 "be advised that by continuing you will declare a level %(scan_level)s on "
 "these objects."
 msgstr ""
-"Gli oggetti seguenti non sono ancora autorizzati per il livello "
-"%(scan_level)s, si prega di notare che continuando si dichiarerà un livello "
-"%(scan_level)s su questi oggetti."
+"Gli oggetti seguenti non sono ancora autorizzati per il livello %(scan_level)"
+"s, si prega di notare che continuando si dichiarerà un livello %(scan_level)"
+"s su questi oggetti."
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -5239,12 +5238,11 @@ msgid ""
 "the mime type \"boefje/dns-records\" is added, the normalizer expects the "
 "raw file to contain dns scan information.</p>"
 msgstr ""
-"<p>Aggiungi un set di tipi MIME, separati da virgole, ad esempio:</"
-"p><p><i>\"text/html, image/jpeg\"</i> o <i>\"boefje/dns-records\"</i>.</"
-"p><p>I tipi MIME vengono utilizzati per abbinare il Normalizer corretto a un "
-"file raw. Quando viene aggiunto il tipo MIME \"boefje/dns-records\", il "
-"Normalizer si aspetta che il file raw contenga informazioni sulla scansione "
-"DNS.</p>"
+"<p>Aggiungi un set di tipi MIME, separati da virgole, ad esempio:</p><p><i>"
+"\"text/html, image/jpeg\"</i> o <i>\"boefje/dns-records\"</i>.</p><p>I tipi "
+"MIME vengono utilizzati per abbinare il Normalizer corretto a un file raw. "
+"Quando viene aggiunto il tipo MIME \"boefje/dns-records\", il Normalizer si "
+"aspetta che il file raw contenga informazioni sulla scansione DNS.</p>"
 
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
@@ -5900,8 +5898,8 @@ msgstr ""
 "OpenKAT è dedicato a proteggere la riservatezza e la privacy delle "
 "informazioni affidate a esso. Come parte di questo obbligo fondamentale, "
 "OpenKAT si impegna a proteggere e utilizzare adeguatamente le informazioni "
-"personali (a volte denominate \"dati personali\", \"informazioni "
-"personalmente identificabili\" o \"PII\") raccolte online."
+"personali (a volte denominate \"dati personali\", "
+"\"informazioni personalmente identificabili\" o \"PII\") raccolte online."
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
@@ -6039,8 +6037,7 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
-msgstr ""
-"Non ci sono boefjes abilitati a eseguire la scansione di un OOI di tipo"
+msgstr "Non ci sono boefjes abilitati a eseguire la scansione di un OOI di tipo"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "See"
