@@ -58,5 +58,27 @@
       "https://raw.githubusercontent.com/RickGeex/CVE-2025-5777-CitrixBleed/refs/heads/main/CVE-2025-5777.py",
       "{hostname}"
     ]
+  },
+  {
+    "plugin_id": "rpki-download",
+    "name": "RPKI download",
+    "scan_level": 1,
+    "oci_image": "datacatering/duckdb:v1.3.2",
+    "oci_arguments": [
+      "/duckdb",
+      "-c",
+      "copy(select x.* from (select unnest(roas) as x from read_json('https://console.rpki-client.org/vrps.json', maximum_object_size=100000000))) to '/dev/stdout' (format parquet);"
+    ]
+  },
+  {
+    "plugin_id": "bgp-download",
+    "name": "BGP download",
+    "scan_level": 1,
+    "oci_image": "datacatering/duckdb:v1.3.2",
+    "oci_arguments": [
+      "/duckdb",
+      "-c",
+      "copy(select * from read_json('https://bgp.tools/table.jsonl', maximum_object_size=100000000)) to '/dev/stdout' (format parquet);"
+    ]
   }
 ]
