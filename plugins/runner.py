@@ -26,6 +26,13 @@ class PluginRunner:
             is_ip = False
 
         plugin = Plugin.objects.get(plugin_id=plugin_id)
+
+        client = docker.from_env()
+
+        # TODO: to get the original entrypoint run:
+        #     original_entrypoint = client.images.get(plugin.oci_image).attrs["Config"]["Entrypoint"]
+        #   (Perhaps we need this later on.)
+
         callback_kwargs = (
             {
                 "entrypoint": self.override_entrypoint,
@@ -34,7 +41,7 @@ class PluginRunner:
                 "volumes": [f'{(self.plugins_dir / "entrypoint" / "main").absolute()}:{self.override_entrypoint}'],
             }
             if not use_stdout
-            else {}
+            else {"entrypoint": []}
         )
 
         # TODO: add nameserver through configuration later
@@ -45,7 +52,7 @@ class PluginRunner:
         else:
             format_map["hostname"] = target
 
-        return docker.from_env().containers.run(
+        return client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
             command=[arg.format_map(format_map) for arg in plugin.oci_arguments],

@@ -159,7 +159,7 @@ def process_raw_file(file: File, handle_error: bool = False):
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
         return
 
-    if file.task_result:
+    if hasattr(file, "task_result"):
         pass
 
     if file.type == "?":  # TODO

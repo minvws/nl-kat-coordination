@@ -44,5 +44,19 @@
       "-",
       "{ip_address|hostname}"
     ]
+  },
+  {
+    "plugin_id": "citrix-bleed",
+    "name": "CitrixBleed",
+    "scan_level": 4,
+    "oci_image": "ghcr.io/astral-sh/uv:python3.13-alpine",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "--with",
+      "requests",
+      "https://raw.githubusercontent.com/RickGeex/CVE-2025-5777-CitrixBleed/refs/heads/main/CVE-2025-5777.py",
+      "{hostname}"
+    ]
   }
 ]
