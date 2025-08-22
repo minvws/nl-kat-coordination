@@ -18,8 +18,8 @@ msgstr ""
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
 "Last-Translator: Joost Krapels <joost.krapels@ictinstitute.nl>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -434,8 +434,8 @@ msgid ""
 msgstr ""
 "U krijgt vrijwaring voor niveau L%(tcl)s van uw beheerder. Voordat u OOI-"
 "vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
-"accepteren. Onthoud: <strong>met grote macht komt grote "
-"verantwoordelijkheid.</strong>"
+"accepteren. Onthoud: <strong>met grote macht komt grote verantwoordelijkheid."
+"</strong>"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
@@ -579,7 +579,8 @@ msgstr " letters"
 #: account/validators.py
 msgid ""
 " special characters such as: {str(validators.get('special_characters',''))}"
-msgstr " speciale karakters als: {str(validators.get('special_characters',''))}"
+msgstr ""
+" speciale karakters als: {str(validators.get('special_characters',''))}"
 
 #: account/validators.py
 msgid " lower case letters"
@@ -2560,8 +2561,8 @@ msgid ""
 "and the maximum clearance level you can assign to objects (e.g. a URL)."
 msgstr ""
 "Het vrijwaringsniveau bepaalt het maximale scanniveau voor beveiligingsscans "
-"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten ("
-"bijvoorbeeld een URL)."
+"en het maximale vrijwaringsniveau dat je kunt toewijzen aan objecten "
+"(bijvoorbeeld een URL)."
 
 #: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -4228,9 +4229,8 @@ msgstr ""
 "placeholder die kan worden gebruikt is '${ooi}', die de naam van het object "
 "weergeeft als er maar één object is. Je kunt de naam ook aanpassen door "
 "voorvoegsels, achtervoegsels of andere notaties toe te voegen, zoals '%%W' "
-"voor het weeknummer, door opties te gebruiken van <a href="
-"\"https://strftime.org/\" target=\"_blank\" rel=\"noopener\">Python strftime "
-"code</a>."
+"voor het weeknummer, door opties te gebruiken van <a href=\"https://strftime."
+"org/\" target=\"_blank\" rel=\"noopener\">Python strftime code</a>."
 
 #: reports/templates/partials/export_report_settings.html
 #: reports/templates/partials/generate_report_header.html
@@ -5743,8 +5743,8 @@ msgid ""
 msgstr ""
 "<p>Selecteer een vrijwaringsniveau voor uw Boefje. Lees voor meer informatie "
 "over de verschillende vrijwaringsniveaus de <a href='https://docs.openkat.nl/"
-"manual/usermanual.html#scan-levels-clearance-indemnities'> "
-"documentatie</a>.</p> "
+"manual/usermanual.html#scan-levels-clearance-indemnities'> documentatie</a>."
+"</p> "
 
 #: tools/forms/settings.py
 #, fuzzy
@@ -5816,12 +5816,12 @@ msgid ""
 "the mime type \"boefje/dns-records\" is added, the normalizer expects the "
 "raw file to contain dns scan information.</p>"
 msgstr ""
-"<p>Voeg een set mime-types toe, gescheiden door komma’s, "
-"bijvoorbeeld:</p><p><i>‘tekst/html, afbeelding/jpeg’</i> of <i>‘boefje/dns-"
-"records’</i>.</p><p>Mime-types worden gebruikt om de juiste normalizer aan "
-"een onbewerkt bestand te koppelen. Wanneer het mime-type ‘boefje/dns-records’"
-" is toegevoegd, verwacht de normalizer het raw-bestand met dns-"
-"scaninformatie.</p>"
+"<p>Voeg een set mime-types toe, gescheiden door komma’s, bijvoorbeeld:</"
+"p><p><i>‘tekst/html, afbeelding/jpeg’</i> of <i>‘boefje/dns-records’</i>.</"
+"p><p>Mime-types worden gebruikt om de juiste normalizer aan een onbewerkt "
+"bestand te koppelen. Wanneer het mime-type ‘boefje/dns-records’ is "
+"toegevoegd, verwacht de normalizer het raw-bestand met dns-scaninformatie.</"
+"p>"
 
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
@@ -6457,7 +6457,8 @@ msgstr "OpenKAT is veilig"
 msgid ""
 "Forensically secured storage of evidence is one of the basic ingredients of "
 "OpenKAT."
-msgstr "Forensisch geborgde opslag van bewijsmateriaal is de basis van OpenKAT."
+msgstr ""
+"Forensisch geborgde opslag van bewijsmateriaal is de basis van OpenKAT."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT is sweet"
@@ -6467,7 +6468,8 @@ msgstr "OpenKAT is lief"
 msgid ""
 "OpenKAT thinks about privacy, and stores what is necessary, within the rules "
 "of your organization and the law."
-msgstr "OpenKAT slaat op wat nodig is, binnen het kader dat de beheerder stelt."
+msgstr ""
+"OpenKAT slaat op wat nodig is, binnen het kader dat de beheerder stelt."
 
 #: rocky/templates/landing_page.html
 msgid "A wide playing field"
@@ -6621,8 +6623,9 @@ msgid ""
 msgstr ""
 "<strong>Warning:</strong> U heeft geen rechten om dit OOI te scannen. Uw "
 "maximale vrijwaringsniveau is %(member_clearance_level)s en dit OOI heeft "
-"niveau %(boefje_scan_level)s. Ga naar uw <a href=\"%(account_details)s\""
-">account instellingen</a> om uw vrijwaringsniveau aan te passen."
+"niveau %(boefje_scan_level)s. Ga naar uw <a "
+"href=\"%(account_details)s\">account instellingen</a> om uw "
+"vrijwaringsniveau aan te passen."
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Boefjes overview"
@@ -6642,7 +6645,8 @@ msgstr "Scanprofiel"
 #: rocky/templates/oois/ooi_detail.html
 #, fuzzy
 msgid "Unable to start scan. See the warning for more details."
-msgstr "Niet mogelijke een scan te starten. Zie waarschuwing voor meer details."
+msgstr ""
+"Niet mogelijke een scan te starten. Zie waarschuwing voor meer details."
 
 #: rocky/templates/oois/ooi_detail.html
 #, fuzzy
@@ -6977,10 +6981,9 @@ msgid ""
 "target=\"_blank\" rel=\"noopener\">documentation</a>."
 msgstr ""
 "Creëer een nieuw lid voor organisatie <strong>%(organization)s</strong>. "
-"Check de <a href="
-"\"https://docs.openkat.nl/basics/users-and-organisations.html#users\" target="
-"\"_blank\" rel=\"noopener\">documentatie voor gedetaileerde informatie over "
-"de verschillende accounttypes</a>."
+"Check de <a href=\"https://docs.openkat.nl/basics/users-and-organisations."
+"html#users\" target=\"_blank\" rel=\"noopener\">documentatie voor "
+"gedetaileerde informatie over de verschillende accounttypes</a>."
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
@@ -8349,8 +8352,8 @@ msgid ""
 "with http:// or https://, optionally a second column 'network' is supported "
 msgstr ""
 "Voor het type URL-object is een kolom ‘raw’ met URL-waarden vereist, "
-"beginnend met http:// of https://. Optioneel wordt een tweede kolom ‘network’"
-" ondersteund. "
+"beginnend met http:// of https://. Optioneel wordt een tweede kolom "
+"‘network’ ondersteund. "
 
 #: rocky/views/upload_csv.py
 msgid ""
@@ -8375,8 +8378,8 @@ msgid ""
 "are ignored) "
 msgstr ""
 "Vrijwaringsniveaus kunnen gecontroleerd worden door een column ‘clearance’ "
-"op te nemen met numerieke waarden 0, 1, 2, 3, en 4 voor het gewenste niveau ("
-"andere waarden worden genegeerd) "
+"op te nemen met numerieke waarden 0, 1, 2, 3, en 4 voor het gewenste niveau "
+"(andere waarden worden genegeerd) "
 
 #: rocky/views/upload_csv.py
 msgid "Object(s) could not be created for row number(s): "
