@@ -1,0 +1,133 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: detect-private-key
+      - id: check-case-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: pretty-format-json
+        args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
+
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+        files: pyproject.toml$
+
+  - repo: https://github.com/rstcheck/rstcheck
+    rev: v6.2.5
+    hooks:
+      - id: rstcheck
+        # https://github.com/rstcheck/rstcheck-core/issues/4
+        args:
+          [
+            "--ignore-messages",
+            "Hyperlink target .* is not referenced",
+            "--ignore-directives",
+            "mermaid,automodule",
+          ]
+        additional_dependencies: ["rstcheck[sphinx]"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.12.12"
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+      - id: pyupgrade
+        args: [--py312-plus]
+
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.27.0
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "5.2"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        args: []
+        additional_dependencies:
+          - django-stubs
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        additional_dependencies: ["tomli"]
+        args: ["-L", "lama", "--ignore-regex", ".{1024}|.*codespell-ignore.*"]
+        exclude: |
+          (?x)(
+          \.po$ |
+          \.xml$ |
+          \.svg$ |
+          pyproject.toml$ |
+          requirements-.*.txt$ |
+          ^docs/source/_static
+          )
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.36.4
+    hooks:
+      - id: djlint-reformat-django
+        files: |
+          (?x)(
+          ^.*/templates/.*$ |
+          ^reports/report_types/.*/.*\.html
+          )
+        exclude: '^openkat/templates/admin/.*\.html$'
+
+      - id: djlint-django
+        files: |
+          (?x)(
+          ^.*/templates/.*$ |
+          ^reports/report_types/.*/.*\.html
+          )
+        exclude: '^openkat/templates/admin/.*\.html$'
+
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.23.1
+    hooks:
+      - id: stylelint
+        args: [--fix]
+        additional_dependencies:
+          - stylelint@15.10.1
+          - stylelint-config-standard-scss@10.0.0
+        files: "^(openkat\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        args: ["-e", "SC1091"]
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
+        args: ["-w", "-s", "-i", "4", "-sr"]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - prettier@3.2.5 # SEE: https://github.com/pre-commit/pre-commit/issues/3133
+        exclude: |
+          (?x)(
+          \.html$ |
+          \.json$ |
+          \.min\.js$ |
+          )

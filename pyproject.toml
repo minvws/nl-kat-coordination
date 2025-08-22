@@ -1,0 +1,119 @@
+[project]
+name = "openkat"
+version = "2.0.0-alpha"
+description = "OpenKAT package"
+requires-python = ">=3.12"
+readme = "README.md"
+license = "EUPL-1.2"
+dependencies = [
+  "django>=5.2,<6.0",
+  "django-stubs-ext>=5.2,<6.0",
+  "django-environ>=0.12.0",
+  "psycopg>=3.2.9",
+  "granian>=2.2.6",
+  "structlog>=25.3.0",
+  "django-structlog>=9.1.1",
+  "django-xtdb",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=6.0.0",
+    "pytest-django>=4.5.2",
+    "pytest-mock>=3.11.1",
+    "pytest-xdist>=3.7.0",
+    "pytest-env>=1.1.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
+
+[tool.coverage.run]
+relative_files = true
+
+[tool.pytest.ini_options]
+addopts = "-m 'not slow' --durations=10 -n auto --ignore=tests/integration"
+DJANGO_SETTINGS_MODULE = "tests.settings"
+markers = ["slow: marks tests as slow"]
+env = [
+  "D:OPENKAT_DB_HOST=localhost",
+]
+
+[tool.djlint]
+max_line_length = 120
+blank_line_after_tag = "load,extends,include"
+# https://www.djlint.com/docs/linter/#rules
+ignore = "H006,H016,H017,H030,H031"
+
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["environ.*", "django_xtdb.*"]
+ignore_missing_imports = true
+
+[tool.setuptools_scm]
+write_to = "_version.py"
+
+[tool.ruff]
+fix = true
+
+# Exclude a variety of commonly ignored directories.
+extend-exclude = [
+  "__pycache__"
+]
+
+line-length = 120
+
+# Support Python 3.12 and higher
+target-version = "py312"
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+select = [
+  "ALL",
+]
+ignore = [
+  "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+  "ANN401", # Sometimes Any is needed
+  "D1", # Docstrings shouldn't be required for everything
+  "COM812", # Incompatible with formatter
+  "D203", # Incompatible with formatter
+  "D212", # Incompatible with D213
+  "EM", # Not a problem
+  "FIX", # Comments indicating todos are useful
+  "PLR2004", # False positives
+  "PLR5501", # Not always better
+  "RET505", # If/else can be more readable by showing intent
+  "RET508", # If/else can be more readable by showing intent
+  "SIM102", # Nested if statement are sometimes useful for better code understanding
+  "SIM103", # Creating long return statements is often less readable
+  "SIM108", # Ternary operator is not always more readable
+  "SIM114", # This is not always easier to understand
+  "S101", # Assert use is normal in pytest tests
+  "S104", # Binding to all is normal in containers
+  "S105", # Disabled because of false positives
+  "S106", # Disabled because of false positives
+  "S308", # Mark_safe usage is okay
+  "S324", # Insecure hash functions can still be useful
+  "S603", # Disabled because of false positives
+  "S607", # Disabled because of false positives
+  "TD002", # Not necessary if TD003 is fixed
+  "TD003", # TODO: Make sure all TODOs have issues
+  "TRY003", # Not a problem
+]
+
+# Add "Example" to allowed code comments
+task-tags = ["Example", "todo", "TODO", "FIXME"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"openkat.settings".msg = "Use django.conf.settings"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false

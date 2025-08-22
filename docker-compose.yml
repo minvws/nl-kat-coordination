@@ -1,0 +1,62 @@
+services:
+  postgres:
+    restart: unless-stopped
+    image: docker.io/library/postgres:17
+    shm_size: 256MB
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
+      interval: 10s
+      retries: 10
+    # Django runserver does not limit the number of threads. We need to increase
+    # the maximum number of connection to make sure that we don't hit the limit.
+    command: -c max_connections=500
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  xtdb:
+    image: "ghcr.io/xtdb/xtdb:nightly-20250821"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - xtdb-data:/var/lib/xtdb
+    environment:
+    # Change to DEBUG to see which queries are executed
+      - XTDB_LOGGING_LEVEL=DEBUG
+
+  openkat:
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - xtdb
+    ports:
+      - "127.0.0.1:8000:8000"
+    build:
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./:/app/openkat
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fc42:ca7:2::/64
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
+
+volumes:
+  postgres-data:
+  bytes-data:
+  xtdb-data:
