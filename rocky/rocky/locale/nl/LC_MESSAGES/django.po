@@ -6,7 +6,7 @@
 # 跨性别 <github@lgbt.sh>, 2023, 2025.
 # Madelon Dohmen <maddohmen@hotmail.com>, 2023, 2024, 2025.
 # PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>, 2024.
-# Joost Krapels <joost.krapels@ictinstitute.nl>, 2024.
+# Joost Krapels <joost.krapels@ictinstitute.nl>, 2024, 2025.
 # Jeroen Dekkers <jeroen@dekkers.ch>, 2024, 2025.
 # Wim Benes <fryskefirefox@gmail.com>, 2024, 2025.
 # paulvandenbraken <paul.vandenbraken@ezzenz.nl>, 2025.
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-20 07:38+0000\n"
 "PO-Revision-Date: 2025-08-22 09:39+0000\n"
-"Last-Translator: Jeroen Dekkers <jeroen@dekkers.ch>\n"
+"Last-Translator: Joost Krapels <joost.krapels@ictinstitute.nl>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
 "Language: nl\n"
