@@ -1226,9 +1226,9 @@ tanimachi==0.0.6 \
     --hash=sha256:a5a65f13f267cade7dbde4f5d7e038d3100761b6aadafbfa6e7385355f40e90b \
     --hash=sha256:eb00c5fe2b7075cec131ee123791cf4801b50ce3af23d3ea81436a651a3b1798
     # via boefjes
-tldextract==3.5.0 \
-    --hash=sha256:2cb271ca8d06ea1630a1361b58edad14e0cf81f34ce3c90b052854528fe2a281 \
-    --hash=sha256:4df1c65b95be61d59428e8611e955e54e6f1d4483d3e8d5733d3a9062155e910
+tldextract==5.3.0 \
+    --hash=sha256:b3d2b70a1594a0ecfa6967d57251527d58e00bb5a91a74387baa0d87a0678609 \
+    --hash=sha256:f70f31d10b55c83993f55e91ecb7c5d84532a8972f22ec578ecfbe5ea2292db2
     # via boefjes
 tomli==2.2.1 ; python_full_version <= '3.11' \
     --hash=sha256:023aa114dd824ade0100497eb2318602af309e5a55595f76b626d6d9f3b7b0a6 \
