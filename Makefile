@@ -58,7 +58,7 @@ base-image:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-images: dns-sec nmap export-http nikto generic entrypoint
+images: dns-sec nmap export-http nikto generic entrypoint dig
 
 plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
@@ -79,6 +79,9 @@ nikto: base-image
 
 generic: base-image
 	docker build -f katalogus/images/generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
+
+dig:
+	docker build -f plugins/plugins/kat_dig/plugin.Dockerfile -t $(REGISTRY)/dig:latest -t openkat/dig .
 
 testclean:
 	docker compose -f .ci/docker-compose.yml kill

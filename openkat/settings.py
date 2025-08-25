@@ -41,6 +41,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 SECRET_KEY = env("SECRET_KEY")
 
 OPENKAT_REPORT_PERMALINKS = env.bool("OPENKAT_REPORT_PERMALINKS", True)
+HOST_MOUNT_DIR = env.str("HOST_MOUNT_DIR", default=Path(__file__).resolve().parent.parent.absolute())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -182,6 +183,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "openkat.middleware.auth_token.MediaAuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
@@ -340,7 +342,7 @@ if USE_S3:
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
 MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_PATH = "media/"
+MEDIA_URL = "media/"
 
 
 _IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
@@ -536,6 +538,7 @@ WORKERS = env.int("WORKERS", default=4)
 SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL", default=60)
 SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
 OUTGOING_REQUEST_TIMEOUT = env.int("OUTGOING_REQUEST_TIMEOUT", default=30)
+PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
 
 
 def OCTOPOES_FACTORY(organization: str):

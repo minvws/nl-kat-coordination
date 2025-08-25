@@ -5,15 +5,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('plugins', '0001_initial'),
-    ]
+    dependencies = [("plugins", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='plugin',
-            name='oci_arguments',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=256), default=list, size=None),
-        ),
+            model_name="plugin",
+            name="oci_arguments",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(blank=True, max_length=256), default=list, size=None
+            ),
+        )
     ]

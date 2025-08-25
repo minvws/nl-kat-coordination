@@ -58,9 +58,9 @@ class BoefjeResource:
 class NormalizerResource:
     """Represents a Normalizer package that we can run. Throws a ModuleException if any validation fails."""
 
-    def __init__(self, path: Path, package: str):
+    def __init__(self, path: Path, package: str, definition_file: str = NORMALIZER_DEFINITION_FILE):
         self.path = path
-        self.normalizer = Normalizer.model_validate_json(path.joinpath(NORMALIZER_DEFINITION_FILE).read_text())
+        self.normalizer = Normalizer.model_validate_json(path.joinpath(definition_file).read_text())
         self.normalizer.consumes.append(f"normalizer/{self.normalizer.plugin_id}")
         self.package = package
 

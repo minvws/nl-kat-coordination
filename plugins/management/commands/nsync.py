@@ -1,11 +1,16 @@
+import json
 from pathlib import Path
 
+import structlog
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from pydantic import BaseModel, Field, TypeAdapter
 
-from katalogus.worker.repository import get_local_repository
+from katalogus.worker.repository import ModuleException, _find_packages_in_path_containing_files, get_local_repository
+from openkat.settings import BASE_DIR
 from plugins.models import EnabledPlugin, Plugin
+
+logger = structlog.get_logger(__name__)
 
 
 class Command(BaseCommand):
@@ -49,6 +54,25 @@ def nsync() -> list[Plugin]:
         )
         plugins.append(plugin)
         enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
+
+    for path, package in _find_packages_in_path_containing_files(BASE_DIR / "plugins" / "plugins", ("plugin.json",)):
+        try:
+            definition = json.loads(path.joinpath("plugin.json").read_text())
+            plugin = Plugin(
+                plugin_id=definition.get("plugin_id"),
+                name=definition.get("name"),
+                scan_level=definition.get("scan_level", 1),
+                description=definition.get("description"),
+                consumes=definition.get("consumes", []),
+                recurrences=definition.get("recurrences"),
+                oci_image=definition.get("oci_image"),
+                oci_arguments=definition.get("oci_arguments", []),
+                version=definition.get("version"),
+            )
+            plugins.append(plugin)
+            enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
+        except ModuleException as exc:
+            logger.error(exc)
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
     for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):

@@ -7,7 +7,7 @@
 .venv
 .idea
 dist
-assts/dist
+assets/dist
 
 db.sqlite3
 static

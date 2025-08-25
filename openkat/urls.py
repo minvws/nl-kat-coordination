@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
@@ -157,3 +159,4 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/kat-alogus/", include("katalogus.urls"), name="katalogus"),
     path("<organization_code>/reports/", include("reports.urls"), name="reports"),
 )
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

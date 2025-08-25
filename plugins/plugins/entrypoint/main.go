@@ -21,6 +21,7 @@ func main() {
 	}
 
 	pluginId := os.Getenv("PLUGIN_ID") // TODO: force plugin id?
+	var bearer = "Token " + os.Getenv("OPENKAT_TOKEN")
 
 	// Get upload URL from environment or use default
 	uploadURL := os.Getenv("UPLOAD_URL")
@@ -66,7 +67,7 @@ func main() {
 		}
 		stderrFile.Write(stderrBytes)
 
-		err = writer.WriteField("type", "stderr")
+		err = writer.WriteField("type", "error")
 		if err != nil {
 			log.Fatalf("Failed to create type part: %v", err)
 		}
@@ -77,7 +78,7 @@ func main() {
 		}
 		stdoutFile.Write(stdoutBytes)
 
-		err = writer.WriteField("type", "stdout")
+		err = writer.WriteField("type", pluginId)
 		if err != nil {
 			log.Fatalf("Failed to create type part: %v", err)
 		}
@@ -85,7 +86,18 @@ func main() {
 
 	writer.Close()
 
-	resp, err := http.Post(uploadURL, writer.FormDataContentType(), &body)
+	req, err := http.NewRequest("POST", uploadURL, &body)
+
+	if err != nil {
+		log.Fatalf("Creating request failed: %v", err)
+	}
+
+	req.Header.Add("Authorization", bearer)
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
 	if err != nil {
 		log.Fatalf("Upload failed: %v", err)
 	}

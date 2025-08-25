@@ -5,7 +5,4 @@ COPY main.go .
 RUN go build -o main main.go
 
 FROM scratch
-
 COPY --from=build /app/main .
-
-ENTRYPOINT ["/app/main"]
