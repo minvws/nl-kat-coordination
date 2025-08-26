@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 from ipaddress import IPv4Address, IPv6Address
@@ -214,4 +215,4 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 if __name__ == "__main__":
     result = run(sys.argv[1])
-    print(result)
+    print(json.dumps(result))

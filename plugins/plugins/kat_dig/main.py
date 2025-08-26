@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -38,4 +39,4 @@ def run(file_id: str):
 
 if __name__ == "__main__":
     oois = run(sys.argv[1])
-    print(oois)
+    print(json.dumps(oois))

@@ -104,7 +104,7 @@ def run_plugin(self, plugin_id: str, organization: str | None = None, input_data
         type="plugin",
         organization=organization,
         status=TaskStatus.RUNNING,
-        data={},  # TODO
+        data={"plugin_id": plugin_id, "organization": organization, "input_data": input_data},  # TODO
     )
 
     org = None

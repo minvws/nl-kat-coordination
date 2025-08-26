@@ -27,11 +27,8 @@ class PluginRunner:
         try:
             IPAddress(target)
             is_ip = True
-        except AddrFormatError:
+        except (AddrFormatError, ValueError):
             is_ip = False
-
-        # if Path(target).exists():
-        #     is_file = True
 
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         client = docker.from_env()

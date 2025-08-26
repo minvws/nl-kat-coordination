@@ -86,6 +86,9 @@ dig:
 dns:
 	docker build -f plugins/plugins/kat_dns/plugin.Dockerfile -t $(REGISTRY)/dns:latest -t openkat/dns .
 
+nmap2:
+	docker build -f plugins/plugins/kat_nmap/plugin.Dockerfile -t $(REGISTRY)/nmap-2:latest -t openkat/nmap-2 .
+
 testclean:
 	docker compose -f .ci/docker-compose.yml kill
 	docker compose -f .ci/docker-compose.yml down --remove-orphans

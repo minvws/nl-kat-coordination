@@ -1,0 +1,16 @@
+{
+  "plugin_id": "kat_nmap_normalize2",
+  "name": "nmap normalizer 2e",
+  "description": "Parses data from all nmap variants into IP-addresses, ports and services.",
+  "scan_level": 2,
+  "consumes": [
+    "file:nmap-2"
+  ],
+  "oci_image": "ghcr.io/minvws/openkat/nmap-2:latest",
+  "oci_arguments": [
+    "uv",
+    "run",
+    "main.py",
+    "{hostname}"
+  ]
+}
