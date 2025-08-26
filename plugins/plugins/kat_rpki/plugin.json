@@ -1,0 +1,8 @@
+{
+  "plugin_id": "kat_rpki_normalize2",
+  "name": "RPKI normalizer 2",
+  "description": "Parses RPKI data into findings.",
+  "consumes": [
+    "plugin:rpki-download,plugin:bgp-download"
+  ]
+}

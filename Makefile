@@ -83,6 +83,9 @@ generic: base-image
 dig:
 	docker build -f plugins/plugins/kat_dig/plugin.Dockerfile -t $(REGISTRY)/dig:latest -t openkat/dig .
 
+dns:
+	docker build -f plugins/plugins/kat_dns/plugin.Dockerfile -t $(REGISTRY)/dns:latest -t openkat/dns .
+
 testclean:
 	docker compose -f .ci/docker-compose.yml kill
 	docker compose -f .ci/docker-compose.yml down --remove-orphans
