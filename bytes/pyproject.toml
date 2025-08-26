@@ -37,7 +37,7 @@ dependencies = [
     "fastapi-slim>=0.115.2",
     "structlog>=25.2.0,<26",
     "cryptography>45",
-    "boto3>=1.35.15,<2",
+    "boto3>=1.40",
 ]
 
 [tool.uv]
