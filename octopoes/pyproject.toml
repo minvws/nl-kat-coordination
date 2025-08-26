@@ -15,7 +15,7 @@ dependencies = [
     "celery>=5.2.7,<6",
     "pyparsing>=3.0.9,<4",
     "packaging~=23.0",
-    "tldextract>=3.4.0,<4",
+    "tldextract>5",
     "opentelemetry-sdk",
     "opentelemetry-instrumentation",
     "opentelemetry-exporter-otlp-proto-grpc",
