@@ -5,7 +5,7 @@ discussion:
 labels: Data Models, Plugins
 ---
 
-# RFD 0006: Flexible (OCI) Plugins
+# RFD 0009: Flexible (OCI) Plugins
 
 ## Introduction
 
@@ -73,7 +73,7 @@ The core of this proposal is to:
 
 1.
 
-#### Why the proposal covers the requirements
+### Why the proposal covers the requirements
 
 - **FR 1**: 
 

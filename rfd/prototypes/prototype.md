@@ -6,6 +6,10 @@ labels: { comma, separated, list }
 
 # RFD {number}: {title}
 
+---
+
+# RFD 0010: Generic Scheduling
+
 ## Introduction
 
 { Introduction to the RFD }
@@ -14,6 +18,21 @@ labels: { comma, separated, list }
 
 { The proposal section should contain the main content of the RFD. This is
 where the idea is explained in detail. }
+
+### Functional Requirements (FR)
+
+1.
+
+### Extensibility (Potential Future Requirements)
+
+1.
+
+### Why the proposal covers the requirements
+
+- **FR 1**:
+
+- **EX 1**:
+
 
 ## Footnotes
 
