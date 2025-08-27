@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# jan klopper <jan@underdark.nl>, 2023.
+# jan klopper <jan@underdark.nl>, 2023, 2025.
 #: reports/forms.py
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-22 13:42+0000\n"
-"PO-Revision-Date: 2023-11-18 13:03+0000\n"
+"POT-Creation-Date: 2025-08-20 07:38+0000\n"
+"PO-Revision-Date: 2025-08-22 09:39+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/en@pirate/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.2\n"
+"X-Generator: Weblate 5.13\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -255,7 +255,7 @@ msgid "Backup token"
 msgstr ""
 
 #: account/mixins.py
-msgid "Clearance level has been set"
+msgid "Clearance level has been set."
 msgstr ""
 
 #: account/mixins.py
@@ -590,6 +590,8 @@ msgstr ""
 #: rocky/templates/oois/ooi_mute_finding.html
 #: rocky/templates/organizations/organization_edit.html
 #: rocky/templates/organizations/organization_member_edit.html
+#: rocky/templates/partials/delete_ooi_modal.html
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
 #: rocky/templates/partials/mute_findings_modal.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
@@ -761,7 +763,7 @@ msgstr ""
 
 #: crisis_room/templates/crisis_room_findings.html
 msgid ""
-"This table shows the findings that have been identiefied for each "
+"This table shows the findings that have been identified for each "
 "organization, sorted by the finding types and grouped by organizations. This "
 "data is based on the latest Crisis Room Findings Report of each organization."
 msgstr ""
@@ -1173,7 +1175,9 @@ msgstr ""
 #: reports/templates/report_overview/modal_partials/delete_modal.html
 #: reports/templates/report_overview/report_history_table.html
 #: reports/templates/report_overview/scheduled_reports_table.html
-#: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/partials/delete_ooi_modal.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
 
@@ -1238,6 +1242,7 @@ msgstr ""
 #: crisis_room/templates/partials/new_dashboard_item_modal_report_section.html
 #: katalogus/templates/partials/no_enabling_permission_message.html
 #: katalogus/templates/plugin_container_image.html
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
@@ -1303,13 +1308,15 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/boefje.py
 #: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/explanations.html rocky/views/mixins.py
+#: rocky/templates/partials/explanations.html
+#: rocky/templates/scan_profiles/scan_profile_detail.html rocky/views/mixins.py
 msgid "Clearance level"
 msgstr ""
 
 #: crisis_room/templates/partials/report_dashboard_item_filter.html
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html rocky/views/mixins.py
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/views/mixins.py
 msgid "Clearance type"
 msgstr ""
 
@@ -1532,6 +1539,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/boefje_setup.html
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
 msgid "Save changes"
 msgstr ""
 
@@ -2272,6 +2280,7 @@ msgstr ""
 
 #: onboarding/templates/step_2b_organization_update.html
 #: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_7_clearance_level_introduction.html
 msgid "Continue"
 msgstr ""
@@ -2348,10 +2357,6 @@ msgid ""
 "of <strong>L%(tcl)s</strong>."
 msgstr ""
 
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-msgid "Add URL"
-msgstr ""
-
 #: onboarding/templates/step_5_add_scan_ooi.html
 msgid "Add an object"
 msgstr ""
@@ -2402,9 +2407,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_6_set_clearance_level.html
-#: rocky/templates/oois/ooi_list.html
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-#: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr ""
 
@@ -2909,20 +2911,6 @@ msgid "Terms in report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/multi_organization_report/basic_security_details.html
-msgid "System specific checks"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/aggregate_organisation_report/system_specific_overview.html
-#: reports/report_types/multi_organization_report/basic_security_details.html
-msgid ""
-"This is where checks are done that are specific to system types. Different "
-"security and compliance issues come into play for different systems. They "
-"are listed here under each other."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #, python-format
@@ -2986,6 +2974,14 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific_overview.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid ""
+"This is where checks are done that are specific to system types. Different "
+"security and compliance issues come into play for different systems. They "
+"are listed here under each other."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3272,6 +3268,10 @@ msgstr ""
 #: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "services are compliant"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "System specific checks"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
@@ -3925,6 +3925,7 @@ msgstr ""
 #: reports/templates/partials/report_names_form.html
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_detail_add_related_object.html
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
 #: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_multiselect.html
@@ -3938,7 +3939,6 @@ msgstr ""
 
 #: reports/templates/partials/report_names_form.html
 #: reports/templates/report_overview/modal_partials/rename_modal.html
-#: rocky/views/scan_profile.py
 msgid "Reset"
 msgstr ""
 
@@ -4903,8 +4903,8 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid ""
-"Boefjes that has a scan level below or equal to the clearance level, is "
-"permitted to scan an object."
+"All the boefjes with a scan level below or equal to the clearance level will "
+"be allowed to scan this object."
 msgstr ""
 
 #: tools/forms/ooi.py
@@ -5808,7 +5808,6 @@ msgid "Delete %(primary_key)s"
 msgstr ""
 
 #: rocky/templates/oois/ooi_delete.html
-#: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Are you sure?"
 msgstr ""
 
@@ -6051,7 +6050,8 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "Delete object(s)"
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Edit clearance level"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
@@ -6297,6 +6297,36 @@ msgstr ""
 
 #: rocky/templates/partials/current_config.html
 msgid "Current configuration"
+msgstr ""
+
+#: rocky/templates/partials/delete_ooi_modal.html
+msgid "Delete objects"
+msgstr ""
+
+#: rocky/templates/partials/delete_ooi_modal.html
+msgid ""
+"Are you sure you want to delete all the selected objects? The history of the "
+"deleted objects will still be available."
+msgstr ""
+
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
+msgid "Edit clearance level settings"
+msgstr ""
+
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
+msgid "You are editing clearance level of all the selected objects."
+msgstr ""
+
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
+msgid "Switching between declare and inherit"
+msgstr ""
+
+#: rocky/templates/partials/edit_ooi_clearance_level_modal.html
+msgid ""
+"Clearance levels can be automatically inherited or you can manually declare "
+"the clearance level for an object. Switching to inherit clearance level will "
+"also recalculate the clearance levels of objects that inherit from these "
+"clearance levels."
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
@@ -6647,30 +6677,11 @@ msgid "Go to content"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Current clearance level"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Declared clearance level explanation"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Declared:"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-#, python-format
 msgid ""
-"This means that this object will be scanned by Boefjes with scan level "
-"%(scan_level)s and lower. Setting the clearance level from “declared” to "
-"“inherit” means that this object will inherit its level from neighbouring "
-"objects. This means that the clearance level might stay the same, increase, "
-"or decrease depending on other declared clearance levels. Clearance levels "
-"of objects that inherit from this clearance level will also be recalculated."
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level to inherit"
+"The clearance level determines the level of boefje scans allowed on this "
+"object. An object inherits its clearance level from neighbouring objects. "
+"This means that the clearance level might stay the same, increase or "
+"decrease, depending on other declared clearance levels."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -6683,10 +6694,8 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"This object has a clearance level of \"L0\". This means that this object "
-"will not be scanned by any Boefje until that Boefje is run manually for this "
-"object again. Objects with a clearance level higher than \"L0\" will be "
-"scanned automatically by Boefjes with corresponding scan levels."
+"This object has a clearance level of \"empty\". This means that this object "
+"has no clearance level."
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -6715,7 +6724,7 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
-"You don't have permissions to set clearance level. Contact your "
+"You don't have permissions to set the clearance level. Contact your "
 "administrator."
 msgstr ""
 
@@ -6739,20 +6748,8 @@ msgstr ""
 msgid "to manage your clearance level."
 msgstr ""
 
-#: rocky/templates/scan_profiles/scan_profile_reset.html
-msgid "Set clearance level for:"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_reset.html
-msgid "Setting the scan level from \\"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_reset.html
-msgid "You are about to set the clearance level from \\"
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_reset.html
-msgid "Yes, set to inherit"
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Current clearance level"
 msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
@@ -7231,7 +7228,7 @@ msgstr ""
 
 #: rocky/views/ooi_list.py
 #, python-format
-msgid "Successfully set scan profile to %s for %d oois."
+msgid "Successfully set scan profile to %s for %d OOIs."
 msgstr ""
 
 #: rocky/views/ooi_list.py
@@ -7246,7 +7243,7 @@ msgstr ""
 
 #: rocky/views/ooi_list.py
 #, python-format
-msgid "Successfully set %d ooi(s) clearance level to inherit."
+msgid "Successfully set %d OOI(s) clearance level to inherit."
 msgstr ""
 
 #: rocky/views/ooi_list.py
@@ -7254,7 +7251,7 @@ msgid "An error occurred while deleting oois."
 msgstr ""
 
 #: rocky/views/ooi_list.py
-msgid "An error occurred while deleting oois: one of the OOIs doesn't exist."
+msgid "An error occurred while deleting OOIs: one of the OOIs doesn't exist."
 msgstr ""
 
 #: rocky/views/ooi_list.py
@@ -7408,8 +7405,8 @@ msgid "Could not process your request, action required."
 msgstr ""
 
 #: rocky/views/scan_profile.py
-#, python-brace-format
-msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
+msgid ""
+"Cannot set clearance level. The clearance type must be inherited or declared."
 msgstr ""
 
 #: rocky/views/scans.py

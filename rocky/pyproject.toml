@@ -7,7 +7,7 @@ requires-python = "~=3.10"
 license = "EUPL-1.2"
 dependencies = [
     "beautifulsoup4>=4.11.2,<5",
-    "django==5.1.10",
+    "django>=5.1.11,<5.2",
     "django-two-factor-auth>=1.17.0,<2",
     "django-environ>=0.12.0,<0.13",
     "jsonschema>=4.17.0,<5",
@@ -31,7 +31,7 @@ dependencies = [
     "whitenoise[brotli]>=6.5.0,<7",
     "opentelemetry-instrumentation",
     "opentelemetry-instrumentation-fastapi",
-    "granian>=2.2.6,<3",
+    "granian>=2.5",
     "django-components>=0.88,<0.89",
     "pyparsing>=3.1.1,<4",
     "pydantic-settings>=2.0.3,<3",
@@ -51,6 +51,7 @@ dependencies = [
     "structlog>=25.3.0,<26",
     "django-structlog>=9.1.1,<10",
     "cron-descriptor>=1.4.5,<2",
+    "weasyprint>=66",
 ]
 
 [dependency-groups]
