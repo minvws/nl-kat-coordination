@@ -6,11 +6,11 @@
   "consumes": [
     "file:nmap-2"
   ],
-  "oci_image": "ghcr.io/minvws/openkat/nmap-2:latest",
+  "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
   "oci_arguments": [
     "uv",
     "run",
-    "main.py",
+    "kat_nmap/main.py",
     "{hostname}"
   ]
 }

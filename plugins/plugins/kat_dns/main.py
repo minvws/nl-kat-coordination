@@ -114,12 +114,12 @@ def run(hostname: str):
                     results.append(soa)
 
                 if isinstance(rr, A):
-                    ipv4 = dict(object_type="IPAddressV4", network=internet["name"], address=IPv4Address(str(rr)))
+                    ipv4 = dict(object_type="IPAddressV4", network=internet["name"], address=str(rr))
                     results.append(ipv4)
                     register_record(dict(object_type="DNSARecord", address=ipv4["address"], **default_args))
 
                 if isinstance(rr, AAAA):
-                    ipv6 = dict(object_type="IPAddressV6", network=internet["name"], address=IPv6Address(str(rr)))
+                    ipv6 = dict(object_type="IPAddressV6", network=internet["name"], address=str(rr))
                     results.append(ipv6)
                     register_record(dict(object_type="DNSAAAARecord", address=ipv6["address"], **default_args))
 

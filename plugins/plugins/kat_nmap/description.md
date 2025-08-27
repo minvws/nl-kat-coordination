@@ -44,20 +44,9 @@ Nmap outputs the following OOIs:
   "organization": "_dev",
   "input_ooi_data": {
     "host": "1.1.1.1"
-  },
-  "dispatches": {
-    "normalizers": ["kat_nmap.normalize"],
-    "boefjes": []
   }
 }
 ```
 
-### Boefje structure
-
-```
-boefjes/tools/kat_nmap
-├── normalize.py
-├── main.py
-```
 
 **Cat name**: Elsje
