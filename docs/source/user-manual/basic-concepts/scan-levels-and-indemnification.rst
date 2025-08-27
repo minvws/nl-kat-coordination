@@ -31,15 +31,18 @@ The levels used range from level 0 to level 4, from 'do not scan' to 'very intru
      - intensive scan
 
 
+Inherited clearance levels
+--------------------------
+
+Objects are linked to other objects in the data model.
+You can choose to declare a clearance level to an object or to let it inherit the clearance level from connected objects.
+Underlying objects will then receive the same safeguard level, parent objects a lower level. For example, a hostname has an IP address for which the same safeguard level applies, but it also has a DNS server that may be outside the organization's domain and receives a lower level.
+
+
 Indemification by user
 ----------------------
 
 The user's statement counts as an indemnification for scanning a particular object. This obtains permission to scan and store the information. The statement is given at the start of a new scan or specifically for certain objects.
-
-Inheritance
------------
-
-Objects are linked to other objects in the data model. Underlying objects receive the same safeguard level, parent objects a lower level. For example, a hostname has an ip address for which the same safeguard level applies, but it also has a DNS server that may be outside the organization's domain and receives a lower level.
 
 Extended profiles
 -----------------

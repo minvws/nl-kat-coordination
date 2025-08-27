@@ -1,4 +1,3 @@
-==========
 Onboarding
 ==========
 
@@ -20,25 +19,10 @@ The onboarding consists of the following steps:
 5. Generating report
 
 
-Login & registration
-====================
-
-Once you login you will see the screen for setting up 2 factor authentication (2FA). You have to scan the QR code with an authenticator application on your phone, the application on your phone will generate a token that you have to type in as a response. Every time you want to login, you have to enter your username, password and 2FA token. You can disable 2FA in the `.env` file if necessary.
-
-
-.. image:: img/00-onboarding-qr-code.png
-  :alt: Setting up 2 factor authentication.
-
-Once you have successfully setup 2FA you will see the following screen.
-
-.. image:: img/00-onboarding-qr-success.png
-  :alt: Successful setup of 2 factor authentication.
-
-After this, continue to the onboarding. The onboarding starts with the registration process, which let's you create your very first organization. The first page of the onboarding shows a quick introduction of how OpenKAT works.
-
-
 Step-by-step onboarding
-=======================
+-----------------------
+
+The onboarding starts with the registration process, which let’s you create your very first organization. The first page of the onboarding shows the welcome page.
 
 .. image:: img/1-onboarding-welcome.png
   :alt: Onboarding welcome page.

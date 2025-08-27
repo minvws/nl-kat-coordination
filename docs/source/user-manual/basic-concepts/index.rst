@@ -1,7 +1,8 @@
 Basic concepts
-##############
+==============
 
-This page contains all the data on how to navigate around in the OpenKAT user interface.
+This page explains the basic concepts of OpenKAT (in simple terms).
+For more detailed information, check the :doc:`../../developer-documentation/basic-principles/index` in the developer documentation.
 
 .. toctree::
    :maxdepth: 4
@@ -9,5 +10,3 @@ This page contains all the data on how to navigate around in the OpenKAT user in
 
    objects-and-recursion
    scan-levels-and-indemnification
-   users-and-organizations
-   system-design
