@@ -59,8 +59,8 @@ class NewSchedule(models.Model):
     plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
     input = models.TextField()
 
-    run_on = models.CharField(max_length=64, null=True)
-    operation = models.CharField(max_length=16, choices=Operation.choices, null=True)
+    run_on = models.CharField(max_length=64, null=True, blank=True)
+    operation = models.CharField(max_length=16, choices=Operation.choices, null=True, blank=True)
 
 
 class Task(models.Model):
