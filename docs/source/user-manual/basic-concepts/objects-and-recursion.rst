@@ -24,10 +24,10 @@ but objects can also be added individually or as CSV files. Objects are also ref
 The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
 
 **Example:**
-If there is a hostname, OpenKAT also expects an IP address and possible open ports based on the data model.
-Depending on the given clearance level, this is then scanned, which in turn provides more information, which in turn may prompt new scans.
-This process continues until OpenKAT has searched the entire data model for this hostname.
-How far OpenKAT goes with its search depends on the safeguards.
+  If there is a hostname, OpenKAT also expects an IP address and possible open ports based on the data model.
+  Depending on the given clearance level, this is then scanned, which in turn provides more information, which in turn may prompt new scans.
+  This process continues until OpenKAT has searched the entire data model for this hostname.
+  How far OpenKAT goes with its search depends on the safeguards.
 
 
 Object clearance type
@@ -39,7 +39,7 @@ Each object has a clearance type. The clearance type tells how the object was ad
 - Empty: empty objects do not have a relation to other objects.
 
 The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`.
-The DNS zone is `inherited` based on the DNS zone boefje.
+The DNS zone is `inherited` based on the DNS zone plugin.
 
 .. image:: img/objects-clearance-types.png
   :alt: different object clearance types

@@ -56,7 +56,7 @@ Click on the tab and click on the 'Edit clearance level' on the right.
 
 
 **Important:**
-If you cannot see this button, you might not have the right to do so. Please contact your administrator.
+  If you cannot see this button, you might not have the right to do so. Please contact your administrator.
 
 Also, if there are any warnings on this page, please follow the instructions of the warnings first.
 You might need to set an indemnification for your organization or accept your given scan level.
@@ -82,7 +82,7 @@ If there are a lot of objects in the overview, you can use the filter to find th
 After selecting the object(s), click on the 'Edit clearance level' button on the top right.
 
 **Important:**
-If you cannot see this button, you might not have the right to do so. Please contact your administrator.
+  If you cannot see this button, you might not have the right to do so. Please contact your administrator.
 
 .. image:: img/add-object-06.png
   :alt: Object page

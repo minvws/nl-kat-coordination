@@ -1,10 +1,10 @@
 Navigation
 ==========
 
-Becoming familiar with new tools can be daunting. We hope the glossary helps to make your life easier.
+See how you can navigate through OpenKAT. All pages of the user interface are explained here.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Contents
 
    overview

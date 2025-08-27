@@ -5,7 +5,7 @@ This section contains an introduction about OpenKAT. Here you can read what Open
 Besides this, you can also find the release notes here.
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :caption: Contents
 
    what-is-openkat

@@ -5,7 +5,7 @@ Get started with OpenKAT! Here we will quickly explain to you how OpenKAT works 
 We will explain the onboarding process, how to create (and scan) objects, and how to generate a report.
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Contents
 
    introduction

@@ -12,7 +12,7 @@ With the Reports functionality you can create reports with a specific focus.
 
 There are 3 different kinds of reports available. These are:
 
-- **Normal report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
+- **Separate report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
 - **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
 - **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations. These reports can be exported as PDF.
 
