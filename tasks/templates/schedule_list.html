@@ -9,6 +9,15 @@
 
     <main id="main-content">
         <section>
+            <div>
+                <h1>{% translate "Schedules" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        All the current schedules.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+
             {% if not newschedule_list %}
                 <div>
                     <h2>{% translate "Schedules" %}</h2>

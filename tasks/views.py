@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
