@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 
-from tasks.models import Task
+from tasks.models import Task, NewSchedule
 
 
 class TaskListView(ListView):
@@ -25,8 +25,33 @@ class TaskDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("plugin_list"), "text": _("Plugins")},
-            {"url": reverse("plugin_detail", kwargs={"pk": self.get_object().id}), "text": _("Plugin Detail")},
+            {"url": reverse("new_task_list"), "text": _("Plugins")},
+            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task Detail")},
+        ]
+
+        return context
+
+
+class ScheduleListView(ListView):
+    template_name = "schedule_list.html"
+    model = NewSchedule
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("schedule_list"), "text": _("Schedules")}]
+
+        return context
+
+
+class ScheduleDetailView(DetailView):
+    template_name = "schedule.html"
+    model = NewSchedule
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("schedule_list"), "text": _("Plugins")},
+            {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule Detail")},
         ]
 
         return context

@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="two-thirds-one-third">
+                <div>
+                    <h1>Schedule: {{ schedule.plugin.plugin_id }} for '{{ schedule.input }}'</h1>
+                    <p class="emphasized">{{ schedule.plugin.plugin_id }}</p>
+                    <p class="emphasized">{{ schedule.organization.code }}</p>
+                    <p class="emphasized">{{ schedule.enabled }}</p>
+                    <p class="emphasized">{{ schedule.recurrences }}</p>
+                    <p class="emphasized">{{ schedule.input }}</p>
+                    <p class="emphasized">{{ schedule.run_on }}</p>
+                    <p class="emphasized">{{ schedule.operation }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

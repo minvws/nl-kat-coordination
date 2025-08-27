@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            {% if not newschedule_list %}
+                <div>
+                    <h2>{% translate "Schedules" %}</h2>
+                    <p>{% translate "There are no Schedules." %}</p>
+                </div>
+            {% else %}
+                <div class="horizontal-scroll sticky-column">
+                    <table rf-selector="table-scan-history" class="nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% translate "Id" %}</th>
+                                <th scope="col">{% translate "Plugin" %}</th>
+                                <th scope="col">{% translate "Organization" %}</th>
+                                <th scope="col">{% translate "Enabled" %}</th>
+                                <th scope="col">{% translate "Recurrences" %}</th>
+                                <th scope="col">{% translate "Input" %}</th>
+                                <th scope="col">{% translate "Run On" %}</th>
+                                <th scope="col">{% translate "Operation" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for schedule in newschedule_list %}
+                                <tr data-schedule-id="{{ schedule.id }}">
+                                    <td>
+                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{{ schedule.id }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url "organization_crisis_room" schedule.organization %}">{{ schedule.organization }}</a>
+                                    </td>
+                                    <td>
+                                        <span>{{ schedule.enabled }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ schedule.recurrences }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ schedule.input }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ schedule.run_on }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ schedule.operation }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}
