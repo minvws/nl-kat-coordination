@@ -39,7 +39,7 @@ user:
 	-python manage.py createsuperuser --no-input
 
 seed:
-	python manage.py setup_dev_account
+	python manage.py seed
 
 messages:
 	python manage.py compilemessages

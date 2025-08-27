@@ -10,7 +10,11 @@ def run(file_id: str):
     dig_file = httpx.get(f'{os.getenv("OPENKAT_API")}/file/{file_id}/', headers=headers).json()
     file = httpx.get(dig_file["file"], headers=headers)
 
-    lines = [line.split("\t") for line in file.content.decode().split("\n") if not line.startswith(";") and line]
+    lines = [
+        [part for part in line.split("\t") if part]
+        for line in file.content.decode().split("\n")
+        if not line.startswith(";") and line
+    ]
 
     if not lines:
         return
@@ -19,7 +23,11 @@ def run(file_id: str):
 
     oois = []
     for line in lines:
-        hostname, ttl, record_class, record_type, content = line
+        try:
+            hostname, ttl, record_class, record_type, content = line
+        except ValueError:
+            raise ValueError(f"Cannot parse line: {line}")
+
         hostnames.add(hostname.rstrip("."))
 
         oois.append(

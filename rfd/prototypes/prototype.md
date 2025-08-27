@@ -33,7 +33,6 @@ where the idea is explained in detail. }
 
 - **EX 1**:
 
-
 ## Footnotes
 
 { Footnotes should be used to provide references to external sources or to

@@ -41,7 +41,7 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
             port_service = dict(object_type="Service", name=service_name)
             results.append(port_service)
 
-            ip_service = dict(object_type="IPService", ip_port=ip_port["port"], service=port_service["name"]) # TODO
+            ip_service = dict(object_type="IPService", ip_port=ip_port["port"], service=port_service["name"])  # TODO
             results.append(ip_service)
 
     return results

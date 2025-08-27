@@ -102,7 +102,7 @@ class Query:
         return new._compile(separator="\n    ")
 
     @classmethod
-    def from_path(cls, path: Path) -> Query:
+    def from_path(cls, path: Path | str) -> Query:
         """
         Create a query from a Path.
 
@@ -112,6 +112,9 @@ class Query:
         If the last segment is not an OOI Type, the result of the query changes to the value of that specific field
         instead of returning the complete OOIs for the last type.
         """
+
+        if isinstance(path, str):
+            path = Path.parse(path)
 
         ooi_type = (
             path.segments[-1].target_type

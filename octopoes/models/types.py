@@ -179,6 +179,7 @@ def get_all_types(cls_: type[OOI]) -> Iterator[type[OOI]]:
 
 
 ALL_TYPES = set(get_all_types(OOI))
+ALL_TYPES_MAP = {t.__name__.lower(): t for t in ALL_TYPES}
 
 
 def get_abstract_types() -> set[type[OOI]]:

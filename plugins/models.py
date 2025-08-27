@@ -1,9 +1,20 @@
-import recurrence.fields
-from django.contrib.postgres.fields import ArrayField
-from django.db import models
-from django.db.models import Q, UniqueConstraint
+import datetime
+from datetime import timezone
 
-from openkat.models import OrganizationMember
+import recurrence
+import structlog
+from django.contrib.postgres.fields import ArrayField
+from django.db import DatabaseError, models
+from django.db.models import Q, QuerySet, UniqueConstraint
+from recurrence.fields import RecurrenceField
+
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.types import ALL_TYPES_MAP
+from openkat.models import Organization, OrganizationMember
+from tasks.models import NewSchedule
+
+logger = structlog.get_logger(__name__)
 
 
 class ScanLevel(models.IntegerChoices):
@@ -25,12 +36,44 @@ class Plugin(models.Model):
 
     # Task specifications
     consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: revise
-    recurrences = recurrence.fields.RecurrenceField(null=True)
+    recurrences = RecurrenceField(null=True)  # If set, this is used as a default
 
     # Image specifications
     oci_image = models.CharField(max_length=256, null=True)
     oci_arguments = ArrayField(models.CharField(max_length=256, blank=True), default=list)
     version = models.CharField(max_length=16, null=True)
+
+    def types_in_arguments(self):
+        return list(
+            {
+                part[1:-1]
+                for arg in self.oci_arguments
+                for part in arg.split("|")
+                if arg.startswith("{") and arg.endswith("}")
+            }
+        )
+
+    def enabled_organizations(self) -> QuerySet:
+        orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
+
+        if not self.enabled_plugins.filter(organization=None, enabled=True).exists():
+            return orgs
+
+        # This plugin is globally enabled
+        return orgs.union(Organization.objects.difference(Organization.objects.filter(enabled_plugins__plugin=self)))
+
+    def enabled_for(self, organization: Organization | None) -> bool:
+        enabled_plugin = self.enabled_plugins.filter(organization=organization).first()
+
+        if enabled_plugin:
+            return enabled_plugin.enabled
+
+        enabled_plugin = self.enabled_plugins.filter(organization=None).first()
+
+        if enabled_plugin:
+            return enabled_plugin.enabled
+
+        return False
 
 
 class PluginSettings(models.Model):
@@ -54,3 +97,54 @@ class EnabledPlugin(models.Model):
 
     def can_scan(self, member: OrganizationMember) -> bool:
         return member.has_perm("openkat.can_scan_organization")
+
+    def save(self, *args, **kwargs):
+        try:
+            self.initialize_schedules()
+        except DatabaseError:
+            logger.warning("Could not aligns schedules for plugin: %s", self)
+            raise
+
+        return super().save(*args, **kwargs)
+
+    def initialize_schedules(self):
+        queries = []
+
+        # TODO: once moved to XTDB 2.0 we can revise this
+        for ooi_type in self.plugin.types_in_arguments():
+            parsed_type = ALL_TYPES_MAP.get(ooi_type)
+
+            if parsed_type == Hostname:
+                queries.append("Hostname.name")
+            if parsed_type in [IPAddressV4, IPAddressV6]:
+                queries.append(f"{parsed_type.object_type}.address")
+
+        schedules = NewSchedule.objects.filter(plugin=self.plugin, organization=self.organization)
+
+        if schedules.exists():
+            return
+
+        # So this is possibly the first time enabling the plugin for the organization
+        for query in queries:
+            NewSchedule.objects.create(
+                plugin=self.plugin,
+                enabled=self.enabled,
+                input=query,
+                organization=self.organization,
+                recurrences=self.plugin.recurrences
+                or recurrence.Recurrence(
+                    rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
+                    dtstart=datetime.datetime.now(timezone.utc),
+                ),
+            )
+
+        if not queries:
+            NewSchedule.objects.create(
+                plugin=self.plugin,
+                enabled=self.enabled,
+                organization=self.organization,
+                recurrences=self.plugin.recurrences
+                or recurrence.Recurrence(
+                    rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(timezone.utc)
+                ),
+            )

@@ -35,7 +35,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.setup_kat_groups()
+        self.setup_group_permissions()
 
+    def setup_group_permissions(self):
         redteamer_permissions = [
             "can_scan_organization",
             "can_enable_disable_plugin",

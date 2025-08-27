@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from pydantic import BaseModel, Field, TypeAdapter
 
-from katalogus.worker.repository import ModuleException, _find_packages_in_path_containing_files, get_local_repository
+from katalogus.worker.repository import ModuleException, _find_packages_in_path_containing_files
 from openkat.settings import BASE_DIR
 from plugins.models import EnabledPlugin, Plugin
 
@@ -41,19 +41,6 @@ plugins_type_adapter = TypeAdapter(list[NewPlugin])
 def nsync() -> list[Plugin]:
     plugins = []
     enabled_plugins = []
-
-    for normalizer_id, resource in get_local_repository().resolve_normalizers().items():
-        plugin = Plugin(
-            plugin_id=normalizer_id,
-            name=resource.normalizer.name,
-            scan_level=resource.normalizer.scan_level,
-            description=resource.normalizer.description,
-            consumes=list(resource.normalizer.consumes),
-            recurrences=resource.normalizer.recurrences,
-            version=resource.normalizer.version,
-        )
-        plugins.append(plugin)
-        enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     for path, package in _find_packages_in_path_containing_files(BASE_DIR / "plugins" / "plugins", ("plugin.json",)):
         try:

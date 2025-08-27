@@ -1,125 +1,103 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import structlog
 from django.conf import settings
-from django.db.models import Q
-from django.db.models.functions import Coalesce
 
 from files.models import File
-from octopoes.models import OOI, ScanLevel
-from octopoes.models.exception import TypeNotFound
-from octopoes.models.types import type_by_name
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.xtdb.query import Aliased, Query
 from openkat.models import Organization
-from plugins.models import EnabledPlugin, Plugin
+from plugins.models import Plugin
 from plugins.runner import PluginRunner
 from tasks.celery import app
-from tasks.models import Task, TaskStatus
+from tasks.models import NewSchedule, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
-def schedule():
-    pass  # TODO: check recurrence field
-
-
-def get_expired_plugins(
-    plugin_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
-) -> list[tuple[OOI, EnabledPlugin]]:
-    # TODO: base this query on the new recurrence field
-    recent_tasks = Task.objects.filter(
-        created_at__gte=datetime.now(timezone.utc) - timedelta(minutes=settings.GRACE_PERIOD), type="plugin"
-    ).all()
-
-    enabled_plugins = EnabledPlugin.objects.filter(enabled=True)
-
-    if organization:
-        enabled_plugins = enabled_plugins.filter(organization__code=organization)
-
-    oois = None
-    expired: list[tuple[OOI, EnabledPlugin]] = []
-
-    if plugin_id:
-        enabled_plugins = enabled_plugins.filter(plugin__plugin_id=plugin_id)
-    if input_oois is not None and organization:
-        connector = settings.OCTOPOES_FACTORY(organization)
-        oois = connector.load_objects_bulk(set(input_oois), datetime.now(timezone.utc)).values()
-
-    for enabled_plugin in enabled_plugins:
-        connector = settings.OCTOPOES_FACTORY(enabled_plugin.organization.code)
-        consumes = set()
-
-        for type_name in enabled_plugin.plugin.consumes:
-            try:
-                consumes.add(type_by_name(type_name))
-            except TypeNotFound:
-                logger.warning("Unknown OOI type %s for plugin consumes %s", type_name, enabled_plugin.plugin.plugin_id)
-
-        scan_levels = {scan_level for scan_level in ScanLevel if scan_level.value >= enabled_plugin.plugin.scan_level}
-
-        if oois:
-            oois = [o for o in oois if o.scan_profile.level in scan_levels]
-        else:
-            oois = connector.list_objects(consumes, datetime.now(timezone.utc), scan_level=scan_levels).items
-
-        for ooi in oois:
-            if recent_tasks.filter(
-                data__input_ooi=ooi.primary_key,
-                organization=enabled_plugin.organization,
-                data__plugin__id=enabled_plugin.plugin.id,
-            ).exists():
-                logger.debug(
-                    "Recent task found, skipping dispatch or plugin %s for %s on %s",
-                    enabled_plugin.plugin.plugin_id,
-                    enabled_plugin.organization.code,
-                    ooi.primary_key,
-                )
-                continue
-
-            expired.append((ooi, enabled_plugin))
-
-    return expired
-
-
-@app.task
 def reschedule(
     plugin_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
 ) -> None:
     logger.info("Scheduling plugins")
+
     count = 0
-    for ooi, enabled_plugin in get_expired_plugins(plugin_id, input_oois, organization):
-        app.send_task("tasks.tasks.run_plugin", (enabled_plugin.plugin.plugin_id, enabled_plugin.organization, ooi))
-        count += 1
+    now = datetime.now(timezone.utc)
+
+    for schedule in NewSchedule.objects.filter(enabled=True):
+        if not schedule.plugin:
+            pass
+
+        for org in schedule.plugin.enabled_organizations():
+            connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
+
+            # TODO: will be replaced with direct(er) queries in XTDB 2.0
+            query = Query.from_path(schedule.input)
+            pk = Aliased(query.result_type, field="primary_key")
+
+            objects = connector.octopoes.ooi_repository.query(
+                query.find(pk).where(query.result_type, primary_key=pk), now
+            )
+            by_pk = {item[-1]: item[0] for item in objects}
+            scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
+
+            for profile in scan_profiles:
+                if profile.level.value < schedule.plugin.scan_level:
+                    continue
+
+                input_data = by_pk[str(profile.reference)]
+
+                last_run = (
+                    Task.objects.filter(
+                        data__plugin_id=schedule.plugin.plugin_id,
+                        data__organization=org.code,
+                        data__input_data=input_data,
+                    )
+                    .order_by("-created_at")
+                    .first()
+                )
+
+                if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                    logger.debug(
+                        "Plugin '%s' has already run recently for organization '%s' on input data '%s'",
+                        schedule.plugin.plugin_id,
+                        org.code,
+                        input_data,
+                    )
+                    continue
+
+                app.send_task("tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data))
+                count += 1
 
     logger.info("Finished scheduling %s plugins", count)
 
 
 @app.task(bind=True)
-def run_plugin(self, plugin_id: str, organization: str | None = None, input_data: str | None = None) -> None:
-    # TODO: remove need to create task beforehand
-    logger.info("Starting task %s for plugin [org=%s, plugin_id=%s]", self.request.id, organization, plugin_id)
+def run_plugin(self, plugin_id: str, organization_code: str | None = None, input_data: str | None = None) -> None:
+    logger.debug(
+        "Starting task plugin",
+        task_id=self.request.id,
+        organization=organization_code,
+        plugin_id=plugin_id,
+        input_data=input_data,
+    )
+    organization: Organization | None = None
+
+    if organization_code:
+        organization = Organization.objects.get(code=organization_code)
 
     task = Task.objects.create(
         id=self.request.id,
         type="plugin",
         organization=organization,
         status=TaskStatus.RUNNING,
-        data={"plugin_id": plugin_id, "organization": organization, "input_data": input_data},  # TODO
+        data={"plugin_id": plugin_id, "organization": organization_code, "input_data": input_data},  # TODO
     )
 
-    org = None
-    if organization:
-        org = Organization.objects.get(code=organization)
+    plugin = Plugin.objects.filter(plugin_id=plugin_id).first()
 
-    plugin = (
-        Plugin.objects.filter(plugin_id=plugin_id)
-        .filter(Q(enabled_plugins__organization=org) | Q(enabled_plugins__isnull=True))
-        .annotate(enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None))
-        .first()
-    )
-
-    if not plugin or not plugin.enabled:
-        raise RuntimeError("Plugin is not enabled")
+    if not plugin or not plugin.enabled_for(organization):
+        raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
 
     try:
         PluginRunner().run(plugin_id, input_data)
@@ -130,7 +108,7 @@ def run_plugin(self, plugin_id: str, organization: str | None = None, input_data
         task.save()
         raise
 
-    logger.info("Handled plugin [org=%s, plugin_id=%s]", organization, plugin_id)
+    logger.info("Handled plugin", organization=organization, plugin_id=plugin_id, input_data=input_data)
 
 
 def process_raw_file(file: File, handle_error: bool = False):

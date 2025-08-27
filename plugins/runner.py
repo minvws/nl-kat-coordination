@@ -21,7 +21,7 @@ class PluginRunner:
         self.override_entrypoint = override_entrypoint
         self.adapter = adapter
 
-    def run(self, plugin_id: str, target: str, output: str = "file"):
+    def run(self, plugin_id: str, target: str | None, output: str = "file"):
         use_stdout = str(output) == "-"
 
         try:
@@ -73,18 +73,23 @@ class PluginRunner:
         )
         token.save()
 
-        # TODO: add nameserver through configuration later
-        format_map = {"nameserver": "1.1.1.1", "ip_address|hostname": target, "file": target}
+        args = plugin.oci_arguments
 
-        if is_ip:
-            format_map["ip_address"] = target
-        else:
-            format_map["hostname"] = target
+        if target is not None:
+            # TODO: add nameserver through configuration later
+            format_map = {"nameserver": "1.1.1.1", "ip_address|hostname": target, "file": target}
+
+            if is_ip:
+                format_map["ip_address"] = target
+            else:
+                format_map["hostname"] = target
+
+            args = [arg.format_map(format_map) for arg in plugin.oci_arguments]
 
         logs = client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
-            command=[arg.format_map(format_map) for arg in plugin.oci_arguments],
+            command=args,
             stdout=use_stdout,
             stderr=True,
             remove=True,

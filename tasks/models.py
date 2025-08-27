@@ -1,5 +1,6 @@
 import uuid
 
+import recurrence.fields
 from django.db import models
 
 from files.models import File
@@ -29,6 +30,12 @@ class TaskStatus(models.TextChoices):
     CANCELLED = "cancelled"
 
 
+class Operation(models.TextChoices):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
 class Schedule(models.Model):
     type = models.CharField(max_length=64)
     organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="schedules")
@@ -41,6 +48,21 @@ class Schedule(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
 
+class NewSchedule(models.Model):
+    enabled = models.BooleanField(default=True)
+    recurrences = recurrence.fields.RecurrenceField(null=True)
+
+    # TODO: multiple organizations?
+    organization = models.ForeignKey(
+        "openkat.organization", on_delete=models.CASCADE, related_name="new_schedules", null=True
+    )
+    plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
+    input = models.TextField()
+
+    run_on = models.CharField(max_length=64, null=True)
+    operation = models.CharField(max_length=16, choices=Operation.choices, null=True)
+
+
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name="tasks", null=True)
@@ -50,6 +72,7 @@ class Task(models.Model):
     status = models.CharField(max_length=16, choices=TaskStatus.choices, default=TaskStatus.PENDING)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
 
 

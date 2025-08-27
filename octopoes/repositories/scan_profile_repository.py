@@ -113,7 +113,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish_now(event, self.session))
 
-    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[ScanProfileBase]:
+    def get_bulk(self, references: set[Reference | str], valid_time: datetime) -> list[ScanProfileBase]:
         ids = list(map(str, references))
         query = generate_pull_query(FieldSet.ALL_FIELDS, {"type": self.object_type, "reference": ids})
         res = self.session.client.query(query, valid_time)

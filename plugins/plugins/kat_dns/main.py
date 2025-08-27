@@ -39,7 +39,7 @@ def get_record_types() -> set[str]:
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
-def run(hostname: str) :
+def run(hostname: str):
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
 
@@ -136,16 +136,25 @@ def run(hostname: str) :
                         mail_hostname_reference = mail_fqdn["name"]
 
                     register_record(
-                        dict(object_type="DNSMXRecord", mail_hostname=mail_hostname_reference, preference=rr.preference, **default_args)
+                        dict(
+                            object_type="DNSMXRecord",
+                            mail_hostname=mail_hostname_reference,
+                            preference=rr.preference,
+                            **default_args,
+                        )
                     )
 
                 if isinstance(rr, NS):
                     ns_fqdn = register_hostname(str(rr.target))
-                    register_record(dict(object_type="DNSNSRecord", name_server_hostname=ns_fqdn["name"], **default_args))
+                    register_record(
+                        dict(object_type="DNSNSRecord", name_server_hostname=ns_fqdn["name"], **default_args)
+                    )
 
                 if isinstance(rr, CNAME):
                     target_fqdn = register_hostname(str(rr.target))
-                    register_record(dict(object_type="DNSCNAMERecord", target_hostname=target_fqdn["name"], **default_args))
+                    register_record(
+                        dict(object_type="DNSCNAMERecord", target_hostname=target_fqdn["name"], **default_args)
+                    )
 
                 if isinstance(rr, CAA):
                     record_value = str(rr).split(" ", 2)
@@ -173,7 +182,14 @@ def run(hostname: str) :
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
                 if isinstance(rr, TXT):
-                    results.append(dict(object_type="DMARCTXTRecord", hostname=input_hostname["name"], value=str(rr).strip('"'), ttl=rrset.ttl))
+                    results.append(
+                        dict(
+                            object_type="DMARCTXTRecord",
+                            hostname=input_hostname["name"],
+                            value=str(rr).strip('"'),
+                            ttl=rrset.ttl,
+                        )
+                    )
 
     return results
 
