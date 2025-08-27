@@ -8,7 +8,7 @@ enabling plugins, OpenKAT can start scanning this object. This section will show
 Adding an object
 ----------------
 
-We start by adding an object, also referred to as 'object of interest' or 'OOI'.
+We start by adding an object, also referred to as 'Object of Interest' (OOI).
 
 New objects can be created via the 'Add' button on the Objects page. You can be done individually or per CSV.
 The specification of the CSV is included on the page where it can be provided.
@@ -33,7 +33,8 @@ Now it is time to fill in the details of the object and continue to the next pag
 The object has now been added and you now see the object detail page.
 You can also find the object in the overview table on the Objects page.
 
-More information about the Objects page and object details can be found here: :doc:`../navigation/objects/objects`.
+See :doc:`../basic-concepts/objects-and-recursion` for more detailed information about the way objects work.
+If you want to know more about the Objects page and the Object details page, see :doc:`../navigation/objects`.
 
 
 Changing clearance level

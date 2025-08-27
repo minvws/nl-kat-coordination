@@ -42,7 +42,7 @@ An example:
 How far OpenKAT goes with its search depends on the clearance levels that are provided. Read more about it here: :doc:`../basic-concepts/scan-levels-and-indemnification`.
 
 So this is what OpenKAT does behind the scenes, in simple terms.
-If you want more details about this process, please check :doc:`../basic-concepts/index` (simple terms) or the :doc:`../../developer-documentation/basic-principles/index` (for developers).
+If you want more details about this process, please check the :doc:`../../developer-documentation/basic-principles/index` in the developer documentation.
 
 
 User flow
@@ -63,4 +63,4 @@ To start with OpenKAT you have to log in first. If you have trouble logging in, 
 
 After logging in, you continue to the onboarding. This onboarding will walk you through creating and scanning your first object and report. You can more about the onboarding, here: :doc:`onboarding`.
 
-You can also skip the onboarding and directly go to :doc:`create-object` to create your first object in OpenKAT.
+You can also skip the onboarding and directly go to :doc:`start-scanning` to create your first object in OpenKAT.

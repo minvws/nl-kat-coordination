@@ -12,7 +12,7 @@ Becoming familiar with new tools can be daunting. We hope the glossary helps to 
    katalogus
    findings
    reports
-   objects/index
+   objects
    tasks
    members
    settings

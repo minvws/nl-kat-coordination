@@ -1,7 +1,10 @@
 Objects
 =======
 
-The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc. It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default:
+Objects overview
+----------------
+The Objects page lists all the objects in Octopoes. Objects can be anything, like DNS records, hostnames, URLs, software, software versions, ports, etc.
+It is any piece of information that is found by the normalizers, bits and boefjes. On a new installation you'll see the following objects by default:
 
 .. image:: img/objects-clean-install.png
   :alt: overview of default objects
@@ -9,26 +12,13 @@ The Objects page lists all the objects in Octopoes. Objects can be anything, lik
 The table gives an overview on the following items:
 - Object: this is the piece of data that was identified, such as a port, software version, hostname, etc.
 - Object type: this shows how this object is labelled.
-- Clearance level: this shows the clearance level of this object.
-- Clearance type: this shows what kind of clearance level is set on the object. See `Object clearances` __ below for more information.
+- Clearance level: this shows the clearance level of this object. See :doc:`../basic-concepts/scan-levels-and-indemnification` for more information.
+- Clearance type: this shows what kind of clearance level is set on the object. ee :doc:`../basic-concepts/objects-and-recursion` for more information.
 
 The objects can be filtered by object types, clearance levels and clearance types. The search functionality can also be used to search for specific objects, such as hostnames.
 
 More information on objects is provided by clicking on the object. This will give an overview page with all information for the specific object. The object details page is further described below.
 
-
-Object clearances
------------------
-Each object has a clearance type. The clearance type tells how the object was added to the Objects list. The following object types are available:
-
-- Declared: declared objects were added by the user.
-- Inherited: inherited objects were identified through propagation and the parsing of bits and normalizers. This means there is a relation to other object(s).
-- Empty: empyth objects do not have a relation to other objects.
-
-The objects below show different clearance types for various objects. The hostname `mispo.es` was manually added and thus is `declared`. The DNS zone is `inherited` based on the DNS zone boefje.
-
-.. image:: img/objects-clearance-types.png
-  :alt: different object clearance types
 
 Object details
 --------------
