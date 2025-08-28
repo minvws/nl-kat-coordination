@@ -41,6 +41,11 @@
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                         </li>
+                        <li>
+                            {% url "file_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Files" %}</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <div>

@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Files" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        All the current files.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+
+            {% if not file_list %}
+                <div>
+                    <h2>{% translate "Files" %}</h2>
+                    <p>{% translate "There are no Files." %}</p>
+                </div>
+            {% else %}
+                <div class="horizontal-scroll sticky-column">
+                    <table rf-selector="table-scan-history" class="nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% translate "File" %}</th>
+                                <th scope="col">{% translate "Created date" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in file_list %}
+                                <tr data-file-id="{{ file.id }}">
+                                    <td>
+                                        <a href="{{ file.file.url }}">{{ file.file }}.{{ file.type }}</a>
+                                    </td>
+                                    <td>{{ file.created_at }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}
