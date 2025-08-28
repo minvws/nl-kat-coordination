@@ -8,6 +8,7 @@ Each plugin (Boefje and Normalizer) contains more information on how it works an
 and which objects are required for the plugin to work.
 
 Before a plugin can run the following two conditions must be met:
+
 - The Boefje and corresponding Normalizer are enabled. Note: all Normalizers are enabled by default.
 - The clearance level of your object (e.g. hostname or URL) is at least the required scan level of the enabled plugin.
 

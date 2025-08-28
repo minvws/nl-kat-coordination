@@ -14,6 +14,7 @@ For each object, the 'clearance level' menu indicates how deeply scanning is all
 The levels used range from level 0 to level 4, from 'do not scan' to 'very intrusive'. Scanning levels are distributed in the data model, either by inheritance or by user statements. The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
 
 .. list-table:: Scan levels
+   :class: table
    :widths: 25 50
    :header-rows: 1
 
@@ -22,9 +23,9 @@ The levels used range from level 0 to level 4, from 'do not scan' to 'very intru
    * - L0
      - do not scan
    * - L1
-     - do not touch
+     - hardly scan
    * - L2
-     - normal user
+     - scan like a normal user
    * - L3
      - detectable scan
    * - L4
