@@ -18,6 +18,12 @@
                     {% endblocktranslate %}
                 </p>
             </div>
+            {% if perms.openkat.add_newschedule %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost"
+                       href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Schedule" %}</a>
+                </div>
+            {% endif %}
             {% if not newschedule_list %}
                 <div>
                     <h2>{% translate "Schedules" %}</h2>

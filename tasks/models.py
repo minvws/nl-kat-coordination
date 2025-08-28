@@ -50,11 +50,11 @@ class Schedule(models.Model):
 
 class NewSchedule(models.Model):
     enabled = models.BooleanField(default=True)
-    recurrences = recurrence.fields.RecurrenceField(null=True)
+    recurrences = recurrence.fields.RecurrenceField(null=True, blank=True)
 
     # TODO: multiple organizations?
     organization = models.ForeignKey(
-        "openkat.organization", on_delete=models.CASCADE, related_name="new_schedules", null=True
+        "openkat.organization", on_delete=models.CASCADE, related_name="new_schedules", null=True, blank=True
     )
     plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
     input = models.TextField(blank=True)

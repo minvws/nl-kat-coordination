@@ -75,6 +75,9 @@ class Plugin(models.Model):
 
         return False
 
+    def __str__(self):
+        return f"{self.plugin_id}"
+
 
 class PluginSettings(models.Model):
     settings = models.JSONField(default=dict)  # TODO: encoder/decoder with for datatimes?
