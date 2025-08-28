@@ -18,7 +18,6 @@
                     {% endblocktranslate %}
                 </p>
             </div>
-
             {% if not newschedule_list %}
                 <div>
                     <h2>{% translate "Schedules" %}</h2>
@@ -34,10 +33,12 @@
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Input" %}</th>
                                 <th scope="col">{% translate "Schedule" %}</th>
-{#                                <th scope="col">{% translate "Run On" %}</th>#}
-{#                                TODO: use these #}
-{#                                <th scope="col">{% translate "Operation" %}</th>#}
+                                <th scope="col">{% translate "Tasks" %}</th>
+                                {#                                <th scope="col">{% translate "Run On" %}</th>#}
+                                {#                                TODO: use these #}
+                                {#                                <th scope="col">{% translate "Operation" %}</th>#}
                                 <th scope="col">{% translate "Enabled" %}</th>
+                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,9 +52,7 @@
                                     </td>
                                     <td>
                                         {% if schedule.organization %}
-                                            <a href="{% url "organization_crisis_room" schedule.organization %}">
-                                                {{ schedule.organization }}
-                                            </a>
+                                            <a href="{% url "organization_crisis_room" schedule.organization %}">{{ schedule.organization }}</a>
                                         {% else %}
                                             {% translate "All" %}
                                         {% endif %}
@@ -61,56 +60,57 @@
                                     <td>
                                         <span>{{ schedule.input }}</span>
                                     </td>
-{#                                    <td>#}
-{#                                        <span>{{ schedule.run_on }}</span>#}
-{#                                    </td>#}
-{#                                    <td>#}
-{#                                        <span>{{ schedule.operation }}</span>#}
-{#                                    </td>#}
+                                    {#                                    <td>#}
+                                    {#                                        <span>{{ schedule.run_on }}</span>#}
+                                    {#                                    </td>#}
+                                    {#                                    <td>#}
+                                    {#                                        <span>{{ schedule.operation }}</span>#}
+                                    {#                                    </td>#}
                                     <td>
-                                        {% for rrule in schedule.recurrences.rrules %}
-                                            <strong>{{ rrule.to_text.upper }}</strong>
-                                        {% endfor %}
+                                        {% for rrule in schedule.recurrences.rrules %}<strong>{{ rrule.to_text.upper }}</strong>{% endfor %}
                                     </td>
-                                        {% if perms.openkat.can_enable_disable_schedule %}
-                                            <form action="{% url "edit_schedule" pk=schedule.id %}"
-                                                  method="post"
-                                                  class="inline">
-                                                {% csrf_token %}
-                                                <td>
-
-                                                        <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
-                                                        <input type="hidden" name="schedule" value="{{ schedule.id }}">
-                                                        <input type="hidden" name="recurrences" value="{{ schedule.recurrences }}">
-                                                        <input type="hidden" name="input" value="{{ schedule.input }}">
-                                                        {% if schedule.enabled %}
-                                                            <input type="hidden" name="enabled" value="false">
-                                                            <button type="submit" class="button ghost destructive">
-                                                                {% translate "Disable" %}
-                                                            </button>
-                                                        {% else %}
-                                                            <input type="hidden" name="enabled" value="true">
-                                                            <button type="submit" class="button ghost schedule-enabled">
-                                                                {% translate "Enable" %}
-                                                            </button>
-                                                        {% endif %}
-                                                </td>
-                                            </form>
-                                            {% else %}
-                                                <td>
-                                                    <span>{{ schedule.recurrences }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="de-emphasized">
-                                                        {% if schedule.enabled %}
-                                                            <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-                                                        {% else %}
-                                                            <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-                                                    </span>
-                                                </td>
-                                            {% endif %}
-
+                                    <td>
+                                        <a href="{% url 'new_task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
+                                    </td>
+                                    {% if perms.openkat.can_enable_disable_schedule %}
+                                        <form action="{% url "edit_schedule" pk=schedule.id %}"
+                                              method="post"
+                                              class="inline">
+                                            {% csrf_token %}
+                                            <td>
+                                                <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
+                                                <input type="hidden" name="schedule" value="{{ schedule.id }}">
+                                                <input type="hidden" name="recurrences" value="{{ schedule.recurrences }}">
+                                                <input type="hidden" name="input" value="{{ schedule.input }}">
+                                                {% if schedule.enabled %}
+                                                    <input type="hidden" name="enabled" value="false">
+                                                    <button type="submit" class="button ghost destructive">{% translate "Disable" %}</button>
+                                                {% else %}
+                                                    <input type="hidden" name="enabled" value="true">
+                                                    <button type="submit" class="button ghost schedule-enabled">{% translate "Enable" %}</button>
+                                                {% endif %}
+                                            </td>
+                                        </form>
+                                    {% else %}
+                                        <td>
+                                            <span>{{ schedule.recurrences }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="de-emphasized">
+                                                {% if schedule.enabled %}
+                                                    <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                                                {% else %}
+                                                    <span class="label system-tag color-3">{% translate "Disabled" %}</span>
+                                                </span>
+                                            </td>
                                         {% endif %}
+                                    {% endif %}
+                                    <td>
+                                        <form action="{% url 'delete_schedule' schedule.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -122,4 +122,3 @@
         </section>
     </main>
 {% endblock content %}
-

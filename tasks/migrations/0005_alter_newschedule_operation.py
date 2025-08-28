@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('tasks', '0004_remove_newschedule_plugins_newschedule_plugin'),
-    ]
+    dependencies = [("tasks", "0004_remove_newschedule_plugins_newschedule_plugin")]
 
     operations = [
         migrations.AlterField(
-            model_name='newschedule',
-            name='operation',
-            field=models.CharField(choices=[('create', 'Create'), ('update', 'Update'), ('delete', 'Delete')], max_length=16, null=True),
-        ),
+            model_name="newschedule",
+            name="operation",
+            field=models.CharField(
+                choices=[("create", "Create"), ("update", "Update"), ("delete", "Delete")], max_length=16, null=True
+            ),
+        )
     ]

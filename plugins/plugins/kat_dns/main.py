@@ -1,7 +1,6 @@
 import json
 import re
 import sys
-from ipaddress import IPv4Address, IPv6Address
 from os import getenv
 
 import dns

@@ -48,5 +48,4 @@ Nmap outputs the following OOIs:
 }
 ```
 
-
 **Cat name**: Elsje

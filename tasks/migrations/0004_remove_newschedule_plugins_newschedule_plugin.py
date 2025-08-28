@@ -5,19 +5,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('tasks', '0003_task_ended_at_newschedule'),
-    ]
+    dependencies = [("tasks", "0003_task_ended_at_newschedule")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='newschedule',
-            name='plugins',
-        ),
+        migrations.RemoveField(model_name="newschedule", name="plugins"),
         migrations.AddField(
-            model_name='newschedule',
-            name='plugin',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='schedules', to='plugins.plugin'),
+            model_name="newschedule",
+            name="plugin",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, related_name="schedules", to="plugins.plugin"
+            ),
         ),
     ]

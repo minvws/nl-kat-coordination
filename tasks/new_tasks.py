@@ -46,7 +46,6 @@ def reschedule(
                     continue
 
                 input_data = by_pk[str(profile.reference)]
-
                 last_run = (
                     Task.objects.filter(
                         data__plugin_id=schedule.plugin.plugin_id,
@@ -66,14 +65,22 @@ def reschedule(
                     )
                     continue
 
-                app.send_task("tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data))
+                app.send_task(
+                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
+                )
                 count += 1
 
     logger.info("Finished scheduling %s plugins", count)
 
 
 @app.task(bind=True)
-def run_plugin(self, plugin_id: str, organization_code: str | None = None, input_data: str | None = None) -> None:
+def run_plugin(
+    self,
+    plugin_id: str,
+    organization_code: str | None = None,
+    input_data: str | None = None,
+    schedule_id: int | None = None,
+) -> None:
     logger.debug(
         "Starting task plugin",
         task_id=self.request.id,
@@ -89,6 +96,7 @@ def run_plugin(self, plugin_id: str, organization_code: str | None = None, input
     task = Task.objects.create(
         id=self.request.id,
         type="plugin",
+        new_schedule_id=schedule_id,
         organization=organization,
         status=TaskStatus.RUNNING,
         data={"plugin_id": plugin_id, "organization": organization_code, "input_data": input_data},  # TODO

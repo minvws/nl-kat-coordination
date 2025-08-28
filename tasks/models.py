@@ -66,6 +66,7 @@ class NewSchedule(models.Model):
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name="tasks", null=True)
+    new_schedule = models.ForeignKey(NewSchedule, on_delete=models.CASCADE, related_name="tasks", null=True)
     organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True)
     type = models.CharField(max_length=32)
     data = models.JSONField(default=dict)

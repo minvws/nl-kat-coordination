@@ -4,9 +4,9 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, DeleteView
 
-from tasks.models import Task, NewSchedule
+from tasks.models import NewSchedule, Task
 
 
 class TaskListView(ListView):
@@ -15,6 +15,14 @@ class TaskListView(ListView):
     model = Task
     ordering = ["-created_at"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if "schedule_id" in self.request.GET:
+            qs = qs.filter(new_schedule__id=self.request.GET["schedule_id"])
+
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -71,6 +79,21 @@ class ScheduleDetailView(DetailView):
         return context
 
 
+class ScheduleDeleteView(DeleteView):
+    model = NewSchedule
+
+    def form_invalid(self, form):
+        return redirect(reverse("schedule_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("schedule_list")
+
+
 class ScheduleUpdateView(UpdateView):
     model = NewSchedule
     fields = ["enabled", "recurrences", "input"]
@@ -85,12 +108,3 @@ class ScheduleUpdateView(UpdateView):
             return redirect_url
 
         return reverse_lazy("schedule_list")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"url": reverse("schedule_list"), "text": _("Plugins")},
-            {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule Detail")},
-        ]
-
-        return context

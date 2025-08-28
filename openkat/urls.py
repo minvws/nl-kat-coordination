@@ -2,11 +2,11 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path
 from django.views.generic.base import TemplateView
+from django.views.i18n import JavaScriptCatalog
 from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
-from django.views.i18n import JavaScriptCatalog
 
 from files.viewsets import FileViewSet
 from katalogus.viewsets import BoefjeViewSet
@@ -88,7 +88,6 @@ urlpatterns += i18n_patterns(
     path("", include("plugins.urls"), name="plugins"),
     path("", include("tasks.urls"), name="tasks"),
     path("", include("files.urls"), name="files"),
-
     path("privacy-statement/", PrivacyStatementView.as_view(), name="privacy_statement"),
     path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
     path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
@@ -164,4 +163,4 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/reports/", include("reports.urls"), name="reports"),
 )
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += [ path('jsi18n.js', JavaScriptCatalog.as_view(packages=['recurrence']), name='jsi18n')]
+urlpatterns += [path("jsi18n.js", JavaScriptCatalog.as_view(packages=["recurrence"]), name="jsi18n")]

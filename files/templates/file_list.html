@@ -17,7 +17,6 @@
                     {% endblocktranslate %}
                 </p>
             </div>
-
             {% if not file_list %}
                 <div>
                     <h2>{% translate "Files" %}</h2>
@@ -40,11 +39,15 @@
                                         <a href="{{ file.file.url }}">{{ file.file }}.{{ file.type }}</a>
                                     </td>
                                     {% if file.task_result and file.task_result.task.data.plugin_id %}
-                                        <td><a href="{% url "task_detail" pk=file.task_result.task.id  %}">
-                                            {{ file.task_result.task.data.plugin_id }}(organization = '{{ file.task_result.task.data.organization }}')
-                                        </a></td>
+                                        <td>
+                                            <a href="{% url "task_detail" pk=file.task_result.task.id %}">
+                                                {{ file.task_result.task.data.plugin_id }}(organization = '{{ file.task_result.task.data.organization }}')
+                                            </a>
+                                        </td>
                                     {% elif file.task_result %}
-                                        <td><a href="{% url "task_detail" pk=file.task_result.task.id  %}">{{ file.task_result.task.id }}</a></td>
+                                        <td>
+                                            <a href="{% url "task_detail" pk=file.task_result.task.id %}">{{ file.task_result.task.id }}</a>
+                                        </td>
                                     {% else %}
                                         <td>{% translate 'No Task' %}</td>
                                     {% endif %}

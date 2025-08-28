@@ -22,10 +22,12 @@
                         <thead>
                             <tr>
                                 <th scope="col">{% translate "Task ID" %}</th>
-                                <th scope="col">{% translate "Organization Code" %}</th>
+                                <th scope="col">{% translate "Plugin" %}</th>
+                                <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Status" %}</th>
-                                <th scope="col">{% translate "Created date" %}</th>
-                                <th scope="col">{% translate "Modified date" %}</th>
+                                <th scope="col">{% translate "Results" %}</th>
+                                <th scope="col">{% translate "Created" %}</th>
+                                <th scope="col">{% translate "Modified" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -35,10 +37,20 @@
                                         <a href="{% url "task_detail" pk=task.id %}">{{ task.id }}</a>
                                     </td>
                                     <td>
+                                        {% if task.data.plugin_id %}
+                                            <a href="{% url "plugin_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
+                                        {% else %}
+                                            No Plugin
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
                                     </td>
                                     <td>
                                         <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">See Results</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
                                     <td>{{ task.modified_at }}</td>
