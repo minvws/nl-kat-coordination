@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -13,6 +14,7 @@ class TaskListView(ListView):
     fields = ["enabled_plugins"]
     model = Task
     ordering = ["-created_at"]
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,6 +41,7 @@ class ScheduleListView(ListView):
     template_name = "schedule_list.html"
     model = NewSchedule
     ordering = ["-id"]
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

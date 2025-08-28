@@ -17,6 +17,7 @@ class PluginListView(ListView):
     template_name = "plugin_list.html"
     fields = ["enabled_plugins"]
     model = Plugin
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_queryset(self):
         plugins = (

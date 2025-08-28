@@ -59,7 +59,7 @@ class SaferExceptionReporterFilter(SafeExceptionReporterFilter):
 
 
 DEFAULT_EXCEPTION_REPORTER_FILTER = "openkat.settings.SaferExceptionReporterFilter"
-
+VIEW_DEFAULT_PAGE_SIZE = env.int("VIEW_DEFAULT_PAGE_SIZE", default=30)
 
 LOGGING = {
     "version": 1,
