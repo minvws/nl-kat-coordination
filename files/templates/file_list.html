@@ -29,6 +29,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">{% translate "File" %}</th>
+                                <th scope="col">{% translate "Task" %}</th>
                                 <th scope="col">{% translate "Created date" %}</th>
                             </tr>
                         </thead>
@@ -38,6 +39,15 @@
                                     <td>
                                         <a href="{{ file.file.url }}">{{ file.file }}.{{ file.type }}</a>
                                     </td>
+                                    {% if file.task_result and file.task_result.task.data.plugin_id %}
+                                        <td><a href="{% url "task_detail" pk=file.task_result.task.id  %}">
+                                            {{ file.task_result.task.data.plugin_id }}(organization = '{{ file.task_result.task.data.organization }}')
+                                        </a></td>
+                                    {% elif file.task_result %}
+                                        <td><a href="{% url "task_detail" pk=file.task_result.task.id  %}">{{ file.task_result.task.id }}</a></td>
+                                    {% else %}
+                                        <td>{% translate 'No Task' %}</td>
+                                    {% endif %}
                                     <td>{{ file.created_at }}</td>
                                 </tr>
                             {% endfor %}

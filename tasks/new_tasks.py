@@ -100,7 +100,7 @@ def run_plugin(self, plugin_id: str, organization_code: str | None = None, input
         raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
 
     try:
-        PluginRunner().run(plugin_id, input_data)
+        PluginRunner().run(plugin_id, input_data, task_id=task.id)
         task.status = TaskStatus.COMPLETED
         task.save()
     except:

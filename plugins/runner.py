@@ -21,7 +21,7 @@ class PluginRunner:
         self.override_entrypoint = override_entrypoint
         self.adapter = adapter
 
-    def run(self, plugin_id: str, target: str | None, output: str = "file"):
+    def run(self, plugin_id: str, target: str | None, output: str = "file", task_id: uuid.UUID | None = None):
         use_stdout = str(output) == "-"
 
         try:
@@ -71,6 +71,10 @@ class PluginRunner:
                 },
             }
         )
+
+        if task_id and not use_stdout:
+            callback_kwargs["environment"]["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
+
         token.save()
 
         args = plugin.oci_arguments
