@@ -38,7 +38,7 @@ found later by OpenKAT must also be included in the report.
 
 Choose report types
 -------------------
-You can then select the desired report types. More information about all the different report types can be found here: :doc:`../navigation/reports`.
+You can then select the desired report types. More information about all the different report types can be found :doc:`here ../navigation/reports`.
 
 .. image:: img/generate-report-03.png
   :alt: Report type selection

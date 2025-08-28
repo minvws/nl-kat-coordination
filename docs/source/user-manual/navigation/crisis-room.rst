@@ -10,7 +10,7 @@ In OpenKAT we differentiate two Crisis Rooms:
 Single Organization Crisis Room
 -------------------------------
 This page shows a Crisis Room for each organization separately.
-Here, a user can create it's own dashboards.
+Here, a user can create its own dashboards.
 
 Findings Dashboard
 ******************

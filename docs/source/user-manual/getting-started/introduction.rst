@@ -25,19 +25,18 @@ OpenKAT scans, collects, analyzes and reports in an ongoing process:
   :alt: Simple process of OpenKAT.
 
 
-The information collected by OpenKAT is stored as objects. An object can be, for example, a URL, IP address, or hostname.
+The information collected by OpenKAT is stored as objects such as URLs, IP addresses, or hostnames.
 
-After the objects are stored, tasks are created. Then, the activated plugins start scanning the objects.
-The resulting information is stored again as an object, which can lead to new scans.
-This process continues until OpenKAT has searched the entire data model.
+After objects are stored, activated plugins start scanning the objects.
+The results are again stored as objects, which can lead to new scans.
+This process continues until OpenKAT has scanned every object.
 
 Reports can be generated from the objects, providing a clear overview of all the information.
 
 An example:
     A user adds an object and hostname. If there is a hostname, OpenKAT also expects an IP address and possible open ports.
-    Tasks are created and the plugins then start searching for IP addresses and open ports, which may yield some more information.
-    That new information may in turn trigger new scans.
-    This process continues until OpenKAT has searched the entire data model for this hostname.
+    Tasks are created and the plugins then start searching for IP addresses and open ports.
+    These new objects may in turn trigger new scans to search for vulnerable software on these open ports.
 
 How far OpenKAT goes with its search depends on the clearance levels that are provided. Read more about it here: :doc:`../basic-concepts/scan-levels-and-indemnification`.
 
@@ -61,6 +60,6 @@ Starting with OpenKAT
 
 To start with OpenKAT you have to log in first. If you have trouble logging in, please read :doc:`login-and-registration`.
 
-After logging in, you continue to the onboarding. This onboarding will walk you through creating and scanning your first object and report. You can more about the onboarding, here: :doc:`onboarding`.
+After logging in, you continue to the onboarding. This onboarding will walk you through creating and scanning your first object and report. You can learn more about the onboarding :doc:`here <onboarding>`.
 
 You can also skip the onboarding and directly go to :doc:`start-scanning` to create your first object in OpenKAT.

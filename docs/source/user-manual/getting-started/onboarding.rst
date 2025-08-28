@@ -1,7 +1,7 @@
 Onboarding
 ==========
 
-If you are using OpenKAT for the first time you can go through the onboarding flow. The onboarding flow helps you to perform your very first scan. The onboarding flow introduces the basic concepts of adding an object, setting a clearance level, enabling boefjes in order to gather data and perform various scans and the creation of your first report.
+If you are using OpenKAT for the first time, you can go through the onboarding flow. The onboarding flow helps you start your first scan. The onboarding flow also introduces the basic concepts of adding an object, setting a clearance level, enabling plugins, starting various scans and creating a report.
 
 The onboarding consists of the following steps:
 
@@ -22,7 +22,7 @@ The onboarding consists of the following steps:
 Step-by-step onboarding
 -----------------------
 
-The onboarding starts with the registration process, which let’s you create your very first organization. The first page of the onboarding shows the welcome page.
+The onboarding starts with the registration process, which lets you create your very first organization. The first page of the onboarding shows the welcome page.
 
 .. image:: img/1-onboarding-welcome.png
   :alt: Onboarding welcome page.

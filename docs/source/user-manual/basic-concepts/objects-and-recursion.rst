@@ -7,11 +7,11 @@ Objects can be anything, like DNS records, hostnames, URLs, IP addresses, softwa
 
 Properties
 ----------
-Objects can be viewed via the 'Objects' page in OpenKAT's main menu. Here are the already created objects with the type and safeguard level for each object.
-Objects can be added, scanned, filtered and there is an export option.
+Objects can be viewed via the 'Objects' page in OpenKAT's main menu. Here, all objects including their type and scan level are shown.
+Objects can be added, scanned, filtered and exported.
 
 New objects can be created via the 'add' option. This can be done individually or per CSV.
-The specification of the CSV is included on the page where it can be provided.
+The specification of the CSV is included on the upload page.
 
 
 Recursion
@@ -21,7 +21,7 @@ OpenKAT includes a data model suitable for information security, but it can be e
 
 Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding,
 but objects can also be added individually or as CSV files. Objects are also referred to as 'Objects of Interest' (OOI).
-The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
+The object itself contains the actual data: an object type describes the object and its logical relations to other object types.
 
 **Example:**
   If there is a hostname, OpenKAT also expects an IP address and possible open ports based on the data model.

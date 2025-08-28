@@ -10,8 +10,8 @@ Adding an object
 
 We start by adding an object, also referred to as 'Object of Interest' (OOI).
 
-New objects can be created via the 'Add' button on the Objects page. You can be done individually or per CSV.
-The specification of the CSV is included on the page where it can be provided.
+New objects can be created via the 'Add' button on the Objects page. This can be done individually or per CSV.
+The specification of the CSV is included on the upload page.
 
 
 .. image:: img/add-object-01.png
@@ -30,7 +30,7 @@ Now it is time to fill in the details of the object and continue to the next pag
 .. image:: img/add-object-03.png
   :alt: Add details about the hostname
 
-The object has now been added and you now see the object detail page.
+After clicking 'Add Hostname', the object will be saved and should appear on the object detail page.
 You can also find the object in the overview table on the Objects page.
 
 See :doc:`../basic-concepts/objects-and-recursion` for more detailed information about the way objects work.
@@ -42,7 +42,7 @@ Changing clearance level
 
 The next step is to change the clearance level of the object.
 The clearance level of an object tells OpenKAT how far it can go with scanning the object.
-More information about the different clearance levels can be found here: :doc:`../basic-concepts/scan-levels-and-indemnification`.
+More information about the different clearance levels can be found :doc:`here ../basic-concepts/scan-levels-and-indemnification`.
 
 There are two ways to change the clearance level:
 
@@ -107,7 +107,7 @@ Go to the KAT-alogus. Here you find all the plug-ins (also called Boefjes) that 
 .. image:: img/katalogus.png
   :alt: KAT-alogus page
 
-As you can see, every plugin has it's own scan level. This tells at what level it can scan your objects.
+As you can see, every plugin has it's own scan level. This is the minimum level objects must have to be scanned with this plug-in.
 You can enable and disable the plugins of your choice and OpenKAT will use it to scan your objects.
 OpenKAT always checks if the plugins do not exceed the clearance level of the objects.
 
@@ -115,14 +115,14 @@ Finally
 -------
 That is it! OpenKAT will now create tasks to scan your object(s).
 On the Tasks page, you can see which tasks have been created.
-It might take a while before all the tasks have been completed.
+It might take a while before all tasks have been completed.
 
 .. image:: img/tasks.png
   :alt: Tasks page
 
 When the tasks are completed, the results will be shown on the Findings page.
 There you can find an overview of all findings that have been collected from the scans.
-For each finding, you can see the details and the possible advises.
+For each finding, you can see the details and the possible recommendations.
 Not every task leads to a finding, but almost every task leads to new objects.
 
-The findings can be made visible into a report. If you want to create a report, please check :doc:`generate-report`.
+The findings can be summarized into a report. If you want to create a report, please check :doc:`generate-report`.
