@@ -2,20 +2,20 @@ import io
 import logging
 from collections.abc import Iterable
 from typing import Any, TypedDict
-
-import yaml
-from models.ooi.findings import Finding, FindingType
-from pydantic import ValidationError
 from typing_extensions import NotRequired
 
-from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
+import yaml
+from pydantic import ValidationError
+
+from boefjes.normalizer_models import NormalizerDeclaration, NormalizerOutput
 from octopoes.models import OOI, Reference
+from octopoes.models.types import OOI_TYPES as CONCRETE_OOI_TYPES
+from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.certificate import SubjectAlternativeName
 from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.network import NetBlock, Network
 from octopoes.models.ooi.web import IPAddress, WebURL
-from octopoes.models.types import OOI_TYPES as CONCRETE_OOI_TYPES
 
 
 class OOITypeEntry(TypedDict):

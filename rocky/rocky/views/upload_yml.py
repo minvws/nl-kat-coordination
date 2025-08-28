@@ -40,18 +40,37 @@ class YAMLData(TypedDict):
 
 YML_CRITERIA = [
     _(
-        'All objects should be stored in "oois" list field at root level. '
-        'Only objects under "oois" field will be created unless they are referenced by an object placed in "oois"'
+      'All objects should be stored in the "oois" list at the root level. '
+      'Only objects under the "oois" field will be created, unless they are referenced by an object within "oois".'
     ),
-    _("It can create various of object type in a single file"),
-    _('Each object should contain an extra field called "ooi_type" that determines ooi type, it\'s case-sensitive'),
+    _("Objects of various types can be included in a single file."),
     _(
-        "You can use YAML referencing. "
-        'Storing referenced objects in the "references" field is suggested for the next possible updates.'
+      'Each object must contain an additional field called "ooi_type", which specifies the object type. '
+      'This field is case-sensitive.'),
+    _(
+      "YAML referencing is supported. "
+      'It is recommended to store referenced objects in the "references" field to facilitate potential future updates.'
     ),
 ]
 
 CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0, 1, 2, 3, 4]
+
+# Some OOI types cannot instantiated
+banned_ooi_classes = [
+    "FindingType",
+    "IPAddress",
+    "NetBlock",
+    "WebURL",
+    "DNSRecord",
+    "DNSSPFMechanism",
+    "SubjectAlternativeName",
+    "BaseReport",
+    "ReportData",
+    "AssetReport",
+    "Report",
+    "HydratedReport",
+    "ReportRecipe",
+]
 
 
 def get_cache_name(ooi_dict: dict, field_combination: list[str]):
@@ -64,7 +83,9 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     form_class = UploadOOIYMLForm
     permission_required = "tools.can_scan_organization"
     reference_cache: dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
-    ooi_types: ClassVar[dict[str, Any]] = {ooi_type: {"type": OOI_TYPES[ooi_type]} for ooi_type in OOI_TYPES}
+    ooi_types: ClassVar[dict[str, Any]] = {
+        ooi_type: {"type": OOI_TYPES[ooi_type]} for ooi_type in OOI_TYPES if ooi_type not in banned_ooi_classes
+    }
     # Types without _natural_key_attrs and some base OOI classes have type_from_raw class method
     ooi_types["GeographicPoint"] = {"type": GeographicPoint, "distinctive_fields": ["ooi", "longitude", "latitude"]}
     ooi_types["Finding"] = {"type": Finding, "distinctive_fields": ["ooi", "finding_type"]}
@@ -84,18 +105,6 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
-        # Some of cannot instantiated, some of them can still instantiable but not recommended.
-        # Thus they are not on list that user can see.
-        base_ooi_classes = [
-            "FindingType",
-            "IPAddress",
-            "NetBlock",
-            "WebURL",
-            "DNSRecord",
-            "DNSSPFMechanism",
-            "BaseReport",
-            "SubjectAlternativeName",
-        ]
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
@@ -107,7 +116,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         context["criteria"] = YML_CRITERIA
         # filter base ooi classes from the "creatable list"
         context["ooi_types"] = list(
-            filter(None, map(lambda x: _(x) if x not in base_ooi_classes else None, self.ooi_types.keys()))
+            filter(None, map(lambda x: _(x) if x not in banned_ooi_classes else None, self.ooi_types.keys()))
         )
         context["base_ooi_types"] = [
             "Following is about base OOI types "
