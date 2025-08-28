@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Let's get started with OpenKAT! If you want to read more about what OpenKAT is and why it is created, please read :doc:`/about-openkat/index`.
+Let's get started with OpenKAT! If you want to read more about what OpenKAT is and why it exists, please read :doc:`/about-openkat/index`.
 
 
 General information
