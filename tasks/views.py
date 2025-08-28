@@ -1,3 +1,4 @@
+from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -46,6 +47,12 @@ class ScheduleListView(ListView):
         return context
 
 
+class NewScheduleForm(ModelForm):
+    class Meta:
+        model = NewSchedule
+        fields = ["enabled", "recurrences", "input"]
+
+
 class ScheduleDetailView(DetailView):
     template_name = "schedule.html"
     model = NewSchedule
@@ -56,6 +63,7 @@ class ScheduleDetailView(DetailView):
             {"url": reverse("schedule_list"), "text": _("Schedules")},
             {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule Detail")},
         ]
+        context["form"] = NewScheduleForm
 
         return context
 

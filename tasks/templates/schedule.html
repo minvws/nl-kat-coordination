@@ -15,10 +15,19 @@
                     <p class="emphasized">{{ newschedule.plugin.plugin_id }}</p>
                     <p class="emphasized">{{ newschedule.organization.code }}</p>
                     <p class="emphasized">{{ newschedule.enabled }}</p>
-                    <p class="emphasized">{{ newschedule.recurrences }}</p>
+                    {% for rrule in newschedule.recurrences.rrules %}
+                        <strong>{{ rrule.to_text.upper }}</strong>
+                    {% endfor %}
                     <p class="emphasized">{{ newschedule.input }}</p>
                     <p class="emphasized">{{ newschedule.run_on }}</p>
                     <p class="emphasized">{{ newschedule.operation }}</p>
+                    <h4> {% translate 'Change Schedule' %}:</h4>
+                    <form action="{% url "edit_schedule" pk=newschedule.id %}" method="POST" class="post-form">
+                        {% csrf_token %}
+                        {{ form.media }}
+                        {{ form.recurrences }}
+                        <button type="submit">Submit</button>
+                    </form>
                 </div>
             </div>
         </section>

@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "new_header.html" %}
@@ -28,22 +29,22 @@
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
-                                <th scope="col">{% translate "Id" %}</th>
+                                <th scope="col"></th>
                                 <th scope="col">{% translate "Plugin" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Input" %}</th>
-                                <th scope="col">{% translate "Recurrences" %}</th>
-                                <th scope="col">{% translate "Run On" %}</th>
+                                <th scope="col">{% translate "Schedule" %}</th>
+{#                                <th scope="col">{% translate "Run On" %}</th>#}
 {#                                TODO: use these #}
 {#                                <th scope="col">{% translate "Operation" %}</th>#}
-{#                                <th scope="col">{% translate "Enabled" %}</th>#}
+                                <th scope="col">{% translate "Enabled" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for schedule in newschedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
-                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{{ schedule.id }}</a>
+                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{% translate 'See Details' %}</a>
                                     </td>
                                     <td>
                                         <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
@@ -66,16 +67,16 @@
 {#                                    <td>#}
 {#                                        <span>{{ schedule.operation }}</span>#}
 {#                                    </td>#}
+                                    <td>
+                                        {% for rrule in schedule.recurrences.rrules %}
+                                            <strong>{{ rrule.to_text.upper }}</strong>
+                                        {% endfor %}
+                                    </td>
                                         {% if perms.openkat.can_enable_disable_schedule %}
                                             <form action="{% url "edit_schedule" pk=schedule.id %}"
                                                   method="post"
                                                   class="inline">
                                                 {% csrf_token %}
-                                                {{ form.media }}
-                                                {{ form }}
-                                                <td>
-                                                    <span>{{ schedule.recurrences }}</span>
-                                                </td>
                                                 <td>
 
                                                         <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
@@ -121,3 +122,4 @@
         </section>
     </main>
 {% endblock content %}
+

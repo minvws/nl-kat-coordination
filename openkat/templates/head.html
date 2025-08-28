@@ -10,6 +10,7 @@
         <link href="{% static "dist/app.css" %}" rel="stylesheet">
     {% endcompress %}
     {% compress js %}
+        <script src="{% url 'jsi18n' %}" nonce="{{ request.csp_nonce }}"></script>
         <script defer src="{% static "dist/imports/manon.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 </head>

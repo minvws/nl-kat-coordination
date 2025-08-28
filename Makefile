@@ -1,4 +1,4 @@
-.PHONY: build build-openkat build-openkat-frontend run test export_migrations debian clean entrypoint
+.PHONY: build build-openkat build-openkat-frontend run test export_migrations debian clean entrypoint plugins
 
 UNAME := $(shell uname)
 

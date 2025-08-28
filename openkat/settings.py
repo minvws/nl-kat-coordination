@@ -172,6 +172,7 @@ INSTALLED_APPS = [
     "compressor",
     "reports",
     "knox",
+    "recurrence",
     # "drf_standardized_errors",
 ]
 
