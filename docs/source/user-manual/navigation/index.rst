@@ -16,4 +16,4 @@ See how you can navigate through OpenKAT. All pages of the user interface are ex
    tasks
    members
    settings
-   user-profile
+   user-settings

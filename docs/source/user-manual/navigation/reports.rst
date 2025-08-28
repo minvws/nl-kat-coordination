@@ -1,22 +1,32 @@
 Reports
 =======
 
-OpenKAT displays all findings in the crisis room, the entry point for all current information from the system. In addition, OpenKAT can create thematic reports and display findings per object. The reports are available in the front end and as PDF, based on a LaTeX parser. The organization's house style can also be incorporated. It is also possible to link to other reporting and alerting systems.
+OpenKAT displays all findings in the crisis room, the entry point for all current information from the system.
+In addition, you can create reports where all the found information can be collected.
 
 .. image:: img/report.png
   :alt: Report
 
-Report types
-************
+
+Kind of reports
+---------------
 With the Reports functionality you can create reports with a specific focus.
 
 There are 3 different kinds of reports available. These are:
 
-- **Separate report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
-- **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
-- **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations. These reports can be exported as PDF.
+- **Separate report:** selecting one or more reports will show the contents of each report below each other. This kind of report might be turned off by default by your administrator.
+- **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects.
+- **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations.
 
-The table below gives an overview of the 12 reports available. It also describes which Object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
+All kind of reports can be exported as PDF. The Aggregate Report can also be exported as JSON.
+
+
+Report types
+------------
+When creating a report, you have to choose one or more report types for your report.
+
+The table below gives an overview of the 12 reports available.
+It also describes which Object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
 
 .. list-table:: Report overview table
    :widths: 25 50 25 25 25 25
@@ -102,10 +112,8 @@ The table below gives an overview of the 12 reports available. It also describes
      - Normal + aggregate
 
 
-
 Report contents
-***************
-
+---------------
 The table below gives an overview of the elements that can be found in each report type based on the required plugins:
 
 .. list-table:: Report overview
@@ -187,8 +195,9 @@ The table below gives an overview of the elements that can be found in each repo
      - The results of the web server checks against all web servers are grouped together and an overview is provided how many of the web servers are compliant with each check. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
      - The number of occurrences for each web check are shown.
 
+
 Report flow
-***********
+-----------
 On the Reports page you can generate new reports and get an overview of all generated reports.
 With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report.
 There are two ways to select objects. You can manually select objects, which will be static.
@@ -198,8 +207,18 @@ And please note that enabling plugins during the report flow wizard will result 
 as the plugins will take some time before they have gathered and analyzed all data.
 Check the Tasks page to verify that all tasks have completed.
 
+If you need more help on generating a report, please check our step-by-step instructions here: :doc:`../getting-started/generate-report`.
+
+
+Plugins
+-------
+Each report has both required and suggested plugins that are used to show data in the report. These plugins are shown in the report flow.
+You can still generate reports if not all required plugins are enabled, however a warning a message is
+shown and the generated report will show that not all required plugins were enabled at the time of generation.
+
+
 Report naming
-*************
+-------------
 When creating a report, two name formats are needed, one for the overall report and one for the underlying asset reports.
 Every asset report consists of one input object and one report type (e.g. a DNS report for mispo.es).
 The overall report contains all the asset reports and also has its own name.
@@ -232,21 +251,15 @@ The pre-filled name formats are as follows:
 Besides these placeholders, it is also possible to use Python Strftime formats. For example, '%x' results in '01/01/25' and '%X' results in '07:06:05'.
 
 
-Plugins
-*******
-
-Each report has both required and suggested plugins that are used to show data in the report. These plugins are shown in the report flow. You can still generate reports if not all required plugins are enabled, however a warning a message is shown and the generated report will show that not all required plugins were enabled at the time of generation.
-
-
 Downloading and/or exporting a report
-*************************************
-
-The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file. Just click the 'Download' or 'Export' button on the right. The JSON output can be used to create a Multi-Report and compare organisation sectors.
+-------------------------------------
+The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file.
+Just click the 'Download' or 'Export' button on the right.
+The JSON output can be used to create a Multi-Report and compare organisation sectors.
 
 
 Generating a Multi Report
-*************************
-
+-------------------------
 With the Multi report you can compare organisations, for example if both are similar health care institutions.
 Create two organisations and make sure both organisations have data. For this tutorial they are named `CAT` and `DOG`.
 
@@ -265,8 +278,7 @@ Create two organisations and make sure both organisations have data. For this tu
 
 
 Troubleshooting
-***************
-
+---------------
 When you do not see one (or more) of the reports options, please check the following things:
 
 - Do you have the required object selected? (This is either the Hostname or IPService for all reports, except the findings report.)

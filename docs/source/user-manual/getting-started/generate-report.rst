@@ -10,7 +10,7 @@ To create a new report, go the Reports page. Press the 'Generate report' button 
 
 There are three different kind of reports:
 
-- **Separate report:** selecting one or more reports will show the contents of each report below each other. This function might be turned off by default by your administrator.
+- **Separate report:** selecting one or more reports will show the contents of each report below each other. This kinds of report might be turned off by default by your administrator.
 - **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects.
 - **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations.
 

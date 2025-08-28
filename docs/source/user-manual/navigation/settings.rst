@@ -5,6 +5,7 @@ The Settings page shows general information and its settings. In some cases you 
 This can be done from the settings page. If you created a new organization, you can also add the indemnification on this page.
 
 The settings that can be changed on this page:
+
 - Change organization data
 - Add indemnification
 - Rerun all bits on the current dataset
