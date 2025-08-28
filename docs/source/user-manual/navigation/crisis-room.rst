@@ -49,7 +49,7 @@ To add a new objects or findings dashboard item to a dashboard:
 
 - Go to the Objects or Findings page
 - Filter the table as you prefer (the same filters will be applied to the table in the dashboard item)
-- Click on the 'Add to dashboard' button, this opens a modal
+- Click on the 'Add to dashboard' button, this opens a pop-up
 - Choose the settings as you prefer
 - Click on the 'Add to dashboard' button
 

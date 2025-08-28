@@ -12,7 +12,7 @@ Kind of reports
 ---------------
 With the Reports functionality you can create reports with a specific focus.
 
-There are 3 different kinds of reports available. These are:
+There are 3 different kinds of reports available:
 
 - **Separate report:** selecting one or more reports will show the contents of each report below each other. This kind of report might be turned off by default by your administrator.
 - **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects.
@@ -26,7 +26,7 @@ Report types
 When creating a report, you have to choose one or more report types for your report.
 
 The table below gives an overview of the 12 reports available.
-It also describes which Object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
+It also describes which object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
 
 .. list-table:: Report overview table
    :widths: 25 50 25 25 25 25
@@ -207,7 +207,7 @@ And please note that enabling plugins during the report flow wizard will result 
 as the plugins will take some time before they have gathered and analyzed all data.
 Check the Tasks page to verify that all tasks have completed.
 
-If you need more help on generating a report, please check our step-by-step instructions here: :doc:`../getting-started/generate-report`.
+If you need more help on generating a report, please check our step-by-step instructions :doc:`here ../getting-started/generate-report`.
 
 
 Plugins
@@ -219,7 +219,7 @@ shown and the generated report will show that not all required plugins were enab
 
 Report naming
 -------------
-When creating a report, two name formats are needed, one for the overall report and one for the underlying asset reports.
+When creating a report, two name formats are needed: one for the overall report and one for the underlying asset reports.
 Every asset report consists of one input object and one report type (e.g. a DNS report for mispo.es).
 The overall report contains all the asset reports and also has its own name.
 
@@ -255,7 +255,7 @@ Downloading and/or exporting a report
 -------------------------------------
 The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file.
 Just click the 'Download' or 'Export' button on the right.
-The JSON output can be used to create a Multi-Report and compare organisation sectors.
+The JSON output can be used to create a Multi-Report and compare organization sectors.
 
 
 Generating a Multi Report
