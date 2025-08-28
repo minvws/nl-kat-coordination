@@ -42,7 +42,7 @@ Changing clearance level
 
 The next step is to change the clearance level of the object.
 The clearance level of an object tells OpenKAT how far it can go with scanning the object.
-More information about the different clearance levels can be found :doc:`here ../basic-concepts/scan-levels-and-indemnification`.
+More information about the different clearance levels can be found :doc:`here <../basic-concepts/scan-levels-and-indemnification>`.
 
 There are two ways to change the clearance level:
 

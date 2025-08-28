@@ -26,8 +26,7 @@ The object itself contains the actual data: an object type describes the object 
 **Example:**
   If there is a hostname, OpenKAT also expects an IP address and possible open ports based on the data model.
   Depending on the given clearance level, this is then scanned, which in turn provides more information, which in turn may prompt new scans.
-  This process continues until OpenKAT has searched the entire data model for this hostname.
-  How far OpenKAT goes with its search depends on the safeguards.
+  How far OpenKAT goes with its search depends on the clearance levels.
 
 
 Object clearance type

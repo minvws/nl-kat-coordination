@@ -21,15 +21,15 @@ The levels used range from level 0 to level 4, from 'do not scan' to 'very intru
    * - Level
      - Description
    * - L0
-     - do not scan
+     - do nothing: do not touch and don't gather information about this object
    * - L1
-     - hardly scan
+     - retrieve information from public sources, but don't touch the object itself
    * - L2
-     - scan like a normal user
+     - touch at normal user level
    * - L3
-     - detectable scan
+     - detectable scanning
    * - L4
-     - intensive scan
+     - intensive scanning
 
 
 Inheritance
