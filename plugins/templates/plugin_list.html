@@ -20,6 +20,12 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
+                {% if perms.openkat.add_plugin %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost"
+                           href="{% url "add_plugin" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Plugin" %}</a>
+                    </div>
+                {% endif %}
             </div>
             <div>
                 <div class="fifty-fifty">

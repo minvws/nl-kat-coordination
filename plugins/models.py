@@ -36,7 +36,7 @@ class Plugin(models.Model):
 
     # Task specifications
     consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: revise
-    recurrences = RecurrenceField(null=True)  # If set, this is used as a default
+    recurrences = RecurrenceField(null=True, blank=True)  # If set, this is used as a default
 
     # Image specifications
     oci_image = models.CharField(max_length=256, null=True)
