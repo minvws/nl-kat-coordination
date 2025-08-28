@@ -8,11 +8,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("plugin_id", type=str)
-        parser.add_argument("target", type=str)
+        parser.add_argument("target", type=str, default="", nargs="*")
         parser.add_argument("--output", "-o", dest="output", type=str, default="file")
 
     def handle(self, plugin_id, target, output, *args, **options):
-        logs = PluginRunner().run(plugin_id, target, output)
+        logs = PluginRunner().run(plugin_id, target or None, output)
 
         if str(output) == "-":
             self.stdout.write(logs.decode())

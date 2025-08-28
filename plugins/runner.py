@@ -27,7 +27,7 @@ class PluginRunner:
         try:
             IPAddress(target)
             is_ip = True
-        except (AddrFormatError, ValueError):
+        except (AddrFormatError, ValueError, TypeError):
             is_ip = False
 
         plugin = Plugin.objects.get(plugin_id=plugin_id)

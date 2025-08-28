@@ -67,7 +67,7 @@
     "oci_arguments": [
       "/duckdb",
       "-c",
-      "copy(select x.* from (select unnest(roas) as x from read_json('https://console.rpki-client.org/vrps.json', maximum_object_size=100000000))) to '/dev/stdout' (format parquet);"
+      "copy(select x.asn, x.prefix from (select unnest(roas) as x from read_json('https://console.rpki-client.org/vrps.json', maximum_object_size=100000000))) to '/dev/stdout' (format parquet);"
     ]
   },
   {
@@ -78,7 +78,7 @@
     "oci_arguments": [
       "/duckdb",
       "-c",
-      "copy(select * from read_json('https://bgp.tools/table.jsonl', maximum_object_size=100000000)) to '/dev/stdout' (format parquet);"
+      "copy(select CIDR, ASN from read_json('https://bgp.tools/table.jsonl', maximum_object_size=100000000)) to '/dev/stdout' (format parquet);"
     ]
   }
 ]
