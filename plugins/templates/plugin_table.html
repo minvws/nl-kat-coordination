@@ -44,6 +44,7 @@
                 </th>
                 <th scope="col">{% translate "Delete" %}</th>
                 <th scope="col">{% translate "Duplicate" %}</th>
+                <th scope="col">{% translate "Files" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -85,6 +86,9 @@
                         <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
                             <button type="submit" class="icon ti-edit action-button">{% translate "Edit" %}</button>
                         </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">{% translate 'See Results' %}</a>
                     </td>
                 </tr>
             {% endfor %}

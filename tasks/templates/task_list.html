@@ -62,7 +62,7 @@
                                         <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
                                     </td>
                                     <td>
-                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">See Results</a>
+                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate 'See Results' %}</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
                                     <td>

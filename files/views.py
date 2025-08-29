@@ -24,6 +24,12 @@ class FileListView(ListView):
         if "task_id" in self.request.GET:
             qs = qs.filter(task_result__task__id=self.request.GET["task_id"])
 
+        if "organization" in self.request.GET:
+            qs = qs.filter(task_result__task__organization=self.request.GET["organization"])
+
+        if "plugin_id" in self.request.GET:
+            qs = qs.filter(task_result__task__data__plugin_id=self.request.GET["plugin_id"])
+
         return qs
 
     def get_context_data(self, **kwargs):
