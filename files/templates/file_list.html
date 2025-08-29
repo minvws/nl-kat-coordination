@@ -27,31 +27,54 @@
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
-                                <th scope="col">{% translate "File" %}</th>
+                                <th scope="col">{% translate "Location" %}</th>
                                 <th scope="col">{% translate "Task" %}</th>
+                                <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Created date" %}</th>
+                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for file in file_list %}
                                 <tr data-file-id="{{ file.id }}">
                                     <td>
-                                        <a href="{{ file.file.url }}">{{ file.file }}.{{ file.type }}</a>
+                                        {{ file.path.parent }}
                                     </td>
-                                    {% if file.task_result and file.task_result.task.data.plugin_id %}
-                                        <td>
-                                            <a href="{% url "task_detail" pk=file.task_result.task.id %}">
-                                                {{ file.task_result.task.data.plugin_id }}(organization = '{{ file.task_result.task.data.organization }}')
-                                            </a>
-                                        </td>
-                                    {% elif file.task_result %}
-                                        <td>
-                                            <a href="{% url "task_detail" pk=file.task_result.task.id %}">{{ file.task_result.task.id }}</a>
-                                        </td>
+                                    {% if file.task_result %}
+                                        {% if file.task_result.task.data.plugin_id %}
+                                            <td>
+                                                <a href="{% url "task_detail" pk=file.task_result.task.id %}">
+                                                    {{ file.task_result.task.data.plugin_id }}
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="{% url "task_detail" pk=file.task_result.task.id %}">{{ file.task_result.task.id }}</a>
+                                            </td>
+                                        {% endif %}
+                                        {% if file.task_result.task.organization %}
+                                            <td>
+                                                <a href="{% url "organization_crisis_room" file.task_result.task.organization.code %}">
+                                                    {{ file.task_result.task.organization.code }}
+                                                </a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                {% translate 'No Organization' %}
+                                            </td>
+                                        {% endif %}
                                     {% else %}
                                         <td>{% translate 'No Task' %}</td>
+                                        <td>{% translate 'No Organization' %}</td>
                                     {% endif %}
                                     <td>{{ file.created_at }}</td>
+                                    <td>
+                                        <a href="{{ file.file.url }}">
+                                            <button class="icon ti-download action-button">
+                                                {% translate "Download" %}
+                                            </button>
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

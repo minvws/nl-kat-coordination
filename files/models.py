@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from pathlib import Path
 
 from django.core.files.base import ContentFile
 from django.db import models
@@ -15,6 +16,8 @@ class File(models.Model):
     organizations = models.ManyToManyField("openkat.organization", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def path(self):
+        return Path(self.file.name)
 
 class GenericContent(ContentFile):
     def __init__(self, content: str | bytes):

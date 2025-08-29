@@ -50,8 +50,8 @@ def reschedule(
                     last_run = (
                         Task.objects.filter(
                             status=TaskStatus.COMPLETED,
+                            organization=org,
                             data__plugin_id=schedule.plugin.plugin_id,
-                            data__organization=org.code,
                             data__input_data=input_data,
                         )
                         .order_by("-created_at")
@@ -75,8 +75,8 @@ def reschedule(
                 last_run = (
                     Task.objects.filter(
                         status=TaskStatus.COMPLETED,
+                        organization=org,
                         data__plugin_id=schedule.plugin.plugin_id,
-                        data__organization=org.code,
                         data__input_data=None,
                     )
                     .order_by("-created_at")
@@ -124,7 +124,7 @@ def run_plugin(
         new_schedule_id=schedule_id,
         organization=organization,
         status=TaskStatus.RUNNING,
-        data={"plugin_id": plugin_id, "organization": organization_code, "input_data": input_data},  # TODO
+        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
 
     plugin = Plugin.objects.filter(plugin_id=plugin_id).first()

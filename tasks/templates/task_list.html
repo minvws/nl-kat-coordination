@@ -27,7 +27,6 @@
                                 <th scope="col">{% translate "Status" %}</th>
                                 <th scope="col">{% translate "Results" %}</th>
                                 <th scope="col">{% translate "Created" %}</th>
-                                <th scope="col">{% translate "Modified" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -38,13 +37,17 @@
                                     </td>
                                     <td>
                                         {% if task.data.plugin_id %}
-                                            <a href="{% url "plugin_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
+                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
                                         {% else %}
                                             No Plugin
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
+                                        {% if task.organization %}
+                                            <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
+                                        {% else %}
+                                            {% translate "No Organization" %}
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
@@ -53,7 +56,6 @@
                                         <a href="{% url 'file_list' %}?task_id={{ task.id }}">See Results</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
-                                    <td>{{ task.modified_at }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

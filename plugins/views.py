@@ -70,6 +70,11 @@ class PluginDetailView(DetailView):
         return context
 
 
+class PluginIdDetailView(PluginDetailView):
+    slug_url_kwarg = "plugin_id"
+    slug_field = "plugin_id"
+
+
 class PluginCreateView(CreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments", "recurrences"]
