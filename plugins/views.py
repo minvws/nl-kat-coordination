@@ -85,7 +85,14 @@ class PluginCreateView(CreateView):
             # Will provide the form with initial values from this plugin
             self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])
 
-        return super().get_form_kwargs()
+        kwargs = super().get_form_kwargs()
+
+        # If we are duplicating a plugin, we should make sure a unique plugin id and name are chosen
+        if "duplicate" in self.request.GET and self.request.GET["duplicate"]:
+            kwargs["initial"]["plugin_id"] = None
+            kwargs["initial"]["name"] = None
+
+        return kwargs
 
     def form_invalid(self, form):
         return redirect(reverse("plugin_list"))

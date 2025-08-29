@@ -77,8 +77,13 @@
                         </form>
                     </td>
                     <td>
+                        <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}&duplicate=true">
+                            <button type="submit" class="icon ti-copy action-button">{% translate "Duplicate" %}</button>
+                        </a>
+                    </td>
+                    <td>
                         <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
-                            <button type="submit" class="icon ti-copy action-button">{% translate "Copy" %}</button>
+                            <button type="submit" class="icon ti-edit action-button">{% translate "Edit" %}</button>
                         </a>
                     </td>
                 </tr>
