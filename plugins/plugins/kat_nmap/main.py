@@ -49,8 +49,10 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
 
 def run(file_id: str):
     headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-    dig_file = httpx.get(f'{os.getenv("OPENKAT_API")}/file/{file_id}/', headers=headers).json()
-    file = httpx.get(dig_file["file"], headers=headers)
+    client = httpx.Client(base_url=os.getenv("OPENKAT_API"), headers=headers)
+
+    dig_file = client.get(f'/file/{file_id}/').json()
+    file = client.get(dig_file["file"])
 
     """Decouple and parse Nmap XMLs and yield relevant network."""
     # Multiple XMLs are concatenated through "\n\n". XMLs end with "\n"; we split on "\n\n\n".
@@ -59,25 +61,41 @@ def run(file_id: str):
     # Relevant network object is received from the normalizer_meta.
     results = []
     logging.info("Parsing %d Nmap-xml(s).", len(raw_splitted))
-    for r in raw_splitted:
-        parsed = NmapParser.parse_fromstring(r)
-        *args, target = parsed.commandline.split(" ")
 
-        if "/" in target:
+    for nmap_output in raw_splitted:
+        results.extend(handle_nmap_result(nmap_output, client))
+
+    return results
+
+
+def handle_nmap_result(nmap_output: str, client: httpx.Client):
+    results = []
+    parsed = NmapParser.parse_fromstring(nmap_output)
+
+    *args, target = parsed.commandline.split(" ")
+    if "/" in target:
+        try:
+            network = ipaddress.IPv4Network(target)
+            prefixlen = network.prefixlen
+        except (AddressValueError, ValueError):
             try:
-                network = ipaddress.IPv4Network(target)
+                network = ipaddress.IPv6Network(target)
                 prefixlen = network.prefixlen
             except (AddressValueError, ValueError):
-                try:
-                    network = ipaddress.IPv6Network(target)
-                    prefixlen = network.prefixlen
-                except (AddressValueError, ValueError):
-                    prefixlen = None
-        else:
-            prefixlen = None
+                prefixlen = None
+    else:
+        prefixlen = None
 
-        for host in parsed.hosts:
-            results.extend(get_ip_ports_and_service(host=host, network="internet", prefixlen=str(prefixlen)))
+    top_ports = None
+
+    if "--top-ports" in args:
+        top_ports = int(args[args.index("--top-ports") + 1])
+
+    for host in parsed.hosts:
+        # TODO: handle this in the API
+        client.delete(f"/objects/ip-ports/?address={host.address}&top_ports={top_ports}")
+
+        results.extend(get_ip_ports_and_service(host=host, network="internet", prefixlen=str(prefixlen)))
 
     return results
 

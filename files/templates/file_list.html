@@ -27,6 +27,7 @@
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
+                                <th scope="col">{% translate "File ID" %}</th>
                                 <th scope="col">{% translate "Location" %}</th>
                                 <th scope="col">{% translate "Task" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
@@ -37,6 +38,9 @@
                         <tbody>
                             {% for file in file_list %}
                                 <tr data-file-id="{{ file.id }}">
+                                    <td>
+                                        <a href="{{ file.file.url }}">{{ file.id }}</a>
+                                    </td>
                                     <td>
                                         {{ file.path.parent }}
                                     </td>

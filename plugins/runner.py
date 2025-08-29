@@ -64,6 +64,7 @@ class PluginRunner:
             if not use_stdout
             else {
                 "entrypoint": [],
+                "network": settings.DOCKER_NETWORK,
                 "environment": {
                     "PLUGIN_ID": plugin.plugin_id,
                     "OPENKAT_TOKEN": token.generate_new_token(),
