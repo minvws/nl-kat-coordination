@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.functions import Coalesce
+from django.forms.models import ModelForm
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -79,6 +80,13 @@ class PluginCreateView(CreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments", "recurrences"]
     template_name = "plugin_form.html"
+
+    def get_form_kwargs(self):
+        if "plugin_id" in self.request.GET:
+            # Will provide the form with initial values from this plugin
+            self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])
+
+        return super().get_form_kwargs()
 
     def form_invalid(self, form):
         return redirect(reverse("plugin_list"))

@@ -31,7 +31,7 @@ class Plugin(models.Model):
 
     # Metadata
     name = models.CharField(max_length=64, unique=True)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     scan_level = models.PositiveSmallIntegerField(choices=ScanLevel.choices, default=ScanLevel.L4)
 
     # Task specifications

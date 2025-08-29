@@ -42,7 +42,8 @@
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                <th scope="col">{% translate "" %}</th>
+                <th scope="col">{% translate "Delete" %}</th>
+                <th scope="col">{% translate "Duplicate" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -74,6 +75,11 @@
                             {% csrf_token %}
                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                         </form>
+                    </td>
+                    <td>
+                        <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
+                            <button type="submit" class="icon ti-copy action-button">{% translate "Copy" %}</button>
+                        </a>
                     </td>
                 </tr>
             {% endfor %}
