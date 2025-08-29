@@ -69,6 +69,7 @@ dependencies = [
   "boto3>=1.38.28",
   "django-storages>=1.14.6",
   "django-recurrence>=1.11.1",
+  "django-filter>=25.1",
 ]
 
 [dependency-groups]

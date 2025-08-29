@@ -11,6 +11,15 @@ logger = get_logger(__name__)
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
     queryset = File.objects.all()
+    search_fields= ["file"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if "type" in self.request.GET:
+            qs = qs.filter(type=self.request.GET["type"])
+
+        return qs
 
     def perform_create(self, serializer):
         file = serializer.save()

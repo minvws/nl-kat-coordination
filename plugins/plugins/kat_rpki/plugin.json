@@ -2,7 +2,13 @@
   "plugin_id": "kat_rpki_normalize2",
   "name": "RPKI normalizer 2",
   "description": "Parses RPKI data into findings.",
-  "consumes": [
-    "plugin:rpki-download,plugin:bgp-download"
+  "consumes": [],
+  "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+  "oci_arguments": [
+    "uv",
+    "run",
+    "kat_rpki/main.py",
+    "{file}",
+    "{file}"
   ]
 }
