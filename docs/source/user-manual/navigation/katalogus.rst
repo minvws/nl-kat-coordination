@@ -12,7 +12,7 @@ Before a plugin can run the following two conditions must be met:
 - The Boefje and corresponding Normalizer are enabled. Note: all Normalizers are enabled by default.
 - The clearance level of your object (e.g. hostname or URL) is at least the required scan level of the enabled plugin.
 
-New Boefjes can be added by an administrator in the web interface, or by manually adding an external KAT-alogus in Rocky's config file.
+New Boefjes can be added by an administrator in the web interface.
 
 .. image:: img/katalogus.png
   :alt: KAT catalog

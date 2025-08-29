@@ -18,16 +18,16 @@ We hope this helps to make your life easier.
    * - Object type
      - The type of object, for example IP address, URL, website.
    * - Finding
-     - Information about the system found by OpenKAT.
+     - A vulnerability or misconfiguration that has been found by OpenKAT.
    * - Finding type
-     - The type of information that has been found by OpenKAT.
+     - Findings found by OpenKAT are categorized by finding types.
    * - Plugin
      - Deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it.
    * - Boefje
      - A type of plugin, which gathers facts from the objects.
    * - Task
      - A task is created for each job that needs to be performed, such as running a plugin or for generating a report.
-       Not every task results in findings, but almost every task results in new objects.
+       Not every task results in findings or new objects.
    * - Clearance type
      - The clearance type tells how the object was added to the Objects list.
        **Declared** objects were added by the user.

@@ -24,7 +24,7 @@ Then press "Reset password". After entering your email address, a reset link wil
 Two-factor authentication (2FA)
 -------------------------------
 
-Once you log in, you will see the screen for setting up two-factor authentication. You have to scan the QR code with an authenticator application on your phone. The application on your phone will generate a token that you have to type in as a response. Every time you want to log in, you have to enter your username, password and 2FA token. You can disable 2FA in the `.env` file if necessary.
+Once you log in, you will see the screen for setting up two-factor authentication. You have to scan the QR code with an authenticator application on your phone. The application on your phone will generate a token that you have to type in as a response. Every time you want to log in, you have to enter your username, password and 2FA token. 
 
 
 .. image:: img/00-onboarding-qr-code.png
