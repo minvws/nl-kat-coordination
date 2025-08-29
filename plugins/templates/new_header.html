@@ -27,6 +27,11 @@
                 <ul>
                     {% if request.user.is_authenticated %}
                         <li>
+                            {% url "organization_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
+                        </li>
+                        <li>
                             {% url "plugin_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
