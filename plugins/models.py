@@ -48,7 +48,7 @@ class Plugin(models.Model):
             {
                 part[1:-1]
                 for arg in self.oci_arguments
-                for part in arg.split("|")
+                for part in arg.lower().split("|")
                 if arg.startswith("{") and arg.endswith("}")
             }
         )
@@ -111,8 +111,13 @@ class EnabledPlugin(models.Model):
         return super().save(*args, **kwargs)
 
     def initialize_schedules(self):
-        queries = []
+        schedules = NewSchedule.objects.filter(plugin=self.plugin, organization=self.organization)
 
+        if schedules.exists():
+            return
+
+        queries = []
+        logger.info("moving on")
         # TODO: once moved to XTDB 2.0 we can revise this
         for ooi_type in self.plugin.types_in_arguments():
             parsed_type = ALL_TYPES_MAP.get(ooi_type)
@@ -122,10 +127,7 @@ class EnabledPlugin(models.Model):
             if parsed_type in [IPAddressV4, IPAddressV6]:
                 queries.append(f"{parsed_type.object_type}.address")
 
-        schedules = NewSchedule.objects.filter(plugin=self.plugin, organization=self.organization)
-
-        if schedules.exists():
-            return
+        logger.info("q on", queries=queries)
 
         # So this is possibly the first time enabling the plugin for the organization
         for query in queries:
@@ -134,20 +136,22 @@ class EnabledPlugin(models.Model):
                 enabled=self.enabled,
                 input=query,
                 organization=self.organization,
-                recurrences=self.plugin.recurrences
-                or recurrence.Recurrence(
+                recurrences=self.plugin.recurrences if self.plugin.recurrences and str(self.plugin.recurrences)
+                else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
                     dtstart=datetime.datetime.now(timezone.utc),
                 ),
             )
 
         if not queries:
+            logger.info("not on")
+
             NewSchedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
                 organization=self.organization,
-                recurrences=self.plugin.recurrences
-                or recurrence.Recurrence(
+                recurrences=self.plugin.recurrences if self.plugin.recurrences and str(self.plugin.recurrences)
+                else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(timezone.utc)
                 ),
             )

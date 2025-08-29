@@ -23,6 +23,7 @@
                             <tr>
                                 <th scope="col">{% translate "Task ID" %}</th>
                                 <th scope="col">{% translate "Plugin" %}</th>
+                                <th scope="col">{% translate "Input Data" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Status" %}</th>
                                 <th scope="col">{% translate "Results" %}</th>
@@ -40,6 +41,13 @@
                                             <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
                                         {% else %}
                                             No Plugin
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if task.data.input_data %}
+                                            <{{ task.data.input_data }}
+                                        {% else %}
+                                            No Data
                                         {% endif %}
                                     </td>
                                     <td>

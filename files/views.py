@@ -1,9 +1,15 @@
 from django.conf import settings
-from django.urls import reverse
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 
 from files.models import File
+import structlog
+
+
+logger = structlog.get_logger(__name__)
 
 
 class FileListView(ListView):
@@ -19,6 +25,30 @@ class FileListView(ListView):
             qs = qs.filter(task_result__task__id=self.request.GET["task_id"])
 
         return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("file_list"), "text": _("Files")}]
+
+        return context
+
+
+class FileCreateView(CreateView):
+    model = File
+    fields = ["file", "type"]
+    template_name = "file_form.html"
+
+    def form_invalid(self, form):
+        logger.error("Failed creating file", errors=form.errors)
+        return redirect(reverse("file_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("file_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

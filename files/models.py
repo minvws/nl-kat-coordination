@@ -6,8 +6,11 @@ from django.core.files.base import ContentFile
 from django.db import models
 
 
-def raw_file_name(instance, directory: str | None = None):
-    return f"files/{datetime.date.today()}/{directory}/{uuid.uuid4()}"
+def raw_file_name(instance, path: str | None = None):
+    if path:
+        return f"files/{datetime.date.today()}/{path}"
+
+    return None
 
 
 class File(models.Model):
@@ -21,14 +24,14 @@ class File(models.Model):
 
 class GenericContent(ContentFile):
     def __init__(self, content: str | bytes):
-        super().__init__(content, name="data")
+        super().__init__(content, name=f"data/{uuid.uuid4()}")
 
 
 class PluginContent(ContentFile):
     def __init__(self, content: str | bytes, plugin_id: str):
-        super().__init__(content, name=plugin_id)
+        super().__init__(content, name=f"{plugin_id}/{uuid.uuid4()}")
 
 
 class ReportContent(ContentFile):
     def __init__(self, content: str | bytes):
-        super().__init__(content, name="reports")
+        super().__init__(content, name=f"reports/{uuid.uuid4()}")

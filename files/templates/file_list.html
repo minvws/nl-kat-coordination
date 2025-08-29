@@ -9,13 +9,21 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Files" %}</h1>
-                <p>
-                    {% blocktranslate trimmed %}
-                        All the current files.
-                    {% endblocktranslate %}
-                </p>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Files" %}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            All the current files.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% if perms.openkat.add_file %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost"
+                           href="{% url "add_file" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add File" %}</a>
+                    </div>
+                {% endif %}
             </div>
             {% if not file_list %}
                 <div>
@@ -29,10 +37,10 @@
                             <tr>
                                 <th scope="col">{% translate "File ID" %}</th>
                                 <th scope="col">{% translate "Location" %}</th>
+                                <th scope="col">{% translate "Name" %}</th>
                                 <th scope="col">{% translate "Task" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Created date" %}</th>
-                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,6 +51,9 @@
                                     </td>
                                     <td>
                                         {{ file.path.parent }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ file.file.url }}">{{ file.path.name }}</a>
                                     </td>
                                     {% if file.task_result %}
                                         {% if file.task_result.task.data.plugin_id %}
@@ -72,13 +83,6 @@
                                         <td>{% translate 'No Organization' %}</td>
                                     {% endif %}
                                     <td>{{ file.created_at }}</td>
-                                    <td>
-                                        <a href="{{ file.file.url }}">
-                                            <button class="icon ti-download action-button">
-                                                {% translate "Download" %}
-                                            </button>
-                                        </a>
-                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
