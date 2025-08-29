@@ -165,6 +165,7 @@ INSTALLED_APPS = [
     "tasks",
     "files",
     "plugins",
+    "objects",
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",

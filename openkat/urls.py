@@ -88,6 +88,7 @@ urlpatterns += i18n_patterns(
     path("", include("plugins.urls"), name="plugins"),
     path("", include("tasks.urls"), name="tasks"),
     path("", include("files.urls"), name="files"),
+    path("", include("objects.urls"), name="objects"),
     path("privacy-statement/", PrivacyStatementView.as_view(), name="privacy_statement"),
     path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
     path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
