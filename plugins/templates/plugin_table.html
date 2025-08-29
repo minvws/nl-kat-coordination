@@ -42,7 +42,7 @@
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                <th class="visually-hidden">{% translate "Detail page" %}</th>
+                <th scope="col">{% translate "" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -67,7 +67,13 @@
                     </td>
                     <td>
                         {% include "new_enable_disable_plugin.html" with plugin=plugin %}
-
+                    </td>
+{#                TODO: permissions #}
+                    <td>
+                        <form action="{% url 'delete_plugin' plugin.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
