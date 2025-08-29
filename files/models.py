@@ -8,7 +8,7 @@ from django.db import models
 
 def raw_file_name(instance, path: str | None = None):
     if path:
-        return f"files/{datetime.date.today()}/{path}"
+        return f"files/{datetime.date.today()}/{instance.type}/{path}"
 
     return None
 

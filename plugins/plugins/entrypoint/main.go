@@ -63,7 +63,7 @@ func main() {
 	if cmdError != nil {
 		log.Printf("Command exited with error: %v", cmdError)
 
-		stderrFile, err := writer.CreateFormFile("file", pluginId)
+		stderrFile, err := writer.CreateFormFile("file", "stderr")
 		if err != nil {
 			log.Fatalf("Failed to create stderr part: %v", err)
 		}
@@ -74,7 +74,7 @@ func main() {
 			log.Fatalf("Failed to create type part: %v", err)
 		}
 	} else {
-		stdoutFile, err := writer.CreateFormFile("file", pluginId)
+		stdoutFile, err := writer.CreateFormFile("file", "stdout")
 		if err != nil {
 			log.Fatalf("Failed to create stdout part: %v", err)
 		}
