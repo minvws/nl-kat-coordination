@@ -7,6 +7,7 @@ from tasks.views import (
     TaskDetailView,
     TaskListView,
     ScheduleDeleteView,
+    ScheduleRunView,
     ScheduleCreateView,
 )
 
@@ -18,4 +19,5 @@ urlpatterns = [
     path("schedule/<slug:pk>/", ScheduleDetailView.as_view(), name="schedule_detail"),
     path("schedule/<slug:pk>/edit", ScheduleUpdateView.as_view(), name="edit_schedule"),
     path("schedule/<slug:pk>/delete", ScheduleDeleteView.as_view(), name="delete_schedule"),
+    path("schedule/<slug:schedule_id>/run", ScheduleRunView.as_view(), name="run_schedule"),
 ]

@@ -45,6 +45,7 @@
                                 {#                                <th scope="col">{% translate "Operation" %}</th>#}
                                 <th scope="col">{% translate "Enabled" %}</th>
                                 <th scope="col">{% translate "" %}</th>
+                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,11 +113,20 @@
                                         {% endif %}
                                     {% endif %}
                                     <td>
+                                        {% if schedule.enabled %}
+                                            <form action="{% url 'run_schedule' schedule.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="ghost">{% translate "Run" %}</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         <form action="{% url 'delete_schedule' schedule.id %}" method="post">
                                             {% csrf_token %}
                                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                                         </form>
                                     </td>
+
                                 </tr>
                             {% endfor %}
                         </tbody>

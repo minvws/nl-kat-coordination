@@ -20,82 +20,61 @@ def reschedule(
     plugin_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
 ) -> None:
     logger.info("Scheduling plugins")
-
-    count = 0
     now = datetime.now(timezone.utc)
 
     for schedule in NewSchedule.objects.filter(enabled=True):
-        if not schedule.plugin:
-            pass
+        last_run = (
+            Task.objects.filter(
+                status=TaskStatus.COMPLETED,
+                new_schedule=schedule,
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        if last_run and not schedule.recurrences.between(last_run.created_at, now):
+            logger.debug(
+                "Plugin '%s' has already run recently",
+                schedule.plugin.plugin_id,
+            )
+            continue
 
-        for org in schedule.plugin.enabled_organizations():
-            connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
+        run_schedule(schedule)
 
-            # TODO: will be replaced with direct(er) queries in XTDB 2.0
-            if schedule.input:
-                query = Query.from_path(schedule.input)
-                pk = Aliased(query.result_type, field="primary_key")
+    logger.info("Finished scheduling plugins")
 
-                objects = connector.octopoes.ooi_repository.query(
-                    query.find(pk).where(query.result_type, primary_key=pk), now
-                )
-                by_pk = {item[-1]: item[0] for item in objects}
-                scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
 
-                for profile in scan_profiles:
-                    if profile.level.value < schedule.plugin.scan_level:
-                        continue
+def run_schedule(schedule: NewSchedule):
+    if not schedule.plugin:
+        pass
 
-                    input_data = by_pk[str(profile.reference)]
-                    last_run = (
-                        Task.objects.filter(
-                            status=TaskStatus.COMPLETED,
-                            organization=org,
-                            data__plugin_id=schedule.plugin.plugin_id,
-                            data__input_data=input_data,
-                        )
-                        .order_by("-created_at")
-                        .first()
-                    )
+    now = datetime.now(timezone.utc)
 
-                    if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                        logger.debug(
-                            "Plugin '%s' has already run recently for organization '%s' on input data '%s'",
-                            schedule.plugin.plugin_id,
-                            org.code,
-                            input_data,
-                        )
-                        continue
+    for org in schedule.plugin.enabled_organizations():
+        connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
 
-                    app.send_task(
-                        "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
-                    )
-                    count += 1
-            else:
-                last_run = (
-                    Task.objects.filter(
-                        status=TaskStatus.COMPLETED,
-                        organization=org,
-                        data__plugin_id=schedule.plugin.plugin_id,
-                        data__input_data=None,
-                    )
-                    .order_by("-created_at")
-                    .first()
-                )
-                if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                    logger.debug(
-                        "Plugin '%s' has already run recently for organization '%s'",
-                        schedule.plugin.plugin_id,
-                        org.code,
-                    )
+        # TODO: will be replaced with direct(er) queries in XTDB 2.0
+        if schedule.input:
+            query = Query.from_path(schedule.input)
+            pk = Aliased(query.result_type, field="primary_key")
+
+            objects = connector.octopoes.ooi_repository.query(
+                query.find(pk).where(query.result_type, primary_key=pk), now
+            )
+            by_pk = {item[-1]: item[0] for item in objects}
+            scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
+
+            for profile in scan_profiles:
+                if profile.level.value < schedule.plugin.scan_level:
                     continue
 
+                input_data = by_pk[str(profile.reference)]
                 app.send_task(
-                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id)
+                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
                 )
-                count += 1
-
-    logger.info("Finished scheduling %s plugins", count)
+        else:
+            app.send_task(
+                "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id)
+            )
 
 
 @app.task(bind=True)

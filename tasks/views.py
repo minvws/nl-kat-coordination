@@ -8,9 +8,11 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import DetailView, ListView, UpdateView, DeleteView, CreateView
 
 from tasks.models import NewSchedule, Task
+from tasks.new_tasks import run_schedule
 
 
 class TaskListView(ListView):
@@ -116,6 +118,22 @@ class ScheduleCreateView(CreateView):
         return reverse_lazy("schedule_list")
 
 
+class ScheduleUpdateView(UpdateView):
+    model = NewSchedule
+    fields = ["enabled", "recurrences", "input"]
+
+    def form_invalid(self, form):
+        return redirect(reverse("schedule_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("schedule_list")
+
+
 class ScheduleDeleteView(DeleteView):
     model = NewSchedule
 
@@ -131,17 +149,8 @@ class ScheduleDeleteView(DeleteView):
         return reverse_lazy("schedule_list")
 
 
-class ScheduleUpdateView(UpdateView):
-    model = NewSchedule
-    fields = ["enabled", "recurrences", "input"]
+class ScheduleRunView(View):
+    def post(self, request, schedule_id, *args, **kwargs):
+        run_schedule(NewSchedule.objects.get(pk=schedule_id))
 
-    def form_invalid(self, form):
-        return redirect(reverse("schedule_list"))
-
-    def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
-
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
-
-        return reverse_lazy("schedule_list")
+        return redirect(reverse("new_task_list"))

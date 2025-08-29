@@ -62,6 +62,11 @@ class NewSchedule(models.Model):
     run_on = models.CharField(max_length=64, null=True, blank=True)
     operation = models.CharField(max_length=16, choices=Operation.choices, null=True, blank=True)
 
+    def run(self):
+        from tasks.new_tasks import run_schedule
+
+        run_schedule(self)
+
 
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
