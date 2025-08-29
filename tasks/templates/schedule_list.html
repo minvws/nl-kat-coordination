@@ -116,7 +116,7 @@
                                         {% if schedule.enabled %}
                                             <form action="{% url 'run_schedule' schedule.id %}" method="post">
                                                 {% csrf_token %}
-                                                <button type="submit" class="ghost">{% translate "Run" %}</button>
+                                                <button type="submit">{% translate "Run" %}</button>
                                             </form>
                                         {% endif %}
                                     </td>

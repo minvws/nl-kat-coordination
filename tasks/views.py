@@ -12,7 +12,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView, UpdateView, DeleteView, CreateView
 
 from tasks.models import NewSchedule, Task
-from tasks.new_tasks import run_schedule
+from tasks.new_tasks import run_schedule, rerun_task
 
 
 class TaskListView(ListView):
@@ -49,6 +49,13 @@ class TaskDetailView(DetailView):
         ]
 
         return context
+
+
+class TaskRescheduleView(View):
+    def post(self, request, task_id, *args, **kwargs):
+        rerun_task(Task.objects.get(pk=task_id))
+
+        return redirect(reverse("new_task_list"))
 
 
 class ScheduleListView(ListView):

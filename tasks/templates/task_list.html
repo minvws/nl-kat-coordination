@@ -28,6 +28,7 @@
                                 <th scope="col">{% translate "Status" %}</th>
                                 <th scope="col">{% translate "Results" %}</th>
                                 <th scope="col">{% translate "Created" %}</th>
+                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,6 +65,12 @@
                                         <a href="{% url 'file_list' %}?task_id={{ task.id }}">See Results</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
+                                    <td>
+                                        <form action="{% url 'reschedule_task' task.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit">{% translate "Reschedule" %}</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

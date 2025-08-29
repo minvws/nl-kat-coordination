@@ -76,6 +76,13 @@ def run_schedule(schedule: NewSchedule):
                 "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id)
             )
 
+def rerun_task(task: Task):
+    plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
+
+    app.send_task(
+        "tasks.new_tasks.run_plugin", (plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None)
+    )
+
 
 @app.task(bind=True)
 def run_plugin(
