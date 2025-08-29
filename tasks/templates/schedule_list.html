@@ -113,12 +113,10 @@
                                         {% endif %}
                                     {% endif %}
                                     <td>
-                                        {% if schedule.enabled %}
-                                            <form action="{% url 'run_schedule' schedule.id %}" method="post">
-                                                {% csrf_token %}
-                                                <button type="submit">{% translate "Run" %}</button>
-                                            </form>
-                                        {% endif %}
+                                        <form action="{% url 'run_schedule' schedule.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit">{% translate "Run" %}</button>
+                                        </form>
                                     </td>
                                     <td>
                                         <form action="{% url 'delete_schedule' schedule.id %}" method="post">
