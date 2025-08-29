@@ -50,28 +50,25 @@ class PluginRunner:
         #     original_entrypoint = client.images.get(plugin.oci_image).attrs["Config"]["Entrypoint"]
         #   (Perhaps we need this later on.)
 
-        callback_kwargs = (
-            {
-                "entrypoint": self.override_entrypoint,
-                "environment": {
-                    "PLUGIN_ID": plugin.plugin_id,
-                    "OPENKAT_TOKEN": token.generate_new_token(),
-                    "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
-                },
-                "network": settings.DOCKER_NETWORK,
-                "volumes": [f"{self.adapter}:{self.override_entrypoint}"],
-            }
-            if not use_stdout
-            else {
+        if use_stdout:
+            callback_kwargs = {
                 "entrypoint": [],
-                "network": settings.DOCKER_NETWORK,
                 "environment": {
                     "PLUGIN_ID": plugin.plugin_id,
                     "OPENKAT_TOKEN": token.generate_new_token(),
                     "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",
                 },
             }
-        )
+        else:
+            callback_kwargs = {
+                "entrypoint": self.override_entrypoint,
+                "environment": {
+                    "PLUGIN_ID": plugin.plugin_id,
+                    "OPENKAT_TOKEN": token.generate_new_token(),
+                    "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
+                },
+                "volumes": [f"{self.adapter}:{self.override_entrypoint}"],
+            }
 
         if task_id and not use_stdout:
             callback_kwargs["environment"]["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
@@ -98,6 +95,7 @@ class PluginRunner:
             stdout=use_stdout,
             stderr=True,
             remove=True,
+            network=settings.DOCKER_NETWORK,
             **callback_kwargs,
         )
 
