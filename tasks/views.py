@@ -1,3 +1,7 @@
+from datetime import datetime, timezone
+
+import recurrence
+
 from django.conf import settings
 from django.forms import ModelForm
 from django.shortcuts import redirect
@@ -83,6 +87,22 @@ class ScheduleCreateView(CreateView):
     model = NewSchedule
     fields = ["plugin", "input", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
+
+    def form_valid(self, form):
+        self.object = form.save()
+
+        if self.object.recurrences and str(self.object.recurrences):
+            return super().form_valid(form)
+        if self.object.plugin and self.object.plugin.recurrences and str(self.object.plugin.recurrences):
+            self.object.recurrences = self.object.plugin.recurrences
+        else:
+            self.object.recurrences = recurrence.Recurrence(
+                rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
+                dtstart=datetime.now(timezone.utc),
+            )
+
+        self.object.save()
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         return redirect(reverse("schedule_list"))
