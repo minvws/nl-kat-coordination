@@ -77,10 +77,19 @@ class PluginIdDetailView(PluginDetailView):
 
 class PluginCreateView(CreateView):
     model = Plugin
-    fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments", "recurrences"]
+    fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
     template_name = "plugin_form.html"
 
     def get_form_kwargs(self):
+        if self.request.method == "POST" and "plugin_id" in self.request.GET:
+            if "duplicate" in self.request.GET and self.request.GET["duplicate"]:
+                # Do not set self.object as we want to create a new plugin
+                return super().get_form_kwargs()
+
+            # Will perform an update instead of a Create
+            self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])
+            return super().get_form_kwargs()
+
         if "plugin_id" in self.request.GET:
             # Will provide the form with initial values from this plugin
             self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])

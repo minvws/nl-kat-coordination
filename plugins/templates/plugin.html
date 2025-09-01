@@ -20,7 +20,9 @@
                     </div>
                     <div class="horizontal-view">
                         {% include "new_enable_disable_plugin.html" with plugin=plugin %}
-
+                        <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
+                            <button type="submit" class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                        </a>
                     </div>
                 </div>
                 <div class="image-square">
@@ -29,6 +31,15 @@
                              src="{% url "plugin_cover_image" plugin_id=plugin.plugin_id %}"
                              alt="boefje placeholder image" />
                     </div>
+                </div>
+                <div>
+                    <p class="emphasized">{{ plugin.plugin_id }}</p>
+                    <p class="emphasized">{{ plugin.name }}</p>
+                    <p class="emphasized">{{ plugin.description }}</p>
+                    <p class="emphasized">{{ plugin.scan_level }}</p>
+                    <p class="emphasized">{{ plugin.consumes }}</p>
+                    <p class="emphasized">{{ plugin.oci_image }}</p>
+                    <p class="emphasized">{{ plugin.oci_arguments }}</p>
                 </div>
             </div>
         </section>

@@ -80,13 +80,6 @@ class Plugin(models.Model):
         return f"{self.plugin_id}"
 
 
-class PluginFile(models.Model):
-    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="plugin_files")
-    file = models.ForeignKey("files.File", on_delete=models.CASCADE, related_name="plugin_files")
-
-    destination = models.CharField(max_length=124)  # Container path
-
-
 class PluginSettings(models.Model):
     settings = models.JSONField(default=dict)  # TODO: encoder/decoder with for datatimes?
     plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="plugin_settings")

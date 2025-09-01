@@ -21,7 +21,7 @@ class PluginRunner:
         self.override_entrypoint = override_entrypoint
         self.adapter = adapter
 
-    def run(self, plugin_id: str, target: str | None, output: str = "file", task_id: uuid.UUID | None = None):
+    def run(self, plugin_id: str, target: str | None, output: str = "file", task_id: uuid.UUID | None = None, keep: bool = False):
         use_stdout = str(output) == "-"
 
         try:
@@ -84,18 +84,28 @@ class PluginRunner:
             else:
                 format_map["hostname"] = target
 
-            args = [arg.format_map(format_map) if arg[1:-1] in format_map else arg for arg in plugin.oci_arguments]
+            new_args = []
+
+            for arg in args:
+                try:
+                    new_args.append(arg.format_map(format_map))
+                except KeyError:
+                    new_args.append(arg)
+        else:
+            new_args = args
 
         logs = client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
-            command=args,
+            command=new_args,
             stdout=use_stdout,
             stderr=True,
-            remove=True,
+            remove=not keep,
             network=settings.DOCKER_NETWORK,
             **callback_kwargs,
         )
+        # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
+        #   after the container has gone.
 
         token.delete()
         plugin_user.delete()
