@@ -6,6 +6,7 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+
 kat:
 	make kat_parallel -j 4
 
@@ -15,6 +16,11 @@ kat_parallel: frontend docker_init images
 clean: .env
 	docker compose down --timeout 0 --volumes --remove-orphans
 	-rm -Rf node_modules assets/dist .parcel-cache static media *.egg-info
+
+ooi-clean: .env
+	docker compose down --volumes xtdb
+	docker compose up -d
+	docker compose exec openkat python manage.py shell -c "import openkat;[openkat.settings.OCTOPOES_FACTORY(o.code).create_node() for o in openkat.models.Organization.objects.all()]"
 
 build: .env
 ifeq ($(UNAME),Darwin)
@@ -28,7 +34,7 @@ reset:
 	make kat
 
 dashboards:
-	docker compose run --rm openkat python3 manage.py dashboards
+	docker compose run --rm openkat python manage.py dashboards
 
 docker_init: build
 	docker compose run --rm openkat make -j 4 init

@@ -9,7 +9,7 @@ from django.db.models import Q, QuerySet, UniqueConstraint
 from recurrence.fields import RecurrenceField
 
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPAddress
 from octopoes.models.types import ALL_TYPES_MAP
 from openkat.models import Organization, OrganizationMember
 from tasks.models import NewSchedule
@@ -46,9 +46,9 @@ class Plugin(models.Model):
     def types_in_arguments(self):
         return list(
             {
-                part[1:-1]
+                part
                 for arg in self.oci_arguments
-                for part in arg.lower().split("|")
+                for part in arg[1:-1].lower().split("|")
                 if arg.startswith("{") and arg.endswith("}")
             }
         )
@@ -124,8 +124,8 @@ class EnabledPlugin(models.Model):
 
             if parsed_type == Hostname:
                 queries.append("Hostname.name")
-            if parsed_type in [IPAddressV4, IPAddressV6]:
-                queries.append(f"{parsed_type.object_type}.address")
+            if parsed_type in [IPAddressV4, IPAddressV6, IPAddress]:
+                queries.append(f"{parsed_type.get_object_type()}.address")
 
         logger.info("q on", queries=queries)
 

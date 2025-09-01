@@ -80,10 +80,16 @@ class PluginRunner:
 
         if target is not None:
             # TODO: add nameserver through configuration later
-            format_map = {"nameserver": "1.1.1.1", "ip_address|hostname": target, "file": target}
+            format_map = {"nameserver": "1.1.1.1", "file": target}
+
+            for ip_key in ["ipaddress", "ipaddressv4", "ipaddressv6"]:
+                format_map[f"hostname|{ip_key}"] = target
+                format_map[f"{ip_key}|hostname"] = target
 
             if is_ip:
-                format_map["ip_address"] = target
+                format_map["ipaddress"] = target
+                format_map["ipaddressv4"] = target
+                format_map["ipaddressv6"] = target
             else:
                 format_map["hostname"] = target
 

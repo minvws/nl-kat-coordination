@@ -33,7 +33,7 @@
       "nmap",
       "--open",
       "--top-ports",
-      "2",
+      "250",
       "-T4",
       "-Pn",
       "-r",
@@ -42,7 +42,7 @@
       "-sS",
       "-oX",
       "-",
-      "{ip_address|hostname}"
+      "{ipaddress|hostname}"
     ]
   },
   {

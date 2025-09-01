@@ -13,15 +13,11 @@ from libnmap.parser import NmapParser
 def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None):
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
+    ip = f"IPAddressV4|internet|{host.address}" if host.ipv4 else f"IPAddressV6|internet|{host.address}"
+    ip_obj = dict(object_type="IPAddressV4", network="Network|internet", address=host.address) if host.ipv4 else dict(object_type="IPAddressV6", network="Network|internet", address=host.address)
 
-    results = []
+    results = [ip_obj]
     if open_ports:
-        ip = (
-            dict(object_type="IPAddressV4", network=network, address=host.address, netblock=prefixlen)
-            if host.ipv4
-            else dict(object_type="IPAddressV6", network=network, address=host.address, netblock=prefixlen)
-        )
-
         for port, protocol in open_ports:
             service: NmapService = host.get_service(port, protocol)
 
@@ -29,9 +25,7 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
             if service.service == "tcpwrapped":
                 continue
 
-            ip_port = dict(
-                object_type="IPPort", address=ip["address"], protocol=protocol, port=port, state=service.state
-            )
+            ip_port = dict(object_type="IPPort", address=ip, protocol=protocol, port=port, state=service.state)
             results.append(ip_port)
 
             service_name = service.service
@@ -41,7 +35,7 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
             port_service = dict(object_type="Service", name=service_name)
             results.append(port_service)
 
-            ip_service = dict(object_type="IPService", ip_port=ip_port["port"], service=port_service["name"])  # TODO
+            ip_service = dict(object_type="IPService", ip_port=f"IPPort|internet|{host.address}|{protocol}|{ip_port['port']}", service=f"Service|{service_name}")  # TODO
             results.append(ip_service)
 
     return results
@@ -95,11 +89,14 @@ def handle_nmap_result(nmap_output: str, client: httpx.Client):
         # TODO: handle this in the API
         client.delete(f"/objects/ip-ports/?address={host.address}&top_ports={top_ports}")
 
-        results.extend(get_ip_ports_and_service(host=host, network="internet", prefixlen=str(prefixlen)))
+        results.extend(get_ip_ports_and_service(host=host, network="Network|internet", prefixlen=str(prefixlen)))
 
     return results
 
 
 if __name__ == "__main__":
     oois = run(sys.argv[1])
+    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+    httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=oois)
+
     print(json.dumps(oois))
