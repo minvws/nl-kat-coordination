@@ -46,10 +46,11 @@ class Plugin(models.Model):
     def types_in_arguments(self):
         return list(
             {
-                part
+                ALL_TYPES_MAP[part]
                 for arg in self.oci_arguments
-                for part in arg[1:-1].lower().split("|")
                 if arg.startswith("{") and arg.endswith("}")
+                for part in arg[1:-1].lower().split("|")
+                if part in ALL_TYPES_MAP
             }
         )
 
@@ -77,6 +78,13 @@ class Plugin(models.Model):
 
     def __str__(self):
         return f"{self.plugin_id}"
+
+
+class PluginFile(models.Model):
+    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="plugin_files")
+    file = models.ForeignKey("files.File", on_delete=models.CASCADE, related_name="plugin_files")
+
+    destination = models.CharField(max_length=124)  # Container path
 
 
 class PluginSettings(models.Model):
@@ -120,12 +128,10 @@ class EnabledPlugin(models.Model):
 
         # TODO: once moved to XTDB 2.0 we can revise this
         for ooi_type in self.plugin.types_in_arguments():
-            parsed_type = ALL_TYPES_MAP.get(ooi_type)
-
-            if parsed_type == Hostname:
+            if ooi_type == Hostname:
                 queries.append("Hostname.name")
-            if parsed_type in [IPAddressV4, IPAddressV6, IPAddress]:
-                queries.append(f"{parsed_type.get_object_type()}.address")
+            if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
+                queries.append(f"{ooi_type.get_object_type()}.address")
 
         logger.info("q on", queries=queries)
 

@@ -5,6 +5,7 @@ from django.conf import settings
 
 from files.models import File
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models.exception import TypeNotFound
 from octopoes.xtdb.query import Aliased, Query
 from openkat.models import Organization
 from plugins.models import Plugin
@@ -25,7 +26,7 @@ def reschedule(
     for schedule in NewSchedule.objects.filter(enabled=True):
         last_run = (
             Task.objects.filter(
-                status=TaskStatus.COMPLETED,
+                status__in=[TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED],
                 new_schedule=schedule,
             )
             .order_by("-created_at")
@@ -54,7 +55,14 @@ def run_schedule(schedule: NewSchedule):
 
         # TODO: will be replaced with direct(er) queries in XTDB 2.0
         if schedule.input:
-            query = Query.from_path(schedule.input)
+            try:
+                query = Query.from_path(schedule.input)
+            except (ValueError, TypeNotFound):
+                app.send_task(
+                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, schedule.input, schedule.id)
+                )
+                continue
+
             pk = Aliased(query.result_type, field="primary_key")
 
             objects = connector.octopoes.ooi_repository.query(

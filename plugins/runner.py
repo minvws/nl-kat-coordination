@@ -50,28 +50,19 @@ class PluginRunner:
         # TODO: to get the original entrypoint run:
         #     original_entrypoint = client.images.get(plugin.oci_image).attrs["Config"]["Entrypoint"]
         #   (Perhaps we need this later on.)
+        callback_kwargs = {
+            "entrypoint": self.override_entrypoint,
+            "environment": {
+                "PLUGIN_ID": plugin.plugin_id,
+                "OPENKAT_TOKEN": token.generate_new_token(),
+                "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
+            },
+            "volumes": [f"{self.adapter}:{self.override_entrypoint}"],
+        }
 
         if use_stdout:
-            callback_kwargs = {
-                "entrypoint": [],
-                "environment": {
-                    "PLUGIN_ID": plugin.plugin_id,
-                    "OPENKAT_TOKEN": token.generate_new_token(),
-                    "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",
-                },
-            }
-        else:
-            callback_kwargs = {
-                "entrypoint": self.override_entrypoint,
-                "environment": {
-                    "PLUGIN_ID": plugin.plugin_id,
-                    "OPENKAT_TOKEN": token.generate_new_token(),
-                    "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
-                },
-                "volumes": [f"{self.adapter}:{self.override_entrypoint}"],
-            }
-
-        if task_id and not use_stdout:
+            callback_kwargs["environment"]["UPLOAD_URL"] = "/dev/null"
+        elif task_id:
             callback_kwargs["environment"]["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
 
         token.save()
@@ -93,7 +84,7 @@ class PluginRunner:
             else:
                 format_map["hostname"] = target
 
-            args = [arg.format_map(format_map) for arg in plugin.oci_arguments]
+            args = [arg.format_map(format_map) if arg[1:-1] in format_map else arg for arg in plugin.oci_arguments]
 
         logs = client.containers.run(
             image=plugin.oci_image,

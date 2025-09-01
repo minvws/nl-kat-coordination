@@ -2,12 +2,15 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 )
 
 var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
@@ -29,8 +32,45 @@ func main() {
 		uploadURL = defaultURL
 	}
 
+	pattern := regexp.MustCompile(`^\{file/(\d+)\}$`)
+
+	new_args := []string{}
+
+	for _, arg := range os.Args {
+		if matches := pattern.FindStringSubmatch(arg); matches != nil {
+			tmpFile, err := os.CreateTemp("/tmp", "")
+
+			if err != nil {
+				log.Fatalf("Failed to create temporary file: %v", err)
+			}
+			err = downloadFile(matches[1], tmpFile.Name())
+
+			if err != nil {
+				log.Fatalf("Failed to download file: %v", err)
+			}
+
+			new_args = append(new_args, tmpFile.Name())
+		} else {
+			new_args = append(new_args, arg)
+		}
+	}
+
 	// Prepare command
-	cmd := exec.Command(os.Args[1], os.Args[2:]...)
+	cmd := exec.Command(new_args[1], new_args[2:]...)
+
+	if uploadURL == "/dev/null" {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Start(); err != nil {
+			log.Fatalf("Failed to start command: %v", err)
+		}
+
+		if cmd.Wait() != nil {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatalf("Failed to get stdout: %v", err)
@@ -110,4 +150,73 @@ func main() {
 	if cmdError != nil {
 		os.Exit(1)
 	}
+}
+
+func downloadFile(file_pk string, destination string) error {
+	api_url := os.Getenv("OPENKAT_API")
+	var bearer = "Token " + os.Getenv("OPENKAT_TOKEN")
+
+	var body bytes.Buffer
+
+	req, err := http.NewRequest("GET", api_url+"/file/"+file_pk, &body)
+
+	if err != nil {
+		return fmt.Errorf("failed to create GET request: %w", err)
+	}
+
+	req.Header.Add("Authorization", bearer)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return fmt.Errorf("failed to make GET request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check if status is OK
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	var data map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		fmt.Println("Decode error:", err)
+		os.Exit(1)
+	}
+
+	req, err = http.NewRequest("GET", data["file"].(string), &body)
+
+	if err != nil {
+		return fmt.Errorf("failed to create GET request: %w", err)
+	}
+
+	req.Header.Add("Authorization", bearer)
+
+	resp, err = client.Do(req)
+
+	if err != nil {
+		return fmt.Errorf("failed to make GET request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check if status is OK
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	// Create local file
+	out, err := os.Create(destination)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer out.Close()
+
+	// Copy response body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to save file: %w", err)
+	}
+
+	return nil
 }

@@ -41,7 +41,7 @@ class FileListView(ListView):
 
 class FileCreateView(CreateView):
     model = File
-    fields = ["file", "type"]
+    fields = ["file"]
     template_name = "file_form.html"
 
     def form_invalid(self, form):
