@@ -138,11 +138,14 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     inferences.append(origin)
                 continue
 
-            task = Task.objects.get(id=origin.origin.task_id)
-            origin.normalizer = task.data
+            tasks = Task.objects.filter(id=origin.origin.task_id)
 
-            if task.data["raw_data"]["boefje_meta"]["boefje"]["id"] != "manual":
-                origin.boefje = katalogus.get_plugin(task.data["raw_data"]["boefje_meta"]["boefje"]["id"])
+            if tasks.exists():
+                task = tasks.first()
+                origin.normalizer = task.data
+
+                if task.data["raw_data"]["boefje_meta"]["boefje"]["id"] != "manual":
+                    origin.boefje = katalogus.get_plugin(task.data["raw_data"]["boefje_meta"]["boefje"]["id"])
             observations.append(origin)
 
         return results

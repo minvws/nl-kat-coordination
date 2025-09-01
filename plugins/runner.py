@@ -39,6 +39,7 @@ class PluginRunner:
         plugin_user.save()
         plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
         plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
+        plugin_user.user_permissions.add(Permission.objects.get(codename="add_ooi"))
 
         token = AuthToken(
             user=plugin_user,

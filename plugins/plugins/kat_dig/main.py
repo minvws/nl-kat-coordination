@@ -33,7 +33,7 @@ def run(file_id: str):
         oois.append(
             {
                 "object_type": "DNSRecord",
-                "hostname": hostname,
+                "hostname": f"Hostname|internet|{hostname}",
                 "ttl": int(ttl),
                 "dns_record_type": record_type,
                 "value": content,

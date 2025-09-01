@@ -117,7 +117,7 @@ class EnabledPlugin(models.Model):
             return
 
         queries = []
-        logger.info("moving on")
+
         # TODO: once moved to XTDB 2.0 we can revise this
         for ooi_type in self.plugin.types_in_arguments():
             parsed_type = ALL_TYPES_MAP.get(ooi_type)

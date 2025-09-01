@@ -2,17 +2,18 @@ import datetime
 from datetime import timezone
 from enum import Enum
 
-from django.urls import reverse
-from django.views.generic import ListView
 from django.conf import settings
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
 
 from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.reports import BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport
+from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types
 from openkat.enums import CUSTOM_SCAN_LEVEL
-from openkat.forms.ooi_form import OOISearchForm, OOITypeMultiCheckboxForm, _EXCLUDED_OOI_TYPES
-from openkat.models import Organization, OrganizationMember
+from openkat.forms.ooi_form import _EXCLUDED_OOI_TYPES, OOISearchForm, OOITypeMultiCheckboxForm
+from openkat.models import Organization
 from openkat.view_helpers import get_mandatory_fields
 from openkat.views.mixins import OOIList
 
@@ -25,6 +26,10 @@ class PageActions(Enum):
 class ObjectListView(ListView):
     template_name = "object_list.html"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+
+    def get(self, request, *args, **kwargs):
+        # TODO
+        return redirect(reverse("ooi_list", kwargs={"organization_code": Organization.objects.first().code}))
 
     def get_queryset(self):
         # TODO: handle

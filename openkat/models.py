@@ -97,6 +97,7 @@ class Organization(models.Model):
             ("can_enable_disable_plugin", "Can enable or disable boefje"),
             ("can_add_boefje", "Can add new or duplicate boefjes"),
             ("can_set_clearance_level", "Can set clearance level"),
+            ("add_ooi", "Add oois"),
             ("can_delete_oois", "Can delete oois"),
             ("can_mute_findings", "Can mute findings"),
             ("can_view_katalogus_settings", "Can view KAT-alogus settings"),

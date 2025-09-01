@@ -1,9 +1,11 @@
 import json
+import os
 import re
 import sys
 from os import getenv
 
 import dns
+import httpx
 from dns.edns import EDEOption
 from dns.message import from_text
 from dns.name import Name
@@ -73,7 +75,7 @@ def run(hostname: str):
     record_store = []
 
     def register_hostname(name: str) -> dict:
-        hostname = dict(network=internet["name"], name=name.rstrip("."))
+        hostname = dict(network=f"Network|{internet['name']}", name=name.rstrip("."))
         hostname_store[hostname["name"]] = hostname
         return hostname
 
@@ -92,11 +94,11 @@ def run(hostname: str):
         for rrset in answer.response.answer:
             for rr in rrset:
                 record_hostname = register_hostname(str(rrset.name))
-                default_args = {"hostname": record_hostname["name"], "value": str(rr), "ttl": rrset.ttl}
+                default_args = {"hostname": f"Hostname|{internet['name']}|{record_hostname['name']}", "value": str(rr), "ttl": rrset.ttl}
 
                 # the soa is the zone of itself, and the argument hostname
                 if isinstance(rr, SOA):
-                    zone = dict(object_type="DNSZone", hostname=record_hostname["name"])
+                    zone = dict(object_type="DNSZone", hostname=f"Hostname|{internet['name']}|{record_hostname['name']}")
                     zone_links[record_hostname["name"]] = zone
                     zone_links[input_hostname["name"]] = zone
 
@@ -107,20 +109,20 @@ def run(hostname: str):
                         retry=rr.retry,
                         expire=rr.expire,
                         minimum=rr.minimum,
-                        soa_hostname=register_hostname(str(rr.mname))["name"],
+                        soa_hostname=f"Hostname|internet|{register_hostname(str(rr.mname))['name']}",
                         **default_args,
                     )
                     results.append(soa)
 
                 if isinstance(rr, A):
-                    ipv4 = dict(object_type="IPAddressV4", network=internet["name"], address=str(rr))
+                    ipv4 = dict(object_type="IPAddressV4", network=f"Network|{internet['name']}", address=str(rr))
                     results.append(ipv4)
-                    register_record(dict(object_type="DNSARecord", address=ipv4["address"], **default_args))
+                    register_record(dict(object_type="DNSARecord", address=f"IPV4address|{internet['name']}|{ipv4['address']}", **default_args))
 
                 if isinstance(rr, AAAA):
-                    ipv6 = dict(object_type="IPAddressV6", network=internet["name"], address=str(rr))
+                    ipv6 = dict(object_type="IPAddressV6", network=f"Network|{internet['name']}", address=str(rr))
                     results.append(ipv6)
-                    register_record(dict(object_type="DNSAAAARecord", address=ipv6["address"], **default_args))
+                    register_record(dict(object_type="DNSAAAARecord", address=f"IPV6address|{internet['name']}|{ipv6['address']}", **default_args))
 
                 if isinstance(rr, TXT):
                     # TODO: concatenated txt records should be handled better
@@ -146,13 +148,13 @@ def run(hostname: str):
                 if isinstance(rr, NS):
                     ns_fqdn = register_hostname(str(rr.target))
                     register_record(
-                        dict(object_type="DNSNSRecord", name_server_hostname=ns_fqdn["name"], **default_args)
+                        dict(object_type="DNSNSRecord", name_server_hostname=f"Hostname|{internet['name']}|{ns_fqdn['name']}", **default_args)
                     )
 
                 if isinstance(rr, CNAME):
                     target_fqdn = register_hostname(str(rr.target))
                     register_record(
-                        dict(object_type="DNSCNAMERecord", target_hostname=target_fqdn["name"], **default_args)
+                        dict(object_type="DNSCNAMERecord", target_hostname=f"Hostname|{internet['name']}|{target_fqdn['name']}", **default_args)
                     )
 
                 if isinstance(rr, CAA):
@@ -174,7 +176,7 @@ def run(hostname: str):
 
     # DKIM
     if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
-        results.append(dict(object_type="DKIMExists", hostname=input_hostname["name"]))
+        results.append(dict(object_type="DKIMExists", hostname=f"Hostname|internet|{input_hostname['name']}"))
 
     # DMARC
     if dmarc_results not in ["NXDOMAIN", "Timeout"]:
@@ -184,7 +186,7 @@ def run(hostname: str):
                     results.append(
                         dict(
                             object_type="DMARCTXTRecord",
-                            hostname=input_hostname["name"],
+                            hostname=f"Hostname|internet|{input_hostname['name']}",
                             value=str(rr).strip('"'),
                             ttl=rrset.ttl,
                         )
@@ -230,4 +232,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 if __name__ == "__main__":
     result = run(sys.argv[1])
+
+    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+    httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=result)
+
     print(json.dumps(result))
