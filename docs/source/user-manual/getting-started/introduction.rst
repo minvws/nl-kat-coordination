@@ -35,7 +35,7 @@ Reports can be generated from the objects, providing a clear overview of all the
 
 An example:
 - A user adds a hostname object. OpenKAT will schedule a plugin to do DNS lookups on the hostname.
-- The plugin will return DNS records that point to IP addresses. Those IP addresses are added to OpenKAT. OpenKAT will then schedule port scans on the IP addresses. 
+- The plugin will return DNS records that point to IP addresses. Those IP addresses are added to OpenKAT. OpenKAT will then schedule port scans on the IP addresses.
 - Any open ports found will be added as new objects which may in turn trigger new scans to search for vulnerable software on these open ports.
 
 How far OpenKAT goes with its search depends on the clearance levels that are provided. Read more about it here: :doc:`../basic-concepts/scan-levels-and-indemnification`.
