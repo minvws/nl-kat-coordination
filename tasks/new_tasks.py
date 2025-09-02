@@ -25,10 +25,7 @@ def reschedule(
 
     for schedule in NewSchedule.objects.filter(enabled=True):
         last_run = (
-            Task.objects.filter(
-                status__in=[TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED],
-                new_schedule=schedule,
-            )
+            Task.objects.filter(new_schedule=schedule)
             .order_by("-created_at")
             .first()
         )

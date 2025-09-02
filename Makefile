@@ -10,7 +10,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 kat:
 	make kat_parallel -j 4
 
-kat_parallel: frontend docker_init images
+kat_parallel: frontend docker_init new-images
 	docker compose up -d
 
 clean: .env
@@ -64,7 +64,8 @@ base-image:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-images: dns-sec nmap export-http nikto generic entrypoint normalizers
+images: dns-sec nmap export-http nikto generic entrypoint plugins
+new-images: entrypoint plugins
 
 plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/

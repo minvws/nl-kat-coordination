@@ -80,5 +80,33 @@
       "-c",
       "copy(select CIDR, ASN from read_json('https://bgp.tools/table.jsonl', maximum_object_size=100000000)) to '/dev/stdout' (format parquet);"
     ]
+  },
+  {
+    "plugin_id": "nuclei-tls-version",
+    "name": "Nuclei TLS Version",
+    "scan_level": 2,
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "ssl/tls-version.yaml",
+      "-j",
+      "-u",
+      "{hostname}"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-expired-ssl",
+    "name": "Nuclei Expired TLS Certificate",
+    "scan_level": 2,
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "ssl/expired-ssl.yaml",
+      "-j",
+      "-u",
+      "{hostname}"
+    ]
   }
 ]
