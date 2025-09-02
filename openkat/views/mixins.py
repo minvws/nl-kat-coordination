@@ -494,4 +494,4 @@ class SeveritiesMixin:
             except ValueError as e:
                 messages.error(self.request, _(str(e)))
 
-        return severities
+        return severities if severities else RiskLevelSeverity
