@@ -60,6 +60,6 @@ Starting with OpenKAT
 
 To start with OpenKAT you have to log in first. If you have trouble logging in, please read :doc:`login-and-registration`.
 
-After logging in, you continue to the onboarding. This onboarding will walk you through creating and scanning your first object and report. You can learn more about the onboarding :doc:`here <onboarding>`.
+After logging in, you continue to the onboarding. This onboarding will walk you through creating and scanning your first object and report. You can learn more about the onboarding process :doc:`here <onboarding>`.
 
 You can also skip the onboarding and directly go to :doc:`start-scanning` to create your first object in OpenKAT.

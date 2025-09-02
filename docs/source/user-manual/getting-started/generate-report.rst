@@ -8,13 +8,13 @@ Select the kind of report
 -------------------------
 To create a new report, go the Reports page. Press the 'Generate report' button and click on the kind of report you want to create.
 
-There are three different kind of reports:
+There are three different kinds of reports:
 
 - **Separate report:** selecting one or more reports will show the contents of each report below each other. This kinds of report might be turned off by default by your administrator.
 - **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects.
 - **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations.
 
-All kind of reports can be exported as PDF. The Aggregate Report can also be exported as JSON.
+All kinds of reports can be exported as PDF. The Aggregate Report can also be exported as JSON.
 
 .. image:: img/generate-report-01.png
   :alt: Reports page with Generate report button
@@ -48,8 +48,7 @@ Configuration
 -------------
 Next, you can see which plugins are required for the report and which plugins are recommended.
 You need to enable the required plugins if you want the results in the report to be correct.
-If you choose not to enable a plugin, the data that plugin would collect or produce will be left out of
-the report which will then be generated based on the available data collected by the enabled plugins.
+If you choose not to enable a plugin, the data that the plugin would collect or produce will be left out of the report, which will then be generated based on the available data collected by the enabled plugins.
 
 .. image:: img/generate-report-04.png
   :alt: Plugin overview
@@ -67,7 +66,7 @@ In this final step, you can schedule the report and give the report a name. A re
 .. image:: img/generate-report-05.png
   :alt: Report schedule
 
-After pressing the 'Generate report' button on the bottom of the page, your report is scheduled.
+After pressing the 'Generate report' button at the bottom of the page, your report is scheduled.
 You can view the schedule for this report on the Scheduled Reports page.
 It will be generated in the background by OpenKAT at the start date and time that you have just selected in the final step.
 
