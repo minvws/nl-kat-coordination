@@ -20,8 +20,7 @@
             </div>
             {% if perms.openkat.add_newschedule %}
                 <div class="horizontal-view toolbar">
-                    <a class="button ghost"
-                       href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Schedule" %}</a>
+                    <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Schedule" %}</a>
                 </div>
             {% endif %}
             {% if not newschedule_list %}
@@ -76,13 +75,9 @@
                                     <td>
                                         {% for rrule in schedule.recurrences.rrules %}
                                             {% if rrule.to_text.upper == 'DAILY' %}
-                                                <strong>
-                                                    {{ rrule.to_text.upper }} at {{ schedule.recurrences.dtstart.time }}
-                                                </strong>
+                                                <strong>{{ rrule.to_text.upper }} at {{ schedule.recurrences.dtstart.time }}</strong>
                                             {% else %}
-                                                <strong>
-                                                    {{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}
-                                                </strong>
+                                                <strong>{{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}</strong>
                                             {% endif %}
                                         {% endfor %}
                                     </td>
@@ -134,7 +129,6 @@
                                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                                         </form>
                                     </td>
-
                                 </tr>
                             {% endfor %}
                         </tbody>

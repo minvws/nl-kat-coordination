@@ -20,8 +20,7 @@
                 </div>
                 {% if perms.openkat.add_file %}
                     <div class="horizontal-view toolbar">
-                        <a class="button ghost"
-                           href="{% url "add_file" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add File" %}</a>
+                        <a class="button ghost" href="{% url "add_file" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add File" %}</a>
                     </div>
                 {% endif %}
             </div>
@@ -49,18 +48,14 @@
                                     <td>
                                         <a href="{{ file.file.url }}">{{ file.id }}</a>
                                     </td>
-                                    <td>
-                                        {{ file.path.parent }}
-                                    </td>
+                                    <td>{{ file.path.parent }}</td>
                                     <td>
                                         <a href="{{ file.file.url }}">{{ file.path.name }}</a>
                                     </td>
                                     {% if file.task_result %}
                                         {% if file.task_result.task.data.plugin_id %}
                                             <td>
-                                                <a href="{% url "task_detail" pk=file.task_result.task.id %}">
-                                                    {{ file.task_result.task.data.plugin_id }}
-                                                </a>
+                                                <a href="{% url "task_detail" pk=file.task_result.task.id %}">{{ file.task_result.task.data.plugin_id }}</a>
                                             </td>
                                         {% else %}
                                             <td>
@@ -74,9 +69,7 @@
                                                 </a>
                                             </td>
                                         {% else %}
-                                            <td>
-                                                {% translate 'No Organization' %}
-                                            </td>
+                                            <td>{% translate 'No Organization' %}</td>
                                         {% endif %}
                                     {% else %}
                                         <td>{% translate 'No Source' %}</td>
