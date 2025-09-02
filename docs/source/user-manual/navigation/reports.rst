@@ -18,7 +18,7 @@ There are 3 different kinds of reports available:
 - **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects.
 - **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations.
 
-All kind of reports can be exported as PDF. The Aggregate Report can also be exported as JSON.
+All kinds of reports can be exported as PDF. The Aggregate Report can also be exported as JSON.
 
 
 Report types

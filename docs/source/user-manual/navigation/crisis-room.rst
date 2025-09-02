@@ -72,7 +72,7 @@ To add a report section:
 - Click on the options button (three dots) next to the section name
 - Click on 'Add section to dashboard'
 
-The following settings can be set:
+The following settings can be configured:
 
 - **Dashboard:** Select the dashboard to which you want to add the dashboard item.
 - **Title on dashboard:** Give the dashboard item a name.

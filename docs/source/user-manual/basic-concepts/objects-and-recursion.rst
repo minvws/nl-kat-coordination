@@ -10,7 +10,7 @@ Properties
 Objects can be viewed via the 'Objects' page in OpenKAT's main menu. Here, all objects including their type and scan level are shown.
 Objects can be added, scanned, filtered and exported.
 
-New objects can be created via the 'add' option. This can be done individually or per CSV.
+New objects can be created using the 'Add' option. This can be done individually or per CSV.
 The specification of the CSV is included on the upload page.
 
 

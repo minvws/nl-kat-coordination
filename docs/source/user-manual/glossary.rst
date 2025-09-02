@@ -34,9 +34,9 @@ We hope this helps to make your life easier.
        **Inherited** objects were identified through propagation and the parsing of bits and normalizers. This means there is a relation to other object(s).
        **Empty** objects do not have a relation to other objects.
    * - Clearance level
-     - The clearance level of an object tells OpenKAT how far it can go with scanning the object.
+     - The clearance level of an object tells OpenKAT how far it can go in scanning the object.
    * - Scan level
-     - The scan level of a plugin tells you how deeply this plugin can scan your object. OpenKAT always checks if the plugins do not exceed the clearance level of the objects.
+     - The scan level of a plugin tells you how deeply this plugin can scan your object. OpenKAT always checks that the plugins do not exceed the clearance level of the objects.
    * - Separate report
      - Reports that are created for separate assets. This function might be turned off by default by your administrator.
    * - Aggregate report
