@@ -30,9 +30,13 @@ class ObjectCreateAPI(ViewSet):
     def get_queryset_params(self):
         return {
             "valid_time": datetime.now(timezone.utc),
-            "ooi_types": {t for t in get_collapsed_types().difference(
-                {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
-            ) if t not in _EXCLUDED_OOI_TYPES},
+            "ooi_types": {
+                t
+                for t in get_collapsed_types().difference(
+                    {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
+                )
+                if t not in _EXCLUDED_OOI_TYPES
+            },
             "scan_level": settings.DEFAULT_SCAN_LEVEL_FILTER,
             "scan_profile_type": settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
             "search_string": "",

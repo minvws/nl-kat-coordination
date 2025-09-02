@@ -14,7 +14,11 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
     ip = f"IPAddressV4|internet|{host.address}" if host.ipv4 else f"IPAddressV6|internet|{host.address}"
-    ip_obj = dict(object_type="IPAddressV4", network="Network|internet", address=host.address) if host.ipv4 else dict(object_type="IPAddressV6", network="Network|internet", address=host.address)
+    ip_obj = (
+        dict(object_type="IPAddressV4", network="Network|internet", address=host.address)
+        if host.ipv4
+        else dict(object_type="IPAddressV6", network="Network|internet", address=host.address)
+    )
 
     results = [ip_obj]
     if open_ports:
@@ -35,7 +39,11 @@ def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None
             port_service = dict(object_type="Service", name=service_name)
             results.append(port_service)
 
-            ip_service = dict(object_type="IPService", ip_port=f"IPPort|internet|{host.address}|{protocol}|{ip_port['port']}", service=f"Service|{service_name}")  # TODO
+            ip_service = dict(
+                object_type="IPService",
+                ip_port=f"IPPort|internet|{host.address}|{protocol}|{ip_port['port']}",
+                service=f"Service|{service_name}",
+            )  # TODO
             results.append(ip_service)
 
     return results
@@ -45,7 +53,7 @@ def run(file_id: str):
     headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
     client = httpx.Client(base_url=os.getenv("OPENKAT_API"), headers=headers)
 
-    dig_file = client.get(f'/file/{file_id}/').json()
+    dig_file = client.get(f"/file/{file_id}/").json()
     file = client.get(dig_file["file"])
 
     """Decouple and parse Nmap XMLs and yield relevant network."""

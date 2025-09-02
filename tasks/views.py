@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
 import recurrence
-
 from django.conf import settings
 from django.forms import ModelForm
 from django.shortcuts import redirect
@@ -9,10 +8,10 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import DetailView, ListView, UpdateView, DeleteView, CreateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from tasks.models import NewSchedule, Task
-from tasks.new_tasks import run_schedule, rerun_task
+from tasks.new_tasks import rerun_task, run_schedule
 
 
 class TaskListView(ListView):

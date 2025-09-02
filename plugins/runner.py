@@ -21,7 +21,14 @@ class PluginRunner:
         self.override_entrypoint = override_entrypoint
         self.adapter = adapter
 
-    def run(self, plugin_id: str, target: str | None, output: str = "file", task_id: uuid.UUID | None = None, keep: bool = False):
+    def run(
+        self,
+        plugin_id: str,
+        target: str | None,
+        output: str = "file",
+        task_id: uuid.UUID | None = None,
+        keep: bool = False,
+    ):
         use_stdout = str(output) == "-"
 
         try:

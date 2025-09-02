@@ -9,7 +9,7 @@ from django.db.models import Q, QuerySet, UniqueConstraint
 from recurrence.fields import RecurrenceField
 
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPAddress
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.types import ALL_TYPES_MAP
 from openkat.models import Organization, OrganizationMember
 from tasks.models import NewSchedule
@@ -135,7 +135,8 @@ class EnabledPlugin(models.Model):
                 enabled=self.enabled,
                 input=query,
                 organization=self.organization,
-                recurrences=self.plugin.recurrences if self.plugin.recurrences and str(self.plugin.recurrences)
+                recurrences=self.plugin.recurrences
+                if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
                     dtstart=datetime.datetime.now(timezone.utc),
@@ -149,7 +150,8 @@ class EnabledPlugin(models.Model):
                 plugin=self.plugin,
                 enabled=self.enabled,
                 organization=self.organization,
-                recurrences=self.plugin.recurrences if self.plugin.recurrences and str(self.plugin.recurrences)
+                recurrences=self.plugin.recurrences
+                if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(timezone.utc)
                 ),

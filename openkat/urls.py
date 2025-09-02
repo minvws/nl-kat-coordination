@@ -9,8 +9,8 @@ from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
-from objects.viewsets import ObjectCreateAPI
 from katalogus.viewsets import BoefjeViewSet
+from objects.viewsets import ObjectCreateAPI
 from openkat.views.bytes_raw import BytesRawView
 from openkat.views.finding_add import FindingAddView
 from openkat.views.finding_list import FindingListView

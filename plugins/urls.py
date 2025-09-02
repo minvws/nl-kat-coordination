@@ -4,11 +4,11 @@ from plugins.views import (
     EnabledPluginUpdateView,
     EnabledPluginView,
     PluginCoverImageView,
-    PluginDetailView,
-    PluginListView,
     PluginCreateView,
     PluginDeleteView,
+    PluginDetailView,
     PluginIdDetailView,
+    PluginListView,
 )
 
 urlpatterns = [

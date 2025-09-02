@@ -10,13 +10,7 @@ def test_enable_plugins(rf, superuser_member):
     example_file = BytesIO(b"{}")
     example_file.name = "testname.json"
 
-    request = setup_request(
-        rf.post(
-            "add_file",
-            {"type": "json", "file": example_file},
-        ),
-        superuser_member.user,
-    )
+    request = setup_request(rf.post("add_file", {"type": "json", "file": example_file}), superuser_member.user)
     response = FileCreateView.as_view()(request)
 
     assert response.status_code == 302

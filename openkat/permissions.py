@@ -31,25 +31,24 @@ class KATModelPermissions(DjangoModelPermissions):
     }
 
     def get_required_permissions(self, method, model_cls):
-        """ Specialized version handling OOIs, that do not have the _meta property """
+        """Specialized version handling OOIs, that do not have the _meta property"""
         if method not in self.perms_map:
             raise exceptions.MethodNotAllowed(method)
 
         if model_cls == OOI or issubclass(model_cls, OOI):
-            kwargs = {'app_label': "openkat", 'model_name': "ooi"}
+            kwargs = {"app_label": "openkat", "model_name": "ooi"}
 
             return [perm % kwargs for perm in self.perms_map[method]]
 
         return super().get_required_permissions(method, model_cls)
 
     def has_permission(self, request, view):
-        """ Specialized version handling an OOIList queryset that does not have the model property """
+        """Specialized version handling an OOIList queryset that does not have the model property"""
 
-        if not request.user or (
-            not request.user.is_authenticated and self.authenticated_users_only):
+        if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
             return False
 
-        if getattr(view, '_ignore_model_permissions', False):
+        if getattr(view, "_ignore_model_permissions", False):
             return True
 
         queryset = self._queryset(view)

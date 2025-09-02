@@ -1,13 +1,12 @@
+import structlog
 from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, CreateView
+from django.views.generic import CreateView, ListView
 
 from files.models import File
-import structlog
-
 
 logger = structlog.get_logger(__name__)
 

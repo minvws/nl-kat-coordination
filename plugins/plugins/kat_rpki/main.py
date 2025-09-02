@@ -10,9 +10,8 @@ import os
 import sys
 from json import JSONDecodeError
 
-import polars as pl
-
 import httpx
+import polars as pl
 
 
 def run(rpki_file_id, bgp_file_id):
@@ -21,17 +20,15 @@ def run(rpki_file_id, bgp_file_id):
 
     try:
         rpki_file = client.get(
-            '/file/',
-            params={"ordering": "created_at", "limit": 1, "search": "rpki-download"},
+            "/file/", params={"ordering": "created_at", "limit": 1, "search": "rpki-download"}
         ).json()["results"][0]["file"]
     except (IndexError, JSONDecodeError):
         raise FileNotFoundError("No RPKI file found. Please enable the rpki-download and bgp-download plugins first.")
 
     try:
-        bgp_file = client.get(
-            '/file/',
-            params={"ordering": "created_at", "limit": 1, "search": "bgp-download"},
-        ).json()["results"][0]["file"]
+        bgp_file = client.get("/file/", params={"ordering": "created_at", "limit": 1, "search": "bgp-download"}).json()[
+            "results"
+        ][0]["file"]
     except (IndexError, JSONDecodeError):
         raise FileNotFoundError("No BGP file found. Please enable the rpki-download and bgp-download plugins first.")
 
@@ -42,7 +39,7 @@ def run(rpki_file_id, bgp_file_id):
 
     # TODO: if the address is private, we do not need a ROA
 
-    raise NotImplemented
+    raise NotImplementedError
 
     results = []
 

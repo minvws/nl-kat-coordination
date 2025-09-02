@@ -5,20 +5,11 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('plugins', '0002_alter_plugin_oci_arguments'),
-    ]
+    dependencies = [("plugins", "0002_alter_plugin_oci_arguments")]
 
     operations = [
+        migrations.AlterField(model_name="plugin", name="description", field=models.TextField(blank=True, null=True)),
         migrations.AlterField(
-            model_name='plugin',
-            name='description',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='plugin',
-            name='recurrences',
-            field=recurrence.fields.RecurrenceField(blank=True, null=True),
+            model_name="plugin", name="recurrences", field=recurrence.fields.RecurrenceField(blank=True, null=True)
         ),
     ]

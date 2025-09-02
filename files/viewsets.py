@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer
     queryset = File.objects.all()
-    search_fields= ["file"]
+    search_fields = ["file"]
 
     def get_queryset(self):
         qs = super().get_queryset()

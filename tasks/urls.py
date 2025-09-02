@@ -1,15 +1,15 @@
 from django.urls import path
 
 from tasks.views import (
+    ScheduleCreateView,
+    ScheduleDeleteView,
     ScheduleDetailView,
     ScheduleListView,
+    ScheduleRunView,
     ScheduleUpdateView,
     TaskDetailView,
     TaskListView,
     TaskRescheduleView,
-    ScheduleDeleteView,
-    ScheduleRunView,
-    ScheduleCreateView,
 )
 
 urlpatterns = [

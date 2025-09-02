@@ -66,36 +66,26 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
                         .first()
                     )
                     if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                        logger.debug(
-                            "Plugin '%s' has already run recently",
-                            schedule.plugin.plugin_id,
-                        )
+                        logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
                         continue
 
                 app.send_task(
                     "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
                 )
         else:
-            last_run = (
-                Task.objects.filter(new_schedule=schedule, data__input_data=None)
-                .order_by("-created_at")
-                .first()
-            )
+            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
             if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                logger.debug(
-                    "Plugin '%s' has already run recently",
-                    schedule.plugin.plugin_id,
-                )
+                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
                 continue
-            app.send_task(
-                "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id)
-            )
+            app.send_task("tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id))
+
 
 def rerun_task(task: Task):
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
     app.send_task(
-        "tasks.new_tasks.run_plugin", (plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None)
+        "tasks.new_tasks.run_plugin",
+        (plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None),
     )
 
 

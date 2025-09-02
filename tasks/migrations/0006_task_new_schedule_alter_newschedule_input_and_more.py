@@ -5,30 +5,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    dependencies = [
-        ('tasks', '0005_alter_newschedule_operation'),
-    ]
+    dependencies = [("tasks", "0005_alter_newschedule_operation")]
 
     operations = [
         migrations.AddField(
-            model_name='task',
-            name='new_schedule',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='tasks.newschedule'),
+            model_name="task",
+            name="new_schedule",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, related_name="tasks", to="tasks.newschedule"
+            ),
+        ),
+        migrations.AlterField(model_name="newschedule", name="input", field=models.TextField(blank=True)),
+        migrations.AlterField(
+            model_name="newschedule",
+            name="operation",
+            field=models.CharField(
+                blank=True,
+                choices=[("create", "Create"), ("update", "Update"), ("delete", "Delete")],
+                max_length=16,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='newschedule',
-            name='input',
-            field=models.TextField(blank=True),
-        ),
-        migrations.AlterField(
-            model_name='newschedule',
-            name='operation',
-            field=models.CharField(blank=True, choices=[('create', 'Create'), ('update', 'Update'), ('delete', 'Delete')], max_length=16, null=True),
-        ),
-        migrations.AlterField(
-            model_name='newschedule',
-            name='run_on',
-            field=models.CharField(blank=True, max_length=64, null=True),
+            model_name="newschedule", name="run_on", field=models.CharField(blank=True, max_length=64, null=True)
         ),
     ]

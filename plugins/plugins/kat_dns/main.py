@@ -94,11 +94,17 @@ def run(hostname: str):
         for rrset in answer.response.answer:
             for rr in rrset:
                 record_hostname = register_hostname(str(rrset.name))
-                default_args = {"hostname": f"Hostname|{internet['name']}|{record_hostname['name']}", "value": str(rr), "ttl": rrset.ttl}
+                default_args = {
+                    "hostname": f"Hostname|{internet['name']}|{record_hostname['name']}",
+                    "value": str(rr),
+                    "ttl": rrset.ttl,
+                }
 
                 # the soa is the zone of itself, and the argument hostname
                 if isinstance(rr, SOA):
-                    zone = dict(object_type="DNSZone", hostname=f"Hostname|{internet['name']}|{record_hostname['name']}")
+                    zone = dict(
+                        object_type="DNSZone", hostname=f"Hostname|{internet['name']}|{record_hostname['name']}"
+                    )
                     zone_links[record_hostname["name"]] = zone
                     zone_links[input_hostname["name"]] = zone
 
@@ -117,12 +123,24 @@ def run(hostname: str):
                 if isinstance(rr, A):
                     ipv4 = dict(object_type="IPAddressV4", network=f"Network|{internet['name']}", address=str(rr))
                     results.append(ipv4)
-                    register_record(dict(object_type="DNSARecord", address=f"IPV4address|{internet['name']}|{ipv4['address']}", **default_args))
+                    register_record(
+                        dict(
+                            object_type="DNSARecord",
+                            address=f"IPV4address|{internet['name']}|{ipv4['address']}",
+                            **default_args,
+                        )
+                    )
 
                 if isinstance(rr, AAAA):
                     ipv6 = dict(object_type="IPAddressV6", network=f"Network|{internet['name']}", address=str(rr))
                     results.append(ipv6)
-                    register_record(dict(object_type="DNSAAAARecord", address=f"IPV6address|{internet['name']}|{ipv6['address']}", **default_args))
+                    register_record(
+                        dict(
+                            object_type="DNSAAAARecord",
+                            address=f"IPV6address|{internet['name']}|{ipv6['address']}",
+                            **default_args,
+                        )
+                    )
 
                 if isinstance(rr, TXT):
                     # TODO: concatenated txt records should be handled better
@@ -148,13 +166,21 @@ def run(hostname: str):
                 if isinstance(rr, NS):
                     ns_fqdn = register_hostname(str(rr.target))
                     register_record(
-                        dict(object_type="DNSNSRecord", name_server_hostname=f"Hostname|{internet['name']}|{ns_fqdn['name']}", **default_args)
+                        dict(
+                            object_type="DNSNSRecord",
+                            name_server_hostname=f"Hostname|{internet['name']}|{ns_fqdn['name']}",
+                            **default_args,
+                        )
                     )
 
                 if isinstance(rr, CNAME):
                     target_fqdn = register_hostname(str(rr.target))
                     register_record(
-                        dict(object_type="DNSCNAMERecord", target_hostname=f"Hostname|{internet['name']}|{target_fqdn['name']}", **default_args)
+                        dict(
+                            object_type="DNSCNAMERecord",
+                            target_hostname=f"Hostname|{internet['name']}|{target_fqdn['name']}",
+                            **default_args,
+                        )
                     )
 
                 if isinstance(rr, CAA):

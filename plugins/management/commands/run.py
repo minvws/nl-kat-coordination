@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument("plugin_id", type=str)
         parser.add_argument("target", type=str, default="")
         parser.add_argument("--output", "-o", dest="output", type=str, default="file")
-        parser.add_argument('--keep-container', "-k", dest="keep", action='store_true')
+        parser.add_argument("--keep-container", "-k", dest="keep", action="store_true")
 
     def handle(self, plugin_id, target, output, keep, *args, **options):
         with capture_logs():

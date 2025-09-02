@@ -22,6 +22,7 @@ class File(models.Model):
     def path(self):
         return Path(self.file.name)
 
+
 class GenericContent(ContentFile):
     def __init__(self, content: str | bytes):
         super().__init__(content, name=f"data/{uuid.uuid4()}")
