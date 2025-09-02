@@ -11,19 +11,19 @@ OpenKAT is a monitoring tool and vulnerability scanner designed to automatically
 Why was OpenKAT created?
 ========================
 
-OpenKAT was created by the Dutch Ministry of Health during the vaccination campaign. New systems and functions were developed at high speed and monitoring was needed. OpenKAT made it possible to automatically monitor multiple organizations at the same time, so vulnerabilities could be found quickly.
+OpenKAT was created by the Dutch Ministry of Health during the COVID-19 pandemic. New systems and functions were developed at high speed and monitoring was needed. OpenKAT made it possible to automatically monitor multiple organizations at the same time, so vulnerabilities could be found quickly.
 
 
 Why is OpenKAT useful?
 ======================
 
-OpenKAT is useful if you have a complex or large system and a wish to know if there are vulnerabilities and configuration mistakes hiding somewhere. Most security incidents are caused by known vulnerabilities and small errors. OpenKAT finds them before they are found.
+OpenKAT is useful if you wish to know if there are vulnerabilities and configuration mistakes hiding somewhere.. Most security incidents are caused by known vulnerabilities and small errors. OpenKAT finds them before they are found by bad actors.
 
 
 Who is OpenKAT for?
 ===================
 
-OpenKAT is built to monitor a larger number of systems, such as the IT systems during the pandemic. Typical users are (network) organizations that want to monitor their systems, like Z-Cert does in healthcare or the Dutch Ministry of Health with the test providers that want to connect to CoronaCheck.
+OpenKAT is built to monitor a larger number of systems, such as the IT systems during the pandemic. It is both for organizations that want to monitor their own systems and organizations which are responsible for monitoring other organizations. For example Z-CERT which is responsible for monitoring all healthcare organizations as CSIRT or the Dutch Ministry of Health which moniitored all the test providers that wanted to connect to CoronaCheck.
 
 The nicest playground for OpenKAT is a situation where many systems are active. In the user group around OpenKAT we see larger organizations from the non-profit sector, their service providers, hosting providers, auditors and others involved in information security.
 
