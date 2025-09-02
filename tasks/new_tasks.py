@@ -8,7 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.exception import TypeNotFound
 from octopoes.xtdb.query import Aliased, Query
 from openkat.models import Organization
-from plugins.models import Plugin, EnabledPlugin
+from plugins.models import Plugin
 from plugins.runner import PluginRunner
 from tasks.celery import app
 from tasks.models import NewSchedule, Task, TaskStatus
