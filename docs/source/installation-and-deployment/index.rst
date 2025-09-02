@@ -1,4 +1,4 @@
-Installation and Deployment
+Installation and deployment
 ###########################
 
 Contains documentation for developers and contributors.
@@ -24,3 +24,5 @@ Contains documentation for developers and contributors.
    environment-settings/index
    external-authentication
    cveapi
+   users-and-organizations
+   faq
