@@ -22,7 +22,9 @@ The onboarding consists of the following steps:
 Step-by-step onboarding
 -----------------------
 
-The onboarding starts with the registration process, which lets you create your very first organization. The first page of the onboarding shows the welcome page.
+Creating an organization (for administrators only)
+**************************************************
+When an administrator starts with the onboarding, the first step is the registration process, which lets you create your very first organization. The first page of the onboarding shows the welcome page.
 
 .. image:: img/1-onboarding-welcome.png
   :alt: Onboarding welcome page.
@@ -42,7 +44,10 @@ The next step is to add the indemnification statement. Before you are allowed to
 .. image:: img/4-onboarding-indemnification-setup.png
   :alt: Registration of the indemnification statement.
 
-The following page shows some information about user clearance levels. At the bottom of the page, you can see which clearance level is trusted to you by the administrator.
+
+Continue onboarding (for all users)
+***********************************
+The following page shows some information about user clearance levels. At the bottom of the page, you can see which clearance level is trusted to you by the administrator. You can only continue if you have accepted this clearance level.
 
 .. image:: img/5-onboarding-user-clearance-level.png
   :alt: Information about the user clearance level.

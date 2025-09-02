@@ -8,19 +8,6 @@ Introduction
 OpenKAT is a monitoring tool and vulnerability scanner designed to automatically and continuously monitor, record, and analyze the status of information systems. It scans networks, analyzes vulnerabilities, and generates clear, accessible reports. By integrating the most commonly used network tools and scanning software into a modular framework, OpenKAT accesses external databases and combines the information from all these sources into clear reports.
 
 
-White papers
-============
-
-Two brochures or white papers about OpenKAT have been created with a general explanation, in English and Dutch. You can read them without giving your email address :-)
-
-- :download:`OpenKAT handout (English) <pdf/OpenKAT handout_ENG.pdf>`
-- :download:`Extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`
-
-These, like the section of the documentation you are reading now, are aimed at a general understanding of the system. The documentation for each module goes into more detail about the software itself.
-
-If, when using OpenKAT, your computer gives a purring sound, it is just a sign of a well functioning instance of this software. Just stay away from the nails while playing.
-
-
 Why was OpenKAT created?
 ========================
 
