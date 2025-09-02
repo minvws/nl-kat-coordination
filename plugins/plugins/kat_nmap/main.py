@@ -66,7 +66,12 @@ def handle_nmap_result(nmap_output: str, client: httpx.Client):
     results = []
     parsed = NmapParser.parse_fromstring(nmap_output)
 
-    *args, target = parsed.commandline.split(" ")
+    try:
+        *args, target = parsed.commandline.split(" ")
+    except KeyError:
+        args = []
+        target = ""
+
     if "/" in target:
         try:
             network = ipaddress.IPv4Network(target)

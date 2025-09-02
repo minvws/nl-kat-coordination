@@ -108,5 +108,22 @@
       "-u",
       "{hostname}"
     ]
+  },
+  {
+    "plugin_id": "masscan",
+    "name": "Masscan",
+    "scan_level": 2,
+    "oci_image": "adarnimrod/masscan:latest",
+    "oci_arguments": [
+      "masscan",
+      "--open",
+      "-p",
+      "80,443",
+      "--max-rate",
+      "100",
+      "-oX",
+      "-",
+      "{ipaddress}"
+    ]
   }
 ]

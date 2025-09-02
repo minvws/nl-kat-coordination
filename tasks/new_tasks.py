@@ -17,11 +17,8 @@ logger = structlog.get_logger(__name__)
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
-def reschedule(
-    plugin_id: str | None = None, input_oois: list[str] | None = None, organization: str | None = None
-) -> None:
+def reschedule() -> None:
     logger.info("Scheduling plugins")
-    now = datetime.now(timezone.utc)
 
     for schedule in NewSchedule.objects.filter(enabled=True):
         run_schedule(schedule, force=False)

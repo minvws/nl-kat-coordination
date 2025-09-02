@@ -74,7 +74,17 @@
                                     {#                                        <span>{{ schedule.operation }}</span>#}
                                     {#                                    </td>#}
                                     <td>
-                                        {% for rrule in schedule.recurrences.rrules %}<strong>{{ rrule.to_text.upper }}</strong>{% endfor %}
+                                        {% for rrule in schedule.recurrences.rrules %}
+                                            {% if rrule.to_text.upper == 'DAILY' %}
+                                                <strong>
+                                                    {{ rrule.to_text.upper }} at {{ schedule.recurrences.dtstart.time }}
+                                                </strong>
+                                            {% else %}
+                                                <strong>
+                                                    {{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}
+                                                </strong>
+                                            {% endif %}
+                                        {% endfor %}
                                     </td>
                                     <td>
                                         <a href="{% url 'new_task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
