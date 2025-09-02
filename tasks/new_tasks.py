@@ -24,24 +24,12 @@ def reschedule(
     now = datetime.now(timezone.utc)
 
     for schedule in NewSchedule.objects.filter(enabled=True):
-        last_run = (
-            Task.objects.filter(new_schedule=schedule)
-            .order_by("-created_at")
-            .first()
-        )
-        if last_run and not schedule.recurrences.between(last_run.created_at, now):
-            logger.debug(
-                "Plugin '%s' has already run recently",
-                schedule.plugin.plugin_id,
-            )
-            continue
-
-        run_schedule(schedule)
+        run_schedule(schedule, force=False)
 
     logger.info("Finished scheduling plugins")
 
 
-def run_schedule(schedule: NewSchedule):
+def run_schedule(schedule: NewSchedule, force: bool = True):
     if not schedule.plugin:
         pass
 
@@ -73,6 +61,20 @@ def run_schedule(schedule: NewSchedule):
                     continue
 
                 input_data = by_pk[str(profile.reference)]
+
+                if not force:
+                    last_run = (
+                        Task.objects.filter(new_schedule=schedule, data__input_data=input_data)
+                        .order_by("-created_at")
+                        .first()
+                    )
+                    if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                        logger.debug(
+                            "Plugin '%s' has already run recently",
+                            schedule.plugin.plugin_id,
+                        )
+                        continue
+
                 app.send_task(
                     "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
                 )
