@@ -40,6 +40,6 @@ We hope this helps to make your life easier.
    * - Separate report
      - Reports that are created for separate assets. This function might be turned off by default by your administrator.
    * - Aggregate report
-     - Report that aggregate findings from different assets into one report.
+     - Report that aggregates findings from different assets into one report.
    * - Multi report
-     - This report combine aggregate reports from different organizations into one report.
+     - This report combines aggregate reports from different organizations into one report.

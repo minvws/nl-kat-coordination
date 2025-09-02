@@ -6,7 +6,7 @@ Technical information has been left out, and can be found in de :doc:`../develop
 
 The user manual is divided into four parts:
 
-- **Getting started**: You want to get started with OpenKAT? Start here! Learn step-by-step how to start scanning and generate reports with OpenKAT.
+- **Getting started**: Do you want to get started with OpenKAT? Start here! Learn step-by-step how to begin scanning and generating reports with OpenKAT.
 - **Basic concepts**: Learn more about the basic concepts of OpenKAT (in simple terms).
 - **Navigation**: See how you can navigate through OpenKAT. All pages of the user interface are explained here.
 - **Glossary**: A summary with the most used terms and their definitions.
