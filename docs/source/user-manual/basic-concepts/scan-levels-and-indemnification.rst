@@ -3,7 +3,7 @@
 Scan levels, clearance & indemnities
 ====================================
 
-Plugins (Boefjes) can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
+Plugins (Boefjes) can collect information with varying intensity. OpenKAT has a system of clearance levels to control permission to perform scans and prevent damage to the systems under test.
 
 * Plugins have a scan level
 * Objects have clearance
@@ -36,8 +36,8 @@ Inheritance
 -----------
 Objects are linked to other objects in the data model.
 You can choose to declare a clearance level to an object or to let it inherit the clearance level from connected objects.
-Underlying objects will then receive the same safeguard level, parent objects a lower level.
-For example, a hostname has an IP address for which the same safeguard level applies, but it also has a DNS server that may be outside the organization's domain and receives a lower level.
+Underlying objects will then receive the same clearance level, parent objects a lower level.
+For example, a hostname has an IP address for which the same clearance level applies, but it also has a DNS server that may be outside the organization's domain and receives a lower level.
 
 More information about the different clearance types for objects can be found here: :doc:`../basic-concepts/objects-and-recursion`.
 

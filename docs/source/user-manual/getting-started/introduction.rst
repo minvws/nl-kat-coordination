@@ -28,7 +28,7 @@ OpenKAT scans, collects, analyzes and reports in an ongoing process:
 The information collected by OpenKAT is stored as objects such as URLs, IP addresses, or hostnames.
 
 After objects are stored, activated plugins start scanning the objects.
-The results are again stored as objects, which can lead to new scans.
+The results are stored as findings, but they can also be stored as objects, which can lead to new scans.
 This process continues until OpenKAT has scanned every object.
 
 Reports can be generated from the objects, providing a clear overview of all the information.
@@ -51,8 +51,8 @@ Now let's see how this looks to the user.
 
 - A user of OpenKAT must first add objects, such as a URL, a hostname, or an IP address.
 - Next, the user chooses which plugins will be used for the scans.
-- After the plugins have had some time to gather information, the user can view the findings.
-- The user can now also generate reports based on the findings. This can be done once or periodically.
+- After the plugins have had some time to gather information, the user can view the findings from the scan.
+- The user can now also generate reports based on these findings. This can be done once or periodically.
 
 
 Starting with OpenKAT

@@ -59,7 +59,7 @@ Click on the tab and then click on the 'Edit clearance level' button on the righ
   If you cannot see this button, you might not have the right to do so. Please contact your administrator.
 
 Also, if there are any warnings on this page, please follow the instructions of the warnings first.
-You might need to set an indemnification for your organization or accept your given scan level.
+You might need to set an indemnification for your organization or accept your assigned clearance level.
 
 .. image:: img/add-object-04.png
   :alt: Clearance level tab
