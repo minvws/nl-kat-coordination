@@ -8,7 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.exception import TypeNotFound
 from octopoes.xtdb.query import Aliased, Query
 from openkat.models import Organization
-from plugins.models import Plugin
+from plugins.models import Plugin, EnabledPlugin
 from plugins.runner import PluginRunner
 from tasks.celery import app
 from tasks.models import NewSchedule, Task, TaskStatus
@@ -76,6 +76,17 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
                     "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
                 )
         else:
+            last_run = (
+                Task.objects.filter(new_schedule=schedule, data__input_data=None)
+                .order_by("-created_at")
+                .first()
+            )
+            if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                logger.debug(
+                    "Plugin '%s' has already run recently",
+                    schedule.plugin.plugin_id,
+                )
+                continue
             app.send_task(
                 "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id)
             )
@@ -108,6 +119,11 @@ def run_plugin(
     if organization_code:
         organization = Organization.objects.get(code=organization_code)
 
+    plugin = Plugin.objects.filter(plugin_id=plugin_id).first()
+
+    if not plugin or not plugin.enabled_for(organization):
+        raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
+
     task = Task.objects.create(
         id=self.request.id,
         type="plugin",
@@ -116,11 +132,6 @@ def run_plugin(
         status=TaskStatus.RUNNING,
         data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
-
-    plugin = Plugin.objects.filter(plugin_id=plugin_id).first()
-
-    if not plugin or not plugin.enabled_for(organization):
-        raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
 
     try:
         PluginRunner().run(plugin_id, input_data, task_id=task.id)
@@ -140,4 +151,5 @@ def process_raw_file(file: File, handle_error: bool = False):
         return
 
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
-        run_plugin.apply_async((plugin.plugin_id,), kwargs={"input_data": str(file.id)})
+        for organization in plugin.enabled_organizations():
+            run_plugin.apply_async((plugin.plugin_id, organization.code), kwargs={"input_data": str(file.id)})

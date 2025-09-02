@@ -1,6 +1,5 @@
-import logging
-
 from django.core.management.base import BaseCommand
+from structlog.testing import capture_logs
 
 from plugins.runner import PluginRunner
 
@@ -15,7 +14,8 @@ class Command(BaseCommand):
         parser.add_argument('--keep-container', "-k", dest="keep", action='store_true')
 
     def handle(self, plugin_id, target, output, keep, *args, **options):
-        logs = PluginRunner().run(plugin_id, target or None, output, keep=keep)
+        with capture_logs():
+            logs = PluginRunner().run(plugin_id, target or None, output, keep=keep)
 
         if str(output) == "-":
             self.stdout.write(logs.decode())

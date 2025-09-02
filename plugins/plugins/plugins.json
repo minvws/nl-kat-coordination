@@ -125,5 +125,19 @@
       "-",
       "{ipaddress}"
     ]
+  },
+  {
+    "plugin_id": "nuclei-tls-version-normalize",
+    "name": "Nuclei Findings",
+    "description": "Parses data to create (CVE) Findings.",
+    "consumes": [
+      "file:nuclei-tls-version"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "sh",
+      "-c",
+      "uv run cat.py {file} | jq '[.\"extracted-results\"[], \"Hostname|internet|\" +.host] | @tsv' -r | grep 'tls12\\|tls13' | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | uv run store_findings.py"
+    ]
   }
 ]
