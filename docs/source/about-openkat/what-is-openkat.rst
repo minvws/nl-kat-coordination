@@ -17,13 +17,13 @@ OpenKAT was created by the Dutch Ministry of Health during the COVID-19 pandemic
 Why is OpenKAT useful?
 ======================
 
-OpenKAT is useful if you wish to know if there are vulnerabilities and configuration mistakes hiding somewhere.. Most security incidents are caused by known vulnerabilities and small errors. OpenKAT finds them before they are found by bad actors.
+OpenKAT is useful if you wish to know if there are vulnerabilities and configuration mistakes hiding somewhere. Most security incidents are caused by known vulnerabilities and small errors. OpenKAT finds them before they are found by bad actors.
 
 
 Who is OpenKAT for?
 ===================
 
-OpenKAT is built to monitor a larger number of systems, such as the IT systems during the pandemic. It is both for organizations that want to monitor their own systems and organizations which are responsible for monitoring other organizations. For example Z-CERT which is responsible for monitoring all healthcare organizations as CSIRT or the Dutch Ministry of Health which moniitored all the test providers that wanted to connect to CoronaCheck.
+OpenKAT is built to monitor a larger number of systems, such as the IT systems during the pandemic. It is both for organizations that want to monitor their own systems and organizations which are responsible for monitoring other organizations. For example, Z-CERT, which is responsible for monitoring all healthcare organizations as a CSIRT, or the Dutch Ministry of Health, which monitored all the test providers that wanted to connect to CoronaCheck.
 
 The nicest playground for OpenKAT is a situation where many systems are active. In the user group around OpenKAT we see larger organizations from the non-profit sector, their service providers, hosting providers, auditors and others involved in information security.
 
@@ -45,7 +45,7 @@ Plugins do the scanning, ranging from a small script to external tools with a wi
 
 External timestamps
 -------------------
-All output from the scans is stored, with its meta data, hashed and timestamped by an external server. This allows you to 'prove' which information was collected, how and when.
+All output from the scans is stored, with its metadata, hashed and timestamped by an external server. This allows you to 'prove' which information was collected, how and when.
 
 
 Datamodel
@@ -60,28 +60,28 @@ OpenKAT will scan for new information, using the logic in the datamodel. The res
 
 Indemnity per user and organisation
 -----------------------------------
-The intensity of a scan can be set in the system, by giving it indemnity for a certain level of intrusion. OpenKAT can be set to a level where it might bring down a system so it needs an “OK” from the user for such steps.
+The intensity of a scan can be set in the system by granting it permission for a certain level of intrusion. OpenKAT can be set to a level where it might bring down a system so it needs an “OK” from the user for such steps.
 
 
 Findings and reports
 --------------------
-Results of the analysis are available for easy viewing in the frontend, per PDF or through the API. The findings can be collected into different kind of reports. These reports can be scheduled, so they will be generated automicatically for you.
+Results of the analysis are available for easy viewing in the frontend, per PDF or through the API. The findings can be collected into different kinds of reports. These reports can be scheduled, so they will be generated automatically for you.
 
 
 Security concept
 ================
 
-The premise behind OpenKAT is that most security incidents are caused by known vulnerabilities and configuration errors. Making mistakes is human, so you can't prevent it. Therefore, the goal is to find known vulnerabilities and configuration errors and fix them as quickly as possible. OpenKAT provides the tools for this. The Ministry of Health in the Netherlands made it publicly available under the EU PL 1.2 licence, to be applied as widely as possible.
+The premise behind OpenKAT is that most security incidents are caused by known vulnerabilities and configuration errors. Making mistakes is human, so they cannot be completely prevented. Therefore, the goal is to find known vulnerabilities and configuration errors and fix them as quickly as possible. OpenKAT provides the tools for this. The Ministry of Health in the Netherlands made it publicly available under the EU PL 1.2 licence, to be applied as widely as possible.
 
 
 Responsible disclosure
 ======================
 
-OpenKAT scans for vulnerabilities. If you find any, it is valid that you deal with them properly. If you come across a vulnerability in a central government system you can report it to the `NCSC <https://www.ncsc.nl/contact/kwetsbaarheid-melden>`_.
+OpenKAT scans for vulnerabilities. If you find any, it is important that you deal with them properly. If you come across a vulnerability in a central government system you can report it to the `NCSC <https://www.ncsc.nl/contact/kwetsbaarheid-melden>`_.
 
-Many organizations have their contact information in ``security.txt`` in the root of their domain, so you get straight to the right people. Not every organization handles it equally professionally, but that's no reason not to want to use that standard yourself.
+Many organizations have their contact information in ``security.txt`` in the root of their domain, so you can reach the right people directly. Not every organization handles it equally professionally, but that's no reason not to want to use that standard yourself.
 
-If you find any vulnerabilities in the software of OpenKAT itself you can report them per e-mail to: security @ irealisatie.nl (remove the spaces).
+If you find any vulnerabilities in the software of OpenKAT itself you can report them by e-mail to: security @ irealisatie.nl (remove the spaces).
 
 
 Where do I start with OpenKAT?

@@ -11,7 +11,7 @@ Do *not* install Docker directly from the default Ubuntu repositories. This vers
 
 #. Follow the Docker installation steps as mentioned here: `Docker Ubuntu Installation steps <https://docs.docker.com/engine/install/ubuntu/#installation-methods>`_. This tutorial followed the installation steps using the `apt` repository. Make sure that you can run the `hello-world` Docker image.
 
-#. Follow the Post-installations steps as described here: `Docker Post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user>`_. Make sure that the Docker `hello-world` image can run as a normal (non-root) user.
+#. Follow the post-installations steps as described here: `Docker post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user>`_. Make sure that the Docker `hello-world` image can run as a normal (non-root) user.
 
 #. Install missing Ubuntu packages.
 
@@ -52,6 +52,6 @@ Do *not* install Docker directly from the default Ubuntu repositories. This vers
     DJANGO_SUPERUSER_PASSWORD=83d0ddac75c3fed23d2fc3a607affe432f9916d0f9dcc12680
 ..
 
-#. Open your browser and go to: `http://localhost:8000/en/login`. Login using the username `superuser@localhost` and the password that you found using the previous step (everything after the equal sign `=`).
+#. Open your browser and go to: `http://localhost:8000/en/login`. Login using the username `superuser@localhost` and the password you found using the previous step (everything after the equal sign `=`).
 
 #. Meowlations! You just installed OpenKAT. As this is your first time using OpenKAT, you will have to walk through the onboarding. This is explained in the user manual: :doc:`../../user-manual/getting-started/onboarding`

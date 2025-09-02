@@ -53,7 +53,7 @@ To add a new objects or findings dashboard item to a dashboard:
 - Choose the settings as you prefer
 - Click on the 'Add to dashboard' button
 
-The following settings can be set:
+The following settings can be configured:
 
 - **Dashboard:** Select the dashboard to which you want to add the dashboard item.
 - **Title on dashboard:** Give the dashboard item a name.
@@ -112,9 +112,9 @@ These findings are shown in a table, grouped by organization and finding types.
 .. image:: img/crisis-room-all-organizations.png
   :alt: Crisis Room for single organization
 
-The findings that are shown on this general Crisis Room have been collected by the 'Crisis Room Aggregate Report'.
+The findings shown in this general Crisis Room have been collected by the 'Crisis Room Aggregate Report'.
 This report is based on a recipe, which has been automatically created by OpenKAT for each organization.
-The output of this report, for each organization, is shown on this general Crisis Room.
+The output of this report for each organization is shown in this general Crisis Room.
 
 The default settings for this report recipe are:
 
