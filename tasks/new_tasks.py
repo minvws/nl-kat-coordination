@@ -156,9 +156,11 @@ def run_plugin(
     try:
         PluginRunner().run(plugin_id, input_data, task_id=task.id)
         task.status = TaskStatus.COMPLETED
+        task.ended_at = datetime.now(timezone.utc)
         task.save()
     except:
         task.status = TaskStatus.FAILED
+        task.ended_at = datetime.now(timezone.utc)
         task.save()
         raise
 
