@@ -1,5 +1,18 @@
 [
   {
+    "plugin_id": "dns",
+    "name": "DNS 2",
+    "description": "Fetch the DNS record(s) of a hostname.",
+    "scan_level": 1,
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_dns/main.py",
+      "{hostname}"
+    ]
+  },
+  {
     "plugin_id": "dig",
     "name": "Dig",
     "description": "Scan DNS records.",
@@ -24,6 +37,21 @@
     ]
   },
   {
+    "plugin_id": "kat_dig_normalize",
+    "name": "Dig normalizer",
+    "description": "Parses dig output.",
+    "consumes": [
+      "file:dig"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_dig/main.py",
+      "{file}"
+    ]
+  },
+  {
     "plugin_id": "nmap-2",
     "name": "Nmap TCP 2",
     "description": "Defaults to top 250 TCP ports. Includes service detection.",
@@ -43,6 +71,23 @@
       "-oX",
       "-",
       "{ipaddress|hostname}"
+    ]
+  },
+  {
+    "plugin_id": "kat_nmap_normalize2",
+    "name": "nmap normalizer 2e",
+    "description": "Parses data from all nmap variants into IP-addresses, ports and services.",
+    "scan_level": 2,
+    "consumes": [
+      "file:nmap-2",
+      "file:masscan"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_nmap/main.py",
+      "{file}"
     ]
   },
   {

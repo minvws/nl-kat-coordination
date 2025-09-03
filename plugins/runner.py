@@ -30,6 +30,7 @@ class PluginRunner:
         task_id: uuid.UUID | None = None,
         keep: bool = False,
         cli: bool = False,
+        parallelism: int | None = None,
     ) -> str:
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
@@ -53,13 +54,21 @@ class PluginRunner:
             command = plugin.oci_arguments
         elif isinstance(target, list):
             if plugin.types_in_arguments():
-                # This plugin expects one target object at a time, so we run the targets sequentially.
-                logs = []
+                # This plugin expects one target object at a time, so we automatically parallelize with xargs if needed.
+                if len(target) == 1:
+                    return self.run(plugin_id, target[0], output, task_id, keep, cli)
 
-                for t in target:
-                    logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
+                parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
+                if parallelism == 0:
+                    logs = []
+                    for t in target:
+                        logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
 
-                return "\n".join(logs)
+                    return "".join(logs)
+
+                tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
+                environment["IN_FILE"] = str(tmp_file.id)
+                command = ["xargs", "-P", str(parallelism), "-I", "%"] + self.create_command(plugin.oci_arguments, "%")
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 environment["IN_FILE"] = str(tmp_file.id)
