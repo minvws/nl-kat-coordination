@@ -6,12 +6,16 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+run := docker compose run --rm -e DATABASE_MIGRATION=false openkat
+exec := docker compose exec openkat
+
 
 kat:
 	make kat_parallel -j 4
 
-kat_parallel: frontend docker_init new-images
+kat_parallel: frontend build new-images
 	docker compose up -d
+	make init -j 4
 
 clean: .env
 	docker compose down --timeout 0 --volumes --remove-orphans
@@ -28,6 +32,7 @@ ifeq ($(UNAME),Darwin)
 else
 	docker compose build --pull --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
+	$(run) python manage.py migrate
 
 reset:
 	make clean
@@ -36,25 +41,22 @@ reset:
 dashboards:
 	docker compose run --rm openkat python manage.py dashboards
 
-docker_init: build
-	docker compose run --rm openkat make -j 4 init
-
 init: user seed messages sync nsync
 
 user:
-	-python manage.py createsuperuser --no-input
+	-$(exec) python manage.py createsuperuser --no-input
 
 seed:
-	python manage.py seed
+	$(exec) python manage.py seed
 
 messages:
-	python manage.py compilemessages
+	$(exec) python manage.py compilemessages
 
 sync:
-	-python manage.py sync
+	-$(exec) python manage.py sync
 
 nsync:
-	-python manage.py nsync
+	-$(exec) python manage.py nsync
 
 frontend:
 	docker run --rm -v $$PWD:/app/openkat node:20-bookworm sh -c "cd /app/openkat && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
@@ -67,10 +69,9 @@ export REGISTRY=ghcr.io/minvws/openkat
 images: dns-sec nmap export-http nikto generic entrypoint plugins
 new-images: entrypoint plugins
 
+entrypoint: plugins/plugins/entrypoint/main
 plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
-
-entrypoint: plugins/plugins/entrypoint/main
 
 dns-sec: base-image
 	docker build -f katalogus/boefjes/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
