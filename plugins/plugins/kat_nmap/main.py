@@ -10,7 +10,7 @@ from libnmap.objects import NmapHost, NmapService
 from libnmap.parser import NmapParser
 
 
-def get_ip_ports_and_service(host: NmapHost, network: str, prefixlen: str | None):
+def get_ip_ports_and_service(host: NmapHost):
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
     ip = f"IPAddressV4|internet|{host.address}" if host.ipv4 else f"IPAddressV6|internet|{host.address}"
@@ -78,20 +78,6 @@ def handle_nmap_result(nmap_output: str, client: httpx.Client):
         *args, target = parsed.commandline.split(" ")
     except KeyError:
         args = []
-        target = ""
-
-    if "/" in target:
-        try:
-            network = ipaddress.IPv4Network(target)
-            prefixlen = network.prefixlen
-        except (AddressValueError, ValueError):
-            try:
-                network = ipaddress.IPv6Network(target)
-                prefixlen = network.prefixlen
-            except (AddressValueError, ValueError):
-                prefixlen = None
-    else:
-        prefixlen = None
 
     top_ports = None
 
@@ -102,7 +88,7 @@ def handle_nmap_result(nmap_output: str, client: httpx.Client):
         # TODO: handle this in the API
         client.delete(f"/objects/ip-ports/?address={host.address}&top_ports={top_ports}")
 
-        results.extend(get_ip_ports_and_service(host=host, network="Network|internet", prefixlen=str(prefixlen)))
+        results.extend(get_ip_ports_and_service(host=host))
 
     return results
 

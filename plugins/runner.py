@@ -43,9 +43,58 @@ class PluginRunner:
         client = docker.from_env()
 
         # Temporary user with limited access rights
+        environment = {
+            "PLUGIN_ID": plugin.plugin_id,
+            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
+        }
+
+        if use_stdout:
+            environment["UPLOAD_URL"] = "/dev/null"
+        elif task_id:
+            environment["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
+
+        command = self.create_command(plugin.oci_arguments, is_ip, target)
+
+        if cli:
+            environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
+
+            rm = "--rm" if not keep else ""
+            envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
+            network = f"--network {settings.DOCKER_NETWORK}"
+            cmd = shlex.join(command)
+            vol = f"-v {self.adapter}:{self.entrypoint}"
+
+            return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
+
+        plugin_user, token = self.create_token(plugin_id)
+        environment["OPENKAT_TOKEN"] = token.generate_new_token()
+        token.save()
+
+        logs = client.containers.run(
+            image=plugin.oci_image,
+            name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
+            command=command,
+            stdout=use_stdout,
+            stderr=True,
+            remove=not keep,
+            network=settings.DOCKER_NETWORK,
+            entrypoint=self.entrypoint,
+            volumes=[f"{self.adapter}:{self.entrypoint}"],
+            environment=environment,
+        )
+        # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
+        #   after the container has gone.
+
+        token.delete()
+        plugin_user.delete()
+
+        return logs.decode()
+
+    def create_token(self, plugin_id: str):
         plugin_user = KATUser(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
         plugin_user.save()
+
         plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
         plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
         plugin_user.user_permissions.add(Permission.objects.get(codename="add_ooi"))
@@ -56,24 +105,9 @@ class PluginRunner:
             expiry=datetime.datetime.now(timezone.utc) + timedelta(minutes=settings.PLUGIN_TIMEOUT),
         )
 
-        # TODO: to get the original entrypoint run:
-        #     original_entrypoint = client.images.get(plugin.oci_image).attrs["Config"]["Entrypoint"]
-        #   (Perhaps we need this later on.)
-        environment = {
-            "PLUGIN_ID": plugin.plugin_id,
-            "OPENKAT_TOKEN": token.generate_new_token(),
-            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
-        }
+        return plugin_user, token
 
-        if use_stdout:
-            environment["UPLOAD_URL"] = "/dev/null"
-        elif task_id:
-            environment["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
-
-        token.save()
-
-        args = plugin.oci_arguments
-
+    def create_command(self, args, is_ip, target):
         if isinstance(target, str):
             # TODO: add nameserver through configuration later
             format_map = {"nameserver": "1.1.1.1", "file": target}
@@ -98,32 +132,4 @@ class PluginRunner:
                     new_args.append(arg)
         else:
             new_args = args
-
-        if cli:
-            rm = "--rm" if not keep else ""
-            envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
-            network = f"--network {settings.DOCKER_NETWORK}"
-            cmd = shlex.join(new_args)
-            vol = f"-v {self.adapter}:{self.entrypoint}"
-
-            return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
-
-        logs = client.containers.run(
-            image=plugin.oci_image,
-            name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
-            command=new_args,
-            stdout=use_stdout,
-            stderr=True,
-            remove=not keep,
-            network=settings.DOCKER_NETWORK,
-            entrypoint=self.entrypoint,
-            volumes=[f"{self.adapter}:{self.entrypoint}"],
-            environment=environment,
-        )
-        # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
-        #   after the container has gone.
-
-        token.delete()
-        plugin_user.delete()
-
-        return logs.decode()
+        return new_args
