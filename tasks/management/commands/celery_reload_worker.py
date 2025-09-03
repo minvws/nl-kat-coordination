@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 def restart_celery(celery_cmd: str):
     logger.info("Stopping celery")
     cmd = shlex.split(celery_cmd)
-    subprocess.call(shlex.split(f"celery -A {cmd[2]} control shutdown -t 2"))
+    subprocess.call(shlex.split(f"celery -A tasks control shutdown -t 2"))
+    subprocess.call(shlex.split(f"pkill -9 -f 'celery worker'"))
 
     logger.info("Starting celery worker")
     subprocess.call(cmd)
@@ -25,6 +26,8 @@ def restart_celery(celery_cmd: str):
 def run_with_reloader(main_func, *args, **kwargs):
     def handle(*args):
         cancel_all_tasks()
+        subprocess.call(shlex.split(f"celery -A tasks control shutdown -t 2"))
+        subprocess.call(shlex.split(f"pkill -9 -f 'celery worker'"))
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, handle)
