@@ -46,7 +46,6 @@ class ObjectCreateAPI(ViewSet):
 
     def create(self, request: Request, *args, **kwargs):
         objects = request.data
-        logger.info(objects=objects)
         organization = Organization.objects.first()
 
         client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)

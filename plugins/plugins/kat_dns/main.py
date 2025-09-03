@@ -40,7 +40,7 @@ def get_record_types() -> set[str]:
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
-def run(hostname: str):
+def run(hostname: str) -> list:
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
 
@@ -60,7 +60,7 @@ def run(hostname: str):
         except (dns.resolver.NoAnswer, dns.resolver.Timeout):
             pass
         except dns.resolver.NXDOMAIN:
-            return
+            return []
 
     dmarc_results = get_email_security_records(resolver, hostname, "_dmarc")
     dkim_results = get_email_security_records(resolver, hostname, "_domainkey")
@@ -259,7 +259,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 if __name__ == "__main__":
     result = run(sys.argv[1])
 
-    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-    httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=result)
+    if result:
+        headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=result)
 
     print(json.dumps(result))

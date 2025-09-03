@@ -7,9 +7,9 @@ from pathlib import Path
 import docker
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from netaddr import AddrFormatError, IPAddress
 
 from account.models import AuthToken, KATUser
+from files.models import File, TemporaryContent
 from plugins.models import Plugin
 
 
@@ -32,20 +32,12 @@ class PluginRunner:
         cli: bool = False,
     ) -> str:
         use_stdout = str(output) == "-"
-
-        try:
-            IPAddress(target)
-            is_ip = True
-        except (AddrFormatError, ValueError, TypeError, AttributeError):
-            is_ip = False
-
         plugin = Plugin.objects.get(plugin_id=plugin_id)
-        client = docker.from_env()
 
         # Temporary user with limited access rights
         environment = {
             "PLUGIN_ID": plugin.plugin_id,
-            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate
+            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate?
         }
 
         if use_stdout:
@@ -53,7 +45,28 @@ class PluginRunner:
         elif task_id:
             environment["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
 
-        command = self.create_command(plugin.oci_arguments, is_ip, target)
+        tmp_file = None
+
+        if isinstance(target, str):
+            command = self.create_command(plugin.oci_arguments, target)
+        elif target is None:
+            command = plugin.oci_arguments
+        elif isinstance(target, list):
+            if plugin.types_in_arguments():
+                # This plugin expects one target object at a time, so we run the targets sequentially.
+                logs = []
+
+                for t in target:
+                    logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
+
+                return "\n".join(logs)
+            else:
+                tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
+                environment["IN_FILE"] = str(tmp_file.id)
+
+                command = self.create_command(plugin.oci_arguments, target)
+        else:
+            raise ValueError(f"Unsuported target type: {type(target)}")
 
         if cli:
             environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
@@ -70,6 +83,7 @@ class PluginRunner:
         environment["OPENKAT_TOKEN"] = token.generate_new_token()
         token.save()
 
+        client = docker.from_env()
         logs = client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
@@ -88,9 +102,12 @@ class PluginRunner:
         token.delete()
         plugin_user.delete()
 
+        if tmp_file:
+            tmp_file.delete()
+
         return logs.decode()
 
-    def create_token(self, plugin_id: str):
+    def create_token(self, plugin_id: str) -> tuple[KATUser, AuthToken]:
         plugin_user = KATUser(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
         plugin_user.save()
@@ -107,29 +124,24 @@ class PluginRunner:
 
         return plugin_user, token
 
-    def create_command(self, args, is_ip, target):
-        if isinstance(target, str):
-            # TODO: add nameserver through configuration later
-            format_map = {"nameserver": "1.1.1.1", "file": target}
+    def create_command(self, args: list[str], target: str | list[str]):
+        # TODO: add nameserver through configuration later
+        format_map = {"nameserver": "1.1.1.1", "file": target}
 
-            for ip_key in ["ipaddress", "ipaddressv4", "ipaddressv6"]:
-                format_map[f"hostname|{ip_key}"] = target
-                format_map[f"{ip_key}|hostname"] = target
+        for ip_key in ["ipaddress", "ipaddressv4", "ipaddressv6"]:
+            format_map[f"hostname|{ip_key}"] = target
+            format_map[f"{ip_key}|hostname"] = target
 
-            if is_ip:
-                format_map["ipaddress"] = target
-                format_map["ipaddressv4"] = target
-                format_map["ipaddressv6"] = target
-            else:
-                format_map["hostname"] = target
+            format_map[ip_key] = target
 
-            new_args = []
+        format_map["hostname"] = target
 
-            for arg in args:
-                try:
-                    new_args.append(arg.format_map(format_map))
-                except KeyError:
-                    new_args.append(arg)
-        else:
-            new_args = args
+        new_args = []
+
+        for arg in args:
+            try:
+                new_args.append(arg.format_map(format_map))
+            except KeyError:
+                new_args.append(arg)
+
         return new_args

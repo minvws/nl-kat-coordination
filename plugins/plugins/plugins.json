@@ -110,6 +110,18 @@
     ]
   },
   {
+    "plugin_id": "nuclei-tls-version-bulk",
+    "name": "Nuclei TLS Version bulk",
+    "scan_level": 2,
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "ssl/tls-version.yaml",
+      "-j"
+    ]
+  },
+  {
     "plugin_id": "masscan",
     "name": "Masscan",
     "scan_level": 2,
@@ -129,9 +141,10 @@
   {
     "plugin_id": "nuclei-tls-version-normalize",
     "name": "Nuclei Findings",
-    "description": "Parses data to create (CVE) Findings.",
+    "description": "Parses nuclei tls version data to create KATFindings.",
     "consumes": [
-      "file:nuclei-tls-version"
+      "file:nuclei-tls-version",
+      "file:nuclei-tls-version-bulk"
     ],
     "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
     "oci_arguments": [

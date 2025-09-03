@@ -28,6 +28,11 @@ class GenericContent(ContentFile):
         super().__init__(content, name=f"data/{uuid.uuid4()}")
 
 
+class TemporaryContent(ContentFile):
+    def __init__(self, content: str | bytes):
+        super().__init__(content, name=f"tmp/{uuid.uuid4()}")
+
+
 class PluginContent(ContentFile):
     def __init__(self, content: str | bytes, plugin_id: str):
         super().__init__(content, name=f"{plugin_id}/{uuid.uuid4()}")
