@@ -136,7 +136,7 @@ class ScheduleUpdateView(UpdateView):
 
         # Plugin has been disabled, cancel all tasks related to the schedule
         for task in Task.objects.filter(
-            schedule=self.object,
+            new_schedule=self.object,
             status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
         ):
             task.cancel()
