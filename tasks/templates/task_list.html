@@ -45,8 +45,16 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if task.data.input_data %}
+                                        {% if task.data.input_data|get_type == 'str' %}
                                             {{ task.data.input_data }}
+                                        {% elif task.data.input_data|get_type == 'list' %}
+                                            {% if task.data.input_data|length > 1 %}
+                                                [{{ task.data.input_data|first }} ... {{ task.data.input_data|last }}]
+                                            {% elif task.data.input_data|length == 1 %}
+                                                {{ task.data.input_data|first }}
+                                            {% else %}
+                                                No Data
+                                            {% endif %}
                                         {% else %}
                                             No Data
                                         {% endif %}

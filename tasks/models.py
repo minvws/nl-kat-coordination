@@ -81,6 +81,13 @@ class Task(models.Model):
     ended_at = models.DateTimeField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
 
+    def cancel(self):
+        from tasks.celery import app
+
+        app.control.revoke(str(self.id), terminate=True, signal="SIGKILL")
+        self.status = TaskStatus.CANCELLED
+        self.save()
+
 
 class TaskResult(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="task_results")

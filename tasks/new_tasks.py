@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timezone
 
 import structlog
@@ -40,9 +41,8 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             try:
                 query = Query.from_path(schedule.input)
             except (ValueError, TypeNotFound):
-                app.send_task(
-                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, schedule.input, schedule.id)
-                )
+                run_plugin_task(schedule.plugin.plugin_id, org.code, schedule.input, schedule.id)
+
                 continue
 
             pk = Aliased(query.result_type, field="primary_key")
@@ -53,49 +53,66 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             by_pk = {item[-1]: item[0] for item in objects}
             scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
 
-            for profile in scan_profiles:
-                if profile.level.value < schedule.plugin.scan_level:
+            input_data = list(sorted([
+                by_pk[str(profile.reference)] for profile in scan_profiles
+                if profile.level.value >= schedule.plugin.scan_level
+            ]))
+
+            if not force:
+                last_run = (
+                    Task.objects.filter(new_schedule=schedule, data__input_data=input_data)
+                    .order_by("-created_at")
+                    .first()
+                )
+                if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                    logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
                     continue
 
-                input_data = by_pk[str(profile.reference)]
-
-                if not force:
-                    last_run = (
-                        Task.objects.filter(new_schedule=schedule, data__input_data=input_data)
-                        .order_by("-created_at")
-                        .first()
-                    )
-                    if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                        logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
-                        continue
-
-                app.send_task(
-                    "tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, input_data, schedule.id)
-                )
+            run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
         else:
             last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
             if last_run and not schedule.recurrences.between(last_run.created_at, now):
                 logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
                 continue
-            app.send_task("tasks.new_tasks.run_plugin", (schedule.plugin.plugin_id, org.code, None, schedule.id))
+
+            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
 
 
 def rerun_task(task: Task):
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
-    app.send_task(
-        "tasks.new_tasks.run_plugin",
-        (plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None),
+    run_plugin_task(
+        plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None
     )
 
+
+def run_plugin_task(
+    plugin_id: str,
+    organization_code: str | None = None,
+    input_data: str | list[str] | None = None,
+    schedule_id: int | None = None,
+) -> None:
+    task_id = uuid.uuid4()
+    Task.objects.create(
+        id=task_id,
+        type="plugin",
+        new_schedule_id=schedule_id,
+        organization=Organization.objects.get(code=organization_code) if organization_code else None,
+        status=TaskStatus.QUEUED,
+        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
+    )
+
+    app.send_task(
+        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data),
+        task_id=str(task_id),
+    )
 
 @app.task(bind=True)
 def run_plugin(
     self,
     plugin_id: str,
     organization_code: str | None = None,
-    input_data: str | None = None,
-    schedule_id: int | None = None,
+    input_data: str | list[str] |None = None,
 ) -> None:
     logger.debug(
         "Starting task plugin",
@@ -105,6 +122,7 @@ def run_plugin(
         input_data=input_data,
     )
     organization: Organization | None = None
+    task = Task.objects.get(id=self.request.id)
 
     if organization_code:
         organization = Organization.objects.get(code=organization_code)
@@ -112,16 +130,14 @@ def run_plugin(
     plugin = Plugin.objects.filter(plugin_id=plugin_id).first()
 
     if not plugin or not plugin.enabled_for(organization):
+        task.status = TaskStatus.FAILED
+        task.save()
         raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
 
-    task = Task.objects.create(
-        id=self.request.id,
-        type="plugin",
-        new_schedule_id=schedule_id,
-        organization=organization,
-        status=TaskStatus.RUNNING,
-        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
-    )
+        Task.objects.filter(id=self.request.id).update(status=TaskStatus.RUNNING)
+
+    task.status = TaskStatus.RUNNING
+    task.save()
 
     try:
         PluginRunner().run(plugin_id, input_data, task_id=task.id)
@@ -142,4 +158,4 @@ def process_raw_file(file: File, handle_error: bool = False):
 
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
         for organization in plugin.enabled_organizations():
-            run_plugin.apply_async((plugin.plugin_id, organization.code), kwargs={"input_data": str(file.id)})
+            run_plugin_task(plugin.plugin_id, organization.code, str(file.id))

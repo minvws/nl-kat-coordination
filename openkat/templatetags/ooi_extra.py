@@ -47,7 +47,7 @@ def ooi_types_to_strings(ooi_types: set[type[OOI]]) -> list["str"]:
 
 @register.filter()
 def get_type(x: Any) -> Any:
-    return type(x)
+    return type(x).__name__
 
 
 @register.simple_tag()

@@ -11,6 +11,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from katalogus.worker.repository import get_local_repository
 from plugins.models import EnabledPlugin, Plugin
+from tasks.models import Task, TaskStatus
 
 
 class PluginListView(ListView):
@@ -149,11 +150,27 @@ class EnabledPluginView(CreateView):
 
 class EnabledPluginUpdateView(UpdateView):
     model = EnabledPlugin
-    fields = ["enabled", "plugin", "organization"]
+    fields = ["enabled"]
     template_name = "new_enable_disable_plugin.html"
 
     def form_invalid(self, form):
         return redirect(reverse("plugin_list"))
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+
+        if self.object.enabled:
+            return result
+
+        # Plugin has been disabled, cancel all tasks for this plugin and organization
+        for task in Task.objects.filter(
+            organization=self.object.organization,
+            data__plugin_id=self.object.plugin.id,
+            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
+        ):
+            task.cancel()
+
+        return result
 
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")

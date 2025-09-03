@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from tasks.models import NewSchedule, Task
+from tasks.models import NewSchedule, Task, TaskStatus
 from tasks.new_tasks import rerun_task, run_schedule
 
 
@@ -127,6 +127,21 @@ class ScheduleCreateView(CreateView):
 class ScheduleUpdateView(UpdateView):
     model = NewSchedule
     fields = ["enabled", "recurrences", "input"]
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+
+        if self.object.enabled:
+            return result
+
+        # Plugin has been disabled, cancel all tasks related to the schedule
+        for task in Task.objects.filter(
+            schedule=self.object,
+            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
+        ):
+            task.cancel()
+
+        return result
 
     def form_invalid(self, form):
         return redirect(reverse("schedule_list"))

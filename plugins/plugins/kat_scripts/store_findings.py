@@ -18,10 +18,14 @@ def main():
 
         results.extend([finding_type, finding])
 
-    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-    httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
-    json.dump(results, sys.stdout)  # stores the result as a JSON file as well
+    return results
 
 
 if __name__ == "__main__":
-    main()
+    results = main()
+
+    if os.getenv("UPLOAD_URL") != "/dev/null":
+        headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
+
+    json.dump(results, sys.stdout)  # stores the result as a JSON file as well
