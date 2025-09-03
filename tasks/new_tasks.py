@@ -1,8 +1,11 @@
+import operator
 import uuid
 from datetime import datetime, timezone
+from functools import reduce
 
 import structlog
 from django.conf import settings
+from django.db.models import Q
 
 from files.models import File
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -59,13 +62,24 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             ]))
 
             if not force:
-                last_run = (
-                    Task.objects.filter(new_schedule=schedule, data__input_data=input_data)
-                    .order_by("-created_at")
-                    .first()
-                )
-                if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                    logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
+                # Filter on the schedule and created after the previous occurrence
+                last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+                # Join the input data targets into a large or-query, checking for task with any of the targets as input
+                filters = reduce(operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data])
+                target_lists = last_runs.filter(filters).values_list("data__input_data", flat=True)
+
+                skip = set()
+
+                for target in target_lists:
+                    if isinstance(target, list):
+                        skip |= set(target)
+                    else:
+                        skip.add(target)
+
+                # filter out these targets
+                input_data = set(input_data) - skip
+
+                if not input_data:
                     continue
 
             run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
@@ -89,7 +103,7 @@ def rerun_task(task: Task):
 def run_plugin_task(
     plugin_id: str,
     organization_code: str | None = None,
-    input_data: str | list[str] | None = None,
+    input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
 ) -> None:
     task_id = uuid.uuid4()
@@ -99,11 +113,11 @@ def run_plugin_task(
         new_schedule_id=schedule_id,
         organization=Organization.objects.get(code=organization_code) if organization_code else None,
         status=TaskStatus.QUEUED,
-        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
+        data={"plugin_id": plugin_id, "input_data": list(input_data)},  # TODO
     )
 
     app.send_task(
-        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data),
+        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, list(input_data)),
         task_id=str(task_id),
     )
 

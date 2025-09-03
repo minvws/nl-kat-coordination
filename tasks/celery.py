@@ -1,8 +1,9 @@
 import os
 
 from celery import Celery
-from celery.signals import setup_logging
+from celery.signals import setup_logging, worker_shutdown
 from django.conf import settings
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openkat.settings")
 app = Celery()
@@ -16,6 +17,14 @@ def config_loggers(*args, **kwargs):
     from django.conf import settings  # noqa
 
     dictConfig(settings.LOGGING)
+
+
+@worker_shutdown.connect
+def cancel_all_tasks(*args, **kwargs):
+    from tasks.models import Task, TaskStatus
+
+    for task in Task.objects.filter(status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]):
+        task.cancel()
 
 
 app.conf.beat_schedule = {
