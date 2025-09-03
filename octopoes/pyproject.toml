@@ -14,7 +14,6 @@ dependencies = [
     "kombu>=5.2.4,<6",
     "celery>=5.2.7,<6",
     "pyparsing>=3.0.9,<4",
-    "packaging~=23.0",
     "tldextract>5",
     "opentelemetry-sdk",
     "opentelemetry-instrumentation",
