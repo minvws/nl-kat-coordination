@@ -12,11 +12,6 @@
             <div class="fifty-fifty">
                 <div>
                     <h1>{% translate "Files" %}</h1>
-                    <p>
-                        {% blocktranslate trimmed %}
-                            All the current files.
-                        {% endblocktranslate %}
-                    </p>
                 </div>
                 {% if perms.openkat.add_file %}
                     <div class="horizontal-view toolbar">
@@ -24,6 +19,12 @@
                     </div>
                 {% endif %}
             </div>
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <input type="submit" />
+                </div>
+            </form>
             {% if not file_list %}
                 <div>
                     <h2>{% translate "Files" %}</h2>

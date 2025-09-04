@@ -10,7 +10,12 @@
     <main id="main-content">
         <section>
             {% include "tasks/partials/tasks_overview_header.html" %}
-
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <input type="submit" />
+                </div>
+            </form>
             {% if not task_list %}
                 <div>
                     <h2>{% translate "Tasks" %}</h2>

@@ -1,21 +1,34 @@
+import django_filters
 import structlog
 from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView
+from django_filters.views import FilterView
 
 from files.models import File
 
 logger = structlog.get_logger(__name__)
 
+class FileFilter(django_filters.FilterSet):
+    type = django_filters.CharFilter(label="Type", lookup_expr='icontains')
+    organizations__name = django_filters.CharFilter(label="Organization", lookup_expr='icontains')
+    file = django_filters.CharFilter(label="Location", lookup_expr='icontains')
+    task_result__task__data = django_filters.CharFilter(label="Search", lookup_expr='icontains')
 
-class FileListView(ListView):
+    class Meta:
+        model = File
+        fields = ["type", "file", "organizations__name", "task_result__task__data"]
+
+
+class FileListView(FilterView):
     template_name = "file_list.html"
     model = File
     ordering = ["-id"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = FileFilter
 
     def get_queryset(self):
         qs = super().get_queryset()

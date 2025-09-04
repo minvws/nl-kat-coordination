@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import django_filters
 import recurrence
 from django.conf import settings
 from django.forms import ModelForm
@@ -9,17 +10,27 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django_filters.views import FilterView
 
 from tasks.models import NewSchedule, Task, TaskStatus
 from tasks.new_tasks import rerun_task, run_schedule
 
 
-class TaskListView(ListView):
+class TaskFilter(django_filters.FilterSet):
+    data = django_filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Task
+        fields = ["organization", "data", "status"]
+
+
+class TaskListView(FilterView):
     template_name = "task_list.html"
     fields = ["enabled_plugins"]
     model = Task
     ordering = ["-created_at"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = TaskFilter
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -57,11 +68,21 @@ class TaskRescheduleView(View):
         return redirect(reverse("new_task_list"))
 
 
-class ScheduleListView(ListView):
+class NewScheduleFilter(django_filters.FilterSet):
+    plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
+    input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
+
+    class Meta:
+        model = NewSchedule
+        fields = ["organization", "plugin__plugin_id", "input", "enabled"]
+
+
+class ScheduleListView(FilterView):
     template_name = "schedule_list.html"
     model = NewSchedule
     ordering = ["-id"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = NewScheduleFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
