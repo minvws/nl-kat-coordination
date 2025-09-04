@@ -13,6 +13,20 @@
     ]
   },
   {
+    "plugin_id": "dns-AAAAA",
+    "name": "DNS AAAAA",
+    "description": "Fetch the DNS A and AAAA record(s) of a hostname.",
+    "scan_level": 1,
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_dns/main.py",
+      "{hostname}",
+      "A,AAAA"
+    ]
+  },
+  {
     "plugin_id": "dig",
     "name": "Dig",
     "description": "Scan DNS records.",
@@ -23,7 +37,7 @@
       "+nocomments",
       "+noquestion",
       "+nostats",
-      "@{nameserver}",
+      "@1.1.1.1",
       "A",
       "{hostname}",
       "AAAA",

@@ -30,17 +30,14 @@ class ZoneNotFoundException(Exception):
     pass
 
 
-def get_record_types() -> set[str]:
-    requested_record_types = getenv("RECORD_TYPES", "")
-    if not requested_record_types:
-        return DEFAULT_RECORD_TYPES
+def get_record_types(arg: str) -> set[str]:
     parsed_requested_record_types = map(
-        lambda x: re.sub(r"[^A-Za-z]", "", x), requested_record_types.upper().split(",")
+        lambda x: re.sub(r"[^A-Za-z]", "", x), arg.upper().split(",")
     )
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
-def run(hostname: str) -> list:
+def run(hostname: str, record_types: set[str]) -> list:
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
 
@@ -50,7 +47,6 @@ def run(hostname: str) -> list:
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
-    record_types = get_record_types()
     answers = [get_parent_zone_soa(resolver, requested_dns_name)] if "SOA" in record_types else []
 
     for type_ in record_types:
@@ -257,7 +253,8 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 
 if __name__ == "__main__":
-    result = run(sys.argv[1])
+    record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
+    result = run(sys.argv[1], record_types)
 
     if result:
         headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}

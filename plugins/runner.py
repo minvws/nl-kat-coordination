@@ -135,8 +135,7 @@ class PluginRunner:
         return plugin_user, token
 
     def create_command(self, args: list[str], target: str):
-        # TODO: add nameserver through configuration later
-        format_map = {"{nameserver}": "1.1.1.1", "{file}": target}
+        format_map = {"{file}": target}
 
         for ip_key in ["{ipaddress}", "{ipaddressv4}", "{ipaddressv6}"]:
             format_map["{hostname|" + ip_key + "}"] = target
