@@ -106,6 +106,9 @@ def run_plugin_task(
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
 ) -> None:
+    if isinstance(input_data, set):
+        input_data = list(input_data)
+
     task_id = uuid.uuid4()
     Task.objects.create(
         id=task_id,
@@ -113,11 +116,11 @@ def run_plugin_task(
         new_schedule_id=schedule_id,
         organization=Organization.objects.get(code=organization_code) if organization_code else None,
         status=TaskStatus.QUEUED,
-        data={"plugin_id": plugin_id, "input_data": list(input_data)},  # TODO
+        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
 
     app.send_task(
-        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, list(input_data)),
+        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data),
         task_id=str(task_id),
     )
 

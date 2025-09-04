@@ -53,7 +53,7 @@ class PluginRunner:
         elif target is None:
             command = plugin.oci_arguments
         elif isinstance(target, list):
-            if plugin.types_in_arguments():
+            if plugin.types_in_arguments() or any("{file}" in arg for arg in  plugin.oci_arguments):
                 # This plugin expects one target object at a time, so we automatically parallelize with xargs if needed.
                 if len(target) == 1:
                     return self.run(plugin_id, target[0], output, task_id, keep, cli)
@@ -73,20 +73,12 @@ class PluginRunner:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 environment["IN_FILE"] = str(tmp_file.id)
 
-                command = self.create_command(plugin.oci_arguments, target)
+                command = plugin.oci_arguments
         else:
             raise ValueError(f"Unsuported target type: {type(target)}")
 
         if cli:
-            environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
-
-            rm = "--rm" if not keep else ""
-            envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
-            network = f"--network {settings.DOCKER_NETWORK}"
-            cmd = shlex.join(command)
-            vol = f"-v {self.adapter}:{self.entrypoint}"
-
-            return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
+            return self.get_cli(command, environment, keep, plugin)
 
         plugin_user, token = self.create_token(plugin_id)
         environment["OPENKAT_TOKEN"] = token.generate_new_token()
@@ -116,6 +108,15 @@ class PluginRunner:
 
         return logs.decode()
 
+    def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
+        environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
+        rm = "--rm" if not keep else ""
+        envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
+        network = f"--network {settings.DOCKER_NETWORK}"
+        cmd = shlex.join(command)
+        vol = f"-v {self.adapter}:{self.entrypoint}"
+        return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
+
     def create_token(self, plugin_id: str) -> tuple[KATUser, AuthToken]:
         plugin_user = KATUser(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
@@ -133,24 +134,24 @@ class PluginRunner:
 
         return plugin_user, token
 
-    def create_command(self, args: list[str], target: str | list[str]):
+    def create_command(self, args: list[str], target: str):
         # TODO: add nameserver through configuration later
-        format_map = {"nameserver": "1.1.1.1", "file": target}
+        format_map = {"{nameserver}": "1.1.1.1", "{file}": target}
 
-        for ip_key in ["ipaddress", "ipaddressv4", "ipaddressv6"]:
-            format_map[f"hostname|{ip_key}"] = target
-            format_map[f"{ip_key}|hostname"] = target
+        for ip_key in ["{ipaddress}", "{ipaddressv4}", "{ipaddressv6}"]:
+            format_map["{hostname|" + ip_key + "}"] = target
+            format_map["{" + ip_key + "|hostname"] = target
 
             format_map[ip_key] = target
 
-        format_map["hostname"] = target
+        format_map["{hostname}"] = target
 
         new_args = []
 
         for arg in args:
-            try:
-                new_args.append(arg.format_map(format_map))
-            except KeyError:
-                new_args.append(arg)
+            for key, value in format_map.items():
+                arg = arg.replace(key, value)
+
+            new_args.append(arg)
 
         return new_args

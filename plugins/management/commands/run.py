@@ -16,6 +16,9 @@ class Command(BaseCommand):
         parser.add_argument("--parallelism", "-p", dest="parallelism", type=int, help="Level of auto-parallelism.")
 
     def handle(self, plugin_id, targets, output, keep, cli,  parallelism, *args, **options):
+        if cli:
+            output = "-"
+
         with capture_logs():
             logs = PluginRunner().run(plugin_id, targets, output, keep=keep, cli=cli, parallelism=parallelism)
 

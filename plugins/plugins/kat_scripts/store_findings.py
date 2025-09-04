@@ -22,6 +22,8 @@ def main():
 
 
 if __name__ == "__main__":
+    """ expects sys.stdin to have a newline separted list of finding_type_ids and ooi pks, separated by a tab """
+
     results = main()
 
     if os.getenv("UPLOAD_URL") != "/dev/null":

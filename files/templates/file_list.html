@@ -55,7 +55,7 @@
                                     {% if file.task_result %}
                                         {% if file.task_result.task.data.plugin_id %}
                                             <td>
-                                                <a href="{% url "task_detail" pk=file.task_result.task.id %}">{{ file.task_result.task.data.plugin_id }}</a>
+                                                <a href="{% url "plugin_id_detail" file.task_result.task.data.plugin_id %}">{{ file.task_result.task.data.plugin_id }}</a>
                                             </td>
                                         {% else %}
                                             <td>
