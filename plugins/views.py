@@ -1,3 +1,4 @@
+import django_filters
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.functions import Coalesce
@@ -7,18 +8,32 @@ from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django_filters.views import FilterView
 
 from katalogus.worker.repository import get_local_repository
-from plugins.models import EnabledPlugin, Plugin
+from plugins.models import EnabledPlugin, Plugin, ScanLevel
 from tasks.models import Task, TaskStatus
 
 
-class PluginListView(ListView):
+class PluginFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr='icontains')
+    plugin_id = django_filters.CharFilter(label="Plugin Id", lookup_expr='icontains')
+    oci_image = django_filters.CharFilter(label="OCI Image", lookup_expr='icontains')
+    enabled = django_filters.BooleanFilter(label="Enabled")
+    scan_level = django_filters.MultipleChoiceFilter(choices=ScanLevel.choices, label="Scan Level")
+
+    class Meta:
+        model = Plugin
+        fields = ["name", "plugin_id", "oci_image", "enabled", "scan_level"]
+
+
+class PluginListView(FilterView):
     template_name = "plugin_list.html"
     fields = ["enabled_plugins"]
     model = Plugin
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = PluginFilter
 
     def get_queryset(self):
         plugins = (

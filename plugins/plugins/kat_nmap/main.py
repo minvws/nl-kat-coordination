@@ -1,9 +1,7 @@
-import ipaddress
 import json
 import logging
 import os
 import sys
-from ipaddress import AddressValueError
 
 import httpx
 from libnmap.objects import NmapHost, NmapService
