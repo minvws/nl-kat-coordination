@@ -1,3 +1,5 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import CreateView, DeleteView, UpdateView
 from rest_framework import exceptions
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
@@ -59,3 +61,33 @@ class KATModelPermissions(DjangoModelPermissions):
             perms = self.get_required_permissions(request.method, queryset.model)
 
         return request.user.has_perms(perms)
+
+
+class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
+    perms_map = {
+        CreateView.__name__: ["%(app_label)s.add_%(model_name)s"],
+        UpdateView.__name__: ["%(app_label)s.change_%(model_name)s"],
+        DeleteView.__name__: ["%(app_label)s.delete_%(model_name)s"],
+    }
+
+    def get_permission_required(self):
+        permissions_required = []
+
+        if not issubclass(self.__class__, (CreateView, UpdateView, DeleteView)):
+            return permissions_required
+
+        kwargs = {
+            'app_label': self.model._meta.app_label,
+            'model_name': self.model._meta.model_name
+        }
+
+        if issubclass(self.__class__, CreateView):
+            permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
+
+        if issubclass(self.__class__, UpdateView):
+            permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
+
+        if issubclass(self.__class__, DeleteView):
+            permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
+
+        return permissions_required

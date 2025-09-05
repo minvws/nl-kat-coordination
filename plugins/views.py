@@ -12,14 +12,16 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
 from katalogus.worker.repository import get_local_repository
-from plugins.models import EnabledPlugin, Plugin, ScanLevel
+from openkat.models import Organization
+from openkat.permissions import KATModelPermissionRequiredMixin
+from plugins.models import EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
 from tasks.models import Task, TaskStatus
 
 
 class PluginFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr='icontains')
-    plugin_id = django_filters.CharFilter(label="Plugin Id", lookup_expr='icontains')
-    oci_image = django_filters.CharFilter(label="OCI Image", lookup_expr='icontains')
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    plugin_id = django_filters.CharFilter(label="Plugin Id", lookup_expr="icontains")
+    oci_image = django_filters.CharFilter(label="OCI Image", lookup_expr="icontains")
     enabled = django_filters.BooleanFilter(label="Enabled")
     scan_level = django_filters.MultipleChoiceFilter(choices=ScanLevel.choices, label="Scan Level")
 
@@ -36,14 +38,15 @@ class PluginListView(FilterView):
     filterset_class = PluginFilter
 
     def get_queryset(self):
-        plugins = (
-            super()
-            .get_queryset()
-            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
-            .annotate(
-                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
-            )
-        )
+        plugins: PluginQuerySet = super().get_queryset()
+
+        if not self.request.user.can_access_all_organizations:
+            # TODO: multi organization filter
+            organization = Organization.objects.filter(members__user=self.request.user).first()
+            plugins = plugins.with_enabled(organization)
+        else:
+            plugins = plugins.with_enabled(None)
+
         order_by = self.request.GET.get("order_by", "name")
         sorting_order = self.request.GET.get("sorting_order", "asc")
 
@@ -91,7 +94,7 @@ class PluginIdDetailView(PluginDetailView):
     slug_field = "plugin_id"
 
 
-class PluginCreateView(CreateView):
+class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
     template_name = "plugin_form.html"
@@ -131,7 +134,7 @@ class PluginCreateView(CreateView):
         return reverse_lazy("plugin_list")
 
 
-class PluginDeleteView(DeleteView):
+class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     model = Plugin
 
     def form_invalid(self, form):
@@ -146,7 +149,7 @@ class PluginDeleteView(DeleteView):
         return reverse_lazy("plugin_list")
 
 
-class EnabledPluginView(CreateView):
+class EnabledPluginView(KATModelPermissionRequiredMixin, CreateView):
     model = EnabledPlugin
     fields = ["enabled", "plugin", "organization"]
     template_name = "new_enable_disable_plugin.html"
@@ -163,7 +166,7 @@ class EnabledPluginView(CreateView):
         return reverse_lazy("plugin_list")
 
 
-class EnabledPluginUpdateView(UpdateView):
+class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = EnabledPlugin
     fields = ["enabled"]
     template_name = "new_enable_disable_plugin.html"
@@ -181,7 +184,7 @@ class EnabledPluginUpdateView(UpdateView):
         for task in Task.objects.filter(
             organization=self.object.organization,
             data__plugin_id=self.object.plugin.id,
-            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
+            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],
         ):
             task.cancel()
 

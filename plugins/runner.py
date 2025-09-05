@@ -53,7 +53,7 @@ class PluginRunner:
         elif target is None:
             command = plugin.oci_arguments
         elif isinstance(target, list):
-            if plugin.types_in_arguments() or any("{file}" in arg for arg in  plugin.oci_arguments):
+            if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
                 # This plugin expects one target object at a time, so we automatically parallelize with xargs if needed.
                 if len(target) == 1:
                     return self.run(plugin_id, target[0], output, task_id, keep, cli)

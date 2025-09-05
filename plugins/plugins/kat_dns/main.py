@@ -31,9 +31,7 @@ class ZoneNotFoundException(Exception):
 
 
 def get_record_types(arg: str) -> set[str]:
-    parsed_requested_record_types = map(
-        lambda x: re.sub(r"[^A-Za-z]", "", x), arg.upper().split(",")
-    )
+    parsed_requested_record_types = map(lambda x: re.sub(r"[^A-Za-z]", "", x), arg.upper().split(","))
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 

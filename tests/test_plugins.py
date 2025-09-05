@@ -1,7 +1,12 @@
+import datetime
+from datetime import timezone
+
+import pytest
+from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
 from plugins.models import EnabledPlugin, Plugin
-from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginListView
+from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
 from tasks.models import NewSchedule
 from tests.conftest import setup_request
 
@@ -14,31 +19,78 @@ def test_plugin_list(rf, superuser_member):
     assert response.status_code == 200
     assertContains(response, "testing plugins")
     assertContains(response, "Enable")
-    assertNotContains(response, "Disable")
-    assertContains(response, '<form action=" /en/plugins/enabled-plugin ')
+    assertNotContains(response, " Disable")
+    assertContains(response, '<form action=" /en/enabled-plugin/ ')
 
-    enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin, organization=None)
+    enabled_plugin = plugin.enable_for(None)
 
     response = PluginListView.as_view()(request)
     assert response.status_code == 200
     assertContains(response, "testing plugins")
-    assertNotContains(response, "Enable")
-    assertContains(response, "Disable")
-    assertContains(response, f'<form action=" /en/plugins/enabled-plugin/{enabled_plugin.id}')
+    assertNotContains(response, " Enable")
+    assertContains(response, " Disable")
+    assertContains(response, f'<form action=" /en/enabled-plugin/{enabled_plugin.id}')
 
     enabled_plugin.enabled = False
     enabled_plugin.save()
 
     response = PluginListView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, f'<form action=" /en/plugins/enabled-plugin/{enabled_plugin.id}')
+    assertContains(response, f'<form action=" /en/enabled-plugin/{enabled_plugin.id}')
 
     Plugin.objects.create(name="testing plugins 2", plugin_id="testt 2")
     response = PluginListView.as_view()(request)
     assert response.status_code == 200
-    assertContains(response, '<form action=" /en/plugins/enabled-plugin ')
-    assertContains(response, f'<form action=" /en/plugins/enabled-plugin/{enabled_plugin.id}')
+    assertContains(response, '<form action=" /en/enabled-plugin/ ')
+    assertContains(response, f'<form action=" /en/enabled-plugin/{enabled_plugin.id}')
 
+
+def test_plugin_query_with_enabled(organization, organization_b):
+    plugin_1 = Plugin.objects.create(name="1", plugin_id="1")
+    plugin_1.enable_for(organization)
+    Plugin.objects.create(name="2", plugin_id="2").enable_for(organization_b)
+    plugin_3 = Plugin.objects.create(name="3", plugin_id="3")
+    plugin_3.enable_for(None)
+    plugin_3.enable_for(organization)
+    Plugin.objects.create(name="4", plugin_id="4")
+
+    assert {plugin.plugin_id: plugin.enabled for plugin in Plugin.objects.with_enabled(None)} == {
+        "1": False,
+        "2": False,
+        "3": True,
+        "4": False,
+    }
+
+    assert {plugin.plugin_id: plugin.enabled for plugin in Plugin.objects.with_enabled(organization)} == {
+        "1": True,
+        "2": False,
+        "3": True,
+        "4": False,
+    }
+
+    assert {plugin.plugin_id: plugin.enabled for plugin in Plugin.objects.with_enabled(organization_b)} == {
+        "1": False,
+        "2": True,
+        "3": True,
+        "4": False,
+    }
+
+    plugin_3.disable_for(organization_b)
+
+    assert {plugin.plugin_id: plugin.enabled for plugin in Plugin.objects.with_enabled(organization_b)} == {
+        "1": False,
+        "2": True,
+        "3": False,
+        "4": False,
+    }
+
+    plugin_1.disable_for(organization)
+    assert {plugin.plugin_id: plugin.enabled for plugin in Plugin.objects.with_enabled(organization_b)} == {
+        "1": False,
+        "2": True,
+        "3": False,
+        "4": False,
+    }
 
 def test_enable_plugins(rf, superuser_member):
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
@@ -71,12 +123,37 @@ def test_enable_plugins(rf, superuser_member):
     assert response.headers["Location"] == "/en/plugins/"
 
 
+def test_delete_plugin(rf, superuser_member, client_member):
+    plugin = Plugin.objects.create(name="1", plugin_id="1")
+    request = setup_request(
+        rf.post("delete_plugin"), superuser_member.user
+    )
+    response = PluginDeleteView.as_view()(request, pk=plugin.id)
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/en/plugins/"
+    assert Plugin.objects.count() == 0
+
+    plugin = Plugin.objects.create(name="2", plugin_id="2")
+    request = setup_request(
+        rf.post("delete_plugin"), client_member.user
+    )
+
+    with pytest.raises(PermissionDenied):
+        PluginDeleteView.as_view()(request, pk=plugin.id)
+
+
 def test_enabling_plugin_creates_schedule():
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
 
     schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
-    assert str(schedule.recurrences) == "RRULE:FREQ=DAILY"
+    now = datetime.datetime.now(timezone.utc)
+
+    # minute precision should be stable to test
+    assert f"DTSTART:{now.strftime('%Y%m%dT%H%M')}" in str(schedule.recurrences)
+    assert "RRULE:FREQ=DAILY" in str(schedule.recurrences)
+
     assert schedule.enabled
     assert schedule.organization is None
     assert schedule.input == ""

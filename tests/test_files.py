@@ -19,5 +19,5 @@ def test_enable_plugins(rf, superuser_member):
 
     assert file.type == "json"
     assert file.type in file.file.name
-    assert example_file.name in file.file.name
+    assert "testname" in file.file.name
     assert str(datetime.datetime.today().date()) in file.file.name

@@ -38,6 +38,7 @@
                                 <th scope="col">{% translate "File ID" %}</th>
                                 <th scope="col">{% translate "Location" %}</th>
                                 <th scope="col">{% translate "Name" %}</th>
+                                <th scope="col">{% translate "Type" %}</th>
                                 <th scope="col">{% translate "Source" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Created date" %}</th>
@@ -52,6 +53,9 @@
                                     <td>{{ file.path.parent }}</td>
                                     <td>
                                         <a href="{{ file.file.url }}">{{ file.path.name }}</a>
+                                    </td>
+                                    <td>
+                                        {{ file.type }}
                                     </td>
                                     {% if file.task_result %}
                                         {% if file.task_result.task.data.plugin_id %}

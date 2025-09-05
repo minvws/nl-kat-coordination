@@ -22,6 +22,12 @@ class File(models.Model):
     def path(self):
         return Path(self.file.name)
 
+    def save(self, *args, **kwargs):
+        if not self.type:
+            self.type = self.path().suffix.lstrip(".")
+
+        return super().save(*args, **kwargs)
+
 
 class GenericContent(ContentFile):
     def __init__(self, content: str | bytes):

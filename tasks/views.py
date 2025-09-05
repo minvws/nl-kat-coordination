@@ -3,21 +3,23 @@ from datetime import datetime, timezone
 import django_filters
 import recurrence
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
+from openkat.permissions import KATModelPermissionRequiredMixin
 from tasks.models import NewSchedule, Task, TaskStatus
 from tasks.new_tasks import rerun_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
-    data = django_filters.CharFilter(lookup_expr='icontains')
+    data = django_filters.CharFilter(lookup_expr="icontains")
 
     class Meta:
         model = Task
@@ -34,6 +36,9 @@ class TaskListView(FilterView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+
+        if not self.request.user.can_access_all_organizations:
+            qs = qs.filter(organization__members__user=self.request.user)
 
         if "schedule_id" in self.request.GET:
             qs = qs.filter(new_schedule__id=self.request.GET["schedule_id"])
@@ -61,7 +66,9 @@ class TaskDetailView(DetailView):
         return context
 
 
-class TaskRescheduleView(View):
+class TaskRescheduleView(PermissionRequiredMixin, View):
+    permission_required = ("tasks.add_tasks",)
+
     def post(self, request, task_id, *args, **kwargs):
         rerun_task(Task.objects.get(pk=task_id))
 
@@ -83,6 +90,14 @@ class ScheduleListView(FilterView):
     ordering = ["-id"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NewScheduleFilter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        if not self.request.user.can_access_all_organizations:
+            qs = qs.filter(organization__members__user=self.request.user)
+
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -112,7 +127,7 @@ class ScheduleDetailView(DetailView):
         return context
 
 
-class ScheduleCreateView(CreateView):
+class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = NewSchedule
     fields = ["plugin", "input", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
@@ -145,7 +160,7 @@ class ScheduleCreateView(CreateView):
         return reverse_lazy("schedule_list")
 
 
-class ScheduleUpdateView(UpdateView):
+class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = NewSchedule
     fields = ["enabled", "recurrences", "input"]
 
@@ -158,7 +173,7 @@ class ScheduleUpdateView(UpdateView):
         # Plugin has been disabled, cancel all tasks related to the schedule
         for task in Task.objects.filter(
             new_schedule=self.object,
-            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
+            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],
         ):
             task.cancel()
 
@@ -176,7 +191,7 @@ class ScheduleUpdateView(UpdateView):
         return reverse_lazy("schedule_list")
 
 
-class ScheduleDeleteView(DeleteView):
+class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     model = NewSchedule
 
     def form_invalid(self, form):
@@ -191,7 +206,9 @@ class ScheduleDeleteView(DeleteView):
         return reverse_lazy("schedule_list")
 
 
-class ScheduleRunView(View):
+class ScheduleRunView(PermissionRequiredMixin, View):
+    permission_required = ("schedules.add_newschedules",)
+
     def post(self, request, schedule_id, *args, **kwargs):
         run_schedule(NewSchedule.objects.get(pk=schedule_id))
 

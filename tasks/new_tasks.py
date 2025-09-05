@@ -56,16 +56,24 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             by_pk = {item[-1]: item[0] for item in objects}
             scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
 
-            input_data = list(sorted([
-                by_pk[str(profile.reference)] for profile in scan_profiles
-                if profile.level.value >= schedule.plugin.scan_level
-            ]))
+            input_data = list(
+                sorted(
+                    [
+                        by_pk[str(profile.reference)]
+                        for profile in scan_profiles
+                        if profile.level.value >= schedule.plugin.scan_level
+                    ]
+                )
+            )
 
             if not force:
                 # Filter on the schedule and created after the previous occurrence
                 last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
                 # Join the input data targets into a large or-query, checking for task with any of the targets as input
-                filters = reduce(operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data])
+                filters = reduce(
+                    operator.or_,
+                    [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
+                )
                 target_lists = last_runs.filter(filters).values_list("data__input_data", flat=True)
 
                 skip = set()
@@ -119,17 +127,12 @@ def run_plugin_task(
         data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
 
-    app.send_task(
-        "tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data),
-        task_id=str(task_id),
-    )
+    app.send_task("tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
+
 
 @app.task(bind=True)
 def run_plugin(
-    self,
-    plugin_id: str,
-    organization_code: str | None = None,
-    input_data: str | list[str] |None = None,
+    self, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
 ) -> None:
     logger.debug(
         "Starting task plugin",

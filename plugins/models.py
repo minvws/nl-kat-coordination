@@ -5,7 +5,7 @@ import recurrence
 import structlog
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
-from django.db.models import Q, QuerySet, UniqueConstraint
+from django.db.models import Case, F, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
 from recurrence.fields import RecurrenceField
 
 from octopoes.models.ooi.dns.zone import Hostname
@@ -25,6 +25,31 @@ class ScanLevel(models.IntegerChoices):
     L4 = 4
 
 
+class PluginQuerySet(models.QuerySet):
+    def with_enabled(self, organization: Organization | None):
+        global_subquery = EnabledPlugin.objects.filter(Q(organization=None), plugin=OuterRef("pk"))
+        subquery = EnabledPlugin.objects.filter(Q(organization=organization), plugin=OuterRef("pk"))
+
+        qs = self.annotate(
+            global_enabled=Subquery(global_subquery.values("enabled")),
+            global_enabled_id=Subquery(global_subquery.values("pk")),
+            specific_enabled=Subquery(subquery.values("enabled")),
+            specific_enabled_id=Subquery(subquery.values("pk")),
+        ).annotate(
+            enabled=Case(
+                When(specific_enabled__isnull=False, then=F("specific_enabled")),
+                When(global_enabled__isnull=False, then=F("global_enabled")),
+                default=False,
+            ),
+            enabled_id=Case(
+                When(specific_enabled_id__isnull=False, then=F("specific_enabled_id")),
+                When(global_enabled_id__isnull=False, then=F("global_enabled_id")),
+            ),
+        )
+
+        return qs
+
+
 class Plugin(models.Model):
     plugin_id = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)  # TODO: updated_at?
@@ -42,6 +67,8 @@ class Plugin(models.Model):
     oci_image = models.CharField(max_length=256, null=True)
     oci_arguments = ArrayField(models.CharField(max_length=256, blank=True), default=list)
     version = models.CharField(max_length=16, null=True)
+
+    objects = PluginQuerySet.as_manager()
 
     def types_in_arguments(self):
         return list(
@@ -75,6 +102,20 @@ class Plugin(models.Model):
             return enabled_plugin.enabled
 
         return False
+
+    def enable_for(self, organization: Organization | None) -> "EnabledPlugin":
+        enabled_plugin, created = EnabledPlugin.objects.get_or_create(plugin=self, organization=organization)
+        enabled_plugin.enabled = True
+        enabled_plugin.save()
+
+        return enabled_plugin
+
+    def disable_for(self, organization: Organization | None) -> "EnabledPlugin":
+        enabled_plugin, created = EnabledPlugin.objects.get_or_create(plugin=self, organization=organization)
+        enabled_plugin.enabled = False
+        enabled_plugin.save()
+
+        return enabled_plugin
 
     def __str__(self):
         return f"{self.plugin_id}"

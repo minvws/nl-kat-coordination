@@ -41,6 +41,9 @@
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
+                {% if perms.openkat.can_enable_disable_plugin %}
+                    <th scope="col">{% translate "Toggle" %}</th>
+                {% endif %}
                 <th scope="col">{% translate "" %}</th>
                 <th scope="col">{% translate "" %}</th>
                 <th scope="col">{% translate "" %}</th>
@@ -68,9 +71,38 @@
                     {#                        </span>#}
                     {#                    </td>#}
                     <td>
-                        {% include "new_enable_disable_plugin.html" with plugin=plugin %}
-
+                        <span class="de-emphasized">
+                            {% if plugin.enabled %}
+                                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                            {% else %}
+                                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
+                            {% endif %}
+                        </span>
                     </td>
+                    {% if perms.openkat.can_enable_disable_plugin %}
+                        <td>
+                            <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
+                                  method="post"
+                                  class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
+                                <input type="hidden" name="organization" value="">
+                                <input type="hidden" name="organization" value="">
+                                <input type="hidden" name="plugin" value="{{ plugin.id }}">
+                                <input type="hidden"
+                                       name="enabled"
+                                       value="{% if not plugin.enabled %}true{% else %}false{% endif %}">
+                                <button type="submit"
+                                        class="button ghost {% if plugin.enabled %}destructive{% else %}plugin-enabled{% endif %}">
+                                    {% if not plugin.enabled %}
+                                        {% translate "Enable" %}
+                                    {% else %}
+                                        {% translate "Disable" %}
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    {% endif %}
                     {#                TODO: permissions #}
                     <td>
                         <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}&duplicate=true">

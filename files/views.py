@@ -9,14 +9,16 @@ from django.views.generic import CreateView
 from django_filters.views import FilterView
 
 from files.models import File
+from openkat.permissions import KATModelPermissionRequiredMixin
 
 logger = structlog.get_logger(__name__)
 
+
 class FileFilter(django_filters.FilterSet):
-    type = django_filters.CharFilter(label="Type", lookup_expr='icontains')
-    organizations__name = django_filters.CharFilter(label="Organization", lookup_expr='icontains')
-    file = django_filters.CharFilter(label="Location", lookup_expr='icontains')
-    task_result__task__data = django_filters.CharFilter(label="Search", lookup_expr='icontains')
+    type = django_filters.CharFilter(label="Type", lookup_expr="icontains")
+    organizations__name = django_filters.CharFilter(label="Organization", lookup_expr="icontains")
+    file = django_filters.CharFilter(label="Location", lookup_expr="icontains")
+    task_result__task__data = django_filters.CharFilter(label="Search", lookup_expr="icontains")
 
     class Meta:
         model = File
@@ -32,6 +34,9 @@ class FileListView(FilterView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+
+        if not self.request.user.can_access_all_organizations:
+            qs = qs.filter(organizations__members__user=self.request.user)
 
         if "task_id" in self.request.GET:
             qs = qs.filter(task_result__task__id=self.request.GET["task_id"])
@@ -51,7 +56,7 @@ class FileListView(FilterView):
         return context
 
 
-class FileCreateView(CreateView):
+class FileCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = File
     fields = ["file"]
     template_name = "file_form.html"
