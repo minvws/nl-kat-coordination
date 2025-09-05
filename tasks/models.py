@@ -84,9 +84,12 @@ class Task(models.Model):
     def cancel(self):
         from tasks.celery import app
 
-        app.control.revoke(str(self.id), terminate=True, signal="SIGKILL")
+        app.control.revoke(str(self.id), terminate=True)
         self.status = TaskStatus.CANCELLED
         self.save()
+
+    def done(self) -> bool:
+        return self.status in [TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED]
 
 
 class TaskResult(models.Model):

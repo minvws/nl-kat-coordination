@@ -75,6 +75,15 @@ class TaskRescheduleView(PermissionRequiredMixin, View):
         return redirect(reverse("new_task_list"))
 
 
+class TaskCancelView(PermissionRequiredMixin, View):
+    permission_required = ("tasks.change_tasks",)
+
+    def post(self, request, task_id, *args, **kwargs):
+        Task.objects.get(pk=task_id).cancel()
+
+        return redirect(reverse("new_task_list"))
+
+
 class NewScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
     input = django_filters.CharFilter(label="Input", lookup_expr="icontains")

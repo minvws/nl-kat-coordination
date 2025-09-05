@@ -79,10 +79,17 @@
                                     </td>
                                     <td>{{ task.created_at }}</td>
                                     <td>
+                                        {% if task.done %}
                                         <form action="{% url 'reschedule_task' task.id %}" method="post">
                                             {% csrf_token %}
                                             <button type="submit">{% translate "Reschedule" %}</button>
                                         </form>
+                                        {% else %}
+                                            <form action="{% url 'cancel_task' task.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit">{% translate "Cancel" %}</button>
+                                            </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -1,5 +1,6 @@
 import datetime
 import shlex
+import signal
 import uuid
 from datetime import timedelta, timezone
 from pathlib import Path
@@ -85,20 +86,34 @@ class PluginRunner:
         token.save()
 
         client = docker.from_env()
-        logs = client.containers.run(
+
+        container = client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(timezone.utc).timestamp()}",
             command=command,
             stdout=use_stdout,
             stderr=True,
-            remove=not keep,
             network=settings.DOCKER_NETWORK,
             entrypoint=self.entrypoint,
             volumes=[f"{self.adapter}:{self.entrypoint}"],
             environment=environment,
+            detach=True,
         )
+
+        # Add signal handler to kill the container as well (for cancelling tasks)
+        old_handle = signal.getsignal(signal.SIGTERM)
+
+        def handle(sig_num, stack_frame):
+            container.kill(sig_num)
+            old_handle(sig_num, stack_frame)
+
+        signal.signal(signal.SIGTERM, handle)
+
         # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
         #   after the container has gone.
+        container.wait()
+
+        signal.signal(signal.SIGTERM, old_handle)
 
         token.delete()
         plugin_user.delete()
@@ -106,7 +121,12 @@ class PluginRunner:
         if tmp_file:
             tmp_file.delete()
 
-        return logs.decode()
+        logs = container.logs().decode()
+
+        if not keep:
+            container.remove(force=True)
+
+        return logs
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
