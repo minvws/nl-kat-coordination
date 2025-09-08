@@ -56,6 +56,11 @@
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
                         </li>
+                        <li>
+                            {% url "object_set_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Object Sets" %}</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <div>

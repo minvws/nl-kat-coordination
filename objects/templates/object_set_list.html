@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Object Sets" %}</h1>
+            </div>
+            {% if perms.openkat.add_object_set %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "add_object_set" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Object Set" %}</a>
+                </div>
+            {% endif %}
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <button type="submit" class="icon ti-search"></button>
+                </div>
+            </form>
+            {% if not objectset_list %}
+                <div>
+                    <h2>{% translate "Object Sets" %}</h2>
+                    <p>{% translate "There are no object sets." %}</p>
+                </div>
+            {% else %}
+                <div class="horizontal-scroll sticky-column">
+                    <table rf-selector="table-scan-history" class="nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% translate "ID" %}</th>
+                                <th scope="col">{% translate "Name" %}</th>
+                                <th scope="col">{% translate "Object Query" %}</th>
+                                <th scope="col">{% translate "All Objects" %}</th>
+                                <th scope="col">{% translate "Subsets" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for object_set in objectset_list %}
+                                <tr data-object-set-id="{{ object_set.id }}">
+                                    <td>
+                                        <a href="{% url "object_set_detail" pk=object_set.id %}">{{ object_set.id }}</a>
+                                    </td>
+                                    <td>{{ object_set.name }}</td>
+                                    <td>{{ object_set.object_query }}</td>
+                                    <td>{{ object_set.all_objects }}</td>
+                                    <td>{{ object_set.subsets }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}

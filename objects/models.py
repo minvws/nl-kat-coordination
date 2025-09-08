@@ -2,10 +2,6 @@ from django.db import models
 from django.db.models import QuerySet
 
 
-class ObjectQuery(models.Model):
-    query = models.TextField(null=False)
-
-
 class Object(models.Model):
     type = models.CharField(max_length=64, unique=True)
     value = models.TextField()
@@ -17,7 +13,7 @@ class ObjectSet(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True)
     dynamic = models.BooleanField(default=False)
-    object_query = models.ForeignKey(ObjectQuery, on_delete=models.CASCADE, related_name="object_sets", null=True)
+    object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
     all_objects = models.ManyToManyField(Object, blank=True, related_name="object_sets")

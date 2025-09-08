@@ -59,7 +59,7 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
 
         if schedule.object_set.object_query:
             try:
-                query = Query.from_path(schedule.object_set.object_query.query)
+                query = Query.from_path(schedule.object_set.object_query)
             except (ValueError, TypeNotFound):
                 raise ValueError(f"Invalid query: {schedule.object_set.object_query}")
 
