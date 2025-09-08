@@ -31,6 +31,7 @@
                                 <th scope="col">{% translate "Input Data" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Status" %}</th>
+                                <th scope="col">{% translate "Schedule" %}</th>
                                 <th scope="col">{% translate "Results" %}</th>
                                 <th scope="col">{% translate "Created" %}</th>
                                 <th scope="col">{% translate "" %}</th>
@@ -73,6 +74,15 @@
                                     </td>
                                     <td>
                                         <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
+                                    </td>
+                                    <td>
+                                        {% if task.new_schedule_id %}
+                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">
+                                                {{ task.new_schedule_id }}
+                                            </a>
+                                        {% else %}
+                                            No Schedule
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate 'See Results' %}</a>

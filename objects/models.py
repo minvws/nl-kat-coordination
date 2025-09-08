@@ -32,3 +32,6 @@ class ObjectSet(models.Model):
             all_objects = all_objects.union(subset.traverse_objects(depth + 1, max_depth))
 
         return all_objects
+
+    def __str__(self):
+        return self.name or super().__str__()

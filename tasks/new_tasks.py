@@ -9,7 +9,10 @@ from django.db.models import Q
 
 from files.models import File
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
 from octopoes.models.exception import TypeNotFound
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.xtdb.query import Aliased, Query
 from openkat.models import Organization
 from plugins.models import Plugin
@@ -35,8 +38,9 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
         pass
 
     now = datetime.now(timezone.utc)
+    orgs = schedule.plugin.enabled_organizations() if not schedule.organization else [schedule.organization]
 
-    for org in schedule.plugin.enabled_organizations():
+    for org in orgs:
         connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
 
         if not schedule.object_set:
@@ -49,13 +53,6 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             continue
 
         # TODO: will be replaced with direct(er) queries in XTDB 2.0
-        if not schedule.object_set:
-            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
-            if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
-                continue
-
-            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
 
         if schedule.object_set.object_query:
             try:
@@ -84,16 +81,18 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             if not force:
                 # Filter on the schedule and created after the previous occurrence
                 last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+
+                if input_data:
                 # Join the input data targets into a large or-query, checking for task with any of the targets as input
-                filters = reduce(
-                    operator.or_,
-                    [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
-                )
-                target_lists = last_runs.filter(filters).values_list("data__input_data", flat=True)
+                    filters = reduce(
+                        operator.or_,
+                        [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
+                    )
+                    last_runs = last_runs.filter(filters)
 
                 skip = set()
 
-                for target in target_lists:
+                for target in last_runs.values_list("data__input_data", flat=True):
                     if isinstance(target, list):
                         skip |= set(target)
                     else:
@@ -108,29 +107,40 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
             run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
         else:
             values = schedule.object_set.traverse_objects().values_list("value", flat=True)
-            # objects = [f"Hostname|internet|{x}" for x in values]
-
             scan_profiles = connector.octopoes.scan_profile_repository.get_bulk(list(values), now)
-            input_data = {
-                str(profile.reference)
-                for profile in scan_profiles
-                if profile.level.value >= schedule.plugin.scan_level
-            }.intersection(set(values))
+            input_data = set()
+
+            for profile in scan_profiles:
+                if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
+                    continue
+
+                if profile.reference.class_type == Hostname:
+                    input_data.add(profile.reference.tokenized.name)
+                    continue
+
+                if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+                    input_data.add(str(profile.reference.tokenized.address))
+                    continue
+
+                input_data.add(str(profile.reference))
 
             # TODO: deduplicate
             if not force:
                 # Filter on the schedule and created after the previous occurrence
                 last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
-                # Join the input data targets into a large or-query, checking for task with any of the targets as input
-                filters = reduce(
-                    operator.or_,
-                    [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
-                )
-                target_lists = last_runs.filter(filters).values_list("data__input_data", flat=True)
+
+
+                if input_data:
+                    # Join the input data targets into a large or-query, checking for task with any of the targets as input
+                    filters = reduce(
+                        operator.or_,
+                        [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
+                    )
+                    last_runs = last_runs.filter(filters)
 
                 skip = set()
 
-                for target in target_lists:
+                for target in last_runs.values_list("data__input_data", flat=True):
                     if isinstance(target, list):
                         skip |= set(target)
                     else:

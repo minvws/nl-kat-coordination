@@ -116,7 +116,7 @@ class ObjectSetDetailView(DetailView):
 
 class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = ObjectSet
-    fields = ["name", "description", "object_query", "dynamic"]
+    fields = ["name", "all_objects", "object_query", "description", "dynamic"]
     template_name = "object_set_form.html"
 
     def get_success_url(self, **kwargs):
