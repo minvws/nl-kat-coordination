@@ -31,7 +31,7 @@
                               class="{% if order_by == "oci_image" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "oci_image" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                {#                <th>{% translate "Arguments" %}</th>#}
+                <th>{% translate "Version" %}</th>
                 <th scope="col"
                     class="sortable"
                     {% if order_by == "enabled" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
@@ -59,9 +59,18 @@
                     <td>
                         <span class="plugin-oci-image">
                             {% if plugin.oci_image %}
-                                <strong>{{ plugin.oci_image }}</strong>
+                                <strong>{{ plugin.repository }}</strong>
                             {% else %}
                                 No Image
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="plugin-version">
+                            {% if plugin.real_version %}
+                                <strong>{{ plugin.real_version }}</strong>
+                            {% else %}
+                                No Version
                             {% endif %}
                         </span>
                     </td>

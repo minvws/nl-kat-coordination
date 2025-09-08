@@ -6,6 +6,7 @@ import structlog
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
 from django.db.models import Case, F, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
+from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
 from octopoes.models.ooi.dns.zone import Hostname
@@ -69,6 +70,26 @@ class Plugin(models.Model):
     version = models.CharField(max_length=16, null=True)
 
     objects = PluginQuerySet.as_manager()
+
+    def repository(self) -> str | None:
+        if not self.oci_arguments:
+            return None
+
+        repository, tag = parse_repository_tag(self.oci_image)
+
+        return repository
+
+    def real_version(self) -> str | None:
+        if self.version:
+            return self.version
+
+        if not self.oci_arguments:
+            return None
+
+        repository, tag = parse_repository_tag(self.oci_image)
+        # Note: to resolve to the registry, use resolve_repository_name(repository)
+
+        return tag or "latest"
 
     def types_in_arguments(self):
         return list(
