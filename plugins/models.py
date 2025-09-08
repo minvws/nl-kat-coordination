@@ -9,6 +9,7 @@ from django.db.models import Case, F, OuterRef, Q, QuerySet, Subquery, UniqueCon
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
+from objects.models import ObjectSet
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.types import ALL_TYPES_MAP
@@ -184,18 +185,17 @@ class EnabledPlugin(models.Model):
         # TODO: once moved to XTDB 2.0 we can revise this
         for ooi_type in self.plugin.types_in_arguments():
             if ooi_type == Hostname:
-                queries.append("Hostname.name")
+                queries.append(("Hostname.name", "All hostnames"))
             if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
-                queries.append(f"{ooi_type.get_object_type()}.address")
-
-        logger.info("q on", queries=queries)
+                queries.append((f"{ooi_type.get_object_type()}.address", "All IPs"))
 
         # So this is possibly the first time enabling the plugin for the organization
-        for query in queries:
+        for query, name in queries:
+            object_set = ObjectSet.objects.create(name=name, object_query=query, dynamic=True)
             NewSchedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
-                input=query,
+                object_set=object_set,
                 organization=self.organization,
                 recurrences=self.plugin.recurrences
                 if self.plugin.recurrences and str(self.plugin.recurrences)

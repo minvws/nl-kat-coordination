@@ -37,7 +37,7 @@
                                 <th scope="col"></th>
                                 <th scope="col">{% translate "Plugin" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
-                                <th scope="col">{% translate "Input" %}</th>
+                                <th scope="col">{% translate "Objects" %}</th>
                                 <th scope="col">{% translate "Schedule" %}</th>
                                 <th scope="col">{% translate "Tasks" %}</th>
                                 {#                                <th scope="col">{% translate "Run On" %}</th>#}
@@ -65,7 +65,11 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span>{{ schedule.object_set }}</span>
+                                        {% if schedule.object_set %}
+                                            <a href="{% url "object_set_detail" schedule.object_set.id %}">{{ schedule.object_set }}</a>
+                                        {% else %}
+                                            {% translate "No Objects" %}
+                                        {% endif %}
                                     </td>
                                     {#                                    <td>#}
                                     {#                                        <span>{{ schedule.run_on }}</span>#}
