@@ -8,9 +8,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from files.models import File
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
-from octopoes.models.exception import TypeNotFound
+from octopoes.core.service import OctopoesService
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.xtdb.query import Aliased, Query
@@ -33,126 +31,93 @@ def reschedule() -> None:
     logger.info("Finished scheduling plugins")
 
 
-def run_schedule(schedule: NewSchedule, force: bool = True):
+def run_schedule(schedule: NewSchedule, force: bool = True) -> None:
     if not schedule.plugin:
-        pass
+        return
 
-    now = datetime.now(timezone.utc)
     orgs = schedule.plugin.enabled_organizations() if not schedule.organization else [schedule.organization]
 
     for org in orgs:
-        connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
+        run_schedule_for_org(schedule, org, force)
 
-        if not schedule.object_set:
-            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
-            if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
-                continue
 
-            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
+def run_schedule_for_org(schedule: NewSchedule, organization: Organization, force: bool = True) -> None:
+    now = datetime.now(timezone.utc)
+    octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
+
+    if not schedule.object_set:
+        last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
+        if last_run and not schedule.recurrences.between(last_run.created_at, now):
+            logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
+            return
+
+        run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
+        return
+
+    input_data = set()
+    # TODO: will be replaced with direct(er) queries in XTDB 2.0
+    if schedule.object_set.object_query and schedule.object_set.dynamic is True:
+        query = Query.from_path(schedule.object_set.object_query)
+        pk = Aliased(query.result_type, field="primary_key")
+        objects = octopoes.ooi_repository.query(query.find(pk).where(query.result_type, primary_key=pk), now)
+        by_pk = {item[-1]: item[0] for item in objects}
+
+        scan_profiles = octopoes.scan_profile_repository.get_bulk({x for x in by_pk}, now)
+        input_data = input_data.union(
+            {by_pk[str(sp.reference)] for sp in scan_profiles if sp.level.value >= schedule.plugin.scan_level}
+        )
+
+    values = schedule.object_set.traverse_objects().values_list("value", flat=True)
+
+    if not values and not input_data:
+        return
+
+    scan_profiles = octopoes.scan_profile_repository.get_bulk(set(values), now)
+
+    for profile in scan_profiles:
+        if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
             continue
 
-        # TODO: will be replaced with direct(er) queries in XTDB 2.0
+        if profile.reference.class_type == Hostname:
+            input_data.add(profile.reference.tokenized.name)
+            continue
 
-        if schedule.object_set.object_query:
-            try:
-                query = Query.from_path(schedule.object_set.object_query)
-            except (ValueError, TypeNotFound):
-                raise ValueError(f"Invalid query: {schedule.object_set.object_query}")
+        if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+            input_data.add(str(profile.reference.tokenized.address))
+            continue
 
-            pk = Aliased(query.result_type, field="primary_key")
+        input_data.add(str(profile.reference))
 
-            objects = connector.octopoes.ooi_repository.query(
-                query.find(pk).where(query.result_type, primary_key=pk), now
-            )
-            by_pk = {item[-1]: item[0] for item in objects}
-            scan_profiles = connector.octopoes.scan_profile_repository.get_bulk([x for x in by_pk], now)
+    if force:
+        run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+        return
 
-            input_data = list(
-                sorted(
-                    [
-                        by_pk[str(profile.reference)]
-                        for profile in scan_profiles
-                        if profile.level.value >= schedule.plugin.scan_level
-                    ]
-                )
-            )
+    # Filter on the schedule and created after the previous occurrence
+    last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
 
-            if not force:
-                # Filter on the schedule and created after the previous occurrence
-                last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+    if input_data:
+        # Join the input data targets into a large or-query, checking for task with any of the targets as input
+        filters = reduce(
+            operator.or_,
+            [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
+        )
+        last_runs = last_runs.filter(filters)
 
-                if input_data:
-                # Join the input data targets into a large or-query, checking for task with any of the targets as input
-                    filters = reduce(
-                        operator.or_,
-                        [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
-                    )
-                    last_runs = last_runs.filter(filters)
+    skip = set()
 
-                skip = set()
-
-                for target in last_runs.values_list("data__input_data", flat=True):
-                    if isinstance(target, list):
-                        skip |= set(target)
-                    else:
-                        skip.add(target)
-
-                # filter out these targets
-                input_data = set(input_data) - skip
-
-                if not input_data:
-                    continue
-
-            run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
+    for target in last_runs.values_list("data__input_data", flat=True):
+        if isinstance(target, list):
+            skip |= set(target)
         else:
-            values = schedule.object_set.traverse_objects().values_list("value", flat=True)
-            scan_profiles = connector.octopoes.scan_profile_repository.get_bulk(list(values), now)
-            input_data = set()
+            skip.add(target)
 
-            for profile in scan_profiles:
-                if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
-                    continue
+    # filter out these targets
+    input_data = set(input_data) - skip
 
-                if profile.reference.class_type == Hostname:
-                    input_data.add(profile.reference.tokenized.name)
-                    continue
+    if not input_data:
+        return
 
-                if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-                    input_data.add(str(profile.reference.tokenized.address))
-                    continue
-
-                input_data.add(str(profile.reference))
-
-            # TODO: deduplicate
-            if not force:
-                # Filter on the schedule and created after the previous occurrence
-                last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
-
-
-                if input_data:
-                    # Join the input data targets into a large or-query, checking for task with any of the targets as input
-                    filters = reduce(
-                        operator.or_,
-                        [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
-                    )
-                    last_runs = last_runs.filter(filters)
-
-                skip = set()
-
-                for target in last_runs.values_list("data__input_data", flat=True):
-                    if isinstance(target, list):
-                        skip |= set(target)
-                    else:
-                        skip.add(target)
-
-                # filter out these targets
-                input_data = set(input_data) - skip
-
-                if not input_data:
-                    continue
-
-            run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
+    run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
 def rerun_task(task: Task):

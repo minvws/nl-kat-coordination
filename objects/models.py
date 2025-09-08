@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.db.models import QuerySet
 
@@ -16,7 +17,7 @@ class ObjectSet(models.Model):
     # TODO: organization field?
     name = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True)
-    dynamic = models.BooleanField(default=False)
+    dynamic = models.BooleanField(default=False)  # TODO
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
