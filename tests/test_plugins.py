@@ -156,7 +156,7 @@ def test_enabling_plugin_creates_schedule():
 
     assert schedule.enabled
     assert schedule.organization is None
-    assert schedule.input == ""
+    assert schedule.object_set.traverse_objects().count() == 0
     assert schedule.run_on is None
     assert schedule.operation is None
 

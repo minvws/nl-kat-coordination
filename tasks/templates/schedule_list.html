@@ -65,7 +65,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <span>{{ schedule.input }}</span>
+                                        <span>{{ schedule.object_set }}</span>
                                     </td>
                                     {#                                    <td>#}
                                     {#                                        <span>{{ schedule.run_on }}</span>#}
@@ -94,7 +94,7 @@
                                                 <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
                                                 <input type="hidden" name="schedule" value="{{ schedule.id }}">
                                                 <input type="hidden" name="recurrences" value="{{ schedule.recurrences }}">
-                                                <input type="hidden" name="input" value="{{ schedule.input }}">
+                                                <input type="hidden" name="object_set" value="{{ schedule.object_set }}">
                                                 {% if schedule.enabled %}
                                                     <input type="hidden" name="enabled" value="false">
                                                     <button type="submit" class="button ghost destructive">{% translate "Disable" %}</button>

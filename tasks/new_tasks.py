@@ -39,14 +39,29 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
     for org in schedule.plugin.enabled_organizations():
         connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(org.code)
 
-        # TODO: will be replaced with direct(er) queries in XTDB 2.0
-        if schedule.input:
-            try:
-                query = Query.from_path(schedule.input)
-            except (ValueError, TypeNotFound):
-                run_plugin_task(schedule.plugin.plugin_id, org.code, schedule.input, schedule.id)
-
+        if not schedule.object_set:
+            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
+            if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
                 continue
+
+            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
+            continue
+
+        # TODO: will be replaced with direct(er) queries in XTDB 2.0
+        if not schedule.object_set:
+            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
+            if last_run and not schedule.recurrences.between(last_run.created_at, now):
+                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
+                continue
+
+            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
+
+        if schedule.object_set.object_query:
+            try:
+                query = Query.from_path(schedule.object_set.object_query.query)
+            except (ValueError, TypeNotFound):
+                raise ValueError(f"Invalid query: {schedule.object_set.object_query}")
 
             pk = Aliased(query.result_type, field="primary_key")
 
@@ -92,12 +107,42 @@ def run_schedule(schedule: NewSchedule, force: bool = True):
 
             run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
         else:
-            last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
-            if last_run and not schedule.recurrences.between(last_run.created_at, now):
-                logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
-                continue
+            values = schedule.object_set.traverse_objects().values_list("value", flat=True)
+            # objects = [f"Hostname|internet|{x}" for x in values]
 
-            run_plugin_task(schedule.plugin.plugin_id, org.code, None, schedule.id)
+            scan_profiles = connector.octopoes.scan_profile_repository.get_bulk(list(values), now)
+            input_data = {
+                str(profile.reference)
+                for profile in scan_profiles
+                if profile.level.value >= schedule.plugin.scan_level
+            }.intersection(set(values))
+
+            # TODO: deduplicate
+            if not force:
+                # Filter on the schedule and created after the previous occurrence
+                last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+                # Join the input data targets into a large or-query, checking for task with any of the targets as input
+                filters = reduce(
+                    operator.or_,
+                    [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data],
+                )
+                target_lists = last_runs.filter(filters).values_list("data__input_data", flat=True)
+
+                skip = set()
+
+                for target in target_lists:
+                    if isinstance(target, list):
+                        skip |= set(target)
+                    else:
+                        skip.add(target)
+
+                # filter out these targets
+                input_data = set(input_data) - skip
+
+                if not input_data:
+                    continue
+
+            run_plugin_task(schedule.plugin.plugin_id, org.code, input_data, schedule.id)
 
 
 def rerun_task(task: Task):

@@ -118,7 +118,7 @@ class ScheduleListView(FilterView):
 class NewScheduleForm(ModelForm):
     class Meta:
         model = NewSchedule
-        fields = ["enabled", "recurrences", "input"]
+        fields = ["enabled", "recurrences", "object_set"]
 
 
 class ScheduleDetailView(DetailView):
@@ -138,7 +138,7 @@ class ScheduleDetailView(DetailView):
 
 class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = NewSchedule
-    fields = ["plugin", "input", "organization", "recurrences", "enabled"]
+    fields = ["plugin", "object_set", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
 
     def form_valid(self, form):
@@ -171,7 +171,7 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = NewSchedule
-    fields = ["enabled", "recurrences", "input"]
+    fields = ["enabled", "recurrences", "object_set"]
 
     def form_valid(self, form):
         result = super().form_valid(form)
