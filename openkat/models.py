@@ -37,8 +37,8 @@ class UserManager(BaseUserManager["User"]):
         return self.create_user(email, password, **extra_fields)
 
 
-class LowercaseEmailField(models.EmailField[str, str]):
-    """Override EmailField to convert emails to lowercase before saving."""
+class LowerCaseCharField(models.CharField[str, str]):
+    """Override CharField to convert value to lowercase before saving."""
 
     def to_python(self, value: Any | None) -> str | None:
         """Convert email to lowercase."""
@@ -48,11 +48,22 @@ class LowercaseEmailField(models.EmailField[str, str]):
 
         return str_value.lower()
 
+    def pre_save(self, model_instance: models.Model, add: bool) -> str | None:  # noqa: FBT001, ARG002
+        value: str | None = getattr(model_instance, self.attname)
+        if value:
+            value = value.lower()
+            setattr(model_instance, self.attname, value)
+        return value
+
+
+class LowerCaseEmailField(LowerCaseCharField, models.EmailField[str, str]):
+    """Override EmailField to convert emails to lowercase before saving."""
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     id: int
     full_name: models.CharField[str, str] = models.CharField(_("full name"), max_length=150)
-    email: LowercaseEmailField = LowercaseEmailField(_("email"), max_length=254, unique=True)
+    email: LowerCaseEmailField = LowerCaseEmailField(_("email"), max_length=254, unique=True)
     is_staff: models.BooleanField[bool, bool] = models.BooleanField(
         _("staff status"), default=False, help_text=_("Designates whether the user can log into this admin site.")
     )
@@ -69,3 +80,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS: ClassVar[list[str]] = ["full_name"]
 
     objects = UserManager()
+
+    class Meta:
+        managed = False
+
+
+class Organization(models.Model):
+    id: int
+    name: models.CharField[str, str] = models.CharField(
+        max_length=126, unique=True, help_text=_("The name of the organisation")
+    )
+
+    class Meta:
+        managed = False
+
+    def __str__(self) -> str:
+        return self.name
