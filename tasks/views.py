@@ -90,7 +90,7 @@ class NewScheduleFilter(django_filters.FilterSet):
 
     class Meta:
         model = NewSchedule
-        fields = ["organization", "plugin__plugin_id", "input", "enabled"]
+        fields = ["organization", "plugin__plugin_id", "input", "enabled", "object_set"]
 
 
 class ScheduleListView(FilterView):

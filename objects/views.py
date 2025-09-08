@@ -12,9 +12,11 @@ from django.views.generic import CreateView, DetailView, ListView
 from django_filters.views import FilterView
 
 from objects.models import ObjectSet
+from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
 from octopoes.models.types import get_collapsed_types
+from octopoes.xtdb.query import Aliased, Query
 from openkat.enums import CUSTOM_SCAN_LEVEL
 from openkat.forms.ooi_form import _EXCLUDED_OOI_TYPES, OOISearchForm, OOITypeMultiCheckboxForm
 from openkat.models import Organization
@@ -110,6 +112,30 @@ class ObjectSetDetailView(DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
 
         ]
+
+        now = datetime.datetime.now(timezone.utc)
+        obj = self.get_object()
+
+        # TODO: handle...
+        org = Organization.objects.first()
+        connector = settings.OCTOPOES_FACTORY(org.code)
+
+        if obj.object_query:
+            try:
+                query = Query.from_path(obj.object_query)
+            except (ValueError, TypeNotFound):
+                raise ValueError(f"Invalid query: {obj.object_query}")
+
+            pk = Aliased(query.result_type, field="primary_key")
+            objects = connector.octopoes.ooi_repository.query(
+                query.find(pk).where(query.result_type, primary_key=pk).limit(10), now,
+            )
+
+            context["preview"] = [obj[1] for obj in objects]
+            context["preview_organization"] = org
+        else:
+            context["preview"] = None
+            context["preview_organization"] = None
 
         return context
 

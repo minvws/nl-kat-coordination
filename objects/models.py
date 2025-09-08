@@ -3,13 +3,17 @@ from django.db.models import QuerySet
 
 
 class Object(models.Model):
-    type = models.CharField(max_length=64, unique=True)
+    type = models.CharField(max_length=64)
     value = models.TextField()
+
+    def __str__(self):
+        return self.value
 
 
 class ObjectSet(models.Model):
     """ Composite-like model representing a set of objects that can be used as an input for tasks """
 
+    # TODO: organization field?
     name = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True)
     dynamic = models.BooleanField(default=False)

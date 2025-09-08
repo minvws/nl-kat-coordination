@@ -98,7 +98,7 @@
                                                 <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
                                                 <input type="hidden" name="schedule" value="{{ schedule.id }}">
                                                 <input type="hidden" name="recurrences" value="{{ schedule.recurrences }}">
-                                                <input type="hidden" name="object_set" value="{{ schedule.object_set }}">
+                                                <input type="hidden" name="object_set" value="{{ schedule.object_set.id }}">
                                                 {% if schedule.enabled %}
                                                     <input type="hidden" name="enabled" value="false">
                                                     <button type="submit" class="button ghost destructive">{% translate "Disable" %}</button>
