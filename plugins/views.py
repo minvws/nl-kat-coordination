@@ -20,8 +20,8 @@ from tasks.models import Task, TaskStatus
 
 class PluginFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    plugin_id = django_filters.CharFilter(label="Plugin Id", lookup_expr="icontains")
-    oci_image = django_filters.CharFilter(label="OCI Image", lookup_expr="icontains")
+    plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
+    oci_image = django_filters.CharFilter(label="Image", lookup_expr="icontains")
     enabled = django_filters.BooleanFilter(label="Enabled")
     scan_level = django_filters.MultipleChoiceFilter(choices=ScanLevel.choices, label="Scan Level")
 
