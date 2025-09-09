@@ -142,6 +142,52 @@
     ]
   },
   {
+    "plugin_id": "subfinder",
+    "name": "Subfinder",
+    "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
+    "scan_level": 1,
+    "oci_image": "projectdiscovery/subfinder:v2.6.6",
+    "oci_arguments": [
+      "subfinder",
+      "-silent",
+      "-active",
+      "-rate-limit",
+      "0",
+      "-json",
+      "-d",
+      "{hostname}"
+    ]
+  },
+  {
+    "plugin_id": "subfinder-bulk",
+    "name": "Subfinder Bulk",
+    "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
+    "scan_level": 1,
+    "oci_image": "projectdiscovery/subfinder:v2.6.6",
+    "oci_arguments": [
+      "subfinder",
+      "-silent",
+      "-active",
+      "-rate-limit",
+      "0",
+      "-json"
+    ]
+  },
+  {
+    "plugin_id": "parse-subfinder",
+    "name": "Parse Subfinder hostnames",
+    "consumes": [
+      "file:nuclei-tls-version",
+      "file:nuclei-tls-version-bulk"
+    ],
+    "oci_image": "projectdiscovery/subfinder:v2.6.6",
+    "oci_arguments": [
+      "sh",
+      "-c",
+      "uv run cat.py {file} | uv run store.py -h"
+    ]
+  },
+  {
     "plugin_id": "masscan",
     "name": "Masscan",
     "scan_level": 2,
@@ -170,7 +216,7 @@
     "oci_arguments": [
       "sh",
       "-c",
-      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], \"Hostname|internet|\" +.host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store_findings.py"
+      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], \"Hostname|internet|\" +.host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f"
     ]
   }
 ]

@@ -1,14 +1,12 @@
+import argparse
 import json
 import os
-import re
 import sys
 
 import httpx
 
-CVE_PATTERN = re.compile(r"CVE-\d{4}-\d{4,}")
 
-
-def main():
+def findings() -> list[dict]:
     results = []
     for line in sys.stdin.readlines():
         finding_type_id, ooi = line.strip().split("\t", maxsplit=1)
@@ -21,10 +19,25 @@ def main():
     return results
 
 
+def hostnames() -> list[dict]:
+    return [
+        {"object_type": "Hostname", "name": l.strip(), "network": "Network|internet"} for l in sys.stdin.readlines()
+    ]
+
+
 if __name__ == "__main__":
     """ expects sys.stdin to have a newline separted list of finding_type_ids and ooi pks, separated by a tab """
+    parser = argparse.ArgumentParser(description='Optional app description')
+    parser.add_argument('-f', '--findings', action='store_true')
+    parser.add_argument('-h', '--hostnames', action='store_true')
+    args = parser.parse_args()
 
-    results = main()
+    if args.findings:
+        results = findings()
+    elif args.hostnames:
+        results = hostnames()
+    else:
+        raise ValueError("No target type defined")
 
     if os.getenv("UPLOAD_URL") != "/dev/null":
         headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
