@@ -18,7 +18,7 @@ COPY ./boefjes/logging.json logging.json
 ENTRYPOINT ["/usr/local/bin/python", "-m", "worker"]
 CMD []
 
-FROM base as builder
+FROM base AS builder
 
 ARG BOEFJE_PATH
 
