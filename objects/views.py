@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django_filters.views import FilterView
 
 from objects.models import ObjectSet
@@ -144,6 +144,21 @@ class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = ObjectSet
     fields = ["name", "all_objects", "object_query", "description", "dynamic"]
     template_name = "object_set_form.html"
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("object_set_list")
+
+
+class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = ObjectSet
+
+    def form_invalid(self, form):
+        return redirect(reverse("object_set_list"))
 
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")

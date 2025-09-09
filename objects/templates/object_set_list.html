@@ -38,6 +38,7 @@
                                 <th scope="col">{% translate "Object Query" %}</th>
                                 <th scope="col">{% translate "Objects" %}</th>
                                 <th scope="col">{% translate "Schedules" %}</th>
+                                <th scope="col">{% translate "" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,6 +60,12 @@
                                     </td>
                                     <td>
                                         <a href="{% url "schedule_list" %}?object_set={{ object_set.id }}">See Schedules</a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'delete_object_set' object_set.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}

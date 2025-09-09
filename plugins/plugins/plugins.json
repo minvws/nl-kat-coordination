@@ -183,14 +183,14 @@
     "plugin_id": "parse-subfinder",
     "name": "Parse Subfinder hostnames",
     "consumes": [
-      "file:nuclei-tls-version",
-      "file:nuclei-tls-version-bulk"
+      "file:subfinder",
+      "file:subfinder-bulk"
     ],
-    "oci_image": "projectdiscovery/subfinder:v2.6.6",
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
     "oci_arguments": [
       "sh",
       "-c",
-      "uv run cat.py {file} | uv run store.py -h"
+      "uv run cat.py {file} | jq .host -r | uv run store.py -h"
     ]
   },
   {

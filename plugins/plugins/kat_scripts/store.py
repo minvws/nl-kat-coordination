@@ -27,7 +27,7 @@ def hostnames() -> list[dict]:
 
 if __name__ == "__main__":
     """ expects sys.stdin to have a newline separted list of finding_type_ids and ooi pks, separated by a tab """
-    parser = argparse.ArgumentParser(description='Optional app description')
+    parser = argparse.ArgumentParser(description='Optional app description', add_help=False)
     parser.add_argument('-f', '--findings', action='store_true')
     parser.add_argument('-h', '--hostnames', action='store_true')
     args = parser.parse_args()

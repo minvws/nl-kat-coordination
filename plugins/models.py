@@ -166,11 +166,12 @@ class EnabledPlugin(models.Model):
         return member.has_perm("openkat.can_scan_organization")
 
     def save(self, *args, **kwargs):
-        try:
-            self.initialize_schedules()
-        except DatabaseError:
-            logger.warning("Could not aligns schedules for plugin: %s", self)
-            raise
+        if self.enabled:
+            try:
+                self.initialize_schedules()
+            except DatabaseError:
+                logger.warning("Could not aligns schedules for plugin: %s", self)
+                raise
 
         return super().save(*args, **kwargs)
 
