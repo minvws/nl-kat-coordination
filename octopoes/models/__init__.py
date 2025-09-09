@@ -257,6 +257,9 @@ class PrimaryKeyToken(RootModel):
     root: dict[str, str | PrimaryKeyToken]
 
     def __getattr__(self, item: str) -> Any:
+        if item not in self.root:
+            raise AttributeError
+
         return self.root[item]
 
     def __getitem__(self, item: str) -> Any:

@@ -62,14 +62,14 @@ def run(hostname: str, record_types: set[str]) -> list:
     if not answers and dmarc_results == "Timeout" and dkim_results == "Timeout":
         raise TimeoutException("No answers from DNS-Server due to timeouts.")
 
-    internet = dict(name="internet")
+    internet = dict(object_type="Network", name="internet")
 
     zone = None
     hostname_store = {}
     record_store = []
 
     def register_hostname(name: str) -> dict:
-        hostname = dict(network=f"Network|{internet['name']}", name=name.rstrip("."))
+        hostname = dict(object_type="Hostname", network=f"Network|{internet['name']}", name=name.rstrip("."))
         hostname_store[hostname["name"]] = hostname
         return hostname
 
@@ -146,7 +146,7 @@ def run(hostname: str, record_types: set[str]) -> list:
                     mail_hostname_reference = None
                     if str(rr.exchange) != ".":
                         mail_fqdn = register_hostname(str(rr.exchange))
-                        mail_hostname_reference = mail_fqdn["name"]
+                        mail_hostname_reference = f"Hostname|{internet['name']}|{mail_fqdn['name']}"
 
                     register_record(
                         dict(
