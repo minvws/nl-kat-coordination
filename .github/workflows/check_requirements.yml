@@ -51,7 +51,7 @@ jobs:
 
       - name: Commit, sign, and push changes
         if: ${{ github.actor == 'dependabot[bot]' }}
-        run: sh .github/scripts/commit_sign_push.sh
+        run: bash .github/scripts/commit_sign_push.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DESTINATION_BRANCH: ${{ github.ref }}
