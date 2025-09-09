@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
@@ -244,14 +244,22 @@ class OOIFilterForm(OOISearchForm, ClearanceFilterForm, OOITypeMultiCheckboxForm
         self.fields["search"].widget = forms.HiddenInput()
 
     def get_query(self) -> dict[str, Any]:
-        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
-        return {
-            "observed_at": observed_at.strftime("%Y-%m-%d"),
-            "ooi_type": self.cleaned_data.get("ooi_type", []),
-            "clearance_level": self.cleaned_data.get("clearance_level", []),
-            "clearance_type": self.cleaned_data.get("clearance_type", []),
-            "search": self.cleaned_data.get("search", ""),
-        }
+        fields = {}
+        observed_at = self.cleaned_data.get("observed_at", date.today())
+
+        if observed_at != date.today():
+            fields.update({"observed_at": observed_at.strftime("%Y-%m-%d")})
+
+        fields.update(
+            {
+                "ooi_type": self.cleaned_data.get("ooi_type", []),
+                "clearance_level": self.cleaned_data.get("clearance_level", []),
+                "clearance_type": self.cleaned_data.get("clearance_type", []),
+                "search": self.cleaned_data.get("search", ""),
+            }
+        )
+
+        return fields
 
 
 class FindingFilterForm(FindingSearchForm, MutedFindingSelectionForm, FindingSeverityMultiSelectForm, ObservedAtForm):
@@ -263,11 +271,18 @@ class FindingFilterForm(FindingSearchForm, MutedFindingSelectionForm, FindingSev
         self.fields["search"].widget = forms.HiddenInput()
 
     def get_query(self) -> dict[str, Any]:
-        observed_at = self.cleaned_data.get("observed_at", datetime.now(timezone.utc))
+        fields = {}
+        observed_at = self.cleaned_data.get("observed_at", date.today())
 
-        return {
-            "observed_at": observed_at.strftime("%Y-%m-%d"),
-            "severity": self.cleaned_data.get("severity"),
-            "muted_findings": self.cleaned_data.get("muted_findings", "non-muted"),
-            "search": self.cleaned_data.get("search", ""),
-        }
+        if observed_at != date.today():
+            fields.update({"observed_at": observed_at.strftime("%Y-%m-%d")})
+
+        fields.update(
+            {
+                "severity": self.cleaned_data.get("severity"),
+                "muted_findings": self.cleaned_data.get("muted_findings", "non-muted"),
+                "search": self.cleaned_data.get("search", ""),
+            }
+        )
+
+        return fields
