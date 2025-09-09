@@ -185,7 +185,11 @@ def run_plugin(
         task.ended_at = datetime.now(timezone.utc)
         task.save()
     except:
-        task.status = TaskStatus.FAILED
+        task.refresh_from_db(fields=["status"])
+
+        if task.status != TaskStatus.CANCELLED:
+            task.status = TaskStatus.FAILED
+
         task.ended_at = datetime.now(timezone.utc)
         task.save()
         raise
