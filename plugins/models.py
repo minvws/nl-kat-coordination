@@ -101,7 +101,7 @@ class Plugin(models.Model):
                 for part in arg[1:-1].lower().split("|")
                 if part in ALL_TYPES_MAP
             }
-        )
+        ) + [ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP]
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
