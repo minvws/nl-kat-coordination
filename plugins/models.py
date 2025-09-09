@@ -101,6 +101,17 @@ class Plugin(models.Model):
                 for part in arg[1:-1].lower().split("|")
                 if part in ALL_TYPES_MAP
             }
+        )
+
+    def consumed_types(self):
+        return list(
+            {
+                ALL_TYPES_MAP[part]
+                for arg in self.oci_arguments
+                if arg.startswith("{") and arg.endswith("}")
+                for part in arg[1:-1].lower().split("|")
+                if part in ALL_TYPES_MAP
+            }
         ) + [ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP]
 
     def enabled_organizations(self) -> QuerySet:
@@ -184,7 +195,7 @@ class EnabledPlugin(models.Model):
         queries = []
 
         # TODO: once moved to XTDB 2.0 we can revise this
-        for ooi_type in self.plugin.types_in_arguments():
+        for ooi_type in self.plugin.consumed_types():
             if ooi_type == Hostname:
                 queries.append(("Hostname.name", "All hostnames"))
             if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:

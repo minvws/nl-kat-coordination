@@ -50,6 +50,10 @@ class PluginRunner:
         tmp_file = None
 
         if isinstance(target, str):
+            if not plugin.types_in_arguments():
+                tmp_file = File.objects.create(file=TemporaryContent(target))
+                environment["IN_FILE"] = str(tmp_file.id)
+
             command = self.create_command(plugin.oci_arguments, target)
         elif target is None:
             command = plugin.oci_arguments
@@ -65,7 +69,7 @@ class PluginRunner:
                     for t in target:
                         logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
 
-                    return "".join(logs)
+                    return "\n".join(logs)
 
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 environment["IN_FILE"] = str(tmp_file.id)
