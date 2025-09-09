@@ -120,7 +120,7 @@ def run(hostname: str, record_types: set[str]) -> list:
                     register_record(
                         dict(
                             object_type="DNSARecord",
-                            address=f"IPV4address|{internet['name']}|{ipv4['address']}",
+                            address=f"IPAddressV4|{internet['name']}|{ipv4['address']}",
                             **default_args,
                         )
                     )
@@ -131,7 +131,7 @@ def run(hostname: str, record_types: set[str]) -> list:
                     register_record(
                         dict(
                             object_type="DNSAAAARecord",
-                            address=f"IPV6address|{internet['name']}|{ipv6['address']}",
+                            address=f"IPAddressV6|{internet['name']}|{ipv6['address']}",
                             **default_args,
                         )
                     )
