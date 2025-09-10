@@ -72,6 +72,7 @@ def run(file_id: str):
             open_ports = [f"IPPort|internet|{host.address}|{ooi['protocol']}|{ooi['port']}"
                           for ooi in result if ooi["object_type"] == "IPPort" and ooi["state"] == "open"]
 
+            # TODO: use address as filter if it's not in the pk anymore.
             params = {"object_type": "IPPort", "port": ports_scanned}
             ports = [x["primary_key"] for x in client.get("/objects/", params=params).json()["results"]]
 
