@@ -224,8 +224,6 @@ class EnabledPlugin(models.Model):
             )
 
         if not queries:
-            logger.info("not on")
-
             NewSchedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,

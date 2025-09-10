@@ -156,9 +156,18 @@ def test_enabling_plugin_creates_schedule():
 
     assert schedule.enabled
     assert schedule.organization is None
-    assert schedule.object_set.traverse_objects().count() == 0
+    assert schedule.object_set is None
     assert schedule.run_on is None
     assert schedule.operation is None
+
+    plugin = Plugin.objects.create(name="test2", plugin_id="testt2", consumes=["type:hostname"])
+    enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
+    schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
+
+    assert schedule.enabled
+    assert schedule.object_set is not None
+    assert schedule.object_set.traverse_objects().count() == 0
+
 
 
 def test_enabled_organizations(organization, organization_b):
