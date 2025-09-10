@@ -16,9 +16,9 @@ logger = structlog.get_logger(__name__)
 
 class FileFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(label="Type", lookup_expr="icontains")
-    organizations__name = django_filters.CharFilter(label="Organization", lookup_expr="icontains")
     file = django_filters.CharFilter(label="Location", lookup_expr="icontains")
-    task_result__task__data = django_filters.CharFilter(label="Search", lookup_expr="icontains")
+    organizations__name = django_filters.CharFilter(label="Organization", lookup_expr="icontains")
+    task_result__task__data = django_filters.CharFilter(label="Search Source", lookup_expr="icontains")
 
     class Meta:
         model = File

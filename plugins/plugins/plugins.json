@@ -1,7 +1,7 @@
 [
   {
     "plugin_id": "dns",
-    "name": "DNS 2",
+    "name": "DNS",
     "description": "Fetch the DNS record(s) of a hostname.",
     "scan_level": 1,
     "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
