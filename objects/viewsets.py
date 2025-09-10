@@ -8,41 +8,49 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from structlog import get_logger
 
+from objects.serializers import ObjectSerializer
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.types import OOIType, get_collapsed_types
-from openkat.forms.ooi_form import _EXCLUDED_OOI_TYPES
+from octopoes.models import Reference
+from octopoes.models.types import OOIType, type_by_name
+from octopoes.xtdb.query import InvalidField, Query
 from openkat.models import Organization
-from openkat.views.mixins import OOIList
 
 logger = get_logger(__name__)
-TYPE_ADAPTER = TypeAdapter(list[OOIType])
+OOI_TYPE_LIST = TypeAdapter(list[OOIType])
+REF_LIST = TypeAdapter(list[Reference])
 
 
-class ObjectCreateAPI(ViewSet):
-    def get_queryset(self):
-        # TODO: handle
+class ObjectViewSet(ViewSet):
+    def list(self, request, *args, **kwargs):
+        if "object_type" in request.GET:
+            q = Query(type_by_name(request.GET["object_type"]))
+        else:
+            q = Query()
+
+        for parameter, value in request.GET.items():
+            if parameter == "object_type":
+                continue
+            if parameter == "offset":
+                q = q.offset(int(value))
+                continue
+            if parameter == "limit":
+                q = q.limit(int(value))
+                continue
+
+            try:
+                q = q.where(q.result_type, **{parameter: value})
+            except InvalidField:
+                logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
+                continue
+
+        # TODO
         organization = Organization.objects.first()
+        connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
 
-        return OOIList(settings.OCTOPOES_FACTORY(organization.code), **self.get_queryset_params())
+        oois = connector.octopoes.ooi_repository.query(q, datetime.now(timezone.utc))
+        serializer = ObjectSerializer(oois, many=True)
 
-    def get_queryset_params(self):
-        return {
-            "valid_time": datetime.now(timezone.utc),
-            "ooi_types": {
-                t
-                for t in get_collapsed_types().difference(
-                    {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
-                )
-                if t not in _EXCLUDED_OOI_TYPES
-            },
-            "scan_level": settings.DEFAULT_SCAN_LEVEL_FILTER,
-            "scan_profile_type": settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-            "search_string": "",
-            "order_by": "scan_level" if self.request.GET.get("order_by", "") == "scan_level" else "object_type",
-            "asc_desc": "desc" if self.request.GET.get("sorting_order", "") == "desc" else "asc",
-        }
+        return Response(serializer.data)
 
     def create(self, request: Request, *args, **kwargs):
         objects = request.data
@@ -51,8 +59,22 @@ class ObjectCreateAPI(ViewSet):
         client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
         now = datetime.now(timezone.utc)
 
-        for ooi in TYPE_ADAPTER.validate_python(objects):
+        for ooi in OOI_TYPE_LIST.validate_python(objects):
             client.octopoes.ooi_repository.save(ooi, valid_time=now)
+
+        client.octopoes.commit()
+
+        return Response(status=HTTPStatus.CREATED)
+
+    def delete(self, request: Request, *args, **kwargs):
+        objects = request.data
+        organization = Organization.objects.first()
+
+        client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
+        now = datetime.now(timezone.utc)
+
+        for ooi in REF_LIST.validate_python(objects):
+            client.octopoes.ooi_repository.delete(ooi, valid_time=now)
 
         client.octopoes.commit()
 

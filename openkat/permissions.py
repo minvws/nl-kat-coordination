@@ -53,6 +53,12 @@ class KATModelPermissions(DjangoModelPermissions):
         if getattr(view, "_ignore_model_permissions", False):
             return True
 
+        from objects.viewsets import ObjectViewSet
+
+        if isinstance(view, ObjectViewSet):
+            perms = self.get_required_permissions(request.method, OOI)
+            return request.user.has_perms(perms)
+
         queryset = self._queryset(view)
 
         if isinstance(queryset, OOIList):
