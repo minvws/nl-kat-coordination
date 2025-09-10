@@ -216,15 +216,23 @@ class Query:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
         abstract_types = get_abstract_types()
 
-        if (
-            field_name not in ooi_type.model_fields
-            and field_name != "id"
-            and (
-                ooi_type not in abstract_types
-                or not any(field_name in concrete_type.model_fields for concrete_type in ooi_type.strict_subclasses())
-            )
-        ):
+        field_type = None
+
+        if field_name == "id":
+            field_type = str
+        elif field_name in ooi_type.model_fields:
+            field_type = ooi_type.model_fields[field_name].annotation
+        elif ooi_type in abstract_types:
+            for concrete_type in ooi_type.strict_subclasses():
+                if field_name in concrete_type.model_fields:
+                    field_type = concrete_type.model_fields[field_name].annotation
+                    break
+
+        if field_type is None:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
+
+        if field_type == int:
+            value = int(value)
 
         if isinstance(value, str):
             value = value.replace('"', r"\"")
@@ -236,6 +244,10 @@ class Query:
 
             if isinstance(value, bool):
                 self._add_or_statement_for_abstract_types(ref, field_name, str(value).lower())
+                return
+
+            if isinstance(value, int):
+                self._add_or_statement_for_abstract_types(ref, field_name, value)
                 return
 
             if not isinstance(value, type | Aliased):
@@ -251,6 +263,10 @@ class Query:
 
         if isinstance(value, bool):
             self._add_where_statement(ref, field_name, str(value).lower())
+            return
+
+        if isinstance(value, int):
+            self._add_where_statement(ref, field_name, value)
             return
 
         if not isinstance(value, type | Aliased):
@@ -297,7 +313,7 @@ class Query:
                 self._relationship(self._get_object_alias(ref), ooi_type.get_object_type(), field_name, to_alias)
             )
 
-    def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str) -> None:
+    def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str | int) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if ooi_type != OOI:
