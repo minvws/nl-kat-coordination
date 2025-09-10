@@ -108,8 +108,7 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
     setup_request(request, client_member.user)
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
-    assert mock_organization_view_octopoes().list_objects.call_count == 2
+    assert response.status_code == 302
     assert mock_organization_view_octopoes().delete_many.call_count == 1
 
 
@@ -159,7 +158,7 @@ def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_
     setup_request(request, client_member.user)
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
@@ -183,7 +182,7 @@ def test_update_scan_profile_single(rf, client_member, mock_organization_view_oc
     setup_request(request, client_member.user)
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
@@ -198,7 +197,7 @@ def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_vie
     setup_request(request, client_member.user)
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
