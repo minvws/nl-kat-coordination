@@ -13,17 +13,16 @@
     ]
   },
   {
-    "plugin_id": "dns-AAAAA",
-    "name": "DNS AAAAA",
-    "description": "Fetch the DNS A and AAAA record(s) of a hostname.",
+    "plugin_id": "dns-sec",
+    "name": "DNSSEC",
+    "description": "Validates DNSSEC of a hostname by checking the cryptographic signatures.",
     "scan_level": 1,
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_image": "noamblitz/drill:latest",
     "oci_arguments": [
-      "uv",
-      "run",
-      "kat_dns/main.py",
+      "drill",
+      "-DT",
       "{hostname}",
-      "A,AAAA"
+      "@1.1.1.1"
     ]
   },
   {
