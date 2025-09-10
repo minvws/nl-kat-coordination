@@ -63,19 +63,13 @@ def nsync() -> list[Plugin]:
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
     for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
-        plugins.append(
-            Plugin(
-                plugin_id=plugin.plugin_id,
-                name=plugin.name,
-                scan_level=plugin.scan_level,
-                description=plugin.description,
-                consumes=list(plugin.consumes),
-                recurrences=plugin.recurrences,
-                oci_image=plugin.oci_image,
-                oci_arguments=plugin.oci_arguments,
-                version=plugin.version,
-            )
-        )
+        plugin = Plugin(plugin_id=plugin.plugin_id, name=plugin.name, scan_level=plugin.scan_level,
+                   description=plugin.description, consumes=list(plugin.consumes), recurrences=plugin.recurrences,
+                   oci_image=plugin.oci_image, oci_arguments=plugin.oci_arguments, version=plugin.version, )
+        plugins.append(plugin)
+
+        if any("{file}" in arg for arg in plugin.oci_arguments):
+            enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     created_plugins = Plugin.objects.bulk_create(
         plugins,

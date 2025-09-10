@@ -136,6 +136,12 @@ class Plugin(models.Model):
 
         return False
 
+    def enable(self) -> "EnabledPlugin":
+        return self.enable_for(None)
+
+    def disable(self) -> "EnabledPlugin":
+        return self.disable_for(None)
+
     def enable_for(self, organization: Organization | None) -> "EnabledPlugin":
         enabled_plugin, created = EnabledPlugin.objects.get_or_create(plugin=self, organization=organization)
         enabled_plugin.enabled = True
