@@ -70,8 +70,17 @@ class BoefjeOutput(BaseModel):
     files: list[File] | None = None
 
 
-class Handler:
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+class WorkerManager:
+    class Queue(Enum):
+        BOEFJES = "boefje"
+        NORMALIZERS = "normalizer"
+
+    def run(self, queue: Queue) -> None:
+        raise NotImplementedError()
+
+
+class BoefjeHandler:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         """
         With regard to the return type:
             :rtype: tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | bool
@@ -80,7 +89,16 @@ class Handler:
         boefje_meta and its results to allow for deduplication. A failure returns None. And for now as a temporary
         solution, we return False if the task was not handled here directly, but delegated to the Docker runner.
         """
+        raise NotImplementedError()
 
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        raise NotImplementedError()
+
+
+class NormalizerHandler:
+    def handle(self, task: Task) -> None:
         raise NotImplementedError()
 
 
@@ -91,25 +109,16 @@ class PaginatedTasksResponse(BaseModel):
     results: list[Task]
 
 
-class WorkerManager:
-    class Queue(Enum):
-        BOEFJES = "boefje"
-        NORMALIZERS = "normalizer"
-
-    def run(self, queue: Queue) -> None:
-        raise NotImplementedError()
-
-
 class SchedulerClientInterface:
     def pop_items(
-        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int | None = 1
+        self, queue: WorkerManager.Queue, filters: dict[str, list[dict[str, Any]]] | None = None, limit: int = 1
     ) -> list[Task]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         raise NotImplementedError()
 
-    def get_task(self, task_id: uuid.UUID) -> Task:
+    def get_task(self, task_id: uuid.UUID, hydrate: bool = True) -> Task:
         raise NotImplementedError()
 
     def push_item(self, p_item: Task) -> None:

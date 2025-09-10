@@ -10,44 +10,62 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
-                <div>
-                    <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
-                    <p>
-                        {% blocktranslate trimmed with organization.name as organization_name %}
-                            An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
-                            Each finding relates to an object. Click a finding for additional information.
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                <div class="horizontal-view toolbar">
+            <div>
+                <div class="introduction">
+                    <div>
+                        <h1>{% translate "Findings @ " %}{{ observed_at|date }}</h1>
+                        <p>
+                            {% blocktranslate trimmed with organization.name as organization_name %}
+                                An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
+                                Each finding relates to an object. Click a finding for additional information.
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
                     {% include "partials/findings_list_toolbar.html" %}
 
                 </div>
-            </div>
-            <div>
-                {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" source="finding_list" %}
+                {% if organization_member.can_add_dashboard_item and organization_member.can_change_dashboard %}
+                    <div class="toolbar">
+                        <a href="#new-dashboard-item-modal"
+                           class="button ghost"
+                           data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
+                    </div>
+                    {% include "partials/new_dashboard_item_modal.html" with item_type="findings" template="partials/dashboard_finding_list.html" %}
 
-                <div class="toolbar">
-                    <a href="#new-dashboard-item-modal"
-                       class="button ghost"
-                       data-modal-id="new-dashboard-item-modal">{% translate "Add to dashboard" %}</a>
-                </div>
+                {% endif %}
                 {% include "findings/findings_filter.html" %}
 
-                {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                {% if object_list|length >= 1 %}
+                    {% if perms.tools.can_mute_findings %}
+                        {% include "partials/mute_findings_modal.html" %}
+
+                    {% endif %}
                     <form method="post"
                           id="finding-list-form"
                           class="inline layout-wide"
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
                     {% endif %}
-                    <div class="toolbar">
-                        <p class="de-emphasized">
-                            {% blocktranslate trimmed with length=object_list|length total=paginator.count %}
-                                Showing {{ length }} of {{ total }} findings
-                            {% endblocktranslate %}
-                        </p>
+                    <div class="fifty-fifty">
+                        <div>
+                            <p class="de-emphasized">
+                                {% blocktranslate trimmed with length=object_list|length total=paginator.count %}
+                                    Showing {{ length }} of {{ total }} findings
+                                {% endblocktranslate %}
+                            </p>
+                        </div>
+                        {% if object_list|length >= 1 and perms.tools.can_mute_findings %}
+                            <div class="horizontal-view toolbar">
+                                {% if not only_muted %}
+                                    <a class="button ghost" href="#mute-findings-modal"><icon aria-hidden="true" class="icon ti-bell-off"></icon>{% translate "Mute findings" %}</a>
+                                {% else %}
+                                    <button type="submit" class="ghost" form="finding-list-form">
+                                        <icon aria-hidden="true" class="icon ti-bell"></icon>{% translate "Unmute findings" %}
+                                    </button>
+                                    <input type="checkbox" class="hidden" value="true" name="unmute" checked>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="horizontal-scroll sticky-column">
                         <table class="action-buttons nowrap">
@@ -57,7 +75,7 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                                    {% if object_list and perms.tools.can_mute_findings %}
                                         <th>
                                             <input class="toggle-all" data-toggle-target="finding" type="checkbox">
                                         </th>
@@ -89,7 +107,7 @@
                             <tbody>
                                 {% for hydrated_finding in object_list %}
                                     <tr>
-                                        {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                                        {% if object_list and perms.tools.can_mute_findings %}
                                             <td>
                                                 <input type="checkbox"
                                                        name="finding"
@@ -196,40 +214,13 @@
                         {% include "partials/list_paginator.html" %}
 
                     </div>
-                    {% if object_list|length > 1 and perms.tools.can_mute_findings %}
-                        {% if not only_muted %}
-                            <fieldset>
-                                <legend>{% translate "Mute findings" %}</legend>
-                                <div>
-                                    <label for="id_reason">{% translate "Reason:" %}</label>
-                                    <div>
-                                        <textarea name="reason" cols="5" rows="3" id="id_reason"></textarea>
-                                    </div>
-                                    <div>
-                                        <label for="id_end_valid_time">{% translate "Expires by (UTC):" %}</label>
-                                        <input type="datetime-local" name="end_valid_time" id="id_end_valid_time">
-                                    </div>
-                                </div>
-                            </fieldset>
-                        {% endif %}
-                        <div class="button-container">
-                            {% if only_muted %}
-                                <button type="submit" form="finding-list-form">{% translate "Unmute Findings" %}</button>
-                                <input type="checkbox" class="hidden" value="true" name="unmute" checked>
-                            {% else %}
-                                <button type="submit" form="finding-list-form">{% translate "Mute Findings" %}</button>
-                            {% endif %}
-                        </div>
-                    </form>
-                {% endif %}
+                </form>
             </div>
         </section>
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    {% compress js %}
-        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
 {% endblock html_at_end_body %}

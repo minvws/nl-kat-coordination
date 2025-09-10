@@ -80,7 +80,10 @@ services:
       - .env-prod
       - .env
     environment:
-      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
+      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_boefjes
+    networks:
+      - default
+      - boefjes
 
   normalizer:
     restart: on-failure
@@ -175,6 +178,10 @@ services:
       - normalizer
       - octopoes_api
       - katalogus
+
+networks:
+  default:
+  boefjes:
 
 volumes:
   postgres-data:

@@ -6,7 +6,7 @@ from typing import Literal
 
 import structlog
 
-from .interfaces import BoefjeOutput, BoefjeStorageInterface, File, Handler, JobRuntimeError, StatusEnum, Task
+from .interfaces import BoefjeHandler, BoefjeOutput, BoefjeStorageInterface, File, JobRuntimeError, StatusEnum, Task
 from .job_models import BoefjeMeta
 from .repository import BoefjeResource, LocalPluginRepository, _default_mime_types
 
@@ -16,13 +16,13 @@ MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought t
 
 
 class TemporaryEnvironment:
-    """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
+    """Context manager that temporarily adds environment vars and restores the old env after exiting the context"""
 
-    def __init__(self):
+    def __init__(self, additional_environment: dict):
         self._original_environment = os.environ.copy()
+        os.environ.update(additional_environment)
 
     def __enter__(self):
-        os.environ.clear()
         return os.environ
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -30,12 +30,27 @@ class TemporaryEnvironment:
         os.environ.update(self._original_environment)
 
 
-class BoefjeHandler(Handler):
+def _copy_raw_files(
+    storage: BoefjeStorageInterface, boefje_meta: BoefjeMeta, boefje_output: BoefjeOutput, duplicated_tasks: list[Task]
+):
+    for item in duplicated_tasks:
+        new_boefje_meta = item.data
+        new_boefje_meta.runnable_hash = boefje_meta.runnable_hash
+        new_boefje_meta.environment = boefje_meta.environment
+        new_boefje_meta.started_at = boefje_meta.started_at
+        new_boefje_meta.ended_at = boefje_meta.ended_at
+
+        storage.save_output(new_boefje_meta, boefje_output)
+
+        logger.info("Saved raw files boefje %s[%s]", new_boefje_meta.boefje.id, new_boefje_meta.id)
+
+
+class LocalBoefjeHandler(BoefjeHandler):
     def __init__(self, local_repository: LocalPluginRepository, boefje_storage: BoefjeStorageInterface):
         self.local_repository = local_repository
         self.boefje_storage = boefje_storage
 
-    def handle(self, task: Task) -> tuple[BoefjeMeta, list[tuple[set, bytes | str]]] | None | Literal[False]:
+    def handle(self, task: Task) -> tuple[BoefjeMeta, BoefjeOutput] | None | Literal[False]:
         boefje_meta = task.data
 
         if not isinstance(boefje_meta, BoefjeMeta):
@@ -60,14 +75,14 @@ class BoefjeHandler(Handler):
                 raise JobRuntimeError(f"Not a boefje: {boefje_meta.boefje.id}")
 
             if not boefje_resource.module:
-                raise JobRuntimeError("Not runnable module found")
+                raise JobRuntimeError("No runnable module found")
 
-            with TemporaryEnvironment() as temporary_environment:
-                temporary_environment.update(boefje_meta.environment or {})
-                # Until we fully switch over to the Boefje API, we need the start and end time here as a fallback.
-                boefje_meta.started_at = datetime.now(timezone.utc)
+            boefje_meta.started_at = datetime.now(timezone.utc)
+
+            with TemporaryEnvironment(boefje_meta.environment or {}):
                 boefje_results = boefje_resource.module.run(boefje_meta.model_dump())
-                boefje_meta.ended_at = datetime.now(timezone.utc)
+
+            boefje_meta.ended_at = datetime.now(timezone.utc)
         except BaseException as e:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_meta.ended_at = datetime.now(timezone.utc)
@@ -98,8 +113,8 @@ class BoefjeHandler(Handler):
                 File(
                     name=str(len(files)),
                     content=(b64encode(output) if isinstance(output, bytes) else b64encode(output.encode())).decode(),
-                    tags=set(
-                        _default_mime_types(boefje_meta.boefje).union(valid_mimetypes)
+                    tags=_default_mime_types(boefje_meta.boefje).union(
+                        valid_mimetypes
                     ),  # default mime-types are added through the API
                 )
             )
@@ -114,4 +129,14 @@ class BoefjeHandler(Handler):
         if error is not None:
             raise error
 
-        return boefje_meta, boefje_results
+        return boefje_meta, boefje_output
+
+    def copy_raw_files(
+        self, task: Task, output: tuple[BoefjeMeta, BoefjeOutput] | Literal[False], duplicated_tasks: list[Task]
+    ) -> None:
+        if output is False:
+            return  # Output belonged to a docker boefje
+
+        boefje_meta, boefje_output = output
+
+        _copy_raw_files(self.boefje_storage, boefje_meta, boefje_output, duplicated_tasks)

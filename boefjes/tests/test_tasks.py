@@ -1,4 +1,3 @@
-import ast
 import base64
 import os
 import sys
@@ -10,7 +9,7 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.worker.boefje_handler import BoefjeHandler
+from boefjes.worker.boefje_handler import LocalBoefjeHandler
 from boefjes.worker.interfaces import StatusEnum, Task, TaskStatus
 from boefjes.worker.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.worker.models import Bit, Boefje, Normalizer, PluginType
@@ -78,7 +77,7 @@ def test_handle_boefje_with_exception(mocker):
     mock_session.query.all.return_value = []
 
     with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-        BoefjeHandler(local_repository, mock_bytes_api_client).handle(task)
+        LocalBoefjeHandler(local_repository, mock_bytes_api_client).handle(task)
 
     mock_bytes_api_client.save_output.assert_called_once()
     raw_call_args = mock_bytes_api_client.save_output.call_args
@@ -117,13 +116,6 @@ def test_cleared_boefje_env(mock_boefje_handler) -> None:
 
     current_env = os.environ.copy()
     mock_boefje_handler.handle(task)
-
-    output = mock_boefje_handler.boefje_storage.save_output.mock_calls
-    content = base64.b64decode(output[0][1][1].files[0].content)
-    output_dict = ast.literal_eval(content.decode())
-
-    # Assert that there are no overlapping environment keys
-    assert not set(current_env.keys()) & set(output_dict.keys())
 
     # Assert that the original environment has been restored correctly
     assert current_env == os.environ

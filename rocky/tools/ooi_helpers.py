@@ -254,3 +254,22 @@ def create_ooi(
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
+
+
+def create_oois(
+    api_connector: OctopoesAPIConnector,
+    bytes_client: BytesClient,
+    oois: list[OOI],
+    observed_at: datetime,
+    end_valid_time: datetime | None = None,
+) -> None:
+    declarations: list[Declaration] = []
+    task_id = uuid4()
+
+    for ooi in oois:
+        declarations.append(
+            Declaration(ooi=ooi, valid_time=observed_at, task_id=task_id, end_valid_time=end_valid_time)
+        )
+
+    bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations(declarations))
+    api_connector.save_many_declarations(declarations)

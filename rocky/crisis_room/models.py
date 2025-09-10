@@ -1,4 +1,6 @@
-from typing import Literal, TypedDict
+import json
+from typing import Any, Literal, TypedDict
+from urllib.parse import urlencode
 
 import structlog
 from django.core.exceptions import ValidationError
@@ -52,7 +54,7 @@ class DashboardItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     recipe = models.UUIDField(blank=True, null=True)
-    source = models.CharField(blank=True, max_length=32)
+    source = models.CharField(blank=True, max_length=126)
     query = models.CharField(blank=True)
     template = models.CharField(blank=True, max_length=126, default=FINDINGS_DASHBOARD_TEMPLATE)
     position = models.PositiveSmallIntegerField(
@@ -103,6 +105,18 @@ class DashboardItem(models.Model):
         except Dashboard.DoesNotExist:
             return super().__str__()
 
+    @property
+    def get_query_url(self) -> str:
+        if self.query:
+            return urlencode(json.loads(self.query), doseq=True)
+        return ""
+
+    @property
+    def get_query(self) -> dict[str, Any]:
+        if self.query:
+            return json.loads(self.query)
+        return {}
+
     def clean(self) -> None:
         if self.recipe and self.query:
             raise ValidationError(_("You have to choose between a recipe or a query, but not both."))
@@ -138,6 +152,8 @@ class DashboardItem(models.Model):
                 )
             except DashboardItem.DoesNotExist:
                 return
+
+        logger.info("Dashboard item position updated", dashboard_item_id=self.id, event_code="900310")
 
 
 def get_dashboard_item_positions(instance: DashboardItem) -> list[int]:
