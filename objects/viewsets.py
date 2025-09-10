@@ -59,7 +59,7 @@ class ObjectViewSet(ViewSet):
         oois = connector.octopoes.ooi_repository.query(q, datetime.now(timezone.utc))
         serializer = ObjectSerializer(oois, many=True)
 
-        return Response(serializer.data)
+        return Response({"results": serializer.data, "next": None, "previous": None, "count": None})
 
     def create(self, request: Request, *args, **kwargs):
         objects = request.data
@@ -76,15 +76,14 @@ class ObjectViewSet(ViewSet):
         return Response(status=HTTPStatus.CREATED)
 
     def delete(self, request: Request, *args, **kwargs):
-        objects = request.data
         organization = Organization.objects.first()
 
         client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
         now = datetime.now(timezone.utc)
 
-        for ooi in REF_LIST.validate_python(objects):
+        for ooi in REF_LIST.validate_python(request.GET.getlist("pk")):
             client.octopoes.ooi_repository.delete(ooi, valid_time=now)
 
         client.octopoes.commit()
 
-        return Response(status=HTTPStatus.CREATED)
+        return Response(status=HTTPStatus.OK)

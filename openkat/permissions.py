@@ -38,7 +38,7 @@ class KATModelPermissions(DjangoModelPermissions):
             raise exceptions.MethodNotAllowed(method)
 
         if model_cls == OOI or issubclass(model_cls, OOI):
-            kwargs = {"app_label": "openkat", "model_name": "ooi"}
+            kwargs = {"app_label": "objects", "model_name": "object"}
 
             return [perm % kwargs for perm in self.perms_map[method]]
 

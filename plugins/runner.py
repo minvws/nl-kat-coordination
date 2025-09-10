@@ -8,6 +8,7 @@ from pathlib import Path
 import docker
 from django.conf import settings
 from django.contrib.auth.models import Permission
+from docker.errors import ContainerError
 
 from account.models import AuthToken, KATUser
 from files.models import File, TemporaryContent
@@ -115,7 +116,23 @@ class PluginRunner:
 
         # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
         #   after the container has gone.
-        container.wait()
+
+        # Below is a copy of the implementation of container.run() after the check if detach equals True.
+        logging_driver = container.attrs['HostConfig']['LogConfig']['Type']
+
+        out = None
+        if logging_driver == 'json-file' or logging_driver == 'journald':
+            out = container.logs(stdout=use_stdout, stderr=True, stream=True, follow=True)
+
+        exit_status = container.wait()['StatusCode']
+        if exit_status != 0:
+            out = container.logs(stdout=False, stderr=True)
+
+        if not keep:
+            container.remove(force=True)
+
+        if exit_status != 0:
+            raise ContainerError(container, exit_status, command, container.image, out)
 
         signal.signal(signal.SIGTERM, old_handle)
 
@@ -125,12 +142,11 @@ class PluginRunner:
         if tmp_file:
             tmp_file.delete()
 
-        logs = container.logs().decode()
+        if out is None:
+            return ""
 
-        if not keep:
-            container.remove(force=True)
+        return b''.join(out).decode()
 
-        return logs
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
@@ -148,7 +164,9 @@ class PluginRunner:
 
         plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
         plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="add_ooi"))
+        plugin_user.user_permissions.add(Permission.objects.get(codename="add_object"))
+        plugin_user.user_permissions.add(Permission.objects.get(codename="delete_object"))
+        plugin_user.user_permissions.add(Permission.objects.get(codename="view_object"))
 
         token = AuthToken(
             user=plugin_user,
