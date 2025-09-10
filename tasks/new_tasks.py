@@ -46,6 +46,10 @@ def run_schedule_for_org(schedule: NewSchedule, organization: Organization, forc
     octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
 
     if not schedule.object_set:
+        if force:
+            run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
+            return
+
         last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
