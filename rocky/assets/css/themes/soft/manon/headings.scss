@@ -6,7 +6,7 @@
   --h1-font-size: var(--heading-xxl-font-size);
   --h1-text-color: var(--heading-xxl-text-color);
   --h1-font-weight: var(--heading-xxl-font-weight);
-  --h1-line-height: 1.2;
+  --h1-line-height: var(--headings-base-set-line-height);
   --h1-margin: var(--heading-xxl-margin);
 
   /* h2 */
@@ -14,7 +14,7 @@
   --h2-font-size: var(--heading-xl-font-size);
   --h2-text-color: var(--heading-xl-text-color);
   --h2-font-weight: var(--heading-xl-font-weight);
-  --h2-line-height: 1.2;
+  --h2-line-height: var(--headings-base-set-line-height);
   --h2-margin: var(--heading-xl-margin);
 
   /* h3 */
@@ -22,7 +22,7 @@
   --h3-font-size: var(--heading-large-font-size);
   --h3-text-color: var(--heading-large-text-color);
   --h3-font-weight: var(--heading-large-font-weight);
-  --h3-line-height: 1.2;
+  --h3-line-height: var(--headings-base-set-line-height);
   --h3-margin: var(--heading-large-margin);
 
   /* h4 */
@@ -30,15 +30,15 @@
   --h4-font-size: var(--heading-normal-font-size);
   --h4-text-color: var(--heading-normal-text-color);
   --h4-font-weight: var(--heading-normal-font-weight);
-  --h4-line-height: 1.2;
+  --h4-line-height: var(--headings-base-set-line-height);
   --h4-margin: var(--heading-normal-margin);
 
   /* h5 */
   --h5-font-family: var(--heading-small-font-family);
   --h5-font-size: var(--heading-small-font-size);
   --h5-text-color: var(--heading-small-text-color);
-  --h5-font-weight: 1.2;
-  --h5-line-height: var(--heading-small-line-height);
+  --h5-font-weight: var(--heading-small-font-weight);
+  --h5-line-height: var(--headings-base-set-line-height);
   --h5-margin: var(--heading-small-margin);
 
   /* h6 */
@@ -46,7 +46,7 @@
   --h6-font-size: var(--heading-xs-font-size);
   --h6-text-color: var(--heading-xs-text-color);
   --h6-font-weight: var(--heading-xs-font-weight);
-  --h6-line-height: 1.2;
+  --h6-line-height: var(--headings-base-set-line-height);
   --h6-margin: var(--heading-xs-margin);
 }
 
