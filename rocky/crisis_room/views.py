@@ -235,9 +235,7 @@ class DashboardService:
         )
 
         observed_at = (
-            datetime.strptime(query["observed_at"], "%Y-%m-%d")
-            if "observed_at" in query
-            else datetime.now(timezone.utc)
+            datetime.strptime(query["observed_at"], "%Y-%m-%d") if query["observed_at"] else datetime.now(timezone.utc)
         )
         # for now we check till end of day
         valid_time = datetime.combine(observed_at.date(), time(23, 59, 59), tzinfo=timezone.utc)
@@ -279,9 +277,7 @@ class DashboardService:
         only_muted = muted_findings == "muted"
 
         observed_at = (
-            datetime.strptime(query["observed_at"], "%Y-%m-%d")
-            if "observed_at" in query
-            else datetime.now(timezone.utc)
+            datetime.strptime(query["observed_at"], "%Y-%m-%d") if query["observed_at"] else datetime.now(timezone.utc)
         )
         # for now we check till end of day
         valid_time = datetime.combine(observed_at.date(), time(23, 59, 59), tzinfo=timezone.utc)
