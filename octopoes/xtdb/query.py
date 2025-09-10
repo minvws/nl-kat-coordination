@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
-from octopoes.models.types import get_abstract_types, to_concrete
+from octopoes.models.types import OOIType, get_abstract_types, to_concrete
 
 
 class InvalidField(ValueError):
@@ -87,7 +87,7 @@ class Query:
 
         return new
 
-    def where_in(self, ooi_type: Ref, **kwargs: Iterable[str]) -> Query:
+    def where_in(self, ooi_type: Ref, **kwargs: Iterable[str | int]) -> Query:
         """Allows for filtering on multiple values for a specific field."""
         new = self._copy()
 
@@ -195,7 +195,7 @@ class Query:
     def _copy(self) -> Query:
         return replace(self)
 
-    def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str] | bool) -> None:
+    def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | int | set[str] | bool) -> None:
         """
         We need isinstance(value, type) checks to verify value is an OOIType, as issubclass() fails on non-classes:
 
@@ -214,19 +214,7 @@ class Query:
             TypeError: issubclass() arg 1 must be a class
         """
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
-        abstract_types = get_abstract_types()
-
-        field_type = None
-
-        if field_name == "id":
-            field_type = str
-        elif field_name in ooi_type.model_fields:
-            field_type = ooi_type.model_fields[field_name].annotation
-        elif ooi_type in abstract_types:
-            for concrete_type in ooi_type.strict_subclasses():
-                if field_name in concrete_type.model_fields:
-                    field_type = concrete_type.model_fields[field_name].annotation
-                    break
+        field_type = self._get_field_type(field_name, ooi_type)
 
         if field_type is None:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
@@ -237,7 +225,7 @@ class Query:
         if isinstance(value, str):
             value = value.replace('"', r"\"")
 
-        if ooi_type in abstract_types and ooi_type != OOI:
+        if ooi_type in get_abstract_types() and ooi_type != OOI:
             if isinstance(value, str):
                 self._add_or_statement_for_abstract_types(ref, field_name, f'"{value}"')
                 return
@@ -277,19 +265,41 @@ class Query:
 
         self._add_where_statement(ref, field_name, self._get_object_alias(value))
 
-    def _where_field_in(self, ref: Ref, field_name: str, values: Iterable[str]) -> None:
+    def _get_field_type(self, field_name: str, ooi_type: OOIType):
+        abstract_types = get_abstract_types()
+
+        field_type = None
+
+        if field_name == "id":
+            field_type = str
+        elif field_name in ooi_type.model_fields:
+            field_type = ooi_type.model_fields[field_name].annotation
+        elif ooi_type in abstract_types:
+            for concrete_type in ooi_type.strict_subclasses():
+                if field_name in concrete_type.model_fields:
+                    field_type = concrete_type.model_fields[field_name].annotation
+                    break
+
+        return field_type
+
+    def _where_field_in(self, ref: Ref, field_name: str, values: Iterable[str | int]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if field_name not in ooi_type.model_fields and field_name != "id":
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         new_values = []
-        for value in values:
-            if not isinstance(value, str):
-                raise InvalidField("Only strings allowed as values for a WHERE IN statement for now.")
+        field_type = self._get_field_type(field_name, ooi_type)
 
-            value = value.replace('"', r"\"")
-            new_values.append(f'"{value}"')
+        for value in values:
+            if not isinstance(value, (str, int)):
+                raise InvalidField("Only strings and integers allowed as values for a WHERE IN statement for now.")
+
+            if isinstance(value, str):
+                value = value.replace('"', r"\"")
+                new_values.append(f'"{value}"')
+            if field_type == int:
+                new_values.append(int(value))
 
         if ooi_type in get_abstract_types() and ooi_type != OOI:
             types_to_check = ooi_type.strict_subclasses()
@@ -300,7 +310,7 @@ class Query:
             self._or_statement_for_multiple_values(self._get_object_alias(ref), types_to_check, field_name, new_values)
         )
 
-    def _add_where_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
+    def _add_where_statement(self, ref: Ref, field_name: str, to_alias: str | int) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if ooi_type != OOI:

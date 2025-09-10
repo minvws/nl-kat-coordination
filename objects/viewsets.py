@@ -27,21 +27,30 @@ class ObjectViewSet(ViewSet):
         else:
             q = Query()
 
-        for parameter, value in request.GET.items():
+        for parameter in request.GET:
             if parameter == "object_type":
                 continue
+
             if parameter == "offset":
-                q = q.offset(int(value))
+                q = q.offset(int(request.GET.get(parameter)))
                 continue
             if parameter == "limit":
-                q = q.limit(int(value))
+                q = q.limit(int(request.GET.get(parameter)))
                 continue
 
-            try:
-                q = q.where(q.result_type, **{parameter: value})
-            except InvalidField:
-                logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
-                continue
+            value = list(set(request.GET.getlist(parameter)))
+
+            if len(value) == 1:
+                try:
+                    q = q.where(q.result_type, **{parameter: value[0]})
+                except InvalidField:
+                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
+            elif len(value) > 1:
+                try:
+                    q = q.where_in(q.result_type, **{parameter: value})
+                except InvalidField:
+                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
+                    continue
 
         # TODO
         organization = Organization.objects.first()
