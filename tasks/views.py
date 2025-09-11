@@ -60,7 +60,7 @@ class TaskDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("new_task_list"), "text": _("Plugins")},
-            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task Detail")},
+            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
         ]
 
         return context
@@ -129,7 +129,7 @@ class ScheduleDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("schedule_list"), "text": _("Schedules")},
-            {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule Detail")},
+            {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule details")},
         ]
         context["form"] = NewScheduleForm
 
