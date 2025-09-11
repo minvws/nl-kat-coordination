@@ -28,10 +28,43 @@ services:
       - postgres
       - redis
       - xtdb
+      - openkat-test-api
     volumes:
       - ..:/app/openkat
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HOST_MOUNT_DIR=${PWD}
+      - DATABASE_MIGRATION=true
     env_file:
       - .env.test
+    networks:
+      - default
+      - plugins
+
+  openkat-test-api:
+    build:
+      context: ..
+      args:
+        ENVIRONMENT: dev
+        USER_UID: 1001
+        USER_GID: 1001
+      target: dev
+    command: python3 manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - postgres
+      - redis
+      - xtdb
+    volumes:
+      - ..:/app/openkat
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HOST_MOUNT_DIR=${PWD}
+      - DATABASE_MIGRATION=false
+    env_file:
+      - .env.test
+    networks:
+      - default
+      - plugins
 
   postgres:
     image: docker.io/library/postgres:15
@@ -54,3 +87,19 @@ services:
       retries: 4
     env_file:
       - .env.test
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:ab8:d0cb::/64
+        - subnet: 172.24.0.1/16
+          gateway: 172.24.0.2
+  plugins:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 2001:db8:d0cc::/64
+        - subnet: 172.26.0.3/16
+          gateway: 172.26.0.4
