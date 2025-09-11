@@ -88,9 +88,10 @@ export default function (boefje_meta) {
   // Looking if outdated software has been found
   try {
     const data = JSON.parse(file_contents);
-    for (const vulnerability of data["vulnerabilities"])
-      if (vulnerability["id"].startsWith("6"))
-        raws.push([["openkat/finding"], "KAT-OUTDATED-SOFTWARE"]);
+    if (data["vulnerabilities"])
+      for (const vulnerability of data["vulnerabilities"])
+        if (vulnerability["id"].startsWith("6"))
+          raws.push([["openkat/finding"], "KAT-OUTDATED-SOFTWARE"]);
   } catch (e) {
     console.error(e);
   }
