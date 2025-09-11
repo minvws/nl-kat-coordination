@@ -16,9 +16,6 @@ import (
 
 var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
 
-//Example usage:
-//docker run --network nl-kat-coordination_default -v path/to/main:/bin/main --entrypoint=/bin/main projectdiscovery/nuclei nuclei -h
-
 func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: go run main.go <command> [args...]")

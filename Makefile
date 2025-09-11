@@ -92,17 +92,14 @@ plugins:
 	docker build -f plugins/plugins/plugins.Dockerfile -t $(REGISTRY)/plugins:latest -t openkat/plugins .
 
 testclean:
-	docker compose -f .ci/docker-compose.yml kill
-	docker compose -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f .ci/docker-compose.yml down --timeout 0 --remove-orphans --volumes
 	docker compose -f .ci/docker-compose.yml build
 
 utest: testclean ## Run the unit tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_tests
-	docker compose -f .ci/docker-compose.yml stop
 
 itest: testclean ## Run the integration tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration
-	docker compose -f .ci/docker-compose.yml stop
 
 bench: testclean ## Run the report benchmark.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration \

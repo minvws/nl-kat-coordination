@@ -42,6 +42,33 @@ def katalogus_mock(mocker):
     return katalogus
 
 
+@pytest.fixture(scope='session')
+def django_db_setup(request: pytest.FixtureRequest, django_db_blocker):
+    """
+    Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:
+    Since openkat_integration calls pytest, it creates a test database by default within ci_postgres, where the
+    openkat-test-api will use the regular database. This will result in the API not knowing about plugins, users or
+    Authtokens created during the test, but we need this since plugins created during the test have openkat-test-api
+    as a callback service.
+    """
+    settings.DATABASES["default"]["TEST"] = {"MIRROR": True}
+    yield
+    #
+    # with django_db_blocker.unblock():
+    #     test_databases, mirrored_aliases = get_unique_databases_and_mirrors(None)
+    #
+    #     for db_name, aliases in test_databases.values():
+    #         for alias in aliases:
+    #             connection = connections[alias]
+    #             try:
+    #                 teardown_databases((connection, settings.DATABASES['default']['NAME'], True), verbosity=request.config.option.verbose)
+    #             except Exception as exc:  # noqa: BLE001
+    #                 request.node.warn(
+    #                     pytest.PytestWarning(f"Error when trying to teardown test databases: {exc!r}")
+    #                 )
+
+
+
 @pytest.fixture
 def integration_organization(katalogus_mock, mocker, request) -> Organization:
     mocker.patch("openkat.settings.OCTOPOES_FACTORY")

@@ -46,7 +46,9 @@ class PluginRunner:
         if use_stdout:
             environment["UPLOAD_URL"] = "/dev/null"
         elif task_id:
-            environment["UPLOAD_URL"] = f"http://openkat:8000/api/v1/file/?task_id={task_id}"
+            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={task_id}"
+        else:
+            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/"
 
         tmp_file = None
 
