@@ -41,7 +41,7 @@
                             {% for task in task_list %}
                                 <tr data-task-id="{{ task.id }}">
                                     <td>
-                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id }}</a>
+                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:10 }}</a>
                                     </td>
                                     <td>
                                         {% if task.data.plugin_id %}
