@@ -127,7 +127,7 @@ class CrisisRoom(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis "}]
+        context["breadcrumbs"] = [{"url": reverse("crisis_room"), "text": "Crisis room"}]
         context["organizations_dashboards"] = self.organizations_findings
         context["organizations_findings_summary"] = self.organizations_findings_summary
         return context

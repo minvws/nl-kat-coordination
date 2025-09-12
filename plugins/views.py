@@ -1,5 +1,6 @@
 import django_filters
 from django.conf import settings
+from django.contrib import messages
 from django.db.models import Q
 from django.db.models.functions import Coalesce
 from django.http import FileResponse
@@ -83,7 +84,7 @@ class PluginDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("plugin_list"), "text": _("Plugins")},
-            {"url": reverse("plugin_detail", kwargs={"pk": self.get_object().id}), "text": _("Plugin Detail")},
+            {"url": reverse("plugin_detail", kwargs={"pk": self.get_object().id}), "text": _("Plugin details")},
         ]
 
         return context
@@ -178,6 +179,11 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
         result = super().form_valid(form)
 
         if self.object.enabled:
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _("Plugin '{}' has been enabled.").format(self.object.plugin.name),
+            )
             return result
 
         # Plugin has been disabled, cancel all tasks for this plugin and organization
@@ -188,6 +194,11 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
         ):
             task.cancel()
 
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _("Plugin '{}' has been disabled.").format(self.object.plugin.name),
+        )
         return result
 
     def get_success_url(self, **kwargs):
