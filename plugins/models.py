@@ -28,7 +28,7 @@ class ScanLevel(models.IntegerChoices):
 
 
 class PluginQuerySet(models.QuerySet):
-    def with_enabled(self, organization: Organization | None):
+    def with_enabled(self, organization: Organization | None = None):
         global_subquery = EnabledPlugin.objects.filter(Q(organization=None), plugin=OuterRef("pk"))
         subquery = EnabledPlugin.objects.filter(Q(organization=organization), plugin=OuterRef("pk"))
 

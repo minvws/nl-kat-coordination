@@ -124,10 +124,10 @@ def run_schedule_for_org(schedule: NewSchedule, organization: Organization, forc
     run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
-def run_task(task: Task):
+def rerun_task(task: Task):
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
-    run_plugin_task(
+    return run_plugin_task(
         plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None
     )
 
@@ -137,12 +137,12 @@ def run_plugin_task(
     organization_code: str | None = None,
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
-) -> None:
+) -> Task:
     if isinstance(input_data, set):
         input_data = list(input_data)
 
     task_id = uuid.uuid4()
-    Task.objects.create(
+    task = Task.objects.create(
         id=task_id,
         type="plugin",
         new_schedule_id=schedule_id,
@@ -152,6 +152,8 @@ def run_plugin_task(
     )
 
     app.send_task("tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
+
+    return task
 
 
 @app.task(bind=True)

@@ -2,10 +2,9 @@ from datetime import datetime, timezone
 
 import django_filters
 import recurrence
-import structlog
+from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -15,9 +14,15 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
+from objects.models import Object
+from octopoes.core.service import OctopoesService
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
+from plugins.models import Plugin
 from tasks.models import NewSchedule, Task, TaskStatus
-from tasks.new_tasks import run_schedule, run_task
+from tasks.new_tasks import rerun_task, run_plugin_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -69,25 +74,52 @@ class TaskDetailView(DetailView):
 
 
 class TaskForm(ModelForm):
+    plugin_id = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
+    input_data = forms.ModelMultipleChoiceField(Object.objects.all())
+
     class Meta:
         model = Task
-        fields = ["organization", "data"]
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        logger = structlog.get_logger(__name__)
-        logger.info(cleaned_data)
-        if cleaned_data["data"]["plugin_id"] is None:
-            raise ValidationError("Plugin ID cannot be blank.")
-
-        return cleaned_data
+        fields = ["organization"]
 
     def save(self, *args, **kwargs):
-        result = super().save(*args, **kwargs)
-        run_task(self.instance)
+        plugin = self.cleaned_data["plugin_id"]
 
-        return result
+        if self.cleaned_data["organization"] is None:
+            # TODO: handle..
+            organization = Organization.objects.first()
+        else:
+            organization = self.cleaned_data["organization"]
+
+        if not plugin.enable_for(organization):
+            raise ValueError(f"Plugin not enabled for organization {organization.name}")
+
+        pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
+        input_data = set()
+
+        if pks:
+            now = datetime.now(timezone.utc)
+            octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
+            scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
+
+            for profile in scan_profiles:
+                if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
+                    continue
+
+                if profile.reference.class_type == Hostname:
+                    input_data.add(profile.reference.tokenized.name)
+                    continue
+
+                if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+                    input_data.add(str(profile.reference.tokenized.address))
+                    continue
+
+                input_data.add(str(profile.reference))
+
+        return run_plugin_task(
+            plugin.plugin_id,
+            None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
+            list(input_data),
+        )
 
 
 class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
@@ -120,7 +152,7 @@ class TaskRescheduleView(PermissionRequiredMixin, View):
     permission_required = ("tasks.add_tasks",)
 
     def post(self, request, task_id, *args, **kwargs):
-        run_task(Task.objects.get(pk=task_id))
+        rerun_task(Task.objects.get(pk=task_id))
 
         return redirect(reverse("new_task_list"))
 
