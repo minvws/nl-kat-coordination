@@ -2,8 +2,10 @@ from datetime import datetime, timezone
 
 import django_filters
 import recurrence
+import structlog
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -15,7 +17,7 @@ from django_filters.views import FilterView
 
 from openkat.permissions import KATModelPermissionRequiredMixin
 from tasks.models import NewSchedule, Task, TaskStatus
-from tasks.new_tasks import rerun_task, run_schedule
+from tasks.new_tasks import run_schedule, run_task
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -66,11 +68,59 @@ class TaskDetailView(DetailView):
         return context
 
 
+class TaskForm(ModelForm):
+    class Meta:
+        model = Task
+        fields = ["organization", "data"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        logger = structlog.get_logger(__name__)
+        logger.info(cleaned_data)
+        if cleaned_data["data"]["plugin_id"] is None:
+            raise ValidationError("Plugin ID cannot be blank.")
+
+        return cleaned_data
+
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        run_task(self.instance)
+
+        return result
+
+
+class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Task
+    template_name = "task_form.html"
+    form_class = TaskForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["data"] = {"plugin_id": None, "input_data": []}
+
+        if self.request.method == "GET" and "plugin_id" in self.request.GET:
+            initial["data"]["plugin_id"] = self.request.GET.get("plugin_id")
+
+        if self.request.method == "GET" and "input_data" in self.request.GET:
+            initial["data"]["plugin_id"] = self.request.GET.getlist("input_data")
+
+        return initial
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("new_task_list")
+
+
 class TaskRescheduleView(PermissionRequiredMixin, View):
     permission_required = ("tasks.add_tasks",)
 
     def post(self, request, task_id, *args, **kwargs):
-        rerun_task(Task.objects.get(pk=task_id))
+        run_task(Task.objects.get(pk=task_id))
 
         return redirect(reverse("new_task_list"))
 
@@ -156,9 +206,6 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 
         self.object.save()
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        return redirect(reverse("schedule_list"))
 
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")

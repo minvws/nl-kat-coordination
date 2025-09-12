@@ -124,7 +124,7 @@ def run_schedule_for_org(schedule: NewSchedule, organization: Organization, forc
     run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
-def rerun_task(task: Task):
+def run_task(task: Task):
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
     run_plugin_task(

@@ -37,11 +37,6 @@
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
                         </li>
                         <li>
-                            {% url "schedule_list" as index_url %}
-                            <a href="{{ index_url }}"
-                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
-                        </li>
-                        <li>
                             {% url "new_task_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
@@ -50,6 +45,11 @@
                             {% url "file_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Files" %}</a>
+                        </li>
+                        <li>
+                            {% url "schedule_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
                         </li>
                         <li>
                             {% url "object_list" as index_url %}
