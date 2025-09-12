@@ -1,11 +1,3 @@
-# /// script
-# dependencies = [
-#   "httpx==0.27.2",
-#   "polars==1.32.3",
-#   "polars-iptools==0.1.10",
-# ]
-# ///
-
 import json
 from json import JSONDecodeError
 from os import getenv
@@ -17,29 +9,39 @@ import polars_iptools as ip
 
 def run():
     client = httpx.Client(base_url=getenv("OPENKAT_API"), headers={"Authorization": "Token " + getenv("OPENKAT_TOKEN")})
-    rpki_lazy = download_lazyframe(client, "rpki-download")
-    bgp_lazy = download_lazyframe(client, "bgp-download")
+    rpki = download_lazyframe(client, "rpki-download")
+    bgp = download_lazyframe(client, "bgp-download")
 
     ip4s = get_all_objects_of_type(client, "IPAddressV4")
-    ip6s = get_all_objects_of_type(client, "IPAddressV6")  # TODO
+    # ip6s = get_all_objects_of_type(client, "IPAddressV6")  # TODO
 
-    rpki_filtered_v4 = rpki_lazy.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(
-        intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start ip as integer
-        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),   # parse prefix to integer
+    rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
+        intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
+        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
     )
-    bgp_filtered_v4 = bgp_lazy.filter(pl.col("CIDR").str.contains(".", literal=True)).with_columns(
-        bintip=ip.ipv4_to_numeric(pl.col("CIDR").str.split("/").list.get(0)),  # parse CIDR to start ip as integer
-        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),   # parse prefix to integer
+    bgp_v4 = bgp.filter(pl.col("CIDR").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
+        bintip=ip.ipv4_to_numeric(pl.col("CIDR").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
+        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
     )
 
-    ip4s_lazy = pl.LazyFrame({"ip": [x["address"] for x in ip4s.values()]}).with_columns(intip4=ip.ipv4_to_numeric("ip"))
+    # Create a pl.LazyFrame out of the object list of IPAddressV4's
+    ip4s_lazy = pl.LazyFrame(
+        {"ip": [x["address"] for x in ip4s.values()]}).with_columns(intip4=ip.ipv4_to_numeric("ip")
+    )
+
+    # Based on the start-ip and prefix, calculate if an ip from ip4s_lazy is within the range of a row from rpki_v4.
+    # Create a new LazyFrame where an ip address is matched to any rpki_v4 with a network containing the ip.
     new = ip4s_lazy.join_where(
-        rpki_filtered_v4,
+        rpki_v4,
         pl.col("intip") <= pl.col("intip4"),
         pl.col("intip") + 2 ** (32 - pl.col("intprefix")) >= pl.col("intip4"),
     )
+
+    # Join the bgp data the same way, creating a dataframe with all possible triplets (rpki_network, bgp_network, ip)
+    # where "ip in rpki_network && ip in bgp_network". (In general, the list of ip addresses is relatively small and
+    # this results in a dataframe with roughly 5-10 rows per ip address.)
     bgp_new = set(new.join_where(
-        bgp_filtered_v4,
+        bgp_v4,
         pl.col("bintip") <= pl.col("intip4"),
         pl.col("bintip") + 2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4"),
         pl.col("asn") != pl.col("ASN"),
@@ -67,6 +69,8 @@ def run():
 
 
 def download_lazyframe(client, file_type: str) -> pl.LazyFrame:
+    """ Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame """
+
     params = {"ordering": "created_at", "limit": 1}
 
     try:
@@ -80,6 +84,8 @@ def download_lazyframe(client, file_type: str) -> pl.LazyFrame:
 
 
 def get_all_objects_of_type(client: httpx.Client, object_type: str) -> dict[str, dict]:
+    """ Iterate through the object API to collect all objects of type object_type """
+
     offset = 0
     limit = 500
     results = {}

@@ -252,10 +252,10 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 if __name__ == "__main__":
     record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
-    result = run(sys.argv[1], record_types)
+    results = run(sys.argv[1], record_types)
 
-    if result:
+    if results:
         headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=result)
+        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
 
-    print(json.dumps(result))
+    print(json.dumps(results))
