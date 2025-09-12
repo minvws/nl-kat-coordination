@@ -19,10 +19,25 @@
     "scan_level": 1,
     "oci_image": "noamblitz/drill:latest",
     "oci_arguments": [
-      "drill",
-      "-DT",
-      "{hostname}",
-      "@1.1.1.1"
+      "sh",
+      "-c",
+      "run () { D=$(drill -DT $1 $2); (! echo \"$D\" | grep -F \"[U] No data found for: $1. type $2\") && echo \"$D\" ; }; run {hostname} A || run {hostname} AAAA || run {hostname} CNAME"
+    ]
+  },
+  {
+    "plugin_id": "parse-dns-sec",
+    "name": "Parse DNSSEC",
+    "description": "Parse DNSSEC Output",
+    "scan_level": 1,
+    "consumes": [
+      "file:dns-sec"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_dnssec/main.py",
+      "{file}"
     ]
   },
   {

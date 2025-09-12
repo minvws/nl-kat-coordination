@@ -62,21 +62,34 @@ class PluginRunner:
             command = plugin.oci_arguments
         elif isinstance(target, list):
             if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
-                # This plugin expects one target object at a time, so we automatically parallelize with xargs if needed.
+                # This plugin expects one target object at a time.
+
+                # If the list contains one element, run it immediately.
                 if len(target) == 1:
                     return self.run(plugin_id, target[0], output, task_id, keep, cli)
 
                 parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
-                if parallelism == 0:
+
+                # TODO: auto-parallelism has hit an edge case, so it has been now turned off until the go binary
+                #  supports handling auto-parallelism
+                if parallelism == 0 or True:
                     logs = []
                     for t in target:
                         logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
 
                     return "\n".join(logs)
 
-                tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
-                environment["IN_FILE"] = str(tmp_file.id)
-                command = ["xargs", "-P", str(parallelism), "-I", "%"] + self.create_command(plugin.oci_arguments, "%")
+                # Parallelism graveyard:
+                #
+                # cmd = shlex.join(self.create_command(plugin.oci_arguments, "%"))
+                # sub_cmd = shlex.split(f'({cmd})')  # (cmd) will not print the job control output
+                # command = ['while', 'read', '-r', 'LINE', f'{str(parallelism)}`;', 'do', sub_cmd, 'done', '&&', 'wait']
+                #
+                #
+                # Initial working version until we had an xargs version that was too old
+                # tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
+                # environment["IN_FILE"] = str(tmp_file.id)
+                # command = ["xargs", "-P", str(parallelism), "-I", "%"] + self.create_command(plugin.oci_arguments, "%")
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 environment["IN_FILE"] = str(tmp_file.id)
