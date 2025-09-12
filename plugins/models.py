@@ -93,26 +93,21 @@ class Plugin(models.Model):
         return tag or "latest"
 
     def types_in_arguments(self):
-        return list(
-            {
-                ALL_TYPES_MAP[part]
-                for arg in self.oci_arguments
-                if arg.startswith("{") and arg.endswith("}")
-                for part in arg[1:-1].lower().split("|")
-                if part in ALL_TYPES_MAP
-            }
-        )
+        result = []
+
+        for name, ooi_type in ALL_TYPES_MAP.items():
+            for arg in self.oci_arguments:
+                if "{" + name + "}" in arg.lower():
+                    result.append(ooi_type)
+                    break
+
+        return result
 
     def consumed_types(self):
-        return list(
-            {
-                ALL_TYPES_MAP[part]
-                for arg in self.oci_arguments
-                if arg.startswith("{") and arg.endswith("}")
-                for part in arg[1:-1].lower().split("|")
-                if part in ALL_TYPES_MAP
-            }
-        ) + [ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP]
+        return self.types_in_arguments() + [
+            ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes
+            if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP
+        ]
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
