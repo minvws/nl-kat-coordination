@@ -129,13 +129,9 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["data"] = {"plugin_id": None, "input_data": []}
 
         if self.request.method == "GET" and "plugin_id" in self.request.GET:
-            initial["data"]["plugin_id"] = self.request.GET.get("plugin_id")
-
-        if self.request.method == "GET" and "input_data" in self.request.GET:
-            initial["data"]["plugin_id"] = self.request.GET.getlist("input_data")
+            initial["plugin_id"] = self.request.GET.get("plugin_id")
 
         return initial
 
