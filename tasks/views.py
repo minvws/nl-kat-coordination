@@ -90,7 +90,7 @@ class TaskForm(ModelForm):
         else:
             organization = self.cleaned_data["organization"]
 
-        if not plugin.enable_for(organization):
+        if not plugin.enabled_for(organization):
             raise ValueError(f"Plugin not enabled for organization {organization.name}")
 
         pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
@@ -116,7 +116,7 @@ class TaskForm(ModelForm):
                 input_data.add(str(profile.reference))
 
         if not input_data and plugin.consumed_types():
-            raise ValueError(f"No matching input objects found for plugin requiring input objects")
+            raise ValueError("No matching input objects found for plugin requiring input objects")
 
         return run_plugin_task(
             plugin.plugin_id,
