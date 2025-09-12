@@ -133,10 +133,19 @@
                         <a href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">{% translate 'See Results' %}</a>
                     </td>
                     <td>
-                        {% if plugin.enabled and plugin.types_in_arguments %}
-                            <a href="{% url 'add_task' %}?plugin_id={{ plugin.id }}">
-                                <button type="submit">{% translate "Run" %}</button>
-                            </a>
+                        {% if plugin.enabled %}
+                            {% if plugin.consumed_types %}
+                                <a href="{% url 'add_task' %}?plugin_id={{ plugin.id }}">
+                                    <button type="submit">{% translate "Run" %}</button>
+                                </a>
+                            {% elif not plugin.files_in_arguments %}
+                                <form action="{% url 'add_task' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="organization" value="">
+                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
+                                    <button type="submit">{% translate "Run" %}</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

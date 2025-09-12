@@ -103,6 +103,14 @@ class Plugin(models.Model):
 
         return result
 
+    def files_in_arguments(self):
+        results = []
+        for consume in self.consumes:
+            if consume.startswith("file:"):
+                results.append(consume.lstrip("file:"))
+
+        return results
+
     def consumed_types(self):
         return self.types_in_arguments() + [
             ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes

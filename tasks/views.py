@@ -74,15 +74,15 @@ class TaskDetailView(DetailView):
 
 
 class TaskForm(ModelForm):
-    plugin_id = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
-    input_data = forms.ModelMultipleChoiceField(Object.objects.all())
+    plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
+    input_data = forms.ModelMultipleChoiceField(Object.objects.all(), required=False)
 
     class Meta:
         model = Task
         fields = ["organization"]
 
     def save(self, *args, **kwargs):
-        plugin = self.cleaned_data["plugin_id"]
+        plugin = self.cleaned_data["plugin"]
 
         if self.cleaned_data["organization"] is None:
             # TODO: handle..
@@ -114,6 +114,9 @@ class TaskForm(ModelForm):
                     continue
 
                 input_data.add(str(profile.reference))
+
+        if not input_data and plugin.consumed_types():
+            raise ValueError(f"No matching input objects found for plugin requiring input objects")
 
         return run_plugin_task(
             plugin.plugin_id,
