@@ -14,6 +14,7 @@ dependencies = [
   "structlog>=25.3.0",
   "django-structlog>=9.1.1",
   "django-xtdb",
+  "django-two-factor-auth[phonenumberslite]>=1.17.0",
 ]
 
 [dependency-groups]
