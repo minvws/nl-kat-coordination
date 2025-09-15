@@ -7,7 +7,7 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 run := docker compose run --rm -e DATABASE_MIGRATION=false openkat
-exec := docker compose exec openkat
+exec := docker compose exec -T openkat
 
 
 kat:
