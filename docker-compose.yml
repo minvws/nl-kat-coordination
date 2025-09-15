@@ -92,6 +92,7 @@ networks:
         - subnet: 172.29.0.0/16
           gateway: 172.29.0.1
   plugins:
+    name: openkat-plugin-network
     enable_ipv6: true
     ipam:
       config:
