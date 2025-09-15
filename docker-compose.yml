@@ -18,7 +18,7 @@ services:
       - .env
 
   xtdb:
-    image: "ghcr.io/xtdb/xtdb:nightly-20250821"
+    image: "ghcr.io/xtdb/xtdb:nightly-20250912"
     restart: unless-stopped
     ports:
       - "127.0.0.1:5433:5432"

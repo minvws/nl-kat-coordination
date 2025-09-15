@@ -1,0 +1,172 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "Hostname:" %} {{ hostname.name }}</h1>
+                </div>
+            </div>
+            <div>
+                <h2>Details</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>Address</dt>
+                            <dd>
+                                {{ hostname.name }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Network</dt>
+                            <dd>
+                                <a href="{% url 'ooi:network-detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div class="horizontal-scroll">
+                <h2>{% translate "DNS Records" %}</h2>
+                <table>
+                    <caption class="visually-hidden">{% translate "DNS records" %}</caption>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "Content" %}</th>
+                            <th>{% translate "Details" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in hostname.dnsarecord_set.all %}
+                            <tr>
+                                <td>A</td>
+                                <td>
+                                    <a href="{% url 'ooi:ipaddress-detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                </td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.dnsaaaarecord_set.all %}
+                            <tr>
+                                <td>AAAA</td>
+                                <td>
+                                    <a href="{% url 'ooi:ipaddress-detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                </td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.cname_records.all %}
+                            <tr>
+                                <td>CNAME</td>
+                                <td>
+                                    <a href="{% url 'ooi:hostname-detail' record.target_id %}">{{ record.target }}</a>
+                                </td>
+                                <td>{% translate "Source:" %} {{ hostname.name }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.mx_records.all %}
+                            <tr>
+                                <td>MX</td>
+                                <td>
+                                    <a href="{% url 'ooi:hostname-detail' record.mail_server_id %}">{{ record.mail_server }}</a>
+                                </td>
+                                <td>{% translate "Preference:" %} {{ record.preference }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.ns_records.all %}
+                            <tr>
+                                <td>NS</td>
+                                <td>
+                                    <a href="{% url 'ooi:hostname-detail' record.name_server_id %}">{{ record.name_server }}</a>
+                                </td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.dnscaarecord_set.all %}
+                            <tr>
+                                <td>CAA</td>
+                                <td>{{ record.value }}</td>
+                                <td>{% translate "Flags:" %} {{ record.flags }}, {% translate "Tag:" %} {{ record.tag }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.dnstxtrecord_set.all %}
+                            <tr>
+                                <td>TXT</td>
+                                <td>{{ record.value }}</td>
+                                <td>
+                                    {% if record.prefix %}
+                                        {% translate "Prefix:" %} {{ record.prefix }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.dnssrvrecord_set.all %}
+                            <tr>
+                                <td>SRV</td>
+                                <td>
+                                    <a href="{% url 'ooi:hostname-detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
+                                </td>
+                                <td>{% translate "Priority:" %} {{ record.priority }}, {% translate "Weight:" %} {{ record.weight }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="horizontal-scroll">
+                <h2>{% translate "Reverse DNS Records" %}</h2>
+                <table>
+                    <caption class="visually-hidden">{% translate "Reverse DNS records" %}</caption>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "Content" %}</th>
+                            <th>{% translate "Details" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in hostname.dnsptrrecord_set.all %}
+                            <tr>
+                                <td>PTR</td>
+                                <td>{{ record.ip_address }}</td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.cname_targets.all %}
+                            <tr>
+                                <td>CNAME</td>
+                                <td>{{ hostname.name }}</td>
+                                <td>
+                                    {% translate "Target for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.mx_targets.all %}
+                            <tr>
+                                <td>MX</td>
+                                <td>{{ hostname.name }}</td>
+                                <td>
+                                    {% translate "Mail server for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for record in hostname.ns_targets.all %}
+                            <tr>
+                                <td>NS</td>
+                                <td>{{ hostname.name }}</td>
+                                <td>
+                                    {% translate "Authoritative for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

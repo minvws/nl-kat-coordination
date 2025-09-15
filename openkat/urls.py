@@ -7,4 +7,5 @@ urlpatterns = [
     path("", include(tf_urls)),
     path("account/logout/", LogoutView.as_view(), name="logout"),
     path("admin/", admin.site.urls),
+    path("ooi/", include("ooi.urls")),
 ]

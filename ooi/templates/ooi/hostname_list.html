@@ -1,0 +1,41 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Hostnames" %}</h1>
+                </div>
+            </div>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>Hostname</th>
+                                <th>Network</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hostname in hostnames %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'ooi:hostname-detail' hostname.pk %}">{{ hostname.name }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'ooi:network-detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

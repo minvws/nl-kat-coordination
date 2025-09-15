@@ -1,0 +1,129 @@
+from django.contrib import admin
+
+from ooi.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCAARecord,
+    DNSCNAMERecord,
+    DNSMXRecord,
+    DNSNSRecord,
+    DNSPTRRecord,
+    DNSSRVRecord,
+    DNSTXTRecord,
+    Hostname,
+    IPAddress,
+    IPPort,
+    Network,
+    ScanLevel,
+)
+
+
+@admin.register(Network)
+class NetworkAdmin(admin.ModelAdmin[Network]):
+    list_display = ("name",)
+    search_fields = ("name",)
+    ordering = ("name",)
+
+
+@admin.register(IPAddress)
+class IPAddressAdmin(admin.ModelAdmin[IPAddress]):
+    list_display = ("address", "network")
+    list_filter = ("network",)
+    search_fields = ("address",)
+    ordering = ("address",)
+
+
+@admin.register(IPPort)
+class IPPortAdmin(admin.ModelAdmin[IPPort]):
+    list_display = ("address", "protocol", "port")
+    list_filter = ("protocol",)
+    search_fields = ("address__address", "port")
+    ordering = ("address__address", "port")
+
+
+@admin.register(Hostname)
+class HostnameAdmin(admin.ModelAdmin[Hostname]):
+    list_display = ("name", "network")
+    list_filter = ("network",)
+    search_fields = ("name",)
+    ordering = ("name",)
+
+
+@admin.register(ScanLevel)
+class ScanLevelAdmin(admin.ModelAdmin[ScanLevel]):
+    list_display = ("id", "organization", "scan_level", "declared", "last_changed_by")
+    list_filter = ("organization", "scan_level", "declared")
+    search_fields = ("id",)
+    ordering = ("id",)
+
+
+@admin.register(DNSARecord)
+class DNSARecordAdmin(admin.ModelAdmin[DNSARecord]):
+    list_display = ("hostname", "ip_address", "ttl")
+    list_filter = ("ttl",)
+    search_fields = ("hostname__name", "ip_address__address")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSAAAARecord)
+class DNSAAAARecordAdmin(admin.ModelAdmin[DNSAAAARecord]):
+    list_display = ("hostname", "ip_address", "ttl")
+    list_filter = ("ttl",)
+    search_fields = ("hostname__name", "ip_address__address")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSPTRRecord)
+class DNSPTRRecordAdmin(admin.ModelAdmin[DNSPTRRecord]):
+    list_display = ("ip_address", "hostname", "ttl")
+    list_filter = ("ttl",)
+    search_fields = ("hostname__name", "ip_address__address")
+    ordering = ("ip_address__address",)
+
+
+@admin.register(DNSCNAMERecord)
+class DNSCNAMERecordAdmin(admin.ModelAdmin[DNSCNAMERecord]):
+    list_display = ("hostname", "target", "ttl")
+    list_filter = ("ttl",)
+    search_fields = ("hostname__name", "target__name")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSMXRecord)
+class DNSMXRecordAdmin(admin.ModelAdmin[DNSMXRecord]):
+    list_display = ("hostname", "mail_server", "preference", "ttl")
+    list_filter = ("preference", "ttl")
+    search_fields = ("hostname__name", "mail_server__name")
+    ordering = ("hostname__name", "preference")
+
+
+@admin.register(DNSNSRecord)
+class DNSNSRecordAdmin(admin.ModelAdmin[DNSNSRecord]):
+    list_display = ("hostname", "name_server", "ttl")
+    list_filter = ("ttl",)
+    search_fields = ("hostname__name", "name_server__name")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSCAARecord)
+class DNSCAARecordAdmin(admin.ModelAdmin[DNSCAARecord]):
+    list_display = ("hostname", "flags", "tag", "value", "ttl")
+    list_filter = ("flags", "tag", "ttl")
+    search_fields = ("hostname__name", "value")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSTXTRecord)
+class DNSTXTRecordAdmin(admin.ModelAdmin[DNSTXTRecord]):
+    list_display = ("hostname", "prefix", "value", "ttl")
+    list_filter = ("prefix", "ttl")
+    search_fields = ("hostname__name", "prefix", "value")
+    ordering = ("hostname__name",)
+
+
+@admin.register(DNSSRVRecord)
+class DNSSRVRecordAdmin(admin.ModelAdmin[DNSSRVRecord]):
+    list_display = ("hostname", "service", "proto", "priority", "weight", "port", "ttl")
+    list_filter = ("service", "proto", "priority", "ttl")
+    search_fields = ("hostname__name", "service", "proto")
+    ordering = ("hostname__name", "service", "proto")

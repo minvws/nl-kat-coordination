@@ -25,7 +25,23 @@
             {% endif %}
             <div class="collapsing-element">
                 <ul>
-                    {% if request.user.is_authenticated %}{% endif %}
+                    {% if request.user.is_authenticated %}
+                        {% url 'ooi:network-list' as index_url %}
+                        <li>
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Networks" %}</a>
+                        </li>
+                        <li>
+                            {% url 'ooi:hostname-list' as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Hostnames" %}</a>
+                        </li>
+                        <li>
+                            {% url 'ooi:ipaddress-list' as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "IP addresses" %}</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <div>
                     {% include "partials/language-switcher.html" %}
