@@ -75,7 +75,10 @@ class PluginRunner:
                 if parallelism == 0 or True:
                     logs = []
                     for t in target:
-                        logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
+                        try:
+                            logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
+                        except ContainerError:
+                            logs.append(f"Failed to process target: {t}")
 
                     return "\n".join(logs)
 
