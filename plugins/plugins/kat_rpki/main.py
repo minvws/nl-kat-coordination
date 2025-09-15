@@ -1,3 +1,11 @@
+# /// script
+# dependencies = [
+#   "httpx==0.27.2",
+#   "polars==1.32.3",
+#   "polars-iptools==0.1.10",
+# ]
+# ///
+
 import json
 from json import JSONDecodeError
 from os import getenv
@@ -13,7 +21,7 @@ def run():
     bgp = download_lazyframe(client, "bgp-download")
 
     ip4s = get_all_objects_of_type(client, "IPAddressV4")
-    # ip6s = get_all_objects_of_type(client, "IPAddressV6")  # TODO
+    ip6s = get_all_objects_of_type(client, "IPAddressV6")  # TODO
 
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
@@ -24,10 +32,14 @@ def run():
         bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
     )
 
-    # Create a pl.LazyFrame out of the object list of IPAddressV4's
+    # Create a pl.LazyFrame out of the object list of IPAddresses
     ip4s_lazy = pl.LazyFrame(
         {"ip": [x["address"] for x in ip4s.values()]}).with_columns(intip4=ip.ipv4_to_numeric("ip")
     )
+    ip6s_lazy = pl.LazyFrame(
+        {"ip": [x["address"] for x in ip4s.values()]}).with_columns(intip4=ip.ipv4_to_numeric("ip")
+    )
+    breakpoint()
 
     # Based on the start-ip and prefix, calculate if an ip from ip4s_lazy is within the range of a row from rpki_v4.
     # Create a new LazyFrame where an ip address is matched to any rpki_v4 with a network containing the ip.

@@ -4,6 +4,7 @@
 !lib
 **/__pycache__
 .env
+.env.local
 .venv
 .idea
 dist
