@@ -547,7 +547,7 @@ SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
 OUTGOING_REQUEST_TIMEOUT = env.int("OUTGOING_REQUEST_TIMEOUT", default=30)
 PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
 AUTO_PARALLELISM = env.int("AUTO_PARALLELISM", default=8)
-
+BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
 
 def OCTOPOES_FACTORY(organization: str):
     from octopoes.connector.octopoes import OctopoesAPIConnector

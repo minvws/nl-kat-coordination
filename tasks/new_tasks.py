@@ -124,7 +124,7 @@ def run_schedule_for_org(schedule: NewSchedule, organization: Organization, forc
     run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
-def rerun_task(task: Task):
+def rerun_task(task: Task) -> list[Task]:
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
     return run_plugin_task(
@@ -137,9 +137,19 @@ def run_plugin_task(
     organization_code: str | None = None,
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
-) -> Task:
+) -> list[Task]:
     if isinstance(input_data, set):
         input_data = list(input_data)
+
+    if isinstance(input_data, list) and settings.BATCH_SIZE > 0 and len(input_data) > settings.BATCH_SIZE:
+        tasks = []
+        idx = 0
+
+        for idx_2 in range(settings.BATCH_SIZE, len(input_data) + settings.BATCH_SIZE, settings.BATCH_SIZE):
+            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2]))
+            idx = idx_2
+
+        return tasks
 
     task_id = uuid.uuid4()
     task = Task.objects.create(
@@ -153,7 +163,7 @@ def run_plugin_task(
 
     app.send_task("tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
 
-    return task
+    return [task]
 
 
 @app.task(bind=True)
@@ -161,7 +171,7 @@ def run_plugin(
     self, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
 ) -> None:
     logger.debug(
-        "Starting task plugin",
+        "Starting plugin task",
         task_id=self.request.id,
         organization=organization_code,
         plugin_id=plugin_id,
