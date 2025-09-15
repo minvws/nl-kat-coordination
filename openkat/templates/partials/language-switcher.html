@@ -1,0 +1,36 @@
+{% load i18n %}
+
+{% get_language_info for LANGUAGE_CODE as lang %}
+<div class="language-selector">
+    <div class="dropdown">
+        <button type="button"
+                aria-controls="language-switcher"
+                aria-expanded="false"
+                class="dropdown-button ghost">
+            {{ lang.name_local|title }}
+            <span aria-hidden="true" class="icon ti-chevron-down"></span>
+        </button>
+        <ul id="language-switcher" role="listbox" class="dropdown-list">
+            {% for language in languages %}
+                {% get_language_info for language as lang %}
+                {% if LANGUAGE_CODE != language %}
+                    <li>
+                        <a hreflang="{{ language }}"
+                           href="#"
+                           role="option"
+                           data-value="{{ language }}"
+                           lang="{{ language }}">
+                            <button form="set-language"
+                                    type="submit"
+                                    name="language"
+                                    value="{{ language }}">{{ lang.name_local.title }}</button>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <form id="set-language" action="" method="post" class="inline">
+        {% csrf_token %}
+    </form>
+</div>

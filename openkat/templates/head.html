@@ -1,0 +1,15 @@
+{% load static %}
+
+<head>
+    <title>OpenKAT - {{ request.resolver_match.url_name }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{% static "img/favicon.svg" %}" />
+    <link href="{% static "dist/app.css" %}" rel="stylesheet">
+    {% comment %}
+    <script src="{% url 'jsi18n' %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcomment %}
+    <script defer
+            src="{% static "dist/imports/manon.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+</head>

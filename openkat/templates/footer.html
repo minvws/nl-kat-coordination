@@ -1,0 +1,24 @@
+{% load static %}
+{% load i18n %}
+
+<footer id="page-footer">
+    <span>Kwetsbaarheden Analyse Tool</span>
+    {% if request.user.is_authenticated %}<span>{{ openkat_version }}</span>{% endif %}
+    <nav aria-labelledby="footer-nav-1">
+        <h1 id="footer-nav-1" class="visually-hidden">{% translate "Service" %}</h1>
+        <ul>
+            <li>
+                <a href="{% url "crisis_room" %}">OpenKAT</a>
+            </li>
+            <li>
+                <a href="{% url "privacy_statement" %}">{% translate "Privacy Statement" %}</a>
+            </li>
+            {% if organization %}
+                <li>
+                    <a href="{% url "health_beautified" organization_code=organization.code %}">{% translate "Health" %}</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</footer>
+<script src="{% static "js/dropdown.js" %}" nonce="{{ request.csp_nonce }}"></script>
