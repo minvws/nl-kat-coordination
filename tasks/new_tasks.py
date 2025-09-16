@@ -137,16 +137,17 @@ def run_plugin_task(
     organization_code: str | None = None,
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
-) -> list[Task]:
+    batch: bool = True,
+) -> list[Task] | Task:
     if isinstance(input_data, set):
         input_data = list(input_data)
 
-    if isinstance(input_data, list) and settings.BATCH_SIZE > 0 and len(input_data) > settings.BATCH_SIZE:
+    if batch and isinstance(input_data, list) and settings.BATCH_SIZE > 0 and len(input_data) > settings.BATCH_SIZE:
         tasks = []
         idx = 0
 
         for idx_2 in range(settings.BATCH_SIZE, len(input_data) + settings.BATCH_SIZE, settings.BATCH_SIZE):
-            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2]))
+            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False))
             idx = idx_2
 
         return tasks
@@ -163,7 +164,10 @@ def run_plugin_task(
 
     app.send_task("tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
 
-    return [task]
+    if batch:
+        return [task]
+
+    return task
 
 
 @app.task(bind=True)

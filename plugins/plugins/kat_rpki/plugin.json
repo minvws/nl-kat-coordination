@@ -7,8 +7,6 @@
   "oci_arguments": [
     "uv",
     "run",
-    "kat_rpki/main.py",
-    "{file}",
-    "{file}"
+    "kat_rpki/main.py"
   ]
 }
