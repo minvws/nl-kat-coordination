@@ -134,32 +134,28 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
 
         return reverse_lazy("plugin_list")
 
-    
 
-class PluginUpdateView(PluginCreateView):
+class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
 
-    def form_invalid(self, form):
-        return reverse("plugin_detail", kwargs={"pk": self.object.id})
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugin = self.get_object()
 
     def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
+        return reverse("plugin_detail", kwargs={"pk": self.plugin.pk})
 
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
-
-        return reverse("plugin_detail", kwargs={"pk": self.object.id})
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["plugin"] = self.plugin
         context["breadcrumbs"] = [
             {"url": reverse("plugin_list"), "text": _("Plugins")},
-            {"url": reverse("plugin_detail", kwargs={"pk": self.object.id}), "text": _("Plugin details")},
+            {"url": reverse("plugin_detail", kwargs={"pk": self.plugin.pk}), "text": _("Plugin details")},
         ]
 
-        return context    
+        return context
 
 
 class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
@@ -207,9 +203,7 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
         if self.object.enabled:
             messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                _("Plugin '{}' has been enabled.").format(self.object.plugin.name),
+                self.request, messages.SUCCESS, _("Plugin '{}' has been enabled.").format(self.object.plugin.name)
             )
             return result
 
@@ -222,9 +216,7 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
             task.cancel()
 
         messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            _("Plugin '{}' has been disabled.").format(self.object.plugin.name),
+            self.request, messages.SUCCESS, _("Plugin '{}' has been disabled.").format(self.object.plugin.name)
         )
         return result
 
