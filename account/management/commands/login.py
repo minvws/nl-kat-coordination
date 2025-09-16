@@ -13,10 +13,26 @@ class Command(BaseCommand):
     help = "Creates a new authentication token."
 
     def add_arguments(self, parser):
-        parser.add_argument("username", help="Username to create the token for")
+        parser.add_argument(
+            "--username",
+            type=str,
+            help="Username for authentication",
+        )
+        parser.add_argument(
+            "--password",
+            type=str,
+            help="Password for authentication (optional, will prompt if not provided)",
+        )
 
-    def handle(self, username, **kwargs):
-        password = getpass(f"Password for {username}:")
+    def handle(self, *args, **options):
+        username = options.get("username")
+        password = options.get("password")
+
+        if not username:
+            username = input("Username: ")
+        if not password:
+            password = getpass("Password: ")
+
         user = authenticate(username=username, password=password)
 
         with transaction.atomic():

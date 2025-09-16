@@ -38,6 +38,9 @@ reset:
 	make clean
 	make kat
 
+login:
+	OPENKAT_DB_HOST=localhost python manage.py login
+
 dashboards:
 	docker compose run --rm openkat python manage.py dashboards
 
