@@ -52,14 +52,19 @@
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
                         </li>
                         <li>
-                            {% url "network-list" as index_url %}
+                            {% url "network_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Networks" %}</a>
                         </li>
                         <li>
-                            {% url "object_set_list" as index_url %}
+                            {% url "hostname_list" as index_url %}
                             <a href="{{ index_url }}"
-                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Object Sets" %}</a>
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Hostnames" %}</a>
+                        </li>
+                        <li>
+                            {% url "ipaddress_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "IPAddresses" %}</a>
                         </li>
                     {% endif %}
                 </ul>

@@ -9,13 +9,11 @@ from oois.views import (
     NetworkListView,
 )
 
-app_name = "oois"
-
 urlpatterns = [
-    path("ooi/network/", NetworkListView.as_view(), name="network-list"),
-    path("ooi/network/<int:pk>/", NetworkDetailView.as_view(), name="network-detail"),
-    path("ooi/ipaddress/", IPAddressListView.as_view(), name="ipaddress-list"),
-    path("ooi/ipaddress/<int:pk>/", IPAddressDetailView.as_view(), name="ipaddress-detail"),
-    path("ooi/hostname/", HostnameListView.as_view(), name="hostname-list"),
-    path("ooi/hostname/<int:pk>/", HostnameDetailView.as_view(), name="hostname-detail"),
+    path("ooi/network/", NetworkListView.as_view(), name="network_list"),
+    path("ooi/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
+    path("ooi/ipaddress/", IPAddressListView.as_view(), name="ipaddress_list"),
+    path("ooi/ipaddress/<int:pk>/", IPAddressDetailView.as_view(), name="ipaddress_detail"),
+    path("ooi/hostname/", HostnameListView.as_view(), name="hostname_list"),
+    path("ooi/hostname/<int:pk>/", HostnameDetailView.as_view(), name="hostname_detail"),
 ]
