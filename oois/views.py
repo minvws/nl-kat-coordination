@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.urls import reverse
 from django.views.generic import DetailView, ListView
+from django.utils.translation import gettext_lazy as _
 
 from oois.models import Hostname, IPAddress, Network
 
@@ -15,11 +17,23 @@ class NetworkListView(ListView):
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("network_list"), "text": _("Networks")}]
+
+        return context
+
 
 class NetworkDetailView(DetailView):
     model = Network
     template_name = "ooi/network_detail.html"
     context_object_name = "network"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("network_list"), "text": _("Networks")}]
+
+        return context
 
 
 class IPAddressListView(ListView):
@@ -31,6 +45,12 @@ class IPAddressListView(ListView):
     def get_queryset(self) -> "QuerySet[IPAddress]":
         return IPAddress.objects.select_related("network")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("ipaddress_list"), "text": _("IPAddresses")}]
+
+        return context
+
 
 class IPAddressDetailView(DetailView):
     model = IPAddress
@@ -39,6 +59,12 @@ class IPAddressDetailView(DetailView):
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
         return IPAddress.objects.select_related("network").prefetch_related("ipport_set")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("ipaddress_list"), "text": _("IPAddresses")}]
+
+        return context
 
 
 class HostnameListView(ListView):
@@ -49,6 +75,12 @@ class HostnameListView(ListView):
 
     def get_queryset(self) -> "QuerySet[Hostname]":
         return Hostname.objects.select_related("network")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("hostname_list"), "text": _("Hostnames")}]
+
+        return context
 
 
 class HostnameDetailView(DetailView):
@@ -71,3 +103,9 @@ class HostnameDetailView(DetailView):
             "dnstxtrecord_set",
             "dnssrvrecord_set",
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("hostname_list"), "text": _("Hostnames")}]
+
+        return context
