@@ -21,38 +21,31 @@ def ipv6_to_int(ipv6_addr):
     return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
 
 
-def run():
-    client = httpx.Client(base_url=getenv("OPENKAT_API"), headers={"Authorization": "Token " + getenv("OPENKAT_TOKEN")})
-    rpki = download_lazyframe(client, "rpki-download")
-    bgp = download_lazyframe(client, "bgp-download")
-
-    ip4s = get_all_objects_of_type(client, "IPAddressV4")
-    ip6s = get_all_objects_of_type(client, "IPAddressV6")  # TODO
-
+def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict[str, dict]):
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
     )
-    rpki_v6 = rpki.filter(pl.col("prefix").str.contains(":", literal=True)).with_columns(  # filter ipv4 addresses
-        intip=pl.col("prefix").str.split("/").list.get(0).map_elements(ipv6_to_int, return_dtype=pl.Int128),  # parse CIDR to start-ip as an integer
-        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
+    rpki_v6 = rpki.filter(pl.col("prefix").str.contains(":", literal=True)).with_columns(
+        intip=pl.col("prefix").str.split("/").list.get(0).map_elements(ipv6_to_int, return_dtype=pl.Int128),
+        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),
     )
 
-    bgp_v4 = bgp.filter(pl.col("CIDR").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
-        bintip=ip.ipv4_to_numeric(pl.col("CIDR").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
-        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
+    bgp_v4 = bgp.filter(pl.col("CIDR").str.contains(".", literal=True)).with_columns(
+        bintip=ip.ipv4_to_numeric(pl.col("CIDR").str.split("/").list.get(0)),
+        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),
     )
-    bgp_v6 = bgp.filter(pl.col("CIDR").str.contains(":", literal=True)).with_columns(  # filter ipv4 addresses
-        bintip=pl.col("CIDR").str.split("/").list.get(0).map_elements(ipv6_to_int, return_dtype=pl.Int128),  # parse CIDR to start-ip as an integer
-        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
+    bgp_v6 = bgp.filter(pl.col("CIDR").str.contains(":", literal=True)).with_columns(
+        bintip=pl.col("CIDR").str.split("/").list.get(0).map_elements(ipv6_to_int, return_dtype=pl.Int128),
+        bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),
     )
 
     # Create a pl.LazyFrame out of the object list of IPAddresses
     ip4s_lazy = pl.LazyFrame(
-        {"ip": [x["address"] for x in ip4s.values()]}).with_columns(intip4=ip.ipv4_to_numeric("ip")
+        list(ip4s.values())).with_columns(intip4=ip.ipv4_to_numeric("address")
     )
-    ip6s_lazy = pl.LazyFrame({"ip": [x["address"] for x in ip6s.values()]}).with_columns(
-        intip6=pl.col("ip").map_elements(ipv6_to_int, return_dtype=pl.Int128)
+    ip6s_lazy = pl.LazyFrame(list(ip6s.values())).with_columns(
+        intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128)
     )
     # Based on the start-ip and prefix, calculate if an ip from ip4s_lazy is within the range of a row from rpki_v4.
     # Create a new LazyFrame where an ip address is matched to any rpki_v4 with a network containing the ip.
@@ -66,44 +59,53 @@ def run():
     new_v6 = ip6s_lazy.join_where(
         rpki_v6,
         pl.col("intip") <= pl.col("intip6"),
-        pl.col("intip") >= pl.col("intip6") - pl2 ** 100,
+        pl.col("intip") >= pl.col("intip6") - pl2 ** (128 - pl.col("intprefix")),
     )
 
-    # Join the bgp data the same way, creating a dataframe with all possible triplets (rpki_network, bgp_network, ip)
-    # where "ip in rpki_network && ip in bgp_network". (In general, the list of ip addresses is relatively small and
-    # this results in a dataframe with roughly 5-10 rows per ip address.)
-    bgp_new_v4 = set(new_v4.join_where(
+    bgp_new_v4 = ip4s_lazy.join_where(
         bgp_v4,
         pl.col("bintip") <= pl.col("intip4"),
         pl.col("bintip") + pl2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4"),
-        pl.col("asn") != pl.col("ASN"),
-    ).select("ip").collect()["ip"].unique())
+    ).group_by("address").agg("ASN")
 
-    bgp_new_v6 = set(new_v6.join_where(
+    bgp_new_v6 = ip6s_lazy.join_where(
         bgp_v6,
         pl.col("bintip") <= pl.col("intip6"),
-        pl.col("bintip") + pl2 ** (128 - pl.col("bintprefix")) >= pl.col("intip6"),
-        pl.col("asn") != pl.col("ASN"),
-    ).select("ip").collect()["ip"].unique())
+        pl.col("bintip") >= pl.col("intip6") - pl2 ** (128 - pl.col("bintprefix")),
+    ).group_by("address").agg("ASN")
+
+    bgp_rpki_v4 = new_v4.group_by("primary_key", "address").agg("asn").join(
+        bgp_new_v4, on="address"
+    ).filter(pl.col("asn").list.unique() != pl.col("ASN").list.unique())
+
+    bgp_rpki_v6 = new_v6.group_by("primary_key", "address").agg("asn").join(
+        bgp_new_v6, on="address"
+    ).filter(pl.col("asn").list.unique() != pl.col("ASN").list.unique())
 
     results = []
 
-    ip4s_with_rpki = set(new_v4.select("ip").collect()["ip"].unique())
-    ip6s_with_rpki = set(new_v6.select("ip").collect()["ip"].unique())
+    ip4s_without_rpki = ip4s_lazy.join(new_v4, on="address", how="left").filter(pl.col("prefix").is_null())
+    ip6s_without_rpki = ip6s_lazy.join(new_v6, on="address", how="left").filter(pl.col("prefix").is_null())
 
-    for pk, ip_ooi in (ip4s | ip6s).items():
-        if ip_ooi["address"] not in ip4s_with_rpki and ip_ooi["address"] not in ip6s_with_rpki:
-            ft = dict(object_type="KATFindingType", id="KAT-NO-RPKI")
-            f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-            results.extend([ft, f])
-            continue
+    for pk, address in ip4s_without_rpki.select(["primary_key", "address"]).collect().iter_rows():
+        ft = dict(object_type="KATFindingType", id="KAT-NO-RPKI")
+        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
+        results.extend([ft, f])
 
-        if ip_ooi["address"] in bgp_new_v4 or ip_ooi["address"] in bgp_new_v6:
-            ft = dict(object_type="KATFindingType", id="KAT-INVALID-RPKI")
-            f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-            results.extend([ft, f])
+    for pk, address in ip6s_without_rpki.select(["primary_key", "address"]).collect().iter_rows():
+        ft = dict(object_type="KATFindingType", id="KAT-NO-RPKI")
+        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
+        results.extend([ft, f])
 
-    client.post('/objects/', json=results)
+    for pk, address in bgp_rpki_v4.select(["primary_key", "address"]).collect().iter_rows():
+        ft = dict(object_type="KATFindingType", id="KAT-INVALID-RPKI")
+        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
+        results.extend([ft, f])
+
+    for pk, address in bgp_rpki_v6.select(["primary_key", "address"]).collect().iter_rows():
+        ft = dict(object_type="KATFindingType", id="KAT-INVALID-RPKI")
+        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
+        results.extend([ft, f])
 
     return results
 
@@ -148,5 +150,14 @@ def get_all_objects_of_type(client: httpx.Client, object_type: str) -> dict[str,
 
 
 if __name__ == "__main__":
-    oois = run()
+    client = httpx.Client(base_url=getenv("OPENKAT_API"), headers={"Authorization": "Token " + getenv("OPENKAT_TOKEN")})
+    oois = run(
+        download_lazyframe(client, "rpki-download"),
+        download_lazyframe(client, "bgp-download"),
+        get_all_objects_of_type(client, "IPAddressV4"),
+        get_all_objects_of_type(client, "IPAddressV6"),
+    )
+
+    client.post('/objects/', json=oois)
+
     print(json.dumps(oois))
