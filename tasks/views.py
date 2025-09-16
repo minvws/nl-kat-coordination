@@ -122,6 +122,7 @@ class TaskForm(ModelForm):
             plugin.plugin_id,
             None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
             list(input_data),
+            batch=False,
         )
 
 
