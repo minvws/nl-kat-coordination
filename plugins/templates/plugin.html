@@ -9,89 +9,43 @@
 
     <main id="main-content">
         <section>
-            <div class="introduction">
+            {% include "plugin_introduction.html" %}
+            {% include "plugin_tabs.html" with view="general" %}
+            <div>
+                <h2>{% translate "General" %}</h2>
                 <div>
-                    <h1>{{ plugin.name }}</h1>
-                    {% if plugin.description %}<p class="emphasized">{{ plugin.description }}</p>{% endif %}
-                    <div class="horizontal-view scan-intensity">
-                        <span class="de-emphasized">{% translate "Scan level" %}</span>
-                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
-
-                    </div>
-                    {% if perms.openkat.can_enable_disable_plugin %}
-                        <div class="horizontal-view">
-                            {% include "new_enable_disable_plugin.html" with plugin=plugin %}                       
-                        </div>
+                    <h3>{% translate "Container image" %}</h3>
+                    <p>
+                        {% translate "The container image for this plugin is:" %} <code>{{ plugin.oci_image }}</code>
+                    </p>
+                </div>
+                <div>
+                    <h3>{% translate "Arguments" %}</h3>
+                    <ul>
+                    {% for argument in plugin.oci_arguments %}
+                        <li>{{ argument }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h3>{% translate "Consumes" %}</h3>
+                    {% if plugin.consumes %}
+                        <p>
+                            {% blocktranslate trimmed with plugin_name=plugin.name %}
+                                This plugin is able to scan the following object types:
+                            {% endblocktranslate %}
+                        </p>
+                        <p>
+                            {% for ooi_type in plugin.consumes %}
+                                <span class="label tags-color-1-light">{{ ooi_type }}</span>
+                            {% endfor %}
+                        </p>
                     {% else %}
-                        <span class="de-emphasized">
-                            {% if plugin.enabled %}
-                                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-                            {% else %}
-                                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-                            {% endif %}
-                        </span>
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} does not need any input objects.
+                        {% endblocktranslate %}
                     {% endif %}
                 </div>
-                <div>
-                    <div class="horizontal-view toolbar">
-                        {% if perms.openkat.can_add_boefje %}
-                            <a class="button ghost" href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
-                                {% translate "Edit" %}
-                            </a>
-                        {% endif %}
-                        {% if perms.openkat.can_delete_boefje %}
-                            <a class="button ghost destructive" href="{% url 'delete_plugin' plugin.id %}">
-                                {% translate "Delete" %}
-                            </a>
-                        {% endif %}
-                    </div>
-                    {% comment %} <div class="image-square">
-                        <div class="image-container">
-                            <img loading="lazy"
-                                src="{% url "plugin_cover_image" plugin_id=plugin.plugin_id %}"
-                                alt="boefje placeholder image" />
-                        </div>
-                    </div> {% endcomment %}
-                </div>
-            </div>
-            <div>
-                <h2>{% translate "Container image" %}</h2>
-                <p>
-                    {% translate "The container image for this plugin is:" %} <code>{{ plugin.oci_image }}</code>
-                </p>
-            </div>
-            <div>
-                <h2>{% translate "Arguments" %}</h2>
-
-                    {% for argument in plugin.oci_arguments %}
-                        <p><code>{{ argument }}</code></p>
-                    {% endfor %}
-            
-            </div>
-            <div>
-                <h2>{% translate "Version" %}</h2>
-                <p>
-                    {% translate "The version of this plugin is:" %} <code>{{ plugin.version }}</code>
-                </p>
-            </div>
-            <div>
-                <h2>{% translate "Consumes" %}</h2>
-                {% if plugin.consumes %}
-                    <p>
-                        {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to scan the following object types:
-                        {% endblocktranslate %}
-                    </p>
-                    <p>
-                        <ul>
-                            {% for ooi_type in plugin.consumes %}<li>{{ ooi_type }}</li>{% endfor %}
-                        </ul>
-                    </p>
-                {% else %}
-                    {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} does not need any input objects.
-                    {% endblocktranslate %}
-                {% endif %}
             </div>
         </section>
     </main>

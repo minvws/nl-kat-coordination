@@ -98,7 +98,7 @@ class PluginIdDetailView(PluginDetailView):
 class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
-    template_name = "plugin_form.html"
+    template_name = "plugin_settings.html"
 
     def get_form_kwargs(self):
         if self.request.method == "POST" and "plugin_id" in self.request.GET:
@@ -132,7 +132,16 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url
 
-        return reverse_lazy("plugin_list")
+        return reverse("plugin_detail", kwargs={"pk": self.object.id})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("plugin_list"), "text": _("Plugins")},
+            {"url": reverse("plugin_detail", kwargs={"pk": self.object.id}), "text": _("Plugin details")},
+        ]
+
+        return context
 
 
 class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
