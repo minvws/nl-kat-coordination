@@ -47,6 +47,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict
     ip6s_lazy = pl.LazyFrame(list(ip6s.values())).with_columns(
         intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128)
     )
+
     # Based on the start-ip and prefix, calculate if an ip from ip4s_lazy is within the range of a row from rpki_v4.
     # Create a new LazyFrame where an ip address is matched to any rpki_v4 with a network containing the ip.
     pl2 = pl.lit(2, dtype=pl.Int128)
@@ -55,32 +56,28 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict
         pl.col("intip") <= pl.col("intip4"),
         pl.col("intip") >= pl.col("intip4") - pl2 ** (32 - pl.col("intprefix")) + 1,
     )
+    bgp_new_v4 = ip4s_lazy.join_where(
+        bgp_v4,
+        pl.col("bintip") <= pl.col("intip4"),
+        pl.col("bintip") + pl2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4") + 1,
+    )
+    bgp_rpki_v4 = bgp_new_v4.join(
+        new_v4, left_on=["address", "ASN"], right_on=["address", "asn"], how="left"
+    ).filter(pl.col("primary_key_right").is_null())
 
     new_v6 = ip6s_lazy.join_where(
         rpki_v6,
         pl.col("intip") <= pl.col("intip6"),
-        pl.col("intip") >= pl.col("intip6") - pl2 ** (128 - pl.col("intprefix")),
-    )
-
-    bgp_new_v4 = ip4s_lazy.join_where(
-        bgp_v4,
-        pl.col("bintip") <= pl.col("intip4"),
-        pl.col("bintip") + pl2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4"),
-    ).group_by("address").agg("ASN")
-
+        pl.col("intip") >= pl.col("intip6") - pl2 ** (128 - pl.col("intprefix")) + 1,
+        )
     bgp_new_v6 = ip6s_lazy.join_where(
         bgp_v6,
         pl.col("bintip") <= pl.col("intip6"),
-        pl.col("bintip") >= pl.col("intip6") - pl2 ** (128 - pl.col("bintprefix")),
-    ).group_by("address").agg("ASN")
-
-    bgp_rpki_v4 = new_v4.group_by("primary_key", "address").agg("asn").join(
-        bgp_new_v4, on="address"
-    ).filter(pl.col("asn").list.unique() != pl.col("ASN").list.unique())
-
-    bgp_rpki_v6 = new_v6.group_by("primary_key", "address").agg("asn").join(
-        bgp_new_v6, on="address"
-    ).filter(pl.col("asn").list.unique() != pl.col("ASN").list.unique())
+        pl.col("bintip") >= pl.col("intip6") - pl2 ** (128 - pl.col("bintprefix")) + 1,
+    )
+    bgp_rpki_v6 = bgp_new_v6.join(
+        new_v6, left_on=["address", "ASN"], right_on=["address", "asn"], how="left"
+    ).filter(pl.col("primary_key_right").is_null())
 
     results = []
 
