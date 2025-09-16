@@ -60,6 +60,9 @@ async function main() {
       "Content-Type": "application/json",
     },
     body: out_json,
+  }).catch((error) => {
+    console.error(`Posting boefje output went wrong with URL: ${output_url}`);
+    throw new Error(error);
   });
 }
 
