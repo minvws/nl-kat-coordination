@@ -24,7 +24,6 @@ clean: .env
 ooi-clean: .env
 	docker compose down --volumes xtdb
 	docker compose up -d
-	docker compose exec openkat python manage.py shell -c "import openkat;[openkat.settings.OCTOPOES_FACTORY(o.code).create_node() for o in openkat.models.Organization.objects.all()]"
 
 build: .env
 ifeq ($(UNAME),Darwin)
@@ -44,7 +43,7 @@ login:
 dashboards:
 	docker compose run --rm openkat python manage.py dashboards
 
-init: user seed messages sync nsync
+init: user seed messages sync
 
 user:
 	-$(exec) python manage.py createsuperuser --no-input
@@ -58,38 +57,16 @@ messages:
 sync:
 	-$(exec) python manage.py sync
 
-nsync:
-	-$(exec) python manage.py nsync
-
 frontend:
 	docker run --rm -v $$PWD:/app/openkat node:20-bookworm sh -c "cd /app/openkat && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
 
-base-image:
-	docker build -f katalogus/images/base.Dockerfile -t openkat/boefje-base:latest .
-
 export REGISTRY=ghcr.io/minvws/openkat
 
-images: dns-sec nmap export-http nikto generic entrypoint plugins
 new-images: entrypoint plugins
 
 entrypoint: plugins/plugins/entrypoint/main
 plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
-
-dns-sec: base-image
-	docker build -f katalogus/boefjes/kat_dnssec/boefje.Dockerfile -t $(REGISTRY)/dns-sec:latest -t openkat/dns-sec .
-
-nmap: base-image
-	docker build -f katalogus/boefjes/kat_nmap_tcp/boefje.Dockerfile -t $(REGISTRY)/nmap:latest -t openkat/nmap .
-
-export-http: base-image
-	docker build -f katalogus/boefjes/kat_export_http/boefje.Dockerfile -t $(REGISTRY)/export-http:latest -t openkat/export-http .
-
-nikto: base-image
-	docker build -f katalogus/boefjes/kat_nikto/boefje.Dockerfile -t $(REGISTRY)/nikto:latest .
-
-generic: base-image
-	docker build -f katalogus/images/generic.Dockerfile -t $(REGISTRY)/generic:latest -t openkat/generic .
 
 plugins:
 	docker build -f plugins/plugins/plugins.Dockerfile -t $(REGISTRY)/plugins:latest -t openkat/plugins .

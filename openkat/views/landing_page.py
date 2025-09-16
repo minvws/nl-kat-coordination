@@ -7,6 +7,6 @@ class LandingPageView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect("crisis_room")
+            return redirect("plugin_list")
 
         return super().get(request, *args, **kwargs)

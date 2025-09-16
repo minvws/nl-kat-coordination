@@ -8,7 +8,6 @@ from django.views.generic import TemplateView, View
 from pydantic import BaseModel, Field
 
 from account.mixins import OrganizationView
-from octopoes.connector.octopoes import OctopoesAPIConnector
 from openkat.version import __version__
 
 logger = structlog.get_logger(__name__)
@@ -32,7 +31,7 @@ class ServiceHealth(BaseModel):
 ServiceHealth.update_forward_refs()
 
 
-def get_openkat_health(organization_code: str, octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
+def get_openkat_health(organization_code: str) -> ServiceHealth:
     services = [ServiceHealth(service="octopoes", healthy=True)]
 
     services_healthy = all(service.healthy for service in services)

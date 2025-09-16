@@ -10,10 +10,8 @@ from pytest_drf import (
     Returns200,
     Returns201,
     Returns204,
-    Returns400,
     Returns403,
     Returns409,
-    Returns500,
     UsesDeleteMethod,
     UsesDetailEndpoint,
     UsesGetMethod,
@@ -25,7 +23,6 @@ from pytest_drf import (
 from pytest_drf.util import pluralized, url_for
 from pytest_lambda import lambda_fixture, static_fixture
 
-from octopoes.xtdb.exceptions import XTDBException
 from openkat.models import Organization
 
 pytestmark = pytest.mark.django_db
@@ -45,7 +42,7 @@ express_organizations = pluralized(express_organization)
 
 class TestOrganizationViewSet(ViewSetTest):
     @pytest.fixture
-    def organizations(self, octopoes_api_connector):
+    def organizations(self):
         created_organizations = []
         organizations = [
             {"name": "Test Organization 1", "code": "test1", "tags": ["tag1", "tag2"]},
@@ -98,20 +95,6 @@ class TestOrganizationViewSet(ViewSetTest):
             expected = express_organization(organization)
             actual = json
             assert actual == expected
-
-    class TestCreateOctopoesError(UsesPostMethod, UsesListEndpoint, Returns500):
-        data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
-
-        @pytest.fixture(autouse=True)
-        def mock_services(self, octopoes_api_connector):
-            octopoes_api_connector.create_node.side_effect = XTDBException("Test error")
-
-        def test_it_returns_error(self, json):
-            expected = {
-                "type": "server_error",
-                "errors": [{"code": "error", "detail": "Failed creating organization in Octopoes", "attr": None}],
-            }
-            assert json == expected
 
     class TestRetrieve(UsesGetMethod, UsesDetailEndpoint, Returns200):
         def test_it_returns_organization(self, organization, json):
@@ -229,65 +212,3 @@ class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
     def test_it_returns_indemnification(self, json, superuser_member):
         expected = {"indemnification": True, "user": superuser_member.user.id}
         assert json == expected
-
-
-class TestRecalculateBits(APIViewTest, UsesPostMethod, Returns200):
-    url = lambda_fixture(lambda organization: reverse("organization-recalculate-bits", args=[organization.pk]))
-
-    @pytest.fixture
-    def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([Permission.objects.get(codename="can_recalculate_bits")])
-        return drf_redteam_client
-
-    @pytest.fixture(autouse=True)
-    def mock_octopoes(self, octopoes_api_connector):
-        octopoes_api_connector.recalculate_bits.return_value = 42
-
-    def test_it_recalculates_bits(self, json):
-        expected = {"number_of_bits": 42}
-        assert json == expected
-
-
-class TestRecalculateBitsNoPermission(APIViewTest, UsesPostMethod, Returns403):
-    url = lambda_fixture(lambda organization: reverse("organization-recalculate-bits", args=[organization.pk]))
-    client = lambda_fixture("drf_redteam_client")
-
-
-class TestKatalogusCloneSettings(APIViewTest, UsesPostMethod, Returns200):
-    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
-    data = lambda_fixture(lambda organization_b: {"to_organization": organization_b.id})
-
-    @pytest.fixture
-    def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set(
-            [
-                Permission.objects.get(codename="can_set_katalogus_settings"),
-                Permission.objects.get(codename="can_access_all_organizations"),
-            ]
-        )
-
-        return drf_redteam_client
-
-    @pytest.fixture(autouse=True)
-    def mock_katalogus(self, mocker):
-        return mocker.patch("katalogus.client.KATalogusClient")
-
-    def test_it_clones_settings(self, mock_katalogus, organization, organization_b):
-        mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(
-            organization.code, organization_b.code
-        )
-
-
-class TestCloneKatalogusSettingsNoPermission(APIViewTest, UsesPostMethod, Returns403):
-    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
-    client = lambda_fixture("drf_redteam_client")
-
-
-class TestCloneKatalogusSettingsInvalidData(APIViewTest, UsesPostMethod, Returns400):
-    url = lambda_fixture(lambda organization: reverse("organization-clone-katalogus-settings", args=[organization.pk]))
-    data = lambda_fixture(lambda organization_b: {"wrong_field": organization_b.id})
-
-    @pytest.fixture
-    def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([Permission.objects.get(codename="can_set_katalogus_settings")])
-        return drf_redteam_client

@@ -9,7 +9,6 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models.types import OOI_TYPES
 from openkat.models import Organization
 
 
@@ -66,13 +65,6 @@ def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: A
         del kwargs["query"]
 
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
-
-
-def existing_ooi_type(ooi_type: str) -> bool:
-    if not ooi_type:
-        return False
-
-    return ooi_type in [x.__name__ for x in OOI_TYPES.values()]
 
 
 class Breadcrumb(TypedDict):

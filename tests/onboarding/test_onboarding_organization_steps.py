@@ -104,7 +104,7 @@ def test_onboarding_setup_scan_detail(request, member, rf):
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_setup_scan_detail_create_ooi(request, member, rf, octopoes_api_connector, url):
+def test_onboarding_setup_scan_detail_create_ooi(request, member, rf, url):
     member = request.getfixturevalue(member)
 
     response = OnboardingSetupScanOOIAddView.as_view()(
@@ -116,7 +116,7 @@ def test_onboarding_setup_scan_detail_create_ooi(request, member, rf, octopoes_a
     assert response.status_code == 302
 
 
-def test_onboarding_clearance_level_introduction(rf, redteam_member, octopoes_api_connector, url):
+def test_onboarding_clearance_level_introduction(rf, redteam_member, url):
     response = OnboardingClearanceLevelIntroductionView.as_view()(
         setup_request(rf.get("step_clearance_level_introduction", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -135,7 +135,7 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, octopoes_ap
     assertNotContains(response, '<div class="action-buttons">', html=True)
 
 
-def test_onboarding_acknowledge_clearance_level(rf, redteam_member, octopoes_api_connector, url):
+def test_onboarding_acknowledge_clearance_level(rf, redteam_member, url):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -180,7 +180,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, octopoes_api
 
 @pytest.mark.parametrize("clearance_level", [-1, 0])
 def test_onboarding_acknowledge_clearance_level_no_clearance(
-    rf, redteam_member, clearance_level, octopoes_api_connector, url
+    rf, redteam_member, clearance_level, url
 ):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
@@ -215,7 +215,7 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
 
 
 def test_onboarding_set_clearance_level(
-    rf, superuser_member, admin_member, redteam_member, client_member, octopoes_api_connector, url
+    rf, superuser_member, admin_member, redteam_member, client_member, url
 ):
     response_superuser = OnboardingSetClearanceLevelView.as_view()(
         setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), superuser_member.user),
@@ -276,9 +276,8 @@ def test_onboarding_select_plugins_perms(request, member, rf, url):
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_ooi_detail_scan(request, member, rf, octopoes_api_connector, url):
+def test_onboarding_ooi_detail_scan(request, member, rf, url):
     member = request.getfixturevalue(member)
-    octopoes_api_connector.get.return_value = url
 
     response = OnboardingSetupScanOOIDetailView.as_view()(
         setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
@@ -297,10 +296,9 @@ def test_onboarding_ooi_detail_scan(request, member, rf, octopoes_api_connector,
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def test_onboarding_ooi_detail_scan_create_report_schedule(
-    request, member, mock_scheduler, rf, octopoes_api_connector, url
+    request, member, mock_scheduler, rf, url
 ):
     member = request.getfixturevalue(member)
-    octopoes_api_connector.get.return_value = url
 
     request_url = (
         reverse("step_setup_scan_ooi_detail", kwargs={"organization_code": member.organization.code})
@@ -316,9 +314,8 @@ def test_onboarding_ooi_detail_scan_create_report_schedule(
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_scanning_boefjes(request, member, rf, octopoes_api_connector, url):
+def test_onboarding_scanning_boefjes(request, member, rf, url):
     member = request.getfixturevalue(member)
-    octopoes_api_connector.get.return_value = url
 
     request_url = (
         reverse("step_report", kwargs={"organization_code": member.organization.code})

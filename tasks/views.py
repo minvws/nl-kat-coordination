@@ -15,14 +15,11 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
 from objects.models import Object
-from octopoes.core.service import OctopoesService
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
 from tasks.models import NewSchedule, Task, TaskStatus
-from tasks.new_tasks import rerun_task, run_plugin_task, run_schedule
+from tasks.tasks import run_schedule, rerun_task, run_plugin_task
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -98,22 +95,23 @@ class TaskForm(ModelForm):
 
         if pks:
             now = datetime.now(timezone.utc)
-            octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
-            scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
-
-            for profile in scan_profiles:
-                if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
-                    continue
-
-                if profile.reference.class_type == Hostname:
-                    input_data.add(profile.reference.tokenized.name)
-                    continue
-
-                if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-                    input_data.add(str(profile.reference.tokenized.address))
-                    continue
-
-                input_data.add(str(profile.reference))
+            # TODO: fix
+            # octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
+            # scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
+            #
+            # for profile in scan_profiles:
+            #     if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
+            #         continue
+            #
+            #     if profile.reference.class_type == Hostname:
+            #         input_data.add(profile.reference.tokenized.name)
+            #         continue
+            #
+            #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+            #         input_data.add(str(profile.reference.tokenized.address))
+            #         continue
+            #
+            #     input_data.add(str(profile.reference))
 
         if not input_data and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")

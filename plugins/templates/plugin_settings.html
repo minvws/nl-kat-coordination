@@ -5,7 +5,7 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -16,10 +16,10 @@
                     <h2>{% translate "Settings" %}</h2>
                     <p>
                         {% blocktranslate trimmed %}
-                            Here you can edit this plugin. These settings change the plugin itself, 
-                            which can cause the plugin to not work as expected. These changes will 
+                            Here you can edit this plugin. These settings change the plugin itself,
+                            which can cause the plugin to not work as expected. These changes will
                             effect all organizations in this OpenKAT install.
-                            If you want more information about editing a plugin, you can check out the 
+                            If you want more information about editing a plugin, you can check out the
                             <a href="https://docs.openkat.nl/developer-documentation/development-tutorial/creating-boefje.html">documentation</a>.
                         {% endblocktranslate %}
                     </p>

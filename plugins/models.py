@@ -10,9 +10,6 @@ from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
 from objects.models import ObjectSet
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
-from octopoes.models.types import ALL_TYPES_MAP
 from openkat.models import Organization, OrganizationMember
 from tasks.models import NewSchedule
 
@@ -94,14 +91,16 @@ class Plugin(models.Model):
 
     def types_in_arguments(self):
         result = []
-
-        for name, ooi_type in ALL_TYPES_MAP.items():
-            for arg in self.oci_arguments:
-                if "{" + name + "}" in arg.lower():
-                    result.append(ooi_type)
-                    break
-
         return result
+        # TODO: fix
+
+        # for name, ooi_type in ALL_TYPES_MAP.items():
+        #     for arg in self.oci_arguments:
+        #         if "{" + name + "}" in arg.lower():
+        #             result.append(ooi_type)
+        #             break
+        #
+        # return result
 
     def files_in_arguments(self):
         results = []
@@ -112,10 +111,12 @@ class Plugin(models.Model):
         return results
 
     def consumed_types(self):
-        return self.types_in_arguments() + [
-            ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes
-            if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP
-        ]
+        # TODO: fix
+        return []
+        # return self.types_in_arguments() + [
+        #     ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes
+        #     if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP
+        # ]
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
@@ -203,12 +204,13 @@ class EnabledPlugin(models.Model):
 
         queries = []
 
-        # TODO: once moved to XTDB 2.0 we can revise this
+        # TODO: fix
         for ooi_type in self.plugin.consumed_types():
-            if ooi_type == Hostname:
-                queries.append(("Hostname.name", "All hostnames"))
-            if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
-                queries.append((f"{ooi_type.get_object_type()}.address", "All IPs"))
+            pass
+            # if ooi_type == Hostname:
+            #     queries.append(("Hostname.name", "All hostnames"))
+            # if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
+            #     queries.append((f"{ooi_type.get_object_type()}.address", "All IPs"))
 
         # So this is possibly the first time enabling the plugin for the organization
         for query, name in queries:

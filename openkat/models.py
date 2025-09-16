@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from functools import cached_property
+from typing import Any
 
 import structlog
 import tagulous.models
@@ -53,6 +54,29 @@ class LowerCaseSlugField(models.SlugField):
         if value is None:
             return None
         return value.lower()
+
+
+class LowerCaseCharField(models.CharField):
+    """Override CharField to convert value to lowercase before saving."""
+
+    def to_python(self, value: Any | None) -> str | None:
+        """Convert email to lowercase."""
+        str_value: str = super().to_python(value)
+        if str_value is None:
+            return None
+
+        return str_value.lower()
+
+    def pre_save(self, model_instance: models.Model, add: bool) -> str | None:  # noqa: FBT001, ARG002
+        value: str | None = getattr(model_instance, self.attname)
+        if value:
+            value = value.lower()
+            setattr(model_instance, self.attname, value)
+        return value
+
+
+class LowerCaseEmailField(LowerCaseCharField, models.EmailField):
+    """Override EmailField to convert emails to lowercase before saving."""
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):

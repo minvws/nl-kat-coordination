@@ -1,89 +1,56 @@
-from datetime import datetime, timezone
-from http import HTTPStatus
-
-from django.conf import settings
-from pydantic import TypeAdapter
 from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from structlog import get_logger
 
-from objects.serializers import ObjectSerializer
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
-from octopoes.models.types import OOIType, type_by_name
-from octopoes.xtdb.query import InvalidField, Query
-from openkat.models import Organization
-
 logger = get_logger(__name__)
-OOI_TYPE_LIST = TypeAdapter(list[OOIType])
-REF_LIST = TypeAdapter(list[Reference])
 
 
 class ObjectViewSet(ViewSet):
     def list(self, request, *args, **kwargs):
-        if "object_type" in request.GET:
-            q = Query(type_by_name(request.GET["object_type"]))
-        else:
-            q = Query()
-
-        for parameter in request.GET:
-            if parameter == "object_type":
-                continue
-
-            if parameter == "offset":
-                q = q.offset(int(request.GET.get(parameter)))
-                continue
-            if parameter == "limit":
-                q = q.limit(int(request.GET.get(parameter)))
-                continue
-
-            value = list(set(request.GET.getlist(parameter)))
-
-            if len(value) == 1:
-                try:
-                    q = q.where(q.result_type, **{parameter: value[0]})
-                except InvalidField:
-                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
-            elif len(value) > 1:
-                try:
-                    q = q.where_in(q.result_type, **{parameter: value})
-                except InvalidField:
-                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
-                    continue
-
-        # TODO
-        organization = Organization.objects.first()
-        connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-
-        oois = connector.octopoes.ooi_repository.query(q, datetime.now(timezone.utc))
-        serializer = ObjectSerializer(oois, many=True)
-
-        return Response({"results": serializer.data, "next": None, "previous": None, "count": None})
+        # TODO: fix
+        pass
+        # if "object_type" in request.GET:
+        #     q = Query(type_by_name(request.GET["object_type"]))
+        # else:
+        #     q = Query()
+        #
+        # for parameter in request.GET:
+        #     if parameter == "object_type":
+        #         continue
+        #
+        #     if parameter == "offset":
+        #         q = q.offset(int(request.GET.get(parameter)))
+        #         continue
+        #     if parameter == "limit":
+        #         q = q.limit(int(request.GET.get(parameter)))
+        #         continue
+        #
+        #     value = list(set(request.GET.getlist(parameter)))
+        #
+        #     if len(value) == 1:
+        #         try:
+        #             q = q.where(q.result_type, **{parameter: value[0]})
+        #         except InvalidField:
+        #             logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
+        #     elif len(value) > 1:
+        #         try:
+        #             q = q.where_in(q.result_type, **{parameter: value})
+        #         except InvalidField:
+        #             logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
+        #             continue
+        #
+        # # TODO
+        # organization = Organization.objects.first()
+        # connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
+        #
+        # oois = connector.octopoes.ooi_repository.query(q, datetime.now(timezone.utc))
+        # serializer = ObjectSerializer(oois, many=True)
+        #
+        # return Response({"results": serializer.data, "next": None, "previous": None, "count": None})
 
     def create(self, request: Request, *args, **kwargs):
-        objects = request.data
-        organization = Organization.objects.first()
-
-        client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-        now = datetime.now(timezone.utc)
-
-        for ooi in OOI_TYPE_LIST.validate_python(objects):
-            client.octopoes.ooi_repository.save(ooi, valid_time=now)
-
-        client.octopoes.commit()
-
-        return Response(status=HTTPStatus.CREATED)
-
+        # TODO: fix
+        pass
     def delete(self, request: Request, *args, **kwargs):
-        organization = Organization.objects.first()
-
-        client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-        now = datetime.now(timezone.utc)
-
-        for ooi in REF_LIST.validate_python(request.GET.getlist("pk")):
-            client.octopoes.ooi_repository.delete(ooi, valid_time=now)
-
-        client.octopoes.commit()
-
-        return Response(status=HTTPStatus.OK)
+        # TODO: fix
+        pass

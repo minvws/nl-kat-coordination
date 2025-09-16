@@ -63,7 +63,7 @@ class NewSchedule(models.Model):
     operation = models.CharField(max_length=16, choices=Operation.choices, null=True, blank=True)
 
     def run(self):
-        from tasks.new_tasks import run_schedule
+        from tasks.tasks import run_schedule
 
         run_schedule(self)
 

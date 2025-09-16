@@ -21,7 +21,7 @@
         </div>
         {% if perms.openkat.can_enable_disable_plugin %}
             <div class="horizontal-view">
-                {% include "new_enable_disable_plugin.html" with plugin=plugin %}                       
+                {% include "enable_disable_plugin.html" with plugin=plugin %}
             </div>
         {% endif %}
     </div>
@@ -33,4 +33,3 @@
         </div>
     </div>
 </div>
-            

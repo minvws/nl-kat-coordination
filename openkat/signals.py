@@ -1,20 +1,11 @@
-import datetime
-
-from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save, pre_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from structlog import get_logger
 
-from crisis_room.management.commands.dashboards import get_or_create_default_dashboard
 from files.models import File
-from octopoes.api.models import Declaration
-from octopoes.models.ooi.network import Network
-from octopoes.xtdb.exceptions import XTDBException
-from openkat.exceptions import OctopoesException
-from openkat.models import Organization
-from tasks.new_tasks import process_raw_file
+from tasks.tasks import process_raw_file
 
 logger = get_logger(__name__)
 
@@ -87,32 +78,6 @@ def log_delete(sender, instance, **kwargs) -> None:
         object=str(instance),
         **context,
     )
-
-
-@receiver(pre_save, sender=Organization)
-def organization_pre_save(sender, instance, *args, **kwargs):
-    instance.clean()
-    octopoes_client = settings.OCTOPOES_FACTORY(instance.code)
-
-    try:
-        octopoes_client.create_node()
-    except XTDBException as e:
-        raise OctopoesException("Failed creating organization in Octopoes") from e
-
-
-@receiver(post_save, sender=Organization)
-def organization_post_save(sender, instance, created, *args, **kwargs):
-    octopoes_client = settings.OCTOPOES_FACTORY(instance.code)
-
-    # will trigger only when new organization is created, not for updating.
-    if created:
-        get_or_create_default_dashboard(instance, octopoes_client)
-
-    try:
-        valid_time = datetime.datetime.now(datetime.timezone.utc)
-        octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
-    except Exception:
-        logger.exception("Could not seed internet for organization %s", sender)
 
 
 @receiver(post_save, sender=File)

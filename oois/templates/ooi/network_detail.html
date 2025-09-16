@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "Network:" %} {{ network.name }}</h1>
+                </div>
+            </div>
+            <div>
+                <h2>Details</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>Address</dt>
+                            <dd>
+                                {{ network.name }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

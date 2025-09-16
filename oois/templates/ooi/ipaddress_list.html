@@ -1,0 +1,41 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "IP addresses" %}</h1>
+                </div>
+            </div>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>Address</th>
+                                <th>Network</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ipaddress in ipaddresses %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'ooi:ipaddress-detail' ipaddress.pk %}">{{ ipaddress.address }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'ooi:network-detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

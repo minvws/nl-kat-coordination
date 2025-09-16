@@ -1,15 +1,11 @@
-from django.conf import settings
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from structlog import get_logger
 
-from katalogus.client import get_katalogus_client
-from openkat.exceptions import OctopoesException
 from openkat.models import Indemnification, Organization
-from openkat.permissions import CanRecalculateBits, CanSetKatalogusSettings
-from openkat.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode, ToOrganizationSerializer
+from openkat.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode
 
 logger = get_logger(__name__)
 
@@ -31,17 +27,6 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         if self.request.method != "POST":
             serializer_class = OrganizationSerializerReadOnlyCode
         return serializer_class
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        octopoes_client = settings.OCTOPOES_FACTORY(instance.code)
-
-        try:
-            octopoes_client.delete_node()
-        except Exception as e:
-            raise OctopoesException("Failed deleting organization in Octopoes") from e
-
-        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, permission_classes=[])
     def indemnification(self, request, pk=None):
@@ -73,25 +58,3 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         indemnification = Indemnification.objects.create(organization=organization, user=self.request.user)
 
         return Response({"indemnification": True, "user": indemnification.user.pk}, status=status.HTTP_201_CREATED)
-
-    @action(detail=True, methods=["post"], permission_classes=[CanRecalculateBits])
-    def recalculate_bits(self, request, pk=None):
-        organization = self.get_object()
-        logger.info("Recalculating bits", event_code=920000, organization_code=organization.code)
-        connector = settings.OCTOPOES_FACTORY(organization.code)
-        number_of_bits = connector.recalculate_bits()
-
-        return Response({"number_of_bits": number_of_bits})
-
-    @action(detail=True, methods=["post"], permission_classes=[CanSetKatalogusSettings])
-    def clone_katalogus_settings(self, request, pk=None):
-        from_organization = self.get_object()
-
-        serializer = ToOrganizationSerializer(data=request.data)
-        if serializer.is_valid():
-            to_organization = serializer.validated_data["to_organization"]
-            get_katalogus_client().clone_all_configuration_to_organization(from_organization.code, to_organization.code)
-
-            return Response()
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

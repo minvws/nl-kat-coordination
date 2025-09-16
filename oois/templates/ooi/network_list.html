@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Networks" %}</h1>
+                </div>
+            </div>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for network in networks %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'ooi:network-detail' network.pk %}">{{ network.name }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

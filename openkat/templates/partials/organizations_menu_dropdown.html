@@ -15,12 +15,12 @@
         <div id="change-organization" class="dropdown-list">
             <ul>
                 <li>
-                    <a href="{% url "crisis_room" %}">{% translate "All organizations" %}</a>
+                    <a href="{% url "plugin_list" %}">{% translate "All organizations" %}</a>
                 </li>
                 {% for org in organizations_including_blocked %}
                     {% if organization.code != org.code %}
                         <li>
-                            <a href="{% url "organization_crisis_room" org.code %}">{{ org.name }}</a>
+                            {{ org.name }}
                         </li>
                     {% endif %}
                 {% endfor %}

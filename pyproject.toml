@@ -2,19 +2,18 @@
 name = "openkat"
 version = "2.0.0-alpha"
 description = "OpenKAT package"
-requires-python = "~=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license = "EUPL-1.2"
 dependencies = [
   "beautifulsoup4>=4.11.2",
-  "Django>=5.1.9,<5.2.0",
-  "django-two-factor-auth>=1.17.0",
+  "Django>=5.2.0,<6.0",
+  "django-two-factor-auth[phonenumberslite]>=1.17.0",
   "django-environ>=0.12.0",
+  "django-xtdb",
   "jsonschema>=4.17.0",
-  "phonenumbers>=9.0.4",
-  "psycopg2>=2.9.6",
+  #  "phonenumbers>=9.0.4",
   "pydantic>=2.7.1",
-  "python-dotenv>=1.0.0",
   "django-password-validators>=1.7.1",
   "django-csp>=4.0",
   "djangorestframework>=3.16.0",
@@ -70,6 +69,8 @@ dependencies = [
   "django-storages>=1.14.6",
   "django-recurrence>=1.11.1",
   "django-filter>=25.1",
+  "django-stubs-ext>=5.2.5",
+  "psycopg>=3.2.10",
 ]
 
 [dependency-groups]
@@ -95,6 +96,7 @@ package = true
 [tool.uv.sources]
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 django-compressor = { git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce" }
+django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]
@@ -113,7 +115,6 @@ DJANGO_SETTINGS_MODULE = "tests.settings"
 markers = ["slow: marks tests as slow"]
 env = [
   "D:OPENKAT_DB_HOST=localhost",
-  "D:XTDB_URI=http://localhost:3000",
 ]
 
 [tool.djlint]

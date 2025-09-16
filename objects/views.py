@@ -12,17 +12,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django_filters.views import FilterView
 
 from objects.models import ObjectSet
-from octopoes.models.exception import TypeNotFound
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.types import get_collapsed_types
-from octopoes.xtdb.query import Aliased, Query
-from openkat.enums import CUSTOM_SCAN_LEVEL
-from openkat.forms.ooi_form import _EXCLUDED_OOI_TYPES, OOISearchForm, OOITypeMultiCheckboxForm
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
-from openkat.view_helpers import get_mandatory_fields
-from openkat.views.mixins import OOIList
 
 
 class PageActions(Enum):
@@ -38,38 +29,9 @@ class ObjectListView(ListView):
         # TODO
         return redirect(reverse("ooi_list", kwargs={"organization_code": Organization.objects.first().code}))
 
-    def get_queryset(self):
-        # TODO: handle
-        organization = Organization.objects.first()
-
-        return OOIList(settings.OCTOPOES_FACTORY(organization.code), **self.get_queryset_params())
-
-    def get_queryset_params(self):
-        return {
-            "valid_time": datetime.datetime.now(timezone.utc),
-            "ooi_types": {
-                t
-                for t in get_collapsed_types().difference(
-                    {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
-                )
-                if t not in _EXCLUDED_OOI_TYPES
-            },
-            "scan_level": settings.DEFAULT_SCAN_LEVEL_FILTER,
-            "scan_profile_type": settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-            "search_string": "",
-            "order_by": "scan_level" if self.request.GET.get("order_by", "") == "scan_level" else "object_type",
-            "asc_desc": "desc" if self.request.GET.get("sorting_order", "") == "desc" else "asc",
-        }
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("object_list"), "text": _("Objects")}]
-
-        context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
-        context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
-        context["member"] = self.request.user
-        context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
 
         # TODO: handle
         context["organization"] = Organization.objects.first()
@@ -118,20 +80,20 @@ class ObjectSetDetailView(DetailView):
 
         # TODO: handle...
         org = Organization.objects.first()
-        connector = settings.OCTOPOES_FACTORY(org.code)
 
         if obj.object_query:
-            try:
-                query = Query.from_path(obj.object_query)
-            except (ValueError, TypeNotFound):
-                raise ValueError(f"Invalid query: {obj.object_query}")
-
-            pk = Aliased(query.result_type, field="primary_key")
-            objects = connector.octopoes.ooi_repository.query(
-                query.find(pk).where(query.result_type, primary_key=pk).limit(10), now,
-            )
-
-            context["preview"] = [obj[1] for obj in objects]
+            # TODO: fix
+            # try:
+            #     query = Query.from_path(obj.object_query)
+            # except (ValueError, TypeNotFound):
+            #     raise ValueError(f"Invalid query: {obj.object_query}")
+            #
+            # pk = Aliased(query.result_type, field="primary_key")
+            # objects = connector.octopoes.ooi_repository.query(
+            #     query.find(pk).where(query.result_type, primary_key=pk).limit(10), now,
+            # )
+            #
+            # context["preview"] = [obj[1] for obj in objects]
             context["preview_organization"] = org
         else:
             context["preview"] = None

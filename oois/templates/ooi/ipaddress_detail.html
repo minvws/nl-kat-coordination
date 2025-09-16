@@ -1,0 +1,72 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "IP address:" %} {{ ipaddress.address }}</h1>
+                </div>
+            </div>
+            <div>
+                <h2>Details</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>Address</dt>
+                            <dd>
+                                {{ ipaddress.address }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Network</dt>
+                            <dd>
+                                <a href="{% url 'ooi:network-detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div class="horizontal-scroll">
+                <h2>{% translate "IP Ports" %}</h2>
+                {% if ipaddress.ipport_set.all %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "IP ports" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Port" %}</th>
+                                <th>{% translate "Protocol" %}</th>
+                                <th>{% translate "Service" %}</th>
+                                <th>{% translate "TLS" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for port in ipaddress.ipport_set.all %}
+                                <tr>
+                                    <td>{{ port.port }}</td>
+                                    <td>{{ port.protocol }}</td>
+                                    <td>{{ port.service }}</td>
+                                    <td>
+                                        {% if port.tls is True %}
+                                            {% translate "Yes" %}
+                                        {% elif port.tls is False %}
+                                            {% translate "No" %}
+                                        {% else %}
+                                            {% translate "Unknown" %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>{% translate "No ports found for this IP address." %}</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

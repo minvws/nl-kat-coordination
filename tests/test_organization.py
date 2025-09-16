@@ -25,7 +25,6 @@ def bulk_organizations(active_member, blocked_member):
     indemnifications = []
 
     with (
-        patch("openkat.signals.settings.OCTOPOES_FACTORY"),
         patch("crisis_room.management.commands.dashboards.get_or_create_default_dashboard"),
     ):
         for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
@@ -91,7 +90,7 @@ def test_add_organization_page(rf, superuser_member):
 
 
 @pytest.mark.skip("This test is too flaky for now.")
-def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
+def test_add_organization_submit_success(rf, superuser_member, mocker, octopoes_api_connector, log_output):
     mocker.patch("katalogus.client.KATalogusClient")
 
     request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
@@ -341,7 +340,7 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tag2")
 
 
-def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
+def test_organization_code_validator_from_view(rf, superuser_member, mocker, octopoes_api_connector):
     mocker.patch("katalogus.client.KATalogusClient")
     request = setup_request(
         rf.post("organization_add", {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]}),
@@ -358,7 +357,7 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
 
 
 @pytest.mark.django_db
-def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
+def test_organization_code_validator_from_model(mocker, octopoes_api_connector):
     mocker.patch("katalogus.client.KATalogusClient")
 
     with pytest.raises(ValidationError):

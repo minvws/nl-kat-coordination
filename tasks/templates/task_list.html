@@ -5,11 +5,20 @@
 {% load ooi_extra %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
-            {% include "tasks/partials/tasks_overview_header.html" %}
+            <div>
+                <h1>{% translate "Tasks" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        An overview of the tasks for <strong>{{ organization }}</strong>. Tasks are divided in Boefjes, Normalizers and Reports.
+                        Boefjes scan objects and Normalizers dispatch on the output mime-type. Additionally, there is a Report
+                        tasks. This task aggregates and presents findings from both Boefjes and Normalizers.
+                    {% endblocktranslate %}
+                </p>
+            </div>
             {% if perms.openkat.add_task %}
                 <div class="horizontal-view toolbar">
                     <a class="button ghost" href="{% url "add_task" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Run Task" %}</a>

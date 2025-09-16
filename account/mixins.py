@@ -2,20 +2,15 @@ from datetime import datetime, timezone
 from functools import cached_property
 
 import structlog.contextvars
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import ContextMixin
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 
-from katalogus.client import KATalogus, get_katalogus
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from openkat.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
@@ -109,11 +104,6 @@ class OrganizationView(ContextMixin, View):
         if self.organization_member.blocked:
             raise PermissionDenied()
 
-        self.octopoes_api_connector = settings.OCTOPOES_FACTORY(organization_code)
-
-    def get_katalogus(self) -> KATalogus:
-        return get_katalogus(self.organization_member)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["organization"] = self.organization
@@ -144,61 +134,6 @@ class OrganizationView(ContextMixin, View):
                 raise TrustedClearanceLevelTooLowException()
             else:
                 raise AcknowledgedClearanceLevelTooLowException()
-
-    def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
-        self.verify_raise_clearance_level(level)
-        self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user_id=self.request.user.id),
-            datetime.now(timezone.utc),
-        )
-
-        return True
-
-    def raise_clearance_levels(self, ooi_references: list[Reference], level: int) -> bool:
-        self.verify_raise_clearance_level(level)
-        self.octopoes_api_connector.save_many_scan_profiles(
-            [
-                DeclaredScanProfile(reference=reference, level=ScanLevel(level), user_id=self.request.user.id)
-                for reference in ooi_references
-            ],
-            datetime.now(timezone.utc),
-        )
-
-        return True
-
-    def can_raise_clearance_level(self, ooi: OOI, level: int) -> bool:
-        try:
-            self.raise_clearance_level(ooi.reference, level)
-            messages.success(self.request, _("Clearance level has been set"))
-            return True
-        except IndemnificationNotPresentException:
-            messages.error(
-                self.request,
-                _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
-                % (ooi.reference.human_readable, level, self.organization.name),
-            )
-
-        except TrustedClearanceLevelTooLowException:
-            messages.error(
-                self.request,
-                _(
-                    "Could not raise clearance level of %s to L%s. "
-                    "You were trusted a clearance level of L%s. "
-                    "Contact your administrator to receive a higher clearance."
-                )
-                % (ooi.reference.human_readable, level, self.organization_member.max_clearance_level),
-            )
-        except AcknowledgedClearanceLevelTooLowException:
-            messages.error(
-                self.request,
-                _(
-                    "Could not raise clearance level of %s to L%s. "
-                    "You acknowledged a clearance level of L%s. "
-                    "Please accept the clearance level first on your profile page to proceed."
-                )
-                % (ooi.reference.human_readable, level, self.organization_member.acknowledged_clearance_level),
-            )
-        return False
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):
@@ -249,10 +184,6 @@ class OrganizationAPIMixin:
             raise ValidationError("Missing organization_id or organization_code query parameter") from e
         else:
             return self.get_organization("code", organization_code)
-
-    @cached_property
-    def octopoes_api_connector(self) -> OctopoesAPIConnector:
-        return settings.OCTOPOES_FACTORY(self.organization.code)
 
     @cached_property
     def valid_time(self) -> datetime:

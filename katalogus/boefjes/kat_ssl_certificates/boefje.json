@@ -1,9 +1,0 @@
-{
-  "plugin_id": "ssl-certificates",
-  "name": "SSLCertificates",
-  "description": "Scan SSL certificates of websites. Checks if certificates are valid and/or expired.",
-  "consumes": [
-    "Website"
-  ],
-  "scan_level": 2
-}

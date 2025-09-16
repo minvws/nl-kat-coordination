@@ -24,8 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.debug import SafeExceptionReporterFilter
 from kombu import Queue
 
-from octopoes.models import ScanLevel, ScanProfileType
-from octopoes.models.ooi.findings import RiskLevelSeverity
+from oois.enums import ScanLevel
 
 env = environ.Env()
 
@@ -159,22 +158,19 @@ INSTALLED_APPS = [
     "two_factor",
     "account",
     "openkat",
-    "crisis_room",
     "onboarding",
-    "katalogus",
     "tasks",
     "files",
     "plugins",
     "objects",
+    "oois",
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
     "compressor",
-    "reports",
     "knox",
     "recurrence",
-    # "drf_standardized_errors",
 ]
 
 MIDDLEWARE = [
@@ -205,7 +201,7 @@ ROOT_URLCONF = "openkat.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "openkat/templates", BASE_DIR / "reports/report_types"],
+        "DIRS": [BASE_DIR / "openkat/templates"],
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -253,7 +249,22 @@ except ImproperlyConfigured:
         "PORT": env.int("OPENKAT_DB_PORT", default=5432),
     }
 
-DATABASES = {"default": POSTGRES_DB}
+XTDB_DB = {
+    "ENGINE": "django_xtdb",
+    "NAME": env("OPENKAT_XTDB", default=None),
+    "USER": env("OPENKAT_XTDB_USER", default=None),
+    "PASSWORD": env("OPENKAT_XTDB_PASSWORD", default=None),
+    "HOST": env("OPENKAT_XTDB_HOST", default=None),
+    "PORT": env.int("OPENKAT_XTDB_PORT", default=5432),
+}
+
+DATABASES = {
+    "default": POSTGRES_DB,
+    "xtdb": XTDB_DB,
+}
+
+DATABASE_ROUTERS = ["oois.db_router.XTDBRouter"]
+
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
     DATABASES["default"]["OPTIONS"] = {
@@ -361,7 +372,7 @@ WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "crisis_room"
+LOGIN_REDIRECT_URL = "plugin_list"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -537,9 +548,6 @@ WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
 # warning from confusing users.
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
-OPENKAT_OUTGOING_REQUEST_TIMEOUT = env.int("OPENKAT_OUTGOING_REQUEST_TIMEOUT", default=30)
-
-XTDB_URI = env.str("XTDB_URI")
 GRACE_PERIOD = env.int("GRACE_PERIOD", default=1440)
 WORKERS = env.int("WORKERS", default=2)
 SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL", default=60)
@@ -549,20 +557,10 @@ PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
 AUTO_PARALLELISM = env.int("AUTO_PARALLELISM", default=8)
 BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
 
-def OCTOPOES_FACTORY(organization: str):
-    from octopoes.connector.octopoes import OctopoesAPIConnector
 
-    return OctopoesAPIConnector(organization, XTDB_URI)
-
-
-BITS_DISABLED = set(env.list("BITS_DISABLED", default=[]))
-BITS_ENABLED = set(env.list("BITS_ENABLED", default=[]))
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
-DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
-DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0
-GATHER_BIT_METRICS = False
 
 QUEUE_NAME_OCTOPOES = "octopoes"
 QUEUE_NAME_SCHEDULE = "schedule"
