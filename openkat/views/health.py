@@ -15,8 +15,7 @@ logger = structlog.get_logger(__name__)
 
 class Health(OrganizationView, View):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        octopoes_connector = self.octopoes_api_connector
-        openkat_health = get_openkat_health(self.organization.code, octopoes_connector)
+        openkat_health = get_openkat_health(self.organization.code)
         return JsonResponse(openkat_health.model_dump())
 
 
@@ -32,7 +31,7 @@ ServiceHealth.update_forward_refs()
 
 
 def get_openkat_health(organization_code: str) -> ServiceHealth:
-    services = [ServiceHealth(service="octopoes", healthy=True)]
+    services = []
 
     services_healthy = all(service.healthy for service in services)
     additional = None
@@ -65,7 +64,7 @@ class HealthChecks(OrganizationView, TemplateView):
             },
         ]
 
-        openkat_health = get_openkat_health(self.organization.code, self.octopoes_api_connector)
+        openkat_health = get_openkat_health(self.organization.code)
         context["health_checks"] = flatten_health(openkat_health)
 
         return context

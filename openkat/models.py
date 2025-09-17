@@ -40,11 +40,8 @@ DENY_ORGANIZATION_CODES = [
     "scans",
     "upload",
     "tasks",
-    "bytes",
-    "kat-alogus",
-    "boefjes",
     "tasks",
-    "octopoes",
+    "oois",
     "openkat",
 ]
 

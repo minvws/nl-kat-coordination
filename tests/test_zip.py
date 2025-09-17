@@ -15,7 +15,7 @@ def zip_data(raws: QuerySet) -> BytesIO:
     with zipfile.ZipFile(zf_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         for raw_file in raws:
             zf.writestr(str(raw_file.id), raw_file.file.read())
-            zf.writestr(f"raw_meta_{raw_file.id}.json", json.dumps(model_to_dict(raw_file.task.task)))
+            zf.writestr(f"raw_meta_{raw_file.id}.json", json.dumps(model_to_dict(raw_file.task_result.task)))
 
     zf_buffer.seek(0)
 

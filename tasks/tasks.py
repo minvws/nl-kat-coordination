@@ -18,7 +18,7 @@ from tasks.models import NewSchedule, Task, TaskStatus
 logger = structlog.get_logger(__name__)
 
 
-@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
+@app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
 def schedule_scan_profile_recalculations():
     orgs = Organization.objects.all()
     logger.info("Scheduling scan profile recalculation for %s organizations", len(orgs))
@@ -27,12 +27,12 @@ def schedule_scan_profile_recalculations():
         app.send_task(
             "tasks.tasks.recalculate_scan_profiles",
             (org.code,),
-            queue=settings.QUEUE_NAME_OCTOPOES,
+            queue=settings.QUEUE_NAME_SCAN_PROFILES,
             task_id=str(uuid.uuid4()),
         )
 
 
-@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
+@app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
 def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
     # TODO
     return

@@ -27,8 +27,3 @@ class ServiceException(OpenKATError):
     def __init__(self, service_name: str, *args: Any):
         super().__init__(*args)
         self.service_name = service_name
-
-
-class OctopoesException(ServiceException):
-    def __init__(self, *args: Any):
-        super().__init__("Octopoes", *args)

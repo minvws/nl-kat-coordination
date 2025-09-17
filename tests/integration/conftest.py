@@ -9,13 +9,6 @@ def valid_time():
     return datetime.now(timezone.utc)
 
 
-@pytest.fixture
-def katalogus_mock(mocker):
-    katalogus = mocker.patch("katalogus.client.KATalogusClient")
-
-    return katalogus
-
-
 @pytest.fixture(scope='session')
 def django_db_setup(request: pytest.FixtureRequest, django_db_blocker):
     """

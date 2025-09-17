@@ -1,10 +1,11 @@
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from structlog import get_logger
 
 from files.models import File
+from openkat.models import Organization
 from tasks.tasks import process_raw_file
 
 logger = get_logger(__name__)
@@ -78,6 +79,11 @@ def log_delete(sender, instance, **kwargs) -> None:
         object=str(instance),
         **context,
     )
+
+
+@receiver(pre_save, sender=Organization)
+def organization_pre_save(sender, instance, *args, **kwargs):
+    instance.clean()
 
 
 @receiver(post_save, sender=File)

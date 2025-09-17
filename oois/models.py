@@ -4,7 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from oois.enums import MAX_SCAN_LEVEL
-from openkat.models import LowerCaseCharField, Organization
+from openkat.models import LowerCaseCharField
 
 
 class Asset(models.Model):
@@ -18,9 +18,7 @@ class ScanLevel(models.Model):
     ooi_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     ooi_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
     ooi: GenericForeignKey = GenericForeignKey("ooi_type", "ooi_id")
-    organization: models.ForeignKey = models.ForeignKey(
-        Organization, on_delete=models.PROTECT
-    )
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
     scan_level: models.IntegerField = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
     )

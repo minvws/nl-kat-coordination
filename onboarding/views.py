@@ -107,7 +107,7 @@ class OnboardingClearanceLevelIntroductionView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["ooi"] = self.request.GET.get("ooi", "")
-        context["boefjes"] = self.get_boefjes_tiles()
+        context["plugins"] = self.get_boefjes_tiles()
         return context
 
 

@@ -122,8 +122,6 @@ def add_redteam_group_permissions(member):
                 "can_set_clearance_level",
                 "can_delete_oois",
                 "can_mute_findings",
-                "can_view_katalogus_settings",
-                "can_set_katalogus_settings",
             ]
         ).values_list("id", flat=True)
     )
@@ -314,17 +312,8 @@ def setup_request(request, user):
     return request
 
 
-@pytest.fixture
-def mock_scheduler(mocker):
-    return mocker.patch("openkat.views.scheduler.scheduler_client")()
-
-
 def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
-
-
-def get_boefjes_data() -> list[dict]:
-    return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
 @pytest.fixture
