@@ -19,7 +19,9 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from pytest_django import DjangoDbBlocker
 from pytest_django.lazy_django import skip_if_no_django
+from rest_framework.test import APIClient
 
+from account.management.commands.create_authtoken import create_auth_token
 from files.models import File, GenericContent
 from objects.models import Hostname, Network
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
@@ -36,6 +38,15 @@ logging.getLogger("faker").setLevel(logging.INFO)
 @pytest.fixture
 def log_output():
     return structlog.testing.LogCapture()
+
+
+@pytest.fixture
+def drf_client(superuser) -> APIClient:
+    _, token = create_auth_token(superuser.email, "test_key")
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION="Token " + token)
+
+    return client
 
 
 @pytest.fixture(autouse=True)

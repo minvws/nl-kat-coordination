@@ -9,6 +9,7 @@ from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
+from objects.viewsets import NetworkViewSet
 from openkat.views.health import Health, HealthChecks
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
@@ -26,7 +27,7 @@ from openkat.views.organization_member_list import OrganizationMemberListView
 from openkat.views.organization_settings import OrganizationSettingsView
 from openkat.views.privacy_statement import PrivacyStatementView
 from openkat.viewsets import OrganizationViewSet
-from tasks.viewsets import ObjectViewSet, TaskViewSet
+from tasks.viewsets import TaskViewSet
 
 handler404 = "openkat.views.handler404.handler404"
 handler403 = "openkat.views.handler403.handler403"
@@ -35,7 +36,7 @@ router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
 router.register(r"task", TaskViewSet, basename="task")
 router.register(r"file", FileViewSet, basename="file")
-router.register(r"objects", ObjectViewSet, basename="objects")
+router.register(r"network", NetworkViewSet, basename="network")
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
