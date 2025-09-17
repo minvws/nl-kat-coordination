@@ -9,12 +9,11 @@ export function openDialogFromUrl() {
   // If ID is present in the URL on DomReady, open the dialog immediately.
   let id = window.location.hash.slice(1);
   if (id) {
-    showModalBasedOnAnchor(id);
+    const dialog = document.getElementById(id);
+    if (!dialog) return;
 
-    let dialog = document.getElementById(id);
-
-    if (window.location.hash === "#" + id && dialog.open) {
-      dialog.close();
+    if (dialog.querySelector(".error")) {
+      showModalBasedOnAnchor(id);
     }
   }
 }

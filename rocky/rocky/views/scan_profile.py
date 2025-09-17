@@ -10,7 +10,7 @@ from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.view_helpers import get_mandatory_fields, get_ooi_url
 
-from octopoes.models import EmptyScanProfile, InheritedScanProfile, ScanProfileType
+from octopoes.models import DeclaredScanProfile, EmptyScanProfile, ScanProfileType
 from rocky.views.ooi_detail import OOIDetailView
 
 logger = structlog.get_logger(__name__)
@@ -32,10 +32,13 @@ class ScanProfileDetailView(FormView, OOIDetailView):
 
     def get_initial(self):
         initial = super().get_initial()
-        if self.ooi.scan_profile:
-            initial["clearance_type"] = self.ooi.scan_profile.scan_profile_type
 
-        if self.ooi.scan_profile and not isinstance(self.ooi.scan_profile, InheritedScanProfile):
+        if not self.ooi.scan_profile or isinstance(self.ooi.scan_profile, EmptyScanProfile):
+            return initial
+
+        initial["clearance_type"] = self.ooi.scan_profile.scan_profile_type
+
+        if isinstance(self.ooi.scan_profile, DeclaredScanProfile):
             initial["level"] = self.ooi.scan_profile.level
 
         return initial
