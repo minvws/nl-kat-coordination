@@ -25,7 +25,7 @@ from django.views.debug import SafeExceptionReporterFilter
 from django_xtdb.patch import monkey_patch
 from kombu import Queue
 
-from oois.enums import ScanLevel
+from objects.enums import ScanLevel
 
 monkey_patch()
 
@@ -173,7 +173,7 @@ INSTALLED_APPS = [
     "tasks",
     "files",
     "plugins",
-    "oois",
+    "objects",
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",
@@ -276,7 +276,7 @@ DATABASES = {
     "xtdb": XTDB_DB,
 }
 
-DATABASE_ROUTERS = ["oois.db_router.XTDBRouter"]
+DATABASE_ROUTERS = ["objects.db_router.XTDBRouter"]
 
 
 if env.bool("POSTGRES_SSL_ENABLED", False):

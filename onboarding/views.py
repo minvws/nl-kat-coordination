@@ -225,7 +225,7 @@ class OnboardingOrganizationUpdateView(
 
 class OnboardingIndemnificationSetupView(IntroductionAdminStepsMixin, IndemnificationAddView):
     """
-    Step 3: Agree to idemnification to scan oois
+    Step 3: Agree to idemnification to scan objects
     """
 
     current_step = 3

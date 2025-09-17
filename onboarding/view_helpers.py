@@ -11,7 +11,6 @@ from openkat.view_helpers import Breadcrumb, BreadcrumbsMixin, StepsMixin
 ONBOARDING_PERMISSIONS = (
     "openkat.can_scan_organization",
     "openkat.can_set_clearance_level",
-    "openkat.can_enable_disable_plugin",
 )
 
 DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1

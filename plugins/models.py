@@ -11,7 +11,7 @@ from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
 from openkat.models import Organization, OrganizationMember
-from tasks.models import Schedule, ObjectSet
+from tasks.models import ObjectSet, Schedule
 
 logger = structlog.get_logger(__name__)
 
@@ -91,7 +91,7 @@ class Plugin(models.Model):
 
     def types_in_arguments(self) -> list[type[Model]]:
         result = []
-        for model in apps.get_app_config("oois").get_models():
+        for model in apps.get_app_config("objects").get_models():
             for arg in self.oci_arguments:
                 if "{" + model.__name__.lower() + "}" in arg.lower():
                     result.append(model)
@@ -109,7 +109,7 @@ class Plugin(models.Model):
 
     def consumed_types(self) -> list[type[Model]]:
         result = self.types_in_arguments()
-        for model in apps.get_app_config("oois").get_models():
+        for model in apps.get_app_config("objects").get_models():
             for consume in self.consumes:
                 if consume.startswith("type:") and consume.lstrip("type:").lower() == model.__name__.lower():
                     result.append(model)

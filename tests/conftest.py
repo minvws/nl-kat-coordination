@@ -21,7 +21,7 @@ from pytest_django import DjangoDbBlocker
 from pytest_django.lazy_django import skip_if_no_django
 
 from files.models import File, GenericContent
-from oois.models import Hostname, Network
+from objects.models import Hostname, Network
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 from openkat.views.health import ServiceHealth
 from tasks.models import Task as TaskDB
@@ -102,7 +102,6 @@ def add_admin_group_permissions(member):
                 "add_organizationmember",
                 "change_organization",
                 "change_organizationmember",
-                "can_delete_oois",
                 "add_indemnification",
                 "can_scan_organization",
             ]
@@ -373,8 +372,8 @@ def xtdb(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
     """
     # settings.DATABASES["xtdb"]["TEST"] = {"MIRROR": "xtdb"}
 
-    oois = apps.get_app_config("oois")
-    ooi_models = list(oois.get_models())
+    objects = apps.get_app_config("objects")
+    ooi_models = list(objects.get_models())
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 

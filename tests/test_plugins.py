@@ -5,7 +5,7 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
-from oois.models import Hostname, IPAddress, IPPort
+from objects.models import Hostname, IPAddress, IPPort
 from plugins.models import EnabledPlugin, Plugin
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
 from tasks.models import Schedule

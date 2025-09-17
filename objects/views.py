@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 
-from oois.models import Hostname, IPAddress, Network
+from objects.models import Hostname, IPAddress, Network
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
@@ -13,32 +13,32 @@ if TYPE_CHECKING:
 
 class NetworkListView(ListView):
     model = Network
-    template_name = "ooi/network_list.html"
+    template_name = "objects/network_list.html"
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:network_list"), "text": _("Networks")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
         return context
 
 
 class NetworkDetailView(DetailView):
     model = Network
-    template_name = "ooi/network_detail.html"
+    template_name = "objects/network_detail.html"
     context_object_name = "network"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:network_list"), "text": _("Networks")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
         return context
 
 
 class IPAddressListView(ListView):
     model = IPAddress
-    template_name = "ooi/ipaddress_list.html"
+    template_name = "objects/ipaddress_list.html"
     context_object_name = "ipaddresses"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
@@ -47,14 +47,14 @@ class IPAddressListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:ipaddress_list"), "text": _("IPAddresses")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
 
         return context
 
 
 class IPAddressDetailView(DetailView):
     model = IPAddress
-    template_name = "ooi/ipaddress_detail.html"
+    template_name = "objects/ipaddress_detail.html"
     context_object_name = "ipaddress"
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
@@ -62,14 +62,14 @@ class IPAddressDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:ipaddress_list"), "text": _("IPAddresses")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
 
         return context
 
 
 class HostnameListView(ListView):
     model = Hostname
-    template_name = "ooi/hostname_list.html"
+    template_name = "objects/hostname_list.html"
     context_object_name = "hostnames"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
@@ -78,14 +78,14 @@ class HostnameListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:hostname_list"), "text": _("Hostnames")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
         return context
 
 
 class HostnameDetailView(DetailView):
     model = Hostname
-    template_name = "ooi/hostname_detail.html"
+    template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
 
     def get_queryset(self) -> "QuerySet[Hostname]":
@@ -106,6 +106,6 @@ class HostnameDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("oois:hostname_list"), "text": _("Hostnames")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
         return context

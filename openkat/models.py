@@ -41,7 +41,7 @@ DENY_ORGANIZATION_CODES = [
     "upload",
     "tasks",
     "tasks",
-    "oois",
+    "objects",
     "openkat",
 ]
 
@@ -115,15 +115,7 @@ class Organization(models.Model):
         permissions = (
             ("can_switch_organization", "Can switch organization"),
             ("can_scan_organization", "Can scan organization"),
-            ("can_enable_disable_plugin", "Can enable or disable boefje"),
-            ("can_add_boefje", "Can add new or duplicate boefjes"),
             ("can_set_clearance_level", "Can set clearance level"),
-            ("add_ooi", "Add oois"),
-            ("can_delete_oois", "Can delete oois"),
-            ("can_mute_findings", "Can mute findings"),
-            ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
-            ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
-            ("can_recalculate_bits", "Can recalculate bits"),
             ("can_access_all_organizations", "Can access all organizations"),
             ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )

@@ -43,7 +43,6 @@ class Command(BaseCommand):
             "can_enable_disable_plugin",
             "can_add_boefje",
             "can_set_clearance_level",
-            "can_delete_oois",
             "can_mute_findings",
             "can_view_katalogus_settings",
             "can_set_katalogus_settings",

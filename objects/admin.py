@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from oois.models import (
+from objects.models import (
     DNSAAAARecord,
     DNSARecord,
     DNSCAARecord,

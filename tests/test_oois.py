@@ -1,5 +1,5 @@
 
-from oois.models import Hostname, Network
+from objects.models import Hostname, Network
 
 
 def test_query_hostname(xtdb):
