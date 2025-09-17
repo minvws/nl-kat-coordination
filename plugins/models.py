@@ -3,9 +3,10 @@ from datetime import timezone
 
 import recurrence
 import structlog
+from django.apps import apps
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
-from django.db.models import Case, F, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
+from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
@@ -89,18 +90,15 @@ class Plugin(models.Model):
 
         return tag or "latest"
 
-    def types_in_arguments(self):
+    def types_in_arguments(self) -> list[type[Model]]:
         result = []
-        return result
-        # TODO: fix
+        for model in apps.get_app_config("oois").get_models():
+            for arg in self.oci_arguments:
+                if "{" + model.__name__.lower() + "}" in arg.lower():
+                    result.append(model)
+                    break
 
-        # for name, ooi_type in ALL_TYPES_MAP.items():
-        #     for arg in self.oci_arguments:
-        #         if "{" + name + "}" in arg.lower():
-        #             result.append(ooi_type)
-        #             break
-        #
-        # return result
+        return result
 
     def files_in_arguments(self):
         results = []
@@ -110,13 +108,15 @@ class Plugin(models.Model):
 
         return results
 
-    def consumed_types(self):
-        # TODO: fix
-        return []
-        # return self.types_in_arguments() + [
-        #     ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes
-        #     if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP
-        # ]
+    def consumed_types(self) -> list[type[Model]]:
+        result = self.types_in_arguments()
+        for model in apps.get_app_config("oois").get_models():
+            for consume in self.consumes:
+                if consume.startswith("type:") and consume.lstrip("type:").lower() == model.__name__.lower():
+                    result.append(model)
+                    break
+
+        return result
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)

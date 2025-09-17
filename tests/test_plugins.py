@@ -5,6 +5,7 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
+from oois.models import Hostname, IPAddress, IPPort
 from plugins.models import EnabledPlugin, Plugin
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
 from tasks.models import NewSchedule
@@ -213,3 +214,37 @@ def test_enabled_for(organization, organization_b):
     assert plugin.enabled_organizations().first() == organization
     assert plugin.enabled_for(organization) is True
     assert plugin.enabled_for(organization_b) is False
+
+
+def test_arguments():
+    assert Plugin(name="t", plugin_id="t").types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{hostname}"]).types_in_arguments() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).types_in_arguments() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).types_in_arguments() == [IPAddress]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).types_in_arguments() == [IPPort]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipport}"]).types_in_arguments() == [IPPort]
+    assert set(Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipaddress}"]).types_in_arguments()) == {
+        IPPort, IPAddress
+    }
+
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).types_in_arguments() == []
+
+    assert Plugin(name="t", plugin_id="t").consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{hostname}"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).consumed_types() == [IPAddress]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).consumed_types() == [IPPort]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).consumed_types() == [Hostname]
+
+    assert Plugin(name="t", plugin_id="t", consumes=["file:type"]).files_in_arguments() == ["type"]
+    assert Plugin(name="t", plugin_id="t").files_in_arguments() == []
