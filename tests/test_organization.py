@@ -1,4 +1,3 @@
-from unittest.mock import patch
 
 import pytest
 from django.contrib.auth.models import Permission
@@ -24,14 +23,11 @@ def bulk_organizations(active_member, blocked_member):
     members = []
     indemnifications = []
 
-    with (
-        patch("crisis_room.management.commands.dashboards.get_or_create_default_dashboard"),
-    ):
-        for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
-            org = Organization(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
-            organizations.append(org)
+    for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
+        org = Organization(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
+        organizations.append(org)
 
-        orgs = Organization.objects.bulk_create(organizations)
+    orgs = Organization.objects.bulk_create(organizations)
 
     for organization in orgs:
         for member in [active_member, blocked_member]:

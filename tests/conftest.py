@@ -4,7 +4,6 @@ import logging
 from datetime import datetime, timezone
 from os import urandom
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 import structlog
@@ -19,11 +18,12 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from pytest_django import DjangoDbBlocker
+from pytest_django.lazy_django import skip_if_no_django
 
 from files.models import File, GenericContent
+from oois.models import Hostname, Network
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 from openkat.views.health import ServiceHealth
-from tasks.models import Schedule
 from tasks.models import Task as TaskDB
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -74,8 +74,7 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 
 def create_organization(name, organization_code):
-    with patch("openkat.signals.get_or_create_default_dashboard"):
-        return Organization.objects.create(name=name, code=organization_code)
+    return Organization.objects.create(name=name, code=organization_code)
 
 
 def create_member(user, organization):
@@ -283,13 +282,10 @@ def blocked_member(django_user_model, organization):
 
 
 @pytest.fixture
-def mock_models_katalogus(mocker):
-    return mocker.patch("katalogus.client.get_katalogus_client")
+def hostname(xtdb):
+    network = Network.objects.create(name="internet")
 
-
-@pytest.fixture
-def local_repository():
-    return get_local_repository()
+    return Hostname.objects.create(name="test.com", network=network)
 
 
 @pytest.fixture
@@ -305,58 +301,6 @@ def task_db(organization) -> TaskDB:
         },
         status="completed",
     )
-
-
-@pytest.fixture
-def report_schedule(organization):
-    return Schedule.objects.create(
-        type="report",
-        organization=organization,
-        data={
-            "type": "report",
-            "organisation_id": organization.code,
-            "report_recipe_id": "3fed7d00-6261-4ad1-b08f-9b91434aa41e",
-        },
-        enabled=True,
-        schedule=None,
-        deadline_at=None,
-        created_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
-        modified_at=datetime(2025, 2, 12, 16, 1, 19, 951925),
-    )
-
-
-@pytest.fixture
-def bytes_raw_metas():
-    return [
-        {
-            "id": "85c01c8c-c0bf-4fe8-bda5-abdf2d03117c",
-            "boefje_meta": {
-                "id": "6dea9549-c05d-42c9-b55b-8ad54cb9e413",
-                "started_at": "2023-11-01T15:02:46.764085+00:00",
-                "ended_at": "2023-11-01T15:02:47.276154+00:00",
-                "boefje": {"id": "dns-sec", "version": None},
-                "input_ooi": "Hostname|internet|mispoes.nl",
-                "input_ooi_data": {},
-                "organization": "test",
-                "environment": {},
-            },
-            "type": "boefje/dns-sec",
-        }
-    ]
-
-
-@pytest.fixture
-def bytes_get_raw():
-    byte_string = ";; Number of trusted keys: 2\\n;; Chasing: mispoes.nl."
-    " A\\n\\n\\nDNSSEC Trust tree:\\nantagonist.nl. (A)\\n|---mispoes.nl. (DNSKEY keytag: 47684 alg: 13 flags:"
-    " 257)\\n    |---mispoes.nl. (DS keytag: 47684 digest type: 2)\\n        "
-    "|---nl. (DNSKEY keytag: 52707 alg: 13 flags: 256)\\n            "
-    "|---nl. (DNSKEY keytag: 17153 alg: 13 flags: 257)\\n            "
-    "|---nl. (DS keytag: 17153 digest type: 2)\\n                "
-    "|---. (DNSKEY keytag: 46780 alg: 8 flags: 256)\\n                    "
-    b"|---. (DNSKEY keytag: 20326 alg: 8 flags: 257)\\n;; Chase successful\\n"
-
-    return byte_string.encode()
 
 
 def setup_request(request, user):
@@ -428,8 +372,9 @@ def drf_redteam_client(create_drf_client, redteamuser):
     return client
 
 
-@pytest.fixture(scope='session')
-def django_xtdb_setup(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
+# Mark tests using this fixture autmatically with django_db and require access to the "xtdb" database
+@pytest.fixture(scope='session', params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
+def xtdb(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:
     Since openkat_integration calls pytest, it creates a test database by default within ci_postgres, where the
@@ -437,22 +382,57 @@ def django_xtdb_setup(request: pytest.FixtureRequest, django_db_blocker: DjangoD
     Authtokens created during the test, but we need this since plugins created during the test have openkat-test-api
     as a callback service.
     """
-    settings.DATABASES["xtdb"]["TEST"] = {"MIRROR": "xtdb"}
+    # settings.DATABASES["xtdb"]["TEST"] = {"MIRROR": "xtdb"}
 
-    django_db_blocker.unblock()
     oois = apps.get_app_config("oois")
     ooi_models = list(oois.get_models())
+
+    xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
+
     for ooi in ooi_models:
-        ooi._meta.db_table = f"test_{ooi._meta.db_table}"
+        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}"
 
     yield
 
+    django_db_blocker.unblock()
     con = connections["xtdb"]
     con.connect()
 
     flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
-
     con.ops.execute_sql_flush(flush)
+    django_db_blocker.block()
+
+
+def _set_suffix_to_test_databases_except_xtdb(suffix: str) -> None:
+    from django.conf import settings
+
+    for db_settings in settings.DATABASES.values():
+        if db_settings["ENGINE"] == "django_xtdb":
+            continue
+
+        test_name = db_settings.get("TEST", {}).get("NAME")
+
+        if not test_name:
+            if db_settings["ENGINE"] == "django.db.backends.sqlite3":
+                continue
+            test_name = f"test_{db_settings['NAME']}"
+
+        if test_name == ":memory:":
+            continue
+
+        db_settings.setdefault("TEST", {})
+        db_settings["TEST"]["NAME"] = f"{test_name}_{suffix}"
+
+
+@pytest.fixture(scope="session")
+def django_db_modify_db_settings_xdist_suffix(request):
+    skip_if_no_django()
+
+    xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
+    if xdist_suffix:
+        # 'gw0' -> '1', 'gw1' -> '2', ...
+        suffix = str(int(xdist_suffix.replace("gw", "")) + 1)
+        _set_suffix_to_test_databases_except_xtdb(suffix=suffix)
 
 
 @pytest.fixture

@@ -267,6 +267,9 @@ XTDB_DB = {
     "PASSWORD": env("OPENKAT_XTDB_PASSWORD", default=None),
     "HOST": env("OPENKAT_XTDB_HOST", default=None),
     "PORT": env.int("OPENKAT_XTDB_PORT", default=5432),
+    "TEST": {
+        "MIRROR": "xtdb",
+    }
 }
 
 DATABASES = {

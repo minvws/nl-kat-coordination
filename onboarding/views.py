@@ -68,18 +68,6 @@ class OnboardingChooseReportInfoView(
     permission_required = "openkat.can_scan_organization"
 
 
-class OnboardingChooseReportTypeView(
-    OrganizationPermissionRequiredMixin, IntroductionStepsMixin, OrganizationView, TemplateView
-):
-    """
-    3. Choose a report type. Gives the user a choice of many report types. Ex. DNS report
-    """
-
-    template_name = "step_2b_choose_report_type.html"
-    current_step = 2
-    permission_required = "openkat.can_scan_organization"
-
-
 class OnboardingClearanceLevelIntroductionView(
     OrganizationPermissionRequiredMixin,
     IntroductionStepsMixin,

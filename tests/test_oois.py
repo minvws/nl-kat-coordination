@@ -1,10 +1,8 @@
-import pytest
 
 from oois.models import Hostname, Network
 
 
-@pytest.mark.django_db(databases=["xtdb", "default"])
-def test_query_hostname(django_xtdb_setup):
+def test_query_hostname(xtdb):
     network = Network.objects.create(name="internet")
     Hostname.objects.create(network=network, name="test.com")
 

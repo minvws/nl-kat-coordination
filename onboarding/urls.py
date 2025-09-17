@@ -13,11 +13,6 @@ urlpatterns = [
         name="step_choose_report_info",
     ),
     path(
-        "<organization_code>/step/choose-report-type/",
-        views.OnboardingChooseReportTypeView.as_view(),
-        name="step_choose_report_type",
-    ),
-    path(
         "<organization_code>/step/clearance-level-introduction/",
         views.OnboardingClearanceLevelIntroductionView.as_view(),
         name="step_clearance_level_introduction",
