@@ -10,7 +10,7 @@ dependencies = [
   "Django>=5.2.0,<6.0",
   "django-two-factor-auth[phonenumberslite]>=1.17.0",
   "django-environ>=0.12.0",
-  "django-xtdb",
+  "django-xtdb==0.0.2",
   "jsonschema>=4.17.0",
   #  "phonenumbers>=9.0.4",
   "pydantic>=2.7.1",
@@ -96,7 +96,7 @@ package = true
 [tool.uv.sources]
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 django-compressor = { git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce" }
-django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
+django-xtdb = { git = "https://github.com/donnype/django-xtdb.git", rev = "f45ea9ede32ce89b30d141c1005fc2f1c066c37b" }
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]
@@ -111,10 +111,12 @@ omit = ["octopoes/*"]
 
 [tool.pytest.ini_options]
 addopts = "-m 'not slow' --durations=10 -n auto --ignore=tests/integration"
-DJANGO_SETTINGS_MODULE = "tests.settings"
+DJANGO_SETTINGS_MODULE = "openkat.settings"
 markers = ["slow: marks tests as slow"]
 env = [
   "D:OPENKAT_DB_HOST=localhost",
+  "D:OPENKAT_XTDB_HOST=localhost",
+  "D:OPENKAT_XTDB_PORT=5433",
 ]
 
 [tool.djlint]

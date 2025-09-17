@@ -9,6 +9,8 @@ from oois.views import (
     NetworkListView,
 )
 
+app_name = "oois"
+
 urlpatterns = [
     path("ooi/network/", NetworkListView.as_view(), name="network_list"),
     path("ooi/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),

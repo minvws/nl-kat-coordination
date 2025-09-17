@@ -45,7 +45,7 @@ class Network(Asset):
 
 class IPAddress(Asset):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
-    address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True)
+    address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True, )
 
     def __str__(self) -> str:
         return self.address
@@ -62,7 +62,7 @@ class IPPort(models.Model):
     port: models.IntegerField = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(65535)]
     )
-    tls: models.BooleanField = models.BooleanField(null=True)
+    tls: models.BooleanField = models.BooleanField(null=True, )
     service: models.CharField = models.CharField()
 
     class Meta:
@@ -162,9 +162,9 @@ class CAATag(models.TextChoices):
 class DNSCAARecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     flags: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(255)]
+        validators=[MinValueValidator(0), MaxValueValidator(255)],
     )
-    tag: models.CharField = models.CharField(choices=CAATag)
+    tag: models.CharField = models.CharField(choices=CAATag, )
     value: models.CharField = models.CharField()
 
     def __str__(self) -> str:
@@ -173,7 +173,7 @@ class DNSCAARecord(DNSRecordBase):
 
 class DNSTXTRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
-    prefix: models.CharField = models.CharField(blank=True)
+    prefix: models.CharField = models.CharField(blank=True, )
     value: models.CharField = models.CharField()
 
     def __str__(self) -> str:

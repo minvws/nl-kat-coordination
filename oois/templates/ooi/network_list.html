@@ -25,7 +25,7 @@
                             {% for network in networks %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'ooi:network-detail' network.pk %}">{{ network.name }}</a>
+                                        <a href="{% url 'oois:network_detail' network.pk %}">{{ network.name }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}

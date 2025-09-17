@@ -43,6 +43,8 @@ class Command(BaseCommand):
         local_env = f"OPENKAT_TOKEN={token}\n"
         local_env += "OPENKAT_API=http://localhost:8000/api/v1\n"
         local_env += "OPENKAT_DB_HOST=localhost\n"
+        local_env += "OPENKAT_XTDB_HOST=localhost\n"
+        local_env += "OPENKAT_XTDB_PORT=5433\n"
 
         local_env_file = settings.BASE_DIR / ".env.local"
         local_env_file.write_text(local_env)

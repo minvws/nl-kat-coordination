@@ -70,23 +70,20 @@ def sync() -> list[Plugin]:
     enabled_plugins = []
 
     for path, package in _find_packages_in_path_containing_files(BASE_DIR / "plugins" / "plugins", ("plugin.json",)):
-        try:
-            definition = json.loads(path.joinpath("plugin.json").read_text())
-            plugin = Plugin(
-                plugin_id=definition.get("plugin_id"),
-                name=definition.get("name"),
-                scan_level=definition.get("scan_level", 1),
-                description=definition.get("description"),
-                consumes=definition.get("consumes", []),
-                recurrences=definition.get("recurrences"),
-                oci_image=definition.get("oci_image"),
-                oci_arguments=definition.get("oci_arguments", []),
-                version=definition.get("version"),
-            )
-            plugins.append(plugin)
-            enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
-        except ModuleException as exc:
-            logger.error(exc)
+        definition = json.loads(path.joinpath("plugin.json").read_text())
+        plugin = Plugin(
+            plugin_id=definition.get("plugin_id"),
+            name=definition.get("name"),
+            scan_level=definition.get("scan_level", 1),
+            description=definition.get("description"),
+            consumes=definition.get("consumes", []),
+            recurrences=definition.get("recurrences"),
+            oci_image=definition.get("oci_image"),
+            oci_arguments=definition.get("oci_arguments", []),
+            version=definition.get("version"),
+        )
+        plugins.append(plugin)
+        enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
     for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):

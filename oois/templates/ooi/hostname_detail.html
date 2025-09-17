@@ -26,7 +26,7 @@
                         <div>
                             <dt>Network</dt>
                             <dd>
-                                <a href="{% url 'ooi:network-detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                                <a href="{% url 'oois:network_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                             </dd>
                         </div>
                     </dl>
@@ -48,7 +48,7 @@
                             <tr>
                                 <td>A</td>
                                 <td>
-                                    <a href="{% url 'ooi:ipaddress-detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                    <a href="{% url 'oois:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
                                 </td>
                                 <td></td>
                             </tr>
@@ -57,7 +57,7 @@
                             <tr>
                                 <td>AAAA</td>
                                 <td>
-                                    <a href="{% url 'ooi:ipaddress-detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                    <a href="{% url 'oois:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
                                 </td>
                                 <td></td>
                             </tr>
@@ -66,7 +66,7 @@
                             <tr>
                                 <td>CNAME</td>
                                 <td>
-                                    <a href="{% url 'ooi:hostname-detail' record.target_id %}">{{ record.target }}</a>
+                                    <a href="{% url 'oois:hostname_detail' record.target_id %}">{{ record.target }}</a>
                                 </td>
                                 <td>{% translate "Source:" %} {{ hostname.name }}</td>
                             </tr>
@@ -75,7 +75,7 @@
                             <tr>
                                 <td>MX</td>
                                 <td>
-                                    <a href="{% url 'ooi:hostname-detail' record.mail_server_id %}">{{ record.mail_server }}</a>
+                                    <a href="{% url 'oois:hostname_detail' record.mail_server_id %}">{{ record.mail_server }}</a>
                                 </td>
                                 <td>{% translate "Preference:" %} {{ record.preference }}</td>
                             </tr>
@@ -84,7 +84,7 @@
                             <tr>
                                 <td>NS</td>
                                 <td>
-                                    <a href="{% url 'ooi:hostname-detail' record.name_server_id %}">{{ record.name_server }}</a>
+                                    <a href="{% url 'oois:hostname_detail' record.name_server_id %}">{{ record.name_server }}</a>
                                 </td>
                                 <td></td>
                             </tr>
@@ -111,7 +111,7 @@
                             <tr>
                                 <td>SRV</td>
                                 <td>
-                                    <a href="{% url 'ooi:hostname-detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
+                                    <a href="{% url 'oois:hostname_detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
                                 </td>
                                 <td>{% translate "Priority:" %} {{ record.priority }}, {% translate "Weight:" %} {{ record.weight }}</td>
                             </tr>
@@ -143,7 +143,7 @@
                                 <td>CNAME</td>
                                 <td>{{ hostname.name }}</td>
                                 <td>
-                                    {% translate "Target for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                    {% translate "Target for:" %} <a href="{% url 'oois:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -152,7 +152,7 @@
                                 <td>MX</td>
                                 <td>{{ hostname.name }}</td>
                                 <td>
-                                    {% translate "Mail server for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
+                                    {% translate "Mail server for:" %} <a href="{% url 'oois:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
                                 </td>
                             </tr>
                         {% endfor %}
@@ -161,7 +161,7 @@
                                 <td>NS</td>
                                 <td>{{ hostname.name }}</td>
                                 <td>
-                                    {% translate "Authoritative for:" %} <a href="{% url 'ooi:hostname-detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                    {% translate "Authoritative for:" %} <a href="{% url 'oois:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -26,10 +26,10 @@
                             {% for hostname in hostnames %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'ooi:hostname-detail' hostname.pk %}">{{ hostname.name }}</a>
+                                        <a href="{% url 'oois:hostname_detail' hostname.pk %}">{{ hostname.name }}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'ooi:network-detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                                        <a href="{% url 'oois:network_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}

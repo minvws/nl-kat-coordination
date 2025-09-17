@@ -26,10 +26,10 @@
                             {% for ipaddress in ipaddresses %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'ooi:ipaddress-detail' ipaddress.pk %}">{{ ipaddress.address }}</a>
+                                        <a href="{% url 'oois:ipaddress_detail' ipaddress.pk %}">{{ ipaddress.address }}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'ooi:network-detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
+                                        <a href="{% url 'oois:network_detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}

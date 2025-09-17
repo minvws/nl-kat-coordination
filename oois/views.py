@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView
 
 from oois.models import Hostname, IPAddress, Network
 
@@ -19,7 +19,7 @@ class NetworkListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("network_list"), "text": _("Networks")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:network_list"), "text": _("Networks")}]
 
         return context
 
@@ -31,7 +31,7 @@ class NetworkDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("network_list"), "text": _("Networks")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:network_list"), "text": _("Networks")}]
 
         return context
 
@@ -47,7 +47,7 @@ class IPAddressListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("ipaddress_list"), "text": _("IPAddresses")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:ipaddress_list"), "text": _("IPAddresses")}]
 
         return context
 
@@ -62,7 +62,7 @@ class IPAddressDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("ipaddress_list"), "text": _("IPAddresses")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:ipaddress_list"), "text": _("IPAddresses")}]
 
         return context
 
@@ -78,7 +78,7 @@ class HostnameListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("hostname_list"), "text": _("Hostnames")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:hostname_list"), "text": _("Hostnames")}]
 
         return context
 
@@ -106,6 +106,6 @@ class HostnameDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("hostname_list"), "text": _("Hostnames")}]
+        context["breadcrumbs"] = [{"url": reverse("oois:hostname_list"), "text": _("Hostnames")}]
 
         return context

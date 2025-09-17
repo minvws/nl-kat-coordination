@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PluginsConfig(AppConfig):
-    default_auto_field = "django.db.models.BigAutoField"
+class OOIsConfig(AppConfig):
+    default_auto_field = "django_xtdb.patch.XTDBBigAutoField"
     name = "oois"
