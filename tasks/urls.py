@@ -15,7 +15,7 @@ from tasks.views import (
 )
 
 urlpatterns = [
-    path("new-tasks/", TaskListView.as_view(), name="new_task_list"),
+    path("new-tasks/", TaskListView.as_view(), name="task_list"),
     path("new-tasks/add/", TaskCreateView.as_view(), name="add_task"),
     path("new-tasks/<slug:pk>/", TaskDetailView.as_view(), name="task_detail"),
     path("new-tasks/<slug:task_id>/reschedule/", TaskRescheduleView.as_view(), name="reschedule_task"),

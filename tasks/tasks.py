@@ -183,7 +183,7 @@ def run_plugin_task(
         data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
 
-    app.send_task("tasks.new_tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
+    app.send_task("tasks.tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
 
     if batch:
         return [task]

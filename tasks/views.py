@@ -19,7 +19,7 @@ from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
 from tasks.models import NewSchedule, Task, TaskStatus
-from tasks.tasks import run_schedule, rerun_task, run_plugin_task
+from tasks.tasks import rerun_task, run_plugin_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -63,7 +63,7 @@ class TaskDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("new_task_list"), "text": _("Plugins")},
+            {"url": reverse("task_list"), "text": _("Plugins")},
             {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
         ]
 
@@ -143,7 +143,7 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url
 
-        return reverse_lazy("new_task_list")
+        return reverse_lazy("task_list")
 
 
 class TaskRescheduleView(PermissionRequiredMixin, View):
@@ -152,7 +152,7 @@ class TaskRescheduleView(PermissionRequiredMixin, View):
     def post(self, request, task_id, *args, **kwargs):
         rerun_task(Task.objects.get(pk=task_id))
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))
 
 
 class TaskCancelView(PermissionRequiredMixin, View):
@@ -161,7 +161,7 @@ class TaskCancelView(PermissionRequiredMixin, View):
     def post(self, request, task_id, *args, **kwargs):
         Task.objects.get(pk=task_id).cancel()
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))
 
 
 class NewScheduleFilter(django_filters.FilterSet):
@@ -298,4 +298,4 @@ class ScheduleRunView(PermissionRequiredMixin, View):
     def post(self, request, schedule_id, *args, **kwargs):
         run_schedule(NewSchedule.objects.get(pk=schedule_id))
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))

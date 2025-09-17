@@ -87,7 +87,7 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'new_task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
+                                        <a href="{% url 'task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
                                     </td>
                                     {% if perms.openkat.can_enable_disable_schedule %}
                                         <form action="{% url "edit_schedule" pk=schedule.id %}"

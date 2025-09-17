@@ -35,21 +35,9 @@ app.conf.beat_schedule = {
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
-    "schedule-boefjes": {
-        "task": "tasks.tasks.schedule",
-        "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
-    },
-    "reschedule-boefjes": {
+    "reschedule": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
-    },
-    "reschedule": {
-        "task": "tasks.new_tasks.reschedule",
-        "schedule": settings.SCHEDULE_INTERVAL // 6,
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
