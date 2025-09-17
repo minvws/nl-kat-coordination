@@ -1,18 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import CreateView, DeleteView, UpdateView
-from rest_framework.permissions import BasePermission, DjangoModelPermissions
-
-
-# This is a bit clunky, but DRF doesn't allow you to specify a permission
-# directly, only a Permission class
-class CanRecalculateBits(BasePermission):
-    def has_permission(self, request, view) -> bool:
-        return request.user.has_perm("openkat.can_recalculate_bits")
-
-
-class CanSetKatalogusSettings(BasePermission):
-    def has_permission(self, request, view) -> bool:
-        return request.user.has_perm("openkat.can_set_katalogus_settings")
+from rest_framework.permissions import DjangoModelPermissions
 
 
 class KATModelPermissions(DjangoModelPermissions):

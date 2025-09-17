@@ -1,5 +1,3 @@
-import uuid
-from datetime import date, datetime, timezone
 from typing import Any, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
@@ -10,31 +8,6 @@ from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
 from openkat.models import Organization
-
-
-def convert_date_to_datetime(d: date) -> datetime:
-    # returning 23:59 of date_object in UTC timezone
-    return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
-
-
-def get_mandatory_fields(request: HttpRequest, params: list[str] | None = None) -> list:
-    mandatory_fields = []
-
-    if not params:
-        params = ["observed_at", "depth", "view"]
-
-        for type_ in request.GET.getlist("ooi_type", []):
-            mandatory_fields.append(("ooi_type", type_))
-
-    for param in params:
-        if param in request.GET:
-            mandatory_fields.append((param, request.GET.get(param)))
-
-    return mandatory_fields
-
-
-def generate_job_id():
-    return str(uuid.uuid4())
 
 
 def url_with_querystring(path: str, doseq: bool = False, /, **kwargs: Any) -> str:
