@@ -119,8 +119,6 @@ def add_redteam_group_permissions(member):
                 "can_scan_organization",
                 "can_enable_disable_plugin",
                 "can_set_clearance_level",
-                "can_delete_oois",
-                "can_mute_findings",
             ]
         ).values_list("id", flat=True)
     )

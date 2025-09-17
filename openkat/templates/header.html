@@ -52,17 +52,17 @@
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
                         </li>
                         <li>
-                            {% url "oois:network_list" as index_url %}
+                            {% url "objects:network_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Networks" %}</a>
                         </li>
                         <li>
-                            {% url "oois:hostname_list" as index_url %}
+                            {% url "objects:hostname_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Hostnames" %}</a>
                         </li>
                         <li>
-                            {% url "oois:ipaddress_list" as index_url %}
+                            {% url "objects:ipaddress_list" as index_url %}
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "IPAddresses" %}</a>
                         </li>
