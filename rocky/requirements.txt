@@ -181,9 +181,9 @@ cssselect2==0.8.0 \
     --hash=sha256:46fc70ebc41ced7a32cd42d58b1884d72ade23d21e5a4eaaf022401c13f0e76e \
     --hash=sha256:7674ffb954a3b46162392aee2a3a0aedb2e14ecf99fcc28644900f4e6e3e9d3a
     # via weasyprint
-django==5.1.11 \
-    --hash=sha256:3bcdbd40e4d4623b5e04f59c28834323f3086df583058e65ebce99f9982385ce \
-    --hash=sha256:e48091f364007068728aca938e7450fbfe3f2217079bfd2b8af45122585acf64
+django==5.1.12 \
+    --hash=sha256:8a8991b1ec052ef6a44fefd1ef336ab8daa221287bcb91a4a17d5e1abec5bbcc \
+    --hash=sha256:9eb695636cea3601b65690f1596993c042206729afb320ca0960b55f8ed4477b
     # via
     #   django-appconf
     #   django-components
