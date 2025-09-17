@@ -32,30 +32,19 @@ class PluginRunner:
         task_id: uuid.UUID | None = None,
         keep: bool = False,
         cli: bool = False,
-        parallelism: int | None = None,
+        parallelism: int | None = None,  # TODO: fix
     ) -> str:
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
-
-        # Temporary user with limited access rights
         environment = {
             "PLUGIN_ID": plugin.plugin_id,
-            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",  # TODO: generate?
+            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",
         }
-
-        if use_stdout:
-            environment["UPLOAD_URL"] = "/dev/null"
-        elif task_id:
-            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={task_id}"
-        else:
-            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/"
-
         tmp_file = None
 
         if isinstance(target, str):
             if not plugin.types_in_arguments():
                 tmp_file = File.objects.create(file=TemporaryContent(target))
-                environment["IN_FILE"] = str(tmp_file.id)
 
             command = self.create_command(plugin.oci_arguments, target)
         elif target is None:
@@ -64,46 +53,40 @@ class PluginRunner:
             if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
                 # This plugin expects one target object at a time.
 
-                # If the list contains one element, run it immediately.
                 if len(target) == 1:
                     return self.run(plugin_id, target[0], output, task_id, keep, cli)
 
-                parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
-
                 # TODO: auto-parallelism has hit an edge case, so it has been now turned off until the go binary
-                #  supports handling auto-parallelism
-                if parallelism == 0 or True:
-                    logs = []
-                    for t in target:
-                        try:
-                            logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
-                        except ContainerError:
-                            logs.append(f"Failed to process target: {t}")
+                #  supports handling auto-parallelism:
+                #  parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
 
-                    return "\n".join(logs)
+                logs = []
+                for t in target:  # Run the targets sequentially
+                    try:
+                        logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
+                    except ContainerError:
+                        logs.append(f"Failed to process target: {t}")
 
-                # Parallelism graveyard:
-                #
-                # cmd = shlex.join(self.create_command(plugin.oci_arguments, "%"))
-                # sub_cmd = shlex.split(f'({cmd})')  # (cmd) will not print the job control output
-                # command = ['while', 'read', '-r', 'LINE', f'{str(parallelism)}`;', 'do', sub_cmd, 'done', '&&', 'wait']
-                #
-                #
-                # Initial working version until we had an xargs version that was too old
-                # tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
-                # environment["IN_FILE"] = str(tmp_file.id)
-                # command = ["xargs", "-P", str(parallelism), "-I", "%"] + self.create_command(plugin.oci_arguments, "%")
+                return "\n".join(logs)  # Return the output merged
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
-                environment["IN_FILE"] = str(tmp_file.id)
-
                 command = plugin.oci_arguments
         else:
             raise ValueError(f"Unsuported target type: {type(target)}")
 
+        if tmp_file:
+            environment["IN_FILE"] = str(tmp_file.id)
+        if use_stdout:
+            environment["UPLOAD_URL"] = "/dev/null"
+        elif task_id:
+            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={task_id}"
+        else:
+            environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/"
+
         if cli:
             return self.get_cli(command, environment, keep, plugin)
 
+        # Temporary user with limited access rights
         plugin_user, token = self.create_token(plugin_id)
         environment["OPENKAT_TOKEN"] = token.generate_new_token()
         token.save()
@@ -128,6 +111,12 @@ class PluginRunner:
 
         def handle(sig_num, stack_frame):
             container.kill(sig_num)
+            token.delete()
+            plugin_user.delete()
+
+            if tmp_file:
+                tmp_file.delete()
+
             old_handle(sig_num, stack_frame)
 
         signal.signal(signal.SIGTERM, handle)
@@ -149,22 +138,21 @@ class PluginRunner:
         if not keep:
             container.remove(force=True)
 
-        if exit_status != 0:
-            raise ContainerError(container, exit_status, command, container.image, out)
-
-        signal.signal(signal.SIGTERM, old_handle)
-
         token.delete()
         plugin_user.delete()
 
         if tmp_file:
             tmp_file.delete()
 
+        if exit_status != 0:
+            raise ContainerError(container, exit_status, command, container.image, out)
+
+        signal.signal(signal.SIGTERM, old_handle)
+
         if out is None:
             return ""
 
         return b''.join(out).decode()
-
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
@@ -173,9 +161,11 @@ class PluginRunner:
         network = f"--network {settings.DOCKER_NETWORK}"
         cmd = shlex.join(command)
         vol = f"-v {self.adapter}:{self.entrypoint}"
+
         return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
 
-    def create_token(self, plugin_id: str) -> tuple[KATUser, AuthToken]:
+    @staticmethod
+    def create_token(plugin_id: str) -> tuple[KATUser, AuthToken]:
         plugin_user = KATUser(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
         plugin_user.save()
@@ -194,7 +184,8 @@ class PluginRunner:
 
         return plugin_user, token
 
-    def create_command(self, args: list[str], target: str):
+    @staticmethod
+    def create_command(args: list[str], target: str):
         format_map = {"{file}": target}
 
         for ip_key in ["{ipaddress}", "{ipaddressv4}", "{ipaddressv6}"]:
