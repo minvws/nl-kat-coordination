@@ -9,7 +9,7 @@ from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
-from objects.viewsets import NetworkViewSet
+from objects.viewsets import HostnameViewSet, NetworkViewSet
 from openkat.views.health import Health, HealthChecks
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
@@ -37,6 +37,7 @@ router.register(r"organization", OrganizationViewSet)
 router.register(r"task", TaskViewSet, basename="task")
 router.register(r"file", FileViewSet, basename="file")
 router.register(r"network", NetworkViewSet, basename="network")
+router.register(r"hostname", HostnameViewSet, basename="hostname")
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
