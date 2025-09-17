@@ -13,7 +13,7 @@ from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
 from tasks.celery import app
-from tasks.models import NewSchedule, Task, TaskStatus
+from tasks.models import Schedule, Task, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -42,13 +42,13 @@ def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
 def reschedule() -> None:
     logger.info("Scheduling plugins")
 
-    for schedule in NewSchedule.objects.filter(enabled=True):
+    for schedule in Schedule.objects.filter(enabled=True):
         run_schedule(schedule, force=False)
 
     logger.info("Finished scheduling plugins")
 
 
-def run_schedule(schedule: NewSchedule, force: bool = True) -> None:
+def run_schedule(schedule: Schedule, force: bool = True) -> None:
     if not schedule.plugin:
         return
 
@@ -58,7 +58,7 @@ def run_schedule(schedule: NewSchedule, force: bool = True) -> None:
         run_schedule_for_org(schedule, org, force)
 
 
-def run_schedule_for_org(schedule: NewSchedule, organization: Organization, force: bool = True) -> None:
+def run_schedule_for_org(schedule: Schedule, organization: Organization, force: bool = True) -> None:
     now = datetime.now(timezone.utc)
 
     if not schedule.object_set:

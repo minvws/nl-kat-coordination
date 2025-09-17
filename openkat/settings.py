@@ -173,7 +173,6 @@ INSTALLED_APPS = [
     "tasks",
     "files",
     "plugins",
-    "objects",
     "oois",
     "django_password_validators",
     "django_password_validators.password_history",

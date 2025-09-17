@@ -9,7 +9,6 @@ from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
-from objects.viewsets import ObjectViewSet
 from openkat.views.health import Health, HealthChecks
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
@@ -27,7 +26,7 @@ from openkat.views.organization_member_list import OrganizationMemberListView
 from openkat.views.organization_settings import OrganizationSettingsView
 from openkat.views.privacy_statement import PrivacyStatementView
 from openkat.viewsets import OrganizationViewSet
-from tasks.viewsets import TaskViewSet
+from tasks.viewsets import ObjectViewSet, TaskViewSet
 
 handler404 = "openkat.views.handler404.handler404"
 handler403 = "openkat.views.handler403.handler403"
@@ -54,7 +53,6 @@ urlpatterns += i18n_patterns(
     path("", include("plugins.urls"), name="plugins"),
     path("", include("tasks.urls"), name="tasks"),
     path("", include("files.urls"), name="files"),
-    path("", include("objects.urls"), name="objects"),
     path("", include("oois.urls"), name="oois"),
     path("privacy-statement/", PrivacyStatementView.as_view(), name="privacy_statement"),
     path("organizations/", OrganizationListView.as_view(), name="organization_list"),

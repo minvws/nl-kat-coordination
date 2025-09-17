@@ -13,7 +13,7 @@
             <div>
                 <h1>{% translate "Schedules" %}</h1>
             </div>
-            {% if perms.openkat.add_newschedule %}
+            {% if perms.openkat.add_schedule %}
                 <div class="horizontal-view toolbar">
                     <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Schedule" %}</a>
                 </div>
@@ -24,7 +24,7 @@
                     <p  class="action-buttons"><button type="submit" class="icon ti-search"></button></p>
                 </div>
             </form>
-            {% if not newschedule_list %}
+            {% if not schedule_list %}
                 <div>
                     <h2>{% translate "Schedules" %}</h2>
                     <p>{% translate "There are no Schedules." %}</p>
@@ -49,7 +49,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for schedule in newschedule_list %}
+                            {% for schedule in schedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
                                         <a href="{% url "schedule_detail" pk=schedule.id %}">{% translate 'See Details' %}</a>

@@ -8,7 +8,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from oois.models import Hostname, IPAddress, IPPort
 from plugins.models import EnabledPlugin, Plugin
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
-from tasks.models import NewSchedule
+from tasks.models import Schedule
 from tests.conftest import setup_request
 
 
@@ -148,7 +148,7 @@ def test_enabling_plugin_creates_schedule():
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
 
-    schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
+    schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
     now = datetime.datetime.now(timezone.utc)
 
     # minute precision should be stable to test
@@ -163,7 +163,7 @@ def test_enabling_plugin_creates_schedule():
 
     plugin = Plugin.objects.create(name="test2", plugin_id="testt2", consumes=["type:hostname"])
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
-    schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
+    schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
 
     assert schedule.enabled
     # TODO: fix

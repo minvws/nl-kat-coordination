@@ -10,9 +10,8 @@ from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, Un
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
-from objects.models import ObjectSet
 from openkat.models import Organization, OrganizationMember
-from tasks.models import NewSchedule
+from tasks.models import Schedule, ObjectSet
 
 logger = structlog.get_logger(__name__)
 
@@ -197,7 +196,7 @@ class EnabledPlugin(models.Model):
         return super().save(*args, **kwargs)
 
     def initialize_schedules(self):
-        schedules = NewSchedule.objects.filter(plugin=self.plugin, organization=self.organization)
+        schedules = Schedule.objects.filter(plugin=self.plugin, organization=self.organization)
 
         if schedules.exists():
             return
@@ -215,7 +214,7 @@ class EnabledPlugin(models.Model):
         # So this is possibly the first time enabling the plugin for the organization
         for query, name in queries:
             object_set = ObjectSet.objects.create(name=name, object_query=query, dynamic=True)
-            NewSchedule.objects.create(
+            Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
                 object_set=object_set,
@@ -229,7 +228,7 @@ class EnabledPlugin(models.Model):
             )
 
         if not queries:
-            NewSchedule.objects.create(
+            Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
                 organization=self.organization,

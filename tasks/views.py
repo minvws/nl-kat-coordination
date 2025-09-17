@@ -1,3 +1,4 @@
+import datetime
 from datetime import datetime, timezone
 
 import django_filters
@@ -14,11 +15,10 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
-from objects.models import Object
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
-from tasks.models import NewSchedule, Task, TaskStatus
+from tasks.models import Schedule, Task, TaskStatus, ObjectSet
 from tasks.tasks import rerun_task, run_plugin_task, run_schedule
 
 
@@ -72,7 +72,7 @@ class TaskDetailView(DetailView):
 
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
-    input_data = forms.ModelMultipleChoiceField(Object.objects.all(), required=False)
+    # input_data = forms.ModelMultipleChoiceField(Asset.objects.all(), required=False)  #TODO: fix
 
     class Meta:
         model = Task
@@ -164,21 +164,21 @@ class TaskCancelView(PermissionRequiredMixin, View):
         return redirect(reverse("task_list"))
 
 
-class NewScheduleFilter(django_filters.FilterSet):
+class ScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
     input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
 
     class Meta:
-        model = NewSchedule
+        model = Schedule
         fields = ["organization", "plugin__plugin_id", "input", "enabled", "object_set"]
 
 
 class ScheduleListView(FilterView):
     template_name = "schedule_list.html"
-    model = NewSchedule
+    model = Schedule
     ordering = ["-id"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-    filterset_class = NewScheduleFilter
+    filterset_class = ScheduleFilter
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -195,15 +195,15 @@ class ScheduleListView(FilterView):
         return context
 
 
-class NewScheduleForm(ModelForm):
+class ScheduleForm(ModelForm):
     class Meta:
-        model = NewSchedule
+        model = Schedule
         fields = ["enabled", "recurrences", "object_set"]
 
 
 class ScheduleDetailView(DetailView):
     template_name = "schedule.html"
-    model = NewSchedule
+    model = Schedule
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -211,13 +211,13 @@ class ScheduleDetailView(DetailView):
             {"url": reverse("schedule_list"), "text": _("Schedules")},
             {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule details")},
         ]
-        context["form"] = NewScheduleForm
+        context["form"] = ScheduleForm
 
         return context
 
 
 class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
-    model = NewSchedule
+    model = Schedule
     fields = ["plugin", "object_set", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
 
@@ -247,7 +247,7 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 
 class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
-    model = NewSchedule
+    model = Schedule
     fields = ["enabled", "recurrences", "object_set"]
 
     def form_valid(self, form):
@@ -278,7 +278,7 @@ class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
 
 class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
-    model = NewSchedule
+    model = Schedule
 
     def form_invalid(self, form):
         return redirect(reverse("schedule_list"))
@@ -293,9 +293,100 @@ class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class ScheduleRunView(PermissionRequiredMixin, View):
-    permission_required = ("schedules.add_newschedules",)
+    permission_required = ("schedules.add_schedules",)
 
     def post(self, request, schedule_id, *args, **kwargs):
-        run_schedule(NewSchedule.objects.get(pk=schedule_id))
+        run_schedule(Schedule.objects.get(pk=schedule_id))
 
         return redirect(reverse("task_list"))
+
+
+class ObjectSetFilter(django_filters.FilterSet):
+    object_query = django_filters.CharFilter(label="Object Query", lookup_expr="icontains")
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    description = django_filters.CharFilter(label="Description", lookup_expr="icontains")
+
+    class Meta:
+        model = ObjectSet
+        fields = ["name", "description", "object_query"]
+
+
+class ObjectSetListView(FilterView):
+    template_name = "object_set_list.html"
+    model = ObjectSet
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = ObjectSetFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("object_list"), "text": _("Objects")}]
+
+        return context
+
+
+class ObjectSetDetailView(DetailView):
+    template_name = "object_set.html"
+    model = ObjectSet
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("object_list"), "text": _("Objects")},
+            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
+
+        ]
+
+        now = datetime.datetime.now(timezone.utc)
+        obj = self.get_object()
+
+        # TODO: handle...
+        org = Organization.objects.first()
+
+        if obj.object_query:
+            # TODO: fix
+            # try:
+            #     query = Query.from_path(obj.object_query)
+            # except (ValueError, TypeNotFound):
+            #     raise ValueError(f"Invalid query: {obj.object_query}")
+            #
+            # pk = Aliased(query.result_type, field="primary_key")
+            # objects = connector.octopoes.ooi_repository.query(
+            #     query.find(pk).where(query.result_type, primary_key=pk).limit(10), now,
+            # )
+            #
+            # context["preview"] = [obj[1] for obj in objects]
+            context["preview_organization"] = org
+        else:
+            context["preview"] = None
+            context["preview_organization"] = None
+
+        return context
+
+
+class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = ObjectSet
+    fields = ["name", "all_objects", "object_query", "description", "dynamic"]
+    template_name = "object_set_form.html"
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("object_set_list")
+
+
+class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = ObjectSet
+
+    def form_invalid(self, form):
+        return redirect(reverse("object_set_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("object_set_list")

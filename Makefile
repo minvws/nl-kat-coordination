@@ -43,7 +43,7 @@ login:
 dashboards:
 	docker compose run --rm openkat python manage.py dashboards
 
-init: user seed messages sync
+init: user seed messages sync static
 
 user:
 	-$(exec) python manage.py createsuperuser --no-input
@@ -56,6 +56,9 @@ messages:
 
 sync:
 	-$(exec) python manage.py sync
+
+static:
+	-$(exec) python manage.py collectstatic
 
 frontend:
 	docker run --rm -v $$PWD:/app/openkat node:20-bookworm sh -c "cd /app/openkat && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
