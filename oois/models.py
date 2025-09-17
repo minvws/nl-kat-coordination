@@ -23,9 +23,7 @@ class ScanLevel(models.Model):
         default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
     declared: models.BooleanField = models.BooleanField(default=False)
-    last_changed_by: models.ForeignKey = models.ForeignKey(
-        "account.KATUser", on_delete=models.PROTECT, null=True, blank=True
-    )
+    last_changed_by: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
 
     class Meta:
         managed = False
