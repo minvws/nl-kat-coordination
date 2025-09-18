@@ -80,7 +80,7 @@ class Schedule(models.Model):
     object_set = models.ForeignKey(ObjectSet, on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
 
     run_on = models.CharField(max_length=64, null=True, blank=True)
-    operation = models.CharField(max_length=16, choices=Operation.choices, null=True, blank=True)
+    operation = models.CharField(max_length=16, choices=Operation, null=True, blank=True)
 
     def run(self):
         from tasks.tasks import run_schedule
@@ -94,7 +94,7 @@ class Task(models.Model):
     organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True)
     type = models.CharField(max_length=32, default="plugin")
     data = models.JSONField(default=dict)
-    status = models.CharField(max_length=16, choices=TaskStatus.choices, default=TaskStatus.PENDING)
+    status = models.CharField(max_length=16, choices=TaskStatus, default=TaskStatus.PENDING)
 
     created_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True)
