@@ -1,5 +1,4 @@
 import datetime
-from datetime import timezone
 
 import recurrence
 import structlog
@@ -223,7 +222,7 @@ class EnabledPlugin(models.Model):
                 if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
-                    dtstart=datetime.datetime.now(timezone.utc),
+                    dtstart=datetime.datetime.now(datetime.UTC),
                 ),
             )
 
@@ -235,6 +234,6 @@ class EnabledPlugin(models.Model):
                 recurrences=self.plugin.recurrences
                 if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
-                    rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(timezone.utc)
+                    rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(datetime.UTC)
                 ),
             )

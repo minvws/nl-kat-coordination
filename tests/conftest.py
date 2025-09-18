@@ -1,7 +1,7 @@
 import binascii
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from os import urandom
 from pathlib import Path
 
@@ -55,7 +55,7 @@ def fixture_configure_structlog(log_output):
 
 @pytest.fixture
 def valid_time():
-    return datetime(2010, 10, 10, 10, 10, 10, tzinfo=timezone.utc)
+    return datetime(2010, 10, 10, 10, 10, 10, tzinfo=UTC)
 
 
 @pytest.fixture(params=LANG_LIST)

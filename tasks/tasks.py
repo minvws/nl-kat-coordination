@@ -1,6 +1,6 @@
 import operator
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import reduce
 from typing import Any
 
@@ -59,7 +59,7 @@ def run_schedule(schedule: Schedule, force: bool = True) -> None:
 
 
 def run_schedule_for_org(schedule: Schedule, organization: Organization, force: bool = True) -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if not schedule.object_set:
         if force:
@@ -223,7 +223,7 @@ def run_plugin(
     try:
         PluginRunner().run(plugin_id, input_data, task_id=task.id)
         task.status = TaskStatus.COMPLETED
-        task.ended_at = datetime.now(timezone.utc)
+        task.ended_at = datetime.now(UTC)
         task.save()
     except:
         task.refresh_from_db(fields=["status"])
@@ -231,7 +231,7 @@ def run_plugin(
         if task.status != TaskStatus.CANCELLED:
             task.status = TaskStatus.FAILED
 
-        task.ended_at = datetime.now(timezone.utc)
+        task.ended_at = datetime.now(UTC)
         task.save()
         raise
 

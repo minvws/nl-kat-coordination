@@ -1,5 +1,4 @@
 import datetime
-from datetime import timezone
 
 import pytest
 from django.core.exceptions import PermissionDenied
@@ -149,7 +148,7 @@ def test_enabling_plugin_creates_schedule():
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
 
     schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
-    now = datetime.datetime.now(timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
 
     # minute precision should be stable to test
     assert f"DTSTART:{now.strftime('%Y%m%dT%H%M')}" in str(schedule.recurrences)

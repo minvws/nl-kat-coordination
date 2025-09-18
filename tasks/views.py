@@ -1,5 +1,5 @@
 import datetime
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import django_filters
 import recurrence
@@ -94,7 +94,7 @@ class TaskForm(ModelForm):
         input_data = set()
 
         if pks:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             # TODO: fix
             # octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
             # scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
@@ -231,7 +231,7 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
         else:
             self.object.recurrences = recurrence.Recurrence(
                 rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
-                dtstart=datetime.now(timezone.utc),
+                dtstart=datetime.now(UTC),
             )
 
         self.object.save()
@@ -336,7 +336,7 @@ class ObjectSetDetailView(DetailView):
 
         ]
 
-        now = datetime.datetime.now(timezone.utc)
+        now = datetime.datetime.now(UTC)
         obj = self.get_object()
 
         # TODO: handle...

@@ -1,4 +1,3 @@
-
 from django.db.models import Count, QuerySet
 from django.views.generic import ListView
 from structlog import get_logger
