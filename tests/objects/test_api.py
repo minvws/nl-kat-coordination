@@ -62,3 +62,21 @@ def test_hostname_api(drf_client, xtdb):
             "network": network.pk,
         },
     ]
+
+
+def test_bulk_create(drf_client, xtdb):
+    n = 50
+    networks = [{"name": f"net{i}"} for i in range(n)]
+    nets = drf_client.post("/api/v1/network/", data=json.dumps(networks), content_type="application/json").json()
+    assert drf_client.get("/api/v1/network/").json()["count"] == n
+
+    hostnames = [{"name": f"host{i}.com", "network": nets[i % 10]["id"]} for i in range(2 * n)]
+    drf_client.post("/api/v1/hostname/", data=json.dumps(hostnames), content_type="application/json").json()
+    assert drf_client.get("/api/v1/hostname/").json()["count"] == 2 * n
+
+
+def test_bulk_create_tasks(drf_client, xtdb):
+    n = 300
+    tasks = [{"type": f"test{i}"} for i in range(n)]
+    drf_client.post("/api/v1/task/", data=json.dumps(tasks), content_type="application/json").json()
+    assert drf_client.get("/api/v1/task/").json()["count"] == n
