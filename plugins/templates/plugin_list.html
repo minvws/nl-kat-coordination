@@ -28,14 +28,14 @@
             </div>
 
             <div>
-                <form class="inline layout-wide" method="get">
-                    <div class="horizontal-view">
-                        {{ filter.form.as_p }}
-                        <p  class="action-buttons"><button type="submit" class="icon ti-search"></button></p>
-                    </div>
-                </form>
+                <div class="filter-container">
+                    <form class="inline layout-wide" method="get">
+                            {{ filter.form.as_p }}
+                            <button type="submit">{% translate "Apply" %}</button>
+                    </form>
+                </div>
                 {% include "plugin_table.html" %}
-                <div class="fifty-fifty">
+                <div>
                     <p>
                         <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
                     </p>

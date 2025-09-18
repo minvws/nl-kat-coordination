@@ -1,4 +1,5 @@
 import django_filters
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
@@ -20,15 +21,32 @@ from tasks.models import Task, TaskStatus
 
 
 class PluginFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
-    oci_image = django_filters.CharFilter(label="Image", lookup_expr="icontains")
-    enabled = django_filters.BooleanFilter(label="Enabled")
-    scan_level = django_filters.MultipleChoiceFilter(choices=ScanLevel.choices, label="Scan Level")
+    name = django_filters.CharFilter(
+        label="Name", 
+        lookup_expr="icontains",
+        widget=forms.TextInput(attrs={
+            "autocomplete": "off",
+        })
+    )
+    oci_image = django_filters.CharFilter(
+        label="Container image", 
+        lookup_expr="icontains",
+        widget=forms.TextInput(attrs={
+            "autocomplete": "off",
+        })
+    )
+    scan_level = django_filters.ChoiceFilter(
+        label="Scan level",
+        choices=ScanLevel.choices, 
+    )
+    enabled = django_filters.ChoiceFilter(
+        label="State",
+        choices=((True, "Enabled"), (False, "Disabled")),
+    )
 
     class Meta:
         model = Plugin
-        fields = ["name", "plugin_id", "oci_image", "enabled", "scan_level"]
+        fields = ["name", "oci_image", "scan_level", "enabled"]
 
 
 class PluginListView(FilterView):
