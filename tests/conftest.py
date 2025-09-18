@@ -379,6 +379,10 @@ def xtdb(request: pytest.FixtureRequest):
     """
     objects = apps.get_app_config("objects")
     ooi_models = list(objects.get_models())
+    con = connections["xtdb"]
+    con.connect()
+    flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
+    con.ops.execute_sql_flush(flush)
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
@@ -387,9 +391,6 @@ def xtdb(request: pytest.FixtureRequest):
 
     yield
 
-    con = connections["xtdb"]
-    con.connect()
-    flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
     con.ops.execute_sql_flush(flush)
 
 
