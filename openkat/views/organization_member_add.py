@@ -4,7 +4,6 @@ from typing import Any
 
 import structlog
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
@@ -21,12 +20,10 @@ from openkat.forms import AccountTypeSelectForm, MemberRegistrationForm, Passwor
 from openkat.forms.upload_csv import UploadCSVForm
 from openkat.messaging import clearance_level_warning_dns_report
 from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
-from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember
+from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember, User
 from openkat.view_helpers import Breadcrumb, OrganizationMemberBreadcrumbsMixin
 
 logger = structlog.get_logger(__name__)
-
-User = get_user_model()
 
 
 MEMBER_UPLOAD_COLUMNS = [

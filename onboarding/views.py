@@ -2,7 +2,6 @@ from typing import Any
 
 import structlog
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -28,7 +27,6 @@ from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organizatio
 from openkat.views.account import OOIClearanceMixin
 from openkat.views.indemnification_add import IndemnificationAddView
 
-User = get_user_model()
 logger = structlog.get_logger(__name__)
 
 

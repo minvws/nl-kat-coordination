@@ -1,12 +1,11 @@
 import tagulous.admin
 from django.contrib import admin, messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
 
 from openkat.exceptions import OpenKATError
-from openkat.models import AuthToken, Indemnification, Organization, OrganizationMember, OrganizationTag
+from openkat.models import AuthToken, Indemnification, Organization, OrganizationMember, OrganizationTag, User
 
 
 class OrganizationAdmin(admin.ModelAdmin):
@@ -52,8 +51,6 @@ class OrganizationTagAdmin(admin.ModelAdmin):
 
 
 tagulous.admin.register(Organization, OrganizationAdmin)
-
-User = get_user_model()
 
 
 @admin.register(User)

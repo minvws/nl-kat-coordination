@@ -1,13 +1,10 @@
 import logging
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
-
-User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -38,10 +35,7 @@ class Command(BaseCommand):
         self.setup_group_permissions()
 
     def setup_group_permissions(self):
-        redteamer_permissions = [
-            "can_scan_organization",
-            "can_set_clearance_level",
-        ]
+        redteamer_permissions = ["can_scan_organization", "can_set_clearance_level"]
 
         redteam_permissions = self.get_permissions(redteamer_permissions)
         self.group_redteam.permissions.set(redteam_permissions)

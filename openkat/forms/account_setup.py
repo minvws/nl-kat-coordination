@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth import forms as auth_forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
@@ -14,10 +13,9 @@ from openkat.models import (
     ORGANIZATION_CODE_LENGTH,
     Organization,
     OrganizationMember,
+    User,
 )
 from openkat.validators import get_password_validators_help_texts
-
-User = get_user_model()
 
 
 class UserRegistrationForm(forms.Form):

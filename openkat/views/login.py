@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LogoutView
 from django.forms import ValidationError
 from django.shortcuts import resolve_url
@@ -13,8 +12,6 @@ from two_factor.utils import default_device
 from two_factor.views import LoginView, SetupView
 
 from openkat.forms import LoginForm, TwoFactorBackupTokenForm, TwoFactorSetupTokenForm, TwoFactorVerifyTokenForm
-
-User = get_user_model()
 
 
 @method_decorator((sensitive_post_parameters(), never_cache), name="dispatch")
