@@ -18,7 +18,7 @@ from django_filters.views import FilterView
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
-from tasks.models import Schedule, Task, TaskStatus, ObjectSet
+from tasks.models import ObjectSet, Schedule, Task, TaskStatus
 from tasks.tasks import rerun_task, run_plugin_task, run_schedule
 
 
