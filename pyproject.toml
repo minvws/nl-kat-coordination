@@ -142,11 +142,6 @@ no_implicit_reexport = true
 [tool.setuptools_scm]
 write_to = "_version.py"
 
-[tool.vulture]
-min_confidence = 90
-exclude = ["tests/", "*venv*", "openkat/migrations"]
-paths = ["."]
-
 
 [tool.ruff]
 fix = true

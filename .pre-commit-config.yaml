@@ -37,13 +37,6 @@ repos:
           ]
         additional_dependencies: ["rstcheck[sphinx]", "autodoc-pydantic==2.1.0"]
 
-  - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.13
-    hooks:
-      - id: vulture
-        exclude: |
-          /tests/
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.8.1"
     hooks:
