@@ -128,7 +128,6 @@ def add_redteam_group_permissions(member):
         Permission.objects.filter(
             codename__in=[
                 "can_scan_organization",
-                "can_enable_disable_plugin",
                 "can_set_clearance_level",
             ]
         ).values_list("id", flat=True)
@@ -379,8 +378,6 @@ def xtdb(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
     Authtokens created during the test, but we need this since plugins created during the test have openkat-test-api
     as a callback service.
     """
-    # settings.DATABASES["xtdb"]["TEST"] = {"MIRROR": "xtdb"}
-
     objects = apps.get_app_config("objects")
     ooi_models = list(objects.get_models())
 

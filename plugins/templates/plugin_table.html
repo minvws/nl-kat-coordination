@@ -41,7 +41,7 @@
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                {% if perms.openkat.can_enable_disable_plugin %}
+                {% if perms.openkat.add_enabledplugin %}
                     <th scope="col">{% translate "Toggle" %}</th>
                 {% endif %}
                 <th scope="col">{% translate "" %}</th>
@@ -89,7 +89,7 @@
                             {% endif %}
                         </span>
                     </td>
-                    {% if perms.openkat.can_enable_disable_plugin %}
+                    {% if perms.openkat.add_enabledplugin %}
                         <td>
                             <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
                                   method="post"

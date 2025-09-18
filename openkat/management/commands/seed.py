@@ -40,12 +40,7 @@ class Command(BaseCommand):
     def setup_group_permissions(self):
         redteamer_permissions = [
             "can_scan_organization",
-            "can_enable_disable_plugin",
-            "can_add_boefje",
             "can_set_clearance_level",
-            "can_mute_findings",
-            "can_view_katalogus_settings",
-            "can_set_katalogus_settings",
         ]
 
         redteam_permissions = self.get_permissions(redteamer_permissions)
@@ -61,7 +56,6 @@ class Command(BaseCommand):
                 "can_scan_organization",
                 "change_organizationmember",
                 "add_indemnification",
-                "can_recalculate_bits",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)

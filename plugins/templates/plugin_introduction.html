@@ -19,7 +19,7 @@
             {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
         </div>
-        {% if perms.openkat.can_enable_disable_plugin %}
+        {% if perms.openkat.add_enabledplugin %}
             <div class="horizontal-view">
                 {% include "enable_disable_plugin.html" with plugin=plugin %}
             </div>

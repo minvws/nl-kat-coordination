@@ -65,19 +65,6 @@
                         {% translate "There were no organizations found for your user account" %}.
                     {% endif %}
                 </div>
-                <div>
-                    <h2>{% translate "Actions" %}</h2>
-                    <p>{% translate "Actions to perform for all of your organizations." %}</p>
-                    {% if perms.openkat.can_recalculate_bits %}
-                        <form method="post" class="inline">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="dropdown-button ghost"
-                                    name="action"
-                                    value="recalculate">{% translate "Rerun all bits" %}</button>
-                        </form>
-                    {% endif %}
-                </div>
             </div>
         </section>
     </main>
