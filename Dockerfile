@@ -28,7 +28,6 @@ RUN adduser --disabled-password --gecos '' --uid "$USER_UID" --gid "$USER_GID" o
 
 WORKDIR /app/openkat
 
-COPY --from=ghcr.io/astral-sh/uv@sha256:2381d6aa60c326b71fd40023f921a0a3b8f91b14d5db6b90402e65a635053709 /uv /uvx /bin/
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
   && apt-get -y upgrade \
@@ -38,8 +37,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev dependencies
 ARG ENVIRONMENT
 
-COPY uv.lock pyproject.toml .
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     if [ "$ENVIRONMENT" = "dev" ]; then uv sync --locked --group dev; else uv sync --locked; fi
