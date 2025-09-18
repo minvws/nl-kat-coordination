@@ -177,6 +177,7 @@ INSTALLED_APPS = [
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",
+    "django_filters",
     "knox",
     "tagulous",
     "compressor",
