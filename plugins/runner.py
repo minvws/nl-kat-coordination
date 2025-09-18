@@ -11,7 +11,7 @@ from django.contrib.auth.models import Permission
 from docker.errors import ContainerError
 
 from files.models import File, TemporaryContent
-from openkat.models import AuthToken, KATUser
+from openkat.models import AuthToken, User
 from plugins.models import Plugin
 
 
@@ -162,8 +162,8 @@ class PluginRunner:
         return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
 
     @staticmethod
-    def create_token(plugin_id: str) -> tuple[KATUser, AuthToken]:
-        plugin_user = KATUser(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
+    def create_token(plugin_id: str) -> tuple[User, AuthToken]:
+        plugin_user = User(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
         plugin_user.save()
 

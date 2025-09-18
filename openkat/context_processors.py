@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from openkat.models import KATUser
+from openkat.models import User
 from openkat.version import __version__
 
 
@@ -19,7 +19,7 @@ def languages(request):
 
 def organizations_including_blocked(request):
     context = {}
-    if isinstance(request.user, KATUser):
+    if isinstance(request.user, User):
         context["organizations_including_blocked"] = request.user.organizations_including_blocked
     return context
 

@@ -240,7 +240,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "openkat.wsgi.application"
 
-AUTH_USER_MODEL = "openkat.KATUser"
+AUTH_USER_MODEL = "openkat.User"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

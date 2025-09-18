@@ -149,7 +149,7 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
 
-    user = models.ForeignKey("openkat.KATUser", on_delete=models.PROTECT, related_name="members")
+    user = models.ForeignKey("User", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     groups = models.ManyToManyField(Group, blank=True)
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
@@ -221,13 +221,13 @@ class OrganizationMember(models.Model):
 
 
 class Indemnification(models.Model):
-    user = models.ForeignKey("openkat.KATUser", on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("User", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
     EVENT_CODES = {"created": 900221, "updated": 900222, "deleted": 900223}
 
 
-class KATUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     """
     Kat user model manager where email is the unique identifiers
     for authentication instead of usernames.
@@ -259,10 +259,7 @@ class KATUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class KATUser(AbstractBaseUser, PermissionsMixin):
-    # Because we migrated from using the standard Django User model, we need
-    # explicitly use AutoField here instead of using BigAutoField by default
-    id = models.AutoField(primary_key=True, verbose_name="ID")
+class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(_("full name"), max_length=150)
     email = LowerCaseEmailField(_("email"), max_length=254, unique=True)
     is_staff = models.BooleanField(
@@ -285,7 +282,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]
 
-    objects = KATUserManager()
+    objects = UserManager()
 
     EVENT_CODES = {"created": 900101, "updated": 900102, "deleted": 900103}
 

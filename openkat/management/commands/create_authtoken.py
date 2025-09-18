@@ -3,11 +3,11 @@ import sys
 from django.core.management import BaseCommand
 from django.db.utils import IntegrityError
 
-from openkat.models import AuthToken, KATUser
+from openkat.models import AuthToken, User
 
 
 def create_auth_token(username, token_name):
-    user = KATUser.objects.get(email=username)
+    user = User.objects.get(email=username)
     auth_token = AuthToken(user=user, name=token_name)
     token = auth_token.generate_new_token()
     auth_token.save()
@@ -25,7 +25,7 @@ class Command(BaseCommand):
     def handle(self, username, token_name, verbosity, **kwargs):
         try:
             auth_token, token = create_auth_token(username=username, token_name=token_name)
-        except KATUser.DoesNotExist:
+        except User.DoesNotExist:
             self.stderr.write(self.style.ERROR(f"Username {username} not found"))
             sys.exit(1)
         except IntegrityError as e:

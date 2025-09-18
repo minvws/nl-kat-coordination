@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="KATUser",
+            name="User",
             fields=[
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 ("last_login", models.DateTimeField(blank=True, null=True, verbose_name="last login")),
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                         verbose_name="superuser status",
                     ),
                 ),
-                ("id", models.AutoField(primary_key=True, serialize=False, verbose_name="ID")),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("full_name", models.CharField(max_length=150, verbose_name="full name")),
                 ("email", openkat.models.LowerCaseEmailField(max_length=254, unique=True, verbose_name="email")),
                 (
