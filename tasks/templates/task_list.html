@@ -10,11 +10,6 @@
     <main id="main-content">
         <section>
             {% include "tasks/partials/tasks_overview_header.html" %}
-            {% if perms.openkat.add_task %}
-                <div class="horizontal-view toolbar">
-                    <a class="button ghost" href="{% url "add_task" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Run Task" %}</a>
-                </div>
-            {% endif %}
             <form class="inline layout-wide" method="get">
                 <div class="horizontal-view">
                     {{ filter.form.as_p }}

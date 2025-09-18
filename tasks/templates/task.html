@@ -9,16 +9,75 @@
 
     <main id="main-content">
         <section>
-            <div class="two-thirds-one-third">
+            <div class="introduction">
                 <div>
-                    <h1>Task: {{ task.id }}</h1>
-                    <p class="emphasized">{{ task.organization.code }}</p>
-                    <p class="emphasized">{{ task.type }}</p>
-                    <p class="emphasized">{{ task.status }}</p>
-                    <p class="emphasized">{{ task.data }}</p>
-                    <p class="emphasized">{{ task.created_at }}</p>
-                    <p class="emphasized">{{ task.modified_at }}</p>
+                    <div class="horizontal-view">
+                        <h1>{% translate "Task:" %} {{ task.id }}</h1>
+                        <span class="de-emphasized">
+                            {% if task.status == "completed" %}
+                                <span class="label system-tag color-2">{{ task.status|capfirst }}</span>
+                            {% elif task.status == "failed" %}
+                                <span class="label system-tag color-5">{{ task.status|capfirst }}</span>
+                            {% else %}
+                                <span class="label system-tag color-1">{{ task.status|capfirst }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <p>{% translate "Details of the task created in organization" %} <strong>{{ task.organization }}</strong>.</p>
                 </div>
+                <div class="horizontal-view toolbar">
+                    {% if task.done %}
+                        <form action="{% url "reschedule_task" task.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="ghost" type="submit"><span class="icon ti-refresh"></span>{% translate "Reschedule" %}</button>
+                        </form>
+                    {% else %}
+                        <form action="{% url "cancel_task" task.id %}" method="post">
+                            {% csrf_token %}
+                            <button class="desctructive" type="submit">{% translate "Cancel" %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="horizontal-scroll">
+                <h2>{% translate "Task details" %}</h2>
+                <dl>
+                    <div>
+                        <dt>{% translate "Task type" %}</dt>
+                        <dd>{{ task.type|capfirst }}</dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Created by plugin" %}</dt>
+                        <dd>{{ plugin.name }}</dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Created at" %}</dt>
+                        <dd>{{ task.created_at }}</dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Last modified at" %}</dt>
+                        <dd>{{ task.modified_at }}</dd>
+                    </div>
+                </dl>
+            </div>
+            <div>
+                <h2>{% translate "Input objects" %}</h2>
+                {% if task.data.input_data %}
+                    <ul>
+                        {% if task.data.input_data|get_type == 'str' %}
+                            <li>{{ task.data.input_data }}</li>
+                        {% elif task.data.input_data|get_type == 'list' %}
+                                {% for object in task.data.input_data %}
+                                    <li>{{ object }}</li>
+                                {% endfor %}
+                        {% endif %}
+                    </ul>
+                {% else %}
+                    <p>{% translate "This task does not need any input objects." %}</p>
+                {% endif %}
+            </div>
+            <div>
+                <a class="button" href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "View task results" %}</a>
             </div>
         </section>
     </main>

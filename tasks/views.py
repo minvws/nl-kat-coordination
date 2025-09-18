@@ -62,12 +62,17 @@ class TaskListView(FilterView):
 class TaskDetailView(DetailView):
     template_name = "task.html"
     model = Task
+    
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.task = self.get_object()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["plugin"] = Plugin.objects.get(plugin_id=self.task.data["plugin_id"])
         context["breadcrumbs"] = [
             {"url": reverse("new_task_list"), "text": _("Plugins")},
-            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
+            {"url": reverse("task_detail", kwargs={"pk": self.task.id}), "text": _("Task details")},
         ]
 
         return context
