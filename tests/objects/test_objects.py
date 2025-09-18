@@ -34,7 +34,7 @@ def test_network_api(drf_client, xtdb):
 
 def test_hostname_api(drf_client, xtdb):
     network = Network.objects.create(name="internet")
-    network2 = Network.objects.create(name="internet2")
+    Network.objects.create(name="internet2")
     assert drf_client.get("/api/v1/hostname/").json()["results"] == []
 
     hn = Hostname.objects.create(network=network, name="test.com")

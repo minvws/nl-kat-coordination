@@ -96,7 +96,7 @@ package = true
 [tool.uv.sources]
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 django-compressor = { git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce" }
-django-xtdb = { git = "https://github.com/donnype/django-xtdb.git", rev = "f45ea9ede32ce89b30d141c1005fc2f1c066c37b" }
+django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]

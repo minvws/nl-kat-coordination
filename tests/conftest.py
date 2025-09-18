@@ -17,7 +17,6 @@ from django.db import connections
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
-from pytest_django import DjangoDbBlocker
 from pytest_django.lazy_django import skip_if_no_django
 from rest_framework.test import APIClient
 
@@ -368,9 +367,9 @@ def drf_redteam_client(create_drf_client, redteamuser):
     return client
 
 
-# Mark tests using this fixture autmatically with django_db and require access to the "xtdb" database
-@pytest.fixture(scope='session', params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
-def xtdb(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
+# Mark tests using this fixture automatically with django_db and require access to the "xtdb" database
+@pytest.fixture(scope='function', params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
+def xtdb(request: pytest.FixtureRequest):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:
     Since openkat_integration calls pytest, it creates a test database by default within ci_postgres, where the
@@ -388,13 +387,10 @@ def xtdb(request: pytest.FixtureRequest, django_db_blocker: DjangoDbBlocker):
 
     yield
 
-    django_db_blocker.unblock()
     con = connections["xtdb"]
     con.connect()
-
     flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
     con.ops.execute_sql_flush(flush)
-    django_db_blocker.block()
 
 
 def _set_suffix_to_test_databases_except_xtdb(suffix: str) -> None:

@@ -871,7 +871,7 @@ wheels = [
 [[package]]
 name = "django-xtdb"
 version = "0.0.1"
-source = { git = "https://github.com/donnype/django-xtdb.git?rev=f45ea9ede32ce89b30d141c1005fc2f1c066c37b#f45ea9ede32ce89b30d141c1005fc2f1c066c37b" }
+source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#337a16f7c01d406d314de5af65f9da9bc9817f8b" }
 dependencies = [
     { name = "django" },
 ]
@@ -1610,7 +1610,7 @@ requires-dist = [
     { name = "django-tagulous", specifier = ">=2.1.0" },
     { name = "django-two-factor-auth", extras = ["phonenumberslite"], specifier = ">=1.17.0" },
     { name = "django-weasyprint", specifier = ">=2.4.0" },
-    { name = "django-xtdb", git = "https://github.com/donnype/django-xtdb.git?rev=f45ea9ede32ce89b30d141c1005fc2f1c066c37b" },
+    { name = "django-xtdb", git = "https://github.com/dekkers/django-xtdb.git?rev=main" },
     { name = "djangorestframework", specifier = ">=3.16.0" },
     { name = "dnspython", specifier = ">=2.7.0" },
     { name = "docker", specifier = ">=7.1.0" },
