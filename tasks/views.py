@@ -26,7 +26,13 @@ from tasks.new_tasks import rerun_task, run_plugin_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
-    data = django_filters.CharFilter(lookup_expr="icontains")
+    data = django_filters.CharFilter(
+        label="Input data", 
+        lookup_expr="icontains",
+        widget=forms.TextInput(attrs={
+            "autocomplete": "off",
+        })
+    )
 
     class Meta:
         model = Task
@@ -174,6 +180,10 @@ class TaskCancelView(PermissionRequiredMixin, View):
 class NewScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
     input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
+    enabled = django_filters.ChoiceFilter(
+        label="State",
+        choices=((True, "Enabled"), (False, "Disabled")),
+    )
 
     class Meta:
         model = NewSchedule
