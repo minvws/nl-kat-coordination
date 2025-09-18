@@ -381,13 +381,14 @@ def xtdb(request: pytest.FixtureRequest):
     ooi_models = list(objects.get_models())
     con = connections["xtdb"]
     con.connect()
-    flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
-    con.ops.execute_sql_flush(flush)
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
     for ooi in ooi_models:
         ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}"
+
+    flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
+    con.ops.execute_sql_flush(flush)
 
     yield
 

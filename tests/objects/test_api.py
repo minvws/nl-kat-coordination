@@ -46,3 +46,19 @@ def test_hostname_api(drf_client, xtdb):
         "name": "test.com",
         "network": network.pk,
     }]
+
+    hostname = {
+        "network": network.pk,
+        "name": "test2.com"
+    }
+    hn2 = drf_client.post("/api/v1/hostname/", data=json.dumps(hostname), content_type="application/json").json()
+    assert drf_client.get("/api/v1/hostname/?ordering=name").json()["results"] == [{
+            "id": hn.pk,
+            "name": "test.com",
+            "network": network.pk,
+        },{
+            "id": hn2["id"],
+            "name": "test2.com",
+            "network": network.pk,
+        },
+    ]
