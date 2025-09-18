@@ -6,7 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 
-from account.forms import OrganizationForm
+from openkat.forms import OrganizationForm
 from openkat.models import Organization, OrganizationMember
 
 logger = structlog.get_logger(__name__)

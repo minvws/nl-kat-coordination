@@ -11,9 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 
-from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
-from account.views.account import OOIClearanceMixin
 from onboarding.view_helpers import (
     DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
@@ -24,8 +21,11 @@ from onboarding.view_helpers import (
     RegistrationBreadcrumbsMixin,
 )
 from openkat.exceptions import OpenKATError
+from openkat.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
 from openkat.messaging import clearance_level_warning_dns_report
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
+from openkat.views.account import OOIClearanceMixin
 from openkat.views.indemnification_add import IndemnificationAddView
 
 User = get_user_model()
@@ -133,6 +133,7 @@ class OnboardingAcknowledgeClearanceLevelView(
         context["ooi"] = self.request.GET.get("ooi", "")
         context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
+
 
 # account flow
 

@@ -1,6 +1,6 @@
 from pytest_django.asserts import assertContains, assertNotContains
 
-from account.views.account import AccountView
+from openkat.views.account import AccountView
 from tests.conftest import setup_request
 
 

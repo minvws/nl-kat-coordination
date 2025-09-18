@@ -20,9 +20,9 @@ from django_otp.middleware import OTPMiddleware
 from pytest_django.lazy_django import skip_if_no_django
 from rest_framework.test import APIClient
 
-from account.management.commands.create_authtoken import create_auth_token
 from files.models import File, GenericContent
 from objects.models import Hostname, Network
+from openkat.management.commands.create_authtoken import create_auth_token
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 from openkat.views.health import ServiceHealth
 from tasks.models import Task as TaskDB
@@ -124,12 +124,9 @@ def add_redteam_group_permissions(member):
     group = Group.objects.get(name=GROUP_REDTEAM)
     member.groups.add(group)
     redteam_permissions = list(
-        Permission.objects.filter(
-            codename__in=[
-                "can_scan_organization",
-                "can_set_clearance_level",
-            ]
-        ).values_list("id", flat=True)
+        Permission.objects.filter(codename__in=["can_scan_organization", "can_set_clearance_level"]).values_list(
+            "id", flat=True
+        )
     )
     group.permissions.set(redteam_permissions)
 
@@ -368,7 +365,7 @@ def drf_redteam_client(create_drf_client, redteamuser):
 
 
 # Mark tests using this fixture automatically with django_db and require access to the "xtdb" database
-@pytest.fixture(scope='function', params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
+@pytest.fixture(scope="function", params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
 def xtdb(request: pytest.FixtureRequest):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:

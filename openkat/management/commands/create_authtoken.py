@@ -3,7 +3,7 @@ import sys
 from django.core.management import BaseCommand
 from django.db.utils import IntegrityError
 
-from account.models import AuthToken, KATUser
+from openkat.models import AuthToken, KATUser
 
 
 def create_auth_token(username, token_name):
@@ -39,7 +39,9 @@ class Command(BaseCommand):
 
         if verbosity >= 1:
             self.stdout.write(
-                self.style.SUCCESS(f"Successfully created token {token} with name {token_name} for user {auth_token.user}")
+                self.style.SUCCESS(
+                    f"Successfully created token {token} with name {token_name} for user {auth_token.user}"
+                )
             )
         else:
             self.stdout.write(token)

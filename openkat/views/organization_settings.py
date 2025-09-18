@@ -3,7 +3,7 @@ from enum import Enum
 from django.views.generic import TemplateView
 from structlog import get_logger
 
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.view_helpers import OrganizationDetailBreadcrumbsMixin
 
 logger = get_logger(__name__)

@@ -6,23 +6,17 @@ from django.core.management import BaseCommand
 from django.db import transaction
 from structlog.testing import capture_logs
 
-from account.management.commands.create_authtoken import create_auth_token
-from account.models import AuthToken
+from openkat.management.commands.create_authtoken import create_auth_token
+from openkat.models import AuthToken
 
 
 class Command(BaseCommand):
     help = "Creates a new authentication token."
 
     def add_arguments(self, parser):
+        parser.add_argument("--username", type=str, help="Username for authentication")
         parser.add_argument(
-            "--username",
-            type=str,
-            help="Username for authentication",
-        )
-        parser.add_argument(
-            "--password",
-            type=str,
-            help="Password for authentication (optional, will prompt if not provided)",
+            "--password", type=str, help="Password for authentication (optional, will prompt if not provided)"
         )
 
     def handle(self, *args, **options):

@@ -12,7 +12,7 @@ from two_factor.forms import MethodForm
 from two_factor.utils import default_device
 from two_factor.views import LoginView, SetupView
 
-from account.forms import LoginForm, TwoFactorBackupTokenForm, TwoFactorSetupTokenForm, TwoFactorVerifyTokenForm
+from openkat.forms import LoginForm, TwoFactorBackupTokenForm, TwoFactorSetupTokenForm, TwoFactorVerifyTokenForm
 
 User = get_user_model()
 

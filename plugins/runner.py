@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from docker.errors import ContainerError
 
-from account.models import AuthToken, KATUser
 from files.models import File, TemporaryContent
+from openkat.models import AuthToken, KATUser
 from plugins.models import Plugin
 
 
@@ -36,10 +36,7 @@ class PluginRunner:
     ) -> str:
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
-        environment = {
-            "PLUGIN_ID": plugin.plugin_id,
-            "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1",
-        }
+        environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
         tmp_file = None
 
         if isinstance(target, str):
@@ -125,13 +122,13 @@ class PluginRunner:
         #   after the container has gone.
 
         # Below is a copy of the implementation of container.run() after the check if detach equals True.
-        logging_driver = container.attrs['HostConfig']['LogConfig']['Type']
+        logging_driver = container.attrs["HostConfig"]["LogConfig"]["Type"]
 
         out = None
-        if logging_driver == 'json-file' or logging_driver == 'journald':
+        if logging_driver == "json-file" or logging_driver == "journald":
             out = container.logs(stdout=use_stdout, stderr=True, stream=True, follow=True)
 
-        exit_status = container.wait()['StatusCode']
+        exit_status = container.wait()["StatusCode"]
         if exit_status != 0:
             out = container.logs(stdout=False, stderr=True)
 
@@ -152,7 +149,7 @@ class PluginRunner:
         if out is None:
             return ""
 
-        return b''.join(out).decode()
+        return b"".join(out).decode()
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed

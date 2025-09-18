@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
 from pydantic import BaseModel, Field
 
-from account.mixins import OrganizationView
+from openkat.mixins import OrganizationView
 from openkat.version import __version__
 
 logger = structlog.get_logger(__name__)

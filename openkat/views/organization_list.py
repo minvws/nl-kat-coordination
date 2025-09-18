@@ -2,8 +2,7 @@ from django.db.models import Count, QuerySet
 from django.views.generic import ListView
 from structlog import get_logger
 
-from account.models import KATUser
-from openkat.models import Organization
+from openkat.models import KATUser, Organization
 from openkat.view_helpers import OrganizationBreadcrumbsMixin
 
 logger = get_logger(__name__)

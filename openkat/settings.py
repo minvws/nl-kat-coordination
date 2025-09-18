@@ -144,11 +144,9 @@ HELP_DESK_EMAIL = env("HELP_DESK_EMAIL", default="")
 
 # Application definition
 
-KNOX_TOKEN_MODEL = "account.AuthToken"
+KNOX_TOKEN_MODEL = "openkat.AuthToken"
 
-REST_KNOX = {
-    'TOKEN_MODEL': 'account.AuthToken',
-}
+REST_KNOX = {"TOKEN_MODEL": "openkat.AuthToken"}
 
 MIGRATION_MODULES = {"knox": None}  # Skip creation of unused knox_authtoken table
 
@@ -167,7 +165,6 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "two_factor",
-    "account",
     "openkat",
     "onboarding",
     "tasks",
@@ -243,7 +240,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "openkat.wsgi.application"
 
-AUTH_USER_MODEL = "account.KATUser"
+AUTH_USER_MODEL = "openkat.KATUser"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -267,15 +264,10 @@ XTDB_DB = {
     "PASSWORD": env("OPENKAT_XTDB_PASSWORD", default=None),
     "HOST": env("OPENKAT_XTDB_HOST", default=None),
     "PORT": env.int("OPENKAT_XTDB_PORT", default=5432),
-    "TEST": {
-        "MIRROR": "xtdb",
-    }
+    "TEST": {"MIRROR": "xtdb"},
 }
 
-DATABASES = {
-    "default": POSTGRES_DB,
-    "xtdb": XTDB_DB,
-}
+DATABASES = {"default": POSTGRES_DB, "xtdb": XTDB_DB}
 
 DATABASE_ROUTERS = ["objects.db_router.XTDBRouter"]
 
@@ -586,6 +578,11 @@ CELERY = {
     "event_serializer": "json",
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_accept_content": ["application/json", "application/x-python-serialize"],
-    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_SCAN_PROFILES), Queue(QUEUE_NAME_SCHEDULE), Queue(QUEUE_NAME_REPORTS)),
+    "task_queues": (
+        Queue("celery"),
+        Queue(QUEUE_NAME_SCAN_PROFILES),
+        Queue(QUEUE_NAME_SCHEDULE),
+        Queue(QUEUE_NAME_REPORTS),
+    ),
     "worker_concurrency": WORKERS,
 }

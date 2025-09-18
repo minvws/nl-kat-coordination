@@ -5,7 +5,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 
-from account.validators import get_password_validators_help_texts
 from openkat.enums import SCAN_LEVEL
 from openkat.forms.base import BaseOpenKATForm, BaseOpenKATModelForm
 from openkat.models import (
@@ -16,6 +15,7 @@ from openkat.models import (
     Organization,
     OrganizationMember,
 )
+from openkat.validators import get_password_validators_help_texts
 
 User = get_user_model()
 

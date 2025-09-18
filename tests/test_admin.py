@@ -1,10 +1,9 @@
 from admin_auto_tests.test_model import ModelAdminTestCase
 from model_mommy import mommy, random_gen
 
-from account.models import AuthToken
-from openkat.models import Organization
+from openkat.models import AuthToken, Organization
 
-mommy.generators.add("account.models.LowercaseEmailField", random_gen.gen_email)
+mommy.generators.add("openkat.models.LowerCaseEmailField", random_gen.gen_email)
 mommy.generators.add("openkat.models.LowerCaseSlugField", random_gen.gen_slug)
 
 

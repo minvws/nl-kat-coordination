@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from account.mixins import OrganizationView
+from openkat.mixins import OrganizationView
 from openkat.models import OrganizationMember
 
 

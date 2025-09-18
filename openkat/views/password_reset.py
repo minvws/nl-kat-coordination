@@ -6,7 +6,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from account.forms import PasswordResetForm, SetPasswordForm
+from openkat.forms import PasswordResetForm, SetPasswordForm
 
 
 class PasswordResetView(auth_views.PasswordResetView):

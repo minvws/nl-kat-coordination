@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from account.models import KATUser
+from openkat.models import KATUser
 from openkat.version import __version__
 
 

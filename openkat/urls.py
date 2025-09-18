@@ -10,9 +10,11 @@ from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
 from objects.viewsets import HostnameViewSet, NetworkViewSet
+from openkat.views.account import AccountView
 from openkat.views.health import Health, HealthChecks
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
+from openkat.views.login import LoginOpenKATView, LogoutOpenKATView, SetupOpenKATView
 from openkat.views.organization_add import OrganizationAddView
 from openkat.views.organization_edit import OrganizationEditView
 from openkat.views.organization_list import OrganizationListView
@@ -25,7 +27,9 @@ from openkat.views.organization_member_add import (
 from openkat.views.organization_member_edit import OrganizationMemberEditView
 from openkat.views.organization_member_list import OrganizationMemberListView
 from openkat.views.organization_settings import OrganizationSettingsView
+from openkat.views.password_reset import PasswordResetConfirmView, PasswordResetView
 from openkat.views.privacy_statement import PrivacyStatementView
+from openkat.views.recover_email import RecoverEmailView
 from openkat.viewsets import OrganizationViewSet
 from tasks.viewsets import TaskViewSet
 
@@ -47,7 +51,13 @@ urlpatterns = [
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 ]
 urlpatterns += i18n_patterns(
-    path("", include("account.urls"), name="account"),
+    path("<organization_code>/account/", AccountView.as_view(), name="account_detail"),
+    path("login/", LoginOpenKATView.as_view(), name="login"),
+    path("logout/", LogoutOpenKATView.as_view(), name="logout"),
+    path("two_factor/setup/", SetupOpenKATView.as_view(), name="setup"),
+    path("recover-email/", RecoverEmailView.as_view(), name="recover_email"),
+    path("password_reset/", PasswordResetView.as_view(), name="password_reset"),
+    path("reset/<uidb64>/<token>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("admin/", admin.site.urls),
     path("", LandingPageView.as_view(), name="landing_page"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),

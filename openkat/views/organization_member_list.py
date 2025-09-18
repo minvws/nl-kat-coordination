@@ -8,8 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from httpx import RequestError
 
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.forms.members import MemberFilterForm
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.models import OrganizationMember
 from openkat.view_helpers import OrganizationMemberBreadcrumbsMixin
 

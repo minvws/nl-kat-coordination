@@ -1,4 +1,4 @@
-from account.models import AuthToken
+from openkat.models import AuthToken
 
 
 # Regression test for https://github.com/minvws/nl-kat-coordination/issues/2872
