@@ -9,7 +9,7 @@ from rest_framework import routers
 from two_factor.urls import urlpatterns as tf_urls
 
 from files.viewsets import FileViewSet
-from objects.viewsets import HostnameViewSet, NetworkViewSet
+from objects.urls import object_router
 from openkat.views.account import AccountView
 from openkat.views.health import Health, HealthChecks
 from openkat.views.indemnification_add import IndemnificationAddView
@@ -40,12 +40,12 @@ router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
 router.register(r"task", TaskViewSet, basename="task")
 router.register(r"file", FileViewSet, basename="file")
-router.register(r"network", NetworkViewSet, basename="network")
-router.register(r"hostname", HostnameViewSet, basename="hostname")
+
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("api/v1/", include(router.urls)),
+    path("api/v1/objects/", include(object_router.urls)),
     path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),

@@ -58,3 +58,11 @@ class OrganizationViewSet(viewsets.ModelViewSet):
         indemnification = Indemnification.objects.create(organization=organization, user=self.request.user)
 
         return Response({"indemnification": True, "user": indemnification.user.pk}, status=status.HTTP_201_CREATED)
+
+
+class ManyModelViewSet(viewsets.ModelViewSet):
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+
+        return super().get_serializer(*args, **kwargs)
