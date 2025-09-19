@@ -162,9 +162,8 @@ def test_enabling_plugin_creates_schedule():
     schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
 
     assert schedule.enabled
-    # TODO: fix
-    # assert schedule.object_set is not None
-    # assert schedule.object_set.traverse_objects().count() == 0
+    assert schedule.object_set is not None
+    assert len(schedule.object_set.traverse_objects()) == 0
 
 
 def test_enabled_organizations(organization, organization_b):

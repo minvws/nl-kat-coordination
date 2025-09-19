@@ -5,8 +5,10 @@ from functools import reduce
 from typing import Any
 
 import structlog
+from django.apps import apps
 from django.conf import settings
 from django.db.models import Q
+from djangoql.queryset import apply_search
 
 from files.models import File
 from openkat.models import Organization
@@ -34,7 +36,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
 def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
-    # TODO
+    # TODO: fix
     return
 
 
@@ -76,41 +78,37 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
 
     input_data = set()
 
-    if schedule.object_set.object_query and schedule.object_set.dynamic is True:
-        # TODO: fix
-        pass
-        # query = Query.from_path(schedule.object_set.object_query)
-        # pk = Aliased(query.result_type, field="primary_key")
-        # objects = octopoes.ooi_repository.query(query.find(pk).where(query.result_type, primary_key=pk), now)
-        # by_pk = {item[-1]: item[0] for item in objects}
-        #
-        # scan_profiles = octopoes.scan_profile_repository.get_bulk({x for x in by_pk}, now)
-        # input_data = input_data.union(
-        #     {by_pk[str(sp.reference)] for sp in scan_profiles if sp.level.value >= schedule.plugin.scan_level}
-        # )
+    if schedule.object_set.object_query is not None and schedule.object_set.dynamic is True:
+        model_qs = apps.get_app_config("objects").get_model(schedule.object_set.object_type).objects.all()
 
-    values = schedule.object_set.traverse_objects().values_list("value", flat=True)
+        if schedule.object_set.object_query:
+            model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-    if not values and not input_data:
+        # TODO: check scan profile
+        input_data = input_data.union([str(model) for model in model_qs])
+
+
+    if not input_data:
         return
 
     # TODO: fix
-    return
-    scan_profiles = octopoes.scan_profile_repository.get_bulk(set(values), now)
+    # values = schedule.object_set.traverse_objects().values_list("value", flat=True)
 
-    for profile in scan_profiles:
-        if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
-            continue
-
-        if profile.reference.class_type == Hostname:
-            input_data.add(profile.reference.tokenized.name)
-            continue
-
-        if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-            input_data.add(str(profile.reference.tokenized.address))
-            continue
-
-        input_data.add(str(profile.reference))
+    # if not values and not input_data:
+    #     return
+    # for profile in scan_profiles:
+    #     if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
+    #         continue
+    #
+    #     if profile.reference.class_type == Hostname:
+    #         input_data.add(profile.reference.tokenized.name)
+    #         continue
+    #
+    #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+    #         input_data.add(str(profile.reference.tokenized.address))
+    #         continue
+    #
+    #     input_data.add(str(profile.reference))
 
     if force:
         run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)

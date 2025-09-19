@@ -3,12 +3,14 @@ import datetime
 import recurrence
 import structlog
 from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
 from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
+from objects.models import Hostname, IPAddress
 from openkat.models import Organization, OrganizationMember
 from tasks.models import ObjectSet, Schedule
 
@@ -201,18 +203,15 @@ class EnabledPlugin(models.Model):
             return
 
         queries = []
-
-        # TODO: fix
         for ooi_type in self.plugin.consumed_types():
-            pass
-            # if ooi_type == Hostname:
-            #     queries.append(("Hostname.name", "All hostnames"))
-            # if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
-            #     queries.append((f"{ooi_type.get_object_type()}.address", "All IPs"))
+            if ooi_type == Hostname:
+                queries.append((ContentType.objects.get_for_model(Hostname), "", "All hostnames"))
+            if ooi_type == IPAddress:
+                queries.append((ContentType.objects.get_for_model(IPAddress), "", "All IPs"))
 
-        # So this is possibly the first time enabling the plugin for the organization
-        for query, name in queries:
-            object_set = ObjectSet.objects.create(name=name, object_query=query, dynamic=True)
+        # This is possibly the first time enabling the plugin for the organization
+        for object_type, query, name in queries:
+            object_set = ObjectSet.objects.create(name=name, object_type=object_type, object_query=query, dynamic=True)
             Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,

@@ -179,6 +179,7 @@ INSTALLED_APPS = [
     "tagulous",
     "compressor",
     "recurrence",
+    "djangoql",
 ]
 
 MIDDLEWARE = [

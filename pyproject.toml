@@ -71,6 +71,7 @@ dependencies = [
   "django-filter>=25.1",
   "django-stubs-ext>=5.2.5",
   "psycopg>=3.2.10",
+  "djangoql>=0.18.1",
 ]
 
 [dependency-groups]

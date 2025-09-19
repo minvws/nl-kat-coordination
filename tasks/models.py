@@ -1,6 +1,7 @@
 import uuid
 
 import recurrence.fields
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -44,6 +45,7 @@ class ObjectSet(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True)
     dynamic = models.BooleanField(default=False)  # TODO
+    object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
@@ -57,7 +59,7 @@ class ObjectSet(models.Model):
         if depth >= max_depth:
             raise RecursionError("Max depth reached for object set.")
 
-        all_objects = self.all_objects.all()
+        all_objects = self.all_objects
 
         for subset in self.subsets.all():
             all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
