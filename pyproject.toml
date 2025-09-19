@@ -102,7 +102,7 @@ django-compressor = { git = "https://github.com/dekkers/django-compressor.git", 
 django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
 
 [build-system]
-requires = ["setuptools>=62.2", "wheel"]
+requires = ["setuptools>=78.1.1", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [project.scripts]

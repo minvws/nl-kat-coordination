@@ -19,5 +19,13 @@ def main():
     execute_from_command_line(sys.argv)
 
 
+def openkat():
+    """Openkat entrypoint."""
+    import environ  # noqa: PLC0415
+
+    environ.Env.read_env(".env.local")
+    main()
+
+
 if __name__ == "__main__":
     main()

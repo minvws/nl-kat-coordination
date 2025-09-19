@@ -34,6 +34,7 @@ from openkat.viewsets import ManyModelViewSet
 class NetworkViewSet(ManyModelViewSet):
     serializer_class = NetworkSerializer
     queryset = Network.objects.all()
+    filterset_fields = ("name",)
 
 
 class HostnameViewSet(ManyModelViewSet):
