@@ -69,7 +69,7 @@ class PluginRunner:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 command = plugin.oci_arguments
         else:
-            raise ValueError(f"Unsuported target type: {type(target)}")
+            raise ValueError(f"Unsupported target type: {type(target)}")
 
         if tmp_file:
             environment["IN_FILE"] = str(tmp_file.id)
