@@ -69,5 +69,7 @@
     {% endif %}
 </div>
 {% block html_at_end_body %}
-    <script src="{% static "modal/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    <script src="{% static "modal/script.js" %}"
+            nonce="{{ request.csp_nonce }}"
+            type="module"></script>
 {% endblock html_at_end_body %}
