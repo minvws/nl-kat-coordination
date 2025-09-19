@@ -40,16 +40,19 @@ class NetworkViewSet(ManyModelViewSet):
 class HostnameViewSet(ManyModelViewSet):
     serializer_class = HostnameSerializer
     queryset = Hostname.objects.all()
+    filterset_fields = ("name",)
 
 
 class IPAddressViewSet(ManyModelViewSet):
     serializer_class = IPAddressSerializer
     queryset = IPAddress.objects.all()
+    filterset_fields = ("address",)
 
 
 class IPPortViewSet(ManyModelViewSet):
     serializer_class = IPPortSerializer
     queryset = IPPort.objects.all()
+    filterset_fields = ("address", "protocol", "port", "tls", "service")
 
 
 class DNSARecordViewSet(ManyModelViewSet):

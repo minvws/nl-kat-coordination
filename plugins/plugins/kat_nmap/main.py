@@ -10,12 +10,11 @@ from libnmap.objects import NmapHost, NmapReport, NmapService
 from libnmap.parser import NmapParser
 
 
-def get_ip_ports_and_service(host: NmapHost, internet_id: int):
+def get_ip_ports_and_service(host: NmapHost):
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
-    ip_obj = {"object_type": "IPAddress", "network": internet_id, "address": host.address}
 
-    results = [ip_obj]
+    results = []
     if open_ports:
         for port, protocol in open_ports:
             service: NmapService = host.get_service(port, protocol)
@@ -29,7 +28,7 @@ def get_ip_ports_and_service(host: NmapHost, internet_id: int):
 
             ip_port = {
                 "object_type": "IPPort",
-                "address": ip_obj["address"],
+                "address": host.address,
                 "protocol": protocol.upper(),
                 "port": port,
                 "state": service.state,
@@ -69,13 +68,14 @@ def run(file_id: str):
     else:
         internet = response["results"][0]
 
+    by_address = {}
+
     for nmap_output in raw_splitted:
         parsed = NmapParser.parse_fromstring(nmap_output)
         ports_scanned = get_ports_scanned(parsed)
 
         for host in parsed.hosts:
-            result = get_ip_ports_and_service(host, internet["id"])
-
+            new_ports = get_ip_ports_and_service(host)
             response = client.get("/objects/ipaddress/", params={"address": str(host.address), "limit": 1}).json()
 
             if not response["results"]:
@@ -85,7 +85,10 @@ def run(file_id: str):
             else:
                 address = response["results"][0]
 
-            open_ports = [ooi["port"] for ooi in result if ooi["object_type"] == "IPPort" and ooi["state"] == "open"]
+            by_address[address["address"]] = address["id"]
+            not_closed = [
+                ooi["port"] for ooi in new_ports if ooi["object_type"] == "IPPort" and ooi["state"] != "closed"
+            ]
             idx = 0
             batch_size = 200
 
@@ -97,22 +100,16 @@ def run(file_id: str):
                     idx = idx_2
                     continue
                 try:
-                    client.delete("/objects/ipport/", params={"pk": list(set(ports) - set(open_ports))})
+                    client.delete("/objects/ipport/", params={"pk": list(set(ports) - set(not_closed))})
                 except HTTPError:
                     print(f"Failed to delete ports for {host}, continuing")  # noqa: T201
                 idx = idx_2
 
-            results.extend(result)
+            results.extend(new_ports)
 
     results_grouped = defaultdict(list)
-    for result in results:
-        results_grouped[result.pop("object_type").lower()].append(result)
-
-    if "ipaddress" not in results_grouped:
-        return []
-
-    ips = client.post("/objects/ipaddress/", headers=headers, json=results_grouped.pop("ipaddress")).json()
-    by_address = {ip["address"]: ip["id"] for ip in ips}
+    for new_ports in results:
+        results_grouped[new_ports.pop("object_type").lower()].append(new_ports)
 
     for object_path, objects in results_grouped.items():
         for obj in objects:
