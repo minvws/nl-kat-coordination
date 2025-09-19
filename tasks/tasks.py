@@ -1,12 +1,9 @@
-import operator
 import uuid
 from datetime import UTC, datetime
-from functools import reduce
 from typing import Any
 
 import structlog
 from django.conf import settings
-from django.db.models import Q
 
 from files.models import File
 from openkat.models import Organization
@@ -74,7 +71,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
         return
 
-    input_data = set()
+    input_data: set = set()
 
     if schedule.object_set.object_query and schedule.object_set.dynamic is True:
         # TODO: fix
@@ -95,52 +92,51 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         return
 
     # TODO: fix
-    return
-    scan_profiles = octopoes.scan_profile_repository.get_bulk(set(values), now)
+    # scan_profiles = octopoes.scan_profile_repository.get_bulk(set(values), now)
 
-    for profile in scan_profiles:
-        if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
-            continue
+    # for profile in scan_profiles:
+    #     if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
+    #         continue
 
-        if profile.reference.class_type == Hostname:
-            input_data.add(profile.reference.tokenized.name)
-            continue
+    #     if profile.reference.class_type == Hostname:
+    #         input_data.add(profile.reference.tokenized.name)
+    #         continue
 
-        if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-            input_data.add(str(profile.reference.tokenized.address))
-            continue
+    #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+    #         input_data.add(str(profile.reference.tokenized.address))
+    #         continue
 
-        input_data.add(str(profile.reference))
+    #     input_data.add(str(profile.reference))
 
-    if force:
-        run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
-        return
+    # if force:
+    #     run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+    #     return
 
-    # Filter on the schedule and created after the previous occurrence
-    last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+    # # Filter on the schedule and created after the previous occurrence
+    # last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
 
-    if input_data:
-        # Join the input data targets into a large or-query, checking for task with any of the targets as input
-        filters = reduce(
-            operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data]
-        )
-        last_runs = last_runs.filter(filters)
+    # if input_data:
+    #     # Join the input data targets into a large or-query, checking for task with any of the targets as input
+    #     filters = reduce(
+    #         operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data]
+    #     )
+    #     last_runs = last_runs.filter(filters)
 
-    skip = set()
+    # skip = set()
 
-    for target in last_runs.values_list("data__input_data", flat=True):
-        if isinstance(target, list):
-            skip |= set(target)
-        else:
-            skip.add(target)
+    # for target in last_runs.values_list("data__input_data", flat=True):
+    #     if isinstance(target, list):
+    #         skip |= set(target)
+    #     else:
+    #         skip.add(target)
 
-    # filter out these targets
-    input_data = set(input_data) - skip
+    # # filter out these targets
+    # input_data = set(input_data) - skip
 
-    if not input_data:
-        return
+    # if not input_data:
+    #     return
 
-    run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+    # run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
 def rerun_task(task: Task) -> list[Task]:
@@ -169,7 +165,8 @@ def run_plugin_task(
             tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False))
             idx = idx_2
 
-        return tasks
+        # TODO: Refactor return type
+        return tasks  # type: ignore[return-value]
 
     task_id = uuid.uuid4()
     task = Task.objects.create(

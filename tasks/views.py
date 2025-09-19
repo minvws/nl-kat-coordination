@@ -1,4 +1,3 @@
-import datetime
 from datetime import UTC, datetime
 
 import django_filters
@@ -335,7 +334,7 @@ class ObjectSetDetailView(DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
-        now = datetime.datetime.now(UTC)
+        now = datetime.now(UTC)
         obj = self.get_object()
 
         # TODO: handle...

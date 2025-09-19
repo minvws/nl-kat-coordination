@@ -25,8 +25,6 @@ from django.views.debug import SafeExceptionReporterFilter
 from django_xtdb.patch import monkey_patch
 from kombu import Queue
 
-from objects.enums import ScanLevel
-
 monkey_patch()
 
 env = environ.Env()
@@ -561,10 +559,6 @@ PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
 AUTO_PARALLELISM = env.int("AUTO_PARALLELISM", default=8)
 BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
 
-
-DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
-DEFAULT_LIMIT = 50
-DEFAULT_OFFSET = 0
 
 QUEUE_NAME_SCAN_PROFILES = "scan-profiles"
 QUEUE_NAME_SCHEDULE = "schedule"

@@ -35,7 +35,7 @@ class PluginListView(FilterView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = PluginFilter
 
-    def get_queryset(self):
+    def get_queryset(self) -> PluginQuerySet:
         plugins: PluginQuerySet = super().get_queryset()
 
         if not self.request.user.can_access_all_organizations:

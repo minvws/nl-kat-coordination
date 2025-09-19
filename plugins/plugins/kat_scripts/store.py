@@ -40,7 +40,11 @@ if __name__ == "__main__":
         raise ValueError("No target type defined")
 
     if os.getenv("UPLOAD_URL") != "/dev/null":
-        headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+        token = os.getenv("OPENKAT_TOKEN")
+        if not token:
+            raise Exception("No OPENKAT_TOKEN env variable")
+
+        headers = {"Authorization": "Token " + token}
         httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
 
     json.dump(results, sys.stdout)  # stores the result as a JSON file as well

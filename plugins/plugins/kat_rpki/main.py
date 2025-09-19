@@ -7,10 +7,10 @@
 # ///
 
 import json
+import os
 import socket
 from binascii import hexlify
 from json import JSONDecodeError
-from os import getenv
 
 import httpx
 import polars as pl
@@ -145,7 +145,16 @@ def get_all_objects_of_type(client: httpx.Client, object_type: str) -> dict[str,
 
 
 if __name__ == "__main__":
-    client = httpx.Client(base_url=getenv("OPENKAT_API"), headers={"Authorization": "Token " + getenv("OPENKAT_TOKEN")})
+    token = os.getenv("OPENKAT_TOKEN")
+    if not token:
+        raise Exception("No OPENKAT_TOKEN env variable")
+
+    base_url = os.getenv("OPENKAT_API")
+    if not base_url:
+        raise Exception("No OPENKAT_API env variable")
+
+    headers = {"Authorization": "Token " + token}
+    client = httpx.Client(base_url=base_url, headers=headers)
     oois = run(
         download_lazyframe(client, "rpki-download"),
         download_lazyframe(client, "bgp-download"),
