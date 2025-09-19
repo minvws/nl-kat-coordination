@@ -132,7 +132,6 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
         return reverse_lazy("plugin_list")
 
 
-
 class PluginUpdateView(PluginCreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
@@ -204,9 +203,7 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
         if self.object.enabled:
             messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                _("Plugin '{}' has been enabled.").format(self.object.plugin.name),
+                self.request, messages.SUCCESS, _("Plugin '{}' has been enabled.").format(self.object.plugin.name)
             )
             return result
 
@@ -219,9 +216,7 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
             task.cancel()
 
         messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            _("Plugin '{}' has been disabled.").format(self.object.plugin.name),
+            self.request, messages.SUCCESS, _("Plugin '{}' has been disabled.").format(self.object.plugin.name)
         )
         return result
 

@@ -41,7 +41,7 @@ class Network(Asset):
 
 class IPAddress(Asset):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
-    address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True, )
+    address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True)
 
     def __str__(self) -> str:
         return self.address
@@ -55,10 +55,8 @@ class Protocol(models.TextChoices):
 class IPPort(models.Model):
     address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
     protocol: models.CharField = models.CharField(choices=Protocol)
-    port: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(65535)]
-    )
-    tls: models.BooleanField = models.BooleanField(null=True, )
+    port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(65535)])
+    tls: models.BooleanField = models.BooleanField(null=True)
     service: models.CharField = models.CharField()
 
     class Meta:
@@ -109,24 +107,16 @@ class DNSPTRRecord(DNSRecordBase):
 
 
 class DNSCNAMERecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="cname_records"
-    )
-    target: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="cname_targets"
-    )
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_records")
+    target: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_targets")
 
     def __str__(self) -> str:
         return f"{self.hostname} CNAME {self.target}"
 
 
 class DNSMXRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="mx_records"
-    )
-    mail_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="mx_targets"
-    )
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_records")
+    mail_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_targets")
     preference: models.IntegerField = models.IntegerField()
 
     def __str__(self) -> str:
@@ -134,12 +124,8 @@ class DNSMXRecord(DNSRecordBase):
 
 
 class DNSNSRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="ns_records"
-    )
-    name_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="ns_targets"
-    )
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_records")
+    name_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_targets")
 
     def __str__(self) -> str:
         return f"{self.hostname} NS {self.name_server}"
@@ -157,10 +143,8 @@ class CAATag(models.TextChoices):
 
 class DNSCAARecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
-    flags: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(255)],
-    )
-    tag: models.CharField = models.CharField(choices=CAATag, )
+    flags: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(255)])
+    tag: models.CharField = models.CharField(choices=CAATag)
     value: models.CharField = models.CharField()
 
     def __str__(self) -> str:
@@ -169,7 +153,7 @@ class DNSCAARecord(DNSRecordBase):
 
 class DNSTXTRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
-    prefix: models.CharField = models.CharField(blank=True, )
+    prefix: models.CharField = models.CharField(blank=True)
     value: models.CharField = models.CharField()
 
     def __str__(self) -> str:
@@ -181,15 +165,9 @@ class DNSSRVRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     proto: LowerCaseCharField = LowerCaseCharField()
     service: LowerCaseCharField = LowerCaseCharField()
-    priority: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(65535)]
-    )
-    weight: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(65535)]
-    )
-    port: models.IntegerField = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(65535)]
-    )
+    priority: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
+    weight: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
+    port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
 
     def __str__(self) -> str:
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"

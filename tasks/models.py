@@ -38,7 +38,7 @@ class Operation(models.TextChoices):
 
 
 class ObjectSet(models.Model):
-    """ Composite-like model representing a set of objects that can be used as an input for tasks """
+    """Composite-like model representing a set of objects that can be used as an input for tasks"""
 
     # TODO: organization field?
     name = models.CharField(max_length=100, blank=True, null=True)
@@ -91,7 +91,9 @@ class Schedule(models.Model):
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     new_schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
-    organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True)
+    organization = models.ForeignKey(
+        "openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True
+    )
     type = models.CharField(max_length=32, default="plugin")
     data = models.JSONField(default=dict)
     status = models.CharField(max_length=16, choices=TaskStatus, default=TaskStatus.PENDING)

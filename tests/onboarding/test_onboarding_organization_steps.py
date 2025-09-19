@@ -23,7 +23,6 @@ def test_onboarding_introduction(request, member, rf):
     assertContains(response, "Let's get started")
 
 
-
 def test_onboarding_clearance_level_introduction(rf, redteam_member, hostname):
     Plugin.objects.create(plugin_id="fierce", name="Fierce")
     response = OnboardingClearanceLevelIntroductionView.as_view()(
@@ -88,9 +87,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, hostname):
 
 
 @pytest.mark.parametrize("clearance_level", [-1, 0])
-def test_onboarding_acknowledge_clearance_level_no_clearance(
-    rf, redteam_member, clearance_level, hostname
-):
+def test_onboarding_acknowledge_clearance_level_no_clearance(rf, redteam_member, clearance_level, hostname):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,

@@ -4,7 +4,12 @@ from objects.models import Hostname, Network
 
 
 def test_network_api(drf_client, xtdb):
-    assert drf_client.get("/api/v1/objects/network/").json() == {"count": 0, "next": None, "previous": None, "results": []}
+    assert drf_client.get("/api/v1/objects/network/").json() == {
+        "count": 0,
+        "next": None,
+        "previous": None,
+        "results": [],
+    }
 
     net = Network.objects.create(name="internet")
     net2 = Network.objects.create(name="internet2")

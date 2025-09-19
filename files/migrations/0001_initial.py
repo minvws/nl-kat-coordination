@@ -6,20 +6,18 @@ import files.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='File',
+            name="File",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to=files.models.raw_file_name)),
-                ('type', models.CharField(blank=True, max_length=128)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("file", models.FileField(upload_to=files.models.raw_file_name)),
+                ("type", models.CharField(blank=True, max_length=128)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
-        ),
+        )
     ]

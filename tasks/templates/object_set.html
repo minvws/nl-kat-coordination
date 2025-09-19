@@ -13,19 +13,17 @@
                 <div>
                     <h1>Object Set: "{{ objectset.name }}" ({{ objectset.id }})</h1>
                     <p class="emphasized">Query:</p>
-                    <p class="emphasized"><strong>{{ objectset.object_query }}</strong></p>
+                    <p class="emphasized">
+                        <strong>{{ objectset.object_query }}</strong>
+                    </p>
                     {% if preview_organization and preview %}
                         <p class="emphasized">Preview for organization "{{ preview_organization.name }}":</p>
-                        {% for object in preview %}
-                            <strong>{{ object }}</strong>
-                        {% endfor %}
+                        {% for object in preview %}<strong>{{ object }}</strong>{% endfor %}
                     {% endif %}
                     <p class="emphasized">Static Objects:</p>
                     {% if objectset.traverse_objects %}
                         Objects:
-                        {% for object in objectset.traverse_objects %}
-                            <strong>{{ object.value }}</strong>
-                        {% endfor %}
+                        {% for object in objectset.traverse_objects %}<strong>{{ object.value }}</strong>{% endfor %}
                         <p class="emphasized">{{ objectset.description }}</p>
                     {% else %}
                         <strong>No static objects</strong>

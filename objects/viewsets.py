@@ -94,4 +94,3 @@ class DNSTXTRecordViewSet(ManyModelViewSet):
 class DNSSRVRecordViewSet(ManyModelViewSet):
     serializer_class = DNSSRVRecordSerializer
     queryset = DNSSRVRecord.objects.all()
-

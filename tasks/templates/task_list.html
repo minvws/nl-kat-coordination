@@ -27,7 +27,9 @@
             <form class="inline layout-wide" method="get">
                 <div class="horizontal-view">
                     {{ filter.form.as_p }}
-                    <p  class="action-buttons"><button type="submit" class="icon ti-search"></button></p>
+                    <p class="action-buttons">
+                        <button type="submit" class="icon ti-search"></button>
+                    </p>
                 </div>
             </form>
             {% if not task_list %}
@@ -91,9 +93,7 @@
                                     </td>
                                     <td>
                                         {% if task.new_schedule_id %}
-                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">
-                                                {{ task.new_schedule_id }}
-                                            </a>
+                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">{{ task.new_schedule_id }}</a>
                                         {% else %}
                                             No Schedule
                                         {% endif %}
@@ -104,10 +104,10 @@
                                     <td>{{ task.created_at }}</td>
                                     <td>
                                         {% if task.done %}
-                                        <form action="{% url 'reschedule_task' task.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button type="submit">{% translate "Reschedule" %}</button>
-                                        </form>
+                                            <form action="{% url 'reschedule_task' task.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit">{% translate "Reschedule" %}</button>
+                                            </form>
                                         {% else %}
                                             <form action="{% url 'cancel_task' task.id %}" method="post">
                                                 {% csrf_token %}

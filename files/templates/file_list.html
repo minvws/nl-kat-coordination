@@ -59,9 +59,7 @@
                                     <td>
                                         <a href="{{ file.file.url }}">{{ file.path.name }}</a>
                                     </td>
-                                    <td>
-                                        {{ file.type }}
-                                    </td>
+                                    <td>{{ file.type }}</td>
                                     {% if file.task_result %}
                                         {% if file.task_result.task.data.plugin_id %}
                                             <td>
@@ -73,9 +71,7 @@
                                             </td>
                                         {% endif %}
                                         {% if file.task_result.task.organization %}
-                                            <td>
-                                                {{ file.task_result.task.organization.code }}
-                                            </td>
+                                            <td>{{ file.task_result.task.organization.code }}</td>
                                         {% else %}
                                             <td>{% translate 'No Organization' %}</td>
                                         {% endif %}

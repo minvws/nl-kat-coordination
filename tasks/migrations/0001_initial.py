@@ -9,61 +9,138 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-        ('files', '0001_initial'),
-        ('openkat', '0001_initial'),
-        ('plugins', '0001_initial'),
-    ]
+    dependencies = [("files", "0001_initial"), ("openkat", "0001_initial"), ("plugins", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='ObjectSet',
+            name="ObjectSet",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=100, null=True)),
-                ('description', models.TextField(blank=True)),
-                ('dynamic', models.BooleanField(default=False)),
-                ('object_query', models.TextField(blank=True, null=True)),
-                ('all_objects', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=128), default=list, size=None)),
-                ('subsets', models.ManyToManyField(blank=True, related_name='supersets', to='tasks.objectset')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(blank=True, max_length=100, null=True)),
+                ("description", models.TextField(blank=True)),
+                ("dynamic", models.BooleanField(default=False)),
+                ("object_query", models.TextField(blank=True, null=True)),
+                (
+                    "all_objects",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(blank=True, max_length=128), default=list, size=None
+                    ),
+                ),
+                ("subsets", models.ManyToManyField(blank=True, related_name="supersets", to="tasks.objectset")),
             ],
         ),
         migrations.CreateModel(
-            name='Schedule',
+            name="Schedule",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('enabled', models.BooleanField(default=True)),
-                ('recurrences', recurrence.fields.RecurrenceField(blank=True, null=True)),
-                ('run_on', models.CharField(blank=True, max_length=64, null=True)),
-                ('operation', models.CharField(blank=True, choices=[('create', 'Create'), ('update', 'Update'), ('delete', 'Delete')], max_length=16, null=True)),
-                ('object_set', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='schedules', to='tasks.objectset')),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='new_schedules', to='openkat.organization')),
-                ('plugin', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='schedules', to='plugins.plugin')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("enabled", models.BooleanField(default=True)),
+                ("recurrences", recurrence.fields.RecurrenceField(blank=True, null=True)),
+                ("run_on", models.CharField(blank=True, max_length=64, null=True)),
+                (
+                    "operation",
+                    models.CharField(
+                        blank=True,
+                        choices=[("create", "Create"), ("update", "Update"), ("delete", "Delete")],
+                        max_length=16,
+                        null=True,
+                    ),
+                ),
+                (
+                    "object_set",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="schedules",
+                        to="tasks.objectset",
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="new_schedules",
+                        to="openkat.organization",
+                    ),
+                ),
+                (
+                    "plugin",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="schedules",
+                        to="plugins.plugin",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('type', models.CharField(default='plugin', max_length=32)),
-                ('data', models.JSONField(default=dict)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('queued', 'Queued'), ('dispatched', 'Dispatched'), ('running', 'Running'), ('completed', 'Completed'), ('failed', 'Failed'), ('cancelled', 'Cancelled')], default='pending', max_length=16)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('ended_at', models.DateTimeField(null=True)),
-                ('modified_at', models.DateTimeField(auto_now=True)),
-                ('new_schedule', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tasks', to='tasks.schedule')),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='openkat.organization')),
+                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ("type", models.CharField(default="plugin", max_length=32)),
+                ("data", models.JSONField(default=dict)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("queued", "Queued"),
+                            ("dispatched", "Dispatched"),
+                            ("running", "Running"),
+                            ("completed", "Completed"),
+                            ("failed", "Failed"),
+                            ("cancelled", "Cancelled"),
+                        ],
+                        default="pending",
+                        max_length=16,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("ended_at", models.DateTimeField(null=True)),
+                ("modified_at", models.DateTimeField(auto_now=True)),
+                (
+                    "new_schedule",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="tasks",
+                        to="tasks.schedule",
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tasks",
+                        to="openkat.organization",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='TaskResult',
+            name="TaskResult",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='task_result', to='files.file')),
-                ('task', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='task_results', to='tasks.task')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "file",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, related_name="task_result", to="files.file"
+                    ),
+                ),
+                (
+                    "task",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name="task_results", to="tasks.task"
+                    ),
+                ),
             ],
         ),
     ]

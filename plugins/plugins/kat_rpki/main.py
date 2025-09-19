@@ -24,7 +24,7 @@ def ipv6_to_int(ipv6_addr):
 def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict[str, dict]):
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
-        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),   # parse CIDR to prefix as an integer
+        intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),  # parse CIDR to prefix as an integer
     )
     rpki_v6 = rpki.filter(pl.col("prefix").str.contains(":", literal=True)).with_columns(
         intip=pl.col("prefix").str.split("/").list.get(0).map_elements(ipv6_to_int, return_dtype=pl.Int128),
@@ -41,9 +41,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict
     )
 
     # Create a pl.LazyFrame out of the object list of IPAddresses
-    ip4s_lazy = pl.LazyFrame(
-        list(ip4s.values())).with_columns(intip4=ip.ipv4_to_numeric("address")
-    )
+    ip4s_lazy = pl.LazyFrame(list(ip4s.values())).with_columns(intip4=ip.ipv4_to_numeric("address"))
     ip6s_lazy = pl.LazyFrame(list(ip6s.values())).with_columns(
         intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128)
     )
@@ -61,23 +59,23 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict
         pl.col("bintip") <= pl.col("intip4"),
         pl.col("bintip") + pl2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4") + 1,
     )
-    bgp_rpki_v4 = bgp_new_v4.join(
-        new_v4, left_on=["address", "ASN"], right_on=["address", "asn"], how="left"
-    ).filter(pl.col("primary_key_right").is_null())
+    bgp_rpki_v4 = bgp_new_v4.join(new_v4, left_on=["address", "ASN"], right_on=["address", "asn"], how="left").filter(
+        pl.col("primary_key_right").is_null()
+    )
 
     new_v6 = ip6s_lazy.join_where(
         rpki_v6,
         pl.col("intip") <= pl.col("intip6"),
         pl.col("intip") >= pl.col("intip6") - pl2 ** (128 - pl.col("intprefix")) + 1,
-        )
+    )
     bgp_new_v6 = ip6s_lazy.join_where(
         bgp_v6,
         pl.col("bintip") <= pl.col("intip6"),
         pl.col("bintip") >= pl.col("intip6") - pl2 ** (128 - pl.col("bintprefix")) + 1,
     )
-    bgp_rpki_v6 = bgp_new_v6.join(
-        new_v6, left_on=["address", "ASN"], right_on=["address", "asn"], how="left"
-    ).filter(pl.col("primary_key_right").is_null())
+    bgp_rpki_v6 = bgp_new_v6.join(new_v6, left_on=["address", "ASN"], right_on=["address", "asn"], how="left").filter(
+        pl.col("primary_key_right").is_null()
+    )
 
     results = []
 
@@ -108,7 +106,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ip4s: dict[str, dict], ip6s: dict
 
 
 def download_lazyframe(client, file_type: str) -> pl.LazyFrame:
-    """ Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame """
+    """Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame"""
 
     params = {"ordering": "created_at", "limit": 1}
 
@@ -123,7 +121,7 @@ def download_lazyframe(client, file_type: str) -> pl.LazyFrame:
 
 
 def get_all_objects_of_type(client: httpx.Client, object_type: str) -> dict[str, dict]:
-    """ Iterate through the object API to collect all objects of type object_type """
+    """Iterate through the object API to collect all objects of type object_type"""
 
     offset = 0
     limit = 500
@@ -155,6 +153,6 @@ if __name__ == "__main__":
         get_all_objects_of_type(client, "IPAddressV6"),
     )
 
-    client.post('/objects/', json=oois)
+    client.post("/objects/", json=oois)
 
     print(json.dumps(oois))

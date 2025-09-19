@@ -22,6 +22,7 @@ def main():
 def openkat():
     """Openkat entrypoint."""
     import environ
+
     environ.Env.read_env(".env.local")
     main()
 

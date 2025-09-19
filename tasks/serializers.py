@@ -6,7 +6,7 @@ from tasks.models import Task, TaskResult
 
 class BulkCreateListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
-        """ Inspired by the standard create method """
+        """Inspired by the standard create method"""
 
         ModelClass = self.child.Meta.model
         info = model_meta.get_field_info(ModelClass)

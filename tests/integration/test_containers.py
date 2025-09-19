@@ -8,10 +8,7 @@ from plugins.runner import PluginRunner
 @pytest.mark.django_db(transaction=True)
 def test_hello_world():
     plugin = Plugin.objects.create(
-        name="testing plugins",
-        plugin_id="test",
-        oci_image="hello-world:linux",
-        oci_arguments=["/hello"],
+        name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
     )
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")

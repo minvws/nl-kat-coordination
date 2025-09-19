@@ -18,11 +18,7 @@
                     <a href="{% url "plugin_list" %}">{% translate "All organizations" %}</a>
                 </li>
                 {% for org in organizations_including_blocked %}
-                    {% if organization.code != org.code %}
-                        <li>
-                            {{ org.name }}
-                        </li>
-                    {% endif %}
+                    {% if organization.code != org.code %}<li>{{ org.name }}</li>{% endif %}
                 {% endfor %}
             </ul>
         </div>

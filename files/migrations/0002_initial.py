@@ -4,18 +4,12 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-        ('files', '0001_initial'),
-        ('openkat', '0001_initial'),
-    ]
+    dependencies = [("files", "0001_initial"), ("openkat", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='file',
-            name='organizations',
-            field=models.ManyToManyField(blank=True, to='openkat.organization'),
-        ),
+            model_name="file", name="organizations", field=models.ManyToManyField(blank=True, to="openkat.organization")
+        )
     ]

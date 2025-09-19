@@ -42,12 +42,8 @@
                             <tbody>
                                 {% for organization in object_list %}
                                     <tr>
-                                        <td>
-                                            {{ organization.name }}
-                                        </td>
-                                        <td>
-                                            {{ organization.name }}
-                                        </td>
+                                        <td>{{ organization.name }}</td>
+                                        <td>{{ organization.name }}</td>
                                         <td>
                                             {% include "organizations/organization_tags.html" %}
 

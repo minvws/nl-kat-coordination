@@ -69,8 +69,11 @@ def run(file_id: str):
         for host in parsed.hosts:
             result = get_ip_ports_and_service(host=host)
 
-            open_ports = [f"IPPort|internet|{host.address}|{ooi['protocol']}|{ooi['port']}"
-                          for ooi in result if ooi["object_type"] == "IPPort" and ooi["state"] == "open"]
+            open_ports = [
+                f"IPPort|internet|{host.address}|{ooi['protocol']}|{ooi['port']}"
+                for ooi in result
+                if ooi["object_type"] == "IPPort" and ooi["state"] == "open"
+            ]
 
             # TODO: use address as filter if it's not in the pk anymore.
             params = {"object_type": "IPPort", "port": ports_scanned}
@@ -90,7 +93,7 @@ def run(file_id: str):
 
 
 def get_ports_scanned(parsed: NmapReport):
-    """ Given an NmapReport, get the list of ports that were actually scanned """
+    """Given an NmapReport, get the list of ports that were actually scanned"""
 
     ports_scanned = []
 

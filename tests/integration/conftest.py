@@ -9,7 +9,7 @@ def valid_time():
     return datetime.now(UTC)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def django_db_setup(request: pytest.FixtureRequest, django_db_blocker):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:

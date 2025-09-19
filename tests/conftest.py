@@ -38,14 +38,11 @@ def log_output():
 
 
 class JSONAPIClient(APIClient):
-    """ Add json argument to post """
+    """Add json argument to post"""
 
-    def post(self, path, json: dict | None = None, data=None, format=None, content_type=None,
-             follow=False, **extra):
+    def post(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):
         if json is not None and data is None and content_type is None:
-            return super().post(
-                path, json_module.dumps(json), format, "application/json", follow, **extra
-            )
+            return super().post(path, json_module.dumps(json), format, "application/json", follow, **extra)
 
         return super().post(path, data, format, content_type, follow, **extra)
 
@@ -371,7 +368,9 @@ def xtdb(request: pytest.FixtureRequest):
     style = no_style()
     erase = [
         "{} {} {};".format(
-            style.SQL_KEYWORD("ERASE"), style.SQL_KEYWORD("FROM"), style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table))
+            style.SQL_KEYWORD("ERASE"),
+            style.SQL_KEYWORD("FROM"),
+            style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table)),
         )
         for ooi in ooi_models
     ]

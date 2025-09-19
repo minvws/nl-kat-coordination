@@ -1,7 +1,8 @@
 {% load static %}
 {% load i18n %}
 
-<nav class="tabs" aria-label="{% translate "List of views for plugin detail page" %}">
+<nav class="tabs"
+     aria-label="{% translate "List of views for plugin detail page" %}">
     <ul>
         <li {% if view == "general" %}aria-current="page"{% endif %}>
             <a href="{% url "plugin_detail" pk=plugin.id %}">{% translate "General" %}</a>

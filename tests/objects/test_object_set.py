@@ -44,7 +44,10 @@ def test_traverse():
     assert Object.objects.filter(type__contains="second").difference(object_set.all_objects.all()).count() == 10
     assert Object.objects.filter(type__contains="second").difference(object_set.traverse_objects().all()).count() == 10
     assert Object.objects.filter(type__contains="second").difference(second_object_set.all_objects.all()).count() == 0
-    assert Object.objects.filter(type__contains="second").difference(second_object_set.traverse_objects().all()).count() == 0
+    assert (
+        Object.objects.filter(type__contains="second").difference(second_object_set.traverse_objects().all()).count()
+        == 0
+    )
 
     third_object_set = ObjectSet.objects.create()
 

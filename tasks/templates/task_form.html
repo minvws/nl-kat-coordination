@@ -12,6 +12,7 @@
             <form method="post" class="help">
                 {% csrf_token %}
                 {% include "partials/form/form_errors.html" with form=form %}
+
                 {{ form }}
                 <button type="submit">{% translate "Create Task" %}</button>
             </form>

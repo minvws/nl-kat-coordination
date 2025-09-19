@@ -7,49 +7,85 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-        ('openkat', '0001_initial'),
-    ]
+    dependencies = [("openkat", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='Plugin',
+            name="Plugin",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('plugin_id', models.CharField(max_length=64, unique=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('name', models.CharField(max_length=64, unique=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('scan_level', models.PositiveSmallIntegerField(choices=[(0, 'L0'), (1, 'L1'), (2, 'L2'), (3, 'L3'), (4, 'L4')], default=4)),
-                ('consumes', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=128), default=list, size=None)),
-                ('recurrences', recurrence.fields.RecurrenceField(blank=True, null=True)),
-                ('oci_image', models.CharField(max_length=256, null=True)),
-                ('oci_arguments', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=256), default=list, size=None)),
-                ('version', models.CharField(max_length=16, null=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("plugin_id", models.CharField(max_length=64, unique=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("name", models.CharField(max_length=64, unique=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "scan_level",
+                    models.PositiveSmallIntegerField(
+                        choices=[(0, "L0"), (1, "L1"), (2, "L2"), (3, "L3"), (4, "L4")], default=4
+                    ),
+                ),
+                (
+                    "consumes",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(blank=True, max_length=128), default=list, size=None
+                    ),
+                ),
+                ("recurrences", recurrence.fields.RecurrenceField(blank=True, null=True)),
+                ("oci_image", models.CharField(max_length=256, null=True)),
+                (
+                    "oci_arguments",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(blank=True, max_length=256), default=list, size=None
+                    ),
+                ),
+                ("version", models.CharField(max_length=16, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='PluginSettings',
+            name="PluginSettings",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('settings', models.JSONField(default=dict)),
-                ('organizations', models.ManyToManyField(related_name='plugin_settings', to='openkat.organization')),
-                ('plugin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='plugin_settings', to='plugins.plugin')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("settings", models.JSONField(default=dict)),
+                ("organizations", models.ManyToManyField(related_name="plugin_settings", to="openkat.organization")),
+                (
+                    "plugin",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name="plugin_settings", to="plugins.plugin"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='EnabledPlugin',
+            name="EnabledPlugin",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('enabled', models.BooleanField(default=False)),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='enabled_plugins', to='openkat.organization')),
-                ('plugin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='enabled_plugins', to='plugins.plugin')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("enabled", models.BooleanField(default=False)),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="enabled_plugins",
+                        to="openkat.organization",
+                    ),
+                ),
+                (
+                    "plugin",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, related_name="enabled_plugins", to="plugins.plugin"
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('plugin', 'organization'), name='unique_enabled_per_organization'), models.UniqueConstraint(condition=models.Q(('organization', None)), fields=('plugin',), name='unique_global_enabled')],
+                "constraints": [
+                    models.UniqueConstraint(fields=("plugin", "organization"), name="unique_enabled_per_organization"),
+                    models.UniqueConstraint(
+                        condition=models.Q(("organization", None)), fields=("plugin",), name="unique_global_enabled"
+                    ),
+                ]
             },
         ),
     ]

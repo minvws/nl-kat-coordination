@@ -92,6 +92,7 @@ def test_plugin_query_with_enabled(organization, organization_b):
         "4": False,
     }
 
+
 def test_enable_plugins(rf, superuser_member):
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     request = setup_request(
@@ -125,9 +126,7 @@ def test_enable_plugins(rf, superuser_member):
 
 def test_delete_plugin(rf, superuser_member, client_member):
     plugin = Plugin.objects.create(name="1", plugin_id="1")
-    request = setup_request(
-        rf.post("delete_plugin"), superuser_member.user
-    )
+    request = setup_request(rf.post("delete_plugin"), superuser_member.user)
     response = PluginDeleteView.as_view()(request, pk=plugin.id)
 
     assert response.status_code == 302
@@ -135,9 +134,7 @@ def test_delete_plugin(rf, superuser_member, client_member):
     assert Plugin.objects.count() == 0
 
     plugin = Plugin.objects.create(name="2", plugin_id="2")
-    request = setup_request(
-        rf.post("delete_plugin"), client_member.user
-    )
+    request = setup_request(rf.post("delete_plugin"), client_member.user)
 
     with pytest.raises(PermissionDenied):
         PluginDeleteView.as_view()(request, pk=plugin.id)
@@ -168,7 +165,6 @@ def test_enabling_plugin_creates_schedule():
     # TODO: fix
     # assert schedule.object_set is not None
     # assert schedule.object_set.traverse_objects().count() == 0
-
 
 
 def test_enabled_organizations(organization, organization_b):
@@ -223,7 +219,8 @@ def test_arguments():
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).types_in_arguments() == [IPPort]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipport}"]).types_in_arguments() == [IPPort]
     assert set(Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipaddress}"]).types_in_arguments()) == {
-        IPPort, IPAddress
+        IPPort,
+        IPAddress,
     }
 
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).types_in_arguments() == []
