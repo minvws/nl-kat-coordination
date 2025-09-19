@@ -177,6 +177,7 @@ ignore = [
   "S324", # Insecure hash functions can still be useful
   "S603", # Disabled because of false positives
   "S607", # Disabled because of false positives
+  "ERA001" # TODO: Enable when we fixed all the TODOs with commented out code
 ]
 
 # Add "Example" to allowed code comments

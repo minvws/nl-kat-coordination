@@ -40,7 +40,7 @@ def log_output():
 class JSONAPIClient(APIClient):
     """Add json argument to post"""
 
-    def post(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):
+    def post(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):  # noqa: A002
         if json is not None and data is None and content_type is None:
             return super().post(path, json_module.dumps(json), format, "application/json", follow, **extra)
 
@@ -382,8 +382,6 @@ def xtdb(request: pytest.FixtureRequest):
 
 
 def _set_suffix_to_test_databases_except_xtdb(suffix: str) -> None:
-    from django.conf import settings
-
     for db_settings in settings.DATABASES.values():
         if db_settings["ENGINE"] == "django_xtdb":
             continue

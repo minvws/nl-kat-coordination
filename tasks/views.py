@@ -89,28 +89,28 @@ class TaskForm(ModelForm):
         if not plugin.enabled_for(organization):
             raise ValueError(f"Plugin not enabled for organization {organization.name}")
 
-        pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
+        # pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
         input_data = set()
 
-        if pks:
-            now = datetime.now(UTC)
-            # TODO: fix
-            # octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
-            # scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
-            #
-            # for profile in scan_profiles:
-            #     if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
-            #         continue
-            #
-            #     if profile.reference.class_type == Hostname:
-            #         input_data.add(profile.reference.tokenized.name)
-            #         continue
-            #
-            #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-            #         input_data.add(str(profile.reference.tokenized.address))
-            #         continue
-            #
-            #     input_data.add(str(profile.reference))
+        # TODO: fix
+        # if pks:
+        #     now = datetime.now(UTC)
+        #     octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
+        #     scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
+
+        #     for profile in scan_profiles:
+        #         if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
+        #             continue
+
+        #         if profile.reference.class_type == Hostname:
+        #             input_data.add(profile.reference.tokenized.name)
+        #             continue
+
+        #         if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
+        #             input_data.add(str(profile.reference.tokenized.address))
+        #             continue
+
+        #         input_data.add(str(profile.reference))
 
         if not input_data and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")
@@ -334,7 +334,6 @@ class ObjectSetDetailView(DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
-        now = datetime.now(UTC)
         obj = self.get_object()
 
         # TODO: handle...
@@ -342,6 +341,7 @@ class ObjectSetDetailView(DetailView):
 
         if obj.object_query:
             # TODO: fix
+            # now = datetime.now(UTC)
             # try:
             #     query = Query.from_path(obj.object_query)
             # except (ValueError, TypeNotFound):

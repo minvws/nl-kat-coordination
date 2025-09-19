@@ -164,4 +164,4 @@ if __name__ == "__main__":
 
     client.post("/objects/", json=oois)
 
-    print(json.dumps(oois))
+    print(json.dumps(oois))  # noqa: T201

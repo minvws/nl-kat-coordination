@@ -266,6 +266,6 @@ if __name__ == "__main__":
     headers = {"Authorization": "Token " + token}
 
     for object_path, objects in results_grouped.items():
-        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/{object_path}', headers=headers, json=objects)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/{object_path}", headers=headers, json=objects)
 
-    print(json.dumps(results))
+    print(json.dumps(results))  # noqa: T201

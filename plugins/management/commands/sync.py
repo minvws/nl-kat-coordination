@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from pydantic import BaseModel, Field, TypeAdapter
 
-from openkat.settings import BASE_DIR
 from plugins.models import EnabledPlugin, Plugin
 
 logger = structlog.get_logger(__name__)
@@ -69,7 +68,9 @@ def sync() -> list[Plugin]:
     plugins = []
     enabled_plugins = []
 
-    for path, package in _find_packages_in_path_containing_files(BASE_DIR / "plugins" / "plugins", ("plugin.json",)):
+    for path, package in _find_packages_in_path_containing_files(
+        settings.BASE_DIR / "plugins" / "plugins", ("plugin.json",)
+    ):
         definition = json.loads(path.joinpath("plugin.json").read_text())
         plugin = Plugin(
             plugin_id=definition.get("plugin_id"),

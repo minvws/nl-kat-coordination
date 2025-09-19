@@ -56,4 +56,4 @@ def run(file_id: str):
 
 if __name__ == "__main__":
     result = run(sys.argv[1])
-    print(json.dumps(result))
+    print(json.dumps(result))  # noqa: T201

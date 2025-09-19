@@ -90,12 +90,12 @@ def run(file_id: str):
             try:
                 client.delete("/objects/", params={"pk": list(set(ports) - set(open_ports))})
             except HTTPError:
-                print(f"Failed to delete ports for {host}, continuing")
+                print(f"Failed to delete ports for {host}, continuing")  # noqa: T201
                 continue
 
             results.extend(result)
 
-    client.post(f'{os.getenv("OPENKAT_API")}/objects/', json=results)
+    client.post(f"{os.getenv('OPENKAT_API')}/objects/", json=results)
 
     return results
 
@@ -122,4 +122,4 @@ def get_ports_scanned(parsed: NmapReport):
 if __name__ == "__main__":
     oois = run(sys.argv[1])
 
-    print(json.dumps(oois))
+    print(json.dumps(oois))  # noqa: T201

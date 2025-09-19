@@ -118,7 +118,8 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     # if input_data:
     #     # Join the input data targets into a large or-query, checking for task with any of the targets as input
     #     filters = reduce(
-    #         operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data]
+    #         operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target)
+    #                        for target in input_data]
     #     )
     #     last_runs = last_runs.filter(filters)
 

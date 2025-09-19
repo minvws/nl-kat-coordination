@@ -21,7 +21,8 @@ def findings() -> list[dict]:
 
 def hostnames() -> list[dict]:
     return [
-        {"object_type": "Hostname", "name": l.strip(), "network": "Network|internet"} for l in sys.stdin.readlines()
+        {"object_type": "Hostname", "name": line.strip(), "network": "Network|internet"}
+        for line in sys.stdin.readlines()
     ]
 
 
@@ -45,6 +46,6 @@ if __name__ == "__main__":
             raise Exception("No OPENKAT_TOKEN env variable")
 
         headers = {"Authorization": "Token " + token}
-        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/", headers=headers, json=results)
 
     json.dump(results, sys.stdout)  # stores the result as a JSON file as well
