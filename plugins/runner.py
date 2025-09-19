@@ -186,14 +186,10 @@ class PluginRunner:
     @staticmethod
     def create_command(args: list[str], target: str):
         format_map = {"{file}": target}
-
-        for ip_key in ["{ipaddress}", "{ipaddressv4}", "{ipaddressv6}"]:
-            format_map["{hostname|" + ip_key + "}"] = target
-            format_map["{" + ip_key + "|hostname"] = target
-
-            format_map[ip_key] = target
-
+        format_map["{ipaddress}"] = target
         format_map["{hostname}"] = target
+        format_map["{hostname|ipaddress}"] = target
+        format_map["{ipaddress|hostname}"] = target
 
         new_args = []
 

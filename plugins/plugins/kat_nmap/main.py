@@ -30,7 +30,7 @@ def get_ip_ports_and_service(host: NmapHost, internet_id: int):
             ip_port = {
                 "object_type": "IPPort",
                 "address": ip_obj["address"],
-                "protocol": protocol,
+                "protocol": protocol.upper(),
                 "port": port,
                 "state": service.state,
                 "service": service_name,
@@ -86,20 +86,30 @@ def run(file_id: str):
                 address = response["results"][0]
 
             open_ports = [ooi["port"] for ooi in result if ooi["object_type"] == "IPPort" and ooi["state"] == "open"]
-            params = {"port": ports_scanned, "address": address["id"]}
-            ports = [x["id"] for x in client.get("/objects/ipport/", params=params).json()["results"]]
+            idx = 0
+            batch_size = 200
 
-            try:
-                client.delete("/objects/ipport/", params={"pk": list(set(ports) - set(open_ports))})
-            except HTTPError:
-                print(f"Failed to delete ports for {host}, continuing")  # noqa: T201
-                continue
+            for idx_2 in range(batch_size, len(ports_scanned) + batch_size, batch_size):
+                params = {"port": ports_scanned[idx:idx_2], "address": address["id"]}
+                ports = [x["id"] for x in client.get("/objects/ipport/", params=params).json()["results"]]
+
+                if not ports:
+                    idx = idx_2
+                    continue
+                try:
+                    client.delete("/objects/ipport/", params={"pk": list(set(ports) - set(open_ports))})
+                except HTTPError:
+                    print(f"Failed to delete ports for {host}, continuing")  # noqa: T201
+                idx = idx_2
 
             results.extend(result)
 
     results_grouped = defaultdict(list)
     for result in results:
         results_grouped[result.pop("object_type").lower()].append(result)
+
+    if "ipaddress" not in results_grouped:
+        return []
 
     ips = client.post("/objects/ipaddress/", headers=headers, json=results_grouped.pop("ipaddress")).json()
     by_address = {ip["address"]: ip["id"] for ip in ips}
@@ -109,7 +119,7 @@ def run(file_id: str):
             if "address" in obj:
                 obj["address"] = by_address[obj["address"]]
 
-        client.post(f"/objects/{object_path.lower()}/", json=results)
+        client.post(f"/objects/{object_path.lower()}/", json=objects)
 
     return results
 
