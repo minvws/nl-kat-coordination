@@ -52,13 +52,6 @@ DENY_ORGANIZATION_CODES = [
 ]
 
 
-class LowerCaseSlugField(models.SlugField):
-    def to_python(self, value):
-        if value is None:
-            return None
-        return value.lower()
-
-
 class LowerCaseCharField(models.CharField):
     """Override CharField to convert value to lowercase before saving."""
 
@@ -79,7 +72,11 @@ class LowerCaseCharField(models.CharField):
 
 
 class LowerCaseEmailField(LowerCaseCharField, models.EmailField):
-    """Override EmailField to convert emails to lowercase before saving."""
+    """Override EmailField to convert email addresses to lowercase before saving."""
+
+
+class LowerCaseSlugField(LowerCaseCharField, models.SlugField):
+    """Override SlufField to convert slugs to lowercase before saving."""
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
