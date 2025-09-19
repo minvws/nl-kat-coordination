@@ -8,7 +8,7 @@ import files.models
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies: list = []
 
     operations = [
         migrations.CreateModel(

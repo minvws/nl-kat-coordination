@@ -73,11 +73,11 @@
                                         {% if file.task_result.task.organization %}
                                             <td>{{ file.task_result.task.organization.code }}</td>
                                         {% else %}
-                                            <td>{% translate 'No Organization' %}</td>
+                                            <td>{% translate "No Organization" %}</td>
                                         {% endif %}
                                     {% else %}
-                                        <td>{% translate 'No Source' %}</td>
-                                        <td>{% translate 'No Organization' %}</td>
+                                        <td>{% translate "No Source" %}</td>
+                                        <td>{% translate "No Organization" %}</td>
                                     {% endif %}
                                     <td>{{ file.created_at }}</td>
                                 </tr>

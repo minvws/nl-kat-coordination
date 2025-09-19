@@ -20,9 +20,10 @@
                            role="option"
                            data-value="{{ language }}"
                            lang="{{ language }}">
-                            <button form="set-language" type="submit" name="language" value={{ language }}>
-                                {{ lang.name_local.title }}
-                            </button>
+                            <button form="set-language"
+                                    type="submit"
+                                    name="language"
+                                    value="{{ language }}">{{ lang.name_local.title }}</button>
                         </a>
                     </li>
                 {% endif %}

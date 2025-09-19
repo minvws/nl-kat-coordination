@@ -1,12 +1,21 @@
 import json
+import os
 import sys
-from os import getenv
 
 import httpx
 
 
 def run(file_id: str):
-    client = httpx.Client(base_url=getenv("OPENKAT_API"), headers={"Authorization": "Token " + getenv("OPENKAT_TOKEN")})
+    token = os.getenv("OPENKAT_TOKEN")
+    if not token:
+        raise Exception("No OPENKAT_TOKEN env variable")
+
+    base_url = os.getenv("OPENKAT_API")
+    if not base_url:
+        raise Exception("No OPENKAT_API env variable")
+
+    headers = {"Authorization": "Token " + token}
+    client = httpx.Client(base_url=base_url, headers=headers)
     drill_file = client.get(f"/file/{file_id}/").json()
     file_content = client.get(drill_file["file"]).content.decode()
 
@@ -47,4 +56,4 @@ def run(file_id: str):
 
 if __name__ == "__main__":
     result = run(sys.argv[1])
-    print(json.dumps(result))
+    print(json.dumps(result))  # noqa: T201

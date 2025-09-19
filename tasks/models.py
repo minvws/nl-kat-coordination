@@ -85,7 +85,8 @@ class Schedule(models.Model):
     operation = models.CharField(max_length=16, choices=Operation, null=True, blank=True)
 
     def run(self):
-        from tasks.tasks import run_schedule
+        # Import here to prevent circular imports
+        from tasks.tasks import run_schedule  # noqa: PLC0415
 
         run_schedule(self)
 
@@ -105,7 +106,8 @@ class Task(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def cancel(self):
-        from tasks.celery import app
+        # Import here to prevent circular imports
+        from tasks.celery import app  # noqa: PLC0415
 
         self.status = TaskStatus.CANCELLED
         self.save()

@@ -19,9 +19,9 @@
                     <p class="emphasized">{{ schedule.object_set }}</p>
                     <p class="emphasized">{{ schedule.run_on }}</p>
                     <p class="emphasized">{{ schedule.operation }}</p>
-                    <h4>{% translate 'Change Schedule' %}:</h4>
+                    <h4>{% translate "Change Schedule" %}:</h4>
                     <form action="{% url "edit_schedule" pk=schedule.id %}"
-                          method="POST"
+                          method="post"
                           class="post-form">
                         {% csrf_token %}
                         {{ form.media }}

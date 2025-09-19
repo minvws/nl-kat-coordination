@@ -27,7 +27,7 @@ class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
     def get_permission_required(self):
         permissions_required = []
 
-        if not issubclass(self.__class__, (CreateView, UpdateView, DeleteView)):
+        if not issubclass(self.__class__, CreateView | UpdateView | DeleteView):
             return permissions_required
 
         kwargs = {"app_label": self.model._meta.app_label, "model_name": self.model._meta.model_name}

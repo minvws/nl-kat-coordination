@@ -31,7 +31,7 @@ ServiceHealth.update_forward_refs()
 
 
 def get_openkat_health(organization_code: str) -> ServiceHealth:
-    services = []
+    services: list = []
 
     services_healthy = all(service.healthy for service in services)
     additional = None

@@ -31,7 +31,7 @@ def get_password_validators_help_texts():
         min_length_alpha += _(" letters")
     min_length_special = str(validators.get("min_length_special", ""))
     if min_length_special:
-        min_length_special += _(f" special characters such as: {str(validators.get('special_characters',''))}")
+        min_length_special += _(f" special characters such as: {str(validators.get('special_characters', ''))}")
     min_length_lower = str(validators.get("min_length_lower", ""))
     if min_length_lower:
         min_length_lower += _(" lower case letters")
