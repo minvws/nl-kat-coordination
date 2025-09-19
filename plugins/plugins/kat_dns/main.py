@@ -206,7 +206,7 @@ def run(hostname: str, record_types: set[str]) -> list:
                 if isinstance(rr, TXT):
                     results.append(
                         dict(
-                            object_type="DMARCTXTRecord",
+                            object_type="DNSTXTRecord",
                             hostname=f"Hostname|internet|{input_hostname['name']}",
                             value=str(rr).strip('"'),
                             ttl=rrset.ttl,
@@ -259,13 +259,9 @@ if __name__ == "__main__":
     for result in results:
         results_grouped[result["object_type"].lower()].append(result)
 
-    token = os.getenv("OPENKAT_TOKEN")
-    if not token:
-        raise Exception("No OPENKAT_TOKEN env variable")
-
-    headers = {"Authorization": "Token " + token}
+    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN", "")}
 
     for object_path, objects in results_grouped.items():
-        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/{object_path}", headers=headers, json=objects)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/{object_path}/", headers=headers, json=objects)
 
     print(json.dumps(results))  # noqa: T201

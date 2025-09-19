@@ -76,7 +76,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
         return
 
-    input_data = set()
+    input_data: set[str] = set()
 
     if schedule.object_set.object_query is not None and schedule.object_set.dynamic is True:
         model_qs = apps.get_app_config("objects").get_model(schedule.object_set.object_type).objects.all()
@@ -86,7 +86,6 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
 
         # TODO: check scan profile
         input_data = input_data.union([str(model) for model in model_qs])
-
 
     if not input_data:
         return
@@ -155,7 +154,7 @@ def run_plugin_task(
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
     batch: bool = True,
-) -> list[Task] | Task:
+) -> list[Task]:
     if isinstance(input_data, set):
         input_data = list(input_data)
 
@@ -164,7 +163,7 @@ def run_plugin_task(
         idx = 0
 
         for idx_2 in range(settings.BATCH_SIZE, len(input_data) + settings.BATCH_SIZE, settings.BATCH_SIZE):
-            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False))
+            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False)[0])
             idx = idx_2
 
         return tasks
@@ -181,10 +180,7 @@ def run_plugin_task(
 
     app.send_task("tasks.tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
 
-    if batch:
-        return [task]
-
-    return task
+    return [task]
 
 
 @app.task(bind=True)

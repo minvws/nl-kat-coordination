@@ -1,4 +1,3 @@
-import datetime
 from datetime import UTC, datetime
 
 import django_filters
@@ -92,7 +91,7 @@ class TaskForm(ModelForm):
             raise ValueError(f"Plugin not enabled for organization {organization.name}")
 
         # TODO: fix, ips, etc.
-        input_hostnames = set(str(model) for model in self.cleaned_data["input_hostnames"])
+        input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}
 
         if not input_hostnames and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")
@@ -102,7 +101,7 @@ class TaskForm(ModelForm):
             None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
             list(input_hostnames),
             batch=False,
-        )
+        )[0]
 
 
 class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
@@ -316,7 +315,6 @@ class ObjectSetDetailView(DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
-        now = datetime.datetime.now(UTC)
         obj = self.get_object()
 
         # TODO: handle...

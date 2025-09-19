@@ -41,10 +41,12 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]):
     )
 
     # Create a pl.LazyFrame out of the object list of IPAddresses
-    ip4s_lazy = pl.LazyFrame([ipaddr for ipaddr in ips if "." in ipaddr["address"]], schema=["id", "address"]).with_columns(intip4=ip.ipv4_to_numeric("address"))
-    ip6s_lazy = pl.LazyFrame([ipaddr for ipaddr in ips if ":" in ipaddr["address"]], schema=["id", "address"]).with_columns(
-        intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128)
-    )
+    ip4s_lazy = pl.LazyFrame(
+        [ipaddr for ipaddr in ips if "." in ipaddr["address"]], schema=["id", "address"]
+    ).with_columns(intip4=ip.ipv4_to_numeric("address"))
+    ip6s_lazy = pl.LazyFrame(
+        [ipaddr for ipaddr in ips if ":" in ipaddr["address"]], schema=["id", "address"]
+    ).with_columns(intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128))
     ip4s_lazy.collect()
     ip6s_lazy.collect()
 
