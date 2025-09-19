@@ -54,7 +54,7 @@
                             {% for schedule in schedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
-                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{% translate 'See Details' %}</a>
+                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{% translate "See Details" %}</a>
                                     </td>
                                     <td>
                                         <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
