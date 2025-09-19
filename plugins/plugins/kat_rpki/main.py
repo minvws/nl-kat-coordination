@@ -85,24 +85,20 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]):
     ip6s_without_rpki = ip6s_lazy.join(new_v6, on="address", how="left").filter(pl.col("prefix").is_null())
 
     for pk, address in ip4s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        ft = dict(object_type="KATFindingType", id="KAT-NO-RPKI")
-        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-        results.extend([ft, f])
+        f = dict(object_type="Finding", finding_type="KAT-NO-RPKI", ooi=pk)
+        results.append(f)
 
     for pk, address in ip6s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        ft = dict(object_type="KATFindingType", id="KAT-NO-RPKI")
-        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-        results.extend([ft, f])
+        f = dict(object_type="Finding", finding_type="KAT-NO-RPKI", ooi=pk)
+        results.append(f)
 
     for pk, address in bgp_rpki_v4.select(["id", "address"]).collect().iter_rows():
-        ft = dict(object_type="KATFindingType", id="KAT-INVALID-RPKI")
-        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-        results.extend([ft, f])
+        f = dict(object_type="Finding", finding_type="KAT-INVALID-RPKI", ooi=pk)
+        results.append(f)
 
     for pk, address in bgp_rpki_v6.select(["id", "address"]).collect().iter_rows():
-        ft = dict(object_type="KATFindingType", id="KAT-INVALID-RPKI")
-        f = dict(object_type="Finding", finding_type=f"KATFindingType|{ft['id']}", ooi=pk)
-        results.extend([ft, f])
+        f = dict(object_type="Finding", finding_type="KAT-INVALID-RPKI", ooi=pk)
+        results.append(f)
 
     return results
 
@@ -153,6 +149,6 @@ if __name__ == "__main__":
         get_all_objects_of_type(client, "IPAddress"),
     )
 
-    client.post("/objects/", json=oois)
+    client.post("/objects/findings/", json=oois)
 
     print(json.dumps(oois))

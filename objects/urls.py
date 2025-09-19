@@ -35,6 +35,7 @@ object_router.register(r"network", NetworkViewSet, basename="network")
 object_router.register(r"hostname", HostnameViewSet, basename="hostname")
 object_router.register(r"ipaddress", IPAddressViewSet, basename="ipaddress")
 object_router.register(r"ipport", IPPortViewSet, basename="ipport")
+
 object_router.register(r"dnsarecord", DNSARecordViewSet, basename="dnsarecord")
 object_router.register(r"dnsaaaarecord", DNSAAAARecordViewSet, basename="dnsaaaarecord")
 object_router.register(r"dnsptrrecord", DNSPTRRecordViewSet, basename="dnsptrrecord")
