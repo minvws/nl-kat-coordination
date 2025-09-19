@@ -384,12 +384,18 @@ def xtdb(request: pytest.FixtureRequest):
     for ooi in ooi_models:
         ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}"
 
-    flush = con.ops.sql_flush(no_style(), [ooi._meta.db_table for ooi in ooi_models])
-    con.ops.execute_sql_flush(flush)
+    style = no_style()
+    erase = [
+        "{} {} {};".format(
+            style.SQL_KEYWORD("ERASE"), style.SQL_KEYWORD("FROM"), style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table))
+        )
+        for ooi in ooi_models
+    ]
+    con.ops.execute_sql_flush(erase)
 
     yield
 
-    con.ops.execute_sql_flush(flush)
+    con.ops.execute_sql_flush(erase)
 
 
 def _set_suffix_to_test_databases_except_xtdb(suffix: str) -> None:
