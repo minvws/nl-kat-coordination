@@ -15,6 +15,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
+from objects.models import Hostname
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
@@ -72,7 +73,7 @@ class TaskDetailView(DetailView):
 
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
-    # input_data = forms.ModelMultipleChoiceField(Asset.objects.all(), required=False)  #TODO: fix
+    input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
 
     class Meta:
         model = Task
@@ -90,36 +91,16 @@ class TaskForm(ModelForm):
         if not plugin.enabled_for(organization):
             raise ValueError(f"Plugin not enabled for organization {organization.name}")
 
-        pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
-        input_data = set()
+        # TODO: fix, ips, etc.
+        input_hostnames = set(str(model) for model in self.cleaned_data["input_hostnames"])
 
-        if pks:
-            now = datetime.now(UTC)
-            # TODO: fix
-            # octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
-            # scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
-            #
-            # for profile in scan_profiles:
-            #     if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
-            #         continue
-            #
-            #     if profile.reference.class_type == Hostname:
-            #         input_data.add(profile.reference.tokenized.name)
-            #         continue
-            #
-            #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-            #         input_data.add(str(profile.reference.tokenized.address))
-            #         continue
-            #
-            #     input_data.add(str(profile.reference))
-
-        if not input_data and plugin.consumed_types():
+        if not input_hostnames and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")
 
         return run_plugin_task(
             plugin.plugin_id,
             None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
-            list(input_data),
+            list(input_hostnames),
             batch=False,
         )
 

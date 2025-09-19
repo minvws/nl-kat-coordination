@@ -8,6 +8,7 @@ from pathlib import Path
 import docker
 from django.conf import settings
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from docker.errors import ContainerError
 
 from files.models import File, TemporaryContent
@@ -169,9 +170,10 @@ class PluginRunner:
 
         plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
         plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="add_object"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="delete_object"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="view_object"))
+
+        content_types = ContentType.objects.filter(app_label="objects")
+        permissions = Permission.objects.filter(content_type__in=content_types)
+        plugin_user.user_permissions.add(*permissions)
 
         token = AuthToken(
             user=plugin_user,
