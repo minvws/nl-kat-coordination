@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 
 from objects.models import Hostname, IPAddress, Network
+from openkat.permissions import KATModelPermissionRequiredMixin
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
@@ -34,6 +35,13 @@ class NetworkDetailView(DetailView):
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
         return context
+
+
+class NetworkCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Network
+    template_name = "objects/generic_object_form.html"
+    fields = ["name"]
+    success_url = reverse_lazy("objects:network_list")
 
 
 class IPAddressListView(ListView):
@@ -65,6 +73,13 @@ class IPAddressDetailView(DetailView):
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
 
         return context
+
+
+class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = IPAddress
+    template_name = "objects/generic_object_form.html"
+    fields = ["network", "address"]
+    success_url = reverse_lazy("objects:ipaddress_list")
 
 
 class HostnameListView(ListView):
@@ -109,3 +124,10 @@ class HostnameDetailView(DetailView):
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
         return context
+
+
+class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Hostname
+    template_name = "objects/generic_object_form.html"
+    fields = ["network", "name"]
+    success_url = reverse_lazy("objects:hostname_list")

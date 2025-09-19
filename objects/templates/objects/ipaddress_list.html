@@ -13,6 +13,11 @@
                     <h1>{% translate "IP addresses" %}</h1>
                 </div>
             </div>
+            {% if perms.openkat.add_ipaddress %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "objects:add_ipaddress" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add IPAddress" %}</a>
+                </div>
+            {% endif %}
             <div>
                 <div class="horizontal-scroll sticky-column">
                     <table class="nowrap">

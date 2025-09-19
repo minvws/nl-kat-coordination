@@ -74,9 +74,7 @@
                                         {% endif %}
                                         {% if file.task_result.task.organization %}
                                             <td>
-                                                <a href="{% url "organization_crisis_room" file.task_result.task.organization.code %}">
-                                                    {{ file.task_result.task.organization.code }}
-                                                </a>
+                                                {{ file.task_result.task.organization.code }}
                                             </td>
                                         {% else %}
                                             <td>{% translate 'No Organization' %}</td>

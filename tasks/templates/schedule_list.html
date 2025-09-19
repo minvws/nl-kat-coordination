@@ -59,7 +59,7 @@
                                     </td>
                                     <td>
                                         {% if schedule.organization %}
-                                            <a href="{% url "organization_crisis_room" schedule.organization %}">{{ schedule.organization }}</a>
+                                            {{ schedule.organization }}
                                         {% else %}
                                             {% translate "All" %}
                                         {% endif %}

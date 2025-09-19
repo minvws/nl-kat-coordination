@@ -115,5 +115,3 @@ class DNSSRVRecordSerializer(serializers.ModelSerializer):
         model = DNSSRVRecord
         fields = "__all__"
         list_serializer_class = BulkCreateListSerializer
-
-

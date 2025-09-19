@@ -2,6 +2,7 @@ import json
 import os
 import re
 import sys
+from collections import defaultdict
 from os import getenv
 
 import dns
@@ -253,9 +254,14 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 if __name__ == "__main__":
     record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
     results = run(sys.argv[1], record_types)
+    results_grouped = defaultdict(list)
 
-    if results:
-        headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
+    for result in results:
+        results_grouped[result["object_type"].lower()].append(result)
+
+    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
+
+    for object_path, objects in results_grouped.items():
+        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/{object_path}', headers=headers, json=objects)
 
     print(json.dumps(results))

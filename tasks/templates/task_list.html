@@ -81,7 +81,7 @@
                                     </td>
                                     <td>
                                         {% if task.organization %}
-                                            <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
+                                            {{ task.organization }}
                                         {% else %}
                                             {% translate "No Organization" %}
                                         {% endif %}
