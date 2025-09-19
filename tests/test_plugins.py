@@ -215,6 +215,10 @@ def test_arguments():
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{hostname}"]).types_in_arguments() == [Hostname]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).types_in_arguments() == [Hostname]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).types_in_arguments() == [IPAddress]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress|hostname}"]).types_in_arguments() == [
+        IPAddress,
+        Hostname,
+    ]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).types_in_arguments() == [IPPort]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipport}"]).types_in_arguments() == [IPPort]
     assert set(Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipaddress}"]).types_in_arguments()) == {

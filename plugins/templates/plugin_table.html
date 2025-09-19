@@ -135,7 +135,7 @@
                     <td>
                         {% if plugin.enabled %}
                             {% if plugin.consumed_types %}
-                                <a href="{% url 'add_task' %}?plugin_id={{ plugin.id }}">
+                                <a href="{% url 'add_task' %}?plugin={{ plugin.id }}">
                                     <button type="submit">{% translate "Run" %}</button>
                                 </a>
                             {% elif not plugin.files_in_arguments %}

@@ -14,7 +14,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
-from objects.models import Hostname
+from objects.models import Hostname, IPAddress
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
@@ -73,6 +73,7 @@ class TaskDetailView(DetailView):
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
     input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
+    input_ips = forms.ModelMultipleChoiceField(IPAddress.objects.all(), required=False)
 
     class Meta:
         model = Task
@@ -92,14 +93,15 @@ class TaskForm(ModelForm):
 
         # TODO: fix, ips, etc.
         input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}
+        input_ips = {str(model) for model in self.cleaned_data["input_ips"]}
 
-        if not input_hostnames and plugin.consumed_types():
+        if not input_hostnames and not input_ips and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")
 
         return run_plugin_task(
             plugin.plugin_id,
             None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
-            list(input_hostnames),
+            list(input_hostnames) + list(input_ips),
             batch=False,
         )[0]
 
@@ -112,8 +114,8 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
     def get_initial(self):
         initial = super().get_initial()
 
-        if self.request.method == "GET" and "plugin_id" in self.request.GET:
-            initial["plugin_id"] = self.request.GET.get("plugin_id")
+        if self.request.method == "GET" and "plugin" in self.request.GET:
+            initial["plugin"] = self.request.GET.get("plugin")
 
         return initial
 

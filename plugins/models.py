@@ -92,11 +92,16 @@ class Plugin(models.Model):
 
     def types_in_arguments(self) -> list[type[Model]]:
         result = []
+        parsed_args = [
+            args.lstrip("{").rstrip("}").split("|")
+            for args in self.oci_arguments
+            if args.startswith("{") and args.endswith("}")
+        ]
+        flat_args = [x.lower() for args in parsed_args for x in args]
+
         for model in apps.get_app_config("objects").get_models():
-            for arg in self.oci_arguments:
-                if "{" + model.__name__.lower() + "}" in arg.lower():
-                    result.append(model)
-                    break
+            if model.__name__.lower() in flat_args:
+                result.append(model)
 
         return result
 
