@@ -1,4 +1,3 @@
-
 from objects.models import (
     DNSAAAARecord,
     DNSARecord,
@@ -10,6 +9,7 @@ from objects.models import (
     DNSSRVRecord,
     DNSTXTRecord,
     Hostname,
+    IPAddress,
     IPPort,
     Network,
 )
@@ -24,6 +24,7 @@ from objects.serializers import (
     DNSSRVRecordSerializer,
     DNSTXTRecordSerializer,
     HostnameSerializer,
+    IPAddressSerializer,
     IPPortSerializer,
     NetworkSerializer,
 )
@@ -38,6 +39,11 @@ class NetworkViewSet(ManyModelViewSet):
 class HostnameViewSet(ManyModelViewSet):
     serializer_class = HostnameSerializer
     queryset = Hostname.objects.all()
+
+
+class IPAddressViewSet(ManyModelViewSet):
+    serializer_class = IPAddressSerializer
+    queryset = IPAddress.objects.all()
 
 
 class IPPortViewSet(ManyModelViewSet):

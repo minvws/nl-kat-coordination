@@ -1,5 +1,5 @@
 import binascii
-import json
+import json as json_module
 import logging
 from datetime import UTC, datetime
 from os import urandom
@@ -20,11 +20,9 @@ from django_otp.middleware import OTPMiddleware
 from pytest_django.lazy_django import skip_if_no_django
 from rest_framework.test import APIClient
 
-from files.models import File, GenericContent
 from objects.models import Hostname, Network
 from openkat.management.commands.create_authtoken import create_auth_token
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
-from openkat.views.health import ServiceHealth
 from tasks.models import Task as TaskDB
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -39,10 +37,23 @@ def log_output():
     return structlog.testing.LogCapture()
 
 
+class JSONAPIClient(APIClient):
+    """ Add json argument to post """
+
+    def post(self, path, json: dict | None = None, data=None, format=None, content_type=None,
+             follow=False, **extra):
+        if json is not None and data is None and content_type is None:
+            return super().post(
+                path, json_module.dumps(json), format, "application/json", follow, **extra
+            )
+
+        return super().post(path, data, format, content_type, follow, **extra)
+
+
 @pytest.fixture
 def drf_client(superuser) -> APIClient:
     _, token = create_auth_token(superuser.email, "test_key")
-    client = APIClient()
+    client = JSONAPIClient()
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
 
     return client
@@ -320,33 +331,6 @@ def get_stub_path(file_name: str) -> Path:
 
 
 @pytest.fixture
-def health():
-    ServiceHealth(
-        service="openkat",
-        healthy=True,
-        version="0.0.1.dev1",
-        additional=None,
-        results=[
-            ServiceHealth(
-                service="xtdb",
-                healthy=True,
-                version="1.24.1",
-                additional={
-                    "version": "1.24.1",
-                    "revision": "1164f9a3c7e36edbc026867945765fd4366c1731",
-                    "indexVersion": 22,
-                    "consumerState": None,
-                    "kvStore": "xtdb.rocksdb.RocksKv",
-                    "estimateNumKeys": 24552,
-                    "size": 24053091,
-                },
-                results=[],
-            )
-        ],
-    )
-
-
-@pytest.fixture
 def drf_admin_client(create_drf_client, admin_user):
     client = create_drf_client(admin_user)
     # We need to set this so that the test client doesn't throw an
@@ -428,18 +412,6 @@ def django_db_modify_db_settings_xdist_suffix(request):
         # 'gw0' -> '1', 'gw1' -> '2', ...
         suffix = str(int(xdist_suffix.replace("gw", "")) + 1)
         _set_suffix_to_test_databases_except_xtdb(suffix=suffix)
-
-
-@pytest.fixture
-def raw_a(client_member, client_member_b, findings_report_bytes_data):
-    a, b = findings_report_bytes_data
-    return File.objects.create(file=GenericContent(json.dumps(a)))
-
-
-@pytest.fixture
-def raw_b(client_member, client_member_b, findings_report_bytes_data):
-    a, b = findings_report_bytes_data
-    return File.objects.create(file=GenericContent(json.dumps(b)))
 
 
 def get_dummy_data(filename: str) -> bytes:
