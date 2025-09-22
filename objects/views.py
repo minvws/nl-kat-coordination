@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import django_filters
 from django.conf import settings
-from django.db.models import QuerySet
+from django.db.models import Case, CharField, OuterRef, QuerySet, Subquery, When
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -38,35 +38,6 @@ class NetworkListView(FilterView):
         return context
 
 
-class FindingFilter(django_filters.FilterSet):
-    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
-
-    class Meta:
-        model = Finding
-        fields = ["finding_type__code"]
-
-
-class FindingListView(FilterView):
-    model = Finding
-    template_name = "objects/finding_list.html"
-    context_object_name = "findings"
-    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-    filterset_class = FindingFilter
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("objects:finding_list"), "text": _("Findings")}]
-
-        return context
-
-
-class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
-    model = Finding
-    template_name = "objects/generic_object_form.html"
-    fields = ["organization", "finding_type", "object_type", "object_id"]  # TODO: make easy
-    success_url = reverse_lazy("objects:finding_list")
-
-
 class NetworkDetailView(DetailView):
     model = Network
     template_name = "objects/network_detail.html"
@@ -92,6 +63,59 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
     def form_invalid(self, form):
         return redirect(reverse("objects:network_list"))
+
+
+class FindingFilter(django_filters.FilterSet):
+    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
+
+    class Meta:
+        model = Finding
+        fields = ["finding_type__code"]
+
+
+class FindingListView(FilterView):
+    model = Finding
+    template_name = "objects/finding_list.html"
+    context_object_name = "findings"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = FindingFilter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        ref = OuterRef("object_id")
+        qs = qs.annotate(
+            object=Case(
+                When(object_type="hostname", then=Subquery(Hostname.objects.filter(pk=ref).values("name"))),
+                When(object_type="ipaddress", then=Subquery(IPAddress.objects.filter(pk=ref).values("address"))),
+                When(object_type="network", then=Subquery(Network.objects.filter(pk=ref).values("name"))),
+                default=None,
+                output_field=CharField(),
+            )
+        )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:finding_list"), "text": _("Findings")}]
+
+        return context
+
+
+class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Finding
+    template_name = "objects/generic_object_form.html"
+    fields = ["organization", "finding_type", "object_type", "object_id"]  # TODO: make easy
+    success_url = reverse_lazy("objects:finding_list")
+
+
+class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Finding
+    success_url = reverse_lazy("objects:finding_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:finding_list"))
 
 
 class IPAddressFilter(django_filters.FilterSet):

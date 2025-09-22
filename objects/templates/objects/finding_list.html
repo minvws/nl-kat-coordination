@@ -42,7 +42,9 @@
                                 <tr>
                                     <td>{{ finding.organization }}</td>
                                     <td>{{ finding.finding_type.code }}</td>
-                                    <td>{{ finding.object_type }}({{ finding.object_id }})</td>
+                                    <td>
+                                        <a href="{% url "objects:"|add:finding.object_type|add:"_detail" pk=finding.object_id %}">{{ finding.object }}</a>
+                                    </td>
                                     <td>
                                         <form action="{% url 'objects:delete_finding' finding.pk %}" method="post">
                                             {% csrf_token %}
