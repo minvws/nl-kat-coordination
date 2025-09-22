@@ -80,7 +80,7 @@
       "-sS",
       "-oX",
       "-",
-      "{ipaddress|hostname}"
+      "{ipaddress}"
     ]
   },
   {
@@ -102,7 +102,7 @@
       "-sU",
       "-oX",
       "-",
-      "{ipaddress|hostname}"
+      "{ipaddress}"
     ]
   },
   {
