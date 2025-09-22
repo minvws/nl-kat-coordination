@@ -1,8 +1,8 @@
-from conftest import setup_request
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, Network
 from objects.views import NetworkListView
+from tests.conftest import setup_request
 
 
 def test_query_hostname(xtdb):

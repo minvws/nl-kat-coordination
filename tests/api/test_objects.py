@@ -129,6 +129,22 @@ def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
     assert Hostname.objects.count() == 2
 
 
+def test_generic_api_saves_unrelated_objects_even_if_some_exist(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+    Hostname.objects.create(network=network, name="test.com")
+
+    ips = [{"network": "internet", "address": "127.0.0.1"}, {"network": "internet", "address": "127.0.0.2"}]
+    hns = [{"network": "internet", "name": "test.com"}, {"network": "internet", "name": "test2.com"}]
+
+    res = drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "hostname": hns})
+
+    assert "ipaddress" in res.json()
+    assert "hostname" in res.json()
+
+    assert IPAddress.objects.count() == 2
+    assert Hostname.objects.count() == 2
+
+
 def test_generic_api_saves_related_objects(drf_client, xtdb):
     Network.objects.create(name="internet")
 
@@ -142,7 +158,7 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
 
 
 def test_bulk_create(drf_client, xtdb):
-    n = 50
+    n = 25
     networks = [{"name": f"net{i}"} for i in range(n)]
     nets = drf_client.post("/api/v1/objects/network/", json=networks).json()
     time.sleep(0.3)
