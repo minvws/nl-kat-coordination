@@ -5,6 +5,8 @@ import recurrence
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import OuterRef, Subquery
+from django.db.models.fields.json import KeyTextTransform
 from django.forms import ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -49,6 +51,12 @@ class TaskListView(FilterView):
 
         if "schedule_id" in self.request.GET:
             qs = qs.filter(new_schedule__id=self.request.GET["schedule_id"])
+
+        qs = qs.annotate(
+            plugin_name=Subquery(
+                Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
+            )
+        )
 
         return qs
 
