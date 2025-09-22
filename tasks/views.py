@@ -309,7 +309,7 @@ class ObjectSetListView(FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("object_list"), "text": _("Objects")}]
+        context["breadcrumbs"] = [{"url": reverse("object_set_list"), "text": _("Objects Sets")}]
 
         return context
 
@@ -321,7 +321,7 @@ class ObjectSetDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("object_list"), "text": _("Objects")},
+            {"url": reverse("object_set_list"), "text": _("Objects Sets")},
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
