@@ -18,11 +18,11 @@ class FileFilter(django_filters.FilterSet):
     type = django_filters.CharFilter(label="Type", lookup_expr="icontains")
     file = django_filters.CharFilter(label="Location", lookup_expr="icontains")
     organizations__name = django_filters.CharFilter(label="Organization", lookup_expr="icontains")
-    task_result__task__data = django_filters.CharFilter(label="Search Source", lookup_expr="icontains")
+    task_result__task__data = django_filters.CharFilter(label="Source", lookup_expr="icontains")
 
     class Meta:
         model = File
-        fields = ["type", "file", "organizations__name", "task_result__task__data"]
+        fields = ["file", "type", "task_result__task__data", "organizations__name"]
 
 
 class FileListView(FilterView):
