@@ -2,13 +2,18 @@ from django.urls import path
 from rest_framework import routers
 
 from objects.views import (
+    FindingCreateView,
+    FindingListView,
     HostnameCreateView,
+    HostnameDeleteView,
     HostnameDetailView,
     HostnameListView,
     IPAddressCreateView,
+    IPAddressDeleteView,
     IPAddressDetailView,
     IPAddressListView,
     NetworkCreateView,
+    NetworkDeleteView,
     NetworkDetailView,
     NetworkListView,
 )
@@ -54,13 +59,18 @@ object_router.register(r"dnssrvrecord", DNSSRVRecordViewSet, basename="dnssrvrec
 
 
 urlpatterns = [
+    path("objects/finding/", FindingListView.as_view(), name="finding_list"),
+    path("objects/finding/add", FindingCreateView.as_view(), name="add_finding"),
     path("objects/network/", NetworkListView.as_view(), name="network_list"),
     path("objects/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
     path("objects/network/add/", NetworkCreateView.as_view(), name="add_network"),
+    path("objects/network/<int:pk>/delete", NetworkDeleteView.as_view(), name="delete_network"),
     path("objects/ipaddress/", IPAddressListView.as_view(), name="ipaddress_list"),
     path("objects/ipaddress/<int:pk>/", IPAddressDetailView.as_view(), name="ipaddress_detail"),
     path("objects/ipaddress/add/", IPAddressCreateView.as_view(), name="add_ipaddress"),
+    path("objects/ipaddress/<int:pk>/delete", IPAddressDeleteView.as_view(), name="delete_ipaddress"),
     path("objects/hostname/", HostnameListView.as_view(), name="hostname_list"),
     path("objects/hostname/<int:pk>/", HostnameDetailView.as_view(), name="hostname_detail"),
     path("objects/hostname/add/", HostnameCreateView.as_view(), name="add_hostname"),
+    path("objects/hostname/<int:pk>/delete/", HostnameDeleteView.as_view(), name="delete_hostname"),
 ]

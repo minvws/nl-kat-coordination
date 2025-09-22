@@ -66,6 +66,11 @@
                             <a href="{{ index_url }}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "IPAddresses" %}</a>
                         </li>
+                        <li>
+                            {% url "objects:finding_list" as index_url %}
+                            <a href="{{ index_url }}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <div>

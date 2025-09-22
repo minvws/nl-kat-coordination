@@ -31,7 +31,8 @@
                     <table class="nowrap">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>{% translate "Name" %}</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -39,6 +40,12 @@
                                 <tr>
                                     <td>
                                         <a href="{% url 'objects:network_detail' network.pk %}">{{ network.name }}</a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_network' network.pk %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -10,12 +10,12 @@
         <section>
             <div class="fifty-fifty">
                 <div>
-                    <h1>{% translate "Hostnames" %}</h1>
+                    <h1>{% translate "Findings" %}</h1>
                 </div>
             </div>
-            {% if perms.openkat.add_hostname %}
+            {% if perms.openkat.add_finding %}
                 <div class="horizontal-view toolbar">
-                    <a class="button ghost" href="{% url "objects:add_hostname" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Hostname" %}</a>
+                    <a class="button ghost" href="{% url "objects:add_finding" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Finding" %}</a>
                 </div>
             {% endif %}
             <form class="inline layout-wide" method="get">
@@ -31,23 +31,20 @@
                     <table class="nowrap">
                         <thead>
                             <tr>
-                                <th>{% translate "Hostname" %}</th>
-                                <th>{% translate "Network" %}</th>
+                                <th>{% translate "Organization" %}</th>
+                                <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Object" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for hostname in hostnames %}
+                            {% for finding in findings %}
                                 <tr>
+                                    <td>{{ finding.organization }}</td>
+                                    <td>{{ finding.finding_type.code }}</td>
+                                    <td>{{ finding.object_type }}({{ finding.object_id }})</td>
                                     <td>
-                                        <a href="{% url 'objects:hostname_detail' hostname.pk %}">{{ hostname.name }}</a>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'objects:hostname_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_hostname' hostname.pk %}"
-                                              method="post">
+                                        <form action="{% url 'objects:delete_finding' finding.pk %}" method="post">
                                             {% csrf_token %}
                                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                                         </form>

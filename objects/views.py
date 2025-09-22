@@ -3,12 +3,13 @@ from typing import TYPE_CHECKING
 import django_filters
 from django.conf import settings
 from django.db.models import QuerySet
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DeleteView, DetailView
 from django_filters.views import FilterView
 
-from objects.models import Hostname, IPAddress, Network
+from objects.models import Finding, Hostname, IPAddress, Network
 from openkat.permissions import KATModelPermissionRequiredMixin
 
 if TYPE_CHECKING:
@@ -37,6 +38,35 @@ class NetworkListView(FilterView):
         return context
 
 
+class FindingFilter(django_filters.FilterSet):
+    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
+
+    class Meta:
+        model = Finding
+        fields = ["finding_type__code"]
+
+
+class FindingListView(FilterView):
+    model = Finding
+    template_name = "objects/finding_list.html"
+    context_object_name = "findings"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = FindingFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:finding_list"), "text": _("Findings")}]
+
+        return context
+
+
+class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Finding
+    template_name = "objects/generic_object_form.html"
+    fields = ["organization", "finding_type", "object_type", "object_id"]  # TODO: make easy
+    success_url = reverse_lazy("objects:finding_list")
+
+
 class NetworkDetailView(DetailView):
     model = Network
     template_name = "objects/network_detail.html"
@@ -56,11 +86,28 @@ class NetworkCreateView(KATModelPermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("objects:network_list")
 
 
+class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Network
+    success_url = reverse_lazy("objects:network_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:network_list"))
+
+
+class IPAddressFilter(django_filters.FilterSet):
+    address = django_filters.CharFilter(label="Address", lookup_expr="contains")
+
+    class Meta:
+        model = IPAddress
+        fields = ["address"]
+
+
 class IPAddressListView(FilterView):
     model = IPAddress
     template_name = "objects/ipaddress_list.html"
     context_object_name = "ipaddresses"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
         return IPAddress.objects.select_related("network")
@@ -94,11 +141,28 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("objects:ipaddress_list")
 
 
+class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = IPAddress
+    success_url = reverse_lazy("objects:ipaddress_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:ipaddress_list"))
+
+
+class HostnameFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
+
+    class Meta:
+        model = Hostname
+        fields = ["name"]
+
+
 class HostnameListView(FilterView):
     model = Hostname
     template_name = "objects/hostname_list.html"
     context_object_name = "hostnames"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
         return Hostname.objects.select_related("network")
@@ -136,6 +200,14 @@ class HostnameDetailView(DetailView):
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
         return context
+
+
+class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Hostname
+    success_url = reverse_lazy("objects:hostname_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:hostname_list"))
 
 
 class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):

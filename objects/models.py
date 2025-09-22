@@ -48,7 +48,7 @@ class FindingType(models.Model):
 
 
 class Finding(models.Model):
-    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True)
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
 
     # TODO
     object_type: models.ForeignKey = models.CharField()
