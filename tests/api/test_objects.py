@@ -18,10 +18,11 @@ def test_finding_api(drf_client, xtdb):
     }
 
     hn = Hostname.objects.create(network=net, name="test.com")
-    drf_client.post(
+    res = drf_client.post(
         "/api/v1/objects/finding/",
         json={"finding_type_code": "TEST", "object_type": "Hostname", "object_code": hn.name},
     )
+    assert res.status_code == 201
     assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 2
 
     res = drf_client.post(
@@ -40,7 +41,7 @@ def test_finding_api(drf_client, xtdb):
 
     assert res.status_code == 200
 
-    assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 5
+    assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 4
     assert drf_client.get("/api/v1/objects/findingtype/").json()["count"] == 3
     test2 = drf_client.get("/api/v1/objects/findingtype/?code=TEST2").json()
     assert test2["count"] == 1

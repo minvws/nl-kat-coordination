@@ -20,30 +20,12 @@ from objects.models import (
     Network,
     ScanLevel,
 )
-from tasks.serializers import BulkCreateListSerializer
 
 
 class FindingTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingType
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
-
-
-class FindingCreateListSerializer(serializers.ListSerializer):
-    def create(self, validated_data):
-        by_code = {}
-        for item in validated_data:
-            ft, created = FindingType.objects.get_or_create(code=item["finding_type_code"])
-            by_code[item["finding_type_code"]] = ft
-
-        bulk = []
-        for item in validated_data:
-            object_id = object_by_code(item.pop("object_code", None), item.pop("object_id", None), item["object_type"])
-            finding_type = by_code[item.pop("finding_type_code")]
-            bulk.append(Finding(finding_type=finding_type, object_id=object_id, **item))
-
-        return self.child.Meta.model.objects.bulk_create(bulk)
 
 
 def object_by_code(object_code: str | None, object_id: int | None, object_type: str):
@@ -73,42 +55,19 @@ class FindingSerializer(serializers.ModelSerializer):
             validated_data["object_type"],
         )
 
-        return Finding.objects.create(
-            finding_type=FindingType.objects.get(code=validated_data.pop("finding_type_code")),
-            object_id=object_id,
-            **validated_data,
-        )
+        ft, created = FindingType.objects.get_or_create(code=validated_data.pop("finding_type_code"))
+        f, created = Finding.objects.get_or_create(finding_type=ft, object_id=object_id, **validated_data)
+        return f
 
     class Meta:
         model = Finding
         fields = "__all__"
-        list_serializer_class = FindingCreateListSerializer
 
 
 class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Network
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
-
-
-class QueryRelatedNetworkListSerializer(serializers.ListSerializer):
-    def create(self, validated_data):
-        """Inspired by the standard create method"""
-
-        network_names = {item["network"] for item in validated_data}
-        networks = {}
-
-        for name in network_names:
-            net, created = Network.objects.get_or_create(name=name)
-            networks[net.name] = net
-
-        bulk = []
-        for item in validated_data:
-            network = item.pop("network")
-            bulk.append(self.child.Meta.model(network=networks[network], **item))
-
-        return self.child.Meta.model.objects.bulk_create(bulk)
 
 
 class HostnameSerializer(serializers.ModelSerializer):
@@ -128,14 +87,12 @@ class HostnameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hostname
         fields = "__all__"
-        list_serializer_class = QueryRelatedNetworkListSerializer
 
 
 class ScanLevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanLevel
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class IPAddressSerializer(serializers.ModelSerializer):
@@ -156,74 +113,63 @@ class IPAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = IPAddress
         fields = "__all__"
-        list_serializer_class = QueryRelatedNetworkListSerializer
 
 
 class IPPortSerializer(serializers.ModelSerializer):
     class Meta:
         model = IPPort
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSARecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSARecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSAAAARecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSAAAARecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSPTRRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSPTRRecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSCNAMERecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSCNAMERecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSMXRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSMXRecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSNSRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSNSRecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSCAARecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSCAARecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSTXTRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSTXTRecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
 
 
 class DNSSRVRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = DNSSRVRecord
         fields = "__all__"
-        list_serializer_class = BulkCreateListSerializer
