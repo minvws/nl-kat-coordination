@@ -40,6 +40,8 @@
                         <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
                     </p>
                 </div>
+                {% include "partials/list_paginator.html" %}
+
             </div>
         </section>
     </main>
