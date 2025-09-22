@@ -60,8 +60,8 @@
                                         <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:10 }}</a>
                                     </td>
                                     <td>
-                                        {% if task.data.plugin_id %}
-                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
+                                        {% if task.plugin_name %}
+                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
                                         {% else %}
                                             No Plugin
                                         {% endif %}

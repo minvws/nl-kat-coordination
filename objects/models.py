@@ -1,10 +1,16 @@
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.datastructures import CaseInsensitiveMapping
 
 from objects.enums import MAX_SCAN_LEVEL
 from openkat.models import LowerCaseCharField
+
+
+def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
+    return CaseInsensitiveMapping({model.__name__: model for model in apps.get_app_config("objects").get_models()})
 
 
 class Asset(models.Model):

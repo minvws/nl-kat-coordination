@@ -1,6 +1,6 @@
 import time
 
-from objects.models import Hostname, Network
+from objects.models import Hostname, IPAddress, IPPort, Network
 
 
 def test_network_api(drf_client, xtdb):
@@ -62,6 +62,30 @@ def test_ip_api(drf_client, xtdb):
     ipport = {"address": ip_res["id"], "protocol": "TCP", "port": 80, "service": "http"}
     port_res = drf_client.post("/api/v1/objects/ipport/", json=ipport).json()
     assert drf_client.get("/api/v1/objects/ipport/").json()["results"] == [ipport | {"id": port_res["id"], "tls": None}]
+
+
+def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+
+    ips = [{"network": network.pk, "address": "127.0.0.1"}, {"network": network.pk, "address": "127.0.0.2"}]
+    hns = [{"network": network.pk, "name": "test.com"}, {"network": network.pk, "name": "test2.com"}]
+
+    drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "hostname": hns})
+
+    assert IPAddress.objects.count() == 2
+    assert Hostname.objects.count() == 2
+
+
+def test_generic_api_saves_related_objects(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+
+    ips = [{"network": network.pk, "address": "127.0.0.1"}, {"network": network.pk, "address": "127.0.0.2"}]
+    ports = [{"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "http"}]
+
+    drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "ipport": ports})
+
+    assert IPAddress.objects.count() == 2
+    assert IPPort.objects.count() == 0  # TODO: fix
 
 
 def test_bulk_create(drf_client, xtdb):

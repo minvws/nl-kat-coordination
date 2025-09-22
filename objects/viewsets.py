@@ -1,3 +1,9 @@
+from http import HTTPStatus
+
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
+
 from objects.models import (
     DNSAAAARecord,
     DNSARecord,
@@ -28,7 +34,38 @@ from objects.serializers import (
     IPPortSerializer,
     NetworkSerializer,
 )
+from openkat.permissions import KATMultiModelPermissions
 from openkat.viewsets import ManyModelViewSet
+
+
+class ObjectViewSet(ViewSet):
+    permission_classes = (KATMultiModelPermissions,)
+    serializers = (
+        DNSAAAARecordSerializer,
+        DNSARecordSerializer,
+        DNSCAARecordSerializer,
+        DNSCNAMERecordSerializer,
+        DNSMXRecordSerializer,
+        DNSNSRecordSerializer,
+        DNSPTRRecordSerializer,
+        DNSSRVRecordSerializer,
+        DNSTXTRecordSerializer,
+        HostnameSerializer,
+        IPAddressSerializer,
+        IPPortSerializer,
+        NetworkSerializer,
+    )
+
+    def create(self, request: Request, *args, **kwargs):
+        serializers = {serializer.Meta.model.__name__.lower(): serializer for serializer in self.serializers}
+
+        for object_type, models in request.data.items():
+            serializer_class = serializers[object_type.lower()]
+            serializer = serializer_class(data=models, many=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        return Response(status=HTTPStatus.CREATED)
 
 
 class NetworkViewSet(ManyModelViewSet):

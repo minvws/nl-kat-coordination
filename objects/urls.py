@@ -26,11 +26,13 @@ from objects.viewsets import (
     IPAddressViewSet,
     IPPortViewSet,
     NetworkViewSet,
+    ObjectViewSet,
 )
 
 app_name = "objects"
 
 object_router = routers.SimpleRouter()
+object_router.register(r"", ObjectViewSet, basename="object")
 object_router.register(r"network", NetworkViewSet, basename="network")
 object_router.register(r"hostname", HostnameViewSet, basename="hostname")
 object_router.register(r"ipaddress", IPAddressViewSet, basename="ipaddress")

@@ -2,7 +2,6 @@ import datetime
 
 import recurrence
 import structlog
-from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
@@ -10,7 +9,7 @@ from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, Un
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
-from objects.models import Hostname, IPAddress
+from objects.models import Hostname, IPAddress, object_type_by_name
 from openkat.models import Organization, OrganizationMember
 from tasks.models import ObjectSet, Schedule
 
@@ -27,6 +26,11 @@ class ScanLevel(models.IntegerChoices):
 
 class PluginQuerySet(models.QuerySet):
     def with_enabled(self, organization: Organization | None = None):
+        """
+        We have the EnabledPlugin model that tells whether a plugin is enabled for an organization. If the
+        organization is None, the plugin is enabled for all organizations. However, the organization-specific case
+        should take precedence. That's why we treat globally enabled and "specifically" enabled as separate cases.
+        """
         global_subquery = EnabledPlugin.objects.filter(Q(organization=None), plugin=OuterRef("pk"))
         subquery = EnabledPlugin.objects.filter(Q(organization=organization), plugin=OuterRef("pk"))
 
@@ -37,9 +41,11 @@ class PluginQuerySet(models.QuerySet):
             specific_enabled_id=Subquery(subquery.values("pk")),
         ).annotate(
             enabled=Case(
-                When(specific_enabled__isnull=False, then=F("specific_enabled")),
-                When(global_enabled__isnull=False, then=F("global_enabled")),
-                default=False,
+                When(
+                    specific_enabled__isnull=False, then=F("specific_enabled")
+                ),  # Check if there is an org-specific setting
+                When(global_enabled__isnull=False, then=F("global_enabled")),  # Fall back on global configuration
+                default=False,  # Default to False
             ),
             enabled_id=Case(
                 When(specific_enabled_id__isnull=False, then=F("specific_enabled_id")),
@@ -99,8 +105,8 @@ class Plugin(models.Model):
         ]
         flat_args = [x.lower() for args in parsed_args for x in args]
 
-        for model in apps.get_app_config("objects").get_models():
-            if model.__name__.lower() in flat_args:
+        for model_name, model in object_type_by_name().items():
+            if model_name.lower() in flat_args:
                 result.append(model)
 
         return result
@@ -115,9 +121,9 @@ class Plugin(models.Model):
 
     def consumed_types(self) -> list[type[Model]]:
         result = self.types_in_arguments()
-        for model in apps.get_app_config("objects").get_models():
+        for model_name, model in object_type_by_name().items():
             for consume in self.consumes:
-                if consume.startswith("type:") and consume.lstrip("type:").lower() == model.__name__.lower():
+                if consume.startswith("type:") and consume.lstrip("type:").lower() == model_name.lower():
                     result.append(model)
                     break
 

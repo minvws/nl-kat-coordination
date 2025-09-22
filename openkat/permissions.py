@@ -2,6 +2,8 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import CreateView, DeleteView, UpdateView
 from rest_framework.permissions import DjangoModelPermissions
 
+from objects.models import object_type_by_name
+
 
 class KATModelPermissions(DjangoModelPermissions):
     # We change the permissions map to include the view permissions for
@@ -17,7 +19,26 @@ class KATModelPermissions(DjangoModelPermissions):
     }
 
 
+class KATMultiModelPermissions(KATModelPermissions):
+    def has_permission(self, request, view):
+        if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
+            return False
+
+        if getattr(view, "_ignore_model_permissions", False):
+            return True
+
+        perms = []
+        models = {key.lower(): model for key, model in object_type_by_name().items()}
+
+        for key in request.data:
+            perms.extend(self.get_required_permissions(request.method, models[key]))
+
+        return request.user.has_perms(perms)
+
+
 class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
+    """DRF-like behavior for regular views, inferred not by the HTTP method but by the view type."""
+
     perms_map = {
         CreateView.__name__: ["%(app_label)s.add_%(model_name)s"],
         UpdateView.__name__: ["%(app_label)s.change_%(model_name)s"],
