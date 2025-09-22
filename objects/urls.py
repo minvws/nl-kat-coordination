@@ -22,6 +22,8 @@ from objects.viewsets import (
     DNSPTRRecordViewSet,
     DNSSRVRecordViewSet,
     DNSTXTRecordViewSet,
+    FindingTypeViewSet,
+    FindingViewSet,
     HostnameViewSet,
     IPAddressViewSet,
     IPPortViewSet,
@@ -33,6 +35,8 @@ app_name = "objects"
 
 object_router = routers.SimpleRouter()
 object_router.register(r"", ObjectViewSet, basename="object")
+object_router.register(r"findingtype", FindingTypeViewSet, basename="findingtype")
+object_router.register(r"finding", FindingViewSet, basename="finding")
 object_router.register(r"network", NetworkViewSet, basename="network")
 object_router.register(r"hostname", HostnameViewSet, basename="hostname")
 object_router.register(r"ipaddress", IPAddressViewSet, basename="ipaddress")

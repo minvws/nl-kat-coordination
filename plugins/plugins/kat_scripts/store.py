@@ -6,46 +6,41 @@ import sys
 import httpx
 
 
-def findings() -> list[dict]:
+def findings(object_type: str) -> list[dict]:
     results = []
     for line in sys.stdin.readlines():
-        finding_type_id, ooi = line.strip().split("\t", maxsplit=1)
-
-        finding_type = {"object_type": "KATFindingType", "id": finding_type_id}
-        finding = {"object_type": "Finding", "ooi": ooi, "finding_type": f"KATFindingType|{finding_type['id']}"}
-
-        results.extend([finding_type, finding])
+        code, obj = line.strip().split("\t", maxsplit=1)
+        results.append({"finding_type_code": code, "object_code": obj.strip(), "object_type": object_type})
 
     return results
 
 
 def hostnames() -> list[dict]:
-    return [
-        {"object_type": "Hostname", "name": line.strip(), "network": "Network|internet"}
-        for line in sys.stdin.readlines()
-    ]
+    return [{"name": line.strip(), "network": "internet"} for line in sys.stdin.readlines()]
 
 
 if __name__ == "__main__":
     """ expects sys.stdin to have a newline separated list of finding_type_ids and ooi pks, separated by a tab """
     parser = argparse.ArgumentParser(description="Optional app description", add_help=False)
     parser.add_argument("-f", "--findings", action="store_true")
+    parser.add_argument("-t", "--object_type")
     parser.add_argument("-h", "--hostnames", action="store_true")
     args = parser.parse_args()
 
+    token = os.getenv("OPENKAT_TOKEN")
+
+    if not token:
+        raise Exception("No OPENKAT_TOKEN env variable")
+
+    headers = {"Authorization": "Token " + token}
+
     if args.findings:
-        results = findings()
+        results = findings(args.object_type)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/finding/", headers=headers, json=results)
     elif args.hostnames:
         results = hostnames()
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/hostname/", headers=headers, json=results)
     else:
         raise ValueError("No target type defined")
-
-    if os.getenv("UPLOAD_URL") != "/dev/null":
-        token = os.getenv("OPENKAT_TOKEN")
-        if not token:
-            raise Exception("No OPENKAT_TOKEN env variable")
-
-        headers = {"Authorization": "Token " + token}
-        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/", headers=headers, json=results)
 
     json.dump(results, sys.stdout)  # stores the result as a JSON file as well

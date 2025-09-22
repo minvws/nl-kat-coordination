@@ -14,6 +14,8 @@ from objects.models import (
     DNSPTRRecord,
     DNSSRVRecord,
     DNSTXTRecord,
+    Finding,
+    FindingType,
     Hostname,
     IPAddress,
     IPPort,
@@ -29,6 +31,8 @@ from objects.serializers import (
     DNSPTRRecordSerializer,
     DNSSRVRecordSerializer,
     DNSTXTRecordSerializer,
+    FindingSerializer,
+    FindingTypeSerializer,
     HostnameSerializer,
     IPAddressSerializer,
     IPPortSerializer,
@@ -68,6 +72,17 @@ class ObjectViewSet(ViewSet):
             response[object_type] = serializer.data
 
         return JsonResponse(status=HTTPStatus.CREATED, data=response)
+
+
+class FindingTypeViewSet(ManyModelViewSet):
+    serializer_class = FindingTypeSerializer
+    queryset = FindingType.objects.all()
+    filterset_fields = ("code",)
+
+
+class FindingViewSet(ManyModelViewSet):
+    serializer_class = FindingSerializer
+    queryset = Finding.objects.all()
 
 
 class NetworkViewSet(ManyModelViewSet):

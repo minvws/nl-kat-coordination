@@ -1,6 +1,50 @@
 import time
 
-from objects.models import Hostname, IPAddress, IPPort, Network
+from objects.models import Finding, FindingType, Hostname, IPAddress, IPPort, Network
+
+
+def test_finding_api(drf_client, xtdb):
+    ft = FindingType.objects.create(code="TEST", score=5)
+    net = Network.objects.create(name="internet")
+    f = Finding.objects.create(finding_type=ft, object_type="Network", object_id=net.id)
+
+    assert drf_client.get("/api/v1/objects/finding/").json() == {
+        "count": 1,
+        "next": None,
+        "previous": None,
+        "results": [
+            {"id": f.pk, "object_id": net.id, "object_type": "Network", "organization": None, "finding_type": ft.code}
+        ],
+    }
+
+    hn = Hostname.objects.create(network=net, name="test.com")
+    drf_client.post(
+        "/api/v1/objects/finding/",
+        json={"finding_type_code": "TEST", "object_type": "Hostname", "object_code": hn.name},
+    )
+    assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 2
+
+    res = drf_client.post(
+        "/api/v1/objects/finding/",
+        json=[
+            {"finding_type_code": "TEST", "object_type": "Network", "object_code": net.name},
+            {"finding_type_code": "TEST2", "object_type": "Network", "object_code": net.name},
+            {"finding_type_code": "TEST3", "object_type": "Network", "object_code": net.name},
+        ],
+    )
+    assert res.status_code == 201
+
+    res = drf_client.get("/api/v1/objects/findingtype/?code=TEST2")
+    test2_id = res.json()["results"][0]["id"]
+    res = drf_client.patch(f"/api/v1/objects/findingtype/{test2_id}/", json={"code": "TEST2", "score": 6.0})
+
+    assert res.status_code == 200
+
+    assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 5
+    assert drf_client.get("/api/v1/objects/findingtype/").json()["count"] == 3
+    test2 = drf_client.get("/api/v1/objects/findingtype/?code=TEST2").json()
+    assert test2["count"] == 1
+    assert test2["results"][0]["score"] == 6.0
 
 
 def test_network_api(drf_client, xtdb):
@@ -41,23 +85,28 @@ def test_hostname_api(drf_client, xtdb):
 
     hn = Hostname.objects.create(network=network, name="test.com")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network": network.pk}
+        {"id": hn.pk, "name": "test.com", "network_id": network.pk}
     ]
 
-    hostname = {"network": network.pk, "name": "test2.com"}
+    hostname = {"network": "internet", "name": "test2.com"}
     hn2 = drf_client.post("/api/v1/objects/hostname/", json=hostname).json()
     assert drf_client.get("/api/v1/objects/hostname/?ordering=name").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network": network.pk},
-        {"id": hn2["id"], "name": "test2.com", "network": network.pk},
+        {"id": hn.pk, "name": "test.com", "network_id": network.pk},
+        {"id": hn2["id"], "name": "test2.com", "network_id": network.pk},
     ]
+
+    response = drf_client.post("/api/v1/objects/hostname/", json={"name": "test.com"})
+    assert response.status_code == 400
 
 
 def test_ip_api(drf_client, xtdb):
-    network = Network.objects.create(name="internet")
+    net = Network.objects.create(name="internet")
 
-    ip = {"network": network.pk, "address": "127.0.0.1"}
+    ip = {"network": "internet", "address": "127.0.0.1"}
     ip_res = drf_client.post("/api/v1/objects/ipaddress/", json=ip).json()
-    assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [ip | {"id": ip_res["id"]}]
+    assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
+        {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1"}
+    ]
 
     ipport = {"address": ip_res["id"], "protocol": "TCP", "port": 80, "service": "http"}
     port_res = drf_client.post("/api/v1/objects/ipport/", json=ipport).json()
@@ -65,10 +114,10 @@ def test_ip_api(drf_client, xtdb):
 
 
 def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
-    network = Network.objects.create(name="internet")
+    Network.objects.create(name="internet")
 
-    ips = [{"network": network.pk, "address": "127.0.0.1"}, {"network": network.pk, "address": "127.0.0.2"}]
-    hns = [{"network": network.pk, "name": "test.com"}, {"network": network.pk, "name": "test2.com"}]
+    ips = [{"network": "internet", "address": "127.0.0.1"}, {"network": "internet", "address": "127.0.0.2"}]
+    hns = [{"network": "internet", "name": "test.com"}, {"network": "internet", "name": "test2.com"}]
 
     res = drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "hostname": hns})
 
@@ -80,9 +129,9 @@ def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
 
 
 def test_generic_api_saves_related_objects(drf_client, xtdb):
-    network = Network.objects.create(name="internet")
+    Network.objects.create(name="internet")
 
-    ips = [{"network": network.pk, "address": "127.0.0.1"}, {"network": network.pk, "address": "127.0.0.2"}]
+    ips = [{"network": "internet", "address": "127.0.0.1"}, {"network": "internet", "address": "127.0.0.2"}]
     ports = [{"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "http"}]
 
     drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "ipport": ports})
@@ -98,7 +147,7 @@ def test_bulk_create(drf_client, xtdb):
     time.sleep(0.3)
     assert drf_client.get("/api/v1/objects/network/").json()["count"] == n
 
-    hostnames = [{"name": f"host{i}.com", "network": nets[i % 10]["id"]} for i in range(2 * n)]
+    hostnames = [{"name": f"host{i}.com", "network": nets[i % 10]["name"]} for i in range(2 * n)]
     drf_client.post("/api/v1/objects/hostname/", json=hostnames).json()
     time.sleep(0.3)
     assert drf_client.get("/api/v1/objects/hostname/").json()["count"] == 2 * n

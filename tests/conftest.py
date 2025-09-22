@@ -46,11 +46,17 @@ class JSONAPIClient(APIClient):
 
         return super().post(path, data, format, content_type, follow, **extra)
 
+    def patch(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):  # noqa: A002
+        if json is not None and data is None and content_type is None:
+            return super().patch(path, json_module.dumps(json), format, "application/json", follow, **extra)
+
+        return super().patch(path, data, format, content_type, follow, **extra)
+
 
 @pytest.fixture
 def drf_client(superuser) -> APIClient:
     _, token = create_auth_token(superuser.email, "test_key")
-    client = JSONAPIClient()
+    client = JSONAPIClient(raise_request_exception=False)
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
 
     return client

@@ -38,8 +38,30 @@ class ScanLevel(models.Model):
         return str(self.id)
 
 
+class FindingType(models.Model):
+    code: models.CharField = models.CharField(unique=True)
+    score: models.CharField = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
+    description: models.CharField = models.CharField(null=True)
+
+    class Meta:
+        managed = False
+
+
+class Finding(models.Model):
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True)
+
+    # TODO
+    object_type: models.ForeignKey = models.CharField()
+    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+
+    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
+
+    class Meta:
+        managed = False
+
+
 class Network(Asset):
-    name: LowerCaseCharField = LowerCaseCharField()
+    name: LowerCaseCharField = LowerCaseCharField(unique=True)
 
     def __str__(self) -> str:
         return self.name
@@ -74,7 +96,7 @@ class IPPort(models.Model):
 
 class Hostname(Asset):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
-    name: LowerCaseCharField = LowerCaseCharField()
+    name: LowerCaseCharField = LowerCaseCharField(unique=True)
 
     def __str__(self) -> str:
         return self.name

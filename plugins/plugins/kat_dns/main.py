@@ -34,7 +34,7 @@ def get_record_types(arg: str) -> set[str]:
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
-def run(hostname: str, record_types: set[str], internet_id: int) -> list:
+def run(hostname: str, record_types: set[str]) -> list:
     resolver = dns.resolver.Resolver()
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
@@ -63,7 +63,7 @@ def run(hostname: str, record_types: set[str], internet_id: int) -> list:
     record_store = []
 
     def register_hostname(name: str) -> dict:
-        hostname = {"object_type": "Hostname", "network": internet_id, "name": name.rstrip(".")}
+        hostname = {"object_type": "Hostname", "network": "internet", "name": name.rstrip(".")}
         hostname_store[hostname["name"]] = hostname
         return hostname
 
@@ -83,12 +83,12 @@ def run(hostname: str, record_types: set[str], internet_id: int) -> list:
                 default_args = {"hostname": record_hostname["name"], "value": str(rr), "ttl": rrset.ttl}
 
                 if isinstance(rr, A):
-                    ipv4 = {"object_type": "IPAddress", "network": internet_id, "address": str(rr)}
+                    ipv4 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv4)
                     register_record({"object_type": "DNSARecord", "ip_address": ipv4["address"], **default_args})
 
                 if isinstance(rr, AAAA):
-                    ipv6 = {"object_type": "IPAddress", "network": internet_id, "address": str(rr)}
+                    ipv6 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv6)
                     register_record({"object_type": "DNSAAAARecord", "ip_address": ipv6["address"], **default_args})
 
@@ -185,16 +185,10 @@ if __name__ == "__main__":
 
     headers = {"Authorization": "Token " + token}
     client = httpx.Client(base_url=base_url, headers=headers)
-    response = client.get("/objects/network/", params={"name": "internet", "limit": 1}).json()
-
-    if not response["results"]:
-        internet = client.post("/objects/network/", json={"name": "internet"}).json()
-    else:
-        internet = response["results"][0]
-
     record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
-    results = run(sys.argv[1], record_types, internet["id"])
+    results = run(sys.argv[1], record_types)
     results_grouped = defaultdict(list)
+
     for result in results:
         results_grouped[result.pop("object_type").lower()].append(result)
 
