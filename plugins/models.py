@@ -222,7 +222,9 @@ class EnabledPlugin(models.Model):
 
         # This is possibly the first time enabling the plugin for the organization
         for object_type, query, name in queries:
-            object_set = ObjectSet.objects.create(name=name, object_type=object_type, object_query=query, dynamic=True)
+            object_set, created = ObjectSet.objects.get_or_create(
+                name=name, object_type=object_type, object_query=query, dynamic=True
+            )
             Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,

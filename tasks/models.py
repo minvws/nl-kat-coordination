@@ -49,7 +49,7 @@ class ObjectSet(models.Model):
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
-    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: fix?
+    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: fix?
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
     def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[str]:  # TODO: fix?

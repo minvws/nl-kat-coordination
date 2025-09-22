@@ -16,9 +16,9 @@
                     <p class="emphasized">
                         <strong>{{ objectset.object_query }}</strong>
                     </p>
-                    {% if preview_organization and preview %}
-                        <p class="emphasized">Preview for organization "{{ preview_organization.name }}":</p>
-                        {% for object in preview %}<strong>{{ object }}</strong>{% endfor %}
+                    {% if objects %}
+                        <p class="emphasized">Preview:</p>
+                        {% for object in objects %}<strong>{{ object }}</strong>{% endfor %}
                     {% endif %}
                     <p class="emphasized">Static Objects:</p>
                     {% if objectset.traverse_objects %}
