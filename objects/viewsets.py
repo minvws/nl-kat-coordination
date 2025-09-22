@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
+from django.http import JsonResponse
 from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from objects.models import (
@@ -58,14 +58,16 @@ class ObjectViewSet(ViewSet):
 
     def create(self, request: Request, *args, **kwargs):
         serializers = {serializer.Meta.model.__name__.lower(): serializer for serializer in self.serializers}
+        response = {}
 
         for object_type, models in request.data.items():
             serializer_class = serializers[object_type.lower()]
             serializer = serializer_class(data=models, many=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            response[object_type] = serializer.data
 
-        return Response(status=HTTPStatus.CREATED)
+        return JsonResponse(status=HTTPStatus.CREATED, data=response)
 
 
 class NetworkViewSet(ManyModelViewSet):

@@ -70,7 +70,10 @@ def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
     ips = [{"network": network.pk, "address": "127.0.0.1"}, {"network": network.pk, "address": "127.0.0.2"}]
     hns = [{"network": network.pk, "name": "test.com"}, {"network": network.pk, "name": "test2.com"}]
 
-    drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "hostname": hns})
+    res = drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "hostname": hns})
+
+    assert "ipaddress" in res.json()
+    assert "hostname" in res.json()
 
     assert IPAddress.objects.count() == 2
     assert Hostname.objects.count() == 2

@@ -198,11 +198,11 @@ if __name__ == "__main__":
     for result in results:
         results_grouped[result.pop("object_type").lower()].append(result)
 
-    hostnames = client.post("/objects/hostname/", headers=headers, json=results_grouped.pop("hostname")).json()
-    by_name = {h["name"]: h["id"] for h in hostnames}
+    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": results_grouped.pop("ipaddress")}
+    response = client.post("/objects/", headers=headers, json=hostnames_and_ips).json()
 
-    ips = client.post("/objects/ipaddress/", headers=headers, json=results_grouped.pop("ipaddress")).json()
-    by_address = {ip["address"]: ip["id"] for ip in ips}
+    by_name = {h["name"]: h["id"] for h in response["hostname"]}
+    by_address = {ip["address"]: ip["id"] for ip in response["ipaddress"]}
 
     for object_path, objects in results_grouped.items():
         for obj in objects:
@@ -218,6 +218,6 @@ if __name__ == "__main__":
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
-        res = client.post(f"/objects/{object_path}/", headers=headers, json=objects)
+    res = client.post("/objects/", headers=headers, json=results_grouped)
 
     print(json.dumps(results))  # noqa: T201

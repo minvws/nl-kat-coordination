@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import sys
-from collections import defaultdict
 
 import httpx
 from httpx import HTTPError
@@ -27,7 +26,6 @@ def get_ip_ports_and_service(host: NmapHost):
                 service_name = "https"
 
             ip_port = {
-                "object_type": "IPPort",
                 "address": host.address,
                 "protocol": protocol.upper(),
                 "port": port,
@@ -86,11 +84,9 @@ def run(file_id: str):
                 address = response["results"][0]
 
             by_address[address["address"]] = address["id"]
-            not_closed = [
-                ooi["port"] for ooi in new_ports if ooi["object_type"] == "IPPort" and ooi["state"] != "closed"
-            ]
+            not_closed = [ooi["port"] for ooi in new_ports if ooi["state"] != "closed"]
             idx = 0
-            batch_size = 200
+            batch_size = 250
 
             for idx_2 in range(batch_size, len(ports_scanned) + batch_size, batch_size):
                 params = {"port": ports_scanned[idx:idx_2], "address": address["id"]}
@@ -107,16 +103,11 @@ def run(file_id: str):
 
             results.extend(new_ports)
 
-    results_grouped = defaultdict(list)
-    for new_ports in results:
-        results_grouped[new_ports.pop("object_type").lower()].append(new_ports)
+    for port in results:
+        if "address" in port:
+            port["address"] = by_address[port["address"]]
 
-    for object_path, objects in results_grouped.items():
-        for obj in objects:
-            if "address" in obj:
-                obj["address"] = by_address[obj["address"]]
-
-        client.post(f"/objects/{object_path.lower()}/", json=objects)
+    client.post("/objects/ipport/", json=results)
 
     return results
 
