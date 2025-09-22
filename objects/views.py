@@ -1,9 +1,12 @@
 from typing import TYPE_CHECKING
 
+import django_filters
 from django.conf import settings
+from django.db.models import QuerySet
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView
+from django_filters.views import FilterView
 
 from objects.models import Hostname, IPAddress, Network
 from openkat.permissions import KATModelPermissionRequiredMixin
@@ -12,11 +15,20 @@ if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
 
-class NetworkListView(ListView):
+class NetworkFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
+
+    class Meta:
+        model = Network
+        fields = ["name"]
+
+
+class NetworkListView(FilterView):
     model = Network
     template_name = "objects/network_list.html"
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = NetworkFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,7 +56,7 @@ class NetworkCreateView(KATModelPermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("objects:network_list")
 
 
-class IPAddressListView(ListView):
+class IPAddressListView(FilterView):
     model = IPAddress
     template_name = "objects/ipaddress_list.html"
     context_object_name = "ipaddresses"
@@ -82,7 +94,7 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("objects:ipaddress_list")
 
 
-class HostnameListView(ListView):
+class HostnameListView(FilterView):
     model = Hostname
     template_name = "objects/hostname_list.html"
     context_object_name = "hostnames"

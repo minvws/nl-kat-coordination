@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -163,6 +164,8 @@ def test_enabling_plugin_creates_schedule():
 
     assert schedule.enabled
     assert schedule.object_set is not None
+    assert schedule.object_set.object_query == ""
+    assert schedule.object_set.object_type == ContentType.objects.get(model="hostname")
     assert len(schedule.object_set.traverse_objects()) == 0
 
 

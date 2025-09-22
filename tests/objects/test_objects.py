@@ -1,4 +1,8 @@
+from conftest import setup_request
+from pytest_django.asserts import assertContains, assertNotContains
+
 from objects.models import Hostname, Network
+from objects.views import NetworkListView
 
 
 def test_query_hostname(xtdb):
@@ -9,6 +13,26 @@ def test_query_hostname(xtdb):
     assert networks.count() == 1
     networks = Network.objects.filter(hostname__name="none.com")
     assert networks.count() == 0
+
+
+def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
+    Network.objects.create(name="internet")
+
+    request = setup_request(rf.get("objects:network_list", query_params={"name": "nter"}), superuser_member.user)
+    response = NetworkListView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "internet")
+    assertContains(response, "Networks")
+
+    request = setup_request(rf.get("objects:network_list"), superuser_member.user)
+    response = NetworkListView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "internet")
+
+    request = setup_request(rf.get("objects:network_list", query_params={"name": "no"}), superuser_member.user)
+    response = NetworkListView.as_view()(request)
+    assert response.status_code == 200
+    assertNotContains(response, "internet")
 
 
 def test_update_get_or_create(xtdb):

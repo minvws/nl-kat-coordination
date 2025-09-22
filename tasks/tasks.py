@@ -10,7 +10,6 @@ from django.db.models import Q
 from djangoql.queryset import apply_search
 
 from files.models import File
-from objects.models import object_type_by_name
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -79,7 +78,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     input_data: set[str] = set()
 
     if schedule.object_set.object_query is not None and schedule.object_set.dynamic is True:
-        model_qs = object_type_by_name()[schedule.object_set.object_type].objects.all()
+        model_qs = schedule.object_set.object_type.model_class().objects.all()
 
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
