@@ -125,35 +125,7 @@
                             <span class="icon ti-chevron-right"></span>
                         </a>
                     </td>
-                    {% comment %} <td class="nowrap actions sticky-cell">
-                        <button class="expando-button" data-icon-open-class="icon ti-chevron-down" data-icon-close-class="icon ti-chevron-up" data-close-label="{% translate "Close details" %}">
-                            {% translate "Open details" %}
-                        </button>
-                    </td> {% endcomment %}
                 </tr>
-                {% comment %} <tr class="expando-row">
-                    <td colspan="8">
-                        <div>
-                            <h5>{% translate "Plugin details" %}</h5>
-                            <p>
-                                {% blocktranslate trimmed %}
-                                    To view more details about this plugin or to edit, duplicate or delete the plugin,
-                                    go to the plugin detail page.
-                                {% endblocktranslate %}
-                                        </p>
-                                </div>
-                                {# TODO: Permissions #}
-                                <div class="button-container">
-                                    <a class="button"
-                                       href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
-                                        {% translate "View results" %}
-                                </a>
-                                <a class="button ghost" href="{% url "plugin_detail" pk=plugin.id %}">
-                                {% translate "Plugin details" %}<span class="icon ti-chevron-right"></span>
-                            </a>
-                        </div>
-                    </td>
-</tr> {% endcomment %}
 {% endfor %}
 </tbody>
 </table>
