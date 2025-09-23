@@ -22,9 +22,15 @@
                         </p>
                     </div>
                     <div>
+                        <h3>{% translate "Creation date" %}</h3>
+                        <p>
+                            {{ plugin.created_at }}
+                        </p>
+                    </div>
+                    <div>
                         <h3>{% translate "Arguments" %}</h3>
                         <ul>
-                            {% for argument in plugin.oci_arguments %}<li>{{ argument }}</li>{% endfor %}
+                            {% for argument in plugin.oci_arguments %}<li><code>{{ argument }}</code></li>{% endfor %}
                         </ul>
                     </div>
                     <div>

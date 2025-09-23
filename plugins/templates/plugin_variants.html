@@ -98,18 +98,13 @@
                                         <div>
                                         <h5>{% translate "Arguments" %}</h5>
                                             {% if variant.oci_arguments %}
-                                                <p>{% translate "The following arguments are used for this plugin variant:" %}</p>
-                                                <code>{{ variant.oci_arguments|join:" " }}</code>
+                                                <ul>
+                                                    {% for argument in variant.oci_arguments %}
+                                                        <li><code>{{ argument }}</code></li>
+                                                    {% endfor %}
+                                                </ul>
                                             {% else %}
                                                 <p>{% translate "There are no arguments used for this plugin variant." %}</p>
-                                            {% endif %}
-                                        </div>
-                                        <div>
-                                            <h5>{% translate "Scan interval" %}</h5>
-                                            {% if variant.created %}
-                                                <p>{{ variant.created }}</p>
-                                            {% else %}
-                                                <p>-</p>
                                             {% endif %}
                                         </div>
                                         <div class="button-container">
