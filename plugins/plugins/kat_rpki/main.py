@@ -87,19 +87,19 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]):
     ip6s_without_rpki = ip6s_lazy.join(new_v6, on="address", how="left").filter(pl.col("prefix").is_null())
 
     for pk, address in ip4s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        f = dict(object_type="Finding", finding_type="KAT-NO-RPKI", ooi=pk)
+        f = dict(finding_type_code="KAT-NO-RPKI", object_id=pk, object_type="ipaddress")
         results.append(f)
 
     for pk, address in ip6s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        f = dict(object_type="Finding", finding_type="KAT-NO-RPKI", ooi=pk)
+        f = dict(finding_type_code="KAT-NO-RPKI", object_id=pk, object_type="ipaddress")
         results.append(f)
 
     for pk, address in bgp_rpki_v4.select(["id", "address"]).collect().iter_rows():
-        f = dict(object_type="Finding", finding_type="KAT-INVALID-RPKI", ooi=pk)
+        f = dict(finding_type_code="KAT-INVALID-RPKI", object_id=pk, object_type="ipaddress")
         results.append(f)
 
     for pk, address in bgp_rpki_v6.select(["id", "address"]).collect().iter_rows():
-        f = dict(object_type="Finding", finding_type="KAT-INVALID-RPKI", ooi=pk)
+        f = dict(finding_type_code="KAT-INVALID-RPKI", object_id=pk, object_type="ipaddress")
         results.append(f)
 
     return results
