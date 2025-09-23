@@ -138,7 +138,6 @@ def test_admin_edits_redteamer(rf, admin_member, redteam_member, log_output):
     )
 
     redteam_member.refresh_from_db()
-    assert redteam_member.status == "active"
     assert redteam_member.trusted_clearance_level == 4
 
     # TODO: fix

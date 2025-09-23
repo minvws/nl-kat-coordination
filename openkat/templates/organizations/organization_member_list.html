@@ -55,7 +55,6 @@
                             <tr>
                                 <th>{% translate "E-mail" %}</th>
                                 <th>{% translate "Role" %}</th>
-                                <th>{% translate "Status" %}</th>
                                 <th>{% translate "Assigned clearance level" %}</th>
                                 <th>{% translate "Accepted clearance level" %}</th>
                                 <th>{% translate "Edit" %}</th>
@@ -78,17 +77,6 @@
                                                 {{ group.name|title }}
                                                 <br>
                                             {% endfor %}
-                                        </td>
-                                        <td class="nowrap">
-                                            {% if member.user.is_superuser %}
-                                                <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
-                                            {% else %}
-                                                {% if member.status == 'active' %}
-                                                    <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
-                                                {% elif member.status == 'new' %}
-                                                    <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
-                                                {% endif %}
-                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if member.trusted_clearance_level < 0 %}

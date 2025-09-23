@@ -105,13 +105,7 @@ def create_member(user, organization):
     Indemnification.objects.create(user=user, organization=organization)
 
     return OrganizationMember.objects.create(
-        user=user,
-        organization=organization,
-        status=OrganizationMember.STATUSES.ACTIVE,
-        blocked=False,
-        trusted_clearance_level=4,
-        acknowledged_clearance_level=4,
-        onboarded=False,
+        user=user, organization=organization, blocked=False, trusted_clearance_level=4, acknowledged_clearance_level=4
     )
 
 
@@ -269,19 +263,9 @@ def client_user_two_organizations(clientuser, organization, organization_b):
 
 
 @pytest.fixture
-def new_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
-    member = create_member(user, organization)
-    member.status = OrganizationMember.STATUSES.NEW
-    member.save()
-    return member
-
-
-@pytest.fixture
 def active_member(django_user_model, organization):
     user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
     member = create_member(user, organization)
-    member.status = OrganizationMember.STATUSES.ACTIVE
     member.save()
     return member
 
@@ -290,7 +274,6 @@ def active_member(django_user_model, organization):
 def blocked_member(django_user_model, organization):
     user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
-    member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
     member.save()
     return member

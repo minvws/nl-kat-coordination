@@ -34,11 +34,9 @@ def bulk_organizations(active_member, blocked_member):
                 OrganizationMember(
                     user=member.user,
                     organization=organization,
-                    status=OrganizationMember.STATUSES.ACTIVE,
                     blocked=False,
                     trusted_clearance_level=4,
                     acknowledged_clearance_level=4,
-                    onboarded=False,
                 )
             )
             indemnifications.append(Indemnification(user=member.user, organization=organization))
@@ -190,8 +188,6 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, admin_member.user.email)
     assertContains(response, "Role")
     assertContains(response, "Admin")
-    assertContains(response, "Status")
-    assertContains(response, admin_member.status)
 
     # We should not be showing information about the User to just any admin in an organization
     assertNotContains(response, "Added")
@@ -206,37 +202,12 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, "Blocked")
 
 
-def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
+def test_organization_filtered_member_list(rf, superuser_member, blocked_member):
     # Test with only filter option blocked status "blocked"
     request = setup_request(rf.get("organization_member_list", {"blocked": "blocked"}), superuser_member.user)
     response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
-    assertNotContains(response, new_member.user.full_name)
     assertNotContains(response, blocked_member.user.full_name)
-
-    # Test with only filter option status "new" checked
-    request2 = setup_request(rf.get("organization_member_list", {"status": "new"}), superuser_member.user)
-    response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
-
-    assertNotContains(response2, new_member.user.full_name)
-    assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, 'class="icon neutral"')
-    assertNotContains(response2, 'class="icon positive"')
-
-    # Test with every filter option checked (new, active, blocked and unblocked)
-    request3 = setup_request(
-        rf.get("organization_member_list", {"status": ["new", "active"], "blocked": ["blocked", "unblocked"]}),
-        superuser_member.user,
-    )
-    response3 = OrganizationMemberListView.as_view()(request3, organization_code=superuser_member.organization.code)
-
-    # We should not expose full names of users to just any admin in any organization
-    assertNotContains(response3, superuser_member.user.full_name)
-    assertNotContains(response3, new_member.user.full_name)
-    assertNotContains(response3, blocked_member.user.full_name)
-
-    assertContains(response3, 'class="icon neutral"')
-    assertContains(response3, 'class="icon positive"')
 
 
 def test_organization_does_not_exist(client, client_member):

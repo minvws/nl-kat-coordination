@@ -352,7 +352,4 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        self.organization_member.onboarded = True
-        self.organization_member.status = OrganizationMember.STATUSES.ACTIVE
-        self.organization_member.save()
         return redirect(reverse("plugin_list"))

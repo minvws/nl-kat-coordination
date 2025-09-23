@@ -32,9 +32,8 @@ class OrganizationMemberListView(
         qs = super().get_queryset()
         form = self.member_filter_form(self.request.GET)
         if form.is_valid():
-            current_status = form.cleaned_data.get("status")
             account_status = form.cleaned_data.get("blocked")
-            return qs.filter(organization=self.organization, status__in=current_status, blocked__in=account_status)
+            return qs.filter(organization=self.organization, blocked__in=account_status)
         return qs
 
     def post(self, request, *args, **kwargs):

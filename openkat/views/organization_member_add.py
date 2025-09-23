@@ -206,7 +206,6 @@ class MembersUploadView(
 
         member_kwargs = {
             "organization": self.organization,
-            "status": OrganizationMember.STATUSES.ACTIVE,
             "trusted_clearance_level": trusted_clearance,
             "acknowledged_clearance_level": acknowledged_clearance,
         }

@@ -96,7 +96,6 @@ class OrganizationView(ContextMixin, View):
             self.organization_member = OrganizationMember(
                 user=self.request.user,
                 organization=self.organization,
-                status=OrganizationMember.STATUSES.ACTIVE,
                 trusted_clearance_level=clearance_level,
                 acknowledged_clearance_level=clearance_level,
             )

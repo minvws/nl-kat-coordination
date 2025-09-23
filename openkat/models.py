@@ -139,19 +139,10 @@ class Organization(models.Model):
 
 
 class OrganizationMember(models.Model):
-    # New is the status after an e-mail invite has been created for a member but the invite hasn't been accepted yet.
-    # Active is when the member has accepted the invited or the account was created directly without an invite.
-    # Blocked is when an organization admin has blocked the member.
-    class STATUSES(models.TextChoices):
-        ACTIVE = "active", _("active")
-        NEW = "new", _("new")
-
     user = models.ForeignKey("User", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     groups = models.ManyToManyField(Group, blank=True)
-    status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
     blocked = models.BooleanField(default=False)
-    onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
@@ -275,6 +266,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_("The clearance level of the user for all organizations."),
         validators=[MinValueValidator(-1), MaxValueValidator(MAX_SCAN_LEVEL)],
     )
+    onboarded = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]
