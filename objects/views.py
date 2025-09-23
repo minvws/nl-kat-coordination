@@ -86,9 +86,17 @@ class FindingListView(FilterView):
         ref = OuterRef("object_id")
         qs = qs.annotate(
             object=Case(
-                When(object_type="hostname", then=Subquery(Hostname.objects.filter(pk=ref).values("name"))),
-                When(object_type="ipaddress", then=Subquery(IPAddress.objects.filter(pk=ref).values("address"))),
-                When(object_type="network", then=Subquery(Network.objects.filter(pk=ref).values("name"))),
+                When(
+                    object_type__in=["hostname", "Hostname"],
+                    then=Subquery(Hostname.objects.filter(pk=ref).values("name")),
+                ),
+                When(
+                    object_type__in=["ipaddress", "IPAddress"],
+                    then=Subquery(IPAddress.objects.filter(pk=ref).values("address")),
+                ),
+                When(
+                    object_type__in=["network", "Network"], then=Subquery(Network.objects.filter(pk=ref).values("name"))
+                ),
                 default=None,
                 output_field=CharField(),
             )

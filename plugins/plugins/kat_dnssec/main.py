@@ -31,25 +31,13 @@ def run(file_id: str):
 
     # [S] self sig OK; [B] bogus; [T] trusted; [U] unsigned
     if result_line.startswith("[U]"):
-        finding_type = {"object_type": "KATFindingType", "id": "KAT-NO-DNSSEC"}
-        finding = {
-            "object_type": "Finding",
-            "ooi": f"Hostname|internet|{domain}",
-            "finding_type": f"KATFindingType|{finding_type['id']}",
-            "description": f"Domain {domain} is not signed with DNSSEC.",
-        }
-        results.extend([finding_type, finding])
+        finding = {"object_type": "Hostname", "object_code": domain, "finding_type_code": "KAT-NO-DNSSEC"}
+        results.append(finding)
     elif result_line.startswith("[S]") or result_line.startswith("[B]"):
-        finding_type = {"object_type": "KATFindingType", "id": "KAT-INVALID-DNSSEC"}
-        finding = {
-            "object_type": "Finding",
-            "ooi": f"Hostname|internet|{domain}",
-            "finding_type": f"KATFindingType|{finding_type['id']}",
-            "description": f"Domain {domain} is signed with an invalid DNSSEC.",
-        }
-        results.extend([finding_type, finding])
+        finding = {"object_type": "Hostname", "object_code": domain, "finding_type_code": "KAT-INVALID-DNSSEC"}
+        results.append(finding)
 
-    client.post("/objects/", json=results)
+    client.post("/objects/finding/", json=results)
 
     return results
 
