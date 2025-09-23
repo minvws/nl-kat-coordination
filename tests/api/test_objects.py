@@ -1,6 +1,18 @@
 import time
+from collections import defaultdict
 
-from objects.models import Finding, FindingType, Hostname, IPAddress, IPPort, Network
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
+    DNSNSRecord,
+    Finding,
+    FindingType,
+    Hostname,
+    IPAddress,
+    IPPort,
+    Network,
+)
 
 
 def test_finding_api(drf_client, xtdb):
@@ -168,3 +180,61 @@ def test_bulk_create(drf_client, xtdb):
     drf_client.post("/api/v1/objects/hostname/", json=hostnames).json()
     time.sleep(0.3)
     assert drf_client.get("/api/v1/objects/hostname/").json()["count"] == 2 * n
+
+
+def test_dns_records_are_not_duplicated(drf_client, xtdb):
+    results_grouped = defaultdict(list)
+    results = [
+        {"object_type": "ipaddress", "network": "internet", "address": "127.0.0.1"},
+        {"object_type": "hostname", "network": "internet", "name": "b.nl"},
+        {"object_type": "hostname", "network": "internet", "name": "ns3.a.ns"},
+        {"object_type": "hostname", "network": "internet", "name": "ns1.a.ns"},
+        {"object_type": "hostname", "network": "internet", "name": "ns2.a.ns"},
+        {"object_type": "DNSNSRecord", "name_server": "ns3.a.ns", "hostname": "b.nl", "value": "ns3.a.ns.", "ttl": 1},
+        {"object_type": "DNSNSRecord", "name_server": "ns1.a.ns", "hostname": "b.nl", "value": "ns1.a.ns.", "ttl": 1},
+        {"object_type": "DNSNSRecord", "name_server": "ns2.a.ns", "hostname": "b.nl", "value": "ns2.a.ns.", "ttl": 1},
+        {"object_type": "DNSARecord", "ip_address": "127.0.0.1", "hostname": "b.nl", "value": "127.0.0.1", "ttl": 1},
+    ]
+
+    for result in results:
+        results_grouped[result.pop("object_type").lower()].append(result)
+
+    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": results_grouped.pop("ipaddress")}
+    response = drf_client.post("/api/v1/objects/", json=hostnames_and_ips).json()
+    by_name = {h["name"]: h["id"] for h in response["hostname"]}
+    by_address = {ip["address"]: ip["id"] for ip in response["ipaddress"]}
+
+    for object_path, objects in results_grouped.items():
+        for obj in objects:
+            if "hostname" in obj:
+                obj["hostname"] = by_name[obj["hostname"]]
+            if "mail_server" in obj:
+                obj["mail_server"] = by_name[obj["mail_server"]]
+            if "name_server" in obj:
+                obj["name_server"] = by_name[obj["name_server"]]
+            if "target" in obj:
+                obj["target"] = by_name[obj["target"]]
+
+            if "ip_address" in obj:
+                obj["ip_address"] = by_address[obj["ip_address"]]
+
+    drf_client.post("/api/v1/objects/", json=results_grouped)
+    time.sleep(0.1)
+
+    assert IPAddress.objects.count() == 1
+    assert Hostname.objects.count() == 4
+    assert DNSARecord.objects.count() == 1
+    assert DNSAAAARecord.objects.count() == 0
+    assert DNSNSRecord.objects.count() == 3
+    assert DNSCNAMERecord.objects.count() == 0
+
+    drf_client.post("/api/v1/objects/", json=hostnames_and_ips).json()
+    drf_client.post("/api/v1/objects/", json=results_grouped)
+    time.sleep(0.1)
+
+    assert IPAddress.objects.count() == 1
+    assert Hostname.objects.count() == 4
+    assert DNSARecord.objects.count() == 1
+    assert DNSAAAARecord.objects.count() == 0
+    assert DNSNSRecord.objects.count() == 3
+    assert DNSCNAMERecord.objects.count() == 0

@@ -22,6 +22,13 @@ from objects.models import (
 )
 
 
+class GetOrCreateSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        obj, created = self.Meta.model.objects.get_or_create(**validated_data)
+
+        return obj
+
+
 class FindingTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingType
@@ -115,61 +122,61 @@ class IPAddressSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class IPPortSerializer(serializers.ModelSerializer):
+class IPPortSerializer(GetOrCreateSerializer):
     class Meta:
         model = IPPort
         fields = "__all__"
 
 
-class DNSARecordSerializer(serializers.ModelSerializer):
+class DNSARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSARecord
         fields = "__all__"
 
 
-class DNSAAAARecordSerializer(serializers.ModelSerializer):
+class DNSAAAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSAAAARecord
         fields = "__all__"
 
 
-class DNSPTRRecordSerializer(serializers.ModelSerializer):
+class DNSPTRRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSPTRRecord
         fields = "__all__"
 
 
-class DNSCNAMERecordSerializer(serializers.ModelSerializer):
+class DNSCNAMERecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCNAMERecord
         fields = "__all__"
 
 
-class DNSMXRecordSerializer(serializers.ModelSerializer):
+class DNSMXRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSMXRecord
         fields = "__all__"
 
 
-class DNSNSRecordSerializer(serializers.ModelSerializer):
+class DNSNSRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSNSRecord
         fields = "__all__"
 
 
-class DNSCAARecordSerializer(serializers.ModelSerializer):
+class DNSCAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCAARecord
         fields = "__all__"
 
 
-class DNSTXTRecordSerializer(serializers.ModelSerializer):
+class DNSTXTRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSTXTRecord
         fields = "__all__"
 
 
-class DNSSRVRecordSerializer(serializers.ModelSerializer):
+class DNSSRVRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSSRVRecord
         fields = "__all__"

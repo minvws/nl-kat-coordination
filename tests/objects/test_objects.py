@@ -1,3 +1,5 @@
+import time
+
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, Network
@@ -8,6 +10,7 @@ from tests.conftest import setup_request
 def test_query_hostname(xtdb):
     network = Network.objects.create(name="internet")
     Hostname.objects.create(network=network, name="test.com")
+    time.sleep(0.1)
 
     networks = Network.objects.filter(hostname__name="test.com")
     assert networks.count() == 1
