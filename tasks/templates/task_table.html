@@ -2,23 +2,25 @@
 {% load static %}
 {% load ooi_extra %}
 
+<div class="filter-container">
+    <form class="inline layout-wide" method="get">
+        {{ filter.form.as_p }}
+        <button type="submit">{% translate "Apply" %}</button>
+    </form>
+</div>
 {% if not task_list %}
     <div>
-        <p>{% translate "There are no tasks." %}</p>
+        <p>{% translate "No tasks have been found." %}</p>
     </div>
 {% else %}
-    <div class="filter-container">
-        <form class="inline layout-wide" method="get">
-            {{ filter.form.as_p }}
-            <button type="submit">{% translate "Apply" %}</button>
-        </form>
-    </div>
     <div class="horizontal-scroll sticky-column">
         <table rf-selector="table-scan-history" class="nowrap">
             <thead>
                 <tr>
                     <th scope="col">{% translate "ID" %}</th>
-                    <th scope="col">{% translate "Plugin" %}</th>
+                    {% if not plugin %}
+                        <th scope="col">{% translate "Plugin" %}</th>
+                    {% endif %}
                     <th scope="col">{% translate "Status" %}</th>
                     <th scope="col">{% translate "Completion date" %}</th>
                     <th scope="col">{% translate "Organization" %}</th>
@@ -32,13 +34,15 @@
                         <td>
                             <a href="{% url "task_detail" pk=task.id %}">{{ task.id }}</a>
                         </td>
-                        <td>
-                            {% if task.data.plugin_id %}
-                                <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
+                        {% if not plugin %}
+                            <td>
+                                {% if task.plugin_name %}
+                                    <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        {% endif %}
                         <td>
                             <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
                         </td>

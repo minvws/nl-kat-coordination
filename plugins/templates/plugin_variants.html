@@ -31,120 +31,106 @@
                     {% endif %}
                 </div>
             </div>
+            <div class="filter-container">
+                <form class="inline layout-wide" method="get">
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
+                </form>
+            </div>
             {% if variants %}
                 <div class="horizontal-scroll">
-                    <ul class="accordion">
-                        <li>
-                            <button id="definition-asset" aria-expanded="true">All variants</button>
-                            <div aria-labelledby="definition-asset">
-                                <table>
-                                    <caption class="visually-hidden">{% translate "Overview of variants" %}</caption>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">{% translate "Name" %}</th>
-                                            <th scope="col">{% translate "Scan level" %}</th>
-                                            <th scope="col">{% translate "Status" %}</th>
-                                            <th scope="col">{% translate "Age" %}</th>
-                                            <th scope="col">{% translate "Scan interval" %}</th>
-                                            <th scope="col">{% translate "Run on" %}</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for variant in variants %}
-                                            <tr>
-                                                <td>
-                                                    <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=variant.id %}">
-                                                        {% if variant.id == plugin.id %}
-                                                            {{ variant.name }} ({% translate "current" %})
-                                                        {% else %}
-                                                            {{ variant.name }}
-                                                        {% endif %}
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "Overview of variants" %}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">{% translate "Name" %}</th>
+                                <th scope="col">{% translate "Scan level" %}</th>
+                                <th scope="col">{% translate "Status" %}</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for variant in variants %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url "plugin_detail" pk=variant.id %}">
+                                            {% if variant.id == plugin.id %}
+                                                <strong>{{ variant.name }} ({% translate "current" %})</strong>
+                                            {% else %}
+                                                {{ variant.name }}
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% include "partials/scan_level_indicator.html" with value=variant.scan_level %}
 
-                                                </td>
-                                                <td>
-                                                    {% if variant.enabled %}
-                                                        <span class="label tags-color-2-medium">{% translate "Enabled" %}</span>
-                                                    {% else %}
-                                                        <span class="label tags-color-4-medium">{% translate "Disabled" %}</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <span title="{{ variant.created }} UTC">{{ variant.created }}</span>
-                                                </td>
-                                                <td>
-                                                    <span title="{{ variant.interval }}">
-                                                        {% if variant.interval %}
-                                                            {{ variant.interval }} {% translate "minutes" %}
-                                                        {% elif variant.run_on %}
-                                                            -
-                                                        {% else %}
-                                                            {% translate "Default system scan frequency" %}
-                                                        {% endif %}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span title="{{ variant.run_on }}">
-                                                        {% if variant.run_on %}
-                                                            {{ variant.run_on|join:", "|capfirst }}
-                                                        {% else %}
-                                                            -
-                                                        {% endif %}
-                                                    </span>
-                                                </td>
-                                                <td class="actions">
-                                                    <button class="expando-button"
-                                                            data-icon-open-class="icon ti-chevron-down"
-                                                            data-icon-close-class="icon ti-chevron-up"
-                                                            data-close-label="{% translate "Close details" %}">
-                                                        {% translate "Open details" %}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr class="expando-row">
-                                                <td colspan="5">
-                                                    <h5>{% translate "Boefje ID" %}</h5>
-                                                    <p>{{ variant.id }}</p>
-                                                    <h5>{% translate "Creation date" %}</h5>
-                                                    {% if variant.created %}
-                                                        <p>{{ variant.created }}</p>
-                                                    {% else %}
-                                                        <p>-</p>
-                                                    {% endif %}
-                                                    <h5>{% translate "Arguments" %}</h5>
-                                                    {% if variant.oci_arguments %}
-                                                        <p>{% translate "The following arguments are used for this Boefje variant:" %}</p>
-                                                        <p class="explanation" aria-label="{% translate "explanation" %}">{{ variant.oci_arguments|join:" " }}</p>
-                                                    {% else %}
-                                                        <p>{% translate "There are no arguments used for this Boefje variant." %}</p>
-                                                    {% endif %}
-                                                    {% if perms.tools.can_add_boefje %}
-                                                        <div class="horizontal-view toolbar">
-                                                            <a class="button ghost"
-                                                               href="{% url "edit_boefje" plugin_id=variant.id organization_code=organization.code %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit variant" %}</a>
-                                                        </div>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </li>
-                    </ul>
+                                    </td>
+                                    <td>
+                                        {% if variant.enabled %}
+                                            <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                                        {% else %}
+                                            <span class="label system-tag color-3">{% translate "Disabled" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="actions">
+                                        <button class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="expando-row">
+                                    <td colspan="5">
+                                        <div>
+                                            <h5>{% translate "Container image" %}</h5>
+                                            <p>{{ variant.oci_image }}</p>
+                                        </div>
+                                        <div>
+                                            <h5>{% translate "Creation date" %}</h5>
+                                            {% if variant.created_at %}
+                                                <p>{{ variant.created_at }}</p>
+                                            {% else %}
+                                                <p>-</p>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                        <h5>{% translate "Arguments" %}</h5>
+                                            {% if variant.oci_arguments %}
+                                                <p>{% translate "The following arguments are used for this plugin variant:" %}</p>
+                                                <code>{{ variant.oci_arguments|join:" " }}</code>
+                                            {% else %}
+                                                <p>{% translate "There are no arguments used for this plugin variant." %}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h5>{% translate "Scan interval" %}</h5>
+                                            {% if variant.created %}
+                                                <p>{{ variant.created }}</p>
+                                            {% else %}
+                                                <p>-</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="button-container">
+                                                {% if perms.tools.can_add_boefje %}
+                                                    <a class="button ghost"
+                                                    href="{% url "update_plugin" pk=variant.id %}"><span aria-hidden="true" class="icon ti-edit action-button"></span>{% translate "Edit plugin" %}</a>
+                                                {% endif %}
+                                                {% if perms.openkat.can_delete_boefje %}
+                                                    <a class="button ghost destructive" href="{% url "delete_plugin" plugin.id %}">
+                                                        {% translate "Delete plugin" %}
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             {% else %}
-                <p class="explanation" aria-label="{% translate "explanation" %}">
-                    <span>{% translate "This Boefje has no variants yet." %}</span>
-                    {% blocktranslate trimmed %}
-                        You can make a variant and change the arguments and JSON Schema
-                        to customize it to fit your needs.
-                    {% endblocktranslate %}
-                </p>
+                <p>{% translate "No variants for this have been found." %}</p>
             {% endif %}
         </section>
     </main>

@@ -12,12 +12,15 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+from django.db.models import OuterRef, Subquery
+from django.db.models.fields.json import KeyTextTransform
 
 from katalogus.worker.repository import get_local_repository
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
 from tasks.models import Task, TaskStatus
+from tasks.views import TaskFilter
 
 
 class PluginFilter(django_filters.FilterSet):
@@ -33,6 +36,17 @@ class PluginFilter(django_filters.FilterSet):
     class Meta:
         model = Plugin
         fields = ["name", "oci_image", "scan_level", "enabled"]
+  
+        
+class PluginVariantFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(
+        label="Name", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
+    )
+    scan_level = django_filters.ChoiceFilter(label="Scan level", choices=ScanLevel.choices)
+
+    class Meta:
+        model = Plugin
+        fields = ["name", "scan_level"]
 
 
 class PluginListView(FilterView):
@@ -101,11 +115,41 @@ class PluginIdDetailView(PluginDetailView):
 
 class PluginScansDetailView(PluginDetailView):
     template_name = "plugin_scans.html"
+    filterset_class = TaskFilter
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    
+    def get_tasks(self):
+        return Task.objects.filter(data__plugin_id=self.get_object().plugin_id)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filterset = self.filterset_class(self.request.GET, queryset=self.get_tasks())
+        context["filter"] = filterset
+        context["task_list"] = filterset.qs.order_by("-ended_at")
+        return context
 
 
 class PluginVariantsDetailView(PluginDetailView):
     template_name = "plugin_variants.html"
-    model = Plugin
+    filterset_class = PluginVariantFilter
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    
+    def get_variants(self):
+        return Plugin.objects.filter(oci_image=self.get_object().oci_image)
+    
+    def filter_variants(self, filterset):
+        variants = filterset.qs.filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True)).annotate(
+                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
+            ).order_by("name")
+        return variants
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filterset = self.filterset_class(self.request.GET, queryset=self.get_variants())
+        context["filter"] = filterset
+        context["variants"] = self.filter_variants(filterset)
+        return context
+    
 
 
 class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
