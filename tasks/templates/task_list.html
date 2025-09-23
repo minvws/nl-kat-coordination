@@ -57,7 +57,7 @@
                             {% for task in task_list %}
                                 <tr data-task-id="{{ task.id }}">
                                     <td>
-                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:10 }}</a>
+                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:8 }}</a>
                                     </td>
                                     <td>
                                         {% if task.plugin_name %}
@@ -71,7 +71,7 @@
                                             {{ task.data.input_data }}
                                         {% elif task.data.input_data|get_type == 'list' %}
                                             {% if task.data.input_data|length > 1 %}
-                                                [{{ task.data.input_data|first }}, ..., {{ task.data.input_data|last }}]
+                                                {{ task.data.input_data|first }}, ...
                                             {% elif task.data.input_data|length == 1 %}
                                                 {{ task.data.input_data|first }}
                                             {% else %}
@@ -85,7 +85,7 @@
                                         {% if task.organization %}
                                             {{ task.organization }}
                                         {% else %}
-                                            {% translate "No Organization" %}
+                                            -
                                         {% endif %}
                                     </td>
                                     <td>
@@ -95,11 +95,11 @@
                                         {% if task.new_schedule_id %}
                                             <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">{{ task.new_schedule_id }}</a>
                                         {% else %}
-                                            No Schedule
+                                            -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "See Results" %}</a>
+                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "Show" %}</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
                                     <td>
