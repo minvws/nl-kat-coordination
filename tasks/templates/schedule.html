@@ -11,15 +11,12 @@
         <section>
             <div class="two-thirds-one-third">
                 <div>
-                    <h1>Schedule: '{{ newschedule.plugin.plugin_id }}' for object set '{{ newschedule.object_set }}'</h1>
-                    <p class="emphasized">{{ newschedule.plugin.plugin_id }}</p>
-                    <p class="emphasized">{{ newschedule.organization.code }}</p>
-                    <p class="emphasized">{{ newschedule.enabled }}</p>
-                    {% for rrule in newschedule.recurrences.rrules %}<strong>{{ rrule.to_text.upper }}</strong>{% endfor %}
-                    <p class="emphasized">{{ newschedule.object_set }}</p>
-                    <p class="emphasized">{{ newschedule.run_on }}</p>
-                    <p class="emphasized">{{ newschedule.operation }}</p>
-                    <h4>{% translate 'Change Schedule' %}:</h4>
+                    <h1>{% translate "Edit schedule" %}</h1>
+                    <p>
+                        {% blocktranslate with plugin=newschedule.plugin.plugin_id object_set=newschedule.object_set trimmed %} 
+                            Here you can change the schedule for plugin "{{plugin }}" with object set "{{ object_set }}".
+                        {% endblocktranslate %}
+                    </p>
                     <form action="{% url "edit_schedule" pk=newschedule.id %}"
                           method="POST"
                           class="post-form">

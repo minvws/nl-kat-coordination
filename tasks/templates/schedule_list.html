@@ -10,14 +10,21 @@
 
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Schedules" %}</h1>
-            </div>
-            {% if perms.openkat.add_newschedule %}
-                <div class="horizontal-view toolbar">
-                    <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Schedule" %}</a>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "Schedules" %}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
-            {% endif %}
+                {% if perms.openkat.add_newschedule %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add schedule" %}</a>
+                    </div>
+                {% endif %}
+            </div>
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                         {{ filter.form.as_p }}
@@ -34,28 +41,28 @@
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
-                                <th scope="col"></th>
                                 <th scope="col">{% translate "Plugin" %}</th>
+                                <th scope="col">{% translate "Object set" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
-                                <th scope="col">{% translate "Objects" %}</th>
                                 <th scope="col">{% translate "Schedule" %}</th>
-                                <th scope="col">{% translate "Tasks" %}</th>
-                                {#                                <th scope="col">{% translate "Run On" %}</th>#}
-                                {#                                TODO: use these #}
-                                {#                                <th scope="col">{% translate "Operation" %}</th>#}
+                                <th scope="col">{% translate "Run on" %}</th>
+                                <th scope="col">{% translate "Operation" %}</th>
                                 <th scope="col">{% translate "Enabled" %}</th>
-                                <th scope="col">{% translate "" %}</th>
-                                <th scope="col">{% translate "" %}</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for schedule in newschedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
-                                        <a href="{% url "schedule_detail" pk=schedule.id %}">{% translate 'See Details' %}</a>
+                                        <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
+                                        {% if schedule.object_set %}
+                                            <a href="{% url "object_set_detail" schedule.object_set.id %}">{{ schedule.object_set }}</a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if schedule.organization %}
@@ -65,29 +72,27 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if schedule.object_set %}
-                                            <a href="{% url "object_set_detail" schedule.object_set.id %}">{{ schedule.object_set }}</a>
-                                        {% else %}
-                                            {% translate "No Objects" %}
-                                        {% endif %}
-                                    </td>
-                                    {#                                    <td>#}
-                                    {#                                        <span>{{ schedule.run_on }}</span>#}
-                                    {#                                    </td>#}
-                                    {#                                    <td>#}
-                                    {#                                        <span>{{ schedule.operation }}</span>#}
-                                    {#                                    </td>#}
-                                    <td>
                                         {% for rrule in schedule.recurrences.rrules %}
                                             {% if rrule.to_text.upper == 'DAILY' %}
-                                                <strong>{{ rrule.to_text.upper }} at {{ schedule.recurrences.dtstart.time }}</strong>
+                                                {{ rrule.to_text.upper }} at {{ schedule.recurrences.dtstart.time }}
                                             {% else %}
-                                                <strong>{{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}</strong>
+                                                {{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}
                                             {% endif %}
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'new_task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
+                                        {% if schedule.run_on %}
+                                            {{ schedule.run_on }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if schedule.operation %}
+                                            {{ schedule.operation }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     {% if perms.openkat.can_enable_disable_schedule %}
                                         <form action="{% url "edit_schedule" pk=schedule.id %}"
@@ -122,17 +127,39 @@
                                             </td>
                                         {% endif %}
                                     {% endif %}
-                                    <td>
-                                        <form action="{% url 'run_schedule' schedule.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button type="submit">{% translate "Run" %}</button>
-                                        </form>
+                                    <td class="nowrap actions sticky-cell">
+                                        <button class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
                                     </td>
-                                    <td>
-                                        <form action="{% url 'delete_schedule' schedule.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
+                                </tr>
+                                <tr class="expando-row">
+                                    <td colspan="6">
+                                        <div class="button-container">
+                                            {# TODO: Permissions #}
+                                            <a class="button" href="{% url "new_task_list" %}?schedule_id={{ schedule.id }}">{% translate "View tasks" %}</a>
+                                            <form action="{% url "run_schedule" schedule.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button class="ghost" type="submit">
+                                                    <span class="icon ti-refresh"></span>
+                                                    {% translate "Rerun now" %}
+                                                </button>
+                                            </form>
+                                            <a class="button ghost" href="{% url "schedule_detail" pk=schedule.id %}">
+                                                <span class="icon ti-edit"></span>
+                                                {% translate "Edit" %}
+                                            </a>
+                                            <form action="{% url "delete_schedule" schedule.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button class="ghost destructive" type="submit" class="icon ti-trash action-button">
+                                                    <span class="icon ti-trash"></span>
+                                                    {% translate "Delete" %}
+                                                </button>
+                                            </form>
+                                        </div>     
                                     </td>
                                 </tr>
                             {% endfor %}
