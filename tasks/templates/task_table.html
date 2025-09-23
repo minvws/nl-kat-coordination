@@ -1,0 +1,147 @@
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% if not task_list %}
+    <div>
+        <p>{% translate "There are no tasks." %}</p>
+    </div>
+{% else %}
+    <div class="filter-container">
+        <form class="inline layout-wide" method="get">
+            {{ filter.form.as_p }}
+            <button type="submit">{% translate "Apply" %}</button>
+        </form>
+    </div>
+    <div class="horizontal-scroll sticky-column">
+        <table rf-selector="table-scan-history" class="nowrap">
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "ID" %}</th>
+                    <th scope="col">{% translate "Plugin" %}</th>
+                    <th scope="col">{% translate "Status" %}</th>
+                    <th scope="col">{% translate "Completion date" %}</th>
+                    <th scope="col">{% translate "Organization" %}</th>
+                    <th scope="col">{% translate "Input object" %}</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in task_list %}
+                    <tr data-task-id="{{ task.id }}">
+                        <td>
+                            <a href="{% url "task_detail" pk=task.id %}">{{ task.id }}</a>
+                        </td>
+                        <td>
+                            {% if task.data.plugin_id %}
+                                <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
+                        </td>
+                        <td>
+                            {% if task.ended_at %}
+                                {{ task.ended_at }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.organization %}
+                                <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.data.input_data|get_type == 'str' %}
+                                {{ task.data.input_data }}
+                            {% elif task.data.input_data|get_type == 'list' %}
+                                {% if task.data.input_data|length > 1 %}
+                                    [{{ task.data.input_data|first }}, ..., {{ task.data.input_data|last }}]
+                                {% elif task.data.input_data|length == 1 %}
+                                    {{ task.data.input_data|first }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="nowrap actions sticky-cell">
+                            <button class="expando-button"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close details" %}">
+                                {% translate "Open details" %}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="expando-row">
+                        <td colspan="6">
+                            <div>
+                                <h5>{% translate "Task type" %}</h5>
+                                <p>{{ task.type|capfirst }}</p>
+                            </div>
+                            <div>
+                                <h5>{% translate "Created at" %}</h5>
+                                <p>{{ task.created_at }}</p>
+                            </div>
+                            <div>
+                                <h5>{% translate "Last modified at" %}</h5>
+                                <p>{{ task.modified_at }}</p>
+                            </div>
+                            <div>
+                                <h5>{% translate "Schedule" %}</h5>
+                                {% if task.new_schedule_id %}
+                                    <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">{{ task.new_schedule_id }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% with input_count=task.data.input_data|length %}
+                                    {% if task.data.input_data %}
+                                        {% if task.data.input_data|get_type == 'str' %}
+                                            <h5>{% translate "Input data" %}</h5>
+                                            {{ task.data.input_data }}
+                                        {% elif task.data.input_data|get_type == 'list' %}
+                                            <h5>{% translate "Input data" %} ({{ task.data.input_data|slice:"10"|length }}/{{ input_count }})</h5>
+                                            <ul>
+                                                {% for object in task.data.input_data|slice:"10" %}<li>{{ object }}</li>{% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% else %}
+                                        <h5>{% translate "Input data" %}</h5>
+                                        <p>{% translate "This task does not need any input objects." %}</p>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="button-container">
+                                <a class="button" href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "View results" %}</a>
+                                {% if task.done %}
+                                    <form action="{% url 'reschedule_task' task.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button class="ghost" type="submit">
+                                            <span class="icon ti-refresh"></span>{% translate "Rerun now" %}
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form action="{% url 'cancel_task' task.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button class="ghost destructive" type="submit">{% translate "Cancel" %}</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "partials/list_paginator.html" %}
+
+{% endif %}

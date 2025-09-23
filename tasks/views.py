@@ -29,16 +29,12 @@ from tasks.new_tasks import rerun_task, run_plugin_task, run_schedule
 
 class TaskFilter(django_filters.FilterSet):
     data = django_filters.CharFilter(
-        label="Input data", 
-        lookup_expr="icontains",
-        widget=forms.TextInput(attrs={
-            "autocomplete": "off",
-        })
+        label="Input object", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
     )
 
     class Meta:
         model = Task
-        fields = ["organization", "data", "status"]
+        fields = ["status", "organization", "data"]
 
 
 class TaskListView(FilterView):
@@ -76,7 +72,7 @@ class TaskListView(FilterView):
 class TaskDetailView(DetailView):
     template_name = "task.html"
     model = Task
-    
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.task = self.get_object()
@@ -187,15 +183,11 @@ class TaskCancelView(PermissionRequiredMixin, View):
 
 class NewScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
-    input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
-    enabled = django_filters.ChoiceFilter(
-        label="State",
-        choices=((True, "Enabled"), (False, "Disabled")),
-    )
+    enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
 
     class Meta:
         model = NewSchedule
-        fields = ["organization", "plugin__plugin_id", "input", "enabled", "object_set"]
+        fields = ["plugin__plugin_id", "object_set", "organization", "enabled"]
 
 
 class ScheduleListView(FilterView):

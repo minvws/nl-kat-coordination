@@ -9,106 +9,23 @@
 
     <main id="main-content">
         <section>
-            {% include "tasks/partials/tasks_overview_header.html" %}
-            <div class="filter-container">
-                <form class="inline layout-wide" method="get">
-                        {{ filter.form.as_p }}
-                        <button type="submit">{% translate "Apply" %}</button>
-                </form>
-            </div>
-            {% if not task_list %}
+            <div class="introduction">
                 <div>
-                    <h2>{% translate "Tasks" %}</h2>
-                    <p>{% translate "There are no tasks." %}</p>
+                    <h1>{% translate "Tasks" %}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
-            {% else %}
-                <div class="horizontal-scroll sticky-column">
-                    <table rf-selector="table-scan-history" class="nowrap">
-                        <thead>
-                            <tr>
-                                <th scope="col">{% translate "Task ID" %}</th>
-                                <th scope="col">{% translate "Plugin" %}</th>
-                                <th scope="col">{% translate "Input Data" %}</th>
-                                <th scope="col">{% translate "Organization" %}</th>
-                                <th scope="col">{% translate "Status" %}</th>
-                                <th scope="col">{% translate "Schedule" %}</th>
-                                <th scope="col">{% translate "Results" %}</th>
-                                <th scope="col">{% translate "Created" %}</th>
-                                <th scope="col">{% translate "" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for task in task_list %}
-                                <tr data-task-id="{{ task.id }}">
-                                    <td>
-                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:10 }}</a>
-                                    </td>
-                                    <td>
-                                        {% if task.data.plugin_id %}
-                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
-                                        {% else %}
-                                            No Plugin
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.data.input_data|get_type == 'str' %}
-                                            {{ task.data.input_data }}
-                                        {% elif task.data.input_data|get_type == 'list' %}
-                                            {% if task.data.input_data|length > 1 %}
-                                                [{{ task.data.input_data|first }}, ..., {{ task.data.input_data|last }}]
-                                            {% elif task.data.input_data|length == 1 %}
-                                                {{ task.data.input_data|first }}
-                                            {% else %}
-                                                No Data
-                                            {% endif %}
-                                        {% else %}
-                                            No Data
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if task.organization %}
-                                            <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
-                                        {% else %}
-                                            {% translate "No Organization" %}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <i class="icon {{ task.status }}"></i>{{ task.status|capfirst }}
-                                    </td>
-                                    <td>
-                                        {% if task.new_schedule_id %}
-                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">
-                                                {{ task.new_schedule_id }}
-                                            </a>
-                                        {% else %}
-                                            No Schedule
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate 'See Results' %}</a>
-                                    </td>
-                                    <td>{{ task.created_at }}</td>
-                                    <td>
-                                        {% if task.done %}
-                                        <form action="{% url 'reschedule_task' task.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button type="submit">{% translate "Reschedule" %}</button>
-                                        </form>
-                                        {% else %}
-                                            <form action="{% url 'cancel_task' task.id %}" method="post">
-                                                {% csrf_token %}
-                                                <button type="submit">{% translate "Cancel" %}</button>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% include "partials/list_paginator.html" %}
+                {% if perms.openkat.add_task %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost" href="{% url "add_task" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add task" %}</a>
+                    </div>
+                {% endif %}
+            </div>
+            {% include "task_table.html" %}
 
-            {% endif %}
         </section>
     </main>
 {% endblock content %}
