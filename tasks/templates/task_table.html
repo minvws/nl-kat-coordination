@@ -17,14 +17,13 @@
         <table rf-selector="table-scan-history" class="nowrap">
             <thead>
                 <tr>
-                    <th scope="col">{% translate "ID" %}</th>
+                    <th scope="col">{% translate "Input objects" %}</th>
                     {% if not plugin %}
                         <th scope="col">{% translate "Plugin" %}</th>
                     {% endif %}
                     <th scope="col">{% translate "Status" %}</th>
                     <th scope="col">{% translate "Completion date" %}</th>
                     <th scope="col">{% translate "Organization" %}</th>
-                    <th scope="col">{% translate "Input object" %}</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -32,7 +31,19 @@
                 {% for task in task_list %}
                     <tr data-task-id="{{ task.id }}">
                         <td>
-                            <a href="{% url "task_detail" pk=task.id %}">{{ task.id }}</a>
+                            {% if task.data.input_data|get_type == 'str' %}
+                                <span class="label tags-color-3-light">{{ task.data.input_data }}</span>
+                            {% elif task.data.input_data|length >= 1 and task.data.input_data|get_type == 'list' %}
+                                <span class="label tags-color-1-light">{{ task.data.input_data|first }}</span>
+                                {% if task.data.input_data|length >= 2 %}
+                                    <span class="label tags-color-2-light">{{ task.data.input_data|last }}</span>
+                                {% endif %}
+                                {% if task.data.input_data|length >= 3 %}
+                                    <span class="label tags-color-grey-2">...</span>
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         {% if not plugin %}
                             <td>
@@ -60,21 +71,6 @@
                                 -
                             {% endif %}
                         </td>
-                        <td>
-                            {% if task.data.input_data|get_type == 'str' %}
-                                {{ task.data.input_data }}
-                            {% elif task.data.input_data|get_type == 'list' %}
-                                {% if task.data.input_data|length > 1 %}
-                                    [{{ task.data.input_data|first }}, ..., {{ task.data.input_data|last }}]
-                                {% elif task.data.input_data|length == 1 %}
-                                    {{ task.data.input_data|first }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
                         <td class="nowrap actions sticky-cell">
                             <button class="expando-button"
                                     data-icon-open-class="icon ti-chevron-down"
@@ -86,6 +82,10 @@
                     </tr>
                     <tr class="expando-row">
                         <td colspan="6">
+                            <div>
+                                <h5>{% translate "ID" %}</h5>
+                                <p>{{ task.id }}</p>
+                            </div>
                             <div>
                                 <h5>{% translate "Task type" %}</h5>
                                 <p>{{ task.type|capfirst }}</p>
@@ -113,7 +113,7 @@
                                             <h5>{% translate "Input data" %}</h5>
                                             {{ task.data.input_data }}
                                         {% elif task.data.input_data|get_type == 'list' %}
-                                            <h5>{% translate "Input data" %} ({{ task.data.input_data|slice:"10"|length }}/{{ input_count }})</h5>
+                                            <h5>{% translate "Input objects" %} ({{ task.data.input_data|slice:"10"|length }}/{{ input_count }})</h5>
                                             <ul>
                                                 {% for object in task.data.input_data|slice:"10" %}<li>{{ object }}</li>{% endfor %}
                                             </ul>

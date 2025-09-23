@@ -45,9 +45,7 @@
                                 <th scope="col">{% translate "Object set" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Schedule" %}</th>
-                                <th scope="col">{% translate "Run on" %}</th>
-                                <th scope="col">{% translate "Operation" %}</th>
-                                <th scope="col">{% translate "Enabled" %}</th>
+                                <th scope="col">{% translate "State" %}</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -79,20 +77,6 @@
                                                 {{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}
                                             {% endif %}
                                         {% endfor %}
-                                    </td>
-                                    <td>
-                                        {% if schedule.run_on %}
-                                            {{ schedule.run_on }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if schedule.operation %}
-                                            {{ schedule.operation }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
                                     </td>
                                     {% if perms.openkat.can_enable_disable_schedule %}
                                         <form action="{% url "edit_schedule" pk=schedule.id %}"
