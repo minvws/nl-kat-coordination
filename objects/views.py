@@ -79,7 +79,7 @@ class ObjectListView(ListView):
 
 
 class ObjectSetFilter(django_filters.FilterSet):
-    object_query = django_filters.CharFilter(label="Object Query", lookup_expr="icontains")
+    object_query = django_filters.CharFilter(label="Object query", lookup_expr="icontains")
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
     description = django_filters.CharFilter(label="Description", lookup_expr="icontains")
 
@@ -109,7 +109,7 @@ class ObjectSetDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("object_list"), "text": _("Objects")},
-            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
+            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object set detail")},
 
         ]
 

@@ -9,28 +9,42 @@
 
     <main id="main-content">
         <section>
-            <div class="two-thirds-one-third">
+            <div class="introduction">
                 <div>
-                    <h1>Object Set: "{{ objectset.name }}" ({{ objectset.id }})</h1>
-                    <p class="emphasized">Query:</p>
-                    <p class="emphasized"><strong>{{ objectset.object_query }}</strong></p>
-                    {% if preview_organization and preview %}
-                        <p class="emphasized">Preview for organization "{{ preview_organization.name }}":</p>
-                        {% for object in preview %}
-                            <strong>{{ object }}</strong>
-                        {% endfor %}
-                    {% endif %}
-                    <p class="emphasized">Static Objects:</p>
-                    {% if objectset.traverse_objects %}
-                        Objects:
-                        {% for object in objectset.traverse_objects %}
-                            <strong>{{ object.value }}</strong>
-                        {% endfor %}
-                        <p class="emphasized">{{ objectset.description }}</p>
-                    {% else %}
-                        <strong>No static objects</strong>
-                    {% endif %}
+                    <h1>{{ objectset.name }}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
+            </div>
+            <div>
+                <h2>{% translate "Query" %}</h2>
+                <p>{{ objectset.object_query }}</p>
+            </div>
+            {% if preview_organization and preview %}
+                <div>
+                    <h2>{% translate "Preview" %}</h2>
+                    <p>{% translate "Preview for organization" %} "{{ preview_organization.name }}".</p>
+                    <ul>
+                        {% for object in preview %}
+                            <li>{{ object }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div>
+                <h2>{% translate "Static objects" %}</h2>
+                {% if objectset.traverse_objects %}
+                <ul>
+                    {% for object in objectset.traverse_objects %}
+                        <li>{{ object.value }} ({{ objectset.description }})</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>{% translate "There are no static object for this object set." %}</p>
+                {% endif %}
             </div>
         </section>
     </main>
