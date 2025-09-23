@@ -38,6 +38,16 @@
     width: 100%;
     display: table;
   }
+
+  .button-container {
+    width: 100%;
+    display: flex;
+
+    form {
+      width: auto;
+      padding-right: 0%;
+    }
+  }
 }
 
 /* Overrides the default first/last table cell exception */

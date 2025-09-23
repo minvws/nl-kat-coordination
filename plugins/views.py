@@ -22,27 +22,13 @@ from tasks.models import Task, TaskStatus
 
 class PluginFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(
-        label="Name", 
-        lookup_expr="icontains",
-        widget=forms.TextInput(attrs={
-            "autocomplete": "off",
-        })
+        label="Name", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
     )
     oci_image = django_filters.CharFilter(
-        label="Container image", 
-        lookup_expr="icontains",
-        widget=forms.TextInput(attrs={
-            "autocomplete": "off",
-        })
+        label="Container image", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
     )
-    scan_level = django_filters.ChoiceFilter(
-        label="Scan level",
-        choices=ScanLevel.choices, 
-    )
-    enabled = django_filters.ChoiceFilter(
-        label="State",
-        choices=((True, "Enabled"), (False, "Disabled")),
-    )
+    scan_level = django_filters.ChoiceFilter(label="Scan level", choices=ScanLevel.choices)
+    enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
 
     class Meta:
         model = Plugin
@@ -113,6 +99,15 @@ class PluginIdDetailView(PluginDetailView):
     slug_field = "plugin_id"
 
 
+class PluginScansDetailView(PluginDetailView):
+    template_name = "plugin_scans.html"
+
+
+class PluginVariantsDetailView(PluginDetailView):
+    template_name = "plugin_variants.html"
+    model = Plugin
+
+
 class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
@@ -161,6 +156,16 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.plugin = self.get_object()
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
+            .annotate(
+                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
+            )
+        )
 
     def get_success_url(self, **kwargs):
         return reverse("plugin_detail", kwargs={"pk": self.plugin.pk})

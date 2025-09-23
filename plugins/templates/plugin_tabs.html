@@ -7,6 +7,12 @@
         <li {% if view == "general" %}aria-current="page"{% endif %}>
             <a href="{% url "plugin_detail" pk=plugin.id %}">{% translate "General" %}</a>
         </li>
+        <li {% if view == "scans" %}aria-current="page"{% endif %}>
+            <a href="{% url "plugin_detail_scans" pk=plugin.id %}">{% translate "Scans" %}</a>
+        </li>
+        <li {% if view == "variants" %}aria-current="page"{% endif %}>
+            <a href="{% url "plugin_detail_variants" pk=plugin.id %}">{% translate "Variants" %}</a>
+        </li>
         {% if perms.openkat.can_add_boefje %}
             <li {% if view == "settings" %}aria-current="page"{% endif %}>
                 <a href="{% url "update_plugin" pk=plugin.id %}">{% translate "Settings" %}</a>

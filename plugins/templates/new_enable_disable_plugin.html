@@ -22,11 +22,9 @@
         </button>
     </form>
 {% else %}
-    <span class="de-emphasized">
-        {% if plugin.enabled %}
-            <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-        {% else %}
-            <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-        {% endif %}
-    </span>
+    {% if plugin.enabled %}
+        <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+    {% else %}
+        <span class="label system-tag color-3">{% translate "Disabled" %}</span>
+    {% endif %}
 {% endif %}

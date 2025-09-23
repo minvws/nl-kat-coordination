@@ -1,0 +1,39 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "new_header.html" %}
+
+    <main id="main-content">
+        <section>
+            {% include "plugin_introduction.html" %}
+            {% include "plugin_tabs.html" with view="scans" %}
+
+            <div class="introduction">
+                <div>
+                    <h2>{% translate "Scans" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed with level=plugin.scan_level %}
+                            This plugin will only scan objects with a corresponding clearance level of L{{ level }} or higher.
+                            There is no indemnification for this plugin to scan objects with a lower clearance level
+                            than L{{ level }}.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                <div class="horizontal-view toolbar">
+                    {% if perms.openkat.add_task %}
+                        <a class="button ghost"
+                           href="{% url "add_task" %}?plugin_id={{ plugin.id }}">
+                            <span class="icon ti-refresh"></span>{% translate "Rerun plugin" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% include "task_table.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

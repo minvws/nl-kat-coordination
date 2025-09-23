@@ -22,33 +22,36 @@
                               class="{% if order_by == "name" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "name" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
+                <th>{% translate "Description" %}</th>
                 <th scope="col"
                     class="sortable"
                     {% if order_by == "oci_image" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
                     <button form="plugin_list" name="order_by" value="oci_image" class="sort">
-                        {% translate "Image" %}
+                        {% translate "Container image" %}
                         <span aria-hidden="true"
                               class="{% if order_by == "oci_image" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "oci_image" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
                 <th>{% translate "Version" %}</th>
                 <th scope="col"
+                    class="sortable nowrap"
+                    {% if order_by == "scan_level" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
+                    <button form="plugin_list" name="order_by" value="scan_level" lass="sort">
+                        {% translate "Scan level" %}
+                        <span aria-hidden="true"
+                              class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
+                    </button>
+                </th>
+                <th scope="col"
                     class="sortable"
                     {% if order_by == "enabled" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
                     <button form="plugin_list" name="order_by" value="enabled" class="sort">
-                        {% translate "State" %}
+                        {% translate "Actions" %}
                         <span aria-hidden="true"
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                {% if perms.openkat.can_enable_disable_plugin %}
-                    <th scope="col">{% translate "Toggle" %}</th>
-                {% endif %}
-                <th scope="col">{% translate "" %}</th>
-                <th scope="col">{% translate "" %}</th>
-                <th scope="col">{% translate "" %}</th>
-                <th scope="col">{% translate "Results" %}</th>
-                <th scope="col">{% translate "" %}</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -58,39 +61,38 @@
                         <a href="{% url "plugin_detail" pk=plugin.id %}">{{ plugin.name }}</a>
                     </td>
                     <td>
+                        <p>
+                            {% if plugin.description %}
+                                {{ plugin.description }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </p>
+                    </td>
+                    <td>
                         <span class="plugin-oci-image">
                             {% if plugin.oci_image %}
-                                <strong>{{ plugin.repository }}</strong>
+                                {{ plugin.repository }}
                             {% else %}
-                                No Image
+                                {% translate "No container image" %}
                             {% endif %}
                         </span>
                     </td>
                     <td>
-                        <span class="plugin-version">
+                        <p>
                             {% if plugin.real_version %}
-                                <strong>{{ plugin.real_version }}</strong>
+                                {{ plugin.real_version }}
                             {% else %}
-                                No Version
+                                {% translate "No version" %}
                             {% endif %}
-                        </span>
+                        </p>
                     </td>
-                    {#                    <td>#}
-                    {#                        <span class="plugin-oci-arguments">#}
-                    {#                            {% for argument in plugin.oci_arguments %}{{ argument }}{{ ' ' }}{% endfor %}#}
-                    {#                        </span>#}
-                    {#                    </td>#}
                     <td>
-                        <span class="de-emphasized">
-                            {% if plugin.enabled %}
-                                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-                            {% else %}
-                                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-                            {% endif %}
-                        </span>
+                        {% include "scan_level_indicator.html" with value=plugin.scan_level %}
+
                     </td>
-                    {% if perms.openkat.can_enable_disable_plugin %}
-                        <td>
+                    <td>
+                        {% if perms.openkat.can_enable_disable_plugin %}
                             <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
                                   method="post"
                                   class="inline">
@@ -110,46 +112,49 @@
                                     {% endif %}
                                 </button>
                             </form>
-                        </td>
-                    {% endif %}
-                    {#                TODO: permissions #}
-                    <td>
-                        <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}&duplicate=true">
-                            <button type="submit" class="icon ti-copy action-button">{% translate "Duplicate" %}</button>
-                        </a>
-                    </td>
-                    <td>
-                        <a href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}">
-                            <button type="submit" class="icon ti-edit action-button">{% translate "Edit" %}</button>
-                        </a>
-                    </td>
-                    <td>
-                        <form action="{% url 'delete_plugin' plugin.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                        </form>
-                    </td>
-                    <td>
-                        <a href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">{% translate 'See Results' %}</a>
-                    </td>
-                    <td>
-                        {% if plugin.enabled %}
-                            {% if plugin.consumed_types %}
-                                <a href="{% url 'add_task' %}?plugin_id={{ plugin.id }}">
-                                    <button type="submit">{% translate "Run" %}</button>
-                                </a>
-                            {% elif not plugin.files_in_arguments %}
-                                <form action="{% url 'add_task' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="organization" value="">
-                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
-                                    <button type="submit">{% translate "Run" %}</button>
-                                </form>
+                        {% else %}
+                            {% if plugin.enabled %}
+                                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
+                            {% else %}
+                                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
                             {% endif %}
                         {% endif %}
                     </td>
+                    <td class="nowrap">
+                        <a href="{% url "plugin_detail" pk=plugin.id %}">
+                            <span class="icon ti-chevron-right"></span>
+                        </a>
+                    </td>
+                    {% comment %} <td class="nowrap actions sticky-cell">
+                        <button class="expando-button" data-icon-open-class="icon ti-chevron-down" data-icon-close-class="icon ti-chevron-up" data-close-label="{% translate "Close details" %}">
+                            {% translate "Open details" %}
+                        </button>
+                    </td> {% endcomment %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% comment %} <tr class="expando-row">
+                    <td colspan="8">
+                        <div>
+                            <h5>{% translate "Plugin details" %}</h5>
+                            <p>
+                                {% blocktranslate trimmed %}
+                                    To view more details about this plugin or to edit, duplicate or delete the plugin,
+                                    go to the plugin detail page.
+                                {% endblocktranslate %}
+                                        </p>
+                                </div>
+                                {# TODO: Permissions #}
+                                <div class="button-container">
+                                    <a class="button"
+                                       href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
+                                        {% translate "View results" %}
+                                </a>
+                                <a class="button ghost" href="{% url "plugin_detail" pk=plugin.id %}">
+                                {% translate "Plugin details" %}<span class="icon ti-chevron-right"></span>
+                            </a>
+                        </div>
+                    </td>
+</tr> {% endcomment %}
+{% endfor %}
+</tbody>
+</table>
 </div>
