@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
+from objects.models import Network
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
 
 
@@ -25,14 +26,13 @@ class Command(BaseCommand):
 
     def setup_kat_groups(self):
         self.group_admin, self.group_admin_created = Group.objects.get_or_create(name=GROUP_ADMIN)
-
         self.group_redteam, self.group_redteam_created = Group.objects.get_or_create(name=GROUP_REDTEAM)
-
         self.group_client, self.group_client_created = Group.objects.get_or_create(name=GROUP_CLIENT)
 
     def handle(self, *args, **options):
         self.setup_kat_groups()
         self.setup_group_permissions()
+        Network.objects.get_or_create(name="internet")
 
     def setup_group_permissions(self):
         redteamer_permissions = ["can_scan_organization", "can_set_clearance_level"]
