@@ -1,17 +1,22 @@
+from collections.abc import Mapping, Sequence
+from urllib.parse import urlencode
+
+from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from openkat.models import Organization
 from openkat.view_helpers import Breadcrumb, BreadcrumbsMixin, StepsMixin
-from reports.views.base import get_selection
 
-ONBOARDING_PERMISSIONS = (
-    "openkat.can_scan_organization",
-    "openkat.can_set_clearance_level",
-    "openkat.can_enable_disable_plugin",
-)
+ONBOARDING_PERMISSIONS = ("openkat.can_scan_organization", "openkat.can_set_clearance_level")
 
 DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1
+
+
+def get_selection(request: HttpRequest, pre_selection: Mapping[str, str | Sequence[str]] | None = None) -> str:
+    if pre_selection is not None:
+        return "?" + urlencode(pre_selection, True)
+    return "?" + urlencode(request.GET, True)
 
 
 class IntroductionStepsMixin(StepsMixin):
@@ -27,16 +32,6 @@ class IntroductionStepsMixin(StepsMixin):
             {
                 "text": _("2: Choose a report"),
                 "url": reverse_lazy("step_choose_report_info", kwargs={"organization_code": self.organization.code})
-                + get_selection(self.request),
-            },
-            {
-                "text": _("3: Setup scan"),
-                "url": reverse_lazy("step_setup_scan_ooi_info", kwargs={"organization_code": self.organization.code})
-                + get_selection(self.request),
-            },
-            {
-                "text": _("4: Open report"),
-                "url": reverse_lazy("step_report", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request),
             },
         ]

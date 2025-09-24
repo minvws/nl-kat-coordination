@@ -1,41 +1,243 @@
-from django.db import models
-from django.db.models import QuerySet
+import tempfile
+
+from django.apps import apps
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import connections, models
+from django.db.models import Model
+from django.forms.models import model_to_dict
+from django.utils.datastructures import CaseInsensitiveMapping
+from psycopg import sql
+from transit.writer import Writer
+
+from objects.enums import MAX_SCAN_LEVEL
+from openkat.models import LowerCaseCharField
 
 
-class Object(models.Model):
-    type = models.CharField(max_length=64)
-    value = models.TextField()
-
-    def __str__(self):
-        return self.value
+def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
+    return CaseInsensitiveMapping({model.__name__: model for model in apps.get_app_config("objects").get_models()})
 
 
-class ObjectSet(models.Model):
-    """ Composite-like model representing a set of objects that can be used as an input for tasks """
+def to_xtdb_dict(model: Model) -> dict:
+    mod = model_to_dict(model, exclude=["id"])
+    mod["_id"] = model.id
 
-    # TODO: organization field?
-    name = models.CharField(max_length=100, blank=True, null=True)
-    description = models.TextField(blank=True)
-    dynamic = models.BooleanField(default=False)  # TODO
-    object_query = models.TextField(null=True, blank=True)
+    return mod
 
-    # can hold both objects and other groups (composite pattern)
-    all_objects = models.ManyToManyField(Object, blank=True, related_name="object_sets")
-    subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> QuerySet[Object]:
-        # TODO: handle cycles
-        # TODO: configurable max_depth
+class Asset(models.Model):
+    class Meta:
+        managed = False
+        abstract = True
 
-        if depth >= max_depth:
-            raise RecursionError("Max depth reached for object set.")
 
-        all_objects = self.all_objects.all()
+class ScanLevel(models.Model):
+    id: int
+    ooi_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    ooi_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    ooi: GenericForeignKey = GenericForeignKey("ooi_type", "ooi_id")
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    scan_level: models.IntegerField = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
+    )
+    declared: models.BooleanField = models.BooleanField(default=False)
+    last_changed_by: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
 
-        for subset in self.subsets.all():
-            all_objects = all_objects.union(subset.traverse_objects(depth + 1, max_depth))
+    class Meta:
+        managed = False
 
-        return all_objects
+    def __str__(self) -> str:
+        return str(self.id)
 
-    def __str__(self):
-        return self.name or super().__str__()
+
+class FindingType(models.Model):
+    code: models.CharField = models.CharField()
+    score: models.CharField = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
+    description: models.CharField = models.CharField(null=True)
+
+    class Meta:
+        managed = False
+
+
+class Finding(models.Model):
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
+
+    # TODO
+    object_type: models.ForeignKey = models.CharField()
+    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+
+    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
+
+    class Meta:
+        managed = False
+
+
+class Network(Asset):
+    name: LowerCaseCharField = LowerCaseCharField()
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class IPAddress(Asset):
+    network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
+    address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True)
+
+    def __str__(self) -> str:
+        return self.address
+
+
+class Protocol(models.TextChoices):
+    TCP = "TCP", "TCP"
+    UDP = "UDP", "UDP"
+
+
+class IPPort(models.Model):
+    address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    protocol: models.CharField = models.CharField(choices=Protocol)
+    port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(65535)])
+    tls: models.BooleanField = models.BooleanField(null=True)
+    service: models.CharField = models.CharField()
+
+    class Meta:
+        managed = False
+
+    def __str__(self) -> str:
+        return f"[{self.address}]:{self.port}"
+
+
+class Hostname(Asset):
+    network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
+    name: LowerCaseCharField = LowerCaseCharField()
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class DNSRecordBase(models.Model):
+    ttl: models.IntegerField = models.IntegerField()
+
+    class Meta:
+        managed = False
+        abstract = True
+
+
+class DNSARecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+
+    def __str__(self) -> str:
+        return f"{self.hostname} A {self.ip_address}"
+
+
+class DNSAAAARecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+
+    def __str__(self) -> str:
+        return f"{self.hostname} AAAA {self.ip_address}"
+
+
+class DNSPTRRecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+
+    def __str__(self) -> str:
+        return f"{self.ip_address} PTR {self.hostname}"
+
+
+class DNSCNAMERecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_records")
+    target: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_targets")
+
+    def __str__(self) -> str:
+        return f"{self.hostname} CNAME {self.target}"
+
+
+class DNSMXRecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_records")
+    mail_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_targets")
+    preference: models.IntegerField = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.hostname} MX {self.preference} {self.mail_server}"
+
+
+class DNSNSRecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_records")
+    name_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_targets")
+
+    def __str__(self) -> str:
+        return f"{self.hostname} NS {self.name_server}"
+
+
+class CAATag(models.TextChoices):
+    CONTACTEMAIL = "contactemail", "contactemail"
+    CONTACTPHONE = "contactphone", "contactphone"
+    IODEF = "iodef", "iodef"
+    ISSUE = "issue", "issue"
+    ISSUEMAIL = "issuemail", "issuemail"
+    ISSUEVMC = "issuevmc", "issuevmc"
+    ISSUEWILD = "issuewild", "issuewild"
+
+
+class DNSCAARecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    flags: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(255)])
+    tag: models.CharField = models.CharField(choices=CAATag)
+    value: models.CharField = models.CharField()
+
+    def __str__(self) -> str:
+        return f"{self.hostname} CAA {self.flags} {self.tag} {self.value}"
+
+
+class DNSTXTRecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    prefix: models.CharField = models.CharField(blank=True)
+    value: models.CharField = models.CharField()
+
+    def __str__(self) -> str:
+        prefix_part = f"{self.prefix}." if self.prefix else ""
+        return f"{prefix_part}{self.hostname} TXT {self.value}"
+
+
+class DNSSRVRecord(DNSRecordBase):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    proto: LowerCaseCharField = LowerCaseCharField()
+    service: LowerCaseCharField = LowerCaseCharField()
+    priority: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
+    weight: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
+    port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
+
+    def __str__(self) -> str:
+        return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
+
+
+def bulk_insert(objects: list[models.Model]):
+    """Use COPY to efficiently bulk-insert objects into XTDB"""
+
+    if not objects:
+        return
+
+    table_name = objects[0]._meta.db_table
+
+    with tempfile.NamedTemporaryFile() as fp:
+        # The transit-json format is not working because the writer uses a comma as a delimiter between objects. It
+        # would work if we override Writer.marshaler.write_sep() to skip the comma (or use a newline) between objects.
+        # But apparently msgpack works out of the box, which makes life even easier.
+
+        writer = Writer(fp, "msgpack")
+        for obj in objects:
+            writer.write(to_xtdb_dict(obj))
+
+        fp.seek(0)
+
+        with (
+            connections["xtdb"].cursor() as cursor,
+            cursor.copy(
+                sql.SQL("COPY {} FROM STDIN WITH (FORMAT 'transit-msgpack')").format(sql.Identifier(table_name))
+            ) as copy,
+        ):
+            while data := fp.read():
+                copy.write(data)

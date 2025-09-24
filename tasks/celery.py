@@ -1,4 +1,5 @@
 import os
+from logging.config import dictConfig
 
 from celery import Celery
 from celery.signals import setup_logging, worker_shutdown
@@ -12,15 +13,12 @@ app.autodiscover_tasks()
 
 @setup_logging.connect
 def config_loggers(*args, **kwargs):
-    from logging.config import dictConfig  # noqa
-    from django.conf import settings  # noqa
-
     dictConfig(settings.LOGGING)
 
 
 @worker_shutdown.connect
 def cancel_all_tasks(*args, **kwargs):
-    from tasks.models import Task, TaskStatus
+    from tasks.models import Task, TaskStatus  # noqa: PLC0415
 
     for task in Task.objects.filter(
         status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
@@ -35,21 +33,9 @@ app.conf.beat_schedule = {
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },
-    "schedule-boefjes": {
-        "task": "tasks.tasks.schedule",
-        "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
-    },
-    "reschedule-boefjes": {
+    "reschedule": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,
-        "args": tuple(),
-        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
-    },
-    "reschedule": {
-        "task": "tasks.new_tasks.reschedule",
-        "schedule": settings.SCHEDULE_INTERVAL // 6,
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
     },

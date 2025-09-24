@@ -1,89 +1,154 @@
-from datetime import datetime, timezone
 from http import HTTPStatus
 
-from django.conf import settings
-from pydantic import TypeAdapter
+from django.http import JsonResponse
 from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
-from structlog import get_logger
 
-from objects.serializers import ObjectSerializer
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
-from octopoes.models.types import OOIType, type_by_name
-from octopoes.xtdb.query import InvalidField, Query
-from openkat.models import Organization
-
-logger = get_logger(__name__)
-OOI_TYPE_LIST = TypeAdapter(list[OOIType])
-REF_LIST = TypeAdapter(list[Reference])
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCAARecord,
+    DNSCNAMERecord,
+    DNSMXRecord,
+    DNSNSRecord,
+    DNSPTRRecord,
+    DNSSRVRecord,
+    DNSTXTRecord,
+    Finding,
+    FindingType,
+    Hostname,
+    IPAddress,
+    IPPort,
+    Network,
+)
+from objects.serializers import (
+    DNSAAAARecordSerializer,
+    DNSARecordSerializer,
+    DNSCAARecordSerializer,
+    DNSCNAMERecordSerializer,
+    DNSMXRecordSerializer,
+    DNSNSRecordSerializer,
+    DNSPTRRecordSerializer,
+    DNSSRVRecordSerializer,
+    DNSTXTRecordSerializer,
+    FindingSerializer,
+    FindingTypeSerializer,
+    HostnameSerializer,
+    IPAddressSerializer,
+    IPPortSerializer,
+    NetworkSerializer,
+)
+from openkat.permissions import KATMultiModelPermissions
+from openkat.viewsets import ManyModelViewSet
 
 
 class ObjectViewSet(ViewSet):
-    def list(self, request, *args, **kwargs):
-        if "object_type" in request.GET:
-            q = Query(type_by_name(request.GET["object_type"]))
-        else:
-            q = Query()
-
-        for parameter in request.GET:
-            if parameter == "object_type":
-                continue
-
-            if parameter == "offset":
-                q = q.offset(int(request.GET.get(parameter)))
-                continue
-            if parameter == "limit":
-                q = q.limit(int(request.GET.get(parameter)))
-                continue
-
-            value = list(set(request.GET.getlist(parameter)))
-
-            if len(value) == 1:
-                try:
-                    q = q.where(q.result_type, **{parameter: value[0]})
-                except InvalidField:
-                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
-            elif len(value) > 1:
-                try:
-                    q = q.where_in(q.result_type, **{parameter: value})
-                except InvalidField:
-                    logger.debug("Invalid field for query", result_type=q.result_type, parameter=parameter)
-                    continue
-
-        # TODO
-        organization = Organization.objects.first()
-        connector: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-
-        oois = connector.octopoes.ooi_repository.query(q, datetime.now(timezone.utc))
-        serializer = ObjectSerializer(oois, many=True)
-
-        return Response({"results": serializer.data, "next": None, "previous": None, "count": None})
+    permission_classes = (KATMultiModelPermissions,)
+    serializers = (
+        DNSAAAARecordSerializer,
+        DNSARecordSerializer,
+        DNSCAARecordSerializer,
+        DNSCNAMERecordSerializer,
+        DNSMXRecordSerializer,
+        DNSNSRecordSerializer,
+        DNSPTRRecordSerializer,
+        DNSSRVRecordSerializer,
+        DNSTXTRecordSerializer,
+        HostnameSerializer,
+        IPAddressSerializer,
+        IPPortSerializer,
+        NetworkSerializer,
+    )
 
     def create(self, request: Request, *args, **kwargs):
-        objects = request.data
-        organization = Organization.objects.first()
+        serializers = {serializer.Meta.model.__name__.lower(): serializer for serializer in self.serializers}
+        response = {}
 
-        client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-        now = datetime.now(timezone.utc)
+        for object_type, models in request.data.items():
+            serializer_class = serializers[object_type.lower()]
+            serializer = serializer_class(data=models, many=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response[object_type] = serializer.data
 
-        for ooi in OOI_TYPE_LIST.validate_python(objects):
-            client.octopoes.ooi_repository.save(ooi, valid_time=now)
+        return JsonResponse(status=HTTPStatus.CREATED, data=response)
 
-        client.octopoes.commit()
 
-        return Response(status=HTTPStatus.CREATED)
+class FindingTypeViewSet(ManyModelViewSet):
+    serializer_class = FindingTypeSerializer
+    queryset = FindingType.objects.all()
+    filterset_fields = ("code",)
 
-    def delete(self, request: Request, *args, **kwargs):
-        organization = Organization.objects.first()
 
-        client: OctopoesAPIConnector = settings.OCTOPOES_FACTORY(organization.code)
-        now = datetime.now(timezone.utc)
+class FindingViewSet(ManyModelViewSet):
+    serializer_class = FindingSerializer
+    queryset = Finding.objects.all()
 
-        for ooi in REF_LIST.validate_python(request.GET.getlist("pk")):
-            client.octopoes.ooi_repository.delete(ooi, valid_time=now)
 
-        client.octopoes.commit()
+class NetworkViewSet(ManyModelViewSet):
+    serializer_class = NetworkSerializer
+    queryset = Network.objects.all()
+    filterset_fields = ("name",)
 
-        return Response(status=HTTPStatus.OK)
+
+class HostnameViewSet(ManyModelViewSet):
+    serializer_class = HostnameSerializer
+    queryset = Hostname.objects.all()
+    filterset_fields = ("name",)
+
+
+class IPAddressViewSet(ManyModelViewSet):
+    serializer_class = IPAddressSerializer
+    queryset = IPAddress.objects.all()
+    filterset_fields = ("address",)
+
+
+class IPPortViewSet(ManyModelViewSet):
+    serializer_class = IPPortSerializer
+    queryset = IPPort.objects.all()
+    filterset_fields = ("address", "protocol", "port", "tls", "service")
+
+
+class DNSARecordViewSet(ManyModelViewSet):
+    serializer_class = DNSARecordSerializer
+    queryset = DNSARecord.objects.all()
+
+
+class DNSAAAARecordViewSet(ManyModelViewSet):
+    serializer_class = DNSAAAARecordSerializer
+    queryset = DNSAAAARecord.objects.all()
+
+
+class DNSPTRRecordViewSet(ManyModelViewSet):
+    serializer_class = DNSPTRRecordSerializer
+    queryset = DNSPTRRecord.objects.all()
+
+
+class DNSCNAMERecordViewSet(ManyModelViewSet):
+    serializer_class = DNSCNAMERecordSerializer
+    queryset = DNSCNAMERecord.objects.all()
+
+
+class DNSMXRecordViewSet(ManyModelViewSet):
+    serializer_class = DNSMXRecordSerializer
+    queryset = DNSMXRecord.objects.all()
+
+
+class DNSNSRecordViewSet(ManyModelViewSet):
+    serializer_class = DNSNSRecordSerializer
+    queryset = DNSNSRecord.objects.all()
+
+
+class DNSCAARecordViewSet(ManyModelViewSet):
+    serializer_class = DNSCAARecordSerializer
+    queryset = DNSCAARecord.objects.all()
+
+
+class DNSTXTRecordViewSet(ManyModelViewSet):
+    serializer_class = DNSTXTRecordSerializer
+    queryset = DNSTXTRecord.objects.all()
+
+
+class DNSSRVRecordViewSet(ManyModelViewSet):
+    serializer_class = DNSSRVRecordSerializer
+    queryset = DNSSRVRecord.objects.all()

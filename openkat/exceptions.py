@@ -1,6 +1,3 @@
-from typing import Any
-
-
 class OpenKATError(Exception):
     pass
 
@@ -19,16 +16,3 @@ class AcknowledgedClearanceLevelTooLowException(ClearanceLevelTooLowException):
 
 class TrustedClearanceLevelTooLowException(ClearanceLevelTooLowException):
     pass
-
-
-class ServiceException(OpenKATError):
-    """Base exception representing an issue with an (external) service"""
-
-    def __init__(self, service_name: str, *args: Any):
-        super().__init__(*args)
-        self.service_name = service_name
-
-
-class OctopoesException(ServiceException):
-    def __init__(self, *args: Any):
-        super().__init__("Octopoes", *args)

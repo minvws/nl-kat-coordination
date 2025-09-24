@@ -5,7 +5,7 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -13,12 +13,12 @@
                 <div>
                     <h1>{% translate "Edit schedule" %}</h1>
                     <p>
-                        {% blocktranslate with plugin=newschedule.plugin.plugin_id object_set=newschedule.object_set trimmed %} 
-                            Here you can change the schedule for plugin "{{plugin }}" with object set "{{ object_set }}".
+                        {% blocktranslate with plugin=schedule.plugin.plugin_id object_set=schedule.object_set trimmed %}
+                            Here you can change the schedule for plugin "{{ plugin }}" with object set "{{ object_set }}".
                         {% endblocktranslate %}
                     </p>
-                    <form action="{% url "edit_schedule" pk=newschedule.id %}"
-                          method="POST"
+                    <form action="{% url "edit_schedule" pk=schedule.id %}"
+                          method="post"
                           class="post-form">
                         {% csrf_token %}
                         {{ form.media }}

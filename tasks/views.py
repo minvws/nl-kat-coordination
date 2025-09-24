@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import django_filters
 import recurrence
@@ -15,16 +15,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+from djangoql.queryset import apply_search
 
-from objects.models import Object
-from octopoes.core.service import OctopoesService
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from objects.models import Hostname, IPAddress
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
-from tasks.models import NewSchedule, Task, TaskStatus
-from tasks.new_tasks import rerun_task, run_plugin_task, run_schedule
+from tasks.models import ObjectSet, Schedule, Task, TaskStatus
+from tasks.tasks import rerun_task, run_plugin_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -73,16 +71,12 @@ class TaskDetailView(DetailView):
     template_name = "task.html"
     model = Task
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.task = self.get_object()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = Plugin.objects.get(plugin_id=self.task.data["plugin_id"])
         context["breadcrumbs"] = [
-            {"url": reverse("new_task_list"), "text": _("Plugins")},
-            {"url": reverse("task_detail", kwargs={"pk": self.task.id}), "text": _("Task details")},
+            {"url": reverse("task_list"), "text": _("Plugins")},
+            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
         ]
 
         return context
@@ -90,7 +84,8 @@ class TaskDetailView(DetailView):
 
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
-    input_data = forms.ModelMultipleChoiceField(Object.objects.all(), required=False)
+    input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
+    input_ips = forms.ModelMultipleChoiceField(IPAddress.objects.all(), required=False)
 
     class Meta:
         model = Task
@@ -108,37 +103,19 @@ class TaskForm(ModelForm):
         if not plugin.enabled_for(organization):
             raise ValueError(f"Plugin not enabled for organization {organization.name}")
 
-        pks = list(self.cleaned_data["input_data"].values_list("value", flat=True))
-        input_data = set()
+        # TODO: fix, ips, etc.
+        input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}
+        input_ips = {str(model) for model in self.cleaned_data["input_ips"]}
 
-        if pks:
-            now = datetime.now(timezone.utc)
-            octopoes: OctopoesService = settings.OCTOPOES_FACTORY(organization.code).octopoes
-            scan_profiles = octopoes.scan_profile_repository.get_bulk(set(pks), now)
-
-            for profile in scan_profiles:
-                if profile.level.value < plugin.scan_level or str(profile.reference) not in pks:
-                    continue
-
-                if profile.reference.class_type == Hostname:
-                    input_data.add(profile.reference.tokenized.name)
-                    continue
-
-                if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-                    input_data.add(str(profile.reference.tokenized.address))
-                    continue
-
-                input_data.add(str(profile.reference))
-
-        if not input_data and plugin.consumed_types():
+        if not input_hostnames and not input_ips and plugin.consumed_types():
             raise ValueError("No matching input objects found for plugin requiring input objects")
 
         return run_plugin_task(
             plugin.plugin_id,
             None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
-            list(input_data),
+            list(input_hostnames) + list(input_ips),
             batch=False,
-        )
+        )[0]
 
 
 class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
@@ -149,8 +126,8 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
     def get_initial(self):
         initial = super().get_initial()
 
-        if self.request.method == "GET" and "plugin_id" in self.request.GET:
-            initial["plugin_id"] = self.request.GET.get("plugin_id")
+        if self.request.method == "GET" and "plugin" in self.request.GET:
+            initial["plugin"] = self.request.GET.get("plugin")
 
         return initial
 
@@ -160,7 +137,7 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url
 
-        return reverse_lazy("new_task_list")
+        return reverse_lazy("task_list")
 
 
 class TaskRescheduleView(PermissionRequiredMixin, View):
@@ -169,7 +146,7 @@ class TaskRescheduleView(PermissionRequiredMixin, View):
     def post(self, request, task_id, *args, **kwargs):
         rerun_task(Task.objects.get(pk=task_id))
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))
 
 
 class TaskCancelView(PermissionRequiredMixin, View):
@@ -178,24 +155,25 @@ class TaskCancelView(PermissionRequiredMixin, View):
     def post(self, request, task_id, *args, **kwargs):
         Task.objects.get(pk=task_id).cancel()
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))
 
 
-class NewScheduleFilter(django_filters.FilterSet):
+class ScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
+    input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
     enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
 
     class Meta:
-        model = NewSchedule
+        model = Schedule
         fields = ["plugin__plugin_id", "object_set", "organization", "enabled"]
 
 
 class ScheduleListView(FilterView):
     template_name = "schedule_list.html"
-    model = NewSchedule
+    model = Schedule
     ordering = ["-id"]
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-    filterset_class = NewScheduleFilter
+    filterset_class = ScheduleFilter
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -212,15 +190,15 @@ class ScheduleListView(FilterView):
         return context
 
 
-class NewScheduleForm(ModelForm):
+class ScheduleForm(ModelForm):
     class Meta:
-        model = NewSchedule
+        model = Schedule
         fields = ["enabled", "recurrences", "object_set"]
 
 
 class ScheduleDetailView(DetailView):
     template_name = "schedule.html"
-    model = NewSchedule
+    model = Schedule
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -228,13 +206,13 @@ class ScheduleDetailView(DetailView):
             {"url": reverse("schedule_list"), "text": _("Schedules")},
             {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule details")},
         ]
-        context["form"] = NewScheduleForm
+        context["form"] = ScheduleForm
 
         return context
 
 
 class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
-    model = NewSchedule
+    model = Schedule
     fields = ["plugin", "object_set", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
 
@@ -248,7 +226,7 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
         else:
             self.object.recurrences = recurrence.Recurrence(
                 rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
-                dtstart=datetime.now(timezone.utc),
+                dtstart=datetime.now(UTC),
             )
 
         self.object.save()
@@ -264,7 +242,7 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 
 class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
-    model = NewSchedule
+    model = Schedule
     fields = ["enabled", "recurrences", "object_set"]
 
     def form_valid(self, form):
@@ -295,7 +273,7 @@ class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
 
 class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
-    model = NewSchedule
+    model = Schedule
 
     def form_invalid(self, form):
         return redirect(reverse("schedule_list"))
@@ -310,9 +288,88 @@ class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class ScheduleRunView(PermissionRequiredMixin, View):
-    permission_required = ("schedules.add_newschedules",)
+    permission_required = ("schedules.add_schedules",)
 
     def post(self, request, schedule_id, *args, **kwargs):
-        run_schedule(NewSchedule.objects.get(pk=schedule_id))
+        run_schedule(Schedule.objects.get(pk=schedule_id))
 
-        return redirect(reverse("new_task_list"))
+        return redirect(reverse("task_list"))
+
+
+class ObjectSetFilter(django_filters.FilterSet):
+    object_query = django_filters.CharFilter(label="Object Query", lookup_expr="icontains")
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    description = django_filters.CharFilter(label="Description", lookup_expr="icontains")
+
+    class Meta:
+        model = ObjectSet
+        fields = ["name", "description", "object_query"]
+
+
+class ObjectSetListView(FilterView):
+    template_name = "object_set_list.html"
+    model = ObjectSet
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = ObjectSetFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("object_set_list"), "text": _("Objects Sets")}]
+
+        return context
+
+
+class ObjectSetDetailView(DetailView):
+    template_name = "object_set.html"
+    model = ObjectSet
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("object_set_list"), "text": _("Objects Sets")},
+            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
+        ]
+
+        obj = self.get_object()
+
+        if obj.object_query is not None and obj.dynamic is True:
+            model_qs = obj.object_type.model_class().objects.all()
+
+            if obj.object_query:
+                model_qs = apply_search(model_qs, obj.object_query)
+
+            # TODO: check scan profile
+            context["objects"] = model_qs
+        else:
+            context["objects"] = None
+
+        return context
+
+
+class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = ObjectSet
+    fields = ["name", "all_objects", "object_type", "object_query", "description", "dynamic"]
+    template_name = "object_set_form.html"
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("object_set_list")
+
+
+class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = ObjectSet
+
+    def form_invalid(self, form):
+        return redirect(reverse("object_set_list"))
+
+    def get_success_url(self, **kwargs):
+        redirect_url = self.get_form().data.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("object_set_list")

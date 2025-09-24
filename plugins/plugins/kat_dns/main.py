@@ -2,24 +2,23 @@ import json
 import os
 import re
 import sys
+from collections import defaultdict
 from os import getenv
 
 import dns
 import httpx
 from dns.edns import EDEOption
 from dns.message import from_text
-from dns.name import Name
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
 from dns.rdtypes.ANY.NS import NS
-from dns.rdtypes.ANY.SOA import SOA
 from dns.rdtypes.ANY.TXT import TXT
 from dns.rdtypes.IN.A import A
 from dns.rdtypes.IN.AAAA import AAAA
 from dns.resolver import Answer
 
-DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
+DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"}
 
 
 class TimeoutException(Exception):
@@ -36,7 +35,6 @@ def get_record_types(arg: str) -> set[str]:
 
 
 def run(hostname: str, record_types: set[str]) -> list:
-    requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
@@ -45,8 +43,7 @@ def run(hostname: str, record_types: set[str]) -> list:
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
-    answers = [get_parent_zone_soa(resolver, requested_dns_name)] if "SOA" in record_types else []
-
+    answers = []
     for type_ in record_types:
         try:
             answer: Answer = resolver.resolve(hostname, type_)
@@ -62,14 +59,11 @@ def run(hostname: str, record_types: set[str]) -> list:
     if not answers and dmarc_results == "Timeout" and dkim_results == "Timeout":
         raise TimeoutException("No answers from DNS-Server due to timeouts.")
 
-    internet = dict(object_type="Network", name="internet")
-
-    zone = None
     hostname_store = {}
     record_store = []
 
     def register_hostname(name: str) -> dict:
-        hostname = dict(object_type="Hostname", network=f"Network|{internet['name']}", name=name.rstrip("."))
+        hostname = {"object_type": "Hostname", "network": "internet", "name": name.rstrip(".")}
         hostname_store[hostname["name"]] = hostname
         return hostname
 
@@ -80,123 +74,66 @@ def run(hostname: str, record_types: set[str]) -> list:
     # register argument hostname
     input_hostname = register_hostname(hostname)
 
-    # keep track of discovered zones
-    zone_links = {}
     results = []
 
     for answer in answers:
         for rrset in answer.response.answer:
             for rr in rrset:
                 record_hostname = register_hostname(str(rrset.name))
-                default_args = {
-                    "hostname": f"Hostname|{internet['name']}|{record_hostname['name']}",
-                    "value": str(rr),
-                    "ttl": rrset.ttl,
-                }
-
-                # the soa is the zone of itself, and the argument hostname
-                if isinstance(rr, SOA):
-                    zone = dict(
-                        object_type="DNSZone", hostname=f"Hostname|{internet['name']}|{record_hostname['name']}"
-                    )
-                    zone_links[record_hostname["name"]] = zone
-                    zone_links[input_hostname["name"]] = zone
-
-                    soa = dict(
-                        object_type="DNSSOARecord",
-                        serial=rr.serial,
-                        refresh=rr.refresh,
-                        retry=rr.retry,
-                        expire=rr.expire,
-                        minimum=rr.minimum,
-                        soa_hostname=f"Hostname|internet|{register_hostname(str(rr.mname))['name']}",
-                        **default_args,
-                    )
-                    results.append(soa)
+                default_args = {"hostname": record_hostname["name"], "value": str(rr), "ttl": rrset.ttl}
 
                 if isinstance(rr, A):
-                    ipv4 = dict(object_type="IPAddressV4", network=f"Network|{internet['name']}", address=str(rr))
+                    ipv4 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv4)
-                    register_record(
-                        dict(
-                            object_type="DNSARecord",
-                            address=f"IPAddressV4|{internet['name']}|{ipv4['address']}",
-                            **default_args,
-                        )
-                    )
+                    register_record({"object_type": "DNSARecord", "ip_address": ipv4["address"], **default_args})
 
                 if isinstance(rr, AAAA):
-                    ipv6 = dict(object_type="IPAddressV6", network=f"Network|{internet['name']}", address=str(rr))
+                    ipv6 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv6)
-                    register_record(
-                        dict(
-                            object_type="DNSAAAARecord",
-                            address=f"IPAddressV6|{internet['name']}|{ipv6['address']}",
-                            **default_args,
-                        )
-                    )
+                    register_record({"object_type": "DNSAAAARecord", "ip_address": ipv6["address"], **default_args})
 
                 if isinstance(rr, TXT):
                     # TODO: concatenated txt records should be handled better
                     # see https://www.rfc-editor.org/rfc/rfc1035 3.3.14
                     default_args["value"] = str(rr).strip('"').replace('" "', "")
-                    register_record(dict(object_type="DNSTXTRecord", **default_args))
+                    register_record({"object_type": "DNSTXTRecord", **default_args})
 
                 if isinstance(rr, MX):
                     mail_hostname_reference = None
                     if str(rr.exchange) != ".":
                         mail_fqdn = register_hostname(str(rr.exchange))
-                        mail_hostname_reference = f"Hostname|{internet['name']}|{mail_fqdn['name']}"
+                        mail_hostname_reference = mail_fqdn["name"]
 
                     register_record(
-                        dict(
-                            object_type="DNSMXRecord",
-                            mail_hostname=mail_hostname_reference,
-                            preference=rr.preference,
+                        {
+                            "object_type": "DNSMXRecord",
+                            "mail_hostname": mail_hostname_reference,
+                            "preference": rr.preference,
                             **default_args,
-                        )
+                        }
                     )
 
                 if isinstance(rr, NS):
                     ns_fqdn = register_hostname(str(rr.target))
-                    register_record(
-                        dict(
-                            object_type="DNSNSRecord",
-                            name_server_hostname=f"Hostname|{internet['name']}|{ns_fqdn['name']}",
-                            **default_args,
-                        )
-                    )
+                    register_record({"object_type": "DNSNSRecord", "name_server": ns_fqdn["name"], **default_args})
 
                 if isinstance(rr, CNAME):
                     target_fqdn = register_hostname(str(rr.target))
-                    register_record(
-                        dict(
-                            object_type="DNSCNAMERecord",
-                            target_hostname=f"Hostname|{internet['name']}|{target_fqdn['name']}",
-                            **default_args,
-                        )
-                    )
+                    register_record({"object_type": "DNSCNAMERecord", "target": target_fqdn["name"], **default_args})
 
                 if isinstance(rr, CAA):
                     record_value = str(rr).split(" ", 2)
                     default_args["flags"] = min(max(0, int(record_value[0])), 255)
                     default_args["tag"] = re.sub("[^\\w]", "", record_value[1].lower())
                     default_args["value"] = record_value[2]
-                    register_record(dict(object_type="DNSCAARecord", **default_args))
-
-    # link the hostnames to their discovered zones
-    for hostname_, zone in zone_links.items():
-        hostname_store[hostname_]["dns_zone"] = zone["hostname"]
-
-    if zone:
-        results.append(zone)
+                    register_record({"object_type": "DNSCAARecord", **default_args})
 
     results.extend(hostname_store.values())
     results.extend(record_store)
 
     # DKIM
     if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
-        results.append(dict(object_type="DKIMExists", hostname=f"Hostname|internet|{input_hostname['name']}"))
+        results.append({"object_type": "DKIMExists", "hostname": input_hostname["name"]})
 
     # DMARC
     if dmarc_results not in ["NXDOMAIN", "Timeout"]:
@@ -204,28 +141,15 @@ def run(hostname: str, record_types: set[str]) -> list:
             for rr in rrset:
                 if isinstance(rr, TXT):
                     results.append(
-                        dict(
-                            object_type="DMARCTXTRecord",
-                            hostname=f"Hostname|internet|{input_hostname['name']}",
-                            value=str(rr).strip('"'),
-                            ttl=rrset.ttl,
-                        )
+                        {
+                            "object_type": "DNSTXTRecord",
+                            "hostname": input_hostname["name"],
+                            "value": str(rr).strip('"'),
+                            "ttl": rrset.ttl,
+                        }
                     )
 
     return results
-
-
-def get_parent_zone_soa(resolver: dns.resolver.Resolver, name: Name) -> Answer:
-    while True:
-        try:
-            return resolver.resolve(name, dns.rdatatype.SOA)
-        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-            pass
-
-        try:
-            name = name.parent()
-        except dns.name.NoParent:
-            raise ZoneNotFoundException
 
 
 def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, record_subdomain: str) -> str:
@@ -251,11 +175,43 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 
 if __name__ == "__main__":
+    token = os.getenv("OPENKAT_TOKEN")
+    if not token:
+        raise Exception("No OPENKAT_TOKEN env variable")
+
+    base_url = os.getenv("OPENKAT_API")
+    if not base_url:
+        raise Exception("No OPENKAT_API env variable")
+
+    headers = {"Authorization": "Token " + token}
+    client = httpx.Client(base_url=base_url, headers=headers)
     record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
     results = run(sys.argv[1], record_types)
+    results_grouped = defaultdict(list)
 
-    if results:
-        headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-        httpx.post(f'{os.getenv("OPENKAT_API")}/objects/', headers=headers, json=results)
+    for result in results:
+        results_grouped[result.pop("object_type").lower()].append(result)
 
-    print(json.dumps(results))
+    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": results_grouped.pop("ipaddress")}
+    response = client.post("/objects/", headers=headers, json=hostnames_and_ips).json()
+
+    by_name = {h["name"]: h["id"] for h in response["hostname"]}
+    by_address = {ip["address"]: ip["id"] for ip in response["ipaddress"]}
+
+    for object_path, objects in results_grouped.items():
+        for obj in objects:
+            if "hostname" in obj:
+                obj["hostname"] = by_name[obj["hostname"]]
+            if "mail_server" in obj:
+                obj["mail_server"] = by_name[obj["mail_server"]]
+            if "name_server" in obj:
+                obj["name_server"] = by_name[obj["name_server"]]
+            if "target" in obj:
+                obj["target"] = by_name[obj["target"]]
+
+            if "ip_address" in obj:
+                obj["ip_address"] = by_address[obj["ip_address"]]
+
+    res = client.post("/objects/", headers=headers, json=results_grouped)
+
+    print(json.dumps(results))  # noqa: T201

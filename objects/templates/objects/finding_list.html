@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Findings" %}</h1>
+                </div>
+            </div>
+            {% if perms.openkat.add_finding %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "objects:add_finding" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Finding" %}</a>
+                </div>
+            {% endif %}
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <p class="action-buttons">
+                        <button type="submit" class="icon ti-search"></button>
+                    </p>
+                </div>
+            </form>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Organization" %}</th>
+                                <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Object" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for finding in findings %}
+                                <tr>
+                                    <td>{{ finding.organization }}</td>
+                                    <td>{{ finding.finding_type.code }}</td>
+                                    <td>
+                                        <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object }}</a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_finding' finding.pk %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include "partials/list_paginator.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

@@ -4,8 +4,8 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from account.forms import IndemnificationAddForm
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from openkat.forms import IndemnificationAddForm
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.models import Indemnification
 
 

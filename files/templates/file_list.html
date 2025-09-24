@@ -5,7 +5,7 @@
 {% load ooi_extra %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -29,8 +29,8 @@
             </div>
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
-                        {{ filter.form.as_p }}
-                        <button type="submit">{% translate "Apply" %}</button>
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
                 </form>
             </div>
             {% if not file_list %}
@@ -71,17 +71,14 @@
                                     <td>{{ file.created_at }}</td>
                                     <td>
                                         {% if file.task_result.task.organization %}
-                                            <a href="{% url "organization_crisis_room" file.task_result.task.organization.code %}">
-                                                {{ file.task_result.task.organization }}
-                                            </a>
+                                            <td>{{ file.task_result.task.organization.code }}</td>
                                         {% else %}
                                             -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ file.file.url }}"><span class="icon ti-download"></span></a>   
+                                        <a href="{{ file.file.url }}"><span class="icon ti-download"></span></a>
                                     </td>
-
                                 </tr>
                             {% endfor %}
                         </tbody>

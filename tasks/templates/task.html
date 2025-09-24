@@ -5,7 +5,7 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -36,7 +36,7 @@
                     {% else %}
                         <form action="{% url "cancel_task" task.id %}" method="post">
                             {% csrf_token %}
-                            <button class="desctructive" type="submit">{% translate "Cancel" %}</button>
+                            <button class="destructive" type="submit">{% translate "Cancel" %}</button>
                         </form>
                     {% endif %}
                 </div>

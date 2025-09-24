@@ -1,6 +1,6 @@
 from django.test import override_settings
 
-from account.validators import get_password_validators_help_texts
+from openkat.validators import get_password_validators_help_texts
 
 
 @override_settings(

@@ -33,14 +33,9 @@
                         <td>
                             {% if task.data.input_data|get_type == 'str' %}
                                 <span class="label tags-color-3-light">{{ task.data.input_data }}</span>
-                            {% elif task.data.input_data|length >= 1 and task.data.input_data|get_type == 'list' %}
+                            {% elif task.data.input_data|get_type == 'list' and task.data.input_data|length >= 1 %}
                                 <span class="label tags-color-1-light">{{ task.data.input_data|first }}</span>
-                                {% if task.data.input_data|length >= 2 %}
-                                    <span class="label tags-color-2-light">{{ task.data.input_data|last }}</span>
-                                {% endif %}
-                                {% if task.data.input_data|length >= 3 %}
-                                    <span class="label tags-color-grey-2">...</span>
-                                {% endif %}
+                                {% if task.data.input_data|length >= 2 %}<span class="label tags-color-grey-2">...</span>{% endif %}
                             {% else %}
                                 -
                             {% endif %}

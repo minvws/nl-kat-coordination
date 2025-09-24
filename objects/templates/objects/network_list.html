@@ -1,0 +1,60 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Networks" %}</h1>
+                </div>
+            </div>
+            {% if perms.openkat.add_network %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "objects:add_network" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Network" %}</a>
+                </div>
+            {% endif %}
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <p class="action-buttons">
+                        <button type="submit" class="icon ti-search"></button>
+                    </p>
+                </div>
+            </form>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Name" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for network in networks %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'objects:network_detail' network.pk %}">{{ network.name }}</a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_network' network.pk %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include "partials/list_paginator.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

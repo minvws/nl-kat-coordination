@@ -20,21 +20,18 @@ def test_organizationmember_no_permissions(active_member, django_assert_num_quer
     with django_assert_num_queries(3):
         assert not active_member.has_perm("openkat.view_organization")
         assert not active_member.has_perm("openkat.can_scan_organization")
-        assert not active_member.has_perm("openkat.can_enable_disable_plugin")
 
 
 def test_organizationmember_permissions(active_member, django_assert_num_queries):
     content_type = ContentType.objects.get_for_model(Organization)
     view_organization = Permission.objects.get(codename="view_organization", content_type=content_type)
     can_scan_organization = Permission.objects.get(codename="can_scan_organization", content_type=content_type)
-    can_enable_disable_plugin = Permission.objects.get(codename="can_enable_disable_plugin", content_type=content_type)
 
     group1 = Group.objects.create(name="group1")
     group2 = Group.objects.create(name="group2")
 
     active_member.user.user_permissions.add(view_organization)
     group1.permissions.add(can_scan_organization)
-    group2.permissions.add(can_enable_disable_plugin)
 
     active_member.user.groups.add(group1)
     active_member.groups.add(group2)
@@ -42,14 +39,12 @@ def test_organizationmember_permissions(active_member, django_assert_num_queries
     with django_assert_num_queries(3):
         assert active_member.has_perm("openkat.view_organization")
         assert active_member.has_perm("openkat.can_scan_organization")
-        assert active_member.has_perm("openkat.can_enable_disable_plugin")
 
 
 def test_organizationmember_permissions_superuser(superuser_member, django_assert_num_queries):
     with django_assert_num_queries(1):
         assert superuser_member.has_perm("openkat.view_organization")
         assert superuser_member.has_perm("openkat.can_scan_organization")
-        assert superuser_member.has_perm("openkat.can_enable_disable_plugin")
 
 
 def test_user_two_organization(client_user_two_organizations, organization, organization_b):

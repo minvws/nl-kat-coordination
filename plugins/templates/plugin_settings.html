@@ -5,30 +5,30 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             {% include "plugin_introduction.html" %}
             {% include "plugin_tabs.html" with view="settings" %}
+
             <div class="introduction">
                 <div>
                     <h2>{% translate "Settings" %}</h2>
                     <p>
                         {% blocktranslate trimmed %}
-                            Here you can edit this plugin. These settings change the plugin itself, 
-                            which can cause the plugin to not work as expected. These changes will 
+                            Here you can edit this plugin. These settings change the plugin itself,
+                            which can cause the plugin to not work as expected. These changes will
                             effect all organizations in this OpenKAT install.
-                            If you want more information about editing a plugin, you can check out the 
+                            If you want more information about editing a plugin, you can check out the
                             <a href="https://docs.openkat.nl/developer-documentation/development-tutorial/creating-boefje.html">documentation</a>.
                         {% endblocktranslate %}
                     </p>
                 </div>
                 <div class="horizontal-view toolbar">
                     {% if perms.openkat.can_delete_boefje %}
-                        <a class="button ghost destructive" href="{% url "delete_plugin" plugin.id %}">
-                            {% translate "Delete plugin" %}
-                        </a>
+                        <a class="button ghost destructive"
+                           href="{% url "delete_plugin" plugin.id %}">{% translate "Delete plugin" %}</a>
                     {% endif %}
                 </div>
             </div>
@@ -37,8 +37,7 @@
                 {{ form }}
                 <div class="button-container">
                     <button type="submit">{% translate "Save changes" %}</button>
-                    <a href="{% url "plugin_detail" pk=plugin.id %}"
-                    class="button ghost">{% translate "Discard changes" %}</a>
+                    <a href="{% url "plugin_detail" pk=plugin.id %}" class="button ghost">{% translate "Discard changes" %}</a>
                 </div>
             </form>
         </section>

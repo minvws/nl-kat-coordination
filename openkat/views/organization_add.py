@@ -6,8 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 
-from account.forms import OrganizationForm
-from openkat.exceptions import ServiceException
+from openkat.forms import OrganizationForm
 from openkat.models import Organization, OrganizationMember
 
 logger = structlog.get_logger(__name__)
@@ -33,14 +32,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        try:
-            self.object = form.save()
-        except ServiceException as e:
-            message = f"An issue occurred in {e.service_name} while creating the organization"
-            logger.exception(message)
-            messages.add_message(self.request, messages.ERROR, _(message))
-
-            return redirect(self.success_url)  # get_success_url() assumes self.object is set, see ModelFormMixin
+        self.object = form.save()
 
         try:
             member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)

@@ -1,0 +1,21 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <form method="post" class="help">
+                {% csrf_token %}
+                {% include "partials/form/form_errors.html" with form=form %}
+
+                {{ form }}
+                <button type="submit">{% translate "Add Object" %}</button>
+            </form>
+        </section>
+    </main>
+{% endblock content %}

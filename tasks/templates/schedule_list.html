@@ -6,7 +6,7 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -19,7 +19,7 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
-                {% if perms.openkat.add_newschedule %}
+                {% if perms.openkat.add_schedule %}
                     <div class="horizontal-view toolbar">
                         <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add schedule" %}</a>
                     </div>
@@ -27,8 +27,8 @@
             </div>
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
-                        {{ filter.form.as_p }}
-                        <button type="submit">{% translate "Apply" %}</button>
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
                 </form>
             </div>
             {% if not newschedule_list %}
@@ -50,7 +50,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for schedule in newschedule_list %}
+                            {% for schedule in schedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
                                         <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
@@ -64,7 +64,7 @@
                                     </td>
                                     <td>
                                         {% if schedule.organization %}
-                                            <a href="{% url "organization_crisis_room" schedule.organization %}">{{ schedule.organization }}</a>
+                                            {{ schedule.organization }}
                                         {% else %}
                                             {% translate "All" %}
                                         {% endif %}
@@ -77,6 +77,9 @@
                                                 {{ rrule.to_text.upper }} since {{ schedule.recurrences.dtstart }}
                                             {% endif %}
                                         {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'task_list' %}?schedule_id={{ schedule.id }}">See Tasks</a>
                                     </td>
                                     {% if perms.openkat.can_enable_disable_schedule %}
                                         <form action="{% url "edit_schedule" pk=schedule.id %}"
@@ -124,7 +127,8 @@
                                     <td colspan="6">
                                         <div class="button-container">
                                             {# TODO: Permissions #}
-                                            <a class="button" href="{% url "new_task_list" %}?schedule_id={{ schedule.id }}">{% translate "View tasks" %}</a>
+                                            <a class="button"
+                                               href="{% url "new_task_list" %}?schedule_id={{ schedule.id }}">{% translate "View tasks" %}</a>
                                             <form action="{% url "run_schedule" schedule.id %}" method="post">
                                                 {% csrf_token %}
                                                 <button class="ghost" type="submit">
@@ -132,18 +136,19 @@
                                                     {% translate "Rerun now" %}
                                                 </button>
                                             </form>
-                                            <a class="button ghost" href="{% url "schedule_detail" pk=schedule.id %}">
+                                            <a class="button ghost"
+                                               href="{% url "schedule_detail" pk=schedule.id %}">
                                                 <span class="icon ti-edit"></span>
                                                 {% translate "Edit" %}
                                             </a>
                                             <form action="{% url "delete_schedule" schedule.id %}" method="post">
                                                 {% csrf_token %}
-                                                <button class="ghost destructive" type="submit" class="icon ti-trash action-button">
+                                                <button class="ghost destructive" type="submit">
                                                     <span class="icon ti-trash"></span>
                                                     {% translate "Delete" %}
                                                 </button>
                                             </form>
-                                        </div>     
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

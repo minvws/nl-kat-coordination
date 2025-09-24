@@ -23,7 +23,9 @@ class Command(BaseCommand):
             "-c",
             dest="cli",
             action="store_true",
-            help="Do not actually run the plugin container but dump the equivalent docker run command. Useful for debugging. Note: to run the command, make sure to set the OPENKAT_TOKEN environment variable first to a personal auth token",
+            help="Do not actually run the plugin container but dump the equivalent docker run command. "
+            "Useful for debugging. Note: to run the command, make sure to set the OPENKAT_TOKEN environment "
+            "variable first to a personal auth token",
         )
         parser.add_argument("--parallelism", "-p", dest="parallelism", type=int, help="Level of auto-parallelism.")
 

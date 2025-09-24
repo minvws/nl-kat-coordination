@@ -1,5 +1,3 @@
-import uuid
-from datetime import date, datetime, timezone
 from typing import Any, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
@@ -9,33 +7,7 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models.types import OOI_TYPES
 from openkat.models import Organization
-
-
-def convert_date_to_datetime(d: date) -> datetime:
-    # returning 23:59 of date_object in UTC timezone
-    return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
-
-
-def get_mandatory_fields(request: HttpRequest, params: list[str] | None = None) -> list:
-    mandatory_fields = []
-
-    if not params:
-        params = ["observed_at", "depth", "view"]
-
-        for type_ in request.GET.getlist("ooi_type", []):
-            mandatory_fields.append(("ooi_type", type_))
-
-    for param in params:
-        if param in request.GET:
-            mandatory_fields.append((param, request.GET.get(param)))
-
-    return mandatory_fields
-
-
-def generate_job_id():
-    return str(uuid.uuid4())
 
 
 def url_with_querystring(path: str, doseq: bool = False, /, **kwargs: Any) -> str:
@@ -66,13 +38,6 @@ def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: A
         del kwargs["query"]
 
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
-
-
-def existing_ooi_type(ooi_type: str) -> bool:
-    if not ooi_type:
-        return False
-
-    return ooi_type in [x.__name__ for x in OOI_TYPES.values()]
 
 
 class Breadcrumb(TypedDict):

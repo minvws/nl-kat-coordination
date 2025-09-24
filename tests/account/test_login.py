@@ -3,7 +3,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import Client
 from pytest_django.asserts import assertContains
 
-from account.views.login import LoginOpenKATView
+from openkat.views.login import LoginOpenKATView
 
 
 def test_login_view(rf, clientuser):

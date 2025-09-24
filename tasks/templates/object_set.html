@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{{ objectset.name }}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Query" %}</h2>
+                <p>{{ objectset.object_query }}</p>
+            </div>
+            {% if objects %}
+                <div>
+                    <h2>{% translate "Preview" %}</h2>
+                    <ul>
+                        {% for object in objects %}<li>{{ object }}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div>
+                <h2>{% translate "Static objects" %}</h2>
+                {% if objectset.traverse_objects %}
+                    <ul>
+                        {% for object in objectset.traverse_objects %}<li>{{ object.value }} ({{ objectset.description }})</li>{% endfor %}
+                    </ul>
+                {% else %}
+                    <p>{% translate "There are no static object for this object set." %}</p>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

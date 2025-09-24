@@ -1,9 +1,0 @@
-{
-  "plugin_id": "snyk",
-  "name": "Snyk.io-vulnerabilities",
-  "description": "Get Snyk.io vulnerabilities based on identified Software.",
-  "consumes": [
-    "SoftwareInstance"
-  ],
-  "scan_level": 1
-}

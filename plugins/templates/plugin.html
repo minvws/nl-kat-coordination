@@ -5,58 +5,59 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             {% include "plugin_introduction.html" %}
             {% include "plugin_tabs.html" with view="general" %}
 
-            <div class="introduction">
+            <div>
+                <h2>{% translate "General" %}</h2>
                 <div>
-                    <h2>{% translate "General" %}</h2>
-                    <div>
-                        <h3>{% translate "Container image" %}</h3>
+                    <h3>{% translate "Container image" %}</h3>
+                    <p>
+                        {% translate "The container image for this plugin is:" %} <code>{{ plugin.oci_image }}</code>
+                    </p>
+                </div>
+                <div>
+                    <h3>{% translate "Creation date" %}</h3>
+                    <p>{{ plugin.created_at }}</p>
+                </div>
+                <div>
+                    <h3>{% translate "Arguments" %}</h3>
+                    <ul>
+                        {% for argument in plugin.oci_arguments %}
+                            <li>
+                                <code>{{ argument }}</code>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h3>{% translate "Consumes" %}</h3>
+                    {% if plugin.consumes %}
                         <p>
-                            {% translate "The container image for this plugin is:" %} <code>{{ plugin.oci_image }}</code>
-                        </p>
-                    </div>
-                    <div>
-                        <h3>{% translate "Creation date" %}</h3>
-                        <p>
-                            {{ plugin.created_at }}
-                        </p>
-                    </div>
-                    <div>
-                        <h3>{% translate "Arguments" %}</h3>
-                        <ul>
-                            {% for argument in plugin.oci_arguments %}<li><code>{{ argument }}</code></li>{% endfor %}
-                        </ul>
-                    </div>
-                    <div>
-                        <h3>{% translate "Consumes" %}</h3>
-                        {% if plugin.consumes %}
-                            <p>
-                                {% blocktranslate trimmed with plugin_name=plugin.name %}
-                                    This plugin is able to scan the following object types:
-                                {% endblocktranslate %}
-                            </p>
-                            <p>
-                                {% for ooi_type in plugin.consumes %}<span class="label tags-color-1-light">{{ ooi_type }}</span>{% endfor %}
-                            </p>
-                        {% else %}
                             {% blocktranslate trimmed with plugin_name=plugin.name %}
-                                {{ plugin_name }} does not need any input objects.
+                                This plugin is able to scan the following object types:
                             {% endblocktranslate %}
-                        {% endif %}
-                    </div>
+                        </p>
+                        <p>
+                            {% for ooi_type in plugin.consumes %}<span class="label tags-color-1-light">{{ ooi_type }}</span>{% endfor %}
+                        </p>
+                    {% else %}
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} does not need any input objects.
+                        {% endblocktranslate %}
+                    {% endif %}
                 </div>
-                <div class="horizontal-view toolbar">
-                    <a class="button ghost"
-                       href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
-                        {% translate "View results" %}<span class="icon ti-chevron-right"></span>
-                    </a>
-                </div>
-            </section>
-        </main>
-    {% endblock content %}
+            </div>
+            <div class="horizontal-view toolbar">
+                <a class="button ghost"
+                   href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
+                    {% translate "View results" %}<span class="icon ti-chevron-right"></span>
+                </a>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

@@ -92,7 +92,7 @@
 
                     </td>
                     <td>
-                        {% if perms.openkat.can_enable_disable_plugin %}
+                        {% if perms.openkat.add_enabledplugin %}
                             <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
                                   method="post"
                                   class="inline">
@@ -125,8 +125,24 @@
                             <span class="icon ti-chevron-right"></span>
                         </a>
                     </td>
+                    <td>
+                        {% if plugin.enabled %}
+                            {% if plugin.consumed_types %}
+                                <a href="{% url 'add_task' %}?plugin={{ plugin.id }}">
+                                    <button type="submit">{% translate "Run" %}</button>
+                                </a>
+                            {% elif not plugin.files_in_arguments %}
+                                <form action="{% url 'add_task' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="organization" value="">
+                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
+                                    <button type="submit">{% translate "Run" %}</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    </td>
                 </tr>
-{% endfor %}
-</tbody>
-</table>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>

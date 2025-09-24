@@ -4,7 +4,6 @@ from typing import Any
 
 import structlog
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
@@ -16,17 +15,15 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 
-from account.forms import AccountTypeSelectForm, MemberRegistrationForm, PasswordResetForm
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
+from openkat.forms import AccountTypeSelectForm, MemberRegistrationForm, PasswordResetForm
 from openkat.forms.upload_csv import UploadCSVForm
 from openkat.messaging import clearance_level_warning_dns_report
-from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember, User
 from openkat.view_helpers import Breadcrumb, OrganizationMemberBreadcrumbsMixin
 
 logger = structlog.get_logger(__name__)
-
-User = get_user_model()
 
 
 MEMBER_UPLOAD_COLUMNS = [
@@ -209,7 +206,6 @@ class MembersUploadView(
 
         member_kwargs = {
             "organization": self.organization,
-            "status": OrganizationMember.STATUSES.ACTIVE,
             "trusted_clearance_level": trusted_clearance,
             "acknowledged_clearance_level": acknowledged_clearance,
         }

@@ -13,6 +13,27 @@
     ]
   },
   {
+    "plugin_id": "dns-bulk",
+    "name": "DNS Bulk",
+    "description": "Fetch the DNS record(s) of a hostname.",
+    "scan_level": 1,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "xargs",
+      "-I",
+      "%",
+      "-P",
+      "8",
+      "uv",
+      "run",
+      "kat_dns/main.py",
+      "%"
+    ]
+  },
+  {
     "plugin_id": "dns-sec",
     "name": "DNSSEC",
     "description": "Validates DNSSEC of a hostname by checking the cryptographic signatures.",
@@ -59,7 +80,7 @@
       "-sS",
       "-oX",
       "-",
-      "{ipaddress|hostname}"
+      "{ipaddress}"
     ]
   },
   {
@@ -81,12 +102,12 @@
       "-sU",
       "-oX",
       "-",
-      "{ipaddress|hostname}"
+      "{ipaddress}"
     ]
   },
   {
     "plugin_id": "parse-nmap",
-    "name": "Parse NMAP XML data.",
+    "name": "Parse NMAP XML",
     "description": "Parses data from all nmap variants into IP-addresses, ports and services.",
     "scan_level": 2,
     "consumes": [
@@ -166,8 +187,8 @@
     ]
   },
   {
-    "plugin_id": "nuclei-tls-version-bulk",
-    "name": "Nuclei TLS Version bulk",
+    "plugin_id": "nuclei-tls-bulk",
+    "name": "Nuclei TLS bulk",
     "scan_level": 2,
     "consumes": [
       "type:hostname"
@@ -258,7 +279,7 @@
     "oci_arguments": [
       "sh",
       "-c",
-      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], \"Hostname|internet|\" +.host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f"
+      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], .host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f -t hostname"
     ]
   }
 ]

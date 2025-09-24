@@ -5,13 +5,14 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <form method="post" class="help">
                 {% csrf_token %}
                 {% include "partials/form/form_errors.html" with form=form %}
+
                 {{ form }}
                 <button type="submit">{% translate "Create Task" %}</button>
             </form>
