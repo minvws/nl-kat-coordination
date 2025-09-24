@@ -72,7 +72,9 @@ services:
       - .env.test
 
   xtdb:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.1.0"
+    image: "ghcr.io/xtdb/xtdb:nightly-20250912"
+    environment:
+      - XTDB_LOGGING_LEVEL=DEBUG
 
   redis:
     restart: on-failure

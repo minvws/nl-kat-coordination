@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="two-thirds-one-third">
+                <div>
+                    <h1>Object Set: "{{ objectset.name }}" ({{ objectset.id }})</h1>
+                    <p class="emphasized">Query:</p>
+                    <p class="emphasized">
+                        <strong>{{ objectset.object_query }}</strong>
+                    </p>
+                    {% if objects %}
+                        <p class="emphasized">Preview:</p>
+                        {% for object in objects %}<strong>{{ object }}</strong>{% endfor %}
+                    {% endif %}
+                    <p class="emphasized">Static Objects:</p>
+                    {% if objectset.traverse_objects %}
+                        Objects:
+                        {% for object in objectset.traverse_objects %}<strong>{{ object.value }}</strong>{% endfor %}
+                        <p class="emphasized">{{ objectset.description }}</p>
+                    {% else %}
+                        <strong>No static objects</strong>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

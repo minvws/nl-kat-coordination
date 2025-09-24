@@ -9,10 +9,7 @@ from plugins.runner import PluginRunner
 @pytest.mark.django_db()
 def test_hello_world():
     plugin = Plugin.objects.create(
-        name="testing plugins",
-        plugin_id="test",
-        oci_image="hello-world:linux",
-        oci_arguments=["/hello"],
+        name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
     )
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -27,15 +24,14 @@ def test_hello_world():
     file = File.objects.first()
     assert file.file.read().decode() == hello_world
 
+
 # todo: todo and fix everything below
+
 
 @pytest.mark.django_db()
 def test_input_output():
     plugin = Plugin.objects.create(
-        name="Test Plugin",
-        plugin_id="cat-plugin",
-        oci_image="alpine:latest",
-        oci_arguments=["/bin/cat"],
+        name="Test Plugin", plugin_id="cat-plugin", oci_image="alpine:latest", oci_arguments=["/bin/cat"]
     )
 
     output = PluginRunner().run(plugin.plugin_id, "hello world^C", output="-")
@@ -43,8 +39,10 @@ def test_input_output():
 
     assert File.objects.count() == 1
 
+
 # test write to stdout
 # - also results in 1 (temp) file
+
 
 @pytest.mark.django_db()
 def test_with_static_file_input():
@@ -59,6 +57,7 @@ def test_with_static_file_input():
     output = PluginRunner().run(plugin.plugin_id, None, output="-")
     assert output == "test content"
 
+
 @pytest.mark.django_db()
 def test_with_argument():
     plugin = Plugin.objects.create(
@@ -68,8 +67,9 @@ def test_with_argument():
         oci_arguments=["nslookup", "{hostname}"],
     )
 
-    output = PluginRunner().run(plugin.plugin_id, ['nu.nl'], output="-")
+    output = PluginRunner().run(plugin.plugin_id, ["nu.nl"], output="-")
     assert "Name:	nu.nl" in output
+
 
 @pytest.mark.django_db()
 def test_with_multiple_arguments():
@@ -79,9 +79,10 @@ def test_with_multiple_arguments():
         oci_image="alpine:latest",
         oci_arguments=["nslookup", "{hostname}"],
     )
-    output = PluginRunner().run(plugin.plugin_id, ['nu.nl', 'example.com'], output="-")
+    output = PluginRunner().run(plugin.plugin_id, ["nu.nl", "example.com"], output="-")
     assert "Name:	nu.nl" in output
     assert "Name:	example.com" in output
+
 
 # test with file input ("{file"})
 # - create File with pk = 123

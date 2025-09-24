@@ -5,15 +5,29 @@
 {% load ooi_extra %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
-            {% include "tasks/partials/tasks_overview_header.html" %}
+            <div>
+                <h1>{% translate "Tasks" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        An overview of the tasks for <strong>{{ organization }}</strong>. Tasks are divided in Boefjes, Normalizers and Reports.
+                        Boefjes scan objects and Normalizers dispatch on the output mime-type. Additionally, there is a Report
+                        tasks. This task aggregates and presents findings from both Boefjes and Normalizers.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+            {% if perms.openkat.add_task %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "add_task" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Run Task" %}</a>
+                </div>
+            {% endif %}
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
-                        {{ filter.form.as_p }}
-                        <button type="submit">{% translate "Apply" %}</button>
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
                 </form>
             </div>
             {% if not task_list %}
@@ -41,11 +55,11 @@
                             {% for task in task_list %}
                                 <tr data-task-id="{{ task.id }}">
                                     <td>
-                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:10 }}</a>
+                                        <a href="{% url "task_detail" pk=task.id %}">{{ task.id|truncatechars:8 }}</a>
                                     </td>
                                     <td>
-                                        {% if task.data.plugin_id %}
-                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.data.plugin_id }}</a>
+                                        {% if task.plugin_name %}
+                                            <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
                                         {% else %}
                                             No Plugin
                                         {% endif %}
@@ -55,7 +69,7 @@
                                             {{ task.data.input_data }}
                                         {% elif task.data.input_data|get_type == 'list' %}
                                             {% if task.data.input_data|length > 1 %}
-                                                [{{ task.data.input_data|first }}, ..., {{ task.data.input_data|last }}]
+                                                {{ task.data.input_data|first }}, ...
                                             {% elif task.data.input_data|length == 1 %}
                                                 {{ task.data.input_data|first }}
                                             {% else %}
@@ -67,9 +81,9 @@
                                     </td>
                                     <td>
                                         {% if task.organization %}
-                                            <a href="{% url "organization_crisis_room" task.organization %}">{{ task.organization }}</a>
+                                            {{ task.organization }}
                                         {% else %}
-                                            {% translate "No Organization" %}
+                                            -
                                         {% endif %}
                                     </td>
                                     <td>
@@ -77,23 +91,21 @@
                                     </td>
                                     <td>
                                         {% if task.new_schedule_id %}
-                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">
-                                                {{ task.new_schedule_id }}
-                                            </a>
+                                            <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">{{ task.new_schedule_id }}</a>
                                         {% else %}
-                                            No Schedule
+                                            -
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate 'See Results' %}</a>
+                                        <a href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "Show" %}</a>
                                     </td>
                                     <td>{{ task.created_at }}</td>
                                     <td>
                                         {% if task.done %}
-                                        <form action="{% url 'reschedule_task' task.id %}" method="post">
-                                            {% csrf_token %}
-                                            <button type="submit">{% translate "Reschedule" %}</button>
-                                        </form>
+                                            <form action="{% url 'reschedule_task' task.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit">{% translate "Reschedule" %}</button>
+                                            </form>
                                         {% else %}
                                             <form action="{% url 'cancel_task' task.id %}" method="post">
                                                 {% csrf_token %}

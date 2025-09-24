@@ -41,7 +41,7 @@
                               class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
                     </button>
                 </th>
-                {% if perms.openkat.can_enable_disable_plugin %}
+                {% if perms.openkat.add_enabledplugin %}
                     <th scope="col">{% translate "Toggle" %}</th>
                 {% endif %}
                 <th scope="col">{% translate "" %}</th>
@@ -75,11 +75,6 @@
                             {% endif %}
                         </span>
                     </td>
-                    {#                    <td>#}
-                    {#                        <span class="plugin-oci-arguments">#}
-                    {#                            {% for argument in plugin.oci_arguments %}{{ argument }}{{ ' ' }}{% endfor %}#}
-                    {#                        </span>#}
-                    {#                    </td>#}
                     <td>
                         <span class="de-emphasized">
                             {% if plugin.enabled %}
@@ -89,7 +84,7 @@
                             {% endif %}
                         </span>
                     </td>
-                    {% if perms.openkat.can_enable_disable_plugin %}
+                    {% if perms.openkat.add_enabledplugin %}
                         <td>
                             <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
                                   method="post"
@@ -130,12 +125,12 @@
                         </form>
                     </td>
                     <td>
-                        <a href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">{% translate 'See Results' %}</a>
+                        <a href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">{% translate "See Results" %}</a>
                     </td>
                     <td>
                         {% if plugin.enabled %}
                             {% if plugin.consumed_types %}
-                                <a href="{% url 'add_task' %}?plugin_id={{ plugin.id }}">
+                                <a href="{% url 'add_task' %}?plugin={{ plugin.id }}">
                                     <button type="submit">{% translate "Run" %}</button>
                                 </a>
                             {% elif not plugin.files_in_arguments %}

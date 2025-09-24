@@ -57,7 +57,7 @@ def test_upload_members(rf, superuser_member):
 
     assert response.url == f"/en/{superuser_member.organization.code}/members"
 
-    assert OrganizationMember.objects.filter(organization=superuser_member.organization, status="active").count() == 5
+    assert OrganizationMember.objects.filter(organization=superuser_member.organization).count() == 5
     assert not OrganizationMember.objects.filter(organization=superuser_member.organization).last().user.password
 
 

@@ -11,7 +11,7 @@ class PageActions(Enum):
     START_SCAN = "start_scan"
     RESCHEDULE_TASK = "reschedule_task"
     CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
-    SCAN_OOIS = "scan_oois"
+    SCAN_OOIS = "scan_objects"
 
 
 class PageActionsView(ProcessFormView):

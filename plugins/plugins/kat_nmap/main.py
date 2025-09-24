@@ -12,14 +12,8 @@ from libnmap.parser import NmapParser
 def get_ip_ports_and_service(host: NmapHost):
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
-    ip = f"IPAddressV4|internet|{host.address}" if host.ipv4 else f"IPAddressV6|internet|{host.address}"
-    ip_obj = (
-        dict(object_type="IPAddressV4", network="Network|internet", address=host.address)
-        if host.ipv4
-        else dict(object_type="IPAddressV6", network="Network|internet", address=host.address)
-    )
 
-    results = [ip_obj]
+    results = []
     if open_ports:
         for port, protocol in open_ports:
             service: NmapService = host.get_service(port, protocol)
@@ -27,30 +21,33 @@ def get_ip_ports_and_service(host: NmapHost):
             # If service is tcpwrapped we should consider the port closed
             if service.service == "tcpwrapped":
                 continue
-
-            ip_port = dict(object_type="IPPort", address=ip, protocol=protocol, port=port, state=service.state)
-            results.append(ip_port)
-
             service_name = service.service
             if service_name == "http" and service.tunnel == "ssl":
                 service_name = "https"
 
-            port_service = dict(object_type="Service", name=service_name)
-            results.append(port_service)
-
-            ip_service = dict(
-                object_type="IPService",
-                ip_port=f"IPPort|internet|{host.address}|{ip_port['protocol']}|{ip_port['port']}",
-                service=f"Service|{service_name}",
-            )  # TODO
-            results.append(ip_service)
+            ip_port = {
+                "address": host.address,
+                "protocol": protocol.upper(),
+                "port": port,
+                "state": service.state,
+                "service": service_name,
+            }
+            results.append(ip_port)
 
     return results
 
 
 def run(file_id: str):
-    headers = {"Authorization": "Token " + os.getenv("OPENKAT_TOKEN")}
-    client = httpx.Client(base_url=os.getenv("OPENKAT_API"), headers=headers)
+    token = os.getenv("OPENKAT_TOKEN")
+    if not token:
+        raise Exception("No OPENKAT_TOKEN env variable")
+
+    base_url = os.getenv("OPENKAT_API")
+    if not base_url:
+        raise Exception("No OPENKAT_API env variable")
+
+    headers = {"Authorization": "Token " + token}
+    client = httpx.Client(base_url=base_url, headers=headers)
 
     nmap_file = client.get(f"/file/{file_id}/").json()
     file = client.get(nmap_file["file"])
@@ -62,35 +59,61 @@ def run(file_id: str):
     results = []
     logging.info("Parsing %d Nmap-xml(s).", len(raw_splitted))
 
+    response = client.get("/objects/network/", params={"name": "internet", "limit": 1}).json()
+
+    if not response["results"]:
+        internet = client.post("/objects/network/", json={"name": "internet"}).json()
+    else:
+        internet = response["results"][0]
+
+    by_address = {}
+
     for nmap_output in raw_splitted:
         parsed = NmapParser.parse_fromstring(nmap_output)
         ports_scanned = get_ports_scanned(parsed)
 
         for host in parsed.hosts:
-            result = get_ip_ports_and_service(host=host)
+            new_ports = get_ip_ports_and_service(host)
+            response = client.get("/objects/ipaddress/", params={"address": str(host.address), "limit": 1}).json()
 
-            open_ports = [f"IPPort|internet|{host.address}|{ooi['protocol']}|{ooi['port']}"
-                          for ooi in result if ooi["object_type"] == "IPPort" and ooi["state"] == "open"]
+            if not response["results"]:
+                address = client.post(
+                    "/objects/ipaddress/", json={"address": str(host.address), "network": internet["id"]}
+                ).json()
+            else:
+                address = response["results"][0]
 
-            # TODO: use address as filter if it's not in the pk anymore.
-            params = {"object_type": "IPPort", "port": ports_scanned}
-            ports = [x["primary_key"] for x in client.get("/objects/", params=params).json()["results"]]
+            by_address[address["address"]] = address["id"]
+            not_closed = [ooi["port"] for ooi in new_ports if ooi["state"] != "closed"]
+            idx = 0
+            batch_size = 250
 
-            try:
-                client.delete("/objects/", params={"pk": list(set(ports) - set(open_ports))})
-            except HTTPError:
-                print(f"Failed to delete ports for {host}, continuing")
-                continue
+            for idx_2 in range(batch_size, len(ports_scanned) + batch_size, batch_size):
+                params = {"port": ports_scanned[idx:idx_2], "address": address["id"]}
+                ports = [x["id"] for x in client.get("/objects/ipport/", params=params).json()["results"]]
 
-            results.extend(result)
+                if not ports:
+                    idx = idx_2
+                    continue
+                try:
+                    client.delete("/objects/ipport/", params={"pk": list(set(ports) - set(not_closed))})
+                except HTTPError:
+                    print(f"Failed to delete ports for {host}, continuing")  # noqa: T201
+                idx = idx_2
 
-    client.post(f'{os.getenv("OPENKAT_API")}/objects/', json=results)
+            results.extend(new_ports)
+
+    for port in results:
+        if "address" in port:
+            port["address"] = by_address[port["address"]]
+
+    client.post("/objects/ipport/", json=results)
 
     return results
 
 
 def get_ports_scanned(parsed: NmapReport):
-    """ Given an NmapReport, get the list of ports that were actually scanned """
+    """Given an NmapReport, get the list of ports that were actually scanned"""
 
     ports_scanned = []
 
@@ -109,6 +132,6 @@ def get_ports_scanned(parsed: NmapReport):
 
 
 if __name__ == "__main__":
-    oois = run(sys.argv[1])
+    results = run(sys.argv[1])
 
-    print(json.dumps(oois))
+    print(json.dumps(results))  # noqa: T201

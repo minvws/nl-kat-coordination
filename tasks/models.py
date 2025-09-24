@@ -1,6 +1,8 @@
 import uuid
 
 import recurrence.fields
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from files.models import File
@@ -36,19 +38,39 @@ class Operation(models.TextChoices):
     DELETE = "delete"
 
 
+class ObjectSet(models.Model):
+    """Composite-like model representing a set of objects that can be used as an input for tasks"""
+
+    # TODO: organization field?
+    name = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField(blank=True)
+    dynamic = models.BooleanField(default=False)  # TODO
+    object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_query = models.TextField(null=True, blank=True)
+
+    # can hold both objects and other groups (composite pattern)
+    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: fix?
+    subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
+
+    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[str]:  # TODO: fix?
+        # TODO: handle cycles
+        # TODO: configurable max_depth
+
+        if depth >= max_depth:
+            raise RecursionError("Max depth reached for object set.")
+
+        all_objects = self.all_objects
+
+        for subset in self.subsets.all():
+            all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
+
+        return all_objects
+
+    def __str__(self):
+        return self.name or super().__str__()
+
+
 class Schedule(models.Model):
-    type = models.CharField(max_length=64)
-    organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="schedules")
-    data = models.JSONField(default=dict)
-    enabled = models.BooleanField(default=True)
-    schedule = models.CharField(max_length=32, null=True)
-
-    deadline_at = models.DateTimeField(null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
-
-
-class NewSchedule(models.Model):
     enabled = models.BooleanField(default=True)
     recurrences = recurrence.fields.RecurrenceField(null=True, blank=True)
 
@@ -57,32 +79,35 @@ class NewSchedule(models.Model):
         "openkat.organization", on_delete=models.CASCADE, related_name="new_schedules", null=True, blank=True
     )
     plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
-    object_set = models.ForeignKey("objects.ObjectSet", on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
+    object_set = models.ForeignKey(ObjectSet, on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
 
     run_on = models.CharField(max_length=64, null=True, blank=True)
-    operation = models.CharField(max_length=16, choices=Operation.choices, null=True, blank=True)
+    operation = models.CharField(max_length=16, choices=Operation, null=True, blank=True)
 
     def run(self):
-        from tasks.new_tasks import run_schedule
+        # Import here to prevent circular imports
+        from tasks.tasks import run_schedule  # noqa: PLC0415
 
         run_schedule(self)
 
 
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name="tasks", null=True, blank=True)
-    new_schedule = models.ForeignKey(NewSchedule, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
-    organization = models.ForeignKey("openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True)
+    new_schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
+    organization = models.ForeignKey(
+        "openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True
+    )
     type = models.CharField(max_length=32, default="plugin")
     data = models.JSONField(default=dict)
-    status = models.CharField(max_length=16, choices=TaskStatus.choices, default=TaskStatus.PENDING)
+    status = models.CharField(max_length=16, choices=TaskStatus, default=TaskStatus.PENDING)
 
     created_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     def cancel(self):
-        from tasks.celery import app
+        # Import here to prevent circular imports
+        from tasks.celery import app  # noqa: PLC0415
 
         self.status = TaskStatus.CANCELLED
         self.save()

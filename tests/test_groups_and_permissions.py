@@ -1,10 +1,6 @@
-import pytest
 from pytest_django.asserts import assertContains, assertNotContains
 
-from account.views.account import AccountView
-from katalogus.views.plugin_detail import BoefjeDetailView
-from octopoes.models.pagination import Paginated
-from octopoes.models.types import OOIType
+from openkat.views.account import AccountView
 from tests.conftest import setup_request
 
 
@@ -42,37 +38,3 @@ def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member
 
     assertNotContains(response_admin, check_text)
     assertNotContains(response_client, check_text)
-
-
-@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
-def test_plugin_settings_list_perms(request, member, rf, octopoes_api_connector, network, dns_records):
-    octopoes_api_connector.list_objects.return_value = Paginated[OOIType](count=1, items=[network])
-    member = request.getfixturevalue(member)
-
-    response = BoefjeDetailView.as_view()(
-        setup_request(rf.get("boefje_detail"), member.user),
-        organization_code=member.organization.code,
-        plugin_type="boefje",
-        plugin_id=dns_records.id,
-    )
-
-    assert response.status_code == 200
-    assertContains(response, "Overview of settings")
-    assertContains(response, "Object list")
-
-
-@pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_plugin_settings_list_perms_2(request, member, rf, dns_records, octopoes_api_connector, network):
-    octopoes_api_connector.list_objects.return_value = Paginated[OOIType](count=1, items=[network])
-    member = request.getfixturevalue(member)
-
-    response = BoefjeDetailView.as_view()(
-        setup_request(rf.get("boefje_detail"), member.user),
-        organization_code=member.organization.code,
-        plugin_type="boefje",
-        plugin_id=dns_records.id,
-    )
-
-    assert response.status_code == 200
-
-    assertNotContains(response, "Overview of settings")

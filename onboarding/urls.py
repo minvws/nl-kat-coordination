@@ -13,21 +13,6 @@ urlpatterns = [
         name="step_choose_report_info",
     ),
     path(
-        "<organization_code>/step/choose-report-type/",
-        views.OnboardingChooseReportTypeView.as_view(),
-        name="step_choose_report_type",
-    ),
-    path(
-        "<organization_code>/step/setup-scan/ooi/info/",
-        views.OnboardingSetupScanOOIInfoView.as_view(),
-        name="step_setup_scan_ooi_info",
-    ),
-    path(
-        "<organization_code>/step/setup-scan/ooi/detail/",
-        views.OnboardingSetupScanOOIDetailView.as_view(),
-        name="step_setup_scan_ooi_detail",
-    ),
-    path(
         "<organization_code>/step/clearance-level-introduction/",
         views.OnboardingClearanceLevelIntroductionView.as_view(),
         name="step_clearance_level_introduction",
@@ -37,22 +22,6 @@ urlpatterns = [
         views.OnboardingAcknowledgeClearanceLevelView.as_view(),
         name="step_acknowledge_clearance_level",
     ),
-    path(
-        "<organization_code>/step/set-clearance-level/",
-        views.OnboardingSetClearanceLevelView.as_view(),
-        name="step_set_clearance_level",
-    ),
-    path(
-        "<organization_code>/step/setup-scan/select-plugins/",
-        views.OnboardingSetupScanSelectPluginsView.as_view(),
-        name="step_setup_scan_select_plugins",
-    ),
-    path(
-        "<organization_code>/step/setup-scan/<ooi_type>/",
-        views.OnboardingSetupScanOOIAddView.as_view(),
-        name="step_setup_scan_ooi_add",
-    ),
-    path("<organization_code>/step/report/", views.OnboardingReportView.as_view(), name="step_report"),
     path(
         "step/introduction/registration/",
         views.OnboardingIntroductionRegistrationView.as_view(),

@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "IP addresses" %}</h1>
+                </div>
+            </div>
+            {% if perms.openkat.add_ipaddress %}
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "objects:add_ipaddress" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add IPAddress" %}</a>
+                </div>
+            {% endif %}
+            <form class="inline layout-wide" method="get">
+                <div class="horizontal-view">
+                    {{ filter.form.as_p }}
+                    <p class="action-buttons">
+                        <button type="submit" class="icon ti-search"></button>
+                    </p>
+                </div>
+            </form>
+            <div>
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th>{% translate "Address" %}</th>
+                                <th>{% translate "Network" %}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ipaddress in ipaddresses %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}">{{ ipaddress.address }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'objects:network_detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_ipaddress' ipaddress.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% include "partials/list_paginator.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

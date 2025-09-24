@@ -1,20 +1,17 @@
 import datetime
-from datetime import timezone
 
 import recurrence
 import structlog
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
-from django.db.models import Case, F, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
+from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
-from objects.models import ObjectSet
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
-from octopoes.models.types import ALL_TYPES_MAP
+from objects.models import Hostname, IPAddress, object_type_by_name
 from openkat.models import Organization, OrganizationMember
-from tasks.models import NewSchedule
+from tasks.models import ObjectSet, Schedule
 
 logger = structlog.get_logger(__name__)
 
@@ -29,6 +26,11 @@ class ScanLevel(models.IntegerChoices):
 
 class PluginQuerySet(models.QuerySet):
     def with_enabled(self, organization: Organization | None = None):
+        """
+        We have the EnabledPlugin model that tells whether a plugin is enabled for an organization. If the
+        organization is None, the plugin is enabled for all organizations. However, the organization-specific case
+        should take precedence. That's why we treat globally enabled and "specifically" enabled as separate cases.
+        """
         global_subquery = EnabledPlugin.objects.filter(Q(organization=None), plugin=OuterRef("pk"))
         subquery = EnabledPlugin.objects.filter(Q(organization=organization), plugin=OuterRef("pk"))
 
@@ -39,9 +41,11 @@ class PluginQuerySet(models.QuerySet):
             specific_enabled_id=Subquery(subquery.values("pk")),
         ).annotate(
             enabled=Case(
-                When(specific_enabled__isnull=False, then=F("specific_enabled")),
-                When(global_enabled__isnull=False, then=F("global_enabled")),
-                default=False,
+                When(
+                    specific_enabled__isnull=False, then=F("specific_enabled")
+                ),  # Check if there is an org-specific setting
+                When(global_enabled__isnull=False, then=F("global_enabled")),  # Fall back on global configuration
+                default=False,  # Default to False
             ),
             enabled_id=Case(
                 When(specific_enabled_id__isnull=False, then=F("specific_enabled_id")),
@@ -59,7 +63,7 @@ class Plugin(models.Model):
     # Metadata
     name = models.CharField(max_length=64, unique=True)
     description = models.TextField(null=True, blank=True)
-    scan_level = models.PositiveSmallIntegerField(choices=ScanLevel.choices, default=ScanLevel.L4)
+    scan_level = models.PositiveSmallIntegerField(choices=ScanLevel, default=ScanLevel.L4)
 
     # Task specifications
     consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: revise
@@ -92,13 +96,13 @@ class Plugin(models.Model):
 
         return tag or "latest"
 
-    def types_in_arguments(self):
+    def types_in_arguments(self) -> list[type[Model]]:
         result = []
 
-        for name, ooi_type in ALL_TYPES_MAP.items():
+        for model_name, model in object_type_by_name().items():
             for arg in self.oci_arguments:
-                if "{" + name + "}" in arg.lower():
-                    result.append(ooi_type)
+                if "{" + model_name.lower() + "}" in arg.lower():
+                    result.append(model)
                     break
 
         return result
@@ -111,11 +115,15 @@ class Plugin(models.Model):
 
         return results
 
-    def consumed_types(self):
-        return self.types_in_arguments() + [
-            ALL_TYPES_MAP[consume.lstrip("type:")] for consume in self.consumes
-            if consume.startswith("type:") and consume.lstrip("type:") in ALL_TYPES_MAP
-        ]
+    def consumed_types(self) -> list[type[Model]]:
+        result = self.types_in_arguments()
+        for model_name, model in object_type_by_name().items():
+            for consume in self.consumes:
+                if consume.startswith("type:") and consume.lstrip("type:").lower() == model_name.lower():
+                    result.append(model)
+                    break
+
+        return result
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
@@ -196,24 +204,24 @@ class EnabledPlugin(models.Model):
         return super().save(*args, **kwargs)
 
     def initialize_schedules(self):
-        schedules = NewSchedule.objects.filter(plugin=self.plugin, organization=self.organization)
+        schedules = Schedule.objects.filter(plugin=self.plugin, organization=self.organization)
 
         if schedules.exists():
             return
 
         queries = []
-
-        # TODO: once moved to XTDB 2.0 we can revise this
         for ooi_type in self.plugin.consumed_types():
             if ooi_type == Hostname:
-                queries.append(("Hostname.name", "All hostnames"))
-            if ooi_type in [IPAddressV4, IPAddressV6, IPAddress]:
-                queries.append((f"{ooi_type.get_object_type()}.address", "All IPs"))
+                queries.append((ContentType.objects.get_for_model(Hostname), "", "All hostnames"))
+            if ooi_type == IPAddress:
+                queries.append((ContentType.objects.get_for_model(IPAddress), "", "All IPs"))
 
-        # So this is possibly the first time enabling the plugin for the organization
-        for query, name in queries:
-            object_set = ObjectSet.objects.create(name=name, object_query=query, dynamic=True)
-            NewSchedule.objects.create(
+        # This is possibly the first time enabling the plugin for the organization
+        for object_type, query, name in queries:
+            object_set, created = ObjectSet.objects.get_or_create(
+                name=name, object_type=object_type, object_query=query, dynamic=True
+            )
+            Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
                 object_set=object_set,
@@ -222,18 +230,18 @@ class EnabledPlugin(models.Model):
                 if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
-                    dtstart=datetime.datetime.now(timezone.utc),
+                    dtstart=datetime.datetime.now(datetime.UTC),
                 ),
             )
 
         if not queries:
-            NewSchedule.objects.create(
+            Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
                 organization=self.organization,
                 recurrences=self.plugin.recurrences
                 if self.plugin.recurrences and str(self.plugin.recurrences)
                 else recurrence.Recurrence(
-                    rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(timezone.utc)
+                    rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(datetime.UTC)
                 ),
             )

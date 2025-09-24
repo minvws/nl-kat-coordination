@@ -1,9 +1,0 @@
-{
-  "plugin_id": "wp-scan",
-  "name": "WPScan",
-  "description": "Scans WordPress websites.",
-  "consumes": [
-    "SoftwareInstance"
-  ],
-  "scan_level": 2
-}

@@ -5,23 +5,23 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div class="two-thirds-one-third">
                 <div>
-                    <h1>Schedule: '{{ newschedule.plugin.plugin_id }}' for object set '{{ newschedule.object_set }}'</h1>
-                    <p class="emphasized">{{ newschedule.plugin.plugin_id }}</p>
-                    <p class="emphasized">{{ newschedule.organization.code }}</p>
-                    <p class="emphasized">{{ newschedule.enabled }}</p>
-                    {% for rrule in newschedule.recurrences.rrules %}<strong>{{ rrule.to_text.upper }}</strong>{% endfor %}
-                    <p class="emphasized">{{ newschedule.object_set }}</p>
-                    <p class="emphasized">{{ newschedule.run_on }}</p>
-                    <p class="emphasized">{{ newschedule.operation }}</p>
-                    <h4>{% translate 'Change Schedule' %}:</h4>
-                    <form action="{% url "edit_schedule" pk=newschedule.id %}"
-                          method="POST"
+                    <h1>Schedule: '{{ schedule.plugin.plugin_id }}' for object set '{{ schedule.object_set }}'</h1>
+                    <p class="emphasized">{{ schedule.plugin.plugin_id }}</p>
+                    <p class="emphasized">{{ schedule.organization.code }}</p>
+                    <p class="emphasized">{{ schedule.enabled }}</p>
+                    {% for rrule in schedule.recurrences.rrules %}<strong>{{ rrule.to_text.upper }}</strong>{% endfor %}
+                    <p class="emphasized">{{ schedule.object_set }}</p>
+                    <p class="emphasized">{{ schedule.run_on }}</p>
+                    <p class="emphasized">{{ schedule.operation }}</p>
+                    <h4>{% translate "Change Schedule" %}:</h4>
+                    <form action="{% url "edit_schedule" pk=schedule.id %}"
+                          method="post"
                           class="post-form">
                         {% csrf_token %}
                         {{ form.media }}

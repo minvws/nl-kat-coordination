@@ -4,8 +4,8 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 
-from account.forms import OrganizationMemberEditForm
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from openkat.forms import OrganizationMemberEditForm
+from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.models import GROUP_CLIENT, OrganizationMember
 
 

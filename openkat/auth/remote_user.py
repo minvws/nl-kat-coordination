@@ -25,11 +25,9 @@ class RemoteUserBackend(BaseRemoteUserBackend):
                         member = OrganizationMember.objects.create(
                             user=user,
                             organization=organization,
-                            status=OrganizationMember.STATUSES.ACTIVE,
                             blocked=False,
                             trusted_clearance_level=4,
                             acknowledged_clearance_level=0,
-                            onboarded=False,
                         )
                         member.groups.set([Group.objects.get(name=group_name)])
             except Exception:

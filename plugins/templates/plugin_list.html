@@ -4,11 +4,9 @@
 {% load static %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
-        {% include "partials/no_enabling_permission_message.html" %}
-
         <section>
             <div class="fifty-fifty">
                 <div>
@@ -26,20 +24,22 @@
                     </div>
                 {% endif %}
             </div>
-
             <div>
                 <div class="filter-container">
                     <form class="inline layout-wide" method="get">
-                            {{ filter.form.as_p }}
-                            <button type="submit">{% translate "Apply" %}</button>
+                        {{ filter.form.as_p }}
+                        <button type="submit">{% translate "Apply" %}</button>
                     </form>
                 </div>
                 {% include "plugin_table.html" %}
+
                 <div>
                     <p>
                         <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
                     </p>
                 </div>
+                {% include "partials/list_paginator.html" %}
+
             </div>
         </section>
     </main>

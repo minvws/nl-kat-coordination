@@ -1,169 +1,249 @@
-import datetime
-from datetime import timezone
-from enum import Enum
+from typing import TYPE_CHECKING
 
 import django_filters
 from django.conf import settings
+from django.db.models import Case, CharField, OuterRef, QuerySet, Subquery, When
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView
 from django_filters.views import FilterView
 
-from objects.models import ObjectSet
-from octopoes.models.exception import TypeNotFound
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.ooi.reports import AssetReport, BaseReport, HydratedReport, Report, ReportData, ReportRecipe
-from octopoes.models.types import get_collapsed_types
-from octopoes.xtdb.query import Aliased, Query
-from openkat.enums import CUSTOM_SCAN_LEVEL
-from openkat.forms.ooi_form import _EXCLUDED_OOI_TYPES, OOISearchForm, OOITypeMultiCheckboxForm
-from openkat.models import Organization
+from objects.models import Finding, Hostname, IPAddress, Network
 from openkat.permissions import KATModelPermissionRequiredMixin
-from openkat.view_helpers import get_mandatory_fields
-from openkat.views.mixins import OOIList
+
+if TYPE_CHECKING:
+    from django.db.models.query import QuerySet
 
 
-class PageActions(Enum):
-    DELETE = "delete"
-    UPDATE_SCAN_PROFILE = "update-scan-profile"
-
-
-class ObjectListView(ListView):
-    template_name = "object_list.html"
-    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-
-    def get(self, request, *args, **kwargs):
-        # TODO
-        return redirect(reverse("ooi_list", kwargs={"organization_code": Organization.objects.first().code}))
-
-    def get_queryset(self):
-        # TODO: handle
-        organization = Organization.objects.first()
-
-        return OOIList(settings.OCTOPOES_FACTORY(organization.code), **self.get_queryset_params())
-
-    def get_queryset_params(self):
-        return {
-            "valid_time": datetime.datetime.now(timezone.utc),
-            "ooi_types": {
-                t
-                for t in get_collapsed_types().difference(
-                    {Finding, FindingType, BaseReport, Report, ReportRecipe, AssetReport, ReportData, HydratedReport}
-                )
-                if t not in _EXCLUDED_OOI_TYPES
-            },
-            "scan_level": settings.DEFAULT_SCAN_LEVEL_FILTER,
-            "scan_profile_type": settings.DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-            "search_string": "",
-            "order_by": "scan_level" if self.request.GET.get("order_by", "") == "scan_level" else "object_type",
-            "asc_desc": "desc" if self.request.GET.get("sorting_order", "") == "desc" else "asc",
-        }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("object_list"), "text": _("Objects")}]
-
-        context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
-        context["ooi_search_form"] = OOISearchForm(self.request.GET)
-        context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
-        context["member"] = self.request.user
-        context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
-
-        # TODO: handle
-        context["organization"] = Organization.objects.first()
-        context["may_update_clearance_level"] = True
-
-        return context
-
-
-class ObjectSetFilter(django_filters.FilterSet):
-    object_query = django_filters.CharFilter(label="Object Query", lookup_expr="icontains")
-    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    description = django_filters.CharFilter(label="Description", lookup_expr="icontains")
+class NetworkFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
 
     class Meta:
-        model = ObjectSet
-        fields = ["name", "description", "object_query"]
+        model = Network
+        fields = ["name"]
 
 
-class ObjectSetListView(FilterView):
-    template_name = "object_set_list.html"
-    model = ObjectSet
+class NetworkListView(FilterView):
+    model = Network
+    template_name = "objects/network_list.html"
+    context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-    filterset_class = ObjectSetFilter
+    filterset_class = NetworkFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("object_list"), "text": _("Objects")}]
+        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
         return context
 
 
-class ObjectSetDetailView(DetailView):
-    template_name = "object_set.html"
-    model = ObjectSet
+class NetworkDetailView(DetailView):
+    model = Network
+    template_name = "objects/network_detail.html"
+    context_object_name = "network"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"url": reverse("object_list"), "text": _("Objects")},
-            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
-
-        ]
-
-        now = datetime.datetime.now(timezone.utc)
-        obj = self.get_object()
-
-        # TODO: handle...
-        org = Organization.objects.first()
-        connector = settings.OCTOPOES_FACTORY(org.code)
-
-        if obj.object_query:
-            try:
-                query = Query.from_path(obj.object_query)
-            except (ValueError, TypeNotFound):
-                raise ValueError(f"Invalid query: {obj.object_query}")
-
-            pk = Aliased(query.result_type, field="primary_key")
-            objects = connector.octopoes.ooi_repository.query(
-                query.find(pk).where(query.result_type, primary_key=pk).limit(10), now,
-            )
-
-            context["preview"] = [obj[1] for obj in objects]
-            context["preview_organization"] = org
-        else:
-            context["preview"] = None
-            context["preview_organization"] = None
+        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
         return context
 
 
-class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
-    model = ObjectSet
-    fields = ["name", "all_objects", "object_query", "description", "dynamic"]
-    template_name = "object_set_form.html"
-
-    def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
-
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
-
-        return reverse_lazy("object_set_list")
+class NetworkCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Network
+    template_name = "objects/generic_object_form.html"
+    fields = ["name"]
+    success_url = reverse_lazy("objects:network_list")
 
 
-class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
-    model = ObjectSet
+class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Network
+    success_url = reverse_lazy("objects:network_list")
 
     def form_invalid(self, form):
-        return redirect(reverse("object_set_list"))
+        return redirect(reverse("objects:network_list"))
 
-    def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
 
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
+class FindingFilter(django_filters.FilterSet):
+    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
 
-        return reverse_lazy("object_set_list")
+    class Meta:
+        model = Finding
+        fields = ["finding_type__code"]
+
+
+class FindingListView(FilterView):
+    model = Finding
+    template_name = "objects/finding_list.html"
+    context_object_name = "findings"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = FindingFilter
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        ref = OuterRef("object_id")
+        qs = qs.annotate(
+            object=Case(
+                When(
+                    object_type__in=["hostname", "Hostname"],
+                    then=Subquery(Hostname.objects.filter(pk=ref).values("name")),
+                ),
+                When(
+                    object_type__in=["ipaddress", "IPAddress"],
+                    then=Subquery(IPAddress.objects.filter(pk=ref).values("address")),
+                ),
+                When(
+                    object_type__in=["network", "Network"], then=Subquery(Network.objects.filter(pk=ref).values("name"))
+                ),
+                default=None,
+                output_field=CharField(),
+            )
+        )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:finding_list"), "text": _("Findings")}]
+
+        return context
+
+
+class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Finding
+    template_name = "objects/generic_object_form.html"
+    fields = ["organization", "finding_type", "object_type", "object_id"]  # TODO: make easy
+    success_url = reverse_lazy("objects:finding_list")
+
+
+class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Finding
+    success_url = reverse_lazy("objects:finding_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:finding_list"))
+
+
+class IPAddressFilter(django_filters.FilterSet):
+    address = django_filters.CharFilter(label="Address", lookup_expr="contains")
+
+    class Meta:
+        model = IPAddress
+        fields = ["address"]
+
+
+class IPAddressListView(FilterView):
+    model = IPAddress
+    template_name = "objects/ipaddress_list.html"
+    context_object_name = "ipaddresses"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = IPAddressFilter
+
+    def get_queryset(self) -> "QuerySet[IPAddress]":
+        return IPAddress.objects.select_related("network")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
+
+        return context
+
+
+class IPAddressDetailView(DetailView):
+    model = IPAddress
+    template_name = "objects/ipaddress_detail.html"
+    context_object_name = "ipaddress"
+
+    def get_queryset(self) -> "QuerySet[IPAddress]":
+        return IPAddress.objects.select_related("network").prefetch_related("ipport_set")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
+
+        return context
+
+
+class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = IPAddress
+    template_name = "objects/generic_object_form.html"
+    fields = ["network", "address"]
+    success_url = reverse_lazy("objects:ipaddress_list")
+
+
+class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = IPAddress
+    success_url = reverse_lazy("objects:ipaddress_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:ipaddress_list"))
+
+
+class HostnameFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
+
+    class Meta:
+        model = Hostname
+        fields = ["name"]
+
+
+class HostnameListView(FilterView):
+    model = Hostname
+    template_name = "objects/hostname_list.html"
+    context_object_name = "hostnames"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    filterset_class = HostnameFilter
+
+    def get_queryset(self) -> "QuerySet[Hostname]":
+        return Hostname.objects.select_related("network")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
+
+        return context
+
+
+class HostnameDetailView(DetailView):
+    model = Hostname
+    template_name = "objects/hostname_detail.html"
+    context_object_name = "hostname"
+
+    def get_queryset(self) -> "QuerySet[Hostname]":
+        return Hostname.objects.select_related("network").prefetch_related(
+            "dnsarecord_set",
+            "dnsaaaarecord_set",
+            "dnsptrrecord_set",
+            "cname_records",
+            "cname_targets",
+            "mx_records",
+            "mx_targets",
+            "ns_records",
+            "ns_targets",
+            "dnscaarecord_set",
+            "dnstxtrecord_set",
+            "dnssrvrecord_set",
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
+
+        return context
+
+
+class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Hostname
+    success_url = reverse_lazy("objects:hostname_list")
+
+    def form_invalid(self, form):
+        return redirect(reverse("objects:hostname_list"))
+
+
+class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
+    model = Hostname
+    template_name = "objects/generic_object_form.html"
+    fields = ["network", "name"]
+    success_url = reverse_lazy("objects:hostname_list")

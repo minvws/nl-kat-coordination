@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -24,15 +22,11 @@ def bulk_organizations(active_member, blocked_member):
     members = []
     indemnifications = []
 
-    with (
-        patch("openkat.signals.settings.OCTOPOES_FACTORY"),
-        patch("crisis_room.management.commands.dashboards.get_or_create_default_dashboard"),
-    ):
-        for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
-            org = Organization(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
-            organizations.append(org)
+    for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
+        org = Organization(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
+        organizations.append(org)
 
-        orgs = Organization.objects.bulk_create(organizations)
+    orgs = Organization.objects.bulk_create(organizations)
 
     for organization in orgs:
         for member in [active_member, blocked_member]:
@@ -40,11 +34,9 @@ def bulk_organizations(active_member, blocked_member):
                 OrganizationMember(
                     user=member.user,
                     organization=organization,
-                    status=OrganizationMember.STATUSES.ACTIVE,
                     blocked=False,
                     trusted_clearance_level=4,
                     acknowledged_clearance_level=4,
-                    onboarded=False,
                 )
             )
             indemnifications.append(Indemnification(user=member.user, organization=organization))
@@ -91,9 +83,7 @@ def test_add_organization_page(rf, superuser_member):
 
 
 @pytest.mark.skip("This test is too flaky for now.")
-def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes, log_output):
-    mocker.patch("katalogus.client.KATalogusClient")
-
+def test_add_organization_submit_success(rf, superuser_member, log_output):
     request = setup_request(rf.post("organization_add", {"name": "neworg", "code": "norg"}), superuser_member.user)
     response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
     assert response.status_code == 302
@@ -198,8 +188,6 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, admin_member.user.email)
     assertContains(response, "Role")
     assertContains(response, "Admin")
-    assertContains(response, "Status")
-    assertContains(response, admin_member.status)
 
     # We should not be showing information about the User to just any admin in an organization
     assertNotContains(response, "Added")
@@ -214,37 +202,12 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, "Blocked")
 
 
-def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
+def test_organization_filtered_member_list(rf, superuser_member, blocked_member):
     # Test with only filter option blocked status "blocked"
     request = setup_request(rf.get("organization_member_list", {"blocked": "blocked"}), superuser_member.user)
     response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
-    assertNotContains(response, new_member.user.full_name)
     assertNotContains(response, blocked_member.user.full_name)
-
-    # Test with only filter option status "new" checked
-    request2 = setup_request(rf.get("organization_member_list", {"status": "new"}), superuser_member.user)
-    response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
-
-    assertNotContains(response2, new_member.user.full_name)
-    assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, 'class="icon neutral"')
-    assertNotContains(response2, 'class="icon positive"')
-
-    # Test with every filter option checked (new, active, blocked and unblocked)
-    request3 = setup_request(
-        rf.get("organization_member_list", {"status": ["new", "active"], "blocked": ["blocked", "unblocked"]}),
-        superuser_member.user,
-    )
-    response3 = OrganizationMemberListView.as_view()(request3, organization_code=superuser_member.organization.code)
-
-    # We should not expose full names of users to just any admin in any organization
-    assertNotContains(response3, superuser_member.user.full_name)
-    assertNotContains(response3, new_member.user.full_name)
-    assertNotContains(response3, blocked_member.user.full_name)
-
-    assertContains(response3, 'class="icon neutral"')
-    assertContains(response3, 'class="icon positive"')
 
 
 def test_organization_does_not_exist(client, client_member):
@@ -315,13 +278,12 @@ def test_admin_rights_edits_organization(rf, admin_member):
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, admin_member, mocker):
+def test_admin_edits_organization(rf, admin_member):
     """Admin editing organization values"""
     request = setup_request(
         rf.post("organization_edit", {"name": "This organization name has been edited", "tags": "tag1,tag2"}),
         admin_member.user,
     )
-    mocker.patch("katalogus.client.KATalogusClient")
     response = OrganizationEditView.as_view()(
         request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
@@ -341,8 +303,7 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tag2")
 
 
-def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClient")
+def test_organization_code_validator_from_view(rf, superuser_member):
     request = setup_request(
         rf.post("organization_add", {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]}),
         superuser_member.user,
@@ -358,9 +319,7 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
 
 
 @pytest.mark.django_db
-def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
-    mocker.patch("katalogus.client.KATalogusClient")
-
+def test_organization_code_validator_from_model():
     with pytest.raises(ValidationError):
         Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
 

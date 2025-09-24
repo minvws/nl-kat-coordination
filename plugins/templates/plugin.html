@@ -5,12 +5,13 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             {% include "plugin_introduction.html" %}
             {% include "plugin_tabs.html" with view="general" %}
+
             <div>
                 <h2>{% translate "General" %}</h2>
                 <div>
@@ -22,9 +23,7 @@
                 <div>
                     <h3>{% translate "Arguments" %}</h3>
                     <ul>
-                    {% for argument in plugin.oci_arguments %}
-                        <li>{{ argument }}</li>
-                    {% endfor %}
+                        {% for argument in plugin.oci_arguments %}<li>{{ argument }}</li>{% endfor %}
                     </ul>
                 </div>
                 <div>
@@ -36,9 +35,7 @@
                             {% endblocktranslate %}
                         </p>
                         <p>
-                            {% for ooi_type in plugin.consumes %}
-                                <span class="label tags-color-1-light">{{ ooi_type }}</span>
-                            {% endfor %}
+                            {% for ooi_type in plugin.consumes %}<span class="label tags-color-1-light">{{ ooi_type }}</span>{% endfor %}
                         </p>
                     {% else %}
                         {% blocktranslate trimmed with plugin_name=plugin.name %}

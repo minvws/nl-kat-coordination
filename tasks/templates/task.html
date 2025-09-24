@@ -5,7 +5,7 @@
 {% load compress %}
 
 {% block content %}
-    {% include "new_header.html" %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -23,18 +23,22 @@
                             {% endif %}
                         </span>
                     </div>
-                    <p>{% translate "Details of the task created in organization" %} <strong>{{ task.organization }}</strong>.</p>
+                    <p>
+                        {% translate "Details of the task created in organization" %} <strong>{{ task.organization }}</strong>.
+                    </p>
                 </div>
                 <div class="horizontal-view toolbar">
                     {% if task.done %}
                         <form action="{% url "reschedule_task" task.id %}" method="post">
                             {% csrf_token %}
-                            <button class="ghost" type="submit"><span class="icon ti-refresh"></span>{% translate "Reschedule" %}</button>
+                            <button class="ghost" type="submit">
+                                <span class="icon ti-refresh"></span>{% translate "Reschedule" %}
+                            </button>
                         </form>
                     {% else %}
                         <form action="{% url "cancel_task" task.id %}" method="post">
                             {% csrf_token %}
-                            <button class="desctructive" type="submit">{% translate "Cancel" %}</button>
+                            <button class="destructive" type="submit">{% translate "Cancel" %}</button>
                         </form>
                     {% endif %}
                 </div>
@@ -44,19 +48,27 @@
                 <dl>
                     <div>
                         <dt>{% translate "Task type" %}</dt>
-                        <dd>{{ task.type|capfirst }}</dd>
+                        <dd>
+                            {{ task.type|capfirst }}
+                        </dd>
                     </div>
                     <div>
                         <dt>{% translate "Created by plugin" %}</dt>
-                        <dd>{{ plugin.name }}</dd>
+                        <dd>
+                            {{ plugin.name }}
+                        </dd>
                     </div>
                     <div>
                         <dt>{% translate "Created at" %}</dt>
-                        <dd>{{ task.created_at }}</dd>
+                        <dd>
+                            {{ task.created_at }}
+                        </dd>
                     </div>
                     <div>
                         <dt>{% translate "Last modified at" %}</dt>
-                        <dd>{{ task.modified_at }}</dd>
+                        <dd>
+                            {{ task.modified_at }}
+                        </dd>
                     </div>
                 </dl>
             </div>
@@ -67,9 +79,7 @@
                         {% if task.data.input_data|get_type == 'str' %}
                             <li>{{ task.data.input_data }}</li>
                         {% elif task.data.input_data|get_type == 'list' %}
-                                {% for object in task.data.input_data %}
-                                    <li>{{ object }}</li>
-                                {% endfor %}
+                            {% for object in task.data.input_data %}<li>{{ object }}</li>{% endfor %}
                         {% endif %}
                     </ul>
                 {% else %}

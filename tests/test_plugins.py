@@ -1,13 +1,14 @@
 import datetime
-from datetime import timezone
 
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
+from objects.models import Hostname, IPAddress, IPPort
 from plugins.models import EnabledPlugin, Plugin
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
-from tasks.models import NewSchedule
+from tasks.models import Schedule
 from tests.conftest import setup_request
 
 
@@ -92,6 +93,7 @@ def test_plugin_query_with_enabled(organization, organization_b):
         "4": False,
     }
 
+
 def test_enable_plugins(rf, superuser_member):
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     request = setup_request(
@@ -125,9 +127,7 @@ def test_enable_plugins(rf, superuser_member):
 
 def test_delete_plugin(rf, superuser_member, client_member):
     plugin = Plugin.objects.create(name="1", plugin_id="1")
-    request = setup_request(
-        rf.post("delete_plugin"), superuser_member.user
-    )
+    request = setup_request(rf.post("delete_plugin"), superuser_member.user)
     response = PluginDeleteView.as_view()(request, pk=plugin.id)
 
     assert response.status_code == 302
@@ -135,9 +135,7 @@ def test_delete_plugin(rf, superuser_member, client_member):
     assert Plugin.objects.count() == 0
 
     plugin = Plugin.objects.create(name="2", plugin_id="2")
-    request = setup_request(
-        rf.post("delete_plugin"), client_member.user
-    )
+    request = setup_request(rf.post("delete_plugin"), client_member.user)
 
     with pytest.raises(PermissionDenied):
         PluginDeleteView.as_view()(request, pk=plugin.id)
@@ -147,8 +145,8 @@ def test_enabling_plugin_creates_schedule():
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
 
-    schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
-    now = datetime.datetime.now(timezone.utc)
+    schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
+    now = datetime.datetime.now(datetime.UTC)
 
     # minute precision should be stable to test
     assert f"DTSTART:{now.strftime('%Y%m%dT%H%M')}" in str(schedule.recurrences)
@@ -162,12 +160,13 @@ def test_enabling_plugin_creates_schedule():
 
     plugin = Plugin.objects.create(name="test2", plugin_id="testt2", consumes=["type:hostname"])
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
-    schedule = NewSchedule.objects.filter(plugin=enabled_plugin.plugin).first()
+    schedule = Schedule.objects.filter(plugin=enabled_plugin.plugin).first()
 
     assert schedule.enabled
     assert schedule.object_set is not None
-    assert schedule.object_set.traverse_objects().count() == 0
-
+    assert schedule.object_set.object_query == ""
+    assert schedule.object_set.object_type == ContentType.objects.get(model="hostname")
+    assert len(schedule.object_set.traverse_objects()) == 0
 
 
 def test_enabled_organizations(organization, organization_b):
@@ -212,3 +211,42 @@ def test_enabled_for(organization, organization_b):
     assert plugin.enabled_organizations().first() == organization
     assert plugin.enabled_for(organization) is True
     assert plugin.enabled_for(organization_b) is False
+
+
+def test_arguments():
+    assert Plugin(name="t", plugin_id="t").types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{hostname}"]).types_in_arguments() == [Hostname]
+    assert Plugin(
+        name="t", plugin_id="t", oci_arguments=["run {hostname} A || run {hostname} AAAA || run {hostname} CNAME"]
+    ).types_in_arguments() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).types_in_arguments() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).types_in_arguments() == [IPAddress]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress|hostname}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).types_in_arguments() == [IPPort]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipport}"]).types_in_arguments() == [IPPort]
+    assert set(Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipaddress}"]).types_in_arguments()) == {
+        IPPort,
+        IPAddress,
+    }
+
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).types_in_arguments() == []
+
+    assert Plugin(name="t", plugin_id="t").consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{hostname}"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).consumed_types() == [IPAddress]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).consumed_types() == [IPPort]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).consumed_types() == [Hostname]
+    assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).consumed_types() == [Hostname]
+
+    assert Plugin(name="t", plugin_id="t", consumes=["file:type"]).files_in_arguments() == ["type"]
+    assert Plugin(name="t", plugin_id="t").files_in_arguments() == []

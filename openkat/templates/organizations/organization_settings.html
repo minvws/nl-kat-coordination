@@ -74,15 +74,6 @@
                             <span class="icon ti-plus" aria-hidden="true"></span>{% translate "Add indemnification" %}
                         </a>
                     {% endif %}
-                    {% if perms.openkat.can_recalculate_bits %}
-                        <form method="post" class="inline">
-                            {% csrf_token %}
-                            <button type="submit"
-                                    class="dropdown-button ghost"
-                                    name="action"
-                                    value="recalculate">{% translate "Rerun all bits" %}</button>
-                        </form>
-                    {% endif %}
                 </div>
             </div>
         </section>
@@ -100,6 +91,7 @@
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
-        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}"
+                nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}

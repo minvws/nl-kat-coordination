@@ -1,11 +1,8 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from openkat.forms.settings import SCAN_LEVEL_CHOICES
-
-User = get_user_model()
 
 
 class ClearanceLevelSelect(forms.Select):

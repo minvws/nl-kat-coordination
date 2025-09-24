@@ -1,9 +1,0 @@
-{
-  "plugin_id": "masscan",
-  "name": "masscan",
-  "description": "Quickly scan large amounts of IPs. Due to the quick scanning it may not always show accurate results.",
-  "consumes": [
-    "IPV4NetBlock"
-  ],
-  "scan_level": 2
-}

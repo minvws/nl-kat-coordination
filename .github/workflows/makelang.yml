@@ -39,7 +39,6 @@ jobs:
         env:
           SECRET_KEY: none
           REDIS_QUEUE_URI: redis://localhost/fake
-          XTDB_URI: http://localhost/fake
 
       - name: Check if at least one source string changed
         run: |

@@ -34,12 +34,16 @@ services:
       - .env
 
   xtdb:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:main"
+    image: "ghcr.io/xtdb/xtdb:nightly-20250912"
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:5433:5432"
+      - "127.0.0.1:8080:8080"
     volumes:
       - xtdb-data:/var/lib/xtdb
+    environment:
+      # Change to DEBUG to see which queries are executed
+      - XTDB_LOGGING_LEVEL=DEBUG
 
   openkat:
     restart: unless-stopped
