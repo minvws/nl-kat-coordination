@@ -6,7 +6,7 @@ from plugins.models import Plugin
 from plugins.runner import PluginRunner
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 def test_hello_world():
     plugin = Plugin.objects.create(
         name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
@@ -28,7 +28,7 @@ def test_hello_world():
 # todo: todo and fix everything below
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 def test_input_output():
     plugin = Plugin.objects.create(
         name="Test Plugin", plugin_id="cat-plugin", oci_image="alpine:latest", oci_arguments=["/bin/cat"]
@@ -36,29 +36,28 @@ def test_input_output():
 
     output = PluginRunner().run(plugin.plugin_id, "hello world^C", output="-")
     assert output == "hello world^C"
-
-    assert File.objects.count() == 1
+    assert File.objects.count() == 0
 
 
 # test write to stdout
 # - also results in 1 (temp) file
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 def test_with_static_file_input():
     file = File.objects.create(file=ContentFile("test content", "test.txt"), type="txt")
     plugin = Plugin.objects.create(
         name="Cat File Plugin",
         plugin_id="cat-file-plugin",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", f"file/{file.pk}"],
+        oci_arguments=["/bin/cat", "{file/" + str(file.pk) + "}"],
     )
 
     output = PluginRunner().run(plugin.plugin_id, None, output="-")
     assert output == "test content"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 def test_with_argument():
     plugin = Plugin.objects.create(
         name="DNS Plugin",
@@ -71,7 +70,7 @@ def test_with_argument():
     assert "Name:	nu.nl" in output
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 def test_with_multiple_arguments():
     plugin = Plugin.objects.create(
         name="DNS Plugin",
