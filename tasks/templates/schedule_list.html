@@ -31,7 +31,7 @@
                     <button type="submit">{% translate "Apply" %}</button>
                 </form>
             </div>
-            {% if not newschedule_list %}
+            {% if not schedule_list %}
                 <div>
                     <h2>{% translate "Schedules" %}</h2>
                     <p>{% translate "There are no Schedules." %}</p>
@@ -128,7 +128,7 @@
                                         <div class="button-container">
                                             {# TODO: Permissions #}
                                             <a class="button"
-                                               href="{% url "new_task_list" %}?schedule_id={{ schedule.id }}">{% translate "View tasks" %}</a>
+                                               href="{% url "task_list" %}?schedule_id={{ schedule.id }}">{% translate "View tasks" %}</a>
                                             <form action="{% url "run_schedule" schedule.id %}" method="post">
                                                 {% csrf_token %}
                                                 <button class="ghost" type="submit">
