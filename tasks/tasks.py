@@ -49,31 +49,33 @@ def reschedule() -> None:
     logger.info("Finished scheduling plugins")
 
 
-def run_schedule(schedule: Schedule, force: bool = True) -> None:
+def run_schedule(schedule: Schedule, force: bool = True) -> list[Task]:
     if not schedule.plugin:
-        return
+        logger.debug("No plugin defined for schedule, skipping")
+        return []
 
     orgs = schedule.plugin.enabled_organizations() if not schedule.organization else [schedule.organization]
+    tasks = []
 
     for org in orgs:
-        run_schedule_for_org(schedule, org, force)
+        tasks.extend(run_schedule_for_org(schedule, org, force))
+
+    return tasks
 
 
-def run_schedule_for_org(schedule: Schedule, organization: Organization, force: bool = True) -> None:
+def run_schedule_for_org(schedule: Schedule, organization: Organization, force: bool = True) -> list[Task]:
     now = datetime.now(UTC)
 
     if not schedule.object_set:
         if force:
-            run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
-            return
+            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
 
         last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
-            return
+            return []
 
-        run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
-        return
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
 
     input_data: set[str] = set()
 
@@ -87,7 +89,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         input_data = input_data.union([str(model) for model in model_qs])
 
     if not input_data:
-        return
+        return []
 
     # TODO: fix
     # values = schedule.object_set.traverse_objects().values_list("value", flat=True)
@@ -109,8 +111,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     #     input_data.add(str(profile.reference))
 
     if force:
-        run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
-        return
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
     # Filter on the schedule and created after the previous occurrence
     last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
@@ -134,9 +135,9 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     input_data = set(input_data) - skip
 
     if not input_data:
-        return
+        return []
 
-    run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
 
 def rerun_task(task: Task) -> list[Task]:

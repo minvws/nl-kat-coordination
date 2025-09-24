@@ -21,7 +21,7 @@ clean: .env
 	docker compose down --timeout 0 --volumes --remove-orphans
 	-rm -Rf node_modules assets/dist .parcel-cache static media *.egg-info
 
-ooi-clean: .env
+object-clean: .env
 	docker compose down --volumes xtdb
 	docker compose up -d
 

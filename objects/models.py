@@ -1,9 +1,15 @@
+import tempfile
+
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import connections, models
+from django.db.models import Model
+from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
+from psycopg import sql
+from transit.writer import Writer
 
 from objects.enums import MAX_SCAN_LEVEL
 from openkat.models import LowerCaseCharField
@@ -11,6 +17,13 @@ from openkat.models import LowerCaseCharField
 
 def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
     return CaseInsensitiveMapping({model.__name__: model for model in apps.get_app_config("objects").get_models()})
+
+
+def to_xtdb_dict(model: Model) -> dict:
+    mod = model_to_dict(model, exclude=["id"])
+    mod["_id"] = model.id
+
+    return mod
 
 
 class Asset(models.Model):
@@ -199,3 +212,32 @@ class DNSSRVRecord(DNSRecordBase):
 
     def __str__(self) -> str:
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
+
+
+def bulk_insert(objects: list[models.Model]):
+    """Use COPY to efficiently bulk-insert objects into XTDB"""
+
+    if not objects:
+        return
+
+    table_name = objects[0]._meta.db_table
+
+    with tempfile.NamedTemporaryFile() as fp:
+        # The transit-json format is not working because the writer uses a comma as a delimiter between objects. It
+        # would work if we override Writer.marshaler.write_sep() to skip the comma (or use a newline) between objects.
+        # But apparently msgpack works out of the box, which makes life even easier.
+
+        writer = Writer(fp, "msgpack")
+        for obj in objects:
+            writer.write(to_xtdb_dict(obj))
+
+        fp.seek(0)
+
+        with (
+            connections["xtdb"].cursor() as cursor,
+            cursor.copy(
+                sql.SQL("COPY {} FROM STDIN WITH (FORMAT 'transit-msgpack')").format(sql.Identifier(table_name))
+            ) as copy,
+        ):
+            while data := fp.read():
+                copy.write(data)

@@ -73,8 +73,6 @@ services:
 
   xtdb:
     image: "ghcr.io/xtdb/xtdb:nightly-20250912"
-    volumes:
-      - xtdb-data:/var/lib/xtdb
     environment:
       - XTDB_LOGGING_LEVEL=DEBUG
 
