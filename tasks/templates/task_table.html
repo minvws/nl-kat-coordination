@@ -95,8 +95,8 @@
                             </div>
                             <div>
                                 <h5>{% translate "Schedule" %}</h5>
-                                {% if task.new_schedule_id %}
-                                    <a href="{% url 'schedule_detail' pk=task.new_schedule_id %}">{{ task.new_schedule_id }}</a>
+                                {% if task.schedule_id %}
+                                    <a href="{% url 'schedule_detail' pk=task.schedule_id %}">{{ task.schedule_id }}</a>
                                 {% else %}
                                     -
                                 {% endif %}

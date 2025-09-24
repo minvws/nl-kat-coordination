@@ -76,7 +76,7 @@ class Schedule(models.Model):
 
     # TODO: multiple organizations?
     organization = models.ForeignKey(
-        "openkat.organization", on_delete=models.CASCADE, related_name="new_schedules", null=True, blank=True
+        "openkat.organization", on_delete=models.CASCADE, related_name="schedules", null=True, blank=True
     )
     plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
     object_set = models.ForeignKey(ObjectSet, on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
@@ -93,7 +93,7 @@ class Schedule(models.Model):
 
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    new_schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
+    schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, related_name="tasks", null=True, blank=True)
     organization = models.ForeignKey(
         "openkat.organization", on_delete=models.CASCADE, related_name="tasks", null=True, blank=True
     )

@@ -50,7 +50,7 @@ class TaskListView(FilterView):
             qs = qs.filter(organization__members__user=self.request.user)
 
         if "schedule_id" in self.request.GET:
-            qs = qs.filter(new_schedule__id=self.request.GET["schedule_id"])
+            qs = qs.filter(schedule__id=self.request.GET["schedule_id"])
 
         qs = qs.annotate(
             plugin_name=Subquery(
@@ -253,7 +253,7 @@ class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
         # Plugin has been disabled, cancel all tasks related to the schedule
         for task in Task.objects.filter(
-            new_schedule=self.object,
+            schedule=self.object,
             status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],
         ):
             task.cancel()

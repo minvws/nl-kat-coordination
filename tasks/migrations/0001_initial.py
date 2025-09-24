@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="new_schedules",
+                        related_name="schedules",
                         to="openkat.organization",
                     ),
                 ),
@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                 ("ended_at", models.DateTimeField(null=True)),
                 ("modified_at", models.DateTimeField(auto_now=True)),
                 (
-                    "new_schedule",
+                    "schedule",
                     models.ForeignKey(
                         blank=True,
                         null=True,

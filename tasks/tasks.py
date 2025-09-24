@@ -70,7 +70,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         if force:
             return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
 
-        last_run = Task.objects.filter(new_schedule=schedule, data__input_data=None).order_by("-created_at").first()
+        last_run = Task.objects.filter(schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
             return []
@@ -114,7 +114,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
         return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
 
     # Filter on the schedule and created after the previous occurrence
-    last_runs = Task.objects.filter(new_schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+    last_runs = Task.objects.filter(schedule=schedule, created_at__gt=schedule.recurrences.before(now))
 
     if input_data:
         # Join the input data targets into a large or-query, checking for task with any of the targets as input
@@ -172,7 +172,7 @@ def run_plugin_task(
     task = Task.objects.create(
         id=task_id,
         type="plugin",
-        new_schedule_id=schedule_id,
+        schedule_id=schedule_id,
         organization=Organization.objects.get(code=organization_code) if organization_code else None,
         status=TaskStatus.QUEUED,
         data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
