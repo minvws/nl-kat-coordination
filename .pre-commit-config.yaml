@@ -59,11 +59,12 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
+        args: []
         additional_dependencies:
           - httpx
         exclude: |
           (?x)(
-          /tests/ |
+          ^tests/ |
           docs/source/conf\.py$ |
           setup\.py$
           )
