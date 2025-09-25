@@ -71,7 +71,7 @@
                                     <td>{{ file.created_at }}</td>
                                     <td>
                                         {% if file.task_result.task.organization %}
-                                            <td>{{ file.task_result.task.organization.code }}</td>
+                                            {{ file.task_result.task.organization.code }}
                                         {% else %}
                                             -
                                         {% endif %}
