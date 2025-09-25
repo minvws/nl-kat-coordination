@@ -1,6 +1,5 @@
 import time
 
-import pytest
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, Network, bulk_insert
@@ -39,7 +38,6 @@ def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
     assertNotContains(response, "internet")
 
 
-@pytest.mark.xfail(reason="Need to implement natural primary keys")
 def test_update_get_or_create(xtdb):
     net = Network.objects.create(name="internet")
     assert Network.objects.count() == 1
