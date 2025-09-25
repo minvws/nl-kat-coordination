@@ -32,6 +32,7 @@ dependencies = [
   "psycopg>=3.2.10",
   "pydantic>=2.7.1",
   "structlog>=25.3.0",
+  "transit-python2>=0.8.321",
   "whitenoise[brotli]>=6.5.0",
 ]
 
@@ -51,7 +52,6 @@ dev = [
     "pytest>=7.4.0",
     # Pytest-common-subject which is needed by pytest-drf still depends on pkg_resources
     "setuptools<81",
-    "transit-python2>=0.8.321",
     "pytest-celery>=1.2.1",
 ]
 
