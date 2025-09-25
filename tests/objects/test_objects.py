@@ -3,7 +3,7 @@ import time
 import pytest
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import Hostname, Network
+from objects.models import Hostname, Network, bulk_insert
 from objects.views import NetworkListView
 from tests.conftest import setup_request
 
@@ -71,3 +71,12 @@ def test_bulk_create(xtdb):
     Network.objects.bulk_create([nnet, nnet2, nnet3], unique_fields=["name"])
 
     assert Network.objects.count() == 6  # Not working in XTDB currently
+
+
+def test_bulk_insert(xtdb):
+    net = Network(name="internet")
+    net2 = Network(name="internet2")
+    net3 = Network(name="internet3")
+
+    bulk_insert([net, net2, net3])
+    assert Network.objects.count() == 3

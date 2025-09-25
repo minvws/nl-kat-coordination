@@ -354,7 +354,7 @@ def xtdb(request: pytest.FixtureRequest):
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
     for ooi in ooi_models:
-        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}"
+        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}".lower()  # Table names are not case-insensitive
 
     style = no_style()
     erase = [
