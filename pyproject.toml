@@ -93,15 +93,34 @@ ignore = "H006,H016,H017,H030,H031"
 
 [tool.mypy]
 python_version = "3.12"
-ignore_missing_imports = true
 strict = true
 disallow_subclassing_any = false
 disallow_untyped_decorators = false
 disallow_any_generics = false
 disallow_untyped_calls = false
 disallow_untyped_defs = false
-no_implicit_reexport = false
 warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = [
+# TODO: install django-stubs an typed-django-filters in mypy and fix type errors
+  "django.*",
+  "django_filters.*",
+  "django_otp.*",
+  "djangoql.*",
+  "environ.*",
+  "knox.*",
+  "libnmap.*",
+  "polars_iptools.*",
+  "recurrence.*",
+  "rest_framework.*",
+  "tagulous.*",
+  "transit.*",
+  "two_factor.*",
+  "whitenoise.*",
+]
+ignore_missing_imports = true
+
 
 [tool.setuptools_scm]
 write_to = "_version.py"
@@ -165,4 +184,4 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 split-on-trailing-comma = false
 
 [tool.codespell]
-ignore-words-list = 'edn,juxt,assertIn'
+ignore-words-list = 'EDE,assertIn'

@@ -571,7 +571,7 @@ phonenumberslite = [
 [[package]]
 name = "django-xtdb"
 version = "0.0.1"
-source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#337a16f7c01d406d314de5af65f9da9bc9817f8b" }
+source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#e04664bb796888d34525175e2437ac999565cf9e" }
 dependencies = [
     { name = "django" },
 ]

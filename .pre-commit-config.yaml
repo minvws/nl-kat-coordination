@@ -61,7 +61,17 @@ repos:
       - id: mypy
         args: []
         additional_dependencies:
+          - celery-types
+          - git+https://github.com/dekkers/django-xtdb.git@e04664bb796888d34525175e2437ac999565cf9e
           - httpx
+          - structlog
+          - types-docker
+          - django-components
+          - django-csp
+          - pydantic
+          - psycopg
+          - polars
+          - dnspython
         exclude: |
           (?x)(
           ^tests/ |

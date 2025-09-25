@@ -138,7 +138,7 @@ class PluginRunner:
 
         exit_status = container.wait()["StatusCode"]
         if exit_status != 0:
-            out = container.logs(stdout=False, stderr=True)
+            stderr_out = container.logs(stdout=False, stderr=True)
 
         if not keep:
             container.remove(force=True)
@@ -150,7 +150,7 @@ class PluginRunner:
             tmp_file.delete()
 
         if exit_status != 0:
-            raise ContainerError(container, exit_status, command, container.image, out)
+            raise ContainerError(container, exit_status, command, container.image, stderr_out.decode())
 
         signal.signal(signal.SIGTERM, original_handler)
 

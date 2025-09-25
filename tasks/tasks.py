@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from functools import reduce
 from typing import Any
 
+import celery
 import structlog
 from celery import Celery
 from django.conf import settings
@@ -197,7 +198,7 @@ def run_plugin_task(
 
 @app.task(bind=True)
 def run_plugin(
-    self: "Task", plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
+    self: celery.Task, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
 ) -> str:
     logger.debug(
         "Starting plugin task",
