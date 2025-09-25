@@ -40,7 +40,7 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.13.1"
     hooks:
-      - id: ruff
+      - id: ruff-check
       - id: ruff-format
 
   - repo: https://github.com/asottile/pyupgrade
@@ -59,11 +59,22 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
+        args: []
         additional_dependencies:
+          - celery-types
+          - git+https://github.com/dekkers/django-xtdb.git@e04664bb796888d34525175e2437ac999565cf9e
           - httpx
+          - structlog
+          - types-docker
+          - django-components
+          - django-csp
+          - pydantic
+          - psycopg
+          - polars
+          - dnspython
         exclude: |
           (?x)(
-          /tests/ |
+          ^tests/ |
           docs/source/conf\.py$ |
           setup\.py$
           )

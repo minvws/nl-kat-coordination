@@ -9,7 +9,7 @@ from libnmap.objects import NmapHost, NmapReport, NmapService
 from libnmap.parser import NmapParser
 
 
-def get_ip_ports_and_service(host: NmapHost):
+def get_ip_ports_and_service(host: NmapHost) -> list[dict[str, str | int]]:
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
 
@@ -37,7 +37,7 @@ def get_ip_ports_and_service(host: NmapHost):
     return results
 
 
-def run(file_id: str):
+def run(file_id: str) -> list[dict[str, str | int]]:
     token = os.getenv("OPENKAT_TOKEN")
     if not token:
         raise Exception("No OPENKAT_TOKEN env variable")
@@ -112,7 +112,7 @@ def run(file_id: str):
     return results
 
 
-def get_ports_scanned(parsed: NmapReport):
+def get_ports_scanned(parsed: NmapReport) -> list[int]:
     """Given an NmapReport, get the list of ports that were actually scanned"""
 
     ports_scanned = []

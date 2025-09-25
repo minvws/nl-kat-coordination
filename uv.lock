@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 
 [[package]]
@@ -571,7 +571,7 @@ phonenumberslite = [
 [[package]]
 name = "django-xtdb"
 version = "0.0.1"
-source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#337a16f7c01d406d314de5af65f9da9bc9817f8b" }
+source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#e04664bb796888d34525175e2437ac999565cf9e" }
 dependencies = [
     { name = "django" },
 ]
@@ -878,6 +878,7 @@ dependencies = [
     { name = "psycopg" },
     { name = "pydantic" },
     { name = "structlog" },
+    { name = "transit-python2" },
     { name = "whitenoise", extra = ["brotli"] },
 ]
 
@@ -896,7 +897,6 @@ dev = [
     { name = "pytest-mock" },
     { name = "pytest-xdist" },
     { name = "setuptools" },
-    { name = "transit-python2" },
 ]
 
 [package.metadata]
@@ -927,6 +927,7 @@ requires-dist = [
     { name = "psycopg", specifier = ">=3.2.10" },
     { name = "pydantic", specifier = ">=2.7.1" },
     { name = "structlog", specifier = ">=25.3.0" },
+    { name = "transit-python2", specifier = ">=0.8.321" },
     { name = "whitenoise", extras = ["brotli"], specifier = ">=6.5.0" },
 ]
 
@@ -945,7 +946,6 @@ dev = [
     { name = "pytest-mock", specifier = ">=3.11.1" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
     { name = "setuptools", specifier = "<81" },
-    { name = "transit-python2", specifier = ">=0.8.321" },
 ]
 
 [[package]]
@@ -1117,7 +1117,7 @@ dependencies = [
     { name = "kombu" },
     { name = "psutil" },
     { name = "pytest-docker-tools" },
-    { name = "setuptools", marker = "python_full_version < '4.0'" },
+    { name = "setuptools", marker = "python_full_version < '4'" },
     { name = "tenacity" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cf/91/21c4ce8728cea5b35e0cd1a5a89495ec3586411035db83e59b348cc80464/pytest_celery-1.2.1.tar.gz", hash = "sha256:7873fb3cf4fbfe9b0dd15d359bdb8bbab4a41c7e48f5b0adb7d36138d3704d52", size = 28190, upload-time = "2025-07-30T14:44:37.153Z" }

@@ -21,7 +21,7 @@ def ipv6_to_int(ipv6_addr):
     return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
 
 
-def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]):
+def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str, str]]:
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),  # parse CIDR to prefix as an integer
@@ -105,10 +105,10 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]):
     return results
 
 
-def download_lazyframe(client, file_type: str) -> pl.LazyFrame:
+def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
     """Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame"""
 
-    params = {"ordering": "created_at", "limit": 1}
+    params = {"ordering": "created_at", "limit": "1"}
 
     try:
         file = client.get("/file/", params=params | {"search": file_type}).json()["results"][0]["file"]

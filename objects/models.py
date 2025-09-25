@@ -224,7 +224,7 @@ class DNSSRVRecord(DNSRecordBase):
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
 
 
-def bulk_insert(objects: list[models.Model]):
+def bulk_insert(objects: list[models.Model]) -> None:
     """Use COPY to efficiently bulk-insert objects into XTDB. Assumes objects have the same type, skips other types."""
 
     if not objects:

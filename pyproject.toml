@@ -32,6 +32,7 @@ dependencies = [
   "psycopg>=3.2.10",
   "pydantic>=2.7.1",
   "structlog>=25.3.0",
+  "transit-python2>=0.8.321",
   "whitenoise[brotli]>=6.5.0",
 ]
 
@@ -51,7 +52,6 @@ dev = [
     "pytest>=7.4.0",
     # Pytest-common-subject which is needed by pytest-drf still depends on pkg_resources
     "setuptools<81",
-    "transit-python2>=0.8.321",
     "pytest-celery>=1.2.1",
 ]
 
@@ -92,14 +92,36 @@ blank_line_after_tag = "load,extends,include"
 ignore = "H006,H016,H017,H030,H031"
 
 
-[[tool.mypy.overrides]]
-follow_imports = "skip"
+[tool.mypy]
+python_version = "3.12"
+strict = true
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
+disallow_any_generics = false
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+warn_return_any = false
 
-disallow_any_generics = true
-disallow_untyped_defs = true
-disallow_untyped_calls = true
-disallow_incomplete_defs = true
-no_implicit_reexport = true
+[[tool.mypy.overrides]]
+module = [
+# TODO: install django-stubs an typed-django-filters in mypy and fix type errors
+  "django.*",
+  "django_filters.*",
+  "django_otp.*",
+  "djangoql.*",
+  "environ.*",
+  "knox.*",
+  "libnmap.*",
+  "polars_iptools.*",
+  "recurrence.*",
+  "rest_framework.*",
+  "tagulous.*",
+  "transit.*",
+  "two_factor.*",
+  "whitenoise.*",
+]
+ignore_missing_imports = true
+
 
 [tool.setuptools_scm]
 write_to = "_version.py"
@@ -163,4 +185,4 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 split-on-trailing-comma = false
 
 [tool.codespell]
-ignore-words-list = 'edn,juxt,assertIn'
+ignore-words-list = 'EDE,assertIn'

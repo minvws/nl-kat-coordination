@@ -87,17 +87,17 @@ def sync() -> list[Plugin]:
         enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
-    for plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
+    for parsed_plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
         plugin = Plugin(
-            plugin_id=plugin.plugin_id,
-            name=plugin.name,
-            scan_level=plugin.scan_level,
-            description=plugin.description,
-            consumes=list(plugin.consumes),
-            recurrences=plugin.recurrences,
-            oci_image=plugin.oci_image,
-            oci_arguments=plugin.oci_arguments,
-            version=plugin.version,
+            plugin_id=parsed_plugin.plugin_id,
+            name=parsed_plugin.name,
+            scan_level=parsed_plugin.scan_level,
+            description=parsed_plugin.description,
+            consumes=list(parsed_plugin.consumes),
+            recurrences=parsed_plugin.recurrences,
+            oci_image=parsed_plugin.oci_image,
+            oci_arguments=parsed_plugin.oci_arguments,
+            version=parsed_plugin.version,
         )
         plugins.append(plugin)
 

@@ -27,7 +27,7 @@ class KATMultiModelPermissions(KATModelPermissions):
         if getattr(view, "_ignore_model_permissions", False):
             return True
 
-        perms = []
+        perms: list[str] = []
         models = {key.lower(): model for key, model in object_type_by_name().items()}
 
         for key in request.data:
@@ -45,8 +45,8 @@ class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
         DeleteView.__name__: ["%(app_label)s.delete_%(model_name)s"],
     }
 
-    def get_permission_required(self):
-        permissions_required = []
+    def get_permission_required(self) -> list[str]:
+        permissions_required: list[str] = []
 
         if not issubclass(self.__class__, CreateView | UpdateView | DeleteView):
             return permissions_required

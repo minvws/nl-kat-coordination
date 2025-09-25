@@ -35,7 +35,7 @@ class FindingTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-def object_by_code(object_code: str | None, object_id: int | None, object_type: str):
+def object_by_code(object_code: str | None, object_id: int | None, object_type: str) -> int | None:
     if not object_code:
         return object_id
 

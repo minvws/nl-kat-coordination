@@ -107,10 +107,10 @@ class Task(models.Model):
     ended_at = models.DateTimeField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
 
-    _async_result = None
+    _async_result: AsyncResult | None = None
 
     @property
-    def async_result(self, celery: Celery = None) -> AsyncResult:
+    def async_result(self, celery: Celery | None = None) -> AsyncResult:
         if self._async_result is not None:
             return self._async_result
 

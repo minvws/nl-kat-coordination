@@ -4,8 +4,9 @@ import shlex
 import signal
 import subprocess
 import sys
+from typing import Any
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV, get_reloader, restart_with_reloader, start_django
 
 from tasks.celery import cancel_all_tasks
@@ -13,7 +14,7 @@ from tasks.celery import cancel_all_tasks
 logger = logging.getLogger(__name__)
 
 
-def restart_celery(celery_cmd: str):
+def restart_celery(celery_cmd: str) -> None:
     logger.info("Stopping celery")
     cmd = shlex.split(celery_cmd)
     subprocess.call(shlex.split("celery -A tasks control shutdown -t 2"))
@@ -45,10 +46,10 @@ def run_with_reloader(main_func, *args, **kwargs):
 
 
 class Command(BaseCommand):
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("celery_cmd", type=str, help="The celery command to run.")
 
-    def handle(self, celery_cmd: str, *args, **kwargs):
+    def handle(self, celery_cmd: str, *args: Any, **kwargs: Any) -> None:
         logger.info("Starting celery worker with autoreload...")
 
         run_with_reloader(restart_celery, celery_cmd)

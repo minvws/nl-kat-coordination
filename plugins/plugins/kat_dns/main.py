@@ -7,7 +7,7 @@ from os import getenv
 
 import dns
 import httpx
-from dns.edns import EDEOption
+from dns.edns import Option
 from dns.message import from_text
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
@@ -39,7 +39,7 @@ def run(hostname: str, record_types: set[str]) -> list:
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
     # enable EDE to get the DNSSEC Bogus return values if the server supports it # codespell-ignore
-    resolver.use_edns(options=[EDEOption(15)])
+    resolver.use_edns(options=[Option("EDE")])
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
@@ -63,7 +63,7 @@ def run(hostname: str, record_types: set[str]) -> list:
     record_store = []
 
     def register_hostname(name: str) -> dict:
-        hostname = {"object_type": "Hostname", "network": "internet", "name": name.rstrip(".")}
+        hostname: dict[str, str | int] = {"object_type": "Hostname", "network": "internet", "name": name.rstrip(".")}
         hostname_store[hostname["name"]] = hostname
         return hostname
 
@@ -74,7 +74,7 @@ def run(hostname: str, record_types: set[str]) -> list:
     # register argument hostname
     input_hostname = register_hostname(hostname)
 
-    results = []
+    results: list[dict[str, str | int]] = []
 
     for answer in answers:
         for rrset in answer.response.answer:
@@ -83,12 +83,12 @@ def run(hostname: str, record_types: set[str]) -> list:
                 default_args = {"hostname": record_hostname["name"], "value": str(rr), "ttl": rrset.ttl}
 
                 if isinstance(rr, A):
-                    ipv4 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
+                    ipv4: dict[str, str | int] = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv4)
                     register_record({"object_type": "DNSARecord", "ip_address": ipv4["address"], **default_args})
 
                 if isinstance(rr, AAAA):
-                    ipv6 = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
+                    ipv6: dict[str, str | int] = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv6)
                     register_record({"object_type": "DNSAAAARecord", "ip_address": ipv6["address"], **default_args})
 

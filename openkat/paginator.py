@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class OpenKATPaginator(Paginator):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
         if self.orphans != 0:
