@@ -2,7 +2,7 @@ import datetime
 import shlex
 import signal
 import uuid
-from datetime import timedelta
+from datetime import UTC, timedelta
 from pathlib import Path
 
 import docker
@@ -115,7 +115,7 @@ class PluginRunner:
 
         container = client.containers.run(
             image=plugin.oci_image,
-            name=f"{plugin.plugin_id}_{datetime.datetime.now(datetime.UTC).timestamp()}",
+            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
             command=command,
             stdout=use_stdout,
             stderr=True,
@@ -185,7 +185,7 @@ class PluginRunner:
         token = AuthToken(
             user=plugin_user,
             name=plugin_id,
-            expiry=datetime.datetime.now(datetime.UTC) + timedelta(minutes=settings.PLUGIN_TIMEOUT),
+            expiry=datetime.datetime.now(UTC) + timedelta(minutes=settings.PLUGIN_TIMEOUT),
         )
 
         return plugin_user, token
