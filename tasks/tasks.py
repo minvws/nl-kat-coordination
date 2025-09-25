@@ -5,6 +5,7 @@ from functools import reduce
 from typing import Any
 
 import structlog
+from celery import Celery
 from django.conf import settings
 from django.db.models import Q
 from djangoql.queryset import apply_search
@@ -49,7 +50,7 @@ def reschedule() -> None:
     logger.info("Finished scheduling plugins")
 
 
-def run_schedule(schedule: Schedule, force: bool = True) -> list[Task]:
+def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -> list[Task]:
     if not schedule.plugin:
         logger.debug("No plugin defined for schedule, skipping")
         return []
@@ -58,24 +59,26 @@ def run_schedule(schedule: Schedule, force: bool = True) -> list[Task]:
     tasks = []
 
     for org in orgs:
-        tasks.extend(run_schedule_for_org(schedule, org, force))
+        tasks.extend(run_schedule_for_org(schedule, org, force, celery=celery))
 
     return tasks
 
 
-def run_schedule_for_org(schedule: Schedule, organization: Organization, force: bool = True) -> list[Task]:
+def run_schedule_for_org(
+    schedule: Schedule, organization: Organization, force: bool = True, celery: Celery = app
+) -> list[Task]:
     now = datetime.now(UTC)
 
     if not schedule.object_set:
         if force:
-            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
+            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id, celery=celery)
 
         last_run = Task.objects.filter(schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
             return []
 
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id)
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id, celery=celery)
 
     input_data: set[str] = set()
 
@@ -111,7 +114,7 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     #     input_data.add(str(profile.reference))
 
     if force:
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)
 
     # Filter on the schedule and created after the previous occurrence
     last_runs = Task.objects.filter(schedule=schedule, created_at__gt=schedule.recurrences.before(now))
@@ -137,14 +140,18 @@ def run_schedule_for_org(schedule: Schedule, organization: Organization, force: 
     if not input_data:
         return []
 
-    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id)
+    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)
 
 
-def rerun_task(task: Task) -> list[Task]:
+def rerun_task(task: Task, celery: Celery = app) -> list[Task]:
     plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
 
     return run_plugin_task(
-        plugin.plugin_id, task.organization.code if task.organization else None, task.data["input_data"], None
+        plugin.plugin_id,
+        task.organization.code if task.organization else None,
+        task.data["input_data"],
+        None,
+        celery=celery,
     )
 
 
@@ -154,6 +161,7 @@ def run_plugin_task(
     input_data: str | list[str] | set[str] | None = None,
     schedule_id: int | None = None,
     batch: bool = True,
+    celery: Celery = app,
 ) -> list[Task]:
     if isinstance(input_data, set):
         input_data = list(input_data)
@@ -163,7 +171,9 @@ def run_plugin_task(
         idx = 0
 
         for idx_2 in range(settings.BATCH_SIZE, len(input_data) + settings.BATCH_SIZE, settings.BATCH_SIZE):
-            tasks.append(run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False)[0])
+            tasks.append(
+                run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False, celery=celery)[0]
+            )
             idx = idx_2
 
         return tasks
@@ -178,7 +188,9 @@ def run_plugin_task(
         data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
     )
 
-    app.send_task("tasks.tasks.run_plugin", (plugin_id, organization_code, input_data), task_id=str(task_id))
+    run_plugin.bind(celery)  # Make sure to bind the right celery instance to be able to test these tasks.
+    async_result = run_plugin.apply_async((plugin_id, organization_code, input_data), task_id=str(task_id))
+    task._async_result = async_result
 
     return [task]
 
@@ -186,7 +198,7 @@ def run_plugin_task(
 @app.task(bind=True)
 def run_plugin(
     self, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
-) -> None:
+) -> str:
     logger.debug(
         "Starting plugin task",
         task_id=self.request.id,
@@ -213,7 +225,7 @@ def run_plugin(
     task.save()
 
     try:
-        PluginRunner().run(plugin_id, input_data, task_id=task.id)
+        out = PluginRunner().run(plugin_id, input_data, task_id=task.id)
         task.status = TaskStatus.COMPLETED
         task.ended_at = datetime.now(UTC)
         task.save()
@@ -228,13 +240,14 @@ def run_plugin(
         raise
 
     logger.info("Handled plugin", organization=organization, plugin_id=plugin_id, input_data=input_data)
+    return out
 
 
-def process_raw_file(file: File, handle_error: bool = False):
+def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app):
     if file.type == "error" and not handle_error:
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
         return
 
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
         for organization in plugin.enabled_organizations():
-            run_plugin_task(plugin.plugin_id, organization.code, str(file.id))
+            run_plugin_task(plugin.plugin_id, organization.code, str(file.id), celery=celery)

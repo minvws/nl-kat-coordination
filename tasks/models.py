@@ -1,6 +1,8 @@
 import uuid
 
 import recurrence.fields
+from celery import Celery
+from celery.result import AsyncResult
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -104,6 +106,22 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True)
     modified_at = models.DateTimeField(auto_now=True)
+
+    _async_result = None
+
+    @property
+    def async_result(self, celery: Celery = None) -> AsyncResult:
+        if self._async_result is not None:
+            return self._async_result
+
+        if not celery:
+            from tasks.celery import app  # noqa: PLC0415
+
+            celery = app
+
+        self._async_result = AsyncResult(str(self.id), app=celery)
+
+        return self._async_result
 
     def cancel(self):
         # Import here to prevent circular imports

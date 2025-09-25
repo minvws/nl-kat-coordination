@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 import structlog
+from celery import Celery
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group, Permission
@@ -24,6 +25,7 @@ from objects.models import Hostname, Network
 from openkat.management.commands.create_authtoken import create_auth_token
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 from tasks.models import Task as TaskDB
+from tasks.tasks import run_plugin
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
@@ -38,7 +40,7 @@ def log_output():
 
 
 class JSONAPIClient(APIClient):
-    """Add json argument to post"""
+    """Add json argument to post and patch"""
 
     def post(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):  # noqa: A002
         if json is not None and data is None and content_type is None:
@@ -398,6 +400,49 @@ def django_db_modify_db_settings_xdist_suffix(request):
         # 'gw0' -> '1', 'gw1' -> '2', ...
         suffix = str(int(xdist_suffix.replace("gw", "")) + 1)
         _set_suffix_to_test_databases_except_xtdb(suffix=suffix)
+
+
+@pytest.fixture(scope="session")
+def celery_config(tmp_path_factory):
+    path = tmp_path_factory.mktemp("celery-test")
+
+    return {"broker_url": "memory://", "result_backend": f"file://{path}", "task_always_eager": True}
+
+
+@pytest.fixture
+def celery(celery_app: Celery):
+    """Celery app with run_plugin registered. Together with task_always_eager in the celery config, his basically makes
+    the test environment synchronous."""
+
+    celery_app.register_task(run_plugin)
+
+    return celery_app
+
+
+@pytest.fixture
+def container(mocker):
+    """Faked container in the plugin runner."""
+
+    container = mocker.Mock()
+    container.wait.return_value = {"StatusCode": 0}
+    container.attrs = {"HostConfig": {"LogConfig": {"Type": "json-file"}}}
+
+    def set_logs(logs: list[str]):
+        container.logs.return_value = logs
+
+    container.set_logs = set_logs
+
+    return container
+
+
+@pytest.fixture
+def docker(mocker, container):
+    """Fake docker in the plugin runner."""
+
+    docker_mocker = mocker.patch("plugins.runner.docker")
+    docker_mocker.from_env().containers.run.return_value = container
+
+    return docker_mocker
 
 
 def get_dummy_data(filename: str) -> bytes:

@@ -92,6 +92,7 @@ dev = [
     # This is used by pytest-xdist to determine the number of physical and logical cores
     "psutil>=7.1.0",
     "transit-python2>=0.8.321",
+    "pytest-celery>=1.2.1",
 ]
 
 [tool.uv]
