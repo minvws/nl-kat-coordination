@@ -60,16 +60,7 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          - types-pyyaml
-          - types-cachetools
-          - types-retry
-          - pydantic
-          - pynacl
           - httpx
-          - types-python-dateutil
-          - types-requests
-          - types-croniter
-          - boto3-stubs[s3]
         exclude: |
           (?x)(
           /tests/ |
