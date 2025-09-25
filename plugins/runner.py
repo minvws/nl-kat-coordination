@@ -191,7 +191,7 @@ class PluginRunner:
         return plugin_user, token
 
     @staticmethod
-    def create_command(args: list[str], target: str):
+    def create_command(args: list[str], target: str) -> list[str]:
         format_map = {"{file}": target}
         format_map["{ipaddress}"] = target
         format_map["{hostname}"] = target

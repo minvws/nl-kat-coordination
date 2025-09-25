@@ -197,7 +197,7 @@ def run_plugin_task(
 
 @app.task(bind=True)
 def run_plugin(
-    self, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
+    self: "Task", plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
 ) -> str:
     logger.debug(
         "Starting plugin task",
@@ -243,7 +243,7 @@ def run_plugin(
     return out
 
 
-def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app):
+def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app) -> None:
     if file.type == "error" and not handle_error:
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
         return

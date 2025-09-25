@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Any
 
 from django.http import JsonResponse
 from rest_framework.request import Request
@@ -60,7 +61,7 @@ class ObjectViewSet(ViewSet):
         NetworkSerializer,
     )
 
-    def create(self, request: Request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> JsonResponse:
         serializers = {serializer.Meta.model.__name__.lower(): serializer for serializer in self.serializers}
         response = {}
 

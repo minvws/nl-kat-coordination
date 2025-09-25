@@ -4,7 +4,7 @@ import sys
 import httpx
 
 
-def main(file_id: str):
+def main(file_id: str) -> None:
     token = os.getenv("OPENKAT_TOKEN")
     if not token:
         raise Exception("No OPENKAT_TOKEN env variable")

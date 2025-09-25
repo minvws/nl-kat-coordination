@@ -3,7 +3,7 @@ import socket
 import struct
 from typing import Any
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 
 from objects.models import Hostname, IPAddress, IPPort, Network, bulk_insert
 
@@ -11,10 +11,10 @@ from objects.models import Hostname, IPAddress, IPPort, Network, bulk_insert
 class Command(BaseCommand):
     help = "Load many objects into XTDB"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("-n", dest="number_of_objects", type=int, default=100_000)
 
-    def handle(self, number_of_objects, *args: Any, **kwargs: Any) -> None:  # noqa: C901, PLR0912, PLR0915
+    def handle(self, number_of_objects: int, *args: Any, **kwargs: Any) -> None:
         """Create demo data for the OOI application."""
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 

@@ -1,5 +1,8 @@
+from typing import Any
+
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from structlog import get_logger
@@ -31,7 +34,7 @@ def user_login_failed_callback(sender, credentials, request, **kwargs):
 
 # Signal sent when a model is saved
 @receiver(post_save, dispatch_uid="log_save")
-def log_save(sender, instance, created, **kwargs) -> None:
+def log_save(sender: type[models.Model], instance: models.Model, created: bool, **kwargs: Any) -> None:
     if isinstance(instance, LogEntry):
         # Django admin will automatically create a LogEntry for each admin
         # action, but we shouldn't send log messages about these.
@@ -66,7 +69,7 @@ def log_save(sender, instance, created, **kwargs) -> None:
 
 # Signal sent when a model is deleted
 @receiver(post_delete, dispatch_uid="log_delete")
-def log_delete(sender, instance, **kwargs) -> None:
+def log_delete(sender: type[models.Model], instance: models.Model, **kwargs: Any) -> None:
     context = {}
     event_codes = getattr(instance, "EVENT_CODES", None)
     if event_codes and "deleted" in event_codes:
