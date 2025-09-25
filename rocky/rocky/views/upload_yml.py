@@ -14,6 +14,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
+from tools.enums import SCAN_LEVEL
 from tools.forms.upload_oois import UploadOOIYMLForm
 
 from octopoes.api.models import Declaration
@@ -26,8 +27,8 @@ from octopoes.models.ooi.network import IPAddress, NetBlock, Network
 from octopoes.models.ooi.web import WebURL
 from octopoes.models.types import OOI_TYPES
 from rocky.bytes_client import get_bytes_client
-from tools.enums import SCAN_LEVEL
 from rocky.views.upload_yaml_examples import ooi_yaml_examples
+
 
 class OOICandidate(dict):
     ooi_type: str
@@ -41,16 +42,17 @@ class YAMLData(TypedDict):
 
 YML_CRITERIA = [
     _(
-      'All objects should be stored in the "oois" list at the root level. '
-      'Only objects under the "oois" field will be created, unless they are referenced by an object within "oois".'
+        'All objects should be stored in the "oois" list at the root level. '
+        'Only objects under the "oois" field will be created, unless they are referenced by an object within "oois".'
     ),
     _("Objects of various types can be included in a single file."),
     _(
-      'Each object must contain an additional field called "ooi_type", which specifies the object type. '
-      'This field is case-sensitive.'),
+        'Each object must contain an additional field called "ooi_type", which specifies the object type. '
+        "This field is case-sensitive."
+    ),
     _(
-      "YAML referencing is supported. "
-      'It is recommended to store referenced objects in the "references" field to facilitate potential future updates.'
+        "YAML referencing is supported. "
+        'It is recommended to store referenced objects in the "references" field to facilitate potential future updates.'
     ),
 ]
 
@@ -108,9 +110,9 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         ]
         context["criteria"] = YML_CRITERIA
         # filter base ooi classes from the "creatable list"
-        context["ooi_types"] = sorted(list(
-            filter(None, map(lambda x: _(x) if x not in banned_ooi_classes else None, self.ooi_types.keys()))
-        ))
+        context["ooi_types"] = sorted(
+            list(filter(None, map(lambda x: _(x) if x not in banned_ooi_classes else None, self.ooi_types.keys())))
+        )
         context["base_ooi_types"] = [
             "Following is about base OOI types "
             "(an example of base OOI class or type can be FindingType and it is base for CWEFindingType and more). "
@@ -125,7 +127,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             "SubjectAlternativeName base type should have proper fields to define as one of child types.",
             'FindingType base type should have an id field that contains "<SubclassName>-..."',
         ]
-        context['examples'] = ooi_yaml_examples
+        context["examples"] = ooi_yaml_examples
         return context
 
     def form_valid(self, form):
