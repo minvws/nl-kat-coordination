@@ -14,3 +14,7 @@ cveapi = "cveapi:run"
 
 [tool.uv]
 package = false
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
