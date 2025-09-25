@@ -3,7 +3,7 @@ name = "cveapi"
 version = "0.0.1.dev1"
 description = "CVE API"
 authors = ["MinVWS <maintainer@openkat.nl>"]
-license = "EUPL"
+license = "EUPL-1.2"
 requires-python = "~=3.10"
 dependencies = [
     "httpx>=0.28.1",
