@@ -78,3 +78,12 @@ def test_bulk_insert(xtdb):
 
     bulk_insert([net, net2, net3])
     assert Network.objects.count() == 3
+
+    net4 = Network(name="internet4")
+    net5 = Network(name="internet5")
+    net6 = Network(name="internet6")
+    host = Hostname(name="test.com", network=net)
+    bulk_insert([net4, net5, net6, host])
+
+    assert Network.objects.count() == 6
+    assert Hostname.objects.count() == 0

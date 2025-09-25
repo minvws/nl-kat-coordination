@@ -215,7 +215,7 @@ class DNSSRVRecord(DNSRecordBase):
 
 
 def bulk_insert(objects: list[models.Model]):
-    """Use COPY to efficiently bulk-insert objects into XTDB"""
+    """Use COPY to efficiently bulk-insert objects into XTDB. Assumes objects have the same type, skips other types."""
 
     if not objects:
         return
@@ -229,6 +229,8 @@ def bulk_insert(objects: list[models.Model]):
 
         writer = Writer(fp, "msgpack")
         for obj in objects:
+            if obj._meta.db_table != table_name:
+                continue
             writer.write(to_xtdb_dict(obj))
 
         fp.seek(0)
