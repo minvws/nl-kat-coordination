@@ -322,6 +322,7 @@ class ObjectSetListView(FilterView):
 class ObjectSetDetailView(DetailView):
     template_name = "object_set.html"
     model = ObjectSet
+    PREVIEW_SIZE = 20
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -339,7 +340,7 @@ class ObjectSetDetailView(DetailView):
                 model_qs = apply_search(model_qs, obj.object_query)
 
             # TODO: check scan profile
-            context["objects"] = model_qs
+            context["objects"] = model_qs[: self.PREVIEW_SIZE]
         else:
             context["objects"] = None
 

@@ -62,8 +62,8 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ object_set.name }}</td>
-                                    <td>{{ object_set.object_type.model }}</td>
                                     <td>{{ object_set.object_query }}</td>
+                                    <td>{{ object_set.object_type.model }}</td>
                                     <td>
                                         {% if object_set.traverse_objects|length > 1 %}
                                             [{{ object_set.traverse_objects|first }}, ...]

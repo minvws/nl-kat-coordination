@@ -174,7 +174,7 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
         return "Timeout"
 
 
-if __name__ == "__main__":
+def main():
     token = os.getenv("OPENKAT_TOKEN")
     if not token:
         raise Exception("No OPENKAT_TOKEN env variable")
@@ -187,6 +187,10 @@ if __name__ == "__main__":
     client = httpx.Client(base_url=base_url, headers=headers)
     record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
     results = run(sys.argv[1], record_types)
+
+    if not results:
+        return
+
     results_grouped = defaultdict(list)
 
     for result in results:
@@ -212,6 +216,10 @@ if __name__ == "__main__":
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
-    res = client.post("/objects/", headers=headers, json=results_grouped)
+    client.post("/objects/", headers=headers, json=results_grouped)
 
     print(json.dumps(results))  # noqa: T201
+
+
+if __name__ == "__main__":
+    main()

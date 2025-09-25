@@ -3,7 +3,8 @@
   flex-direction: row;
   justify-content: flex-start;
 
-  p, button {
+  p,
+  button {
     align-self: flex-end;
   }
 }

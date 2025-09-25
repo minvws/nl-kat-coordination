@@ -2,7 +2,7 @@ import time
 
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import Hostname, Network, bulk_insert
+from objects.models import Hostname, Network, bulk_insert, to_xtdb_dict
 from objects.views import NetworkListView
 from tests.conftest import setup_request
 
@@ -71,7 +71,7 @@ def test_bulk_create(xtdb):
     assert Network.objects.count() == 6  # Not working in XTDB currently
 
 
-def test_bulk_insert(xtdb):
+def test_bulk_insert_networks(xtdb):
     net = Network(name="internet")
     net2 = Network(name="internet2")
     net3 = Network(name="internet3")
@@ -87,3 +87,22 @@ def test_bulk_insert(xtdb):
 
     assert Network.objects.count() == 6
     assert Hostname.objects.count() == 0
+
+
+def test_to_dict(xtdb):
+    net = Network.objects.create(name="internet")
+    host = Hostname.objects.create(name="test.com", network=net)
+
+    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id}
+    assert to_xtdb_dict(host) == {"name": "test.com", "network_id": net.id, "_id": host.id}
+
+
+def test_bulk_insert_hostnames(xtdb):
+    net = Network.objects.create(name="internet")
+    host = Hostname.objects.create(name="test.com", network=net)
+    host1 = Hostname.objects.create(name="test1.com", network=net)
+    host2 = Hostname.objects.create(name="test2.com", network=net)
+    host3 = Hostname.objects.create(name="test3.com", network=net)
+
+    bulk_insert([host, host1, host2, host3])
+    assert Hostname.objects.count() == 4

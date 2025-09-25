@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
-from django.db.models import Model
+from django.db.models import ForeignKey, Model
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
@@ -21,7 +21,14 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 
 def to_xtdb_dict(model: Model) -> dict:
     mod = model_to_dict(model, exclude=["id"])
-    mod["_id"] = model.id
+    mod["_id"] = model.pk
+
+    for field in model._meta.fields:
+        if not isinstance(field, ForeignKey):
+            continue
+
+        mod[field.name + "_id"] = mod[field.name]
+        del mod[field.name]
 
     return mod
 
@@ -112,6 +119,9 @@ class Hostname(Asset):
     name: LowerCaseCharField = LowerCaseCharField()
 
     def __str__(self) -> str:
+        if self.name is None:  # TODO: fix, this  can happen for some reason...
+            return ""
+
         return self.name
 
 
