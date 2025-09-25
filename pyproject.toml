@@ -82,6 +82,7 @@ env = [
   "D:OPENKAT_DB_HOST=localhost",
   "D:OPENKAT_XTDB_HOST=localhost",
   "D:OPENKAT_XTDB_PORT=5433",
+  "D:DOCKER_NETWORK=openkat-test-plugin-network",
 ]
 
 [tool.djlint]

@@ -420,12 +420,13 @@ def celery(celery_app: Celery):
 
 
 @pytest.fixture
-def container(mocker):
-    """Faked container in the plugin runner."""
+def plugin_container(mocker):
+    """Faked container in the plugin runner. Comes with a convenient set_logs method for testing."""
 
     container = mocker.Mock()
     container.wait.return_value = {"StatusCode": 0}
     container.attrs = {"HostConfig": {"LogConfig": {"Type": "json-file"}}}
+    container.logs.return_value = []
 
     def set_logs(logs: list[str]):
         container.logs.return_value = logs
@@ -436,11 +437,11 @@ def container(mocker):
 
 
 @pytest.fixture
-def docker(mocker, container):
+def docker(mocker, plugin_container):
     """Fake docker in the plugin runner."""
 
-    docker_mocker = mocker.patch("plugins.runner.docker")
-    docker_mocker.from_env().containers.run.return_value = container
+    docker_mocker = mocker.patch("plugins.runner.docker.from_env")()
+    docker_mocker.containers.run.return_value = plugin_container
 
     return docker_mocker
 
