@@ -89,6 +89,28 @@ class PluginRunner:
         environment["OPENKAT_TOKEN"] = token.generate_new_token()
         token.save()
 
+        # Add signal handler to kill the container as well (for cancelling tasks)
+        original_handler = signal.getsignal(signal.SIGTERM)
+
+        def handle(signalnum, stack_frame):
+            container.kill(signalnum)
+            token.delete()
+            plugin_user.delete()
+
+            if tmp_file:
+                tmp_file.delete()
+
+            if callable(original_handler):
+                original_handler(signalnum, stack_frame)
+            elif original_handler == signal.SIG_DFL:
+                # Call the default signal handler
+                signal.default_int_handler(signalnum, stack_frame)
+            elif original_handler == signal.SIG_IGN:
+                # Signal was being ignored
+                pass
+
+        signal.signal(signal.SIGTERM, handle)
+
         client = docker.from_env()
 
         container = client.containers.run(
@@ -103,21 +125,6 @@ class PluginRunner:
             environment=environment,
             detach=True,
         )
-
-        # Add signal handler to kill the container as well (for cancelling tasks)
-        old_handle = signal.getsignal(signal.SIGTERM)
-
-        def handle(sig_num, stack_frame):
-            container.kill(sig_num)
-            token.delete()
-            plugin_user.delete()
-
-            if tmp_file:
-                tmp_file.delete()
-
-            old_handle(sig_num, stack_frame)
-
-        signal.signal(signal.SIGTERM, handle)
 
         # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
         #   after the container has gone.
@@ -145,7 +152,7 @@ class PluginRunner:
         if exit_status != 0:
             raise ContainerError(container, exit_status, command, container.image, out)
 
-        signal.signal(signal.SIGTERM, old_handle)
+        signal.signal(signal.SIGTERM, original_handler)
 
         if out is None:
             return ""
