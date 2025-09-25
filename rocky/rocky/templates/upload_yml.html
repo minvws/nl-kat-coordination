@@ -15,18 +15,83 @@
                 <ul>
                     {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
                 </ul>
+
                 <details>
                     <summary>See Base OOI type details</summary>
                     <ul>
                         {% for criterion in base_ooi_types %}<li>{{ criterion }}</li>{% endfor %}
                     </ul>
                 </details>
+
                 <details>
                     <summary>See available OOI types</summary>
-                    <ul>
-                        {% for ooi_type in ooi_types %}<li>{{ ooi_type }}</li>{% endfor %}
-                    </ul>
+                    <div class="padded">
+                        {% for ooi_type in ooi_types %}
+                            <details class="expandable-code">
+                                <summary>{{ ooi_type }}</summary>
+                                {% with yaml_examples=examples|get_item:ooi_type %}
+                                {% if yaml_examples %}
+                                    {% for example in yaml_examples %}
+                                    <div class="content-container" data-yml-code>
+                                        <span data-copy-btn>copy</span>
+                                        <pre><code>{{ example }}</code></pre>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                                {% endwith %}
+                            </details>
+                        {% endfor %}
+                    </div>
                 </details>
+
+                <details class="expandable-code">
+                    <summary>About the YAML file</summary>
+                    <div class="content-container">
+                        <p>Example:</p>
+                        <pre><code>
+oois:
+    - ooi_type: IPAddress
+        clearance: 2
+        address: 2001:db8:3333:4444:5555:6666:7777:8888
+        network:
+            ooi_type: Network
+            clearance: 2
+            name: localhost
+    
+    - ooi_type: IPAddressV4
+        clearance: 2
+        address: 127.0.0.1
+        network:
+            ooi_type: Network
+            clearance: 2
+            name: localhost
+                        </code></pre>
+                    </div>
+                    <br>
+                    <div class="content-container">
+                        <p>Any OOI type can be used many times by referencing</p>
+                        <p>Example with referencing:</p>
+                        <pre><code>
+references:
+    Network: &network1
+        ooi_type: Network
+        clearance: 2
+        name: localhost
+
+oois:
+    - ooi_type: IPAddress
+        clearance: 2
+        address: 2001:db8:3333:4444:5555:6666:7777:8888
+        network: *network1
+    
+    - ooi_type: IPAddressV4
+        clearance: 2
+        address: 127.0.0.1
+        network: *network1
+                        </code></pre>
+                    </div>
+                </details>
+
                 <form novalidate method="post" enctype="multipart/form-data" class="help">
                     {% csrf_token %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
@@ -35,5 +100,6 @@
                 </form>
             </div>
         </section>
+        <script src="{% static "js/uploadYaml.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
     </main>
 {% endblock content %}

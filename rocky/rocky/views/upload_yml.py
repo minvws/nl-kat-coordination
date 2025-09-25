@@ -26,7 +26,8 @@ from octopoes.models.ooi.network import IPAddress, NetBlock, Network
 from octopoes.models.ooi.web import WebURL
 from octopoes.models.types import OOI_TYPES
 from rocky.bytes_client import get_bytes_client
-
+from tools.enums import SCAN_LEVEL
+from rocky.views.upload_yaml_examples import ooi_yaml_examples
 
 class OOICandidate(dict):
     ooi_type: str
@@ -53,17 +54,9 @@ YML_CRITERIA = [
     ),
 ]
 
-CLEARANCE_VALUES = ["0", "1", "2", "3", "4", 0, 1, 2, 3, 4]
-
 # Some OOI types cannot instantiated
 banned_ooi_classes = [
-    "FindingType",
-    "IPAddress",
-    "NetBlock",
-    "WebURL",
-    "DNSRecord",
     "DNSSPFMechanism",
-    "SubjectAlternativeName",
     "BaseReport",
     "ReportData",
     "AssetReport",
@@ -115,9 +108,9 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         ]
         context["criteria"] = YML_CRITERIA
         # filter base ooi classes from the "creatable list"
-        context["ooi_types"] = list(
+        context["ooi_types"] = sorted(list(
             filter(None, map(lambda x: _(x) if x not in banned_ooi_classes else None, self.ooi_types.keys()))
-        )
+        ))
         context["base_ooi_types"] = [
             "Following is about base OOI types "
             "(an example of base OOI class or type can be FindingType and it is base for CWEFindingType and more). "
@@ -132,6 +125,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             "SubjectAlternativeName base type should have proper fields to define as one of child types.",
             'FindingType base type should have an id field that contains "<SubclassName>-..."',
         ]
+        context['examples'] = ooi_yaml_examples
         return context
 
     def form_valid(self, form):
@@ -241,7 +235,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         # Save to cache
         cache[cache_field_name] = ooi
         # Set clearence
-        if ooi_dict.get("clearance") in CLEARANCE_VALUES:
+        if ooi_dict.get("clearance") in SCAN_LEVEL.values:
             self.raise_clearance_level(ooi.reference, int(ooi_dict["clearance"]))
         return ooi
 

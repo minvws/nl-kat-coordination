@@ -1,0 +1,33 @@
+details.expandable-code {
+    > div.content-container {
+        cursor: initial;
+        background-color: var(--code-base-background-color, inherit);
+        gap: 0;
+        border: 1px solid var(--colors-blue-300);
+        border-radius: 3px;
+        color: var(--colors-blue-600);
+
+        > span[data-copy-btn] {
+            align-self: flex-end;
+            cursor: pointer;
+            padding: 0 3px 0 3px;
+            margin: 5px 5px 0 5px;
+            border: 1px dotted var(--colors-blue-300);
+            border-radius: 5px;
+            font-size: small;
+        }
+        
+        > pre {
+            padding: 0;
+            border-radius: inherit;
+        }
+    }
+}
+
+div.padded {
+    padding: 1rem;
+}
+
+details > summary {
+    cursor: pointer;
+}
