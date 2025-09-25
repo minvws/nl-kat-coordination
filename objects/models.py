@@ -112,6 +112,9 @@ class Hostname(Asset):
     name: LowerCaseCharField = LowerCaseCharField()
 
     def __str__(self) -> str:
+        if self.name is None:  # TODO: fix, this  can happen for some reason...
+            return ""
+
         return self.name
 
 

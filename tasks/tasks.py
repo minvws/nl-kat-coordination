@@ -89,7 +89,7 @@ def run_schedule_for_org(
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
         # TODO: check scan profile
-        input_data = input_data.union([str(model) for model in model_qs])
+        input_data = input_data.union([str(model) for model in model_qs if str(model)])
 
     if not input_data:
         return []
