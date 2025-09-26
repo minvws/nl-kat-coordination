@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.12"
 
 [[package]]
@@ -571,7 +571,7 @@ phonenumberslite = [
 [[package]]
 name = "django-xtdb"
 version = "0.0.1"
-source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#e04664bb796888d34525175e2437ac999565cf9e" }
+source = { git = "https://github.com/dekkers/django-xtdb.git?rev=main#2e1dd19c36abdf2667b898d7e71e7c558a322123" }
 dependencies = [
     { name = "django" },
 ]

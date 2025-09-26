@@ -1,8 +1,10 @@
 import time
 
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import OuterRef, Subquery
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import Hostname, Network, bulk_insert, to_xtdb_dict
+from objects.models import Hostname, Network, ScanLevel, bulk_insert, to_xtdb_dict
 from objects.views import NetworkListView
 from tests.conftest import setup_request
 
@@ -16,6 +18,28 @@ def test_query_hostname(xtdb):
     assert networks.count() == 1
     networks = Network.objects.filter(hostname__name="none.com")
     assert networks.count() == 0
+
+
+def test_query_with_scan_levels(xtdb, organization):
+    network = Network.objects.create(name="internet")
+    host = Hostname.objects.create(network=network, name="test.com")
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
+    time.sleep(0.1)
+
+    scan_level_query = (
+        ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
+        .values("object_id")
+        .annotate(scan_levels=ArrayAgg("scan_level"))
+        .values("scan_levels")
+    )
+    host = Hostname.objects.annotate(scan_levels=Subquery(scan_level_query)).get(pk=host.pk)
+    assert host.scan_levels == [0]
+
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
+    assert ScanLevel.objects.count() == 2
+
+    host = Hostname.objects.annotate(scan_levels=Subquery(scan_level_query)).get(pk=host.pk)
+    assert set(host.scan_levels) == {0, 2}
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):

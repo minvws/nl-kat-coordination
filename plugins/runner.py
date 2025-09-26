@@ -33,7 +33,7 @@ class PluginRunner:
         task_id: uuid.UUID | None = None,
         keep: bool = False,
         cli: bool = False,
-        parallelism: int | None = None,  # TODO: fix
+        parallelism: int | None = None,  # TODO: auto-parallelism
     ) -> str:
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
