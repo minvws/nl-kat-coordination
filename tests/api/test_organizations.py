@@ -25,7 +25,7 @@ from pytest_lambda import lambda_fixture, static_fixture
 
 from openkat.models import Organization
 
-pytestmark = pytest.mark.django_db
+pytestmark = pytest.mark.django_db(databases=["xtdb", "default"])
 
 
 def express_organization(organization: Organization) -> dict[str, Any]:

@@ -156,12 +156,12 @@ def seed_groups(db):
 
 
 @pytest.fixture
-def organization():
+def organization(xtdb):
     return create_organization("Test Organization", "org")
 
 
 @pytest.fixture
-def organization_b():
+def organization_b(xtdb):
     return create_organization("OrganizationB", "org_b")
 
 
@@ -336,8 +336,14 @@ def drf_redteam_client(create_drf_client, redteamuser):
     return client
 
 
-# Mark tests using this fixture automatically with django_db and require access to the "xtdb" database
-@pytest.fixture(scope="function", params=[pytest.param("", marks=pytest.mark.django_db(databases=["xtdb", "default"]))])
+# Mark tests using the xtdb fixture automatically with django_db and require access to the "xtdb" database
+def pytest_collection_modifyitems(items):
+    for item in items:
+        if "xtdb" in getattr(item, "fixturenames", ()):
+            item.add_marker(pytest.mark.django_db(databases=["xtdb", "default"]))
+
+
+@pytest.fixture(scope="function")
 def xtdb(request: pytest.FixtureRequest):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:

@@ -318,7 +318,7 @@ def test_organization_code_validator_from_view(rf, superuser_member):
     )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(databases=["xtdb", "default"])
 def test_organization_code_validator_from_model():
     with pytest.raises(ValidationError):
         Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
@@ -411,6 +411,7 @@ def test_organization_list_perms(rf, superuser_member, admin_member, client_memb
     assertNotContains(response_client, "Add new organization")
 
 
+@pytest.mark.django_db(databases=["xtdb", "default"])
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member"])
 def test_organization_edit_perms(request, member, rf):
     member = request.getfixturevalue(member)
@@ -424,6 +425,7 @@ def test_organization_edit_perms(request, member, rf):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db(databases=["xtdb", "default"])
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member"])
 def test_organization_edit_view(request, member, rf):
     member = request.getfixturevalue(member)
@@ -437,6 +439,7 @@ def test_organization_edit_view(request, member, rf):
     assertContains(response, "icon ti-edit")
 
 
+@pytest.mark.django_db(databases=["xtdb", "default"])
 @pytest.mark.parametrize("member", ["redteam_member", "client_member"])
 def test_organization_edit_perms_on_settings_view(request, member, rf):
     member = request.getfixturevalue(member)
