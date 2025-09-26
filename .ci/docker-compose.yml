@@ -96,12 +96,12 @@ networks:
     ipam:
       config:
         - subnet: 2001:ab8:d0cb::/64
-        - subnet: 172.24.0.1/16
-          gateway: 172.24.0.2
+        - subnet: 172.24.0.0/16
+          gateway: 172.24.0.1
   plugins:
     enable_ipv6: true
     ipam:
       config:
         - subnet: 2001:db8:d0cc::/64
-        - subnet: 172.26.0.3/16
-          gateway: 172.26.0.4
+        - subnet: 172.26.0.0/16
+          gateway: 172.26.0.1
