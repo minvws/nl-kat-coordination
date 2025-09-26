@@ -43,7 +43,7 @@
                                     <td>{{ finding.organization }}</td>
                                     <td>{{ finding.finding_type.code }}</td>
                                     <td>
-                                        <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object }}</a>
+                                        <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
                                     </td>
                                     <td>
                                         <form action="{% url 'objects:delete_finding' finding.pk %}" method="post">

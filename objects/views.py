@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import django_filters
 from django.conf import settings
-from django.db.models import Case, CharField, OuterRef, QuerySet, Subquery, When
+from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -79,30 +79,6 @@ class FindingListView(FilterView):
     context_object_name = "findings"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = FindingFilter
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        ref = OuterRef("object_id")
-        qs = qs.annotate(
-            object=Case(
-                When(
-                    object_type__in=["hostname", "Hostname"],
-                    then=Subquery(Hostname.objects.filter(pk=ref).values("name")),
-                ),
-                When(
-                    object_type__in=["ipaddress", "IPAddress"],
-                    then=Subquery(IPAddress.objects.filter(pk=ref).values("address")),
-                ),
-                When(
-                    object_type__in=["network", "Network"], then=Subquery(Network.objects.filter(pk=ref).values("name"))
-                ),
-                default=None,
-                output_field=CharField(),
-            )
-        )
-
-        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

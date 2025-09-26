@@ -18,21 +18,21 @@ from objects.models import (
 def test_finding_api(drf_client, xtdb):
     ft = FindingType.objects.create(code="TEST", score=5)
     net = Network.objects.create(name="internet")
-    f = Finding.objects.create(finding_type=ft, object_type="Network", object_id=net.id)
+    f = Finding.objects.create(finding_type=ft, object_type="network", object_id=net.id)
 
     assert drf_client.get("/api/v1/objects/finding/").json() == {
         "count": 1,
         "next": None,
         "previous": None,
         "results": [
-            {"id": f.pk, "object_id": net.id, "object_type": "Network", "organization": None, "finding_type": ft.code}
+            {"id": f.pk, "object_id": net.id, "object_type": "network", "organization": None, "finding_type": ft.code}
         ],
     }
 
     hn = Hostname.objects.create(network=net, name="test.com")
     res = drf_client.post(
         "/api/v1/objects/finding/",
-        json={"finding_type_code": "TEST", "object_type": "Hostname", "object_code": hn.name},
+        json={"finding_type_code": "TEST", "object_type": "hostname", "object_code": hn.name},
     )
     assert res.status_code == 201
     assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 2
@@ -40,9 +40,9 @@ def test_finding_api(drf_client, xtdb):
     res = drf_client.post(
         "/api/v1/objects/finding/",
         json=[
-            {"finding_type_code": "TEST", "object_type": "Network", "object_code": net.name},
-            {"finding_type_code": "TEST2", "object_type": "Network", "object_code": net.name},
-            {"finding_type_code": "TEST3", "object_type": "Network", "object_code": net.name},
+            {"finding_type_code": "TEST", "object_type": "network", "object_code": net.name},
+            {"finding_type_code": "TEST2", "object_type": "network", "object_code": net.name},
+            {"finding_type_code": "TEST3", "object_type": "network", "object_code": net.name},
         ],
     )
     assert res.status_code == 201

@@ -1,11 +1,9 @@
 import tempfile
 
 from django.apps import apps
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
-from django.db.models import ForeignKey, Model
+from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
@@ -39,17 +37,40 @@ class Asset(models.Model):
         abstract = True
 
 
+class ManagerWithGenericObjectForeignKey(Manager):
+    """GenericForeignKey-like behavior. (We could consider writing a custom GenericForeignKey as well at one point.)"""
+
+    def get_queryset(self):
+        ref = OuterRef("object_id")
+
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                object_human_readable=Case(
+                    When(object_type="hostname", then=Subquery(Hostname.objects.filter(pk=ref).values("name"))),
+                    When(object_type="ipaddress", then=Subquery(IPAddress.objects.filter(pk=ref).values("address"))),
+                    When(object_type="network", then=Subquery(Network.objects.filter(pk=ref).values("name"))),
+                    default=None,
+                    output_field=CharField(),
+                )
+            )
+        )
+
+
 class ScanLevel(models.Model):
     id: int
-    ooi_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    ooi_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-    ooi: GenericForeignKey = GenericForeignKey("ooi_type", "ooi_id")
+
     organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
     scan_level: models.IntegerField = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
     declared: models.BooleanField = models.BooleanField(default=False)
     last_changed_by: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
+
+    object_type: LowerCaseCharField = LowerCaseCharField()
+    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    objects = ManagerWithGenericObjectForeignKey()
 
     class Meta:
         managed = False
@@ -69,12 +90,11 @@ class FindingType(models.Model):
 
 class Finding(models.Model):
     organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
-
-    # TODO
-    object_type: models.ForeignKey = models.CharField()
-    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-
     finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
+
+    object_type: LowerCaseCharField = LowerCaseCharField()
+    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    objects = ManagerWithGenericObjectForeignKey()
 
     class Meta:
         managed = False
