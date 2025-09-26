@@ -336,11 +336,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-admin-auto-tests"
-version = "0.1.2"
-source = { git = "https://github.com/dekkers/django-admin-auto-tests?rev=f6eb4cbb9112b5aa933313d79e4da823adb41e1e#f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
-
-[[package]]
 name = "django-appconf"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -636,30 +631,6 @@ wheels = [
 ]
 
 [[package]]
-name = "factory-boy"
-version = "3.3.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "faker" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ba/98/75cacae9945f67cfe323829fc2ac451f64517a8a330b572a06a323997065/factory_boy-3.3.3.tar.gz", hash = "sha256:866862d226128dfac7f2b4160287e899daf54f2612778327dd03d0e2cb1e3d03", size = 164146, upload-time = "2025-02-03T09:49:04.433Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/8d/2bc5f5546ff2ccb3f7de06742853483ab75bf74f36a92254702f8baecc79/factory_boy-3.3.3-py2.py3-none-any.whl", hash = "sha256:1c39e3289f7e667c4285433f305f8d506efc2fe9c73aaea4151ebd5cdea394fc", size = 37036, upload-time = "2025-02-03T09:49:01.659Z" },
-]
-
-[[package]]
-name = "faker"
-version = "37.8.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "tzdata" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/da/1336008d39e5d4076dddb4e0f3a52ada41429274bf558a3cc28030d324a3/faker-37.8.0.tar.gz", hash = "sha256:090bb5abbec2b30949a95ce1ba6b20d1d0ed222883d63483a0d4be4a970d6fb8", size = 1912113, upload-time = "2025-09-15T20:24:13.592Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/11/02ebebb09ff2104b690457cb7bc6ed700c9e0ce88cf581486bb0a5d3c88b/faker-37.8.0-py3-none-any.whl", hash = "sha256:b08233118824423b5fc239f7dd51f145e7018082b4164f8da6a9994e1f1ae793", size = 1953940, upload-time = "2025-09-15T20:24:11.482Z" },
-]
-
-[[package]]
 name = "granian"
 version = "2.5.4"
 source = { registry = "https://pypi.org/simple" }
@@ -830,18 +801,6 @@ wheels = [
 ]
 
 [[package]]
-name = "model-mommy"
-version = "2.0.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/0b/71/ae2850e1a466020e10f218ef5a917bed1812b50f9f0fd794330cb0475e70/model_mommy-2.0.0.tar.gz", hash = "sha256:3d332afce941c57f1990f45b083ba13252ba74fcd1ae43fd047e5af7a70fb312", size = 30412, upload-time = "2019-10-21T22:04:00.723Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/69/1d588507ba30f51e5347696a42bd37d4bf5d46cfc12ad335ed9d77ccfac3/model_mommy-2.0.0-py2.py3-none-any.whl", hash = "sha256:40d6e740aad7509e696a324b94cf2b0a104da93c3d4a7924cea1be3d0eb95b4f", size = 16513, upload-time = "2019-10-21T22:03:57.103Z" },
-]
-
-[[package]]
 name = "msgpack-python"
 version = "0.5.6"
 source = { registry = "https://pypi.org/simple" }
@@ -884,9 +843,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "django-admin-auto-tests" },
-    { name = "factory-boy" },
-    { name = "model-mommy" },
     { name = "psutil" },
     { name = "pytest" },
     { name = "pytest-celery" },
@@ -933,9 +889,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "django-admin-auto-tests", git = "https://github.com/dekkers/django-admin-auto-tests?rev=f6eb4cbb9112b5aa933313d79e4da823adb41e1e" },
-    { name = "factory-boy", specifier = ">=3.2.1" },
-    { name = "model-mommy", specifier = ">=2.0.0" },
     { name = "psutil", specifier = ">=7.1.0" },
     { name = "pytest", specifier = ">=7.4.0" },
     { name = "pytest-celery", specifier = ">=1.2.1" },
