@@ -445,3 +445,18 @@ def test_organization_edit_perms_on_settings_view(request, member, rf):
         OrganizationSettingsView.as_view()(
             setup_request(rf.get("organization_settings"), member.user), organization_code=member.organization.code
         )
+
+
+def test_organization_tags(organization):
+    assert list(organization.tags.all()) == []
+
+    organization.tags = ["testtag1", "testtag2"]
+    organization.save()
+    assert list(organization.tags.all()) == ["testtag1", "testtag2"]
+
+    organization = Organization.objects.create(name="testtags", code="testtags", tags=["testtag3", "testtag4"])
+    assert list(organization.tags.all()) == ["testtag3", "testtag4"]
+
+    organization.tags = []
+    organization.save()
+    assert list(organization.tags.all()) == []
