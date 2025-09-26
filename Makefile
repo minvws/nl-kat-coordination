@@ -24,6 +24,7 @@ clean: .env
 object-clean: .env
 	docker compose down --volumes xtdb
 	docker compose up -d
+	make seed
 
 build: .env
 ifeq ($(UNAME),Darwin)
