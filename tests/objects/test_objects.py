@@ -29,17 +29,28 @@ def test_query_with_scan_levels(xtdb, organization):
     scan_level_query = (
         ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
         .values("object_id")
-        .annotate(scan_levels=ArrayAgg("scan_level"))
-        .values("scan_levels")
+        .order_by()
+        .annotate(scan_levels=ArrayAgg("scan_level"))  # collect scan levels in subquery
+        .annotate(organizations=ArrayAgg("organization"))  # collect scan levels in subquery
     )
-    host = Hostname.objects.annotate(scan_levels=Subquery(scan_level_query)).get(pk=host.pk)
+    host = (
+        Hostname.objects.annotate(scan_levels=Subquery(scan_level_query.values("scan_levels")))
+        .annotate(organizations=Subquery(scan_level_query.values("organizations")))
+        .get(pk=host.pk)
+    )
     assert host.scan_levels == [0]
+    assert host.organizations == [1]
 
     ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
     assert ScanLevel.objects.count() == 2
 
-    host = Hostname.objects.annotate(scan_levels=Subquery(scan_level_query)).get(pk=host.pk)
+    host = (
+        Hostname.objects.annotate(scan_levels=Subquery(scan_level_query.values("scan_levels")))
+        .annotate(organizations=Subquery(scan_level_query.values("organizations")))
+        .get(pk=host.pk)
+    )
     assert set(host.scan_levels) == {0, 2}
+    assert host.organizations == [1, 1]
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
