@@ -94,6 +94,8 @@ class PluginRunner:
 
         def handle(signalnum, stack_frame):
             container.kill(signalnum)
+            container.remove(force=True)
+
             token.delete()
             plugin_user.delete()
 
@@ -109,10 +111,7 @@ class PluginRunner:
                 # Signal was being ignored
                 pass
 
-        signal.signal(signal.SIGTERM, handle)
-
         client = docker.from_env()
-
         container = client.containers.run(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
@@ -125,6 +124,8 @@ class PluginRunner:
             environment=environment,
             detach=True,
         )
+
+        signal.signal(signal.SIGTERM, handle)
 
         # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
         #   after the container has gone.
