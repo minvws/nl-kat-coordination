@@ -10,7 +10,9 @@ from objects.models import (
     DNSNSRecord,
     Hostname,
     IPAddress,
+    IPPort,
     Network,
+    Protocol,
     ScanLevel,
     bulk_insert,
     to_xtdb_dict,
@@ -109,8 +111,14 @@ def test_recalculate_scan_profiles(xtdb, organization):
     )
 
     # The A record inherits level 2 from the hostname test.com
-    A = DNSARecord.objects.create(ip_address=IPAddress.objects.create(network=network, address="0.0.0.0"), hostname=h)
+    ip = IPAddress.objects.create(network=network, address="0.0.0.0")
+    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
     sl = ScanLevel.objects.create(organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1)
+
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False, service="unknown")
+    port_sl = ScanLevel.objects.create(
+        organization=organization.pk, object_type="ipport", object_id=port.id, scan_level=1
+    )
 
     NS = DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
@@ -134,6 +142,15 @@ def test_recalculate_scan_profiles(xtdb, organization):
 
     nsl.refresh_from_db()  # Now we do see the effect
     assert nsl.scan_level == 1
+
+    port_sl.refresh_from_db()
+    assert port_sl.scan_level == 1
+
+    ScanLevel.objects.create(organization=organization.pk, object_type="ipaddress", object_id=ip.id, scan_level=4)
+    recalculate_scan_profiles()
+
+    port_sl.refresh_from_db()
+    assert port_sl.scan_level == 4
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
