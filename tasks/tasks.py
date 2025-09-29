@@ -78,13 +78,6 @@ def recalculate_scan_profiles() -> None:
                 and sl_dns.object_type = %(model_name)s
                 and sl_dns.scan_level < %(max_inherit_scan_level)s
                 AND sl_hn.scan_level > sl_dns.scan_level
-                group by
-                    sl_dns._id,
-                    sl_dns.declared,
-                    sl_dns.last_changed_by,
-                    sl_dns.object_id,
-                    sl_dns.object_type,
-                    sl_dns.organization
             """,  # noqa: S608
                 {"model_name": model.__name__.lower(), "max_inherit_scan_level": 2},
             )
@@ -112,13 +105,6 @@ def recalculate_scan_profiles() -> None:
                     and sl_dns.object_type = %(model_name)s
                     and sl_hn.scan_level < %(max_inherit_scan_level)s
                     AND sl_dns.scan_level > sl_hn.scan_level
-                    group by
-                        sl_hn._id,
-                        sl_hn.declared,
-                        sl_hn.last_changed_by,
-                        sl_hn.object_id,
-                        sl_hn.object_type,
-                        sl_hn.organization
                 """,  # noqa: S608
             {"model_name": DNSNSRecord.__name__.lower(), "max_inherit_scan_level": 1},
         )
@@ -145,13 +131,6 @@ def recalculate_scan_profiles() -> None:
                 and sl_dns.object_type = %(model_name)s
                 and sl_dns.scan_level < %(max_inherit_scan_level)s
                 AND sl_hn.scan_level > sl_dns.scan_level
-                group by
-                    sl_dns._id,
-                    sl_dns.declared,
-                    sl_dns.last_changed_by,
-                    sl_dns.object_id,
-                    sl_dns.object_type,
-                    sl_dns.organization
             """,  # noqa: S608
             {"model_name": DNSMXRecord.__name__.lower(), "max_inherit_scan_level": 1},
         )
@@ -180,13 +159,6 @@ def recalculate_scan_profiles() -> None:
                 WHERE child_scan_level.object_type = %(model_name)s
                 AND child_scan_level.scan_level < %(max_inherit_scan_level)s
                 AND parent_scan_level.scan_level > child_scan_level.scan_level
-                GROUP BY
-                    child_scan_level._id,
-                    child_scan_level.declared,
-                    child_scan_level.last_changed_by,
-                    child_scan_level.object_id,
-                    child_scan_level.object_type,
-                    child_scan_level.organization
             """,  # noqa: S608
             {"model_name": IPPort.__name__.lower(), "max_inherit_scan_level": 4},
         )
