@@ -114,9 +114,9 @@ faker==37.4.0 \
     --hash=sha256:7f69d579588c23d5ce671f3fa872654ede0e67047820255f43a4aa1925b89780 \
     --hash=sha256:cb81c09ebe06c32a10971d1bbdb264bb0e22b59af59548f011ac4809556ce533
     # via factory-boy
-fastapi-slim==0.116.1 \
-    --hash=sha256:37517a302492c30014979cff8d85f42ae5fbdbe4f8b5d0ceed81745bb3b23149 \
-    --hash=sha256:5dca6046d3a3e35eb733188649a9f883c9d49474b9b3255ecb8ec52a820fbb9f
+fastapi-slim==0.116.2 \
+    --hash=sha256:891b0035cb6d76e4b6c4465328ff04c78224ea62ee9472ca4ad1d0300cd263f9 \
+    --hash=sha256:d8285f49fb431ec75e1ded9bc364412a043535fb50bd0442891c578b581f9df7
     # via mula
 googleapis-common-protos==1.70.0 \
     --hash=sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257 \

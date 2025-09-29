@@ -289,9 +289,9 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11' \
     # via
     #   anyio
     #   pytest
-fastapi-slim==0.116.1 \
-    --hash=sha256:37517a302492c30014979cff8d85f42ae5fbdbe4f8b5d0ceed81745bb3b23149 \
-    --hash=sha256:5dca6046d3a3e35eb733188649a9f883c9d49474b9b3255ecb8ec52a820fbb9f
+fastapi-slim==0.116.2 \
+    --hash=sha256:891b0035cb6d76e4b6c4465328ff04c78224ea62ee9472ca4ad1d0300cd263f9 \
+    --hash=sha256:d8285f49fb431ec75e1ded9bc364412a043535fb50bd0442891c578b581f9df7
     # via boefjes
 filelock==3.18.0 \
     --hash=sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2 \
