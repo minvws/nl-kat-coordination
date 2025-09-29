@@ -174,7 +174,7 @@ class HostnameListView(FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
-        scan_level_query = (
+        scan_level_subquery = (
             ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
             .values("object_id")
             .order_by()
@@ -184,8 +184,8 @@ class HostnameListView(FilterView):
 
         return (
             Hostname.objects.select_related("network")
-            .annotate(scan_levels=Subquery(scan_level_query.values("scan_levels")))
-            .annotate(organizations=Subquery(scan_level_query.values("organizations")))
+            .annotate(scan_levels=Subquery(scan_level_subquery.values("scan_levels")))
+            .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
         )
 
     def get_context_data(self, **kwargs):

@@ -2,16 +2,26 @@ import operator
 import uuid
 from datetime import UTC, datetime
 from functools import reduce
-from typing import Any
 
 import celery
 import structlog
 from celery import Celery
 from django.conf import settings
-from django.db.models import Q
+from django.db import OperationalError, connections
+from django.db.models import Max, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
 from files.models import File
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCAARecord,
+    DNSCNAMERecord,
+    DNSPTRRecord,
+    DNSSRVRecord,
+    DNSTXTRecord,
+    ScanLevel,
+)
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -23,21 +33,59 @@ logger = structlog.get_logger(__name__)
 
 @app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
 def schedule_scan_profile_recalculations():
-    orgs = Organization.objects.all()
-    logger.info("Scheduling scan profile recalculation for %s organizations", len(orgs))
-
-    for org in orgs:
-        app.send_task(
-            "tasks.tasks.recalculate_scan_profiles",
-            (org.code,),
-            queue=settings.QUEUE_NAME_SCAN_PROFILES,
-            task_id=str(uuid.uuid4()),
-        )
+    recalculate_scan_profiles()
 
 
-@app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
-def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
-    # TODO: fix
+def recalculate_scan_profiles() -> None:
+    """
+    These are the rules for Scan Profile:
+      - For all DNSRecords of type "A", "AAAA", "CAA", "CNAME", "PTR", "SOA", "SRV", "TXT", the hostname field has:
+        * max_issue_scan_level=0, max_inherit_scan_level=2
+      - For all DNSMXRecords:
+        * max_issue_scan_level=None, max_inherit_scan_level=1
+      - For all DNSNSRecords:
+        * max_issue_scan_level=1, max_inherit_scan_level=0
+      - For IPAddress the netblock field has:
+        * max_issue_scan_level=0, max_inherit_scan_level=4
+      - For IPPort the address field has:
+        * max_issue_scan_level=0, max_inherit_scan_level=4
+    """
+
+    updates = []
+    with connections["xtdb"].cursor() as cursor:
+        for model in [
+            DNSARecord,
+            DNSAAAARecord,
+            DNSPTRRecord,
+            DNSCNAMERecord,
+            DNSCAARecord,
+            DNSTXTRecord,
+            DNSSRVRecord,
+        ]:
+            try:
+                out = cursor.execute(
+                    """
+                    select sl_dns._id as _id, least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as new_scan_level
+                    from objects_scanlevel sl_hn
+                           join objects_hostname hn on hn._id = sl_hn.object_id
+                           join objects_dnsarecord dr on dr.hostname_id = sl_hn.object_id
+                           join objects_scanlevel sl_dns
+                                on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
+                    where sl_hn.object_type = 'hostname'
+                    and sl_dns.object_type = %(model_name)s
+                    and sl_dns.scan_level <= %(max_inherit_scan_level)s
+                    group by sl_dns._id, sl_dns.scan_level
+                    having max(sl_hn.scan_level) >= %(max_inherit_scan_level)s
+                """,
+                    {"model_name": model.__name__.lower(), "max_inherit_scan_level": model.__name__.lower()},
+                )
+                new = out.fetchmany()
+                logger.info("Found %s new updates for %s", len(new), model.__name__)
+                updates.extend(new)
+            except OperationalError:
+                logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
+                continue
+
     return
 
 
@@ -60,12 +108,12 @@ def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -
     tasks = []
 
     for org in orgs:
-        tasks.extend(run_schedule_for_org(schedule, org, force, celery=celery))
+        tasks.extend(run_schedule_for_organization(schedule, org, force, celery=celery))
 
     return tasks
 
 
-def run_schedule_for_org(
+def run_schedule_for_organization(
     schedule: Schedule, organization: Organization, force: bool = True, celery: Celery = app
 ) -> list[Task]:
     now = datetime.now(UTC)
@@ -89,30 +137,23 @@ def run_schedule_for_org(
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-        # TODO: check scan profile
+        subquery = Subquery(
+            ScanLevel.objects.filter(
+                object_type=schedule.object_set.object_type.model_class().__name__,
+                object_id=OuterRef("id"),
+                organization=organization.pk,
+            )
+            .values("object_id")
+            .annotate(
+                max_scan_level=Max("scan_level")
+            )  # Take the because we need a level at least the plugin.scan_level
+            .values("max_scan_level")
+        )
+        model_qs = model_qs.annotate(max_scan_level=subquery).filter(max_scan_level__gte=schedule.plugin.scan_level)
         input_data = input_data.union([str(model) for model in model_qs if str(model)])
 
     if not input_data:
         return []
-
-    # TODO: fix
-    # values = schedule.object_set.traverse_objects().values_list("value", flat=True)
-
-    # if not values and not input_data:
-    #     return
-    # for profile in scan_profiles:
-    #     if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
-    #         continue
-    #
-    #     if profile.reference.class_type == Hostname:
-    #         input_data.add(profile.reference.tokenized.name)
-    #         continue
-    #
-    #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-    #         input_data.add(str(profile.reference.tokenized.address))
-    #         continue
-    #
-    #     input_data.add(str(profile.reference))
 
     if force:
         return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)

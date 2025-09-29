@@ -1,7 +1,7 @@
 import time
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import OuterRef, Subquery
+from django.db.models import Max, OuterRef, Subquery
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, Network, ScanLevel, bulk_insert, to_xtdb_dict
@@ -26,7 +26,7 @@ def test_query_with_scan_levels(xtdb, organization):
     ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
     time.sleep(0.1)
 
-    scan_level_query = (
+    scan_level_subquery = (
         ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
         .values("object_id")
         .order_by()
@@ -34,8 +34,8 @@ def test_query_with_scan_levels(xtdb, organization):
         .annotate(organizations=ArrayAgg("organization"))  # collect scan levels in subquery
     )
     host = (
-        Hostname.objects.annotate(scan_levels=Subquery(scan_level_query.values("scan_levels")))
-        .annotate(organizations=Subquery(scan_level_query.values("organizations")))
+        Hostname.objects.annotate(scan_levels=Subquery(scan_level_subquery.values("scan_levels")))
+        .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
         .get(pk=host.pk)
     )
     assert host.scan_levels == [0]
@@ -45,12 +45,42 @@ def test_query_with_scan_levels(xtdb, organization):
     assert ScanLevel.objects.count() == 2
 
     host = (
-        Hostname.objects.annotate(scan_levels=Subquery(scan_level_query.values("scan_levels")))
-        .annotate(organizations=Subquery(scan_level_query.values("organizations")))
+        Hostname.objects.annotate(scan_levels=Subquery(scan_level_subquery.values("scan_levels")))
+        .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
         .get(pk=host.pk)
     )
     assert set(host.scan_levels) == {0, 2}
     assert host.organizations == [1, 1]
+
+
+def test_add_scan_level_filter_to_object_query(xtdb, organization):
+    network = Network.objects.create(name="internet")
+    host = Hostname.objects.create(network=network, name="test.com")
+    sl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
+    time.sleep(0.1)
+
+    subquery = Subquery(
+        ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"), organization=organization.pk)
+        .values("object_id")
+        .annotate(max_scan_level=Max("scan_level"))  # Take the because we need a level at least the plugin.scan_level
+        .values("max_scan_level")
+    )
+
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=0).count() == 1
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=1).count() == 0
+
+    sl.scan_level = 2
+    sl.save()
+
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=1).count() == 1
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=2).count() == 1
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 0
+
+    # Also check capitalized
+    ScanLevel.objects.create(organization=organization.pk, object_type="Hostname", object_id=host.id, scan_level=3)
+
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=2).count() == 1
+    assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 1
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
