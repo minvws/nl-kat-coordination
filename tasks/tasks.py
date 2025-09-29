@@ -8,7 +8,7 @@ import structlog
 from celery import Celery
 from django.conf import settings
 from django.db import OperationalError
-from django.db.models import Max, OuterRef, Q, Subquery
+from django.db.models import Max, Model, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -42,131 +42,57 @@ def schedule_scan_profile_recalculations():
     recalculate_scan_profiles()
 
 
-def recalculate_scan_profiles() -> None:
+def recalculate_scan_profiles(depth: int = 0) -> None:
     """
-    These are the rules for Scan Profile:
-      - [x] For all DNSRecords, the hostname field has:
-        * max_issue_scan_level=0, max_inherit_scan_level=2
-      - [x] For all DNSMXRecords, the mail_server field:
-        * max_issue_scan_level=None, max_inherit_scan_level=1
-      - [x] For all DNSNSRecords, the name_server field:
-        * max_issue_scan_level=1, max_inherit_scan_level=0
-      - [~] For IPAddress the netblock field has:
-        * max_issue_scan_level=0, max_inherit_scan_level=4
-      - [x] For IPPort the address field has:
-        * max_issue_scan_level=0, max_inherit_scan_level=4
+    These are the currently implemented rules for Scan Profile:
+      - For all DNSRecords, the hostname field has max_inherit_scan_level=2
+      - For all DNSMXRecords, the mail_server field has max_inherit_scan_level=1
+      - For all DNSNSRecords, the name_server field has max_issue_scan_level=1
+      - For IPPort the address field has max_inherit_scan_level=4
+      - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 (if/once a netblock has been reintroduced)
     """
     updates = []
 
     for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
-        try:
-            out = ScanLevel.objects.raw(
+        updates.extend(calculate_updates(Hostname, model, relation="hostname_id", max_inherit=2))
+
+    updates.extend(calculate_updates(DNSNSRecord, Hostname, relation="name_server_id", max_inherit=1, from_parent=True))
+    updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
+    updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
+
+    if updates:
+        bulk_insert(updates)
+        if depth < 10:
+            # In theory, we could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
+            recalculate_scan_profiles(depth + 1)
+
+
+def calculate_updates(
+    parent_model: type[Model], child_model: type[Model], max_inherit: int, relation: str, from_parent: bool = False
+) -> list[ScanLevel]:
+    on_clause = f"parent._id = child.{relation}" if not from_parent else f"parent.{relation} = child._id"
+
+    try:
+        return list(
+            ScanLevel.objects.raw(
                 f"""
-                select
-                    sl_dns._id,
-                    sl_dns.declared,
-                    sl_dns.last_changed_by,
-                    sl_dns.object_id,
-                    sl_dns.object_type,
-                    sl_dns.organization,
-                    least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as scan_level
-                from {ScanLevel._meta.db_table} sl_hn
-                       join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
-                       join {model._meta.db_table} dr on dr.hostname_id = sl_hn.object_id
-                       join {ScanLevel._meta.db_table} sl_dns
-                            on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
-                and sl_dns.object_type = %(model_name)s
-                and sl_dns.scan_level < %(max_inherit_scan_level)s
-                AND sl_hn.scan_level > sl_dns.scan_level
-            """,  # noqa: S608
-                {"model_name": model.__name__.lower(), "max_inherit_scan_level": 2},
-            )
-            updates.extend(list(out))
-        except OperationalError:
-            logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
-            continue
-
-    try:
-        out = ScanLevel.objects.raw(
-            f"""
-                    select
-                        sl_hn._id,
-                        sl_hn.declared,
-                        sl_hn.last_changed_by,
-                        sl_hn.object_id,
-                        sl_hn.object_type,
-                        sl_hn.organization,
-                        least(max(sl_dns.scan_level), %(max_inherit_scan_level)s) as scan_level
-                    from {ScanLevel._meta.db_table} sl_hn
-                        join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
-                        join {DNSNSRecord._meta.db_table} dr on dr.name_server_id = sl_hn.object_id
-                        join {ScanLevel._meta.db_table} sl_dns
-                    on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
-                    and sl_dns.object_type = %(model_name)s
-                    and sl_hn.scan_level < %(max_inherit_scan_level)s
-                    AND sl_dns.scan_level > sl_hn.scan_level
-                """,  # noqa: S608
-            {"model_name": DNSNSRecord.__name__.lower(), "max_inherit_scan_level": 1},
-        )
-        updates.extend(list(out))
-    except OperationalError:
-        logger.error("Failed to perform scan profile recalculation query", model=DNSNSRecord.__name__)
-
-    try:
-        out = ScanLevel.objects.raw(
-            f"""
-                select
-                    sl_dns._id,
-                    sl_dns.declared,
-                    sl_dns.last_changed_by,
-                    sl_dns.object_id,
-                    sl_dns.object_type,
-                    sl_dns.organization,
-                    least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as scan_level
-                from {ScanLevel._meta.db_table} sl_hn
-                       join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
-                       join {DNSMXRecord._meta.db_table} dr on dr.mail_server_id = sl_hn.object_id
-                       join {ScanLevel._meta.db_table} sl_dns
-                            on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
-                and sl_dns.object_type = %(model_name)s
-                and sl_dns.scan_level < %(max_inherit_scan_level)s
-                AND sl_hn.scan_level > sl_dns.scan_level
-            """,  # noqa: S608
-            {"model_name": DNSMXRecord.__name__.lower(), "max_inherit_scan_level": 1},
-        )
-        updates.extend(list(out))
-    except OperationalError:
-        logger.error("Failed to perform scan profile recalculation query", model=DNSMXRecord.__name__)
-
-    try:
-        out = ScanLevel.objects.raw(
-            f"""
-                SELECT
-                    child_scan_level._id,
-                    child_scan_level.declared,
-                    child_scan_level.last_changed_by,
-                    child_scan_level.object_id,
-                    child_scan_level.object_type,
-                    child_scan_level.organization,
-                    LEAST(MAX(parent_scan_level.scan_level), %(max_inherit_scan_level)s) AS scan_level
-               FROM {ScanLevel._meta.db_table} child_scan_level
-                JOIN {IPPort._meta.db_table} child ON child._id = child_scan_level.object_id
-                JOIN {IPAddress._meta.db_table} parent ON parent._id = child.address_id
-                JOIN {ScanLevel._meta.db_table} parent_scan_level ON (
-                    parent_scan_level.object_id = parent._id AND
-                    parent_scan_level.organization = child_scan_level.organization
+                SELECT child_level._id, child_level.declared, child_level.last_changed_by, child_level.object_id,
+                child_level.object_type, child_level.organization,
+                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
+                FROM {ScanLevel._meta.db_table} child_level
+                JOIN {child_model._meta.db_table} child ON child._id = child_level.object_id
+                JOIN {parent_model._meta.db_table} parent ON {on_clause}
+                JOIN {ScanLevel._meta.db_table} parent_level ON (
+                    parent_level.object_id = parent._id AND parent_level.organization = child_level.organization
                 )
-                WHERE child_scan_level.object_type = %(model_name)s
-                AND child_scan_level.scan_level < %(max_inherit_scan_level)s
-                AND parent_scan_level.scan_level > child_scan_level.scan_level
+                WHERE child_level.scan_level < %(max_inherit)s AND parent_level.scan_level > child_level.scan_level
             """,  # noqa: S608
-            {"model_name": IPPort.__name__.lower(), "max_inherit_scan_level": 4},
+                {"max_inherit": max_inherit},
+            )
         )
-        updates.extend(list(out))
     except OperationalError:
-        logger.error("Failed to perform scan profile recalculation query", model=IPPort.__name__)
-
-    bulk_insert(updates)
+        logger.error("Failed to perform scan level query", parent_model=parent_model, child_model=child_model)
+        return []
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
