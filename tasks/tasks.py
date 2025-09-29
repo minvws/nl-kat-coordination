@@ -17,6 +17,7 @@ from objects.models import (
     DNSARecord,
     DNSCAARecord,
     DNSCNAMERecord,
+    DNSMXRecord,
     DNSNSRecord,
     DNSPTRRecord,
     DNSSRVRecord,
@@ -42,11 +43,11 @@ def schedule_scan_profile_recalculations():
 def recalculate_scan_profiles() -> None:
     """
     These are the rules for Scan Profile:
-      - For all DNSRecords of type "A", "AAAA", "CAA", "CNAME", "PTR", "SOA", "SRV", "TXT", the hostname field has:
+      - [x] For all DNSRecords, the hostname field has:
         * max_issue_scan_level=0, max_inherit_scan_level=2
-      - For all DNSMXRecords:
+      - [x] For all DNSMXRecords, the mail_server field:
         * max_issue_scan_level=None, max_inherit_scan_level=1
-      - For all DNSNSRecords:
+      - [x] For all DNSNSRecords, the name_server field:
         * max_issue_scan_level=1, max_inherit_scan_level=0
       - For IPAddress the netblock field has:
         * max_issue_scan_level=0, max_inherit_scan_level=4
@@ -125,9 +126,41 @@ def recalculate_scan_profiles() -> None:
     except OperationalError:
         logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
 
-    bulk_insert(updates)
+    try:
+        out = ScanLevel.objects.raw(
+            f"""
+                select
+                    sl_dns._id,
+                    sl_dns.declared,
+                    sl_dns.last_changed_by,
+                    sl_dns.object_id,
+                    sl_dns.object_type,
+                    sl_dns.organization,
+                    least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as scan_level
+                from {ScanLevel._meta.db_table} sl_hn
+                       join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
+                       join {DNSMXRecord._meta.db_table} dr on dr.mail_server_id = sl_hn.object_id
+                       join {ScanLevel._meta.db_table} sl_dns
+                            on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
+                where sl_hn.object_type = 'hostname'
+                and sl_dns.object_type = %(model_name)s
+                and sl_dns.scan_level <= %(max_inherit_scan_level)s
+                group by
+                    sl_dns._id,
+                    sl_dns.declared,
+                    sl_dns.last_changed_by,
+                    sl_dns.object_id,
+                    sl_dns.object_type,
+                    sl_dns.organization
+                having max(sl_hn.scan_level) >= %(max_inherit_scan_level)s
+            """,  # noqa: S608
+            {"model_name": DNSMXRecord.__name__.lower(), "max_inherit_scan_level": 1},
+        )
+        updates.extend(list(out))
+    except OperationalError:
+        logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
 
-    return
+    bulk_insert(updates)
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
