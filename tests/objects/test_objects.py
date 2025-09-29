@@ -4,8 +4,9 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Max, OuterRef, Subquery
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import Hostname, Network, ScanLevel, bulk_insert, to_xtdb_dict
+from objects.models import DNSARecord, Hostname, IPAddress, Network, ScanLevel, bulk_insert, to_xtdb_dict
 from objects.views import NetworkListView
+from tasks.tasks import recalculate_scan_profiles
 from tests.conftest import setup_request
 
 
@@ -81,6 +82,21 @@ def test_add_scan_level_filter_to_object_query(xtdb, organization):
 
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=2).count() == 1
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 1
+
+
+def test_recalculate_scan_profiles(xtdb, organization):
+    network = Network.objects.create(name="internet")
+    host = Hostname.objects.create(network=network, name="test.com")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    A = DNSARecord.objects.create(ip_address=ip, hostname=host)
+
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
+    sl = ScanLevel.objects.create(organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1)
+
+    recalculate_scan_profiles()
+
+    sl.refresh_from_db()
+    assert sl.scan_level == 2
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):

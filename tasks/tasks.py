@@ -7,7 +7,7 @@ import celery
 import structlog
 from celery import Celery
 from django.conf import settings
-from django.db import OperationalError, connections
+from django.db import OperationalError, connections, transaction
 from django.db.models import Max, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
@@ -20,6 +20,7 @@ from objects.models import (
     DNSPTRRecord,
     DNSSRVRecord,
     DNSTXTRecord,
+    Hostname,
     ScanLevel,
 )
 from openkat.models import Organization
@@ -51,7 +52,6 @@ def recalculate_scan_profiles() -> None:
         * max_issue_scan_level=0, max_inherit_scan_level=4
     """
 
-    updates = []
     with connections["xtdb"].cursor() as cursor:
         for model in [
             DNSARecord,
@@ -64,27 +64,35 @@ def recalculate_scan_profiles() -> None:
         ]:
             try:
                 out = cursor.execute(
-                    """
+                    f"""
                     select sl_dns._id as _id, least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as new_scan_level
-                    from objects_scanlevel sl_hn
-                           join objects_hostname hn on hn._id = sl_hn.object_id
-                           join objects_dnsarecord dr on dr.hostname_id = sl_hn.object_id
-                           join objects_scanlevel sl_dns
+                    from {ScanLevel._meta.db_table} sl_hn
+                           join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
+                           join {model._meta.db_table} dr on dr.hostname_id = sl_hn.object_id
+                           join {ScanLevel._meta.db_table} sl_dns
                                 on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
                     where sl_hn.object_type = 'hostname'
                     and sl_dns.object_type = %(model_name)s
                     and sl_dns.scan_level <= %(max_inherit_scan_level)s
                     group by sl_dns._id, sl_dns.scan_level
                     having max(sl_hn.scan_level) >= %(max_inherit_scan_level)s
-                """,
-                    {"model_name": model.__name__.lower(), "max_inherit_scan_level": model.__name__.lower()},
+                """,  # noqa: S608
+                    {"model_name": model.__name__.lower(), "max_inherit_scan_level": 2},
                 )
-                new = out.fetchmany()
-                logger.info("Found %s new updates for %s", len(new), model.__name__)
-                updates.extend(new)
             except OperationalError:
                 logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
                 continue
+
+            with transaction.atomic():
+                new = out.fetchmany()
+
+                for update in new:
+                    cursor.execute(
+                        f"UPDATE {ScanLevel._meta.db_table} SET scan_level = %(new_scan_level)s WHERE _id = %(id)s",  # noqa: S608
+                        {"id": update[0], "new_scan_level": update[1]},
+                    )
+
+                logger.info("Performed %s updates for %s", len(new), model.__name__)
 
     return
 
