@@ -4,7 +4,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Max, OuterRef, Subquery
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import DNSARecord, Hostname, IPAddress, Network, ScanLevel, bulk_insert, to_xtdb_dict
+from objects.models import DNSARecord, DNSNSRecord, Hostname, IPAddress, Network, ScanLevel, bulk_insert, to_xtdb_dict
 from objects.views import NetworkListView
 from tasks.tasks import recalculate_scan_profiles
 from tests.conftest import setup_request
@@ -86,17 +86,29 @@ def test_add_scan_level_filter_to_object_query(xtdb, organization):
 
 def test_recalculate_scan_profiles(xtdb, organization):
     network = Network.objects.create(name="internet")
-    host = Hostname.objects.create(network=network, name="test.com")
+    h = Hostname.objects.create(network=network, name="test.com")
+    nameserver = Hostname.objects.create(network=network, name="ns.test.com")
     ip = IPAddress.objects.create(network=network, address="127.0.0.1")
-    A = DNSARecord.objects.create(ip_address=ip, hostname=host)
+    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
+    NS = DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
     sl = ScanLevel.objects.create(organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1)
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=h.id, scan_level=2)
+    nsl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=nameserver.id)
 
     recalculate_scan_profiles()
 
     sl.refresh_from_db()
     assert sl.scan_level == 2
+
+    nsl.refresh_from_db()
+    assert nsl.scan_level == 0
+
+    ScanLevel.objects.create(organization=organization.pk, object_type="dnsnsrecord", object_id=NS.id, scan_level=2)
+    recalculate_scan_profiles()
+
+    nsl.refresh_from_db()
+    assert nsl.scan_level == 1
 
 
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):

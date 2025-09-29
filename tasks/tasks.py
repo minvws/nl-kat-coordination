@@ -7,7 +7,7 @@ import celery
 import structlog
 from celery import Celery
 from django.conf import settings
-from django.db import OperationalError, connections, transaction
+from django.db import OperationalError
 from django.db.models import Max, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
@@ -17,11 +17,13 @@ from objects.models import (
     DNSARecord,
     DNSCAARecord,
     DNSCNAMERecord,
+    DNSNSRecord,
     DNSPTRRecord,
     DNSSRVRecord,
     DNSTXTRecord,
     Hostname,
     ScanLevel,
+    bulk_insert,
 )
 from openkat.models import Organization
 from plugins.models import Plugin
@@ -51,48 +53,79 @@ def recalculate_scan_profiles() -> None:
       - For IPPort the address field has:
         * max_issue_scan_level=0, max_inherit_scan_level=4
     """
+    updates = []
 
-    with connections["xtdb"].cursor() as cursor:
-        for model in [
-            DNSARecord,
-            DNSAAAARecord,
-            DNSPTRRecord,
-            DNSCNAMERecord,
-            DNSCAARecord,
-            DNSTXTRecord,
-            DNSSRVRecord,
-        ]:
-            try:
-                out = cursor.execute(
-                    f"""
-                    select sl_dns._id as _id, least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as new_scan_level
+    for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
+        try:
+            out = ScanLevel.objects.raw(
+                f"""
+                select
+                    sl_dns._id,
+                    sl_dns.declared,
+                    sl_dns.last_changed_by,
+                    sl_dns.object_id,
+                    sl_dns.object_type,
+                    sl_dns.organization,
+                    least(max(sl_hn.scan_level), %(max_inherit_scan_level)s) as scan_level
+                from {ScanLevel._meta.db_table} sl_hn
+                       join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
+                       join {model._meta.db_table} dr on dr.hostname_id = sl_hn.object_id
+                       join {ScanLevel._meta.db_table} sl_dns
+                            on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
+                where sl_hn.object_type = 'hostname'
+                and sl_dns.object_type = %(model_name)s
+                and sl_dns.scan_level <= %(max_inherit_scan_level)s
+                group by
+                    sl_dns._id,
+                    sl_dns.declared,
+                    sl_dns.last_changed_by,
+                    sl_dns.object_id,
+                    sl_dns.object_type,
+                    sl_dns.organization
+                having max(sl_hn.scan_level) >= %(max_inherit_scan_level)s
+            """,  # noqa: S608
+                {"model_name": model.__name__.lower(), "max_inherit_scan_level": 2},
+            )
+            updates.extend(list(out))
+        except OperationalError:
+            logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
+            continue
+
+    try:
+        out = ScanLevel.objects.raw(
+            f"""
+                    select
+                        sl_hn._id,
+                        sl_hn.declared,
+                        sl_hn.last_changed_by,
+                        sl_hn.object_id,
+                        sl_hn.object_type,
+                        sl_hn.organization,
+                        least(max(sl_dns.scan_level), %(max_inherit_scan_level)s) as scan_level
                     from {ScanLevel._meta.db_table} sl_hn
-                           join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
-                           join {model._meta.db_table} dr on dr.hostname_id = sl_hn.object_id
-                           join {ScanLevel._meta.db_table} sl_dns
-                                on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
+                        join {Hostname._meta.db_table} hn on hn._id = sl_hn.object_id
+                        join {DNSNSRecord._meta.db_table} dr on dr.name_server_id = sl_hn.object_id
+                        join {ScanLevel._meta.db_table} sl_dns
+                    on sl_hn.organization = sl_dns.organization and sl_dns.object_id = dr._id
                     where sl_hn.object_type = 'hostname'
                     and sl_dns.object_type = %(model_name)s
-                    and sl_dns.scan_level <= %(max_inherit_scan_level)s
-                    group by sl_dns._id, sl_dns.scan_level
-                    having max(sl_hn.scan_level) >= %(max_inherit_scan_level)s
+                    and sl_hn.scan_level <= %(max_inherit_scan_level)s
+                    group by
+                        sl_hn._id,
+                        sl_hn.declared,
+                        sl_hn.last_changed_by,
+                        sl_hn.object_id,
+                        sl_hn.object_type,
+                        sl_hn.organization
+                    having max(sl_dns.scan_level) >= %(max_inherit_scan_level)s
                 """,  # noqa: S608
-                    {"model_name": model.__name__.lower(), "max_inherit_scan_level": 2},
-                )
-            except OperationalError:
-                logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
-                continue
+            {"model_name": DNSNSRecord.__name__.lower(), "max_inherit_scan_level": 1},
+        )
+        updates.extend(list(out))
+    except OperationalError:
+        logger.error("Failed to perform scan profile recalculation query", model=model.__name__)
 
-            with transaction.atomic():
-                new = out.fetchmany()
-
-                for update in new:
-                    cursor.execute(
-                        f"UPDATE {ScanLevel._meta.db_table} SET scan_level = %(new_scan_level)s WHERE _id = %(id)s",  # noqa: S608
-                        {"id": update[0], "new_scan_level": update[1]},
-                    )
-
-                logger.info("Performed %s updates for %s", len(new), model.__name__)
+    bulk_insert(updates)
 
     return
 
