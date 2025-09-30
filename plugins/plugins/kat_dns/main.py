@@ -107,7 +107,7 @@ def run(hostname: str, record_types: set[str]) -> list:
                     register_record(
                         {
                             "object_type": "DNSMXRecord",
-                            "mail_hostname": mail_hostname_reference,
+                            "mail_server": mail_hostname_reference,
                             "preference": rr.preference,
                             **default_args,
                         }
