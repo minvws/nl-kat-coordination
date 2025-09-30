@@ -192,7 +192,7 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
-    fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
+    fields = ["plugin_id", "name", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
 
     def form_invalid(self, form):

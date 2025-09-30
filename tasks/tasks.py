@@ -246,11 +246,20 @@ def run_plugin_task(
     if isinstance(input_data, set):
         input_data = list(input_data)
 
-    if batch and isinstance(input_data, list) and settings.BATCH_SIZE > 0 and len(input_data) > settings.BATCH_SIZE:
+    # Get plugin to check for plugin-specific batch_size
+    try:
+        plugin = Plugin.objects.get(plugin_id=plugin_id)
+        # Use plugin-specific batch_size if set, otherwise fall back to global setting
+        batch_size = plugin.batch_size if plugin.batch_size is not None else settings.BATCH_SIZE
+    except Plugin.DoesNotExist:
+        # Fall back to global setting if plugin not found
+        batch_size = settings.BATCH_SIZE
+
+    if batch and isinstance(input_data, list) and batch_size > 0 and len(input_data) > batch_size:
         tasks = []
         idx = 0
 
-        for idx_2 in range(settings.BATCH_SIZE, len(input_data) + settings.BATCH_SIZE, settings.BATCH_SIZE):
+        for idx_2 in range(batch_size, len(input_data) + batch_size, batch_size):
             tasks.append(
                 run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False, celery=celery)[0]
             )
