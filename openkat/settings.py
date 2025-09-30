@@ -175,7 +175,6 @@ INSTALLED_APPS = [
     "django_filters",
     "knox",
     "tagulous",
-    "compressor",
     "recurrence",
     "djangoql",
 ]
@@ -341,15 +340,11 @@ STATICFILES_DIRS = (BASE_DIR / "assets", BASE_DIR / "components")
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
 ]
-COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", True)
-COMPRESS_OFFLINE = True
-COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "openkat.storage.OpenKATStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 USE_S3 = env.bool("USE_S3", False)
@@ -362,18 +357,6 @@ if USE_S3:
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "media/"
 
-
-_IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
-
-
-def immutable_file_test(path, url):
-    # Match filename with 12 hex digits before the extension e.g.
-    # app.db8f2edc0c8a.js. Configuring this is necessary because whitenoise
-    # doesn't automatically detect the django-compressor files as immutable.
-    return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
-
-
-WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"

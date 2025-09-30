@@ -38,7 +38,6 @@ override_dh_virtualenv:
 
 	export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://redis:5672" \
 	&& $(DH_VENV_DIR)/bin/python manage.py collectstatic --noinput --clear \
-	&& $(DH_VENV_DIR)/bin/python manage.py compress \
 	&& $(DH_VENV_DIR)/bin/python manage.py compilemessages \
 	&& rm -rf $(DH_VENV_DIR)/bin/__pycache__
 	find static -type f -exec install -m 644 -D "{}" "$(DESTDIR)/usr/share/kat-openkat/{}" \;
