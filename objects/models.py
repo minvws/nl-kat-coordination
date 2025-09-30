@@ -59,8 +59,6 @@ class ManagerWithGenericObjectForeignKey(Manager):
 
 
 class ScanLevel(models.Model):
-    id: int
-
     organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
     scan_level: models.IntegerField = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]

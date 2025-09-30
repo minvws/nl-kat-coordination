@@ -2,16 +2,32 @@ import operator
 import uuid
 from datetime import UTC, datetime
 from functools import reduce
-from typing import Any
 
 import celery
 import structlog
 from celery import Celery
 from django.conf import settings
-from django.db.models import Q
+from django.db import OperationalError, connections
+from django.db.models import Max, Model, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
 from files.models import File
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCAARecord,
+    DNSCNAMERecord,
+    DNSMXRecord,
+    DNSNSRecord,
+    DNSPTRRecord,
+    DNSSRVRecord,
+    DNSTXTRecord,
+    Hostname,
+    IPAddress,
+    IPPort,
+    ScanLevel,
+    bulk_insert,
+)
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -23,22 +39,83 @@ logger = structlog.get_logger(__name__)
 
 @app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
 def schedule_scan_profile_recalculations():
-    orgs = Organization.objects.all()
-    logger.info("Scheduling scan profile recalculation for %s organizations", len(orgs))
+    recalculate_scan_profiles()
 
-    for org in orgs:
-        app.send_task(
-            "tasks.tasks.recalculate_scan_profiles",
-            (org.code,),
-            queue=settings.QUEUE_NAME_SCAN_PROFILES,
-            task_id=str(uuid.uuid4()),
+
+def recalculate_scan_profiles(depth: int = 0) -> None:
+    """
+    These are the currently implemented rules for Scan Profile:
+      - For all DNSRecords, the hostname field has max_inherit_scan_level=2
+      - For all DNSMXRecords, the mail_server field has max_inherit_scan_level=1
+      - For all DNSNSRecords, the name_server field has max_issue_scan_level=1
+      - For IPPort the address field has max_inherit_scan_level=4
+      - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 (if/once a netblock has been reintroduced)
+    """
+    updates = []
+
+    for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
+        updates.extend(calculate_updates(Hostname, model, relation="hostname_id", max_inherit=2))
+
+    updates.extend(calculate_updates(DNSNSRecord, Hostname, relation="name_server_id", max_inherit=1, from_parent=True))
+    updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
+    updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
+
+    if not updates:
+        return
+
+    bulk_insert(updates)
+
+    if depth < 10:  # We could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
+        recalculate_scan_profiles(depth + 1)
+
+
+def calculate_updates(
+    parent_model: type[Model], child_model: type[Model], max_inherit: int, relation: str, from_parent: bool = False
+) -> list[ScanLevel]:
+    on_clause = f"parent._id = child.{relation}" if not from_parent else f"parent.{relation} = child._id"
+
+    try:
+        updates = list(
+            ScanLevel.objects.raw(
+                f"""
+                SELECT child_level._id, child_level.declared, child_level.last_changed_by, child_level.object_id,
+                child_level.object_type, child_level.organization,
+                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
+                FROM {ScanLevel._meta.db_table} child_level
+                JOIN {child_model._meta.db_table} child ON child._id = child_level.object_id
+                JOIN {parent_model._meta.db_table} parent ON {on_clause}
+                JOIN {ScanLevel._meta.db_table} parent_level ON (
+                    parent_level.object_id = parent._id AND parent_level.organization = child_level.organization
+                )
+                WHERE child_level.scan_level < %(max_inherit)s
+                AND parent_level.scan_level > child_level.scan_level
+                AND child_level.declared = false
+            """,  # noqa: S608
+                {"max_inherit": max_inherit},
+            )
         )
-
-
-@app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
-def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
-    # TODO: fix
-    return
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT false as declared, null as last_changed_by,
+                child._id as object_id, %(object_type)s as object_type, parent_level.organization as organization,
+                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
+                FROM {ScanLevel._meta.db_table} parent_level
+                JOIN {parent_model._meta.db_table} parent ON parent._id = parent_level.object_id
+                JOIN {child_model._meta.db_table} child ON {on_clause}
+                LEFT JOIN {ScanLevel._meta.db_table} child_level ON (
+                    child_level.object_id = child._id AND child_level.organization = parent_level.organization
+                )
+                WHERE child_level._id is null
+            """,  # noqa: S608
+                {"max_inherit": max_inherit, "object_type": child_model.__name__.lower()},
+            )
+            columns = [col[0] for col in cursor.description]
+            inserts = [ScanLevel(**dict(zip(columns, row))) for row in cursor.fetchall()]
+        return updates + inserts
+    except OperationalError:
+        logger.error("Failed to perform scan level query", parent_model=parent_model, child_model=child_model)
+        return []
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
@@ -60,12 +137,12 @@ def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -
     tasks = []
 
     for org in orgs:
-        tasks.extend(run_schedule_for_org(schedule, org, force, celery=celery))
+        tasks.extend(run_schedule_for_organization(schedule, org, force, celery=celery))
 
     return tasks
 
 
-def run_schedule_for_org(
+def run_schedule_for_organization(
     schedule: Schedule, organization: Organization, force: bool = True, celery: Celery = app
 ) -> list[Task]:
     now = datetime.now(UTC)
@@ -89,30 +166,23 @@ def run_schedule_for_org(
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-        # TODO: check scan profile
+        subquery = Subquery(
+            ScanLevel.objects.filter(
+                object_type=schedule.object_set.object_type.model_class().__name__,
+                object_id=OuterRef("id"),
+                organization=organization.pk,
+            )
+            .values("object_id")
+            .annotate(
+                max_scan_level=Max("scan_level")
+            )  # Take the because we need a level at least the plugin.scan_level
+            .values("max_scan_level")
+        )
+        model_qs = model_qs.annotate(max_scan_level=subquery).filter(max_scan_level__gte=schedule.plugin.scan_level)
         input_data = input_data.union([str(model) for model in model_qs if str(model)])
 
     if not input_data:
         return []
-
-    # TODO: fix
-    # values = schedule.object_set.traverse_objects().values_list("value", flat=True)
-
-    # if not values and not input_data:
-    #     return
-    # for profile in scan_profiles:
-    #     if profile.level.value < schedule.plugin.scan_level or str(profile.reference) not in values:
-    #         continue
-    #
-    #     if profile.reference.class_type == Hostname:
-    #         input_data.add(profile.reference.tokenized.name)
-    #         continue
-    #
-    #     if profile.reference.class_type in [IPAddressV4, IPAddressV6]:
-    #         input_data.add(str(profile.reference.tokenized.address))
-    #         continue
-    #
-    #     input_data.add(str(profile.reference))
 
     if force:
         return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)

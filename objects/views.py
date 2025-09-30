@@ -2,14 +2,15 @@ from typing import TYPE_CHECKING
 
 import django_filters
 from django.conf import settings
-from django.db.models import QuerySet
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView
 from django_filters.views import FilterView
 
-from objects.models import Finding, Hostname, IPAddress, Network
+from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel
 from openkat.permissions import KATModelPermissionRequiredMixin
 
 if TYPE_CHECKING:
@@ -173,7 +174,19 @@ class HostnameListView(FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
-        return Hostname.objects.select_related("network")
+        scan_level_subquery = (
+            ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
+            .values("object_id")
+            .order_by()
+            .annotate(scan_levels=ArrayAgg("scan_level"))  # collect scan levels in subquery
+            .annotate(organizations=ArrayAgg("organization"))  # collect scan levels in subquery
+        )
+
+        return (
+            Hostname.objects.select_related("network")
+            .annotate(scan_levels=Subquery(scan_level_subquery.values("scan_levels")))
+            .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -33,6 +33,7 @@
                             <tr>
                                 <th>{% translate "Hostname" %}</th>
                                 <th>{% translate "Network" %}</th>
+                                <th>{% translate "Scan Levels" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -44,6 +45,13 @@
                                     </td>
                                     <td>
                                         <a href="{% url 'objects:hostname_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                                    </td>
+                                    <td>
+                                        {% if hostname.scan_levels %}
+                                            {% for level in hostname.scan_levels %}<span class="label tags-color-1-light">{{ level }}</span>{% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="{% url 'objects:delete_hostname' hostname.pk %}"
