@@ -48,7 +48,8 @@
                                     </td>
                                     <td>
                                         {% if hostname.max_scan_level %}
-                                            <span class="label tags-color-1-light">{{ hostname.max_scan_level }}</span>
+                                            {% include "partials/scan_level_indicator.html" with value=hostname.max_scan_level %}
+
                                         {% else %}
                                             -
                                         {% endif %}

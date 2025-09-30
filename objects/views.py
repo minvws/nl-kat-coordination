@@ -219,6 +219,7 @@ class HostnameDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
 
         return context
 
