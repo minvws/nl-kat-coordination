@@ -153,6 +153,23 @@ def test_recalculate_scan_profiles(xtdb, organization):
     assert port_sl.scan_level == 4
 
 
+def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
+    network = Network.objects.create(name="internet")
+
+    h = Hostname.objects.create(network=network, name="test.com")
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=h.id, scan_level=2)
+    ip = IPAddress.objects.create(network=network, address="0.0.0.0")
+    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
+    sl = ScanLevel.objects.create(
+        organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1, declared=True
+    )
+
+    recalculate_scan_profiles()
+
+    sl.refresh_from_db()
+    assert sl.scan_level == 1
+
+
 def test_network_view_filtered_on_name(rf, superuser_member, xtdb):
     Network.objects.create(name="internet")
 

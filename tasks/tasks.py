@@ -60,11 +60,13 @@ def recalculate_scan_profiles(depth: int = 0) -> None:
     updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
     updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
 
-    if updates:
-        bulk_insert(updates)
-        if depth < 10:
-            # In theory, we could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
-            recalculate_scan_profiles(depth + 1)
+    if not updates:
+        return
+
+    bulk_insert(updates)
+
+    if depth < 10:  # We could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
+        recalculate_scan_profiles(depth + 1)
 
 
 def calculate_updates(
@@ -85,7 +87,9 @@ def calculate_updates(
                 JOIN {ScanLevel._meta.db_table} parent_level ON (
                     parent_level.object_id = parent._id AND parent_level.organization = child_level.organization
                 )
-                WHERE child_level.scan_level < %(max_inherit)s AND parent_level.scan_level > child_level.scan_level
+                WHERE child_level.scan_level < %(max_inherit)s
+                AND parent_level.scan_level > child_level.scan_level
+                AND child_level.declared = false
             """,  # noqa: S608
                 {"max_inherit": max_inherit},
             )
