@@ -33,7 +33,7 @@
                             <tr>
                                 <th>{% translate "Hostname" %}</th>
                                 <th>{% translate "Network" %}</th>
-                                <th>{% translate "Scan Levels" %}</th>
+                                <th>{% translate "Max Scan Level" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -47,8 +47,8 @@
                                         <a href="{% url 'objects:hostname_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                                     </td>
                                     <td>
-                                        {% if hostname.scan_levels %}
-                                            {% for level in hostname.scan_levels %}<span class="label tags-color-1-light">{{ level }}</span>{% endfor %}
+                                        {% if hostname.max_scan_level %}
+                                            <span class="label tags-color-1-light">{{ hostname.max_scan_level }}</span>
                                         {% else %}
                                             -
                                         {% endif %}

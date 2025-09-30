@@ -1,7 +1,6 @@
 from celery import Celery
 
-from objects.models import Hostname, Network
-from openkat.models import Organization
+from objects.models import Hostname, Network, ScanLevel
 from plugins.models import Plugin
 from tasks.models import Schedule, TaskStatus
 from tasks.tasks import run_schedule
@@ -11,7 +10,9 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     logs = [b"test logs"]
     plugin_container.set_logs(logs)
 
-    plugin = Plugin.objects.create(name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"])
+    plugin = Plugin.objects.create(
+        name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
+    )
     plugin.enable_for(organization)
     schedule = Schedule.objects.filter(plugin=plugin).first()
 
@@ -26,8 +27,14 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert len(tasks) == 0
 
     network = Network.objects.create(name="internet")
-    Hostname.objects.create(name="test.com", network=network)
+    host = Hostname.objects.create(name="test.com", network=network)
+    sl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
 
+    tasks = run_schedule(schedule, force=False, celery=celery)
+    assert len(tasks) == 0
+
+    sl.scan_level = 2
+    sl.save()
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 1
 
@@ -56,7 +63,9 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert "OPENKAT_TOKEN" in kwargs["environment"]
     assert kwargs["detach"] is True
 
-    plugin2 = Plugin.objects.create(name="test2", plugin_id="test2", oci_image="T", oci_arguments=["{hostname}"])
+    plugin2 = Plugin.objects.create(
+        name="test2", plugin_id="test2", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
+    )
     plugin2.enable()
     schedule = Schedule.objects.filter(plugin=plugin2).first()
     assert schedule.object_set.name == "All hostnames"
@@ -72,11 +81,13 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert len(tasks) == 1
 
 
-def test_run_schedule_for_none(xtdb, celery: Celery, docker, plugin_container):
+def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugin_container):
     logs = [b"test logs"]
     plugin_container.set_logs(logs)
 
-    plugin = Plugin.objects.create(name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"])
+    plugin = Plugin.objects.create(
+        name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
+    )
     plugin.enable()
     schedule = Schedule.objects.filter(plugin=plugin).first()
 
@@ -85,12 +96,8 @@ def test_run_schedule_for_none(xtdb, celery: Celery, docker, plugin_container):
     assert schedule.plugin == plugin
 
     network = Network.objects.create(name="internet")
-    Hostname.objects.create(name="test.com", network=network)
+    host = Hostname.objects.create(name="test.com", network=network)
+    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
-    assert len(tasks) == 0  # There are no organizations to parse for
-
-    Organization.objects.create(name="test", code="test")
-
-    tasks = run_schedule(schedule, force=False, celery=celery)
-    assert len(tasks) == 1  # There are no organizations to parse for
+    assert len(tasks) == 1

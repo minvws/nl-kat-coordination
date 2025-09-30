@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import django_filters
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import OuterRef, QuerySet, Subquery
+from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -178,13 +178,13 @@ class HostnameListView(FilterView):
             ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
             .values("object_id")
             .order_by()
-            .annotate(scan_levels=ArrayAgg("scan_level"))  # collect scan levels in subquery
+            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
             .annotate(organizations=ArrayAgg("organization"))  # collect scan levels in subquery
         )
 
         return (
             Hostname.objects.select_related("network")
-            .annotate(scan_levels=Subquery(scan_level_subquery.values("scan_levels")))
+            .annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
             .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
         )
 
