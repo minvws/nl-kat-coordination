@@ -1,4 +1,6 @@
 import tempfile
+from enum import Enum
+from typing import cast
 
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -9,7 +11,6 @@ from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
 from transit.writer import Writer
 
-from objects.enums import MAX_SCAN_LEVEL
 from openkat.models import LowerCaseCharField, Organization
 
 
@@ -29,6 +30,17 @@ def to_xtdb_dict(model: Model) -> dict:
         del mod[field.name]
 
     return mod
+
+
+class ScanLevelEnum(models.IntegerChoices):
+    L0 = 0, "L0"
+    L1 = 1, "L1"
+    L2 = 2, "L2"
+    L3 = 3, "L3"
+    L4 = 4, "L4"
+
+
+MAX_SCAN_LEVEL = max(scan_level.value for scan_level in cast("type[Enum]", ScanLevelEnum))
 
 
 class Asset(models.Model):

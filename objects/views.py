@@ -1,15 +1,17 @@
 from typing import TYPE_CHECKING
 
 import django_filters
+from django import forms
 from django.conf import settings
 from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django_filters.views import FilterView
 
-from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel
+from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel, ScanLevelEnum
+from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 
 if TYPE_CHECKING:
@@ -74,6 +76,100 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
     def form_invalid(self, form):
         return redirect(reverse("objects:network_list"))
+
+
+class ScanLevelUpdateForm(forms.ModelForm):
+    """Form for updating scan level of an object."""
+
+    scan_level = forms.ChoiceField(
+        choices=ScanLevelEnum.choices,
+        required=True,
+        label=_("Scan Level"),
+        widget=forms.Select(attrs={"class": "scan-level-select"}),
+    )
+
+    class Meta:
+        model = ScanLevel
+        fields = ["scan_level"]
+
+    def __init__(self, *args, **kwargs):
+        self.object_id = kwargs.pop("object_id", None)
+        self.object_type = kwargs.pop("object_type", None)
+        self.organization = kwargs.pop("organization", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.declared = True
+        instance.object_id = self.object_id
+        instance.object_type = self.object_type
+        instance.organization = self.organization
+
+        if commit:
+            instance.save()
+        return instance
+
+
+class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelUpdateForm
+
+    def get_success_url(self):
+        return reverse("objects:hostname_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        hostname_id = self.kwargs.get("pk")
+        organization_id = self.kwargs.get("organization_id")
+
+        kwargs["object_id"] = hostname_id
+        kwargs["object_type"] = "hostname"
+        kwargs["organization"] = Organization.objects.get(id=organization_id)
+
+        # Try to get existing scan level
+        try:
+            scan_level = ScanLevel.objects.get(
+                object_id=hostname_id, object_type="hostname", organization_id=organization_id
+            )
+            kwargs["instance"] = scan_level
+        except ScanLevel.DoesNotExist:
+            pass
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
+class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelUpdateForm
+
+    def get_success_url(self):
+        return reverse("objects:network_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        network_id = self.kwargs.get("pk")
+        organization_id = self.kwargs.get("organization_id")
+
+        kwargs["object_id"] = network_id
+        kwargs["object_type"] = "network"
+        kwargs["organization"] = Organization.objects.get(id=organization_id)
+
+        # Try to get existing scan level
+        try:
+            scan_level = ScanLevel.objects.get(
+                object_id=network_id, object_type="network", organization_id=organization_id
+            )
+            kwargs["instance"] = scan_level
+        except ScanLevel.DoesNotExist:
+            pass
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
 class FindingFilter(django_filters.FilterSet):
@@ -176,6 +272,37 @@ class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
     def form_invalid(self, form):
         return redirect(reverse("objects:ipaddress_list"))
+
+
+class IPAddressScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelUpdateForm
+
+    def get_success_url(self):
+        return reverse("objects:ipaddress_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        ipaddress_id = self.kwargs.get("pk")
+        organization_id = self.kwargs.get("organization_id")
+
+        kwargs["object_id"] = ipaddress_id
+        kwargs["object_type"] = "ipaddress"
+        kwargs["organization"] = Organization.objects.get(id=organization_id)
+
+        # Try to get existing scan level
+        try:
+            scan_level = ScanLevel.objects.get(
+                object_id=ipaddress_id, object_type="ipaddress", organization_id=organization_id
+            )
+            kwargs["instance"] = scan_level
+        except ScanLevel.DoesNotExist:
+            pass
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
 class HostnameFilter(django_filters.FilterSet):

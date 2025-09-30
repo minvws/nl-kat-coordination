@@ -37,17 +37,38 @@
                                     <th scope="col">{% translate "Organization" %}</th>
                                     <th scope="col">{% translate "Scan level" %}</th>
                                     <th scope="col">{% translate "Declared" %}</th>
+                                    <th scope="col" colspan="2">{% translate "Update" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for scan_level in scan_levels %}
                                     <tr>
-                                        <td>{{ scan_level.organization }}</td>
+                                        <td>{{ scan_level.organization.name }}</td>
                                         <td>
                                             {% include "partials/scan_level_indicator.html" with value=scan_level.scan_level %}
 
                                         </td>
                                         <td>{{ scan_level.declared }}</td>
+                                        <td>
+                                            <form action="{% url 'objects:update_network_scan_level' network.pk scan_level.organization.id %}"
+                                                  method="post"
+                                                  id="network-scan-level-form-{{ scan_level.organization.id }}">
+                                                {% csrf_token %}
+                                                <select name="scan_level" required>
+                                                    <option value="">-</option>
+                                                    <option value="0" {% if scan_level.scan_level == 0 %}selected{% endif %}>L0</option>
+                                                    <option value="1" {% if scan_level.scan_level == 1 %}selected{% endif %}>L1</option>
+                                                    <option value="2" {% if scan_level.scan_level == 2 %}selected{% endif %}>L2</option>
+                                                    <option value="3" {% if scan_level.scan_level == 3 %}selected{% endif %}>L3</option>
+                                                    <option value="4" {% if scan_level.scan_level == 4 %}selected{% endif %}>L4</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <button type="submit"
+                                                    form="network-scan-level-form-{{ scan_level.organization.id }}"
+                                                    class="button ghost">{% translate "Update" %}</button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
