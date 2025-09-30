@@ -7,7 +7,7 @@ import celery
 import structlog
 from celery import Celery
 from django.conf import settings
-from django.db import OperationalError
+from django.db import OperationalError, connections
 from django.db.models import Max, Model, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
@@ -75,7 +75,7 @@ def calculate_updates(
     on_clause = f"parent._id = child.{relation}" if not from_parent else f"parent.{relation} = child._id"
 
     try:
-        return list(
+        updates = list(
             ScanLevel.objects.raw(
                 f"""
                 SELECT child_level._id, child_level.declared, child_level.last_changed_by, child_level.object_id,
@@ -94,6 +94,25 @@ def calculate_updates(
                 {"max_inherit": max_inherit},
             )
         )
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT false as declared, null as last_changed_by,
+                child._id as object_id, %(object_type)s as object_type, parent_level.organization as organization,
+                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
+                FROM {ScanLevel._meta.db_table} parent_level
+                JOIN {parent_model._meta.db_table} parent ON parent._id = parent_level.object_id
+                JOIN {child_model._meta.db_table} child ON {on_clause}
+                LEFT JOIN {ScanLevel._meta.db_table} child_level ON (
+                    child_level.object_id = child._id AND child_level.organization = parent_level.organization
+                )
+                WHERE child_level._id is null
+            """,  # noqa: S608
+                {"max_inherit": max_inherit, "object_type": child_model.__name__.lower()},
+            )
+            columns = [col[0] for col in cursor.description]
+            inserts = [ScanLevel(**dict(zip(columns, row))) for row in cursor.fetchall()]
+        return updates + inserts
     except OperationalError:
         logger.error("Failed to perform scan level query", parent_model=parent_model, child_model=child_model)
         return []
