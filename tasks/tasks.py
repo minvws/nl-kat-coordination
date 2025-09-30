@@ -79,13 +79,13 @@ def calculate_updates(
             ScanLevel.objects.raw(
                 f"""
                 SELECT child_level._id, child_level.declared, child_level.last_changed_by, child_level.object_id,
-                child_level.object_type, child_level.organization,
+                child_level.object_type, child_level.organization_id,
                 LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
                 FROM {ScanLevel._meta.db_table} child_level
                 JOIN {child_model._meta.db_table} child ON child._id = child_level.object_id
                 JOIN {parent_model._meta.db_table} parent ON {on_clause}
                 JOIN {ScanLevel._meta.db_table} parent_level ON (
-                    parent_level.object_id = parent._id AND parent_level.organization = child_level.organization
+                    parent_level.object_id = parent._id AND parent_level.organization_id = child_level.organization_id
                 )
                 WHERE child_level.scan_level < %(max_inherit)s
                 AND parent_level.scan_level > child_level.scan_level
@@ -98,13 +98,13 @@ def calculate_updates(
             cursor.execute(
                 f"""
                 SELECT false as declared, null as last_changed_by,
-                child._id as object_id, %(object_type)s as object_type, parent_level.organization as organization,
+                child._id as object_id, %(object_type)s as object_type, parent_level.organization_id as organization_id,
                 LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
                 FROM {ScanLevel._meta.db_table} parent_level
                 JOIN {parent_model._meta.db_table} parent ON parent._id = parent_level.object_id
                 JOIN {child_model._meta.db_table} child ON {on_clause}
                 LEFT JOIN {ScanLevel._meta.db_table} child_level ON (
-                    child_level.object_id = child._id AND child_level.organization = parent_level.organization
+                    child_level.object_id = child._id AND child_level.organization_id = parent_level.organization_id
                 )
                 WHERE child_level._id is null
             """,  # noqa: S608
