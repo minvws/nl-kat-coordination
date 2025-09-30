@@ -10,7 +10,7 @@ from psycopg import sql
 from transit.writer import Writer
 
 from objects.enums import MAX_SCAN_LEVEL
-from openkat.models import LowerCaseCharField
+from openkat.models import LowerCaseCharField, Organization
 
 
 def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
@@ -59,7 +59,10 @@ class ManagerWithGenericObjectForeignKey(Manager):
 
 
 class ScanLevel(models.Model):
-    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    # TODO: On_delete should be CADCASE or PROTECT, but deletion tests will then
+    # fail because XTDB does not know the table if we haven't inserted anything
+    # yet.
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
     scan_level: models.IntegerField = models.IntegerField(
         default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
     )
