@@ -8,10 +8,10 @@
 
     <main id="main-content">
         <section>
-            <form method="post" class="help">
+            <form method="post" class="help" id="objectset-form">
                 {% csrf_token %}
                 {{ form }}
-                <button type="submit">{% translate "Save" %}</button>
+                <button type="submit" name="submit_action" value="save">{% translate "Save" %}</button>
             </form>
         </section>
     </main>
