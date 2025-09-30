@@ -168,9 +168,9 @@
                     </tbody>
                 </table>
             </div>
-            {% if scan_levels %}
-                <div>
-                    <h2>{% translate "Scan Levels" %}</h2>
+            <div>
+                <h2>{% translate "Scan Levels" %}</h2>
+                {% if scan_levels %}
                     <div class="horizontal-scroll">
                         <table>
                             <caption class="visually-hidden">{% translate "Overview of variants" %}</caption>
@@ -195,10 +195,10 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            {% else %}
-                <p>{% translate "No Scan Levels found." %}</p>
-            {% endif %}
+                {% else %}
+                    <p>{% translate "No Scan Levels found." %}</p>
+                {% endif %}
+            </div>
         </section>
     </main>
 {% endblock content %}

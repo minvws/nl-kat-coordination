@@ -26,6 +26,37 @@
                     </dl>
                 </div>
             </div>
+            <div>
+                <h2>{% translate "Scan Levels" %}</h2>
+                {% if scan_levels %}
+                    <div class="horizontal-scroll">
+                        <table>
+                            <caption class="visually-hidden">{% translate "Overview of variants" %}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Organization" %}</th>
+                                    <th scope="col">{% translate "Scan level" %}</th>
+                                    <th scope="col">{% translate "Declared" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for scan_level in scan_levels %}
+                                    <tr>
+                                        <td>{{ scan_level.organization }}</td>
+                                        <td>
+                                            {% include "partials/scan_level_indicator.html" with value=scan_level.scan_level %}
+
+                                        </td>
+                                        <td>{{ scan_level.declared }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>{% translate "No Scan Levels found." %}</p>
+                {% endif %}
+            </div>
         </section>
     </main>
 {% endblock content %}

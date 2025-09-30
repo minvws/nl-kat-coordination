@@ -47,6 +47,7 @@ class NetworkDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
 
         return context
 
@@ -139,6 +140,7 @@ class IPAddressDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
 
         return context
 
