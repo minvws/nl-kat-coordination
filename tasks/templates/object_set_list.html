@@ -44,7 +44,7 @@
                                 <th scope="col">{% translate "Description" %}</th>
                                 <th scope="col">{% translate "Object Type" %}</th>
                                 <th scope="col">{% translate "Object Query" %}</th>
-                                <th scope="col">{% translate "Objects" %}</th>
+                                <th scope="col">{% translate "Manual Objects" %}</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -61,18 +61,15 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>{{ object_set.name }}</td>
-                                    <td>{{ object_set.object_query }}</td>
                                     <td>{{ object_set.object_type.model }}</td>
                                     <td>
-                                        {% if object_set.traverse_objects|length > 1 %}
-                                            [{{ object_set.traverse_objects|first }}, ...]
-                                        {% elif object_set.traverse_objects|length == 1 %}
-                                            {{ object_set.traverse_objects|first }}
+                                        {% if object_set.object_query %}
+                                            {{ object_set.object_query|truncatechars:50 }}
                                         {% else %}
                                             -
                                         {% endif %}
                                     </td>
+                                    <td>{{ object_set.all_objects|length }}</td>
                                     <td class="nowrap actions sticky-cell">
                                         <button class="expando-button"
                                                 data-icon-open-class="icon ti-chevron-down"
@@ -84,15 +81,27 @@
                                 </tr>
                                 <tr class="expando-row">
                                     <td colspan="6">
+                                        {% if object_set.all_objects %}
+                                            <div>
+                                                <h5>
+                                                    {% translate "Manually Added Objects" %} ({{ object_set.all_objects|slice:"10"|length }}/{{ object_set.all_objects|length }})
+                                                </h5>
+                                                <ul>
+                                                    {% for object in object_set.all_objects|slice:"10" %}<li>{{ object }}</li>{% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
                                         <div>
                                             {% with object_count=object_set.traverse_objects|length %}
                                                 {% if object_set.traverse_objects %}
-                                                    <h5>{% translate "Objects" %} ({{ object_set.traverse_objects|slice:"10"|length }}/{{ object_count }})</h5>
+                                                    <h5>
+                                                        {% translate "All Objects (Combined)" %} ({{ object_set.traverse_objects|slice:"10"|length }}/{{ object_count }})
+                                                    </h5>
                                                     <ul>
                                                         {% for object in object_set.traverse_objects|slice:"10" %}<li>{{ object }}</li>{% endfor %}
                                                     </ul>
                                                 {% else %}
-                                                    <h5>{% translate "Objects" %}</h5>
+                                                    <h5>{% translate "All Objects" %}</h5>
                                                     <p>{% translate "There are no objects selected for this object list." %}</p>
                                                 {% endif %}
                                             {% endwith %}
