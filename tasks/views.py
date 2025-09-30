@@ -361,6 +361,15 @@ class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
         return reverse_lazy("object_set_list")
 
 
+class ObjectSetUpdateView(KATModelPermissionRequiredMixin, UpdateView):
+    model = ObjectSet
+    fields = ["name", "all_objects", "object_type", "object_query", "description", "dynamic"]
+    template_name = "object_set_form.html"
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy("object_set_detail", kwargs={"pk": self.object.pk})
+
+
 class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     model = ObjectSet
 

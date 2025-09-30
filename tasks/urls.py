@@ -5,6 +5,7 @@ from tasks.views import (
     ObjectSetDeleteView,
     ObjectSetDetailView,
     ObjectSetListView,
+    ObjectSetUpdateView,
     ScheduleCreateView,
     ScheduleDeleteView,
     ScheduleDetailView,
@@ -32,6 +33,7 @@ urlpatterns = [
     path("schedule/<slug:schedule_id>/run/", ScheduleRunView.as_view(), name="run_schedule"),
     path("object-sets/", ObjectSetListView.as_view(), name="object_set_list"),
     path("object-sets/add/", ObjectSetCreateView.as_view(), name="add_object_set"),
-    path("object-sets/<slug:pk>/delete/", ObjectSetDeleteView.as_view(), name="delete_object_set"),
     path("object-sets/<slug:pk>/", ObjectSetDetailView.as_view(), name="object_set_detail"),
+    path("object-sets/<slug:pk>/edit/", ObjectSetUpdateView.as_view(), name="edit_object_set"),
+    path("object-sets/<slug:pk>/delete/", ObjectSetDeleteView.as_view(), name="delete_object_set"),
 ]
