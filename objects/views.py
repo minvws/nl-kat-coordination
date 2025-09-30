@@ -1,8 +1,12 @@
+import csv
+import io
 from typing import TYPE_CHECKING
 
 import django_filters
 from django import forms
 from django.conf import settings
+from django.contrib import messages
+from django.db import transaction
 from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -10,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django_filters.views import FilterView
 
+from objects.forms import HostnameCSVUploadForm, IPAddressCSVUploadForm
 from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel, ScanLevelEnum
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
@@ -266,6 +271,79 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("objects:ipaddress_list")
 
 
+class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
+    template_name = "objects/ipaddress_csv_upload.html"
+    form_class = IPAddressCSVUploadForm
+    success_url = reverse_lazy("objects:ipaddress_list")
+    permission_required = "openkat.add_ipaddress"
+
+    def form_valid(self, form):
+        csv_file = form.cleaned_data["csv_file"]
+        network = form.cleaned_data.get("network")
+
+        # Default to "internet" network if not specified
+        if not network:
+            network, _ = Network.objects.get_or_create(name="internet")
+
+        csv_raw_data = csv_file.read()
+        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
+
+        created_count = 0
+        error_count = 0
+        skipped_count = 0
+
+        try:
+            reader = csv.reader(csv_data, delimiter=",", quotechar='"')
+            for row_num, row in enumerate(reader, 1):
+                if not row or not row[0].strip():
+                    continue  # Skip empty rows
+
+                address = row[0].strip()
+
+                try:
+                    with transaction.atomic():
+                        ipaddress, created = IPAddress.objects.get_or_create(network=network, address=address)
+                        if created:
+                            created_count += 1
+                        else:
+                            skipped_count += 1
+                except Exception as e:
+                    error_count += 1
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Error creating IP address '{address}' on row {row_num}: {error}").format(
+                            address=address, row_num=row_num, error=str(e)
+                        ),
+                    )
+
+            if created_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.SUCCESS,
+                    _("Successfully created {count} IP addresses.").format(count=created_count),
+                )
+            if skipped_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.INFO,
+                    _("{count} IP addresses already existed and were skipped.").format(count=skipped_count),
+                )
+            if error_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    _("{count} IP addresses had errors and were not created.").format(count=error_count),
+                )
+
+        except csv.Error as e:
+            messages.add_message(
+                self.request, messages.ERROR, _("Error parsing CSV file: {error}").format(error=str(e))
+            )
+
+        return super().form_valid(form)
+
+
 class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     model = IPAddress
     success_url = reverse_lazy("objects:ipaddress_list")
@@ -381,3 +459,76 @@ class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
     template_name = "objects/generic_object_form.html"
     fields = ["network", "name"]
     success_url = reverse_lazy("objects:hostname_list")
+
+
+class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
+    template_name = "objects/hostname_csv_upload.html"
+    form_class = HostnameCSVUploadForm
+    success_url = reverse_lazy("objects:hostname_list")
+    permission_required = "openkat.add_hostname"
+
+    def form_valid(self, form):
+        csv_file = form.cleaned_data["csv_file"]
+        network = form.cleaned_data.get("network")
+
+        # Default to "internet" network if not specified
+        if not network:
+            network, _ = Network.objects.get_or_create(name="internet")
+
+        csv_raw_data = csv_file.read()
+        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
+
+        created_count = 0
+        error_count = 0
+        skipped_count = 0
+
+        try:
+            reader = csv.reader(csv_data, delimiter=",", quotechar='"')
+            for row_num, row in enumerate(reader, 1):
+                if not row or not row[0].strip():
+                    continue  # Skip empty rows
+
+                name = row[0].strip()
+
+                try:
+                    with transaction.atomic():
+                        hostname, created = Hostname.objects.get_or_create(network=network, name=name)
+                        if created:
+                            created_count += 1
+                        else:
+                            skipped_count += 1
+                except Exception as e:
+                    error_count += 1
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Error creating hostname '{name}' on row {row_num}: {error}").format(
+                            name=name, row_num=row_num, error=str(e)
+                        ),
+                    )
+
+            if created_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.SUCCESS,
+                    _("Successfully created {count} hostnames.").format(count=created_count),
+                )
+            if skipped_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.INFO,
+                    _("{count} hostnames already existed and were skipped.").format(count=skipped_count),
+                )
+            if error_count > 0:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    _("{count} hostnames had errors and were not created.").format(count=error_count),
+                )
+
+        except csv.Error as e:
+            messages.add_message(
+                self.request, messages.ERROR, _("Error parsing CSV file: {error}").format(error=str(e))
+            )
+
+        return super().form_valid(form)
