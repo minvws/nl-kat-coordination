@@ -52,10 +52,10 @@ class ObjectSet(models.Model):
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
-    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: fix?
+    all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def get_query_objects(self) -> list[str]:
+    def get_query_objects(self) -> list[int]:
         """Get objects from object_query using DjangoQL"""
         if not self.object_query:
             return []
@@ -67,18 +67,15 @@ class ObjectSet(models.Model):
             # Apply the DjangoQL query
             queryset = apply_search(model_class.objects.all(), self.object_query, model_class)
 
-            # Return primary keys as strings
-            return [str(obj.pk) for obj in queryset]
+            # Return primary keys as integers
+            return [obj.pk for obj in queryset]
         except Exception:
             # If query fails, return empty list
             return []
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[str]:  # TODO: fix?
+    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
         # TODO: handle cycles
         # TODO: configurable max_depth
-
-        if depth >= max_depth:
-            raise RecursionError("Max depth reached for object set.")
 
         # Start with manually added objects from all_objects field
         all_objects = list(self.all_objects)
@@ -87,9 +84,10 @@ class ObjectSet(models.Model):
         query_objects = self.get_query_objects()
         all_objects.extend(query_objects)
 
-        # Add objects from subsets
-        for subset in self.subsets.all():
-            all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
+        # Add objects from subsets if we haven't exceeded max depth
+        if depth < max_depth:
+            for subset in self.subsets.all():
+                all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
 
         # Remove duplicates while preserving order
         seen = set()
