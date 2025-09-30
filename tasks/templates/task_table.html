@@ -78,7 +78,10 @@
                     <tr class="expando-row">
                         <td colspan="6">
                             <div class="button-container">
-                                <a class="button" href="{% url 'file_list' %}?task_id={{ task.id }}">{% translate "View results" %}</a>
+                                <a class="button"
+                                   href="{% url 'file_list' %}?task_id={{ task.id }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer">{% translate "View results" %}</a>
                                 {% if task.done %}
                                     <form action="{% url 'reschedule_task' task.id %}" method="post">
                                         {% csrf_token %}
