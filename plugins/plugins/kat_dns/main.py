@@ -7,7 +7,7 @@ from os import getenv
 
 import dns
 import httpx
-from dns.edns import Option
+from dns.edns import EDECode, EDEOption
 from dns.message import from_text
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
@@ -39,7 +39,7 @@ def run(hostname: str, record_types: set[str]) -> list:
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
     # enable EDE to get the DNSSEC Bogus return values if the server supports it # codespell-ignore
-    resolver.use_edns(options=[Option("EDE")])
+    resolver.use_edns(options=[EDEOption(EDECode.BLOCKED)])
     nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
@@ -48,7 +48,7 @@ def run(hostname: str, record_types: set[str]) -> list:
         try:
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
-        except (dns.resolver.NoAnswer, dns.resolver.Timeout):
+        except (dns.resolver.NoAnswer, dns.resolver.Timeout, NotImplementedError):
             pass
         except dns.resolver.NXDOMAIN:
             return []
