@@ -117,30 +117,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.40.38"
+version = "1.40.41"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8d/c7/1442380ad7e211089a3c94b758ffb01079eab0183700fba9d5be417b5cb4/boto3-1.40.38.tar.gz", hash = "sha256:932ebdd8dbf8ab5694d233df86d5d0950291e0b146c27cb46da8adb4f00f6ca4", size = 111559, upload-time = "2025-09-24T19:23:25.7Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/52/f7/d652732fd8fc28f427f3e698e488b7422ede535fe4d813c7988642c7734b/boto3-1.40.41.tar.gz", hash = "sha256:2ea2463fc42812f3cab66b53114579b1f4b9a378ee48921d4385511a94307b24", size = 111621, upload-time = "2025-09-29T19:21:14.928Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/a9/e7e5fe3fec60fb87bc9f8b3874c4c606e290a64b2ae8c157e08c3e69d755/boto3-1.40.38-py3-none-any.whl", hash = "sha256:fac337b4f0615e4d6ceee44686e662f51d8e57916ed2bc763468e3e8c611a658", size = 139345, upload-time = "2025-09-24T19:23:23.756Z" },
+    { url = "https://files.pythonhosted.org/packages/45/a8/d5c924e3dfce8804ff7119c1e84f423414851a82d30d744e81f4b61ddbff/boto3-1.40.41-py3-none-any.whl", hash = "sha256:02eac942aaa9f3a1c8a11f77e6f971b41c125973888f80f3eb177c2f21ad7a01", size = 139342, upload-time = "2025-09-29T19:21:12.728Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.40.38"
+version = "1.40.41"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/11/82a216e24f1af1ba5c3c358201fb9eba5e502242f504dd1f42eb18cbf2c5/botocore-1.40.38.tar.gz", hash = "sha256:18039009e1eca2bff12e576e8dd3c80cd9b312294f1469c831de03169582ad59", size = 14354395, upload-time = "2025-09-24T19:23:14.522Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/55/fa23104e4352f28a457c452a3621b00fe2a7a1e096d04e2f4a9890250448/botocore-1.40.41.tar.gz", hash = "sha256:320873c6a34bfd64fb9bbc55e8ac38e7904a574cfc634d1f0f66b1490c62b89d", size = 14365601, upload-time = "2025-09-29T19:21:03.667Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/f0/ca5a00dd8fe3768ecff54756457dd0c69ed8e1cd09d0f7c21599477b5d5b/botocore-1.40.38-py3-none-any.whl", hash = "sha256:7d60a7557db3a58f9394e7ecec1f6b87495ce947eb713f29d53aee83a6e9dc71", size = 14025193, upload-time = "2025-09-24T19:23:11.093Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/d2/1b5bc59c746413d3eca16bd659b8c00cf2d4eeb6274053d1ff3110d13670/botocore-1.40.41-py3-none-any.whl", hash = "sha256:8246bf73a2e20647cf1d4dae1e9a7c40f97f38a34a6a1fbfd49aa6b3dce5ffaa", size = 14034516, upload-time = "2025-09-29T19:20:59.792Z" },
 ]
 
 [[package]]
@@ -522,16 +522,16 @@ wheels = [
 
 [[package]]
 name = "fastapi-slim"
-version = "0.116.1"
+version = "0.118.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "starlette" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/87/80/2540fb851fe4b407856ba1cad8b27e48d511413c18a082aafc86f182fb1c/fastapi_slim-0.116.1.tar.gz", hash = "sha256:5dca6046d3a3e35eb733188649a9f883c9d49474b9b3255ecb8ec52a820fbb9f", size = 296505, upload-time = "2025-07-11T16:22:29.079Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/48/fca5b9ba7d230db3d0e974782cf39562200cd2937fc577c6308d799ce595/fastapi_slim-0.118.0.tar.gz", hash = "sha256:227564f4d67a289bffdd9aeb61c7b94c2e2c103661289e6661127452f770ea1c", size = 310569, upload-time = "2025-09-29T03:37:24.478Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/0c/94090f4ba0ae3b3117d50e3964311f34232ee379814585cbca042b1f2a0a/fastapi_slim-0.116.1-py3-none-any.whl", hash = "sha256:37517a302492c30014979cff8d85f42ae5fbdbe4f8b5d0ceed81745bb3b23149", size = 95683, upload-time = "2025-07-11T16:22:27.379Z" },
+    { url = "https://files.pythonhosted.org/packages/d4/f7/fc7abf42baa670be8a9ffb1630514b56f0b313db1cfcd695100b447313dd/fastapi_slim-0.118.0-py3-none-any.whl", hash = "sha256:d0889515ca11e0a78c8074acb33c79a82a56ae65fd85c561e733424995d7eeb9", size = 97747, upload-time = "2025-09-29T03:37:21.929Z" },
 ]
 
 [[package]]
