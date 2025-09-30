@@ -6,8 +6,6 @@ from celery.result import AsyncResult
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import QuerySet
-from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -46,45 +44,52 @@ class Operation(models.TextChoices):
 class ObjectSet(models.Model):
     """Composite-like model representing a set of objects that can be used as an input for tasks"""
 
-    name = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    # TODO: organization field?
+    name = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True)
     dynamic = models.BooleanField(default=False)  # TODO
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
-    all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
+    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: fix?
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def get_query_objects(self) -> QuerySet:
-        if self.object_query is None:
-            return self.object_type.model_class().objects.none()
-
-        qs = self.object_type.model_class().objects.all()
-
-        if self.object_query == "":
-            return qs
+    def get_query_objects(self) -> list[str]:
+        """Get objects from object_query using DjangoQL"""
+        if not self.object_query:
+            return []
 
         try:
-            return apply_search(qs, self.object_query)
-        except DjangoQLParserError:
-            return qs
+            # Get the model class from the content type
+            model_class = self.object_type.model_class()
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
+            # Apply the DjangoQL query
+            queryset = apply_search(model_class.objects.all(), self.object_query, model_class)
+
+            # Return primary keys as strings
+            return [str(obj.pk) for obj in queryset]
+        except Exception:
+            # If query fails, return empty list
+            return []
+
+    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[str]:  # TODO: fix?
         # TODO: handle cycles
         # TODO: configurable max_depth
+
+        if depth >= max_depth:
+            raise RecursionError("Max depth reached for object set.")
 
         # Start with manually added objects from all_objects field
         all_objects = list(self.all_objects)
 
         # Add objects from object_query
         query_objects = self.get_query_objects()
-        all_objects.extend([x.pk for x in query_objects])
+        all_objects.extend(query_objects)
 
-        # Add objects from subsets if we haven't exceeded max depth
-        if depth < max_depth:
-            for subset in self.subsets.all():
-                all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
+        # Add objects from subsets
+        for subset in self.subsets.all():
+            all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
 
         # Remove duplicates while preserving order
         seen = set()

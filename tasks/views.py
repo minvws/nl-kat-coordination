@@ -5,7 +5,6 @@ import recurrence
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import OuterRef, Subquery
 from django.db.models.fields.json import KeyTextTransform
 from django.forms import ModelForm
@@ -16,9 +15,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+from djangoql.queryset import apply_search
 
 from objects.models import Hostname, IPAddress
-from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
@@ -33,10 +32,10 @@ class TaskFilter(django_filters.FilterSet):
 
     class Meta:
         model = Task
-        fields = ["status", "data"]
+        fields = ["status", "organization", "data"]
 
 
-class TaskListView(OrganizationFilterMixin, FilterView):
+class TaskListView(FilterView):
     template_name = "task_list.html"
     fields = ["enabled_plugins"]
     model = Task
@@ -68,13 +67,13 @@ class TaskListView(OrganizationFilterMixin, FilterView):
         return context
 
 
-class TaskDetailView(OrganizationFilterMixin, DetailView):
+class TaskDetailView(DetailView):
     template_name = "task.html"
     model = Task
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin"] = Plugin.objects.get(plugin_id=self.object.data["plugin_id"])
+        context["plugin"] = Plugin.objects.get(plugin_id=self.task.data["plugin_id"])
         context["breadcrumbs"] = [
             {"url": reverse("task_list"), "text": _("Plugins")},
             {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
@@ -166,10 +165,10 @@ class ScheduleFilter(django_filters.FilterSet):
 
     class Meta:
         model = Schedule
-        fields = ["plugin__plugin_id", "object_set", "enabled"]
+        fields = ["plugin__plugin_id", "object_set", "organization", "enabled"]
 
 
-class ScheduleListView(OrganizationFilterMixin, FilterView):
+class ScheduleListView(FilterView):
     template_name = "schedule_list.html"
     model = Schedule
     ordering = ["-id"]
@@ -197,47 +196,7 @@ class ScheduleForm(ModelForm):
         fields = ["enabled", "recurrences", "object_set"]
 
 
-class ObjectSetForm(ModelForm):
-    all_objects = forms.MultipleChoiceField(
-        widget=forms.SelectMultiple(attrs={"size": "10"}),
-        required=False,
-        help_text="Select objects manually. These will be combined with objects from the query.",
-    )
-
-    class Meta:
-        model = ObjectSet
-        fields = ["name", "description", "object_type", "object_query", "all_objects", "dynamic"]
-        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "object_query": forms.Textarea(attrs={"rows": 3})}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
-        object_type = None
-
-        if self.instance and self.instance.pk and self.instance.object_type:
-            object_type = self.instance.object_type
-        elif self.data.get("object_type"):
-            object_type = ContentType.objects.filter(pk=self.data.get("object_type")).first()
-
-        if object_type:
-            model_class = object_type.model_class()
-            if model_class:
-                objects = model_class.objects.all()
-                choices = [(obj.pk, str(obj)) for obj in objects]
-                self.fields["all_objects"].choices = choices
-
-                if self.instance and self.instance.all_objects:
-                    self.initial["all_objects"] = [str(pk) for pk in self.instance.all_objects]
-        else:
-            self.fields["all_objects"].choices = []
-            self.fields["all_objects"].help_text += " (Select an object type first to see available objects.)"
-
-    def clean_all_objects(self):
-        return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
-
-
-class ScheduleDetailView(OrganizationFilterMixin, DetailView):
+class ScheduleDetailView(DetailView):
     template_name = "schedule.html"
     model = Schedule
 
@@ -347,7 +306,7 @@ class ObjectSetFilter(django_filters.FilterSet):
         fields = ["name", "description", "object_query"]
 
 
-class ObjectSetListView(OrganizationFilterMixin, FilterView):
+class ObjectSetListView(FilterView):
     template_name = "object_set_list.html"
     model = ObjectSet
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
@@ -360,7 +319,7 @@ class ObjectSetListView(OrganizationFilterMixin, FilterView):
         return context
 
 
-class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
+class ObjectSetDetailView(DetailView):
     template_name = "object_set.html"
     model = ObjectSet
     PREVIEW_SIZE = 20
@@ -372,22 +331,25 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
-        obj: ObjectSet = self.get_object()
+        obj = self.get_object()
 
         if obj.object_query is not None and obj.dynamic is True:
-            # TODO: check scan profiles?
-            context["objects"] = obj.get_query_objects()[: self.PREVIEW_SIZE]
+            model_qs = obj.object_type.model_class().objects.all()
+
+            if obj.object_query:
+                model_qs = apply_search(model_qs, obj.object_query)
+
+            # TODO: check scan profile
+            context["objects"] = model_qs[: self.PREVIEW_SIZE]
         else:
             context["objects"] = None
-
-        context["all_objects"] = obj.object_type.model_class().objects.filter(pk__in=obj.all_objects)
 
         return context
 
 
 class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = ObjectSet
-    form_class = ObjectSetForm
+    fields = ["name", "all_objects", "object_type", "object_query", "description", "dynamic"]
     template_name = "object_set_form.html"
 
     def get_success_url(self, **kwargs):
@@ -401,7 +363,7 @@ class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 class ObjectSetUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = ObjectSet
-    form_class = ObjectSetForm
+    fields = ["name", "all_objects", "object_type", "object_query", "description", "dynamic"]
     template_name = "object_set_form.html"
 
     def get_success_url(self, **kwargs):

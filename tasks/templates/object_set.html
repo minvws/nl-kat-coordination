@@ -11,7 +11,11 @@
             <div class="introduction">
                 <div>
                     <h1>{{ objectset.name }}</h1>
-                    <p>{% translate objectset.description %}</p>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
                 <div class="horizontal-view toolbar">
                     <a class="button" href="{% url 'edit_object_set' pk=objectset.id %}">
@@ -21,27 +25,13 @@
             </div>
             <div>
                 <h2>{% translate "Query" %}</h2>
-                <p>
-                    {% if objectset.object_query %}
-                        <code>{{ objectset.object_query }}</code>
-                    {% elif objectset.object_query == "" %}
-                        {% translate "The query is empty, so all objects of type" %} <strong>{{ objectset.object_type.model }}</strong> {% translate "are in this set." %}
-                    {% else %}
-                        {% translate "No query present" %}
-                    {% endif %}
-                </p>
+                <p>{{ objectset.object_query }}</p>
             </div>
             {% if objects %}
                 <div>
                     <h2>{% translate "Preview" %}</h2>
                     <ul>
-                        {% for object in objects %}
-                            {% with object|to_class_name|lower as model_name %}
-                                <li>
-                                    <a href="{% url "objects:"|add:model_name|add:"_detail" pk=object.id %}">{{ object }}</a>
-                                </li>
-                            {% endwith %}
-                        {% endfor %}
+                        {% for object in objects %}<li>{{ object }}</li>{% endfor %}
                     </ul>
                 </div>
             {% endif %}
@@ -54,6 +44,21 @@
                     <p>{% translate "Count:" %} {{ objectset.all_objects|length }}</p>
                 {% else %}
                     <p>{% translate "No manually added objects." %}</p>
+                {% endif %}
+            </div>
+            <div>
+                <h2>{% translate "All Objects (Combined)" %}</h2>
+                <p>{% translate "This includes manually added objects, objects from the query, and objects from subsets." %}</p>
+                {% if objectset.traverse_objects %}
+                    <p>{% translate "Total count:" %} {{ objectset.traverse_objects|length }}</p>
+                    <ul>
+                        {% for object in objectset.traverse_objects|slice:":20" %}<li>{{ object }}</li>{% endfor %}
+                        {% if objectset.traverse_objects|length > 20 %}
+                            <li>... {% translate "and" %} {{ objectset.traverse_objects|length|add:"-20" }} {% translate "more" %}</li>
+                        {% endif %}
+                    </ul>
+                {% else %}
+                    <p>{% translate "No objects in this set." %}</p>
                 {% endif %}
             </div>
         </section>
