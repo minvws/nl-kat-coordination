@@ -36,7 +36,7 @@ def test_query_hostname(xtdb):
 def test_query_with_scan_levels(xtdb, organization):
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(network=network, name="test.com")
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id)
     time.sleep(0.1)
 
     scan_level_subquery = (
@@ -54,7 +54,7 @@ def test_query_with_scan_levels(xtdb, organization):
     assert host.scan_levels == [0]
     assert host.organizations == [1]
 
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id, scan_level=2)
     assert ScanLevel.objects.count() == 2
 
     host = (
@@ -69,11 +69,11 @@ def test_query_with_scan_levels(xtdb, organization):
 def test_add_scan_level_filter_to_object_query(xtdb, organization):
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(network=network, name="test.com")
-    sl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
+    sl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id)
     time.sleep(0.1)
 
     subquery = Subquery(
-        ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"), organization=organization.pk)
+        ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"), organization=organization)
         .values("object_id")
         .annotate(max_scan_level=Max("scan_level"))  # Take the because we need a level at least the plugin.scan_level
         .values("max_scan_level")
@@ -90,7 +90,7 @@ def test_add_scan_level_filter_to_object_query(xtdb, organization):
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 0
 
     # Also check capitalized
-    ScanLevel.objects.create(organization=organization.pk, object_type="Hostname", object_id=host.id, scan_level=3)
+    ScanLevel.objects.create(organization=organization, object_type="Hostname", object_id=host.id, scan_level=3)
 
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=2).count() == 1
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 1
@@ -100,31 +100,27 @@ def test_recalculate_scan_profiles(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=h.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
 
     nameserver = Hostname.objects.create(network=network, name="ns.test.com")
-    nsl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=nameserver.id)
+    nsl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=nameserver.id)
 
     mailserver = Hostname.objects.create(network=network, name="mail.test.com")
-    ScanLevel.objects.create(
-        organization=organization.pk, object_type="hostname", object_id=mailserver.id, scan_level=1
-    )
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=mailserver.id, scan_level=1)
 
     # The A record inherits level 2 from the hostname test.com
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
     A = DNSARecord.objects.create(ip_address=ip, hostname=h)
-    sl = ScanLevel.objects.create(organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1)
+    sl = ScanLevel.objects.create(organization=organization, object_type="dnsarecord", object_id=A.id, scan_level=1)
 
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False, service="unknown")
-    port_sl = ScanLevel.objects.create(
-        organization=organization.pk, object_type="ipport", object_id=port.id, scan_level=1
-    )
+    port_sl = ScanLevel.objects.create(organization=organization, object_type="ipport", object_id=port.id, scan_level=1)
 
     NS = DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
     # The MX record inherits level 1 from the hostname mail.test.com through the mail_server field
     MX = DNSMXRecord.objects.create(mail_server=mailserver, hostname=h)
-    mxsl = ScanLevel.objects.create(organization=organization.pk, object_type="dnsmxrecord", object_id=MX.id)
+    mxsl = ScanLevel.objects.create(organization=organization, object_type="dnsmxrecord", object_id=MX.id)
 
     recalculate_scan_profiles()
 
@@ -137,7 +133,7 @@ def test_recalculate_scan_profiles(xtdb, organization):
     mxsl.refresh_from_db()
     assert mxsl.scan_level == 1
 
-    ScanLevel.objects.create(organization=organization.pk, object_type="dnsnsrecord", object_id=NS.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="dnsnsrecord", object_id=NS.id, scan_level=2)
     recalculate_scan_profiles()
 
     nsl.refresh_from_db()  # Now we do see the effect
@@ -146,7 +142,7 @@ def test_recalculate_scan_profiles(xtdb, organization):
     port_sl.refresh_from_db()
     assert port_sl.scan_level == 1
 
-    ScanLevel.objects.create(organization=organization.pk, object_type="ipaddress", object_id=ip.id, scan_level=4)
+    ScanLevel.objects.create(organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=4)
     recalculate_scan_profiles()
 
     port_sl.refresh_from_db()
@@ -157,11 +153,11 @@ def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=h.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
     A = DNSARecord.objects.create(ip_address=ip, hostname=h)
     sl = ScanLevel.objects.create(
-        organization=organization.pk, object_type="dnsarecord", object_id=A.id, scan_level=1, declared=True
+        organization=organization, object_type="dnsarecord", object_id=A.id, scan_level=1, declared=True
     )
 
     recalculate_scan_profiles()
@@ -174,7 +170,7 @@ def test_recalculate_scan_profiles_creates_new_profiles(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=h.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
     A = DNSARecord.objects.create(ip_address=ip, hostname=h)
 
