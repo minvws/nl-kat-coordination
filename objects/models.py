@@ -59,7 +59,7 @@ class ManagerWithGenericObjectForeignKey(Manager):
 
 
 class ScanLevel(models.Model):
-    # TODO: On_delete should be CADCASE or PROTECT, but deletion tests will then
+    # TODO: On_delete should be CASCADE or PROTECT, but deletion tests will then
     # fail because XTDB does not know the table if we haven't inserted anything
     # yet.
     organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)

@@ -28,7 +28,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
 
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=network)
-    sl = ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id)
+    sl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 0
@@ -97,7 +97,7 @@ def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugi
 
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=network)
-    ScanLevel.objects.create(organization=organization.pk, object_type="hostname", object_id=host.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id, scan_level=2)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 1

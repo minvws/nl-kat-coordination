@@ -84,7 +84,7 @@
                             <tbody>
                                 {% for scan_level in scan_levels %}
                                     <tr>
-                                        <td>{{ scan_level.organization }}</td>
+                                        <td>{{ scan_level.organization.name }}</td>
                                         <td>
                                             {% include "partials/scan_level_indicator.html" with value=scan_level.scan_level %}
 
