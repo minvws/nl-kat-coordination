@@ -54,7 +54,7 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 # without it
 
 RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" && \
-    python manage.py collectstatic -l && python manage.py compress && python manage.py compilemessages
+    python manage.py collectstatic -l && python manage.py compilemessages
 
 RUN rm -rf tests
 

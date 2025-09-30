@@ -8,7 +8,6 @@ license = "EUPL-1.2"
 dependencies = [
   "celery[redis]>=5.5.3",
   "django-components==0.88",
-  "django-compressor",
   "django-csp>=4.0",
   "django-environ>=0.12.0",
   "django-filter>=25.1",
@@ -56,8 +55,6 @@ dev = [
 package = true
 
 [tool.uv.sources]
-django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
-django-compressor = { git = "https://github.com/dekkers/django-compressor.git", rev = "csp-nonce" }
 django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
 
 [build-system]
