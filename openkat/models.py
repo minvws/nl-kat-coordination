@@ -96,7 +96,7 @@ class OrganizationTag(tagulous.models.TagTreeModel):
 
 
 class Organization(models.Model):
-    id: int
+    id = models.BigAutoField(db_column="_id", primary_key=True, serialize=False, verbose_name="ID")
     name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
     code = LowerCaseSlugField(
         max_length=ORGANIZATION_CODE_LENGTH,
@@ -122,6 +122,21 @@ class Organization(models.Model):
             ("can_access_all_organizations", "Can access all organizations"),
             ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        # XTDB does not return the id after INSERT, so we need to tell Django
+        # that by setting db_returning_fields to empty.
+        orig = self._meta.db_returning_fields
+        self._meta.db_returning_fields = []
+        try:
+            # We change kwargs so that we override the arguments if they are already given in kwargs
+            kwargs["using"] = "xtdb"
+            kwargs["force_insert"] = True
+            super().save(**kwargs)
+        finally:
+            self._meta.db_returning_fields = orig
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])

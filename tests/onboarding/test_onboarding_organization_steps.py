@@ -10,6 +10,7 @@ from plugins.models import Plugin
 from tests.conftest import setup_request
 
 
+@pytest.mark.django_db(databases=["xtdb", "default"])
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def test_onboarding_introduction(request, member, rf):
     member = request.getfixturevalue(member)

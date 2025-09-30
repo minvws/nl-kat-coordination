@@ -38,9 +38,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "django-admin-auto-tests",
-    "factory-boy>=3.2.1",
-    "model-mommy>=2.0.0",
     # This is used by pytest-xdist to determine the number of physical and logical cores
     "psutil>=7.1.0",
     "pytest-cov>=6.0.0",

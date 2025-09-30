@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Organization",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("id", models.BigAutoField(db_column="_id", primary_key=True, serialize=False, verbose_name="ID")),
                 ("name", models.CharField(help_text="The name of the organisation", max_length=126, unique=True)),
                 (
                     "code",
