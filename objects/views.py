@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 import django_filters
 from django.conf import settings
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -31,6 +30,16 @@ class NetworkListView(FilterView):
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NetworkFilter
+
+    def get_queryset(self) -> "QuerySet[Network]":
+        scan_level_subquery = (
+            ScanLevel.objects.filter(object_type="network", object_id=OuterRef("id"))
+            .values("object_id")
+            .order_by()
+            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
+        )
+
+        return Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -120,7 +129,16 @@ class IPAddressListView(FilterView):
     filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
-        return IPAddress.objects.select_related("network")
+        scan_level_subquery = (
+            ScanLevel.objects.filter(object_type="ipaddress", object_id=OuterRef("id"))
+            .values("object_id")
+            .order_by()
+            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
+        )
+
+        return IPAddress.objects.select_related("network").annotate(
+            max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -181,13 +199,10 @@ class HostnameListView(FilterView):
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
-            .annotate(organizations=ArrayAgg("organization"))  # collect scan levels in subquery
         )
 
-        return (
-            Hostname.objects.select_related("network")
-            .annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            .annotate(organizations=Subquery(scan_level_subquery.values("organizations")))
+        return Hostname.objects.select_related("network").annotate(
+            max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
 
     def get_context_data(self, **kwargs):

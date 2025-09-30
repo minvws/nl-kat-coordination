@@ -47,7 +47,7 @@
                                         <a href="{% url 'objects:hostname_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                                     </td>
                                     <td>
-                                        {% if hostname.max_scan_level %}
+                                        {% if hostname.max_scan_level != None %}
                                             {% include "partials/scan_level_indicator.html" with value=hostname.max_scan_level %}
 
                                         {% else %}

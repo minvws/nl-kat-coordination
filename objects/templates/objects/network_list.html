@@ -32,6 +32,7 @@
                         <thead>
                             <tr>
                                 <th>{% translate "Name" %}</th>
+                                <th>{% translate "Max Scan Level" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -40,6 +41,14 @@
                                 <tr>
                                     <td>
                                         <a href="{% url 'objects:network_detail' network.pk %}">{{ network.name }}</a>
+                                    </td>
+                                    <td>
+                                        {% if network.max_scan_level != None %}
+                                            {% include "partials/scan_level_indicator.html" with value=network.max_scan_level %}
+
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="{% url 'objects:delete_network' network.pk %}" method="post">
