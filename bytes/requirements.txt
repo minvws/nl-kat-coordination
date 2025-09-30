@@ -71,13 +71,13 @@ bcrypt==4.3.0 \
     --hash=sha256:f6746e6fec103fcd509b96bacdfdaa2fbde9a553245dbada284435173a6f1aef \
     --hash=sha256:f81b0ed2639568bf14749112298f9e4e2b28853dab50a8b357e31798686a036d
     # via passlib
-boto3==1.40.38 \
-    --hash=sha256:932ebdd8dbf8ab5694d233df86d5d0950291e0b146c27cb46da8adb4f00f6ca4 \
-    --hash=sha256:fac337b4f0615e4d6ceee44686e662f51d8e57916ed2bc763468e3e8c611a658
+boto3==1.40.41 \
+    --hash=sha256:02eac942aaa9f3a1c8a11f77e6f971b41c125973888f80f3eb177c2f21ad7a01 \
+    --hash=sha256:2ea2463fc42812f3cab66b53114579b1f4b9a378ee48921d4385511a94307b24
     # via bytes
-botocore==1.40.38 \
-    --hash=sha256:18039009e1eca2bff12e576e8dd3c80cd9b312294f1469c831de03169582ad59 \
-    --hash=sha256:7d60a7557db3a58f9394e7ecec1f6b87495ce947eb713f29d53aee83a6e9dc71
+botocore==1.40.41 \
+    --hash=sha256:320873c6a34bfd64fb9bbc55e8ac38e7904a574cfc634d1f0f66b1490c62b89d \
+    --hash=sha256:8246bf73a2e20647cf1d4dae1e9a7c40f97f38a34a6a1fbfd49aa6b3dce5ffaa
     # via
     #   boto3
     #   s3transfer
@@ -255,9 +255,9 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11' \
     --hash=sha256:4d111e6e0c13d0644cad6ddaa7ed0261a0b36971f6d23e7ec9b4b9097da78a10 \
     --hash=sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88
     # via anyio
-fastapi-slim==0.116.1 \
-    --hash=sha256:37517a302492c30014979cff8d85f42ae5fbdbe4f8b5d0ceed81745bb3b23149 \
-    --hash=sha256:5dca6046d3a3e35eb733188649a9f883c9d49474b9b3255ecb8ec52a820fbb9f
+fastapi-slim==0.118.0 \
+    --hash=sha256:227564f4d67a289bffdd9aeb61c7b94c2e2c103661289e6661127452f770ea1c \
+    --hash=sha256:d0889515ca11e0a78c8074acb33c79a82a56ae65fd85c561e733424995d7eeb9
     # via bytes
 googleapis-common-protos==1.70.0 \
     --hash=sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257 \
