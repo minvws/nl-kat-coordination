@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <h1>{% translate "Upload IP Addresses from CSV" %}</h1>
+                <p>
+                    {% translate "Upload a CSV file with one column containing IP addresses. You can optionally select a network, otherwise the 'internet' network will be used by default." %}
+                </p>
+            </div>
+            <div>
+                <h2>{% translate "CSV Format" %}</h2>
+                <ul>
+                    <li>{% translate "One column per row with the IP address" %}</li>
+                    <li>
+                        {% translate "Example:" %} <code>192.168.1.1</code>
+                    </li>
+                    <li>{% translate "No header row required" %}</li>
+                </ul>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="button">{% translate "Upload" %}</button>
+                <a href="{% url 'objects:ipaddress_list' %}" class="button ghost">{% translate "Cancel" %}</a>
+            </form>
+        </section>
+    </main>
+{% endblock content %}
