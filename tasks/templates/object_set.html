@@ -17,6 +17,11 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
+                <div class="horizontal-view toolbar">
+                    <a class="button" href="{% url 'edit_object_set' pk=objectset.id %}">
+                        <span aria-hidden="true" class="icon ti-pencil"></span>{% translate "Edit" %}
+                    </a>
+                </div>
             </div>
             <div>
                 <h2>{% translate "Query" %}</h2>
@@ -31,13 +36,29 @@
                 </div>
             {% endif %}
             <div>
-                <h2>{% translate "Static objects" %}</h2>
-                {% if objectset.traverse_objects %}
+                <h2>{% translate "Manually Added Objects" %}</h2>
+                {% if objectset.all_objects %}
                     <ul>
-                        {% for object in objectset.traverse_objects %}<li>{{ object.value }} ({{ objectset.description }})</li>{% endfor %}
+                        {% for object in objectset.all_objects %}<li>{{ object }}</li>{% endfor %}
+                    </ul>
+                    <p>{% translate "Count:" %} {{ objectset.all_objects|length }}</p>
+                {% else %}
+                    <p>{% translate "No manually added objects." %}</p>
+                {% endif %}
+            </div>
+            <div>
+                <h2>{% translate "All Objects (Combined)" %}</h2>
+                <p>{% translate "This includes manually added objects, objects from the query, and objects from subsets." %}</p>
+                {% if objectset.traverse_objects %}
+                    <p>{% translate "Total count:" %} {{ objectset.traverse_objects|length }}</p>
+                    <ul>
+                        {% for object in objectset.traverse_objects|slice:":20" %}<li>{{ object }}</li>{% endfor %}
+                        {% if objectset.traverse_objects|length > 20 %}
+                            <li>... {% translate "and" %} {{ objectset.traverse_objects|length|add:"-20" }} {% translate "more" %}</li>
+                        {% endif %}
                     </ul>
                 {% else %}
-                    <p>{% translate "There are no static object for this object set." %}</p>
+                    <p>{% translate "No objects in this set." %}</p>
                 {% endif %}
             </div>
         </section>
