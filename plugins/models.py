@@ -69,6 +69,11 @@ class Plugin(models.Model):
     # Task specifications
     consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: revise
     recurrences = RecurrenceField(null=True, blank=True)  # If set, this is used as a default
+    batch_size = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Override the global BATCH_SIZE setting for this plugin. Set to 0 to disable batching.",
+    )
 
     # Image specifications
     oci_image = models.CharField(max_length=256, null=True)
