@@ -16,6 +16,7 @@ from django_filters.views import FilterView
 
 from objects.forms import HostnameCSVUploadForm, IPAddressCSVUploadForm
 from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel, ScanLevelEnum
+from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 
@@ -296,7 +297,7 @@ class FindingFilter(django_filters.FilterSet):
         fields = ["finding_type__code"]
 
 
-class FindingListView(FilterView):
+class FindingListView(OrganizationFilterMixin, FilterView):
     model = Finding
     template_name = "objects/finding_list.html"
     context_object_name = "findings"

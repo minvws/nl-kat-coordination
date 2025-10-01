@@ -1,3 +1,5 @@
+import time
+
 from celery import Celery
 
 from objects.models import Hostname, Network, ScanLevel
@@ -29,6 +31,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=network)
     sl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id)
+    time.sleep(0.1)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 0
@@ -98,6 +101,7 @@ def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugi
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=network)
     ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=host.id, scan_level=2)
+    time.sleep(0.1)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 1

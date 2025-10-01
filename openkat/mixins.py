@@ -200,3 +200,27 @@ class OrganizationAPIMixin:
                 ret = ret.replace(tzinfo=UTC)
 
             return ret
+
+
+class OrganizationFilterMixin:
+    """
+    Mixin to filter querysets by organization based on query parameter.
+
+    Usage: Add ?organization=<org_code> to filter objects by organization. Works with both ListView and DetailView.
+    """
+
+    def get_queryset(self):
+        queryset = super().get_queryset()  # type: ignore[misc]
+        organization_code = self.request.GET.get("organization")  # type: ignore[attr-defined]
+
+        if organization_code:
+            try:
+                organization = Organization.objects.get(code=organization_code)
+                if hasattr(queryset.model, "organization"):
+                    queryset = queryset.filter(organization=organization)
+                elif hasattr(queryset.model, "organization_id"):
+                    queryset = queryset.filter(organization_id=organization.id)
+            except Organization.DoesNotExist:
+                queryset = queryset.none()
+
+        return queryset

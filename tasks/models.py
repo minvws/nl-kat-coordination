@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import QuerySet
+from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -59,7 +60,10 @@ class ObjectSet(models.Model):
         if not self.object_query:
             return self.object_type.model_class().objects.none()
 
-        return apply_search(self.object_type.model_class().objects.all(), self.object_query)
+        try:
+            return apply_search(self.object_type.model_class().objects.all(), self.object_query)
+        except DjangoQLParserError:
+            return self.object_type.model_class().objects.none()
 
     def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
         # TODO: handle cycles
