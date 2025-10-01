@@ -60,10 +60,13 @@ def recalculate_scan_profiles(depth: int = 0) -> None:
     updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
     updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
 
+    logger.info("Recalculating %s Scan Profiles", len(updates))
+
     if not updates:
         return
 
     bulk_insert(updates)
+    logger.info("Recalculated %s Scan Profiles", len(updates))
 
     if depth < 10:  # We could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
         recalculate_scan_profiles(depth + 1)

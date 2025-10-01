@@ -1,7 +1,7 @@
+import argparse
 import json
 import os
 import re
-import sys
 from collections import defaultdict
 from os import getenv
 
@@ -17,6 +17,7 @@ from dns.rdtypes.ANY.TXT import TXT
 from dns.rdtypes.IN.A import A
 from dns.rdtypes.IN.AAAA import AAAA
 from dns.resolver import Answer
+from tldextract import tldextract
 
 DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"}
 
@@ -29,12 +30,43 @@ class ZoneNotFoundException(Exception):
     pass
 
 
-def get_record_types(arg: str) -> set[str]:
-    parsed_requested_record_types = map(lambda x: re.sub(r"[^A-Za-z]", "", x), arg.upper().split(","))
+def get_record_types(records: list[str]) -> set[str]:
+    parsed_requested_record_types = map(lambda x: re.sub(r"[^A-Za-z]", "", x.upper()), records)
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
-def run(hostname: str, record_types: set[str]) -> list:
+def mail_records(hostname: str) -> list:
+    resolver = dns.resolver.Resolver()
+    root_domain = tldextract.extract(hostname).registered_domain.rstrip(".")
+    results: list[dict[str, str | int]] = [
+        {"object_type": "Hostname", "network": "internet", "name": hostname.rstrip(".")},
+        {"object_type": "Hostname", "network": "internet", "name": root_domain},
+    ]
+
+    dmarc_results = get_email_security_records(resolver, root_domain, "_dmarc")
+
+    # dkim_results = get_email_security_records(resolver, hostname, "_domainkey")
+    # TODO: DKIM
+    # if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
+    #     results.append({"object_type": "DKIMExists", "hostname": hostname})
+
+    if dmarc_results not in ["NXDOMAIN", "Timeout"]:
+        for rrset in from_text(dmarc_results).answer:
+            for rr in rrset:
+                if isinstance(rr, TXT):
+                    results.append(
+                        {
+                            "object_type": "DNSTXTRecord",
+                            "hostname": root_domain,
+                            "value": str(rr).strip('"'),
+                            "ttl": rrset.ttl,
+                        }
+                    )
+
+    return results
+
+
+def generic_records(hostname: str, record_types: set[str]) -> list:
     resolver = dns.resolver.Resolver()
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
@@ -53,11 +85,8 @@ def run(hostname: str, record_types: set[str]) -> list:
         except dns.resolver.NXDOMAIN:
             return []
 
-    dmarc_results = get_email_security_records(resolver, hostname, "_dmarc")
-    dkim_results = get_email_security_records(resolver, hostname, "_domainkey")
-
-    if not answers and dmarc_results == "Timeout" and dkim_results == "Timeout":
-        raise TimeoutException("No answers from DNS-Server due to timeouts.")
+    if not answers:
+        return []
 
     hostname_store = {}
     record_store = []
@@ -72,7 +101,7 @@ def run(hostname: str, record_types: set[str]) -> list:
         return record
 
     # register argument hostname
-    input_hostname = register_hostname(hostname)
+    register_hostname(hostname)
 
     results: list[dict[str, str | int]] = []
 
@@ -131,24 +160,6 @@ def run(hostname: str, record_types: set[str]) -> list:
     results.extend(hostname_store.values())
     results.extend(record_store)
 
-    # DKIM
-    if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
-        results.append({"object_type": "DKIMExists", "hostname": input_hostname["name"]})
-
-    # DMARC
-    if dmarc_results not in ["NXDOMAIN", "Timeout"]:
-        for rrset in from_text(dmarc_results).answer:
-            for rr in rrset:
-                if isinstance(rr, TXT):
-                    results.append(
-                        {
-                            "object_type": "DNSTXTRecord",
-                            "hostname": input_hostname["name"],
-                            "value": str(rr).strip('"'),
-                            "ttl": rrset.ttl,
-                        }
-                    )
-
     return results
 
 
@@ -185,8 +196,19 @@ def main():
 
     headers = {"Authorization": "Token " + token}
     client = httpx.Client(base_url=base_url, headers=headers)
-    record_types = DEFAULT_RECORD_TYPES if len(sys.argv) < 3 else get_record_types(sys.argv[2])
-    results = run(sys.argv[1], record_types)
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("hostname")
+    parser.add_argument("record_types", nargs="*")
+    parser.add_argument("-m", action="store_true", dest="mail_server")
+    args = parser.parse_args()
+
+    record_types = DEFAULT_RECORD_TYPES if not args.record_types else get_record_types(args.record_types)
+
+    if args.mail_server:
+        results = mail_records(args.hostname)
+    else:
+        results = generic_records(args.hostname, record_types)
 
     if not results:
         return
@@ -196,7 +218,11 @@ def main():
     for result in results:
         results_grouped[result.pop("object_type").lower()].append(result)
 
-    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": results_grouped.pop("ipaddress")}
+    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": []}
+
+    if "ipaddress" in results_grouped:
+        hostnames_and_ips["ipaddress"] = results_grouped.pop("ipaddress")
+
     response = client.post("/objects/", headers=headers, json=hostnames_and_ips).json()
 
     by_name = {h["name"]: h["id"] for h in response["hostname"]}

@@ -148,6 +148,12 @@ class IPPort(models.Model):
 
 
 class Hostname(Asset):
+    class Q:
+        """A set of useful DjangoQL queries for Hostname"""
+
+        mail_server = "dnsmxrecord_mailserver_set != None"
+        name_server = "dnsnsrecord_nameserver_set != None"
+
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
     name: LowerCaseCharField = LowerCaseCharField()
 
