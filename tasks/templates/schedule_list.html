@@ -52,7 +52,11 @@
                             {% for schedule in schedule_list %}
                                 <tr data-schedule-id="{{ schedule.id }}">
                                     <td>
-                                        <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
+                                        {% if schedule.plugin %}
+                                            <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if schedule.object_set %}

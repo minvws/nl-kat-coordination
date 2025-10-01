@@ -18,6 +18,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
 from objects.models import Hostname, IPAddress
+from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
@@ -32,10 +33,10 @@ class TaskFilter(django_filters.FilterSet):
 
     class Meta:
         model = Task
-        fields = ["status", "organization", "data"]
+        fields = ["status", "data"]
 
 
-class TaskListView(FilterView):
+class TaskListView(OrganizationFilterMixin, FilterView):
     template_name = "task_list.html"
     fields = ["enabled_plugins"]
     model = Task
@@ -67,13 +68,13 @@ class TaskListView(FilterView):
         return context
 
 
-class TaskDetailView(DetailView):
+class TaskDetailView(OrganizationFilterMixin, DetailView):
     template_name = "task.html"
     model = Task
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin"] = Plugin.objects.get(plugin_id=self.task.data["plugin_id"])
+        context["plugin"] = Plugin.objects.get(plugin_id=self.object.data["plugin_id"])
         context["breadcrumbs"] = [
             {"url": reverse("task_list"), "text": _("Plugins")},
             {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
@@ -165,10 +166,10 @@ class ScheduleFilter(django_filters.FilterSet):
 
     class Meta:
         model = Schedule
-        fields = ["plugin__plugin_id", "object_set", "organization", "enabled"]
+        fields = ["plugin__plugin_id", "object_set", "enabled"]
 
 
-class ScheduleListView(FilterView):
+class ScheduleListView(OrganizationFilterMixin, FilterView):
     template_name = "schedule_list.html"
     model = Schedule
     ordering = ["-id"]
@@ -236,7 +237,7 @@ class ObjectSetForm(ModelForm):
         return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
 
 
-class ScheduleDetailView(DetailView):
+class ScheduleDetailView(OrganizationFilterMixin, DetailView):
     template_name = "schedule.html"
     model = Schedule
 
@@ -346,7 +347,7 @@ class ObjectSetFilter(django_filters.FilterSet):
         fields = ["name", "description", "object_query"]
 
 
-class ObjectSetListView(FilterView):
+class ObjectSetListView(OrganizationFilterMixin, FilterView):
     template_name = "object_set_list.html"
     model = ObjectSet
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
@@ -359,7 +360,7 @@ class ObjectSetListView(FilterView):
         return context
 
 
-class ObjectSetDetailView(DetailView):
+class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
     template_name = "object_set.html"
     model = ObjectSet
     PREVIEW_SIZE = 20

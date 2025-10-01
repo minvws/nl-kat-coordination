@@ -1,26 +1,26 @@
 {% load i18n %}
 
-{% if organizations_including_blocked|length > 0 %}
-    <div class="dropdown">
-        <button aria-controls="change-organization"
-                aria-expanded="false"
-                class="dropdown-button ghost">
-            {% if not organization.code %}
-                {% translate "Select organization" %}
-            {% else %}
-                {{ organization.name }}
-            {% endif %}
-            <span class="icon ti-chevron-down"></span>
-        </button>
-        <div id="change-organization" class="dropdown-list">
-            <ul>
+<div class="dropdown">
+    <button aria-controls="change-organization"
+            aria-expanded="false"
+            class="dropdown-button ghost">
+        {% if not organization.code %}
+            {% translate "Select organization" %}
+        {% else %}
+            {{ organization.name }}
+        {% endif %}
+        <span class="icon ti-chevron-down"></span>
+    </button>
+    <div id="change-organization" class="dropdown-list">
+        <ul>
+            <li>
+                <a href="?">{% translate "All organizations" %}</a>
+            </li>
+            {% for org in organizations_including_blocked %}
                 <li>
-                    <a href="{% url "plugin_list" %}">{% translate "All organizations" %}</a>
+                    <a href="?organization={{ org.code }}">{{ org.name }}</a>
                 </li>
-                {% for org in organizations_including_blocked %}
-                    {% if organization.code != org.code %}<li>{{ org.name }}</li>{% endif %}
-                {% endfor %}
-            </ul>
-        </div>
+            {% endfor %}
+        </ul>
     </div>
-{% endif %}
+</div>

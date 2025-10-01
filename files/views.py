@@ -9,6 +9,7 @@ from django.views.generic import CreateView
 from django_filters.views import FilterView
 
 from files.models import File
+from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 
 logger = structlog.get_logger(__name__)
@@ -41,7 +42,12 @@ class FileListView(FilterView):
             qs = qs.filter(task_result__task__id=self.request.GET["task_id"])
 
         if "organization" in self.request.GET:
-            qs = qs.filter(task_result__task__organization=self.request.GET["organization"])
+            organization_code = self.request.GET["organization"]
+            try:
+                organization = Organization.objects.get(code=organization_code)
+                qs = qs.filter(task_result__task__organization=organization)
+            except Organization.DoesNotExist:
+                qs = qs.none()
 
         if "plugin_id" in self.request.GET:
             qs = qs.filter(task_result__task__data__plugin_id=self.request.GET["plugin_id"])

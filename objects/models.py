@@ -102,7 +102,7 @@ class FindingType(models.Model):
 
 
 class Finding(models.Model):
-    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
     finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
 
     object_type: LowerCaseCharField = LowerCaseCharField()
