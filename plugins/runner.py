@@ -19,7 +19,8 @@ from plugins.models import Plugin
 class PluginRunner:
     def __init__(
         self,
-        override_entrypoint: str = "/bin/runner",
+        override_entrypoint: str = "/bin/runner",  # Path to the entrypoint binary inside the container.
+        # Path to the entrypoint binary on the host system, which will be mounted into the container.
         adapter: Path = Path(settings.HOST_MOUNT_DIR) / "plugins" / "plugins" / "entrypoint" / "main",
     ):
         self.entrypoint = override_entrypoint
@@ -35,22 +36,89 @@ class PluginRunner:
         cli: bool = False,
         parallelism: int | None = None,  # TODO: auto-parallelism
     ) -> str:
+        """
+        Execute a plugin with different execution modes based on target type and plugin configuration.
+
+        MODE 1 - Direct Argument (has placeholders, single target):
+            - target: "example.com"
+            - oci_arguments: ["tool", "{hostname}"]
+            - Result: Runs as: tool example.com
+            - No temporary file created
+
+        MODE 2 - Standalone (no target):
+            - target: None
+            - oci_arguments: ["tool", "--fetch-url", "..."]
+            - Result: Runs command as-is, no target substitution
+            - Plugin fetches its own data
+
+        MODE 3 - Sequential (has placeholders, list of targets):
+            - target: ["example.com", "test.org"]
+            - oci_arguments: ["tool", "{hostname}"]
+            - Result: Runs tool example.com, then tool test.org (sequentially)
+            - Each target runs in a separate container
+            - Logs are concatenated
+
+        MODE 4 - Bulk stdin (NO placeholders, single or list of targets):
+            - target: "example.com" OR ["example.com", "test.org"]
+            - oci_arguments: ["xargs", "-I", "%", "tool", "%"]
+            - Result: Creates temp file with target(s) (newline-separated if list)
+            - Sets IN_FILE environment variable
+            - Entrypoint pipes file to plugin's stdin
+            - Often uses xargs for parallel processing
+            - Note: Single string target is converted to single-item list
+
+        MODE 5 - File Processing (has {file} placeholder):
+            - target: "<file_id>"
+            - oci_arguments: ["tool", "{file}"]
+            - Result: Replaces {file} with file_id, entrypoint fetches file
+
+        CRITICAL: When oci_arguments has NO bracketed placeholders ({...}),
+        data is passed via stdin through the entrypoint adapter, NOT as arguments.
+        Single string targets are automatically converted to single-item lists
+        to enable consistent stdin processing (MODE 4).
+
+        Args:
+            plugin_id: Unique identifier of the plugin to run
+            target: The target(s) to process. Can be:
+                - str: Single target (hostname, IP, file_id, etc.)
+                - list[str]: Multiple targets
+                - None: No target (plugin fetches own data)
+            output: Where to send results:
+                - "file": Upload to OpenKAT API (default)
+                - "-": Output to stdout (for CLI usage)
+            task_id: Optional task UUID to associate uploaded files with
+            keep: If True, don't remove container after execution (for debugging)
+            cli: If True, return the docker command instead of running it
+            parallelism: Intended for parallel execution of list targets (currently disabled)
+
+        Returns:
+            Plugin output as string (stdout if output="-", otherwise container logs)
+
+        Raises:
+            ContainerError: If the plugin exits with non-zero status
+            ValueError: If target type is not supported
+        """
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
         tmp_file = None
 
         if isinstance(target, str):
-            if not plugin.types_in_arguments():
-                tmp_file = File.objects.create(file=TemporaryContent(target))
+            # MODE 1
+            if plugin.types_in_arguments():
+                command = self.create_command(plugin.oci_arguments, target)
+            else:
+                # This merges old MODE 2 into MODE 4
+                target = [target]
 
-            command = self.create_command(plugin.oci_arguments, target)
-        elif target is None:
+        # MODE 2
+        if target is None:
             command = plugin.oci_arguments
-        elif isinstance(target, list):
-            if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
-                # This plugin expects one target object at a time.
 
+        # MODE 3 & 4: List of targets
+        if isinstance(target, list):
+            # MODE 3: Has placeholders = sequential execution mode
+            if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
                 if len(target) == 1:
                     return self.run(plugin_id, target[0], output, task_id, keep, cli)
 
@@ -66,16 +134,22 @@ class PluginRunner:
                         logs.append(f"Failed to process target: {t}")
 
                 return "\n".join(logs)  # Return the output merged
+
+            # MODE 4: NO placeholders = bulk stdin mode
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
                 command = plugin.oci_arguments
-        else:
+
+        if not isinstance(target, (str, list, type(None))):
             raise ValueError(f"Unsupported target type: {type(target)}")
 
+        # Set IN_FILE for stdin modes (entrypoint reads this file and pipes to plugin)
         if tmp_file:
             environment["IN_FILE"] = str(tmp_file.id)
+
+        # Configure where plugin output should go
         if use_stdout:
-            environment["UPLOAD_URL"] = "/dev/null"
+            environment["UPLOAD_URL"] = "/dev/null"  # CLI mode: don't upload
         elif task_id:
             environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={task_id}"
         else:
@@ -161,6 +235,22 @@ class PluginRunner:
         return b"".join(out).decode()
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
+        """
+        Generate the equivalent docker run command for manual execution.
+
+        This is useful for debugging plugins locally. The user must set their own
+        OPENKAT_TOKEN environment variable before running the command.
+
+        Args:
+            command: The plugin command to execute
+            environment: Environment variables to pass to the container
+            keep: Whether to keep the container after execution
+            plugin: The plugin being executed
+
+        Returns:
+            A complete docker run command as a string
+        """
+
         environment["OPENKAT_TOKEN"] = "$OPENKAT_TOKEN"  # We assume the user has set its own token if needed
         rm = "--rm" if not keep else ""
         envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
@@ -172,6 +262,22 @@ class PluginRunner:
 
     @staticmethod
     def create_token(plugin_id: str) -> tuple[User, AuthToken]:
+        """
+        Create a temporary user and auth token for the plugin to use.
+
+        The plugin gets limited permissions:
+        - Can view and add files (for uploading results)
+        - Can view/add/change/delete all object types (Network, Hostname, IPAddress, etc.)
+
+        The token expires after PLUGIN_TIMEOUT minutes and is deleted after the plugin completes.
+
+        Args:
+            plugin_id: Identifier of the plugin (used as the user's full_name)
+
+        Returns:
+            Tuple of (temporary_user, auth_token)
+        """
+
         plugin_user = User(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
         plugin_user.set_unusable_password()
         plugin_user.save()
@@ -193,6 +299,32 @@ class PluginRunner:
 
     @staticmethod
     def create_command(args: list[str], target: str) -> list[str]:
+        """
+        Replace bracketed placeholders in oci_arguments with the actual target value.
+
+        This enables MODE 1 (Direct Argument) execution where targets are passed
+        as command-line arguments to the plugin.
+
+        Supported placeholders:
+        - {file}: File ID from previous plugin output
+        - {hostname}: Hostname target
+        - {ipaddress}: IP address target
+        - {hostname|ipaddress}: Either hostname or IP
+        - {ipaddress|hostname}: Either IP or hostname
+
+        Example:
+            args: ["tool", "--target", "{hostname}"]
+            target: "example.com"
+            Result: ["tool", "--target", "example.com"]
+
+        Args:
+            args: The oci_arguments list from the plugin configuration
+            target: The target value to substitute into placeholders
+
+        Returns:
+            New list with placeholders replaced by target value
+        """
+
         format_map = {"{file}": target}
         format_map["{ipaddress}"] = target
         format_map["{hostname}"] = target
