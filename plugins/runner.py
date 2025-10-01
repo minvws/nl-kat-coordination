@@ -71,6 +71,11 @@ class PluginRunner:
             - target: "<file_id>"
             - oci_arguments: ["tool", "{file}"]
             - Result: Replaces {file} with file_id, entrypoint fetches file
+            - Alternative: Static file reference using {file/<id>} notation
+              * oci_arguments: ["tool", "{file/123}"]
+              * No target needed - file ID is embedded in the argument
+              * Useful for creating plugins that always process specific files
+              * Can be set via file list "Add to plugin" button
 
         CRITICAL: When oci_arguments has NO bracketed placeholders ({...}),
         data is passed via stdin through the entrypoint adapter, NOT as arguments.
@@ -306,16 +311,26 @@ class PluginRunner:
         as command-line arguments to the plugin.
 
         Supported placeholders:
-        - {file}: File ID from previous plugin output
+        - {file}: File ID from previous plugin output (replaced with target value)
+        - {file/<id>}: Static file reference (e.g., {file/123} stays as-is)
         - {hostname}: Hostname target
         - {ipaddress}: IP address target
         - {hostname|ipaddress}: Either hostname or IP
         - {ipaddress|hostname}: Either IP or hostname
 
+        Note: Static file references like {file/123} are NOT replaced by this function
+        and remain in the arguments as-is. The entrypoint adapter will recognize and
+        fetch these files by their embedded IDs.
+
         Example:
             args: ["tool", "--target", "{hostname}"]
             target: "example.com"
             Result: ["tool", "--target", "example.com"]
+
+        Example with static file reference:
+            args: ["tool", "--config", "{file/123}"]
+            target: "example.com"
+            Result: ["tool", "--config", "{file/123}"]  # {file/123} preserved
 
         Args:
             args: The oci_arguments list from the plugin configuration
