@@ -206,46 +206,21 @@ class OrganizationFilterMixin:
     """
     Mixin to filter querysets by organization based on query parameter.
 
-    Usage: Add ?organization=<org_code> or ?organization=<code1>&organization=<code2>
-    to filter objects by one or multiple organizations. Works with both ListView and DetailView.
+    Usage: Add ?organization=<org_code> to filter objects by organization. Works with both ListView and DetailView.
     """
 
     def get_queryset(self):
         queryset = super().get_queryset()  # type: ignore[misc]
-        organization_codes = self.request.GET.getlist("organization")  # type: ignore[attr-defined]
+        organization_code = self.request.GET.get("organization")  # type: ignore[attr-defined]
 
-        if organization_codes:
-            organizations = Organization.objects.filter(code__in=organization_codes)
-
-            if organizations.exists():
+        if organization_code:
+            try:
+                organization = Organization.objects.get(code=organization_code)
                 if hasattr(queryset.model, "organization"):
-                    queryset = queryset.filter(organization__in=organizations)
+                    queryset = queryset.filter(organization=organization)
                 elif hasattr(queryset.model, "organization_id"):
-                    queryset = queryset.filter(organization_id__in=[org.id for org in organizations])
-            else:
+                    queryset = queryset.filter(organization_id=organization.id)
+            except Organization.DoesNotExist:
                 queryset = queryset.none()
 
         return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # type: ignore[misc]
-        organization_codes = self.request.GET.getlist("organization")  # type: ignore[attr-defined]
-
-        if organization_codes:
-            filtered_organizations = list(Organization.objects.filter(code__in=organization_codes))
-            context["filtered_organizations"] = filtered_organizations
-            context["filtered_organization_codes"] = organization_codes
-
-            if len(filtered_organizations) == 1:
-                context["organization"] = filtered_organizations[0]
-
-        # Always build query string without organization params for URL building in template
-        query_params = self.request.GET.copy()  # type: ignore[attr-defined]
-        query_params.pop("organization", None)
-        context["query_string_without_organization"] = query_params.urlencode()
-
-        # Always provide filtered_organization_codes (empty list if none) for template
-        if "filtered_organization_codes" not in context:
-            context["filtered_organization_codes"] = []
-
-        return context
