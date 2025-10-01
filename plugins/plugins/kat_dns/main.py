@@ -39,30 +39,26 @@ def mail_records(hostname: str) -> list:
     resolver = dns.resolver.Resolver()
     root_domain = tldextract.extract(hostname).registered_domain.rstrip(".")
     results: list[dict[str, str | int]] = [
-        {"object_type": "Hostname", "network": "internet", "name": hostname},
-        {"object_type": "Hostname", "network": "internet", "name": root_domain, "root": True},
+        {"object_type": "Hostname", "network": "internet", "name": hostname.rstrip(".")},
+        {"object_type": "Hostname", "network": "internet", "name": root_domain},
     ]
 
-    for domain in [root_domain, hostname]:
-        dmarc_results = get_email_security_records(resolver, domain, "_dmarc")
+    dmarc_results = get_email_security_records(resolver, root_domain, "_dmarc")
 
-        # dkim_res = get_email_security_records(resolver, hostname, "_domainkey")
-        # TODO: DKIM
-        # if dkim_res not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_res.split("\n")[2] == "rcode NOERROR":
-        #     results.append({"object_type": "DKIMExists", "hostname": hostname})
+    # dkim_results = get_email_security_records(resolver, hostname, "_domainkey")
+    # TODO: DKIM
+    # if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"] and dkim_results.split("\n")[2] == "rcode NOERROR":
+    #     results.append({"object_type": "DKIMExists", "hostname": hostname})
 
-        if dmarc_results in ["NXDOMAIN", "Timeout"]:
-            continue
-
+    if dmarc_results not in ["NXDOMAIN", "Timeout"]:
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
                 if isinstance(rr, TXT):
                     results.append(
                         {
                             "object_type": "DNSTXTRecord",
-                            "hostname": f"{domain}",
+                            "hostname": root_domain,
                             "value": str(rr).strip('"'),
-                            "prefix": "_dmarc",
                             "ttl": rrset.ttl,
                         }
                     )
@@ -210,7 +206,7 @@ def main():
     record_types = DEFAULT_RECORD_TYPES if not args.record_types else get_record_types(args.record_types)
 
     if args.mail_server:
-        results = mail_records(args.hostname.rstrip("."))
+        results = mail_records(args.hostname)
     else:
         results = generic_records(args.hostname, record_types)
 
