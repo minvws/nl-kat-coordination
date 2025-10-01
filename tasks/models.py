@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import QuerySet
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -44,8 +45,7 @@ class Operation(models.TextChoices):
 class ObjectSet(models.Model):
     """Composite-like model representing a set of objects that can be used as an input for tasks"""
 
-    # TODO: organization field?
-    name = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=100, blank=True, null=True, unique=True)
     description = models.TextField(blank=True)
     dynamic = models.BooleanField(default=False)  # TODO
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -55,23 +55,11 @@ class ObjectSet(models.Model):
     all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def get_query_objects(self) -> list[int]:
-        """Get objects from object_query using DjangoQL"""
+    def get_query_objects(self) -> QuerySet:
         if not self.object_query:
-            return []
+            return self.object_type.model_class().objects.none()
 
-        try:
-            # Get the model class from the content type
-            model_class = self.object_type.model_class()
-
-            # Apply the DjangoQL query
-            queryset = apply_search(model_class.objects.all(), self.object_query, model_class)
-
-            # Return primary keys as integers
-            return [obj.pk for obj in queryset]
-        except Exception:
-            # If query fails, return empty list
-            return []
+        return apply_search(self.object_type.model_class().objects.all(), self.object_query)
 
     def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
         # TODO: handle cycles
@@ -82,7 +70,7 @@ class ObjectSet(models.Model):
 
         # Add objects from object_query
         query_objects = self.get_query_objects()
-        all_objects.extend(query_objects)
+        all_objects.extend([x.pk for x in query_objects])
 
         # Add objects from subsets if we haven't exceeded max depth
         if depth < max_depth:

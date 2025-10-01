@@ -16,7 +16,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
-from djangoql.queryset import apply_search
 
 from objects.models import Hostname, IPAddress
 from openkat.models import Organization
@@ -375,13 +374,8 @@ class ObjectSetDetailView(DetailView):
         obj = self.get_object()
 
         if obj.object_query is not None and obj.dynamic is True:
-            model_qs = obj.object_type.model_class().objects.all()
-
-            if obj.object_query:
-                model_qs = apply_search(model_qs, obj.object_query)
-
-            # TODO: check scan profile
-            context["objects"] = model_qs[: self.PREVIEW_SIZE]
+            # TODO: check scan profiles?
+            context["objects"] = obj.get_query_objects()[: self.PREVIEW_SIZE]
         else:
             context["objects"] = None
 

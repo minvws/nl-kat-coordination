@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import recurrence
 import structlog
@@ -102,16 +103,25 @@ class Plugin(models.Model):
 
         return tag or "latest"
 
-    def types_in_arguments(self) -> list[type[Model]]:
+    def types_in_arguments(self) -> list[type[Model] | str]:
         result = []
+        models = object_type_by_name()
 
-        for model_name, model in object_type_by_name().items():
-            for arg in self.oci_arguments:
+        for arg in self.oci_arguments:
+            is_model = False
+            for model_name, model in models.items():
                 if "{" + model_name.lower() + "}" in arg.lower():
                     result.append(model)
+                    is_model = True
                     break
 
-        return result
+            if not is_model:
+                result.extend(re.findall(r"{([^}]+)}", arg))
+
+        results = set(result)
+        results.discard("file")
+
+        return list(results)
 
     def files_in_arguments(self):
         results = []
@@ -121,15 +131,26 @@ class Plugin(models.Model):
 
         return results
 
-    def consumed_types(self) -> list[type[Model]]:
+    def consumed_types(self) -> list[type[Model] | str]:
         result = self.types_in_arguments()
-        for model_name, model in object_type_by_name().items():
-            for consume in self.consumes:
-                if consume.startswith("type:") and consume.lstrip("type:").lower() == model_name.lower():
-                    result.append(model)
-                    break
+        for consume in self.consumes:
+            is_model = False
 
-        return result
+            for model_name, model in object_type_by_name().items():
+                if not consume.startswith("type:") or consume.lstrip("type:").lower() != model_name.lower():
+                    continue
+
+                result.append(model)
+                is_model = True
+                break
+
+            if not is_model:
+                result.extend(re.findall(r"{([^}]+)}", consume))
+
+        results = set(result)
+        results.discard("file")
+
+        return list(results)
 
     def enabled_organizations(self) -> QuerySet:
         orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
@@ -216,17 +237,28 @@ class EnabledPlugin(models.Model):
             return
 
         queries = []
-        for ooi_type in self.plugin.consumed_types():
-            if ooi_type == Hostname:
-                queries.append((ContentType.objects.get_for_model(Hostname), "", "All hostnames"))
-            if ooi_type == IPAddress:
-                queries.append((ContentType.objects.get_for_model(IPAddress), "", "All IPs"))
+        consumed_types = self.plugin.consumed_types()
+
+        if Hostname in consumed_types:
+            consumed_types.remove(Hostname)
+            queries.append((ContentType.objects.get_for_model(Hostname), "", "All hostnames"))
+        if IPAddress in consumed_types:
+            consumed_types.remove(IPAddress)
+            queries.append((ContentType.objects.get_for_model(IPAddress), "", "All IPs"))
+
+        # Schedule object sets
+        object_sets = list(
+            ObjectSet.objects.filter(name__in=[name for name in consumed_types if isinstance(name, str)])
+        )
 
         # This is possibly the first time enabling the plugin for the organization
         for object_type, query, name in queries:
-            object_set, created = ObjectSet.objects.get_or_create(
+            new, created = ObjectSet.objects.get_or_create(
                 name=name, object_type=object_type, object_query=query, dynamic=True
             )
+            object_sets.append(new)
+
+        for object_set in object_sets:
             Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,
@@ -240,7 +272,7 @@ class EnabledPlugin(models.Model):
                 ),
             )
 
-        if not queries:
+        if not object_sets:
             Schedule.objects.create(
                 plugin=self.plugin,
                 enabled=self.enabled,

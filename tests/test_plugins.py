@@ -5,11 +5,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
-from objects.models import Hostname, IPAddress, IPPort
+from objects.models import DNSMXRecord, Hostname, IPAddress, IPPort, Network
 from plugins.models import EnabledPlugin, Plugin
 from plugins.runner import PluginRunner
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
-from tasks.models import Schedule
+from tasks.models import ObjectSet, Schedule
 from tests.conftest import setup_request
 
 
@@ -170,6 +170,35 @@ def test_enabling_plugin_creates_schedule():
     assert len(schedule.object_set.traverse_objects()) == 0
 
 
+def test_enabling_plugin_creates_schedule_with_predefined_object_set(xtdb):
+    plugin = Plugin.objects.create(name="test", plugin_id="testt", oci_arguments=["test", "{mail_server}"])
+    plugin.enable()
+
+    # The "mail_server" object set does not exist yet
+    assert Schedule.objects.filter(plugin=plugin).first().object_set is None
+
+    EnabledPlugin.objects.all().delete()
+    Schedule.objects.all().delete()
+
+    ObjectSet.objects.create(
+        name="mail_server", object_type=ContentType.objects.get_for_model(Hostname), object_query=Hostname.Q.mail_server
+    )
+    plugin.enable()
+
+    schedule = Schedule.objects.filter(plugin=plugin).first()
+    assert schedule.object_set is not None
+    assert schedule.object_set.object_query == "dnsmxrecord_mailserver_set != None"
+    assert schedule.object_set.object_type == ContentType.objects.get_for_model(Hostname)
+    assert len(schedule.object_set.traverse_objects()) == 0
+
+    host = Hostname.objects.create(network=Network.objects.create(), name="test.com")
+    mail = Hostname.objects.create(network=Network.objects.create(), name="mail.com")
+    DNSMXRecord.objects.create(hostname=host, mail_server=mail)
+
+    assert list(schedule.object_set.get_query_objects()) == [mail]
+    assert schedule.object_set.traverse_objects() == [mail.pk]
+
+
 def test_enabled_organizations(organization, organization_b):
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
@@ -222,7 +251,9 @@ def test_arguments():
     ).types_in_arguments() == [Hostname]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{HOSTNAME}"]).types_in_arguments() == [Hostname]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress}"]).types_in_arguments() == [IPAddress]
-    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress|hostname}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["test", "{ipaddress|hostname}"]).types_in_arguments() == [
+        "ipaddress|hostname"
+    ]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).types_in_arguments() == [IPPort]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipport}"]).types_in_arguments() == [IPPort]
     assert set(Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "{ipaddress}"]).types_in_arguments()) == {
@@ -232,8 +263,8 @@ def test_arguments():
 
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).types_in_arguments() == []
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).types_in_arguments() == []
-    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).types_in_arguments() == []
-    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).types_in_arguments() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).types_in_arguments() == ["bla"]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).types_in_arguments() == ["Protocol"]
     assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).types_in_arguments() == []
     assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).types_in_arguments() == []
 
@@ -244,8 +275,8 @@ def test_arguments():
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{ipport}", "test"]).consumed_types() == [IPPort]
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{}"]).consumed_types() == []
     assert Plugin(name="t", plugin_id="t", oci_arguments=["{file}"]).consumed_types() == []
-    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).consumed_types() == []
-    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).consumed_types() == []
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{bla}"]).consumed_types() == ["bla"]
+    assert Plugin(name="t", plugin_id="t", oci_arguments=["{Protocol}"]).consumed_types() == ["Protocol"]
     assert Plugin(name="t", plugin_id="t", consumes=["type:hostname"]).consumed_types() == [Hostname]
     assert Plugin(name="t", plugin_id="t", consumes=["type:HOSTNAME"]).consumed_types() == [Hostname]
 
