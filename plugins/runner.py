@@ -71,14 +71,9 @@ class PluginRunner:
             - target: "<file_id>"
             - oci_arguments: ["tool", "{file}"]
             - Result: Replaces {file} with file_id, entrypoint fetches file
-            - Alternative: Static file reference using {file/<id>} notation
-              * oci_arguments: ["tool", "{file/123}"]
-              * No target needed - file ID is embedded in the argument
-              * Useful for creating plugins that always process specific files
-              * Can be set via file list "Add to plugin" button
 
         CRITICAL: When oci_arguments has NO bracketed placeholders ({...}),
-        data is passed via stdin through the entrypoint adapter, not as arguments.
+        data is passed via stdin through the entrypoint adapter, NOT as arguments.
         Single string targets are automatically converted to single-item lists
         to enable consistent stdin processing (MODE 4).
 
@@ -108,9 +103,6 @@ class PluginRunner:
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
         tmp_file = None
 
-        # MODE 2
-        command = plugin.oci_arguments
-
         if isinstance(target, str):
             # MODE 1
             if plugin.types_in_arguments():
@@ -118,6 +110,10 @@ class PluginRunner:
             else:
                 # This merges old MODE 2 into MODE 4
                 target = [target]
+
+        # MODE 2
+        if target is None:
+            command = plugin.oci_arguments
 
         # MODE 3 & 4: List of targets
         if isinstance(target, list):
@@ -142,6 +138,7 @@ class PluginRunner:
             # MODE 4: NO placeholders = bulk stdin mode
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
+                command = plugin.oci_arguments
 
         if not isinstance(target, (str, list, type(None))):
             raise ValueError(f"Unsupported target type: {type(target)}")
@@ -309,24 +306,16 @@ class PluginRunner:
         as command-line arguments to the plugin.
 
         Supported placeholders:
-        - {file}: File ID from previous plugin output (replaced with target value)
-        - {file/<id>}: Static file reference (e.g., {file/123} stays as-is)
+        - {file}: File ID from previous plugin output
         - {hostname}: Hostname target
         - {ipaddress}: IP address target
-
-        Note: Static file references like {file/123} are NOT replaced by this function
-        and remain in the arguments as-is. The entrypoint adapter will recognize and
-        fetch these files by their embedded IDs.
+        - {hostname|ipaddress}: Either hostname or IP
+        - {ipaddress|hostname}: Either IP or hostname
 
         Example:
             args: ["tool", "--target", "{hostname}"]
             target: "example.com"
             Result: ["tool", "--target", "example.com"]
-
-        Example with static file reference:
-            args: ["tool", "--config", "{file/123}"]
-            target: "example.com"
-            Result: ["tool", "--config", "{file/123}"]  # {file/123} preserved
 
         Args:
             args: The oci_arguments list from the plugin configuration
@@ -339,7 +328,8 @@ class PluginRunner:
         format_map = {"{file}": target}
         format_map["{ipaddress}"] = target
         format_map["{hostname}"] = target
-        format_map["{mail_server}"] = target
+        format_map["{hostname|ipaddress}"] = target
+        format_map["{ipaddress|hostname}"] = target
 
         new_args = []
 
