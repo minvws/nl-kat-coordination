@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, IPAddress, IPPort
 from plugins.models import EnabledPlugin, Plugin
+from plugins.runner import PluginRunner
 from plugins.views import EnabledPluginUpdateView, EnabledPluginView, PluginDeleteView, PluginListView
 from tasks.models import Schedule
 from tests.conftest import setup_request
@@ -250,3 +251,21 @@ def test_arguments():
 
     assert Plugin(name="t", plugin_id="t", consumes=["file:type"]).files_in_arguments() == ["type"]
     assert Plugin(name="t", plugin_id="t").files_in_arguments() == []
+
+
+def test_plugin_runner_mode_4_stdin_single_and_multiple():
+    Plugin.objects.create(name="testnmae", plugin_id="test-no-placeholders", oci_arguments=["No", "placeholders"])
+
+    runner = PluginRunner()
+
+    result = runner.run("test-no-placeholders", "example.com", cli=True)
+    assert "docker run" in result
+    assert "IN_FILE=" in result
+
+    result = runner.run("test-no-placeholders", ["example.com", "test.org"], cli=True)
+    assert "docker run" in result
+    assert "IN_FILE=" in result
+
+    result = runner.run("test-no-placeholders", None, cli=True)
+    assert "docker run" in result
+    assert "IN_FILE=" not in result
