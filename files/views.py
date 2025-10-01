@@ -9,6 +9,7 @@ from django.views.generic import CreateView
 from django_filters.views import FilterView
 
 from files.models import File
+from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 
@@ -25,7 +26,7 @@ class FileFilter(django_filters.FilterSet):
         fields = ["file", "task_result__task__data", "organizations__name"]
 
 
-class FileListView(FilterView):
+class FileListView(OrganizationFilterMixin, FilterView):
     template_name = "file_list.html"
     model = File
     ordering = ["-id"]
@@ -33,26 +34,28 @@ class FileListView(FilterView):
     filterset_class = FileFilter
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        # Get base queryset without organization filtering
+        queryset = File.objects.all()
 
         if not self.request.user.can_access_all_organizations:
-            qs = qs.filter(organizations__members__user=self.request.user)
+            queryset = queryset.filter(organizations__members__user=self.request.user)
 
         if "task_id" in self.request.GET:
-            qs = qs.filter(task_result__task__id=self.request.GET["task_id"])
+            queryset = queryset.filter(task_result__task__id=self.request.GET["task_id"])
 
-        if "organization" in self.request.GET:
-            organization_code = self.request.GET["organization"]
-            try:
-                organization = Organization.objects.get(code=organization_code)
-                qs = qs.filter(task_result__task__organization=organization)
-            except Organization.DoesNotExist:
-                qs = qs.none()
+        # Handle organization filtering for task__organization relationship
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes:
+            organizations = Organization.objects.filter(code__in=organization_codes)
+            if organizations.exists():
+                queryset = queryset.filter(task_result__task__organization__in=organizations)
+            else:
+                queryset = queryset.none()
 
         if "plugin_id" in self.request.GET:
-            qs = qs.filter(task_result__task__data__plugin_id=self.request.GET["plugin_id"])
+            queryset = queryset.filter(task_result__task__data__plugin_id=self.request.GET["plugin_id"])
 
-        return qs
+        return queryset.order_by(*self.ordering)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
