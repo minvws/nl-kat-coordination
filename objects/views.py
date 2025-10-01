@@ -199,7 +199,24 @@ class HostnameScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        hostname_id = self.kwargs.get("pk")
+        organization = form.cleaned_data["organization"]
+        scan_level_value = form.cleaned_data["scan_level"]
+
+        # Use get_or_create to avoid duplicates
+        scan_level, created = ScanLevel.objects.get_or_create(
+            object_id=hostname_id,
+            object_type="hostname",
+            organization=organization,
+            defaults={"scan_level": scan_level_value, "declared": True},
+        )
+
+        # If it already existed, update the scan level
+        if not created:
+            scan_level.scan_level = scan_level_value
+            scan_level.declared = True
+            scan_level.save()
+
         return super().form_valid(form)
 
 
@@ -250,7 +267,24 @@ class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        network_id = self.kwargs.get("pk")
+        organization = form.cleaned_data["organization"]
+        scan_level_value = form.cleaned_data["scan_level"]
+
+        # Use get_or_create to avoid duplicates
+        scan_level, created = ScanLevel.objects.get_or_create(
+            object_id=network_id,
+            object_type="network",
+            organization=organization,
+            defaults={"scan_level": scan_level_value, "declared": True},
+        )
+
+        # If it already existed, update the scan level
+        if not created:
+            scan_level.scan_level = scan_level_value
+            scan_level.declared = True
+            scan_level.save()
+
         return super().form_valid(form)
 
 
@@ -483,7 +517,24 @@ class IPAddressScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        ipaddress_id = self.kwargs.get("pk")
+        organization = form.cleaned_data["organization"]
+        scan_level_value = form.cleaned_data["scan_level"]
+
+        # Use get_or_create to avoid duplicates
+        scan_level, created = ScanLevel.objects.get_or_create(
+            object_id=ipaddress_id,
+            object_type="ipaddress",
+            organization=organization,
+            defaults={"scan_level": scan_level_value, "declared": True},
+        )
+
+        # If it already existed, update the scan level
+        if not created:
+            scan_level.scan_level = scan_level_value
+            scan_level.declared = True
+            scan_level.save()
+
         return super().form_valid(form)
 
 
