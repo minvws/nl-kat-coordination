@@ -6,6 +6,7 @@ from celery.result import AsyncResult
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from djangoql.queryset import apply_search
 
 from files.models import File
 
@@ -51,22 +52,52 @@ class ObjectSet(models.Model):
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
-    all_objects = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: fix?
+    all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[str]:  # TODO: fix?
+    def get_query_objects(self) -> list[int]:
+        """Get objects from object_query using DjangoQL"""
+        if not self.object_query:
+            return []
+
+        try:
+            # Get the model class from the content type
+            model_class = self.object_type.model_class()
+
+            # Apply the DjangoQL query
+            queryset = apply_search(model_class.objects.all(), self.object_query, model_class)
+
+            # Return primary keys as integers
+            return [obj.pk for obj in queryset]
+        except Exception:
+            # If query fails, return empty list
+            return []
+
+    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
         # TODO: handle cycles
         # TODO: configurable max_depth
 
-        if depth >= max_depth:
-            raise RecursionError("Max depth reached for object set.")
+        # Start with manually added objects from all_objects field
+        all_objects = list(self.all_objects)
 
-        all_objects = self.all_objects
+        # Add objects from object_query
+        query_objects = self.get_query_objects()
+        all_objects.extend(query_objects)
 
-        for subset in self.subsets.all():
-            all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
+        # Add objects from subsets if we haven't exceeded max depth
+        if depth < max_depth:
+            for subset in self.subsets.all():
+                all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
 
-        return all_objects
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_objects = []
+        for obj in all_objects:
+            if obj not in seen:
+                seen.add(obj)
+                unique_objects.append(obj)
+
+        return unique_objects
 
     def __str__(self):
         return self.name or super().__str__()
