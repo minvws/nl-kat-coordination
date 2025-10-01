@@ -167,16 +167,16 @@ class DNSRecordBase(models.Model):
 
 
 class DNSARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="a_records")
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="a_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.hostname} A {self.ip_address}"
 
 
 class DNSAAAARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="aaaa_records")
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="aaaa_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.hostname} AAAA {self.ip_address}"
@@ -191,16 +191,20 @@ class DNSPTRRecord(DNSRecordBase):
 
 
 class DNSCNAMERecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_records")
-    target: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="cname_targets")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    target: models.ForeignKey = models.ForeignKey(
+        Hostname, on_delete=models.PROTECT, related_name="dnscnamerecord_target_set"
+    )
 
     def __str__(self) -> str:
         return f"{self.hostname} CNAME {self.target}"
 
 
 class DNSMXRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_records")
-    mail_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="mx_targets")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    mail_server: models.ForeignKey = models.ForeignKey(
+        Hostname, on_delete=models.PROTECT, related_name="dnsmxrecord_mailserver_set"
+    )
     preference: models.IntegerField = models.IntegerField()
 
     def __str__(self) -> str:
@@ -208,8 +212,10 @@ class DNSMXRecord(DNSRecordBase):
 
 
 class DNSNSRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_records")
-    name_server: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="ns_targets")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    name_server: models.ForeignKey = models.ForeignKey(
+        Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver_set"
+    )
 
     def __str__(self) -> str:
         return f"{self.hostname} NS {self.name_server}"
@@ -236,7 +242,7 @@ class DNSCAARecord(DNSRecordBase):
 
 
 class DNSTXTRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="txt_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     prefix: models.CharField = models.CharField(blank=True)
     value: models.CharField = models.CharField()
 

@@ -62,7 +62,7 @@
                                 <td></td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.cname_records.all %}
+                        {% for record in hostname.dnscnamerecord_set.all %}
                             <tr>
                                 <td>CNAME</td>
                                 <td>
@@ -71,7 +71,7 @@
                                 <td>{% translate "Source:" %} {{ hostname.name }}</td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.mx_records.all %}
+                        {% for record in hostname.dnsmxrecord_set.all %}
                             <tr>
                                 <td>MX</td>
                                 <td>
@@ -80,7 +80,7 @@
                                 <td>{% translate "Preference:" %} {{ record.preference }}</td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.ns_records.all %}
+                        {% for record in hostname.dnsnsrecord_set.all %}
                             <tr>
                                 <td>NS</td>
                                 <td>
@@ -138,7 +138,7 @@
                                 <td></td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.cname_targets.all %}
+                        {% for record in hostname.dnscnamerecord_target_set.all %}
                             <tr>
                                 <td>CNAME</td>
                                 <td>{{ hostname.name }}</td>
@@ -147,7 +147,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.mx_targets.all %}
+                        {% for record in hostname.dnsmxrecord_mailserver_set.all %}
                             <tr>
                                 <td>MX</td>
                                 <td>{{ hostname.name }}</td>
@@ -156,7 +156,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.ns_targets.all %}
+                        {% for record in hostname.dnsnsrecord_nameserver_set.all %}
                             <tr>
                                 <td>NS</td>
                                 <td>{{ hostname.name }}</td>
@@ -170,6 +170,19 @@
             </div>
             <div>
                 <h2>{% translate "Scan Levels" %}</h2>
+                <form class="inline layout-wide"
+                      method="post"
+                      action="{% url 'objects:add_hostname_scan_level' hostname.pk %}">
+                    <div class="horizontal-view">
+                        {% csrf_token %}
+                        {% include "partials/form/form_errors.html" with form=scan_level_form %}
+
+                        {{ scan_level_form }}
+                        <p class="action-buttons">
+                            <button type="submit">{% translate "Add" %}</button>
+                        </p>
+                    </div>
+                </form>
                 {% if scan_levels %}
                     <div class="horizontal-scroll">
                         <table>
