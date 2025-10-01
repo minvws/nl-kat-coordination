@@ -155,6 +155,11 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
     template_name = "plugin_form.html"
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["description"].widget.attrs["rows"] = 3
+        return form
+
     def get_form_kwargs(self):
         if self.request.method == "POST" and "plugin_id" in self.request.GET:
             if "duplicate" in self.request.GET and self.request.GET["duplicate"]:
@@ -176,6 +181,13 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
             kwargs["initial"]["plugin_id"] = None
             kwargs["initial"]["name"] = None
 
+        # Pre-fill oci_arguments from query parameter (e.g., from file list "Add to plugin" button)
+        if "oci_arguments" in self.request.GET:
+            oci_arg = self.request.GET["oci_arguments"]
+            if "initial" not in kwargs:
+                kwargs["initial"] = {}
+            kwargs["initial"]["oci_arguments"] = [oci_arg]
+
         return kwargs
 
     def form_invalid(self, form):
@@ -194,6 +206,11 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
     fields = ["plugin_id", "name", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["description"].widget.attrs["rows"] = 3
+        return form
 
     def form_invalid(self, form):
         return reverse("plugin_detail", kwargs={"pk": self.object.id})
