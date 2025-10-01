@@ -1,0 +1,50 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <h1>{% translate "Add Hostname" %}</h1>
+            </div>
+            <div>
+                <h2>{% translate "Single Hostname" %}</h2>
+                <form method="post" class="help">
+                    {% csrf_token %}
+                    {% include "partials/form/form_errors.html" with form=form %}
+
+                    {{ form }}
+                    <button type="submit">{% translate "Add Hostname" %}</button>
+                </form>
+            </div>
+            <hr>
+            <div>
+                <h2>{% translate "Upload Multiple Hostnames from CSV" %}</h2>
+                <p>
+                    {% translate "Upload a CSV file with one column containing hostname names. You can optionally select a network, otherwise the 'internet' network will be used by default." %}
+                </p>
+                <div>
+                    <h3>{% translate "CSV Format" %}</h3>
+                    <ul>
+                        <li>{% translate "One column per row with the hostname name" %}</li>
+                        <li>
+                            {% translate "Example:" %} <code>example.com</code>
+                        </li>
+                        <li>{% translate "No header row required" %}</li>
+                    </ul>
+                </div>
+                <form method="post"
+                      action="{{ csv_upload_url }}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ csv_form.as_p }}
+                    <button type="submit" class="button">{% translate "Upload CSV" %}</button>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

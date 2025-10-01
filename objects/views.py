@@ -266,9 +266,15 @@ class IPAddressDetailView(DetailView):
 
 class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = IPAddress
-    template_name = "objects/generic_object_form.html"
+    template_name = "objects/ipaddress_create.html"
     fields = ["network", "address"]
     success_url = reverse_lazy("objects:ipaddress_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["csv_form"] = IPAddressCSVUploadForm()
+        context["csv_upload_url"] = reverse_lazy("objects:ipaddress_csv_upload")
+        return context
 
 
 class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
@@ -283,7 +289,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
         # Default to "internet" network if not specified
         if not network:
-            network, _ = Network.objects.get_or_create(name="internet")
+            network, created = Network.objects.get_or_create(name="internet")
 
         csv_raw_data = csv_file.read()
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
@@ -456,9 +462,15 @@ class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Hostname
-    template_name = "objects/generic_object_form.html"
+    template_name = "objects/hostname_create.html"
     fields = ["network", "name"]
     success_url = reverse_lazy("objects:hostname_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["csv_form"] = HostnameCSVUploadForm()
+        context["csv_upload_url"] = reverse_lazy("objects:hostname_csv_upload")
+        return context
 
 
 class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
@@ -473,7 +485,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
         # Default to "internet" network if not specified
         if not network:
-            network, _ = Network.objects.get_or_create(name="internet")
+            network, created = Network.objects.get_or_create(name="internet")
 
         csv_raw_data = csv_file.read()
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
