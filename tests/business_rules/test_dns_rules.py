@@ -8,25 +8,25 @@ rules = {
     "ipv6_webservers": {
         "name": "ipv6_webservers",
         "object_type": "Hostname",
-        "query": "ns_targets = None and aaaa_records = None",
+        "query": "dnsnsrecord_nameserver_set = None and dnsaaaarecord = None",
         "finding_type_code": "KAT-WEBSERVER-NO-IPV6",
     },
     "ipv6_nameservers": {
         "name": "ipv6_nameservers",
         "object_type": "Hostname",
-        "query": "ns_targets != None and aaaa_records = None",
+        "query": "dnsnsrecord_nameserver_set != None and dnsaaaarecord = None",
         "finding_type_code": "KAT-NAMESERVER-NO-IPV6",
     },
     "two_ipv6_nameservers": {
         "name": "two_ipv6_nameservers",
         "object_type": "Hostname",
-        "query": "ns_targets = None and nameservers_with_ipv6_count < 2",
+        "query": "dnsnsrecord_nameserver_set = None and nameservers_with_ipv6_count < 2",
         "finding_type_code": "KAT-NAMESERVER-NO-TWO-IPV6",
     },
     "missing_spf": {
         "name": "missing_spf",
         "object_type": "Hostname",
-        "query": 'txt_records.value not startswith "v=spf1"',
+        "query": 'dnstxtrecord.value not startswith "v=spf1"',
         "finding_type_code": "KAT-NO-SPF",
     },
 }
@@ -91,7 +91,7 @@ def test_at_least_two_ipv6_name_servers_query(xtdb):
     queryset = Hostname.objects.annotate(
         nameservers_with_ipv6_count=Count(
             Case(
-                When(ns_records__name_server__aaaa_records__isnull=False, then=F("ns_records__name_server_id")),
+                When(dnsnsrecord__name_server__dnsaaaarecord__isnull=False, then=F("dnsnsrecord__name_server_id")),
                 default=None,
             ),
             distinct=True,

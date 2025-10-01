@@ -10,17 +10,20 @@ from objects.views import (
     HostnameDeleteView,
     HostnameDetailView,
     HostnameListView,
+    HostnameScanLevelAddView,
     HostnameScanLevelUpdateView,
     IPAddressCreateView,
     IPAddressCSVUploadView,
     IPAddressDeleteView,
     IPAddressDetailView,
     IPAddressListView,
+    IPAddressScanLevelAddView,
     IPAddressScanLevelUpdateView,
     NetworkCreateView,
     NetworkDeleteView,
     NetworkDetailView,
     NetworkListView,
+    NetworkScanLevelAddView,
     NetworkScanLevelUpdateView,
 )
 from objects.viewsets import (
@@ -72,6 +75,7 @@ urlpatterns = [
     path("objects/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
     path("objects/network/add/", NetworkCreateView.as_view(), name="add_network"),
     path("objects/network/<int:pk>/delete/", NetworkDeleteView.as_view(), name="delete_network"),
+    path("objects/network/<int:pk>/add-scan-level/", NetworkScanLevelAddView.as_view(), name="add_network_scan_level"),
     path(
         "objects/network/<int:pk>/update-scan-level/<int:organization_id>/",
         NetworkScanLevelUpdateView.as_view(),
@@ -83,6 +87,11 @@ urlpatterns = [
     path("objects/ipaddress/upload-csv/", IPAddressCSVUploadView.as_view(), name="ipaddress_csv_upload"),
     path("objects/ipaddress/<int:pk>/delete/", IPAddressDeleteView.as_view(), name="delete_ipaddress"),
     path(
+        "objects/ipaddress/<int:pk>/add-scan-level/",
+        IPAddressScanLevelAddView.as_view(),
+        name="add_ipaddress_scan_level",
+    ),
+    path(
         "objects/ipaddress/<int:pk>/update-scan-level/<int:organization_id>/",
         IPAddressScanLevelUpdateView.as_view(),
         name="update_ipaddress_scan_level",
@@ -92,6 +101,9 @@ urlpatterns = [
     path("objects/hostname/add/", HostnameCreateView.as_view(), name="add_hostname"),
     path("objects/hostname/upload-csv/", HostnameCSVUploadView.as_view(), name="hostname_csv_upload"),
     path("objects/hostname/<int:pk>/delete/", HostnameDeleteView.as_view(), name="delete_hostname"),
+    path(
+        "objects/hostname/<int:pk>/add-scan-level/", HostnameScanLevelAddView.as_view(), name="add_hostname_scan_level"
+    ),
     path(
         "objects/hostname/<int:pk>/update-scan-level/<int:organization_id>/",
         HostnameScanLevelUpdateView.as_view(),

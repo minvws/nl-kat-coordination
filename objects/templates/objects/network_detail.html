@@ -28,6 +28,19 @@
             </div>
             <div>
                 <h2>{% translate "Scan Levels" %}</h2>
+                <form class="inline layout-wide"
+                      method="post"
+                      action="{% url 'objects:add_network_scan_level' network.pk %}">
+                    <div class="horizontal-view">
+                        {% csrf_token %}
+                        {% include "partials/form/form_errors.html" with form=scan_level_form %}
+
+                        {{ scan_level_form }}
+                        <p class="action-buttons">
+                            <button type="submit">{% translate "Add" %}</button>
+                        </p>
+                    </div>
+                </form>
                 {% if scan_levels %}
                     <div class="horizontal-scroll">
                         <table>

@@ -64,6 +64,7 @@ class NetworkDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
         context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+        context["scan_level_form"] = ScanLevelAddForm
 
         return context
 
@@ -115,6 +116,42 @@ class ScanLevelUpdateForm(forms.ModelForm):
         return instance
 
 
+class ScanLevelAddForm(forms.ModelForm):
+    """Form for adding a new scan level to an object."""
+
+    organization = forms.ModelChoiceField(
+        queryset=Organization.objects.all(),
+        required=True,
+        label=_("Organization"),
+        widget=forms.Select(attrs={"class": "organization-select"}),
+    )
+    scan_level = forms.ChoiceField(
+        choices=ScanLevelEnum.choices,
+        required=True,
+        label=_("Scan Level"),
+        widget=forms.Select(attrs={"class": "scan-level-select"}),
+    )
+
+    class Meta:
+        model = ScanLevel
+        fields = ["organization", "scan_level"]
+
+    def __init__(self, *args, **kwargs):
+        self.object_id = kwargs.pop("object_id", None)
+        self.object_type = kwargs.pop("object_type", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.declared = True
+        instance.object_id = self.object_id
+        instance.object_type = self.object_type
+
+        if commit:
+            instance.save()
+        return instance
+
+
 class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
     form_class = ScanLevelUpdateForm
 
@@ -146,6 +183,26 @@ class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
 
+class HostnameScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelAddForm
+
+    def get_success_url(self):
+        return reverse("objects:hostname_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        hostname_id = self.kwargs.get("pk")
+
+        kwargs["object_id"] = hostname_id
+        kwargs["object_type"] = "hostname"
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
 class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
     form_class = ScanLevelUpdateForm
 
@@ -169,6 +226,26 @@ class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
             kwargs["instance"] = scan_level
         except ScanLevel.DoesNotExist:
             pass
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
+class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelAddForm
+
+    def get_success_url(self):
+        return reverse("objects:network_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        network_id = self.kwargs.get("pk")
+
+        kwargs["object_id"] = network_id
+        kwargs["object_type"] = "network"
 
         return kwargs
 
@@ -260,6 +337,7 @@ class IPAddressDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
         context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+        context["scan_level_form"] = ScanLevelAddForm
 
         return context
 
@@ -389,6 +467,26 @@ class IPAddressScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
 
+class IPAddressScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ScanLevelAddForm
+
+    def get_success_url(self):
+        return reverse("objects:ipaddress_detail", kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        ipaddress_id = self.kwargs.get("pk")
+
+        kwargs["object_id"] = ipaddress_id
+        kwargs["object_type"] = "ipaddress"
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
 class HostnameFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="contains")
 
@@ -433,12 +531,12 @@ class HostnameDetailView(DetailView):
             "dnsarecord_set",
             "dnsaaaarecord_set",
             "dnsptrrecord_set",
-            "cname_records",
-            "cname_targets",
-            "mx_records",
-            "mx_targets",
-            "ns_records",
-            "ns_targets",
+            "dnscnamerecord_set",
+            "dnscnamerecord_target_set",
+            "dnsmxrecord_set",
+            "dnsmxrecord_mailserver_set",
+            "dnsnsrecord_set",
+            "dnsnsrecord_nameserver_set",
             "dnscaarecord_set",
             "dnstxtrecord_set",
             "dnssrvrecord_set",
@@ -448,6 +546,7 @@ class HostnameDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
         context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+        context["scan_level_form"] = ScanLevelAddForm
 
         return context
 
