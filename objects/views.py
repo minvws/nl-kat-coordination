@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 
 class NetworkFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
 
     class Meta:
         model = Network
@@ -289,7 +289,7 @@ class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
 
 
 class FindingFilter(django_filters.FilterSet):
-    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
+    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="icontains")
 
     class Meta:
         model = Finding
@@ -326,7 +326,7 @@ class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class IPAddressFilter(django_filters.FilterSet):
-    address = django_filters.CharFilter(label="Address", lookup_expr="contains")
+    address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
 
     class Meta:
         model = IPAddress
@@ -539,7 +539,7 @@ class IPAddressScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
 
 
 class HostnameFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
 
     class Meta:
         model = Hostname
