@@ -147,7 +147,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.dnsmxrecord_mailserver.all %}
+                        {% for record in hostname.dnsmxrecord_mailserver_set.all %}
                             <tr>
                                 <td>MX</td>
                                 <td>{{ hostname.name }}</td>
@@ -156,7 +156,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for record in hostname.dnsnsrecord_nameserver.all %}
+                        {% for record in hostname.dnsnsrecord_nameserver_set.all %}
                             <tr>
                                 <td>NS</td>
                                 <td>{{ hostname.name }}</td>

@@ -9,7 +9,6 @@ from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterR
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
-from tldextract import tldextract
 from transit.writer import Writer
 
 from openkat.models import LowerCaseCharField, Organization
@@ -103,7 +102,7 @@ class FindingType(models.Model):
 
 
 class Finding(models.Model):
-    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
+    organization: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
     finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
 
     object_type: LowerCaseCharField = LowerCaseCharField()
@@ -149,40 +148,14 @@ class IPPort(models.Model):
 
 
 class Hostname(Asset):
-    class Q:
-        """A set of useful DjangoQL queries for Hostname"""
-
-        mail_server = "dnsmxrecord_mailserver != None"
-        name_server = "dnsnsrecord_nameserver != None"
-        root_domain = "root = True"
-
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
     name: LowerCaseCharField = LowerCaseCharField()
-    root: models.BooleanField = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         if self.name is None:  # TODO: fix, this  can happen for some reason...
             return ""
 
         return self.name
-
-    def save(self, *args, **kwargs):
-        if self.name:
-            extracted = tldextract.extract(self.name)
-            registered_domain = extracted.top_domain_under_public_suffix.rstrip(".")
-            self.root = self.name == registered_domain
-
-            # If this is a subdomain, ensure the root domain exists
-            if not self.root and registered_domain:
-                root_hostname, created = Hostname.objects.get_or_create(
-                    network=self.network, name=registered_domain, defaults={"root": True}
-                )
-                # Ensure root flag is set correctly if it already existed
-                if not created and not root_hostname.root:
-                    root_hostname.root = True
-                    root_hostname.save(update_fields=["root"])
-
-        super().save(*args, **kwargs)
 
 
 class DNSRecordBase(models.Model):
@@ -194,16 +167,16 @@ class DNSRecordBase(models.Model):
 
 
 class DNSARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="a_records")
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="a_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.hostname} A {self.ip_address}"
 
 
 class DNSAAAARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="aaaa_records")
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="aaaa_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.hostname} AAAA {self.ip_address}"
@@ -230,7 +203,7 @@ class DNSCNAMERecord(DNSRecordBase):
 class DNSMXRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     mail_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="dnsmxrecord_mailserver"
+        Hostname, on_delete=models.PROTECT, related_name="dnsmxrecord_mailserver_set"
     )
     preference: models.IntegerField = models.IntegerField()
 
@@ -241,7 +214,7 @@ class DNSMXRecord(DNSRecordBase):
 class DNSNSRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     name_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver"
+        Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver_set"
     )
 
     def __str__(self) -> str:
@@ -269,7 +242,7 @@ class DNSCAARecord(DNSRecordBase):
 
 
 class DNSTXTRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="txt_records")
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     prefix: models.CharField = models.CharField(blank=True)
     value: models.CharField = models.CharField()
 

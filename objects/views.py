@@ -1,12 +1,11 @@
 import csv
 import io
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import django_filters
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Max, OuterRef, QuerySet, Subquery
 from django.shortcuts import redirect
@@ -17,41 +16,22 @@ from django_filters.views import FilterView
 
 from objects.forms import HostnameCSVUploadForm, IPAddressCSVUploadForm
 from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel, ScanLevelEnum
-from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
-from tasks.models import ObjectSet
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
 
 class NetworkFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
-    )
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
 
     class Meta:
         model = Network
-        fields = ["name", "object_set"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        network_ct = ContentType.objects.get_for_model(Network)
-        queryset = ObjectSet.objects.filter(object_type=network_ct)
-        if queryset.exists():
-            self.filters["object_set"].queryset = queryset
-        else:
-            # Hide the filter if no object sets exist
-            del self.filters["object_set"]
-
-    def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
-        return queryset
+        fields = ["name"]
 
 
-class NetworkListView(OrganizationFilterMixin, FilterView):
+class NetworkListView(FilterView):
     model = Network
     template_name = "objects/network_list.html"
     context_object_name = "networks"
@@ -59,84 +39,31 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     filterset_class = NetworkFilter
 
     def get_queryset(self) -> "QuerySet[Network]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "network", "object_id": OuterRef("id")}
-
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
         scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
+            ScanLevel.objects.filter(object_type="network", object_id=OuterRef("id"))
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        queryset = Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-
-        # Apply object set filter if specified
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects()
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
-
-        return queryset
+        return Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
-        # Add warning if object set has manual objects that are being ignored
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
-
         return context
 
 
-class NetworkDetailView(OrganizationFilterMixin, DetailView):
+class NetworkDetailView(DetailView):
     model = Network
     template_name = "objects/network_detail.html"
     context_object_name = "network"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Build breadcrumb URL with organization parameters
-        organization_codes = self.request.GET.getlist("organization")
-        breadcrumb_url = reverse("objects:network_list")
-        if organization_codes:
-            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
-
-        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-
-        # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="network")
-        if organization_codes:
-            scan_levels = scan_levels.filter(
-                organization__in=list(
-                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-                )
-            )
-
-        context["scan_levels"] = scan_levels
+        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
@@ -272,24 +199,7 @@ class HostnameScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        hostname_id = self.kwargs.get("pk")
-        organization = form.cleaned_data["organization"]
-        scan_level_value = form.cleaned_data["scan_level"]
-
-        # Use get_or_create to avoid duplicates
-        scan_level, created = ScanLevel.objects.get_or_create(
-            object_id=hostname_id,
-            object_type="hostname",
-            organization=organization,
-            defaults={"scan_level": scan_level_value, "declared": True},
-        )
-
-        # If it already existed, update the scan level
-        if not created:
-            scan_level.scan_level = scan_level_value
-            scan_level.declared = True
-            scan_level.save()
-
+        form.save()
         return super().form_valid(form)
 
 
@@ -340,36 +250,19 @@ class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        network_id = self.kwargs.get("pk")
-        organization = form.cleaned_data["organization"]
-        scan_level_value = form.cleaned_data["scan_level"]
-
-        # Use get_or_create to avoid duplicates
-        scan_level, created = ScanLevel.objects.get_or_create(
-            object_id=network_id,
-            object_type="network",
-            organization=organization,
-            defaults={"scan_level": scan_level_value, "declared": True},
-        )
-
-        # If it already existed, update the scan level
-        if not created:
-            scan_level.scan_level = scan_level_value
-            scan_level.declared = True
-            scan_level.save()
-
+        form.save()
         return super().form_valid(form)
 
 
 class FindingFilter(django_filters.FilterSet):
-    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="icontains")
+    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="contains")
 
     class Meta:
         model = Finding
         fields = ["finding_type__code"]
 
 
-class FindingListView(OrganizationFilterMixin, FilterView):
+class FindingListView(FilterView):
     model = Finding
     template_name = "objects/finding_list.html"
     context_object_name = "findings"
@@ -399,32 +292,14 @@ class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class IPAddressFilter(django_filters.FilterSet):
-    address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
-    object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
-    )
+    address = django_filters.CharFilter(label="Address", lookup_expr="contains")
 
     class Meta:
         model = IPAddress
-        fields = ["address", "object_set"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Filter object sets by IPAddress content type
-        ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
-        queryset = ObjectSet.objects.filter(object_type=ipaddress_ct)
-        if queryset.exists():
-            self.filters["object_set"].queryset = queryset
-        else:
-            # Hide the filter if no object sets exist
-            del self.filters["object_set"]
-
-    def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
-        return queryset
+        fields = ["address"]
 
 
-class IPAddressListView(OrganizationFilterMixin, FilterView):
+class IPAddressListView(FilterView):
     model = IPAddress
     template_name = "objects/ipaddress_list.html"
     context_object_name = "ipaddresses"
@@ -432,61 +307,25 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
     filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "ipaddress", "object_id": OuterRef("id")}
-
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
         scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
+            ScanLevel.objects.filter(object_type="ipaddress", object_id=OuterRef("id"))
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        queryset = IPAddress.objects.select_related("network").annotate(
+        return IPAddress.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
-
-        # Apply object set filter if specified
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects().select_related("network")
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
-
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
 
-        # Add warning if object set has manual objects that are being ignored
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
-
         return context
 
 
-class IPAddressDetailView(OrganizationFilterMixin, DetailView):
+class IPAddressDetailView(DetailView):
     model = IPAddress
     template_name = "objects/ipaddress_detail.html"
     context_object_name = "ipaddress"
@@ -496,25 +335,8 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Build breadcrumb URL with organization parameters
-        organization_codes = self.request.GET.getlist("organization")
-        breadcrumb_url = reverse("objects:ipaddress_list")
-        if organization_codes:
-            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
-
-        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
-
-        # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="ipaddress")
-        if organization_codes:
-            scan_levels = scan_levels.filter(
-                organization__in=list(
-                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-                )
-            )
-
-        context["scan_levels"] = scan_levels
+        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
@@ -661,54 +483,19 @@ class IPAddressScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        ipaddress_id = self.kwargs.get("pk")
-        organization = form.cleaned_data["organization"]
-        scan_level_value = form.cleaned_data["scan_level"]
-
-        # Use get_or_create to avoid duplicates
-        scan_level, created = ScanLevel.objects.get_or_create(
-            object_id=ipaddress_id,
-            object_type="ipaddress",
-            organization=organization,
-            defaults={"scan_level": scan_level_value, "declared": True},
-        )
-
-        # If it already existed, update the scan level
-        if not created:
-            scan_level.scan_level = scan_level_value
-            scan_level.declared = True
-            scan_level.save()
-
+        form.save()
         return super().form_valid(form)
 
 
 class HostnameFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
-    )
+    name = django_filters.CharFilter(label="Name", lookup_expr="contains")
 
     class Meta:
         model = Hostname
-        fields = ["name", "object_set"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Filter object sets by Hostname content type
-        hostname_ct = ContentType.objects.get_for_model(Hostname)
-        queryset = ObjectSet.objects.filter(object_type=hostname_ct)
-        if queryset.exists():
-            self.filters["object_set"].queryset = queryset
-        else:
-            # Hide the filter if no object sets exist
-            del self.filters["object_set"]
-
-    def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
-        return queryset
+        fields = ["name"]
 
 
-class HostnameListView(OrganizationFilterMixin, FilterView):
+class HostnameListView(FilterView):
     model = Hostname
     template_name = "objects/hostname_list.html"
     context_object_name = "hostnames"
@@ -716,61 +503,25 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "hostname", "object_id": OuterRef("id")}
-
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
         scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
+            ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        queryset = Hostname.objects.select_related("network").annotate(
+        return Hostname.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
-
-        # Apply object set filter if specified
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects().select_related("network")
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
-
-        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
-        # Add warning if object set has manual objects that are being ignored
-        object_set_id = self.request.GET.get("object_set")
-        if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
-
         return context
 
 
-class HostnameDetailView(OrganizationFilterMixin, DetailView):
+class HostnameDetailView(DetailView):
     model = Hostname
     template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
@@ -783,9 +534,9 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
             "dnscnamerecord_set",
             "dnscnamerecord_target_set",
             "dnsmxrecord_set",
-            "dnsmxrecord_mailserver",
+            "dnsmxrecord_mailserver_set",
             "dnsnsrecord_set",
-            "dnsnsrecord_nameserver",
+            "dnsnsrecord_nameserver_set",
             "dnscaarecord_set",
             "dnstxtrecord_set",
             "dnssrvrecord_set",
@@ -793,25 +544,8 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Build breadcrumb URL with organization parameters
-        organization_codes = self.request.GET.getlist("organization")
-        breadcrumb_url = reverse("objects:hostname_list")
-        if organization_codes:
-            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
-
-        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
-
-        # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="hostname")
-
-        if organization_codes:
-            scan_levels = scan_levels.filter(
-                organization__in=list(
-                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-                )
-            )
-        context["scan_levels"] = scan_levels
+        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
+        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
