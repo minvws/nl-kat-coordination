@@ -167,16 +167,16 @@ class DNSRecordBase(models.Model):
 
 
 class DNSARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="a_records")
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="a_records")
 
     def __str__(self) -> str:
         return f"{self.hostname} A {self.ip_address}"
 
 
 class DNSAAAARecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
-    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="aaaa_records")
+    ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT, related_name="aaaa_records")
 
     def __str__(self) -> str:
         return f"{self.hostname} AAAA {self.ip_address}"
@@ -236,7 +236,7 @@ class DNSCAARecord(DNSRecordBase):
 
 
 class DNSTXTRecord(DNSRecordBase):
-    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT, related_name="txt_records")
     prefix: models.CharField = models.CharField(blank=True)
     value: models.CharField = models.CharField()
 
