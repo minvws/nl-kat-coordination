@@ -20,23 +20,19 @@ DB_TCP_PORTS = [
 MICROSOFT_RDP_PORTS = [
     3389  # Microsoft Remote Desktop
 ]
-COMMON_TCP_PORTS = (
-    [
-        25,  # SMTP
-        53,  # DNS
-        80,  # HTTP
-        110,  # POP3
-        143,  # IMAP
-        443,  # HTTPS
-        465,  # SMTPS
-        587,  # SMTP (message submmission)
-        993,  # IMAPS
-        995,  # POP3S
-    ]
-    + SA_TCP_PORTS
-    + DB_TCP_PORTS
-    + MICROSOFT_RDP_PORTS
-)
+COMMON_TCP_PORTS = [
+    25,  # SMTP
+    53,  # DNS
+    80,  # HTTP
+    110,  # POP3
+    143,  # IMAP
+    443,  # HTTPS
+    465,  # SMTPS
+    587,  # SMTP (message submmission)
+    993,  # IMAPS
+    995,  # POP3S
+]
+ALL_COMMON_TCP = COMMON_TCP_PORTS + SA_TCP_PORTS + DB_TCP_PORTS + MICROSOFT_RDP_PORTS
 
 COMMON_UDP_PORTS = [
     53  # DNS
@@ -85,12 +81,19 @@ rules = {
         "query": f'protocol = "TCP" and port in ({",".join(str(x) for x in MICROSOFT_RDP_PORTS)})',
         "finding_type_code": "KAT-REMOTE-DESKTOP-PORT",
     },
-    "open_remote_uncommon_port": {
-        "name": "open_remote_uncommon_port",
+    "open_uncommon_port": {
+        "name": "open_uncommon_port",
         "object_type": "IPPort",
-        "query": f'(protocol = "TCP" and port not in ({",".join(str(x) for x in COMMON_TCP_PORTS)})) '
+        "query": f'(protocol = "TCP" and port not in ({",".join(str(x) for x in ALL_COMMON_TCP)})) '
         f'or (protocol = "UDP" and port not in ({",".join(str(x) for x in COMMON_UDP_PORTS)}))',
         "finding_type_code": "KAT-UNCOMMON-OPEN-PORT",
+    },
+    "open_common_port": {
+        "name": "open_common_port",
+        "object_type": "IPPort",
+        "query": f'(protocol = "TCP" and port in ({",".join(str(x) for x in ALL_COMMON_TCP)})) '
+        f'or (protocol = "UDP" and port in ({",".join(str(x) for x in COMMON_UDP_PORTS)}))',
+        "finding_type_code": "KAT-COMMON-OPEN-PORT",
     },
 }
 
@@ -222,10 +225,12 @@ def test_port_classification(xtdb):
     IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=3389, tls=False, service="unknown")
     assert apply_search(IPPort.objects.all(), rules["open_remote_desktop_port"]["query"]).count() == 1
 
-    assert apply_search(IPPort.objects.all(), rules["open_remote_uncommon_port"]["query"]).count() == 0
+    assert apply_search(IPPort.objects.all(), rules["open_uncommon_port"]["query"]).count() == 0
 
     IPPort.objects.create(address=ip, protocol=Protocol.UDP, port=53, tls=False, service="unknown")
-    assert apply_search(IPPort.objects.all(), rules["open_remote_uncommon_port"]["query"]).count() == 0
+    assert apply_search(IPPort.objects.all(), rules["open_uncommon_port"]["query"]).count() == 0
 
     IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=12345, tls=False, service="unknown")
-    assert apply_search(IPPort.objects.all(), rules["open_remote_uncommon_port"]["query"]).count() == 1
+    assert apply_search(IPPort.objects.all(), rules["open_uncommon_port"]["query"]).count() == 1
+
+    assert apply_search(IPPort.objects.all(), rules["open_common_port"]["query"]).count() == 6
