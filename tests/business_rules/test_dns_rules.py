@@ -112,6 +112,12 @@ rules = {
         "query": "dnscaarecord = None",  # TODO: target root domains
         "finding_type_code": "KAT-NO-CAA",
     },
+    "missing_dmarc": {
+        "name": "missing_dmarc",
+        "object_type": "Hostname",
+        "query": 'dnsmxrecord_mailserver != None and name startswith "_dmarc"',
+        "finding_type_code": "KAT-NO-DMARC",
+    },
 }
 
 
@@ -267,3 +273,36 @@ def test_missing_caa(xtdb):
 
     DNSCAARecord.objects.create(hostname=hn2, flags=10, tag=CAATag.CONTACTEMAIL)
     assert apply_search(Hostname.objects.all(), rules["missing_caa"]["query"]).count() == 0
+
+
+def test_missing_dmarc(xtdb):
+    network = Network.objects.create(name="test")
+    h1 = Hostname.objects.create(network=network, name="test.com")
+    h0 = Hostname.objects.create(network=network, name="some.test.com")
+    h2 = Hostname.objects.create(network=network, name="test2.com")
+
+    hostnames = Hostname.objects.raw(
+        f"""
+        SELECT
+            h.*
+        FROM {Hostname._meta.db_table} h
+        LEFT JOIN {Hostname._meta.db_table} root_h ON
+            root_h.network_id = h.network_id
+                AND root_h.root = true
+                AND (h.name = root_h.name OR h.name LIKE '%%.' || root_h.name)
+        LEFT JOIN {DNSTXTRecord._meta.db_table} direct_dmarc ON
+            direct_dmarc.hostname_id = h._id
+                AND direct_dmarc.prefix = '_dmarc'
+                AND direct_dmarc.value LIKE 'v=DMARC1%%'
+        LEFT JOIN {DNSTXTRecord._meta.db_table} root_dmarc ON
+            root_dmarc.hostname_id = root_h._id
+                AND root_dmarc.prefix = '_dmarc' AND root_dmarc.value LIKE 'v=DMARC1%%'
+        where direct_dmarc._id is null and root_dmarc._id is null
+    """  # noqa: S608
+    )
+    assert {hostname.id for hostname in hostnames} == {h0.pk, h1.pk, h2.pk}
+
+    DNSTXTRecord.objects.create(hostname=h1, value="v=DMARC1; p=none; sp=quarantine;", prefix="_dmarc")
+
+    hostnames._result_cache = None
+    assert {hostname.id for hostname in hostnames} == {h2.pk}

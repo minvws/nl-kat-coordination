@@ -31,6 +31,7 @@ dependencies = [
   "psycopg>=3.2.10",
   "pydantic>=2.7.1",
   "structlog>=25.3.0",
+  "tldextract>=5.3.0",
   "transit-python2>=0.8.321",
   "whitenoise[brotli]>=6.5.0",
 ]
