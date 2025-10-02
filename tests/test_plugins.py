@@ -187,7 +187,7 @@ def test_enabling_plugin_creates_schedule_with_predefined_object_set(xtdb):
 
     schedule = Schedule.objects.filter(plugin=plugin).first()
     assert schedule.object_set is not None
-    assert schedule.object_set.object_query == "dnsmxrecord_mailserver_set != None"
+    assert schedule.object_set.object_query == "dnsmxrecord_mailserver != None"
     assert schedule.object_set.object_type == ContentType.objects.get_for_model(Hostname)
     assert len(schedule.object_set.traverse_objects()) == 0
 
