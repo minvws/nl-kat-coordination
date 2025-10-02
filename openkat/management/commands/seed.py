@@ -49,6 +49,13 @@ class Command(BaseCommand):
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.name_server,
         )
+        ObjectSet.objects.get_or_create(
+            name="root_domains",
+            description="Root domains are hostnames that represent the registered domain (e.g., example.com).",
+            dynamic=True,
+            object_type=ContentType.objects.get_for_model(Hostname),
+            object_query=Hostname.Q.root_domain,
+        )
 
     def setup_group_permissions(self):
         redteamer_permissions = ["can_scan_organization", "can_set_clearance_level"]
