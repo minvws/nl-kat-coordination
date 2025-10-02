@@ -26,7 +26,7 @@ class ScanLevel(models.IntegerChoices):
 
 
 class PluginQuerySet(models.QuerySet):
-    def with_enabled(self, organization: Organization | None = None) -> "QuerySet":
+    def with_enabled(self, organization: Organization | None = None) -> "PluginQuerySet":
         """
         We have the EnabledPlugin model that tells whether a plugin is enabled for an organization. If the
         organization is None, the plugin is enabled for all organizations. However, the organization-specific case

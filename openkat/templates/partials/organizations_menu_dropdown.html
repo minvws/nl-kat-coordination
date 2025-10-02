@@ -4,21 +4,33 @@
     <button aria-controls="change-organization"
             aria-expanded="false"
             class="dropdown-button ghost">
-        {% if not organization.code %}
-            {% translate "Select organization" %}
+        {% if filtered_organizations %}
+            {% if filtered_organizations|length == 1 %}
+                {{ filtered_organizations.0.name }}
+            {% else %}
+                {{ filtered_organizations|length }} {% translate "organizations selected" %}
+            {% endif %}
         {% else %}
-            {{ organization.name }}
+            {% translate "All organizations" %}
         {% endif %}
         <span class="icon ti-chevron-down"></span>
     </button>
     <div id="change-organization" class="dropdown-list">
         <ul>
             <li>
-                <a href="?">{% translate "All organizations" %}</a>
+                {% if filtered_organization_codes %}
+                    <a href="?{{ query_string_without_organization }}">{% translate "All organizations" %}</a>
+                {% else %}
+                    <strong>✓ {% translate "All organizations" %}</strong>
+                {% endif %}
             </li>
             {% for org in organizations_including_blocked %}
                 <li>
-                    <a href="?organization={{ org.code }}">{{ org.name }}</a>
+                    {% if org.code in filtered_organization_codes %}
+                        <strong><a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}{% if code != org.code %}organization={{ code }}&{% endif %}{% endfor %}">✓ {{ org.name }}</a></strong>
+                    {% else %}
+                        <a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}organization={{ org.code }}">{{ org.name }}</a>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

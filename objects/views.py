@@ -40,9 +40,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     filterset_class = NetworkFilter
 
     def get_queryset(self) -> "QuerySet[Network]":
-        # Get filtered organizations from URL parameters
         organization_codes = self.request.GET.getlist("organization")
-
         scan_level_filter = {"object_type": "network", "object_id": OuterRef("id")}
 
         # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
@@ -58,8 +56,6 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        # Note: Network doesn't have organization field, so OrganizationFilterMixin
-        # is only used for context (dropdown display), not for actual filtering
         return Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
 
     def get_context_data(self, **kwargs):
@@ -364,9 +360,7 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
     filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
-        # Get filtered organizations from URL parameters
         organization_codes = self.request.GET.getlist("organization")
-
         scan_level_filter = {"object_type": "ipaddress", "object_id": OuterRef("id")}
 
         # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
@@ -382,8 +376,6 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        # Note: IPAddress doesn't have organization field, so OrganizationFilterMixin
-        # is only used for context (dropdown display), not for actual filtering
         return IPAddress.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
@@ -599,9 +591,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
-        # Get filtered organizations from URL parameters
         organization_codes = self.request.GET.getlist("organization")
-
         scan_level_filter = {"object_type": "hostname", "object_id": OuterRef("id")}
 
         # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
@@ -617,8 +607,6 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        # Note: Hostname doesn't have organization field, so OrganizationFilterMixin
-        # is only used for context (dropdown display), not for actual filtering
         return Hostname.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )

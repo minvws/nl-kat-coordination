@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 
 from openkat.models import User
@@ -18,9 +20,19 @@ def languages(request):
 
 
 def organizations_including_blocked(request):
-    context = {}
+    context: dict[str, Any] = {}
     if isinstance(request.user, User):
         context["organizations_including_blocked"] = request.user.organizations_including_blocked
+
+        # Provide organization filter query string for navigation links
+        organization_codes = request.GET.getlist("organization")
+        if organization_codes:
+            # Build query string with organization parameters
+            org_params = "&".join([f"organization={code}" for code in organization_codes])
+            context["organization_query_string"] = org_params
+        else:
+            context["organization_query_string"] = ""
+
     return context
 
 
