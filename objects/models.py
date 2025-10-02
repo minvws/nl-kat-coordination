@@ -151,8 +151,8 @@ class Hostname(Asset):
     class Q:
         """A set of useful DjangoQL queries for Hostname"""
 
-        mail_server = "dnsmxrecord_mailserver_set != None"
-        name_server = "dnsnsrecord_nameserver_set != None"
+        mail_server = "dnsmxrecord_mailserver != None"
+        name_server = "dnsnsrecord_nameserver != None"
 
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
     name: LowerCaseCharField = LowerCaseCharField()
@@ -209,7 +209,7 @@ class DNSCNAMERecord(DNSRecordBase):
 class DNSMXRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     mail_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="dnsmxrecord_mailserver_set"
+        Hostname, on_delete=models.PROTECT, related_name="dnsmxrecord_mailserver"
     )
     preference: models.IntegerField = models.IntegerField()
 
@@ -220,7 +220,7 @@ class DNSMXRecord(DNSRecordBase):
 class DNSNSRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     name_server: models.ForeignKey = models.ForeignKey(
-        Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver_set"
+        Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver"
     )
 
     def __str__(self) -> str:

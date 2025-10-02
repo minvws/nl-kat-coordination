@@ -32,7 +32,7 @@ class NetworkFilter(django_filters.FilterSet):
         fields = ["name"]
 
 
-class NetworkListView(FilterView):
+class NetworkListView(OrganizationFilterMixin, FilterView):
     model = Network
     template_name = "objects/network_list.html"
     context_object_name = "networks"
@@ -40,13 +40,26 @@ class NetworkListView(FilterView):
     filterset_class = NetworkFilter
 
     def get_queryset(self) -> "QuerySet[Network]":
+        # Get filtered organizations from URL parameters
+        organization_codes = self.request.GET.getlist("organization")
+
+        scan_level_filter = {"object_type": "network", "object_id": OuterRef("id")}
+
+        # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_level_filter["organization"] = organization
+
         scan_level_subquery = (
-            ScanLevel.objects.filter(object_type="network", object_id=OuterRef("id"))
+            ScanLevel.objects.filter(**scan_level_filter)
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
+        # Note: Network doesn't have organization field, so OrganizationFilterMixin
+        # is only used for context (dropdown display), not for actual filtering
         return Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
 
     def get_context_data(self, **kwargs):
@@ -56,7 +69,7 @@ class NetworkListView(FilterView):
         return context
 
 
-class NetworkDetailView(DetailView):
+class NetworkDetailView(OrganizationFilterMixin, DetailView):
     model = Network
     template_name = "objects/network_detail.html"
     context_object_name = "network"
@@ -64,7 +77,16 @@ class NetworkDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
-        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+
+        # Filter scan levels by selected organization only if exactly one is selected
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="network")
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_levels = scan_levels.filter(organization=organization)
+
+        context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
@@ -334,7 +356,7 @@ class IPAddressFilter(django_filters.FilterSet):
         fields = ["address"]
 
 
-class IPAddressListView(FilterView):
+class IPAddressListView(OrganizationFilterMixin, FilterView):
     model = IPAddress
     template_name = "objects/ipaddress_list.html"
     context_object_name = "ipaddresses"
@@ -342,13 +364,26 @@ class IPAddressListView(FilterView):
     filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
+        # Get filtered organizations from URL parameters
+        organization_codes = self.request.GET.getlist("organization")
+
+        scan_level_filter = {"object_type": "ipaddress", "object_id": OuterRef("id")}
+
+        # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_level_filter["organization"] = organization
+
         scan_level_subquery = (
-            ScanLevel.objects.filter(object_type="ipaddress", object_id=OuterRef("id"))
+            ScanLevel.objects.filter(**scan_level_filter)
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
+        # Note: IPAddress doesn't have organization field, so OrganizationFilterMixin
+        # is only used for context (dropdown display), not for actual filtering
         return IPAddress.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
@@ -360,7 +395,7 @@ class IPAddressListView(FilterView):
         return context
 
 
-class IPAddressDetailView(DetailView):
+class IPAddressDetailView(OrganizationFilterMixin, DetailView):
     model = IPAddress
     template_name = "objects/ipaddress_detail.html"
     context_object_name = "ipaddress"
@@ -371,7 +406,16 @@ class IPAddressDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
-        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+
+        # Filter scan levels by selected organization only if exactly one is selected
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="ipaddress")
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_levels = scan_levels.filter(organization=organization)
+
+        context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
@@ -547,7 +591,7 @@ class HostnameFilter(django_filters.FilterSet):
         fields = ["name"]
 
 
-class HostnameListView(FilterView):
+class HostnameListView(OrganizationFilterMixin, FilterView):
     model = Hostname
     template_name = "objects/hostname_list.html"
     context_object_name = "hostnames"
@@ -555,13 +599,26 @@ class HostnameListView(FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
+        # Get filtered organizations from URL parameters
+        organization_codes = self.request.GET.getlist("organization")
+
+        scan_level_filter = {"object_type": "hostname", "object_id": OuterRef("id")}
+
+        # Filter by organization only if exactly one is selected (xtdb doesn't support __in)
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_level_filter["organization"] = organization
+
         scan_level_subquery = (
-            ScanLevel.objects.filter(object_type="hostname", object_id=OuterRef("id"))
+            ScanLevel.objects.filter(**scan_level_filter)
             .values("object_id")
             .order_by()
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
+        # Note: Hostname doesn't have organization field, so OrganizationFilterMixin
+        # is only used for context (dropdown display), not for actual filtering
         return Hostname.objects.select_related("network").annotate(
             max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
         )
@@ -573,7 +630,7 @@ class HostnameListView(FilterView):
         return context
 
 
-class HostnameDetailView(DetailView):
+class HostnameDetailView(OrganizationFilterMixin, DetailView):
     model = Hostname
     template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
@@ -586,9 +643,9 @@ class HostnameDetailView(DetailView):
             "dnscnamerecord_set",
             "dnscnamerecord_target_set",
             "dnsmxrecord_set",
-            "dnsmxrecord_mailserver_set",
+            "dnsmxrecord_mailserver",
             "dnsnsrecord_set",
-            "dnsnsrecord_nameserver_set",
+            "dnsnsrecord_nameserver",
             "dnscaarecord_set",
             "dnstxtrecord_set",
             "dnssrvrecord_set",
@@ -597,7 +654,16 @@ class HostnameDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
-        context["scan_levels"] = ScanLevel.objects.filter(object_id=self.object.id)
+
+        # Filter scan levels by selected organization only if exactly one is selected
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="hostname")
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes and len(organization_codes) == 1:
+            organization = Organization.objects.filter(code=organization_codes[0]).first()
+            if organization:
+                scan_levels = scan_levels.filter(organization=organization)
+
+        context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
         return context
