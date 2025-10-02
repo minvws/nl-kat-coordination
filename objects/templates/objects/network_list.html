@@ -40,7 +40,7 @@
                             {% for network in networks %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'objects:network_detail' network.pk %}">{{ network.name }}</a>
+                                        <a href="{% url 'objects:network_detail' network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ network.name }}</a>
                                     </td>
                                     <td>
                                         {% if network.max_scan_level != None %}

@@ -118,15 +118,23 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:network_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
         scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="network")
-        organization_codes = self.request.GET.getlist("organization")
-        if organization_codes and len(organization_codes) == 1:
-            organization = Organization.objects.filter(code=organization_codes[0]).first()
-            if organization:
-                scan_levels = scan_levels.filter(organization=organization)
+        if organization_codes:
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
 
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
@@ -488,15 +496,23 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:ipaddress_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
         scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="ipaddress")
-        organization_codes = self.request.GET.getlist("organization")
-        if organization_codes and len(organization_codes) == 1:
-            organization = Organization.objects.filter(code=organization_codes[0]).first()
-            if organization:
-                scan_levels = scan_levels.filter(organization=organization)
+        if organization_codes:
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
 
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
@@ -777,16 +793,24 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:hostname_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
         scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="hostname")
-        organization_codes = self.request.GET.getlist("organization")
-        if organization_codes and len(organization_codes) == 1:
-            organization = Organization.objects.filter(code=organization_codes[0]).first()
-            if organization:
-                scan_levels = scan_levels.filter(organization=organization)
 
+        if organization_codes:
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
