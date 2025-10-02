@@ -6,6 +6,7 @@ from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
+import yaml
 
 
 class Reference(str):
@@ -54,6 +55,11 @@ class Reference(str):
     @classmethod
     def from_str(cls, ref_str: str) -> Reference:
         return cls(ref_str)
+
+def reference_representer(dumper: yaml.SafeDumper, data: Reference) -> yaml.Node:
+    return dumper.represent_scalar("!Reference", str(data))
+        
+yaml.SafeDumper.add_representer(Reference, reference_representer)
 
 
 class ScanLevel(IntEnum):
@@ -106,6 +112,17 @@ class InheritedScanProfile(ScanProfileBase):
 
 
 ScanProfile = EmptyScanProfile | InheritedScanProfile | DeclaredScanProfile
+def scan_profile_yml_representer(dumper: yaml.SafeDumper, data) -> yaml.Node:
+    return dumper.represent_mapping("!ScanProfile", {
+        "scan_profile_type": data.scan_profile_type,
+        "reference": data.reference,
+        "level": str(data.level),
+        "user_id": data.user_id,
+})
+
+yaml.SafeDumper.add_representer(EmptyScanProfile, scan_profile_yml_representer)
+yaml.SafeDumper.add_representer(InheritedScanProfile, scan_profile_yml_representer)
+yaml.SafeDumper.add_representer(DeclaredScanProfile, scan_profile_yml_representer)
 
 
 class OOI(BaseModel):
@@ -212,6 +229,15 @@ class OOI(BaseModel):
     @classmethod
     def traversable(cls) -> bool:
         return cls._traversable
+    
+    @classmethod
+    def get_ooi_yml_repr_dict(cls, data: OOI):
+        return {
+            "object_type": data.object_type,
+            "scan_profile": data.scan_profile,
+            "user_id": data.user_id,
+            "primary_key": data.primary_key,
+        }
 
     def serialize(self) -> SerializedOOI:
         serialized_oois = {}

@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Literal
+import yaml
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -57,6 +58,23 @@ class X509Certificate(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.issuer} ({reference.tokenized.serial_number})"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: X509Certificate) -> yaml.Node:
+        return dumper.represent_mapping("!X509Certificate", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "subject": data.subject,
+            "issuer": data.issuer,
+            "valid_from": data.valid_from,
+            "valid_until": data.valid_until,
+            "pk_algorithm": data.pk_algorithm,
+            "pk_size": data.pk_size,
+            "pk_number": data.pk_number,
+            "signed_by": data.signed_by,
+            "serial_number": data.serial_number,
+            "expires_in": data.expires_in,
+        })
+
 
 
 class SubjectAlternativeName(OOI):
@@ -87,6 +105,14 @@ class SubjectAlternativeNameHostname(SubjectAlternativeName):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.hostname.name
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: SubjectAlternativeNameHostname) -> yaml.Node:
+        return dumper.represent_mapping("!SubjectAlternativeNameHostname", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "certificate": data.certificate,
+            "hostname": data.hostname,
+        })
 
 
 class SubjectAlternativeNameIP(SubjectAlternativeName):
@@ -109,6 +135,14 @@ class SubjectAlternativeNameIP(SubjectAlternativeName):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.address.address
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: SubjectAlternativeNameIP) -> yaml.Node:
+        return dumper.represent_mapping("!SubjectAlternativeNameIP", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "certificate": data.certificate,
+            "address": data.address,
+        })
 
 
 class SubjectAlternativeNameQualifier(SubjectAlternativeName):
@@ -131,6 +165,14 @@ class SubjectAlternativeNameQualifier(SubjectAlternativeName):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: SubjectAlternativeNameQualifier) -> yaml.Node:
+        return dumper.represent_mapping("!SubjectAlternativeNameQualifier", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "certificate": data.certificate,
+            "name": data.name,
+        })
 
 
 X509Certificate.model_rebuild()

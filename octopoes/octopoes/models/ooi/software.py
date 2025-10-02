@@ -1,4 +1,7 @@
+from __future__ import annotations
 from typing import Literal
+
+import yaml
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -21,6 +24,15 @@ class Software(OOI):
         if version:
             version = f" {version}"
         return f"{reference.tokenized.name}{version}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: Software) -> yaml.Node:
+        return dumper.represent_mapping("!Software", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "name": data.name,
+            "version": data.version,
+            "cpe": data.cpe,
+        })
 
 
 class SoftwareInstance(OOI):
@@ -43,3 +55,12 @@ class SoftwareInstance(OOI):
         ooi_reference = Reference.from_str("|".join(parts[0:-4]))
         software_reference = Reference.from_str("|".join(parts[-4:]))
         return f"{software_reference.human_readable} @ {ooi_reference.human_readable}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: SoftwareInstance) -> yaml.Node:
+        return dumper.represent_mapping("!SoftwareInstance", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "ooi": data.ooi,
+            "software": data.software,
+        })
+    

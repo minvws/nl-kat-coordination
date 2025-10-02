@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import hashlib
 from enum import Enum
 from typing import Literal
+import yaml
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSTXTRecord
@@ -36,6 +39,17 @@ class DNSSPFRecord(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"SPF Record of {reference.tokenized.dns_txt_record.hostname.name}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DNSSPFRecord) -> yaml.Node:
+        return dumper.represent_mapping("!DNSSPFRecord", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "value": data.value,
+            "ttl": data.ttl,
+            "all": data.all,
+            "exp": data.exp,
+            "dns_txt_record": data.dns_txt_record,
+        })
 
 
 class MechanismQualifier(Enum):
@@ -107,7 +121,16 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
             f"SPF {reference.tokenized.qualifier}{reference.tokenized.mechanism}:{reference.tokenized.ip.address}"
             f" for {reference.tokenized.spf_record.dns_txt_record.hostname.name}"
         )
-
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DNSSPFMechanismIP) -> yaml.Node:
+        return dumper.represent_mapping("!DNSSPFMechanismIP", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "spf_record": data.spf_record,
+            "mechanism": data.mechanism,
+            "ip": data.ip,
+            "qualifier": str(data.qualifier),
+        })
 
 class DNSSPFMechanismHostname(DNSSPFMechanism):
     """Represents the DNS SPF Mechanism for Hostnames.
@@ -132,6 +155,16 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
             f"SPF {reference.tokenized.qualifier}{reference.tokenized.mechanism}:{reference.tokenized.hostname.name}"
             f" for {reference.tokenized.spf_record.dns_txt_record.hostname.name}"
         )
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DNSSPFMechanismHostname) -> yaml.Node:
+        return dumper.represent_mapping("!DNSSPFMechanismHostname", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "spf_record": data.spf_record,
+            "mechanism": data.mechanism,
+            "hostname": data.hostname,
+            "qualifier": str(data.qualifier),
+        })
 
 
 class DNSSPFMechanismNetBlock(DNSSPFMechanism):
@@ -158,6 +191,16 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
             f"{reference.tokenized.netblock.start_ip}/{reference.tokenized.netblock.mask}"
             f" for {reference.tokenized.spf_record.dns_txt_record.hostname.name}"
         )
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DNSSPFMechanismNetBlock) -> yaml.Node:
+        return dumper.represent_mapping("!DNSSPFMechanismNetBlock", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "spf_record": data.spf_record,
+            "mechanism": data.mechanism,
+            "netblock": data.netblock,
+            "qualifier": str(data.qualifier),
+        })
 
 
 class DMARCTXTRecord(OOI):
@@ -179,6 +222,15 @@ class DMARCTXTRecord(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"DMARC TXT Record of {reference.tokenized.hostname.name}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DMARCTXTRecord) -> yaml.Node:
+        return dumper.represent_mapping("!DMARCTXTRecord", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "value": data.value,
+            "ttl": data.ttl,
+            "hostname": data.hostname,
+        })
 
 
 class DKIMExists(OOI):
@@ -193,6 +245,13 @@ class DKIMExists(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"DKIM Exists on {reference.tokenized.hostname.name}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DKIMExists) -> yaml.Node:
+        return dumper.represent_mapping("!DKIMExists", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "hostname": data.hostname,
+        })
 
 
 class DKIMSelector(OOI):
@@ -211,6 +270,14 @@ class DKIMSelector(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.selector} DKIM selector of {reference.tokenized.hostname.name}"
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DKIMSelector) -> yaml.Node:
+        return dumper.represent_mapping("!DKIMSelector", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "selector": data.selector,
+            "hostname": data.hostname,
+        })
 
 
 class DKIMKey(OOI):
@@ -229,3 +296,11 @@ class DKIMKey(OOI):
             f"DKIM key of {reference.tokenized.dkim_selector.selector} on "
             f"{reference.tokenized.dkim_selector.hostname.name}"
         )
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: DKIMKey) -> yaml.Node:
+        return dumper.represent_mapping("!DKIMKey", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "key": data.key,
+            "dkim_selector": data.dkim_selector,
+        })

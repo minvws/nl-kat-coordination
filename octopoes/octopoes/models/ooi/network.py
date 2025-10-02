@@ -4,7 +4,8 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, field_serializer
+import yaml
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -30,6 +31,13 @@ class Network(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
+    
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: Network) -> yaml.Node:
+        return dumper.represent_mapping("!Network", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "name": data.name,
+        })
 
 
 class IPAddress(OOI):
@@ -61,7 +69,20 @@ class IPAddressV4(IPAddress):
         "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
+    @field_serializer('address')
+    def serialize_address(self, address: IPv4Address, _info):
+        return address.exploded
+
     _reverse_relation_names = {"network": "ip_v4_addresses", "netblock": "ip_v4_addresses"}
+
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPAddressV6) -> yaml.Node:
+        return dumper.represent_mapping("!IPAddressV6", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "address": data.address.exploded,
+            "network": data.network,
+            "netblock": data.netblock
+        })
 
 
 class IPAddressV6(IPAddress):
@@ -79,7 +100,20 @@ class IPAddressV6(IPAddress):
         "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
+    @field_serializer('address')
+    def serialize_address(self, address: IPv6Address, _info):
+        return address.exploded
+
     _reverse_relation_names = {"network": "ip_v6_addresses", "netblock": "ip_v6_addresses"}
+
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPAddressV6) -> yaml.Node:
+        return dumper.represent_mapping("!IPAddressV6", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "address": data.address.exploded,
+            "network": data.network,
+            "netblock": data.netblock
+        })
 
 
 class Protocol(Enum):
@@ -148,6 +182,15 @@ class IPPort(OOI):
         tokenized = reference.tokenized
         return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
 
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPPort) -> yaml.Node:
+        return dumper.represent_mapping("!IPPort", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "address": data.address,
+            "protocol": str(data.protocol),
+            "port": data.port,
+            "state": str(data.state) if data.state else data.state,
+        })
 
 class AutonomousSystem(OOI):
     """Represents the Autonomous System number object.
@@ -166,6 +209,14 @@ class AutonomousSystem(OOI):
     number: str
     name: str | None
     _natural_key_attrs = ["number"]
+
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: AutonomousSystem) -> yaml.Node:
+        return dumper.represent_mapping("!AutonomousSystem", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "number": data.number,
+            "name": data.name,
+        })
 
 
 class NetBlock(OOI):
@@ -209,6 +260,20 @@ class IPV6NetBlock(NetBlock):
 
     _reverse_relation_names = {"parent": "child_netblocks", "announced_by": "announced_ipv6_netblocks"}
 
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPV6NetBlock) -> yaml.Node:
+        return dumper.represent_mapping("!IPV6NetBlock", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "name": data.name,
+            "description": data.description,
+            "network": data.network,
+            "announced_by": data.announced_by,
+            "parent": data.parent,
+            "start_ip": data.start_ip,
+            "mask": data.mask,
+        })
+
+
 
 class IPV4NetBlock(NetBlock):
     """Represents the IPv4 Netblock object.
@@ -230,6 +295,20 @@ class IPV4NetBlock(NetBlock):
     mask: Annotated[int, Field(ge=0, lt=32)]
 
     _reverse_relation_names = {"parent": "child_netblocks", "announced_by": "announced_ipv4_netblocks"}
+
+
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPV4NetBlock) -> yaml.Node:
+        return dumper.represent_mapping("!IPV4NetBlock", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "name": data.name,
+            "description": data.description,
+            "network": data.network,
+            "announced_by": data.announced_by,
+            "parent": data.parent,
+            "start_ip": data.start_ip,
+            "mask": data.mask,
+        })
 
 
 IPAddressV4.model_rebuild()

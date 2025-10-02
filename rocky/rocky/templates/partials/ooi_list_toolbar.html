@@ -39,6 +39,9 @@
                         <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'json' %}"><span class="icon ti-download"></span>{% translate "Download as JSON" %}</a>
                     </li>
                     <li>
+                        <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'yml' %}"><span class="icon ti-download"></span>{% translate "Download as YAML" %}</a>
+                    </li>
+                    <li>
                         <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'csv' %}"><span class="icon ti-download"></span>{% translate "Download as CSV" %}</a>
                     </li>
                 </ul>

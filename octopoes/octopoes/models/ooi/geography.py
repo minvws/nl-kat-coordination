@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from typing import Annotated, Literal
 
 from pydantic import Field
+import yaml
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -28,3 +31,13 @@ class GeographicPoint(OOI):
     @property
     def natural_key(self) -> str:
         return f"{str(self.ooi)}|{self.longitude}|{self.latitude}"
+
+    @classmethod
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: GeographicPoint) -> yaml.Node:
+        return dumper.represent_mapping("!GeographicPoint", {
+            **cls.get_ooi_yml_repr_dict(data),
+            "ooi": data.ooi,
+            "longitude": data.longitude,
+            "latitude": data.latitude,
+        })
+    
