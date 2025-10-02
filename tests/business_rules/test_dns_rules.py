@@ -2,7 +2,18 @@ from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema, IntField
 
-from objects.models import DNSAAAARecord, DNSNSRecord, DNSTXTRecord, Hostname, IPAddress, IPPort, Network, Protocol
+from objects.models import (
+    CAATag,
+    DNSAAAARecord,
+    DNSCAARecord,
+    DNSNSRecord,
+    DNSTXTRecord,
+    Hostname,
+    IPAddress,
+    IPPort,
+    Network,
+    Protocol,
+)
 
 SA_TCP_PORTS = [
     21,  # FTP
@@ -42,19 +53,19 @@ rules = {
     "ipv6_webservers": {
         "name": "ipv6_webservers",
         "object_type": "Hostname",
-        "query": "dnsnsrecord_nameserver_set = None and dnsaaaarecord = None",
+        "query": "dnsnsrecord_nameserver = None and dnsaaaarecord = None",
         "finding_type_code": "KAT-WEBSERVER-NO-IPV6",
     },
     "ipv6_nameservers": {
         "name": "ipv6_nameservers",
         "object_type": "Hostname",
-        "query": "dnsnsrecord_nameserver_set != None and dnsaaaarecord = None",
+        "query": "dnsnsrecord_nameserver != None and dnsaaaarecord = None",
         "finding_type_code": "KAT-NAMESERVER-NO-IPV6",
     },
     "two_ipv6_nameservers": {
         "name": "two_ipv6_nameservers",
         "object_type": "Hostname",
-        "query": "dnsnsrecord_nameserver_set = None and nameservers_with_ipv6_count < 2",
+        "query": "dnsnsrecord_nameserver = None and nameservers_with_ipv6_count < 2",
         "finding_type_code": "KAT-NAMESERVER-NO-TWO-IPV6",
     },
     "missing_spf": {
@@ -94,6 +105,12 @@ rules = {
         "query": f'(protocol = "TCP" and port in ({",".join(str(x) for x in ALL_COMMON_TCP)})) '
         f'or (protocol = "UDP" and port in ({",".join(str(x) for x in COMMON_UDP_PORTS)}))',
         "finding_type_code": "KAT-COMMON-OPEN-PORT",
+    },
+    "missing_caa": {
+        "name": "missing_caa",
+        "object_type": "Hostname",
+        "query": "dnscaarecord = None",  # TODO: target root domains
+        "finding_type_code": "KAT-NO-CAA",
     },
 }
 
@@ -189,15 +206,17 @@ def test_missing_spf(xtdb):
     assert hns.count() == 1
     assert hns.first().name == "test.com"
 
-    DNSTXTRecord.objects.create(hostname=hn, value="v=spf1")
+    DNSTXTRecord.objects.create(hostname=hn, value="vspf1")
+    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 1
 
+    DNSTXTRecord.objects.create(hostname=hn, value="v=spf1")
     assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
 
     DNSTXTRecord.objects.create(hostname=hn, value="random")
-
     assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
 
     DNSTXTRecord.objects.create(hostname=hn, value="v=spf1 number 2")
+    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
 
 
 def test_port_classification(xtdb):
@@ -234,3 +253,17 @@ def test_port_classification(xtdb):
     assert apply_search(IPPort.objects.all(), rules["open_uncommon_port"]["query"]).count() == 1
 
     assert apply_search(IPPort.objects.all(), rules["open_common_port"]["query"]).count() == 6
+
+
+def test_missing_caa(xtdb):
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+    hn2 = Hostname.objects.create(network=network, name="test2.com")
+
+    assert apply_search(Hostname.objects.all(), rules["missing_caa"]["query"]).count() == 2
+
+    DNSCAARecord.objects.create(hostname=hn, flags=10, tag=CAATag.ISSUE)
+    assert apply_search(Hostname.objects.all(), rules["missing_caa"]["query"]).count() == 1
+
+    DNSCAARecord.objects.create(hostname=hn2, flags=10, tag=CAATag.CONTACTEMAIL)
+    assert apply_search(Hostname.objects.all(), rules["missing_caa"]["query"]).count() == 0
