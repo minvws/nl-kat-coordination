@@ -41,10 +41,10 @@
                             {% for hostname in hostnames %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'objects:hostname_detail' hostname.pk %}">{{ hostname.name }}</a>
+                                        <a href="{% url 'objects:hostname_detail' hostname.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.name }}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'objects:hostname_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
+                                        <a href="{% url 'objects:network_detail' hostname.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.network.name }}</a>
                                     </td>
                                     <td>
                                         {% if hostname.max_scan_level != None %}

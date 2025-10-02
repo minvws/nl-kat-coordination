@@ -41,10 +41,10 @@
                             {% for ipaddress in ipaddresses %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}">{{ ipaddress.address }}</a>
+                                        <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.address }}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'objects:network_detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
+                                        <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a>
                                     </td>
                                     <td>
                                         {% if ipaddress.max_scan_level != None %}
