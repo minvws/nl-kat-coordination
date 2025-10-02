@@ -19,17 +19,19 @@
         <ul>
             <li>
                 {% if filtered_organization_codes %}
-                    <a href="?{{ query_string_without_organization }}">{% translate "All organizations" %}</a>
+                    <a href="?{{ query_string_without_organization }}" class="dropdown-item">{% translate "All organizations" %}</a>
                 {% else %}
-                    <strong>✓ {% translate "All organizations" %}</strong>
+                    <a href="?{{ query_string_without_organization }}" class="dropdown-item"><strong>✓ {% translate "All organizations" %}</strong></a>
                 {% endif %}
             </li>
             {% for org in organizations_including_blocked %}
                 <li>
                     {% if org.code in filtered_organization_codes %}
-                        <strong><a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}{% if code != org.code %}organization={{ code }}&{% endif %}{% endfor %}">✓ {{ org.name }}</a></strong>
+                        <a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}{% if code != org.code %}organization={{ code }}&{% endif %}{% endfor %}"
+                           class="dropdown-item"><strong>✓ {{ org.name }}</strong></a>
                     {% else %}
-                        <a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}organization={{ org.code }}">{{ org.name }}</a>
+                        <a href="?{{ query_string_without_organization }}{% if query_string_without_organization %}&{% endif %}{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}organization={{ org.code }}"
+                           class="dropdown-item">{{ org.name }}</a>
                     {% endif %}
                 </li>
             {% endfor %}
