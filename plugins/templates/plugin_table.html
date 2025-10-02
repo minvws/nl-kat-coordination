@@ -93,25 +93,36 @@
                     </td>
                     <td>
                         {% if perms.openkat.add_enabledplugin %}
-                            <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
-                                  method="post"
-                                  class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
-                                <input type="hidden" name="organization" value="">
-                                <input type="hidden" name="plugin" value="{{ plugin.id }}">
-                                <input type="hidden"
-                                       name="enabled"
-                                       value="{% if not plugin.enabled %}true{% else %}false{% endif %}">
-                                <button type="submit"
-                                        class="button ghost {% if plugin.enabled %}destructive{% else %}plugin-enabled{% endif %}">
-                                    {% if not plugin.enabled %}
-                                        {% translate "Enable" %}
-                                    {% else %}
-                                        {% translate "Disable" %}
-                                    {% endif %}
+                            {% if enable_disable_allowed %}
+                                <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
+                                      method="post"
+                                      class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
+                                    <input type="hidden"
+                                           name="organization"
+                                           value="{% if selected_organization %}{{ selected_organization.id }}{% endif %}">
+                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
+                                    <input type="hidden"
+                                           name="enabled"
+                                           value="{% if not plugin.enabled %}true{% else %}false{% endif %}">
+                                    <button type="submit"
+                                            class="button ghost {% if plugin.enabled %}destructive{% else %}plugin-enabled{% endif %}">
+                                        {% if not plugin.enabled %}
+                                            {% translate "Enable" %}
+                                        {% else %}
+                                            {% translate "Disable" %}
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button type="button"
+                                        class="button ghost"
+                                        disabled
+                                        title="{% translate "Select a single organization to enable/disable plugins" %}">
+                                    {% translate "Enable/Disable" %}
                                 </button>
-                            </form>
+                            {% endif %}
                         {% else %}
                             {% if plugin.enabled %}
                                 <span class="label system-tag color-2">{% translate "Enabled" %}</span>
@@ -134,7 +145,9 @@
                             {% elif not plugin.files_in_arguments %}
                                 <form action="{% url 'add_task' %}" method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="organization" value="">
+                                    <input type="hidden"
+                                           name="organization"
+                                           value="{% if selected_organization %}{{ selected_organization.id }}{% endif %}">
                                     <input type="hidden" name="plugin" value="{{ plugin.id }}">
                                     <button type="submit">{% translate "Run" %}</button>
                                 </form>

@@ -2,7 +2,7 @@ import django_filters
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
+from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
@@ -44,20 +45,31 @@ class PluginVariantFilter(django_filters.FilterSet):
         fields = ["name", "scan_level"]
 
 
-class PluginListView(FilterView):
+class PluginListView(OrganizationFilterMixin, FilterView):
     template_name = "plugin_list.html"
     fields = ["enabled_plugins"]
     model = Plugin
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = PluginFilter
 
-    def get_queryset(self) -> PluginQuerySet:
-        plugins: PluginQuerySet = super().get_queryset()
+    def get_queryset(self) -> QuerySet:
+        plugins: PluginQuerySet = Plugin.objects.all()
+        organization_codes = self.request.GET.getlist("organization")
 
         if not self.request.user.can_access_all_organizations:
-            # TODO: multi organization filter
-            organization = Organization.objects.filter(members__user=self.request.user).first()
-            plugins = plugins.with_enabled(organization)
+            organizations = Organization.objects.filter(members__user=self.request.user)
+        else:
+            organizations = Organization.objects.all()
+
+        if organization_codes:
+            organizations = organizations.filter(code__in=organization_codes)
+
+            if organizations.count() == 1:
+                plugins = plugins.with_enabled(organizations.first())
+            else:
+                plugins = plugins.with_enabled(None)
+        elif not self.request.user.can_access_all_organizations:
+            plugins = plugins.with_enabled(organizations.first())
         else:
             plugins = plugins.with_enabled(None)
 
@@ -75,6 +87,18 @@ class PluginListView(FilterView):
         context["order_by"] = self.request.GET.get("order_by")
         context["sorting_order"] = self.request.GET.get("sorting_order", "asc")
         context["sorting_order_class"] = "ascending" if context["sorting_order"] == "asc" else "descending"
+
+        # Determine if enable/disable actions should be allowed
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes:
+            organizations = Organization.objects.filter(code__in=organization_codes)
+            context["enable_disable_allowed"] = organizations.count() == 1
+            if organizations.count() == 1:
+                context["selected_organization"] = organizations.first()
+        else:
+            context["enable_disable_allowed"] = True
+            if not self.request.user.can_access_all_organizations:
+                context["selected_organization"] = Organization.objects.filter(members__user=self.request.user).first()
 
         return context
 

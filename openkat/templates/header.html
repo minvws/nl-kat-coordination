@@ -28,52 +28,52 @@
                     {% if request.user.is_authenticated %}
                         <li>
                             {% url "organization_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
                         </li>
                         <li>
                             {% url "plugin_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
                         </li>
                         <li>
                             {% url "task_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                         </li>
                         <li>
                             {% url "file_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Files" %}</a>
                         </li>
                         <li>
                             {% url "schedule_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
                         </li>
                         <li>
                             {% url "object_set_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Object Sets" %}</a>
                         </li>
                         <li>
                             {% url "objects:network_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Networks" %}</a>
                         </li>
                         <li>
                             {% url "objects:hostname_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Hostnames" %}</a>
                         </li>
                         <li>
                             {% url "objects:ipaddress_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "IPAddresses" %}</a>
                         </li>
                         <li>
                             {% url "objects:finding_list" as index_url %}
-                            <a href="{{ index_url }}"
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
                         </li>
                     {% endif %}
