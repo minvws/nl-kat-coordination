@@ -54,10 +54,11 @@ def mail_records(hostname: str) -> list:
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
                 if isinstance(rr, TXT):
+                    results.append({"object_type": "Hostname", "network": "internet", "name": f"_dmarc.{root_domain}"})
                     results.append(
                         {
                             "object_type": "DNSTXTRecord",
-                            "hostname": root_domain,
+                            "hostname": f"_dmarc.{root_domain}",
                             "value": str(rr).strip('"'),
                             "ttl": rrset.ttl,
                         }
