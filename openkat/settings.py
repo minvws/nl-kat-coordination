@@ -219,7 +219,11 @@ TEMPLATES = [
                 "openkat.context_processors.organizations_including_blocked",
                 "openkat.context_processors.openkat_version",
             ],
-            "builtins": ["django_components.templatetags.component_tags", "openkat.templatetags.ooi_extra"],
+            "builtins": [
+                "django_components.templatetags.component_tags",
+                "openkat.templatetags.ooi_extra",
+                "openkat.templatetags.objects",
+            ],
             "loaders": [
                 (
                     "django.template.loaders.cached.Loader",

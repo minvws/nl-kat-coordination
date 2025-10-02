@@ -24,8 +24,10 @@
                 <p>
                     {% if objectset.object_query %}
                         <code>{{ objectset.object_query }}</code>
+                    {% elif objectset.object_query == "" %}
+                        {% translate "The query is empty, so all objects of type" %} <strong>{{ objectset.object_type.model }}</strong> {% translate "are in this set." %}
                     {% else %}
-                        -
+                        {% translate "No query present" %}
                     {% endif %}
                 </p>
             </div>
@@ -33,7 +35,13 @@
                 <div>
                     <h2>{% translate "Preview" %}</h2>
                     <ul>
-                        {% for object in objects %}<li>{{ object }}</li>{% endfor %}
+                        {% for object in objects %}
+                            {% with object|to_class_name|lower as model_name %}
+                                <li>
+                                    <a href="{% url "objects:"|add:model_name|add:"_detail" pk=object.id %}">{{ object }}</a>
+                                </li>
+                            {% endwith %}
+                        {% endfor %}
                     </ul>
                 </div>
             {% endif %}

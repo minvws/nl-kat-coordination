@@ -372,7 +372,7 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
         ]
 
-        obj = self.get_object()
+        obj: ObjectSet = self.get_object()
 
         if obj.object_query is not None and obj.dynamic is True:
             # TODO: check scan profiles?

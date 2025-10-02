@@ -57,13 +57,18 @@ class ObjectSet(models.Model):
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
     def get_query_objects(self) -> QuerySet:
-        if not self.object_query:
+        if self.object_query is None:
             return self.object_type.model_class().objects.none()
 
+        qs = self.object_type.model_class().objects.all()
+
+        if self.object_query == "":
+            return qs
+
         try:
-            return apply_search(self.object_type.model_class().objects.all(), self.object_query)
+            return apply_search(qs, self.object_query)
         except DjangoQLParserError:
-            return self.object_type.model_class().objects.none()
+            return qs
 
     def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
         # TODO: handle cycles
