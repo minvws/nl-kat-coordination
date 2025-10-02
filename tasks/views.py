@@ -380,6 +380,8 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
         else:
             context["objects"] = None
 
+        context["all_objects"] = obj.object_type.model_class().objects.filter(pk__in=obj.all_objects)
+
         return context
 
 
