@@ -51,6 +51,7 @@
                                     <th scope="col">{% translate "Scan level" %}</th>
                                     <th scope="col">{% translate "Declared" %}</th>
                                     <th scope="col" colspan="2">{% translate "Update" %}</th>
+                                    <th scope="col">{% translate "Delete" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +82,13 @@
                                             <button type="submit"
                                                     form="network-scan-level-form-{{ scan_level.organization.id }}"
                                                     class="button ghost">{% translate "Update" %}</button>
+                                        </td>
+                                        <td>
+                                            <form action="{% url 'objects:delete_scanlevel' scan_level.pk %}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 {% endfor %}

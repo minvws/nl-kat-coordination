@@ -16,7 +16,23 @@ from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django_filters.views import FilterView
 
 from objects.forms import HostnameCSVUploadForm, IPAddressCSVUploadForm
-from objects.models import Finding, Hostname, IPAddress, Network, ScanLevel, ScanLevelEnum
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCAARecord,
+    DNSCNAMERecord,
+    DNSMXRecord,
+    DNSNSRecord,
+    DNSPTRRecord,
+    DNSSRVRecord,
+    DNSTXTRecord,
+    Finding,
+    Hostname,
+    IPAddress,
+    Network,
+    ScanLevel,
+    ScanLevelEnum,
+)
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
@@ -1016,3 +1032,56 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             )
 
         return super().form_valid(form)
+
+
+# DNS Record Delete Views
+class DNSRecordDeleteView(DeleteView):
+    def get_success_url(self) -> str:
+        hostname_id = self.object.hostname_id
+        return reverse("objects:hostname_detail", kwargs={"pk": hostname_id})
+
+
+class DNSARecordDeleteView(DNSRecordDeleteView):
+    model = DNSARecord
+
+
+class DNSAAAARecordDeleteView(DNSRecordDeleteView):
+    model = DNSAAAARecord
+
+
+class DNSPTRRecordDeleteView(DNSRecordDeleteView):
+    model = DNSPTRRecord
+
+
+class DNSCNAMERecordDeleteView(DNSRecordDeleteView):
+    model = DNSCNAMERecord
+
+
+class DNSMXRecordDeleteView(DNSRecordDeleteView):
+    model = DNSMXRecord
+
+
+class DNSNSRecordDeleteView(DNSRecordDeleteView):
+    model = DNSNSRecord
+
+
+class DNSCAARecordDeleteView(DNSRecordDeleteView):
+    model = DNSCAARecord
+
+
+class DNSTXTRecordDeleteView(DNSRecordDeleteView):
+    model = DNSTXTRecord
+
+
+class DNSSRVRecordDeleteView(DNSRecordDeleteView):
+    model = DNSSRVRecord
+
+
+class ScanLevelDeleteView(DeleteView):
+    model = ScanLevel
+    template_name = "delete_confirm.html"
+
+    def get_success_url(self) -> str:
+        object_type = self.object.object_type
+        object_id = self.object.object_id
+        return reverse(f"objects:{object_type}_detail", kwargs={"pk": object_id})

@@ -2,6 +2,15 @@ from django.urls import path
 from rest_framework import routers
 
 from objects.views import (
+    DNSAAAARecordDeleteView,
+    DNSARecordDeleteView,
+    DNSCAARecordDeleteView,
+    DNSCNAMERecordDeleteView,
+    DNSMXRecordDeleteView,
+    DNSNSRecordDeleteView,
+    DNSPTRRecordDeleteView,
+    DNSSRVRecordDeleteView,
+    DNSTXTRecordDeleteView,
     FindingCreateView,
     FindingDeleteView,
     FindingListView,
@@ -25,6 +34,7 @@ from objects.views import (
     NetworkListView,
     NetworkScanLevelAddView,
     NetworkScanLevelUpdateView,
+    ScanLevelDeleteView,
 )
 from objects.viewsets import (
     DNSAAAARecordViewSet,
@@ -109,4 +119,16 @@ urlpatterns = [
         HostnameScanLevelUpdateView.as_view(),
         name="update_hostname_scan_level",
     ),
+    # DNS Record delete views
+    path("objects/dnsarecord/<int:pk>/delete/", DNSARecordDeleteView.as_view(), name="delete_dnsarecord"),
+    path("objects/dnsaaaarecord/<int:pk>/delete/", DNSAAAARecordDeleteView.as_view(), name="delete_dnsaaaarecord"),
+    path("objects/dnsptrrecord/<int:pk>/delete/", DNSPTRRecordDeleteView.as_view(), name="delete_dnsptrrecord"),
+    path("objects/dnscnamerecord/<int:pk>/delete/", DNSCNAMERecordDeleteView.as_view(), name="delete_dnscnamerecord"),
+    path("objects/dnsmxrecord/<int:pk>/delete/", DNSMXRecordDeleteView.as_view(), name="delete_dnsmxrecord"),
+    path("objects/dnsnsrecord/<int:pk>/delete/", DNSNSRecordDeleteView.as_view(), name="delete_dnsnsrecord"),
+    path("objects/dnscaarecord/<int:pk>/delete/", DNSCAARecordDeleteView.as_view(), name="delete_dnscaarecord"),
+    path("objects/dnstxtrecord/<int:pk>/delete/", DNSTXTRecordDeleteView.as_view(), name="delete_dnstxtrecord"),
+    path("objects/dnssrvrecord/<int:pk>/delete/", DNSSRVRecordDeleteView.as_view(), name="delete_dnssrvrecord"),
+    # Scan level delete view
+    path("objects/scanlevel/<int:pk>/delete/", ScanLevelDeleteView.as_view(), name="delete_scanlevel"),
 ]
