@@ -124,14 +124,14 @@ def test_hostname_api(drf_client, xtdb):
 
     hn = Hostname.objects.create(network=network, name="test.com")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk}
+        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True}
     ]
 
     hostname = {"network": "internet", "name": "test2.com"}
     hn2 = drf_client.post("/api/v1/objects/hostname/", json=hostname).json()
     assert drf_client.get("/api/v1/objects/hostname/?ordering=name").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk},
-        {"id": hn2["id"], "name": "test2.com", "network_id": network.pk},
+        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True},
+        {"id": hn2["id"], "name": "test2.com", "network_id": network.pk, "root": True},
     ]
 
     response = drf_client.post("/api/v1/objects/hostname/", json={"name": "test.com"})

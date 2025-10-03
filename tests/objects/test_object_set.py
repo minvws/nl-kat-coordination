@@ -159,5 +159,5 @@ def test_traverse_objects_invalid_query(xtdb):
     )
 
     result = object_set.traverse_objects()
-    assert len(result) == 1
+    assert len(result) == 2  # Root domain gets saved as well
     assert hostname1.pk in result

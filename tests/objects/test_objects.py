@@ -259,7 +259,7 @@ def test_to_dict(xtdb):
     host = Hostname.objects.create(name="test.com", network=net)
 
     assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id}
-    assert to_xtdb_dict(host) == {"name": "test.com", "network_id": net.id, "_id": host.id}
+    assert to_xtdb_dict(host) == {"name": "test.com", "network_id": net.id, "_id": host.id, "root": True}
 
 
 def test_bulk_insert_hostnames(xtdb):

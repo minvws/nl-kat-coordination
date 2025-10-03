@@ -142,7 +142,7 @@ def test_delete_plugin(rf, superuser_member, client_member):
         PluginDeleteView.as_view()(request, pk=plugin.id)
 
 
-def test_enabling_plugin_creates_schedule():
+def test_enabling_plugin_creates_schedule(xtdb):
     plugin = Plugin.objects.create(name="test", plugin_id="testt")
     enabled_plugin = EnabledPlugin.objects.create(enabled=True, plugin=plugin)
 
