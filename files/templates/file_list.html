@@ -57,7 +57,7 @@
                                 <tr data-file-id="{{ file.id }}">
                                     <td>{{ file.id }}</td>
                                     <td>{{ file.path.name }}</td>
-                                    <td>{{ file.path.parent }}</td>
+                                    <td>{{ file.path.parent|cut:'files/' }}</td>
                                     <td>
                                         {% if file.task_result %}
                                             {% if file.task_result.task.data.plugin_id %}
@@ -83,7 +83,7 @@
                                     <td>
                                         <!-- djlint:off T001 -->
                                         <a href="{% url 'add_plugin' %}?oci_arguments={file/{{ file.id }}}"
-                                           class="button ghost small">{% translate "Add to plugin" %}</a>
+                                           class="button ghost small">{% translate "Add plugin" %}</a>
                                         <!-- djlint:on -->
                                     </td>
                                 </tr>
