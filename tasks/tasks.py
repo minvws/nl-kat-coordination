@@ -335,11 +335,28 @@ def run_plugin(
     return out
 
 
-def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app) -> None:
+def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app) -> list[Task]:
     if file.type == "error" and not handle_error:
         logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
-        return
+        return []
+
+    tasks = []
+
+    if hasattr(file, "task_result") and file.task_result is not None:
+        organization = file.task_result.task.organization
+
+        for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
+            if plugin.enabled_for(organization):
+                tasks.extend(
+                    run_plugin_task(
+                        plugin.plugin_id, organization.code if organization else None, str(file.id), celery=celery
+                    )
+                )
+
+        return tasks
 
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
-        for organization in plugin.enabled_organizations():
-            run_plugin_task(plugin.plugin_id, organization.code, str(file.id), celery=celery)
+        for enabled_org in plugin.enabled_organizations():
+            tasks.extend(run_plugin_task(plugin.plugin_id, enabled_org.code, str(file.id), celery=celery))
+
+    return tasks

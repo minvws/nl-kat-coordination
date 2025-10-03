@@ -12,6 +12,7 @@ from files.models import File
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
+from tasks.tasks import process_raw_file
 
 logger = structlog.get_logger(__name__)
 
@@ -72,6 +73,12 @@ class FileCreateView(KATModelPermissionRequiredMixin, CreateView):
     def form_invalid(self, form):
         logger.error("Failed creating file", errors=form.errors)
         return redirect(reverse("file_list"))
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+        process_raw_file(self.object)
+
+        return result
 
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")

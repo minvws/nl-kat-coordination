@@ -7,9 +7,7 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from structlog import get_logger
 
-from files.models import File
 from openkat.models import Organization
-from tasks.tasks import process_raw_file
 
 logger = get_logger(__name__)
 
@@ -87,9 +85,3 @@ def log_delete(sender: type[models.Model], instance: models.Model, **kwargs: Any
 @receiver(pre_save, sender=Organization)
 def organization_pre_save(sender, instance, *args, **kwargs):
     instance.clean()
-
-
-@receiver(post_save, sender=File)
-def file_post_save(sender, instance, created, *args, **kwargs):
-    if created:
-        process_raw_file(instance)

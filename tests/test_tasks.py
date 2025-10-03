@@ -2,10 +2,11 @@ import time
 
 from celery import Celery
 
+from files.models import File, GenericContent
 from objects.models import Hostname, Network, ScanLevel
 from plugins.models import Plugin
-from tasks.models import Schedule, TaskStatus
-from tasks.tasks import run_schedule
+from tasks.models import Schedule, Task, TaskResult, TaskStatus
+from tasks.tasks import process_raw_file, run_schedule
 
 
 def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_container):
@@ -105,3 +106,40 @@ def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugi
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 1
+
+
+def test_process_raw_file(xtdb, celery: Celery, organization, organization_b, docker, plugin_container):
+    logs = [b"test logs"]
+    plugin_container.set_logs(logs)
+
+    plugin = Plugin.objects.create(
+        name="test", plugin_id="test", consumes=["file:testfile"], oci_image="T", oci_arguments=["{file}"], scan_level=2
+    )
+    plugin.enable()
+
+    f = File.objects.create(file=GenericContent(b"1234"), type="old")
+    f.type = "testfile"  # Avoid the process_raw_file signal
+    f.save()
+    TaskResult.objects.create(file=f, task=Task.objects.create())
+
+    tasks = process_raw_file(f, celery=celery)
+    assert len(tasks) == 1
+    assert tasks[0].organization is None
+
+    f = File.objects.create(file=GenericContent(b"4321"), type="old")
+    f.type = "testfile"  # Avoid the process_raw_file signal
+    f.save()
+    TaskResult.objects.create(file=f, task=Task.objects.create(organization=organization_b))
+
+    tasks = process_raw_file(f, celery=celery)
+    assert len(tasks) == 1
+    assert tasks[0].organization == organization_b
+
+    f = File.objects.create(file=GenericContent(b"4321"), type="old")
+    f.type = "testfile"  # Avoid the process_raw_file signal
+    f.save()
+
+    tasks = process_raw_file(f, celery=celery)
+    assert len(tasks) == 2
+    assert {task.organization for task in tasks} == {organization, organization_b}
+    assert Task.objects.count() == 6
