@@ -32,7 +32,6 @@
                     <table class="nowrap">
                         <thead>
                             <tr>
-                                <th>{% translate "Organization" %}</th>
                                 <th>{% translate "Finding Type" %}</th>
                                 <th>{% translate "Object" %}</th>
                                 <th></th>
@@ -41,7 +40,6 @@
                         <tbody>
                             {% for finding in findings %}
                                 <tr>
-                                    <td>{{ finding.organization }}</td>
                                     <td>{{ finding.finding_type.code }}</td>
                                     <td>
                                         <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>

@@ -406,7 +406,7 @@ class FindingListView(OrganizationFilterMixin, FilterView):
 class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Finding
     template_name = "objects/generic_object_form.html"
-    fields = ["organization", "finding_type", "object_type", "object_id"]  # TODO: make easy
+    fields = ["finding_type", "object_type", "object_id"]  # TODO: make easy
     success_url = reverse_lazy("objects:finding_list")
 
 

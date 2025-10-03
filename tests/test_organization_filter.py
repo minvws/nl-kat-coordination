@@ -1,6 +1,5 @@
 from django.urls import reverse
 
-from objects.models import Finding, FindingType, Hostname, Network
 from plugins.models import Plugin
 from tasks.models import Schedule, Task
 
@@ -103,36 +102,3 @@ def test_schedule_detail_filtered_by_organization(client, client_user_two_organi
 
     response = client.get(reverse("schedule_detail", kwargs={"pk": schedule1.id}) + "?organization=org")
     assert response.status_code == 200
-
-
-def test_finding_list_filtered_by_organization(
-    client, client_user_two_organizations, organization, organization_b, xtdb
-):
-    client.force_login(client_user_two_organizations)
-
-    network = Network.objects.create(name="test-network")
-    hostname1 = Hostname.objects.create(name="test1.example.com", network=network)
-    hostname2 = Hostname.objects.create(name="test2.example.com", network=network)
-
-    finding_type = FindingType.objects.create(code="TEST-001", description="Test finding type")
-
-    Finding.objects.create(
-        organization=organization, finding_type=finding_type, object_type="hostname", object_id=hostname1.id
-    )
-    Finding.objects.create(
-        organization=organization_b, finding_type=finding_type, object_type="hostname", object_id=hostname2.id
-    )
-
-    response = client.get(reverse("objects:finding_list"))
-    assert response.status_code == 200
-    assert len(response.context["object_list"]) == 2
-
-    response = client.get(reverse("objects:finding_list") + "?organization=org")
-    assert response.status_code == 200
-    assert len(response.context["object_list"]) == 1
-    assert response.context["object_list"][0].organization == organization
-
-    response = client.get(reverse("objects:finding_list") + "?organization=org_b")
-    assert response.status_code == 200
-    assert len(response.context["object_list"]) == 1
-    assert response.context["object_list"][0].organization == organization_b
