@@ -6,6 +6,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import (
     DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     Hostname,
@@ -17,7 +18,8 @@ from objects.models import (
     bulk_insert,
     to_xtdb_dict,
 )
-from objects.views import NetworkListView
+from objects.views import HostnameDetailView, NetworkListView
+from openkat.models import Organization
 from tasks.tasks import recalculate_scan_profiles
 from tests.conftest import setup_request
 
@@ -271,3 +273,130 @@ def test_bulk_insert_hostnames(xtdb):
 
     bulk_insert([host, host1, host2, host3])
     assert Hostname.objects.count() == 4
+
+
+def test_hostname_detail_view_shows_dns_record_max_scan_levels(rf, superuser_member, xtdb, organization):
+    # Create network and hostnames
+    net = Network.objects.create(name="internet")
+    hostname = Hostname.objects.create(name="example.com", network=net)
+    Hostname.objects.create(name="target.example.com", network=net)
+    mailserver = Hostname.objects.create(name="mail.example.com", network=net)
+    nameserver = Hostname.objects.create(name="ns.example.com", network=net)
+
+    # Create IP addresses
+    ip1 = IPAddress.objects.create(network=net, address="1.2.3.4")
+    IPAddress.objects.create(network=net, address="5.6.7.8")
+
+    # Create DNS records
+    a_record = DNSARecord.objects.create(hostname=hostname, ip_address=ip1, ttl=300)
+    Hostname.objects.get(name="target.example.com")
+    mx_record = DNSMXRecord.objects.create(hostname=hostname, mail_server=mailserver, preference=10, ttl=300)
+    ns_record = DNSNSRecord.objects.create(hostname=hostname, name_server=nameserver, ttl=300)
+
+    # Create scan levels for the DNS records themselves
+    ScanLevel.objects.create(organization=organization, object_type="dnsarecord", object_id=a_record.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="dnsmxrecord", object_id=mx_record.id, scan_level=1)
+    ScanLevel.objects.create(organization=organization, object_type="dnsnsrecord", object_id=ns_record.id, scan_level=4)
+
+    time.sleep(0.1)
+
+    # Make request to hostname detail view
+    request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/"), superuser_member.user)
+    response = HostnameDetailView.as_view()(request, pk=hostname.pk)
+
+    # Check that the context contains annotated DNS records
+    assert "dnsarecord_set" in response.context_data
+    assert "dnsmxrecord_set" in response.context_data
+    assert "dnsnsrecord_set" in response.context_data
+
+    # Verify A record has correct max scan level
+    a_records = list(response.context_data["dnsarecord_set"])
+    assert len(a_records) == 1
+    assert a_records[0].max_scan_level == 2
+
+    # Verify MX record has correct max scan level
+    mx_records = list(response.context_data["dnsmxrecord_set"])
+    assert len(mx_records) == 1
+    assert mx_records[0].max_scan_level == 1
+
+    # Verify NS record has correct max scan level
+    ns_records = list(response.context_data["dnsnsrecord_set"])
+    assert len(ns_records) == 1
+    assert ns_records[0].max_scan_level == 4
+
+
+def test_hostname_detail_view_filters_scan_levels_by_organization(rf, superuser_member, xtdb, organization):
+    org2 = Organization.objects.create(name="Test Org 2", code="test-org-2")
+
+    net = Network.objects.create(name="internet")
+    hostname = Hostname.objects.create(name="example.com", network=net)
+    ip1 = IPAddress.objects.create(network=net, address="1.2.3.4")
+
+    a_record = DNSARecord.objects.create(hostname=hostname, ip_address=ip1, ttl=300)
+
+    ScanLevel.objects.create(organization=organization, object_type="dnsarecord", object_id=a_record.id, scan_level=2)
+    ScanLevel.objects.create(organization=org2, object_type="dnsarecord", object_id=a_record.id, scan_level=4)
+
+    time.sleep(0.1)
+
+    request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/"), superuser_member.user)
+    response = HostnameDetailView.as_view()(request, pk=hostname.pk)
+    a_records = list(response.context_data["dnsarecord_set"])
+    assert len(a_records) == 1
+    assert a_records[0].max_scan_level == 4  # Max of 2 and 4
+
+    request = setup_request(
+        rf.get(f"/objects/hostname/{hostname.pk}/?organization={organization.code}"), superuser_member.user
+    )
+    response = HostnameDetailView.as_view()(request, pk=hostname.pk)
+    a_records = list(response.context_data["dnsarecord_set"])
+    assert len(a_records) == 1
+    assert a_records[0].max_scan_level == 2  # Only org1's scan level
+
+    request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/?organization={org2.code}"), superuser_member.user)
+    response = HostnameDetailView.as_view()(request, pk=hostname.pk)
+    a_records = list(response.context_data["dnsarecord_set"])
+    assert len(a_records) == 1
+    assert a_records[0].max_scan_level == 4  # Only org2's scan level
+
+
+def test_hostname_detail_view_shows_reverse_dns_record_scan_levels(rf, superuser_member, xtdb, organization):
+    net = Network.objects.create(name="internet")
+    hostname = Hostname.objects.create(name="example.com", network=net)
+    source_hostname = Hostname.objects.create(name="source.example.com", network=net)
+
+    cname_record = DNSCNAMERecord.objects.create(hostname=source_hostname, target=hostname, ttl=300)
+    mx_record = DNSMXRecord.objects.create(hostname=source_hostname, mail_server=hostname, preference=10, ttl=300)
+    ns_record = DNSNSRecord.objects.create(hostname=source_hostname, name_server=hostname, ttl=300)
+
+    ScanLevel.objects.create(
+        organization=organization, object_type="dnscnamerecord", object_id=cname_record.id, scan_level=3
+    )
+    ScanLevel.objects.create(organization=organization, object_type="dnsmxrecord", object_id=mx_record.id, scan_level=2)
+    ScanLevel.objects.create(organization=organization, object_type="dnsnsrecord", object_id=ns_record.id, scan_level=1)
+
+    time.sleep(0.1)
+
+    # Make request to hostname detail view
+    request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/"), superuser_member.user)
+    response = HostnameDetailView.as_view()(request, pk=hostname.pk)
+
+    # Check reverse DNS records
+    assert "dnscnamerecord_target_set" in response.context_data
+    assert "dnsmxrecord_mailserver" in response.context_data
+    assert "dnsnsrecord_nameserver" in response.context_data
+
+    # Verify CNAME target record has correct scan level
+    cname_targets = list(response.context_data["dnscnamerecord_target_set"])
+    assert len(cname_targets) == 1
+    assert cname_targets[0].max_scan_level == 3
+
+    # Verify MX mailserver record has correct scan level
+    mx_mailservers = list(response.context_data["dnsmxrecord_mailserver"])
+    assert len(mx_mailservers) == 1
+    assert mx_mailservers[0].max_scan_level == 2
+
+    # Verify NS nameserver record has correct scan level
+    ns_nameservers = list(response.context_data["dnsnsrecord_nameserver"])
+    assert len(ns_nameservers) == 1
+    assert ns_nameservers[0].max_scan_level == 1
