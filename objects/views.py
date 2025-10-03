@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Max, OuterRef, QuerySet, Subquery
+from django.db.models import Max, OuterRef, Q, QuerySet, Subquery
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -31,10 +31,16 @@ class NetworkFilter(django_filters.FilterSet):
     object_set = django_filters.ModelChoiceFilter(
         label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
+    scan_level = django_filters.MultipleChoiceFilter(
+        label="Scan level",
+        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        method="filter_by_scan_level",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
+    )
 
     class Meta:
         model = Network
-        fields = ["name", "object_set"]
+        fields = ["name", "object_set", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,6 +55,20 @@ class NetworkFilter(django_filters.FilterSet):
     def filter_by_object_set(self, queryset, name, value):
         # This method is called by django-filters, but we handle filtering in the view
         return queryset
+
+    def filter_by_scan_level(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        q_objects = Q()
+
+        for level in value:
+            if level == "none":
+                q_objects |= Q(max_scan_level__isnull=True)
+            else:
+                q_objects |= Q(max_scan_level=level)
+
+        return queryset.filter(q_objects)
 
 
 class NetworkListView(OrganizationFilterMixin, FilterView):
@@ -403,10 +423,16 @@ class IPAddressFilter(django_filters.FilterSet):
     object_set = django_filters.ModelChoiceFilter(
         label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
+    scan_level = django_filters.MultipleChoiceFilter(
+        label="Scan level",
+        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        method="filter_by_scan_level",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
+    )
 
     class Meta:
         model = IPAddress
-        fields = ["address", "object_set"]
+        fields = ["address", "object_set", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -422,6 +448,20 @@ class IPAddressFilter(django_filters.FilterSet):
     def filter_by_object_set(self, queryset, name, value):
         # This method is called by django-filters, but we handle filtering in the view
         return queryset
+
+    def filter_by_scan_level(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        q_objects = Q()
+
+        for level in value:
+            if level == "none":
+                q_objects |= Q(max_scan_level__isnull=True)
+            else:
+                q_objects |= Q(max_scan_level=level)
+
+        return queryset.filter(q_objects)
 
 
 class IPAddressListView(OrganizationFilterMixin, FilterView):
@@ -687,10 +727,16 @@ class HostnameFilter(django_filters.FilterSet):
     object_set = django_filters.ModelChoiceFilter(
         label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
+    scan_level = django_filters.MultipleChoiceFilter(
+        label="Scan level",
+        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        method="filter_by_scan_level",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
+    )
 
     class Meta:
         model = Hostname
-        fields = ["name", "object_set"]
+        fields = ["name", "object_set", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -706,6 +752,20 @@ class HostnameFilter(django_filters.FilterSet):
     def filter_by_object_set(self, queryset, name, value):
         # This method is called by django-filters, but we handle filtering in the view
         return queryset
+
+    def filter_by_scan_level(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        q_objects = Q()
+
+        for level in value:
+            if level == "none":
+                q_objects |= Q(max_scan_level__isnull=True)
+            else:
+                q_objects |= Q(max_scan_level=level)
+
+        return queryset.filter(q_objects)
 
 
 class HostnameListView(OrganizationFilterMixin, FilterView):

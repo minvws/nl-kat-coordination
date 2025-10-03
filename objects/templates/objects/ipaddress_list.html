@@ -18,14 +18,37 @@
                     <a class="button ghost" href="{% url "objects:add_ipaddress" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add IPAddress" %}</a>
                 </div>
             {% endif %}
-            <form class="inline layout-wide" method="get">
-                <div class="horizontal-view">
-                    {{ filter.form.as_p }}
-                    <p class="action-buttons">
-                        <button type="submit" class="icon ti-search"></button>
-                    </p>
-                </div>
-            </form>
+            <div class="filter-container">
+                <form class="inline layout-wide" method="get">
+                    {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                    <div class="horizontal-view">
+                        {% for field in filter.form %}
+                            {% if field.name == 'scan_level' %}
+                                <div>
+                                    <label>{{ field.label }}:</label>
+                                    <span class="scan-level-filter-checkboxes">
+                                        {% for choice_value, choice_label in field.field.choices %}
+                                            <span>
+                                                <input type="checkbox"
+                                                       name="{{ field.name }}"
+                                                       value="{{ choice_value }}"
+                                                       {% if field.value and choice_value|stringformat:"s" in field.value %}checked{% endif %}>
+                                                <span>{{ choice_label }}</span>
+                                            </span>
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                            {% else %}
+                                <p>
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                </p>
+                            {% endif %}
+                        {% endfor %}
+                        <button type="submit">{% translate "Apply" %}</button>
+                    </div>
+                </form>
+            </div>
             <div>
                 <div class="horizontal-scroll sticky-column">
                     <table class="nowrap">
