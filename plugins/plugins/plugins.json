@@ -317,5 +317,19 @@
       "-c",
       "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], .host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f -t hostname"
     ]
+  },
+  {
+    "plugin_id": "parse-nuclei-expired-ssl",
+    "name": "Nuclei Expired SSL Findings",
+    "description": "Parses nuclei expired ssl data to create KATFindings.",
+    "consumes": [
+      "file:nuclei-expired-ssl"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "sh",
+      "-c",
+      "uv run cat.py {file} | grep \"{.*}\" | jq '[\"KAT-CERTIFICATE-EXPIRED\", .host] | @tsv' -r | uv run store.py -f -t hostname"
+    ]
   }
 ]
