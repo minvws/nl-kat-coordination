@@ -49,6 +49,12 @@ COMMON_UDP_PORTS = [
     53  # DNS
 ]
 
+INDICATORS = [
+    "ns1.registrant-verification.ispapi.net",
+    "ns2.registrant-verification.ispapi.net",
+    "ns3.registrant-verification.ispapi.net",
+]
+
 rules = {
     "ipv6_webservers": {
         "name": "ipv6_webservers",
@@ -77,33 +83,33 @@ rules = {
     "open_sysadmin_port": {
         "name": "open_sysadmin_port",
         "object_type": "IPPort",
-        "query": f'protocol = "TCP" and port in ({",".join(str(x) for x in SA_TCP_PORTS)})',
+        "query": f'protocol = "TCP" and port in ({", ".join(str(x) for x in SA_TCP_PORTS)})',
         "finding_type_code": "KAT-OPEN-SYSADMIN-PORT",
     },
     "open_database_port": {
         "name": "open_database_port",
         "object_type": "IPPort",
-        "query": f'protocol = "TCP" and port in ({",".join(str(x) for x in DB_TCP_PORTS)})',
+        "query": f'protocol = "TCP" and port in ({", ".join(str(x) for x in DB_TCP_PORTS)})',
         "finding_type_code": "KAT-OPEN-DATABASE-PORT",
     },
     "open_remote_desktop_port": {
         "name": "open_remote_desktop_port",
         "object_type": "IPPort",
-        "query": f'protocol = "TCP" and port in ({",".join(str(x) for x in MICROSOFT_RDP_PORTS)})',
+        "query": f'protocol = "TCP" and port in ({", ".join(str(x) for x in MICROSOFT_RDP_PORTS)})',
         "finding_type_code": "KAT-REMOTE-DESKTOP-PORT",
     },
     "open_uncommon_port": {
         "name": "open_uncommon_port",
         "object_type": "IPPort",
-        "query": f'(protocol = "TCP" and port not in ({",".join(str(x) for x in ALL_COMMON_TCP)})) '
-        f'or (protocol = "UDP" and port not in ({",".join(str(x) for x in COMMON_UDP_PORTS)}))',
+        "query": f'(protocol = "TCP" and port not in ({", ".join(str(x) for x in ALL_COMMON_TCP)})) '
+        f'or (protocol = "UDP" and port not in ({", ".join(str(x) for x in COMMON_UDP_PORTS)}))',
         "finding_type_code": "KAT-UNCOMMON-OPEN-PORT",
     },
     "open_common_port": {
         "name": "open_common_port",
         "object_type": "IPPort",
-        "query": f'(protocol = "TCP" and port in ({",".join(str(x) for x in ALL_COMMON_TCP)})) '
-        f'or (protocol = "UDP" and port in ({",".join(str(x) for x in COMMON_UDP_PORTS)}))',
+        "query": f'(protocol = "TCP" and port in ({", ".join(str(x) for x in ALL_COMMON_TCP)})) '
+        f'or (protocol = "UDP" and port in ({", ".join(str(x) for x in COMMON_UDP_PORTS)}))',
         "finding_type_code": "KAT-COMMON-OPEN-PORT",
     },
     "missing_caa": {
@@ -117,6 +123,12 @@ rules = {
         "object_type": "Hostname",
         "query": 'dnsmxrecord_mailserver != None and name startswith "_dmarc"',
         "finding_type_code": "KAT-NO-DMARC",
+    },
+    "domain_owner_verification": {
+        "name": "domain_owner_verification",
+        "object_type": "Hostname",
+        "query": f"dnsnsrecord_nameserver.name_server.name in ({', '.join(f'"{x}"' for x in INDICATORS)})",
+        "finding_type_code": "KAT-DOMAIN-OWNERSHIP-PENDING",
     },
 }
 
@@ -306,3 +318,22 @@ def test_missing_dmarc(xtdb):
 
     hostnames._result_cache = None
     assert {hostname.id for hostname in hostnames} == {h2.pk}
+
+
+def test_domain_owner_verification(xtdb):
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+    hn2 = Hostname.objects.create(network=network, name="test2.com")
+    ns1 = Hostname.objects.create(network=network, name="ns1.test.com")
+    ns2 = Hostname.objects.create(network=network, name="ns2.test.com")
+    DNSNSRecord.objects.create(hostname=hn, name_server=ns1)
+    DNSNSRecord.objects.create(hostname=hn, name_server=ns2)
+
+    assert apply_search(Hostname.objects.all(), rules["domain_owner_verification"]["query"]).count() == 0
+
+    pending = Hostname.objects.create(network=network, name="ns1.registrant-verification.ispapi.net")
+    DNSNSRecord.objects.create(hostname=hn, name_server=pending)
+    assert apply_search(Hostname.objects.all(), rules["domain_owner_verification"]["query"]).count() == 1
+
+    DNSNSRecord.objects.create(hostname=hn2, name_server=pending)
+    assert apply_search(Hostname.objects.all(), rules["domain_owner_verification"]["query"]).count() == 2
