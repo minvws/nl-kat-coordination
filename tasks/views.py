@@ -197,46 +197,6 @@ class ScheduleForm(ModelForm):
         fields = ["enabled", "recurrences", "object_set"]
 
 
-class ObjectSetForm(ModelForm):
-    all_objects = forms.MultipleChoiceField(
-        widget=forms.SelectMultiple(attrs={"size": "10"}),
-        required=False,
-        help_text="Select objects manually. These will be combined with objects from the query.",
-    )
-
-    class Meta:
-        model = ObjectSet
-        fields = ["name", "description", "object_type", "object_query", "all_objects", "dynamic"]
-        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "object_query": forms.Textarea(attrs={"rows": 3})}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
-        object_type = None
-
-        if self.instance and self.instance.pk and self.instance.object_type:
-            object_type = self.instance.object_type
-        elif self.data.get("object_type"):
-            object_type = ContentType.objects.filter(pk=self.data.get("object_type")).first()
-
-        if object_type:
-            model_class = object_type.model_class()
-            if model_class:
-                objects = model_class.objects.all()
-                choices = [(obj.pk, str(obj)) for obj in objects]
-                self.fields["all_objects"].choices = choices
-
-                if self.instance and self.instance.all_objects:
-                    self.initial["all_objects"] = [str(pk) for pk in self.instance.all_objects]
-        else:
-            self.fields["all_objects"].choices = []
-            self.fields["all_objects"].help_text += " (Select an object type first to see available objects.)"
-
-    def clean_all_objects(self):
-        return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
-
-
 class ScheduleDetailView(OrganizationFilterMixin, DetailView):
     template_name = "schedule.html"
     model = Schedule
@@ -383,6 +343,46 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
         context["all_objects"] = obj.object_type.model_class().objects.filter(pk__in=obj.all_objects)
 
         return context
+
+
+class ObjectSetForm(ModelForm):
+    all_objects = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={"size": "10"}),
+        required=False,
+        help_text="Select objects manually. These will be combined with objects from the query.",
+    )
+
+    class Meta:
+        model = ObjectSet
+        fields = ["name", "description", "object_type", "object_query", "all_objects", "dynamic"]
+        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "object_query": forms.Textarea(attrs={"rows": 3})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
+        object_type = None
+
+        if self.instance and self.instance.pk and self.instance.object_type:
+            object_type = self.instance.object_type
+        elif self.data.get("object_type"):
+            object_type = ContentType.objects.filter(pk=self.data.get("object_type")).first()
+
+        if object_type:
+            model_class = object_type.model_class()
+            if model_class:
+                objects = model_class.objects.all()
+                choices = [(obj.pk, str(obj)) for obj in objects]
+                self.fields["all_objects"].choices = choices
+
+                if self.instance and self.instance.all_objects:
+                    self.initial["all_objects"] = [str(pk) for pk in self.instance.all_objects]
+        else:
+            self.fields["all_objects"].choices = []
+            self.fields["all_objects"].help_text += " (Select an object type first to see available objects.)"
+
+    def clean_all_objects(self):
+        return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
 
 
 class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):

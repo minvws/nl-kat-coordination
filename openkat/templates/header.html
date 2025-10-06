@@ -73,8 +73,13 @@
                         </li>
                         <li>
                             {% url "objects:finding_list" as index_url %}
-                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                            <a href="{{ index_url }} {% if organization_query_string %}?{{ organization_query_string }}{% endif %} "
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                        </li>
+                        <li>
+                            {% url "business_rule_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Business Rules" %}</a>
                         </li>
                     {% endif %}
                 </ul>

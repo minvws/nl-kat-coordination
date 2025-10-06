@@ -1,6 +1,12 @@
 from django.urls import path
 
 from plugins.views import (
+    BusinessRuleCreateView,
+    BusinessRuleDeleteView,
+    BusinessRuleDetailView,
+    BusinessRuleListView,
+    BusinessRuleToggleView,
+    BusinessRuleUpdateView,
     EnabledPluginUpdateView,
     EnabledPluginView,
     PluginCreateView,
@@ -24,4 +30,11 @@ urlpatterns = [
     path("plugins/<slug:pk>/delete", PluginDeleteView.as_view(), name="delete_plugin"),
     path("enabled-plugin/", EnabledPluginView.as_view(), name="plugin_enabled"),
     path("enabled-plugin/<slug:pk>/", EnabledPluginUpdateView.as_view(), name="edit_enabled_plugin"),
+    # Business Rule views
+    path("business-rules/", BusinessRuleListView.as_view(), name="business_rule_list"),
+    path("business-rules/add/", BusinessRuleCreateView.as_view(), name="add_business_rule"),
+    path("business-rules/<int:pk>/", BusinessRuleDetailView.as_view(), name="business_rule_detail"),
+    path("business-rules/<int:pk>/edit/", BusinessRuleUpdateView.as_view(), name="edit_business_rule"),
+    path("business-rules/<int:pk>/delete/", BusinessRuleDeleteView.as_view(), name="delete_business_rule"),
+    path("business-rules/<int:pk>/toggle/", BusinessRuleToggleView.as_view(), name="toggle_business_rule"),
 ]

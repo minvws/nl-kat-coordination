@@ -1,0 +1,128 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load objects %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "Business Rule:" %} {{ business_rule.name }}</h1>
+                </div>
+            </div>
+            <div class="horizontal-view toolbar">
+                <a href="{% url 'edit_business_rule' business_rule.pk %}"
+                   class="button ghost"><span aria-hidden="true" class="icon ti-pencil"></span>{% translate "Edit" %}</a>
+                <form action="{% url 'delete_business_rule' business_rule.pk %}"
+                      method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="button ghost">
+                        <span aria-hidden="true" class="icon ti-trash"></span>{% translate "Delete" %}
+                    </button>
+                </form>
+            </div>
+            <div>
+                <h2>{% translate "Details" %}</h2>
+                <div class="horizontal-scroll">
+                    <dl>
+                        <div>
+                            <dt>{% translate "Name" %}</dt>
+                            <dd>
+                                {{ business_rule.name }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Description" %}</dt>
+                            <dd>
+                                {{ business_rule.description|default:"-" }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Status" %}</dt>
+                            <dd>
+                                {% if business_rule.enabled %}
+                                    <span class="label tags-color-2-light">{% translate "Enabled" %}</span>
+                                {% else %}
+                                    <span class="label tags-color-3-light">{% translate "Disabled" %}</span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Object Type" %}</dt>
+                            <dd>
+                                {{ business_rule.object_type }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Query" %}</dt>
+                            <dd>
+                                <code>{{ business_rule.query|wordwrap:100|linebreaksbr }}</code>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Finding Type" %}</dt>
+                            <dd>
+                                <span class="label tags-color-1-light">{{ business_rule.finding_type_code }}</span>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Created" %}</dt>
+                            <dd>
+                                {{ business_rule.created_at|date }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Updated" %}</dt>
+                            <dd>
+                                {{ business_rule.updated_at }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Preview of Matching Objects" %}</h2>
+                {% if query_error %}
+                    <div class="notification error">
+                        <strong>{% translate "Query Error:" %}</strong> {{ query_error }}
+                    </div>
+                {% else %}
+                    <p>
+                        {% translate "Total matching objects:" %} <strong>{{ total_count }}</strong>
+                        {% if total_count > 100 %}
+                            {% translate "(showing first 100)" %}
+                        {% endif %}
+                    </p>
+                    {% if matching_objects %}
+                        <div class="horizontal-scroll">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>{% translate "Object" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for obj in matching_objects %}
+                                        {% with obj|to_class_name|lower as model_name %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url "objects:"|add:model_name|add:"_detail" pk=obj.id %}">{{ obj }}</a>
+                                                </td>
+                                            </tr>
+                                        {% endwith %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>{% translate "No matching objects found." %}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

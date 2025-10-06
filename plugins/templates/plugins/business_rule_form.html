@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>
+                        {% if object %}
+                            {% translate "Edit Business Rule" %}
+                        {% else %}
+                            {% translate "Add Business Rule" %}
+                        {% endif %}
+                    </h1>
+                </div>
+            </div>
+            <form method="post" class="form-grid">
+                {% csrf_token %}
+                {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+                <div class="form-row">
+                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<span class="form-error">{{ form.name.errors }}</span>{% endif %}
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.description.id_for_label }}">{{ form.description.label }}:</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<span class="form-error">{{ form.description.errors }}</span>{% endif %}
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.object_type.id_for_label }}">{{ form.object_type.label }}:</label>
+                    {{ form.object_type }}
+                    {% if form.object_type.errors %}<span class="form-error">{{ form.object_type.errors }}</span>{% endif %}
+                    <p class="help-text">{% translate "Model name (e.g., Hostname, IPPort)" %}</p>
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.query.id_for_label }}">{{ form.query.label }}:</label>
+                    {{ form.query }}
+                    {% if form.query.errors %}<span class="form-error">{{ form.query.errors }}</span>{% endif %}
+                    <p class="help-text">{% translate "DjangoQL query string" %}</p>
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.finding_type_code.id_for_label }}">{{ form.finding_type_code.label }}:</label>
+                    {{ form.finding_type_code }}
+                    {% if form.finding_type_code.errors %}<span class="form-error">{{ form.finding_type_code.errors }}</span>{% endif %}
+                    <p class="help-text">{{ form.finding_type_code.help_text }}</p>
+                </div>
+                <div class="form-row">
+                    <label for="{{ form.enabled.id_for_label }}">{{ form.enabled.label }}:</label>
+                    {{ form.enabled }}
+                    {% if form.enabled.errors %}<span class="form-error">{{ form.enabled.errors }}</span>{% endif %}
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="button">{% translate "Save" %}</button>
+                </div>
+            </form>
+        </section>
+    </main>
+{% endblock content %}

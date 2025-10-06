@@ -1,3 +1,5 @@
+from typing import Any
+
 import django_filters
 from django import forms
 from django.conf import settings
@@ -10,11 +12,13 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+from djangoql.queryset import apply_search
 
+from objects.models import FindingType
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
-from plugins.models import EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
+from plugins.models import BusinessRule, EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
 from tasks.models import Task, TaskStatus
 from tasks.views import TaskFilter
 
@@ -332,3 +336,130 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
             return redirect_url
 
         return reverse_lazy("plugin_list")
+
+
+class BusinessRuleFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    enabled = django_filters.BooleanFilter(label="Enabled")
+    object_type = django_filters.CharFilter(label="Object Type", lookup_expr="iexact")
+
+    class Meta:
+        model = BusinessRule
+        fields = ["name", "enabled", "object_type"]
+
+
+class BusinessRuleListView(FilterView):
+    model = BusinessRule
+    template_name = "plugins/business_rule_list.html"
+    context_object_name = "business_rules"
+    filterset_class = BusinessRuleFilter
+    paginate_by = 20
+    ordering = ["-created_at"]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("business_rule_list"), "text": _("Business Rules")}]
+
+        return context
+
+
+class BusinessRuleDetailView(DetailView):
+    model = BusinessRule
+    template_name = "plugins/business_rule_detail.html"
+    context_object_name = "business_rule"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("business_rule_list"), "text": _("Business Rules")}]
+        context["matching_objects"] = []
+        context["total_count"] = 0
+
+        model_class = self.object.object_type.model_class()
+        if model_class is None:
+            context["query_error"] = f"Unknown object type: {self.object.object_type}"
+            return context
+
+        queryset = model_class.objects.all()
+
+        try:
+            matching_objects = apply_search(queryset, self.object.query)
+            context["matching_objects"] = matching_objects[:20]  # Limit to 100 for preview
+            context["total_count"] = matching_objects.count()
+        except Exception as e:
+            context["query_error"] = str(e)
+
+        return context
+
+
+class BusinessRuleForm(forms.ModelForm):
+    finding_type_code = forms.CharField(max_length=100, help_text="Finding type code (e.g., KAT-WEBSERVER-NO-IPV6)")
+
+    class Meta:
+        model = BusinessRule
+        fields = ["name", "description", "enabled", "object_type", "query", "finding_type_code"]
+        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "query": forms.Textarea(attrs={"rows": 5})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["finding_type_code"].initial = self.instance.finding_type_code
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        finding_type_code = self.cleaned_data["finding_type_code"]
+        FindingType.objects.get_or_create(code=finding_type_code)
+
+        if commit:
+            instance.save()
+        return instance
+
+
+class BusinessRuleCreateView(CreateView):
+    model = BusinessRule
+    form_class = BusinessRuleForm
+    template_name = "plugins/business_rule_form.html"
+
+    def get_success_url(self) -> str:
+        return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
+
+
+class BusinessRuleUpdateView(UpdateView):
+    model = BusinessRule
+    form_class = BusinessRuleForm
+    template_name = "plugins/business_rule_form.html"
+
+    def get_success_url(self) -> str:
+        return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
+
+
+class BusinessRuleDeleteView(DeleteView):
+    model = BusinessRule
+    success_url = reverse_lazy("business_rule_list")
+
+
+class BusinessRuleToggleView(UpdateView):
+    model = BusinessRule
+    fields: list[str] = []
+
+    def form_valid(self, form):
+        self.object.enabled = not self.object.enabled
+        self.object.save()
+
+        if self.object.enabled:
+            messages.add_message(
+                self.request, messages.SUCCESS, _("Business rule '{}' has been enabled.").format(self.object.name)
+            )
+        else:
+            messages.add_message(
+                self.request, messages.SUCCESS, _("Business rule '{}' has been disabled.").format(self.object.name)
+            )
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        redirect_url = self.request.POST.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse_lazy("business_rule_list")

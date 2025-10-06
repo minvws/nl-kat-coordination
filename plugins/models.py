@@ -283,3 +283,17 @@ class EnabledPlugin(models.Model):
                     rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(datetime.UTC)
                 ),
             )
+
+
+class BusinessRule(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    enabled = models.BooleanField(default=True)
+    finding_type_code = models.CharField(max_length=100)
+    object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    query = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return self.name
