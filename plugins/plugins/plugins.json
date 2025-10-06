@@ -4,56 +4,8 @@
     "name": "DNS",
     "description": "Fetch the DNS record(s) of a hostname.",
     "scan_level": 1,
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
-    "oci_arguments": [
-      "uv",
-      "run",
-      "kat_dns/main.py",
-      "{hostname}"
-    ]
-  },
-  {
-    "plugin_id": "mail-dns",
-    "name": "Mail DNS",
-    "description": "Fetch the Mail DNS record(s) of a mail server.",
-    "scan_level": 1,
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
-    "oci_arguments": [
-      "uv",
-      "run",
-      "kat_dns/main.py",
-      "{mail_server}",
-      "-m"
-    ]
-  },
-  {
-    "plugin_id": "dns-bulk",
-    "name": "DNS Bulk",
-    "description": "Fetch the DNS record(s) of a hostname.",
-    "scan_level": 1,
     "consumes": [
       "type:hostname"
-    ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
-    "oci_arguments": [
-      "xargs",
-      "-I",
-      "%",
-      "-P",
-      "8",
-      "uv",
-      "run",
-      "kat_dns/main.py",
-      "%"
-    ]
-  },
-  {
-    "plugin_id": "mail-dns-bulk",
-    "name": "Mail DNS Bulk",
-    "description": "Fetch the Mail DNS record(s) of a mail server.",
-    "scan_level": 1,
-    "consumes": [
-      "type:mail_server"
     ],
     "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
     "oci_arguments": [
@@ -195,20 +147,6 @@
     ]
   },
   {
-    "plugin_id": "nuclei-tls-version",
-    "name": "Nuclei TLS Version",
-    "scan_level": 2,
-    "oci_image": "projectdiscovery/nuclei:v3.4.10",
-    "oci_arguments": [
-      "nuclei",
-      "-t",
-      "ssl/tls-version.yaml",
-      "-j",
-      "-u",
-      "{hostname}"
-    ]
-  },
-  {
     "plugin_id": "nuclei-expired-ssl",
     "name": "Nuclei Expired TLS Certificate",
     "scan_level": 2,
@@ -223,8 +161,8 @@
     ]
   },
   {
-    "plugin_id": "nuclei-tls-bulk",
-    "name": "Nuclei TLS bulk",
+    "plugin_id": "nuclei-tls-version",
+    "name": "Nuclei TLS",
     "scan_level": 2,
     "consumes": [
       "type:hostname"
@@ -240,23 +178,6 @@
   {
     "plugin_id": "subfinder",
     "name": "Subfinder",
-    "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
-    "scan_level": 1,
-    "oci_image": "projectdiscovery/subfinder:v2.6.6",
-    "oci_arguments": [
-      "subfinder",
-      "-silent",
-      "-active",
-      "-rate-limit",
-      "0",
-      "-json",
-      "-d",
-      "{hostname}"
-    ]
-  },
-  {
-    "plugin_id": "subfinder-bulk",
-    "name": "Subfinder Bulk",
     "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
     "scan_level": 1,
     "consumes": [
@@ -276,8 +197,7 @@
     "plugin_id": "parse-subfinder",
     "name": "Parse Subfinder hostnames",
     "consumes": [
-      "file:subfinder",
-      "file:subfinder-bulk"
+      "file:subfinder"
     ],
     "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
     "oci_arguments": [
@@ -308,8 +228,7 @@
     "name": "Nuclei Findings",
     "description": "Parses nuclei tls version data to create KATFindings.",
     "consumes": [
-      "file:nuclei-tls-version",
-      "file:nuclei-tls-version-bulk"
+      "file:nuclei-tls-version"
     ],
     "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
     "oci_arguments": [
