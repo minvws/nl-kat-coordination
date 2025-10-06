@@ -31,7 +31,6 @@ env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
@@ -143,9 +142,7 @@ HELP_DESK_EMAIL = env("HELP_DESK_EMAIL", default="")
 # Application definition
 
 KNOX_TOKEN_MODEL = "openkat.AuthToken"
-
 REST_KNOX = {"TOKEN_MODEL": "openkat.AuthToken"}
-
 MIGRATION_MODULES = {"knox": None}  # Skip creation of unused knox_authtoken table
 
 INSTALLED_APPS = [
@@ -282,22 +279,6 @@ if env.bool("POSTGRES_SSL_ENABLED", False):
         "sslkey": env.path("POSTGRES_SSL_KEY"),
     }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-# Although no longer encouraged, it is possible to add more requirements by adding:
-# {  # noqa: ERA001
-#         "NAME": "django_password_validators.password_character_requirements"
-#         ".password_validation.PasswordCharacterValidator",
-#         "OPTIONS": {  # noqa: ERA001
-#             "min_length_digit": env.int("PASSWORD_MIN_DIGIT", 2),  # noqa: ERA001
-#             "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", 2),  # noqa: ERA001
-#             "min_length_special": env.int("PASSWORD_MIN_SPECIAL", 2),  # noqa: ERA001
-#             "min_length_lower": env.int("PASSWORD_MIN_LOWER", 2),  # noqa: ERA001
-#             "min_length_upper": env.int("PASSWORD_MIN_UPPER", 2),  # noqa: ERA001
-#             "special_characters": " ~!@#$%^&*()_+{}\":;'[]",  # noqa: ERA001
-#         },
-#     },
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -398,20 +379,6 @@ CSRF_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
 
-# Configuration for Gitpod
-if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None):
-    # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
-    # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
-    ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
-    CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
-
-# Configuration for GitHub Codespaces
-if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None):
-    # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
-    # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
-    ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
-    CSRF_TRUSTED_ORIGINS.append("https://*." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
-
 # Setup sane security defaults for application
 # Deny x-framing, which is standard since Django 3.0
 # There is no need to embed this in a frame anywhere, not desired.
@@ -461,7 +428,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["openkat.permissions.KATModelPermissions"],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 100,
+    "PAGE_SIZE": env.int("PAGE_SIZE", default=100),
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
@@ -524,13 +491,6 @@ structlog.configure(
 DOCKER_NETWORK = env.str("DOCKER_NETWORK", default="bridge")
 OPENKAT_HOST = env.str("OPENKAT_HOST", default="http://localhost:8000")
 
-# Number of workers to run for the report queue
-POOL_SIZE = env.int("POOL_SIZE", default=2)
-# Time to wait before polling for tasks when the queue is empty
-POLL_INTERVAL = env.int("POLL_INTERVAL", default=10)
-# Seconds to wait before checking the workers when queues are full
-WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
-
 # In production deployments the staticfiles are coming from the collected static
 # files in the static directory. We should not ship all those files also in
 # their original location, but Django will complain if a directory in
@@ -538,19 +498,14 @@ WORKER_HEARTBEAT = env.int("WORKER_HEARTBEAT", default=5)
 # warning from confusing users.
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
-GRACE_PERIOD = env.int("GRACE_PERIOD", default=1440)
 WORKERS = env.int("WORKERS", default=2)
 SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL", default=60)
 SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
-OUTGOING_REQUEST_TIMEOUT = env.int("OUTGOING_REQUEST_TIMEOUT", default=30)
 PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
-AUTO_PARALLELISM = env.int("AUTO_PARALLELISM", default=8)
 BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
-
 
 QUEUE_NAME_SCAN_PROFILES = "scan-profiles"
 QUEUE_NAME_SCHEDULE = "schedule"
-QUEUE_NAME_REPORTS = "reports"
 
 CELERY = {
     "broker_url": env.str("REDIS_QUEUE_URI"),
@@ -560,11 +515,6 @@ CELERY = {
     "event_serializer": "json",
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_accept_content": ["application/json", "application/x-python-serialize"],
-    "task_queues": (
-        Queue("celery"),
-        Queue(QUEUE_NAME_SCAN_PROFILES),
-        Queue(QUEUE_NAME_SCHEDULE),
-        Queue(QUEUE_NAME_REPORTS),
-    ),
+    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_SCAN_PROFILES), Queue(QUEUE_NAME_SCHEDULE)),
     "worker_concurrency": WORKERS,
 }

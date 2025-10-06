@@ -194,8 +194,6 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class ScanLevelUpdateForm(forms.ModelForm):
-    """Form for updating scan level of an object."""
-
     scan_level = forms.ChoiceField(
         choices=ScanLevelEnum.choices,
         required=True,
@@ -226,8 +224,6 @@ class ScanLevelUpdateForm(forms.ModelForm):
 
 
 class ScanLevelAddForm(forms.ModelForm):
-    """Form for adding a new scan level to an object."""
-
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         required=True,
@@ -368,23 +364,19 @@ class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        network_id = self.kwargs.get("pk")
-
-        kwargs["object_id"] = network_id
+        kwargs["object_id"] = self.kwargs.get("pk")
         kwargs["object_type"] = "network"
 
         return kwargs
 
     def form_valid(self, form):
-        network_id = self.kwargs.get("pk")
-        organization = form.cleaned_data["organization"]
         scan_level_value = form.cleaned_data["scan_level"]
 
         # Use get_or_create to avoid duplicates
         scan_level, created = ScanLevel.objects.get_or_create(
-            object_id=network_id,
+            object_id=self.kwargs.get("pk"),
             object_type="network",
-            organization=organization,
+            organization=form.cleaned_data["organization"],
             defaults={"scan_level": scan_level_value, "declared": True},
         )
 
@@ -503,16 +495,11 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        queryset = IPAddress.objects.select_related("network").annotate(
-            max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
-        )
-
-        # Apply object set filter if specified
+        queryset = IPAddress.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects().select_related("network")
+                queryset = ObjectSet.objects.get(id=object_set_id).get_query_objects()
                 # Re-apply scan level annotation to the filtered queryset
                 queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
             except ObjectSet.DoesNotExist:
@@ -528,12 +515,12 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
+                obj_set = ObjectSet.objects.get(id=object_set_id)
+                if obj_set.all_objects:
                     messages.warning(
                         self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
+                        _('"{}" has fixed objects that are ignored (only query results are shown).').format(
+                            obj_set.name
                         ),
                     )
             except ObjectSet.DoesNotExist:
@@ -596,15 +583,12 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
     permission_required = "openkat.add_ipaddress"
 
     def form_valid(self, form):
-        csv_file = form.cleaned_data["csv_file"]
         network = form.cleaned_data.get("network")
 
-        # Default to "internet" network if not specified
         if not network:
             network, created = Network.objects.get_or_create(name="internet")
 
-        csv_raw_data = csv_file.read()
-        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
+        csv_data = io.StringIO(form.cleaned_data["csv_file"].read().decode("UTF-8"))
 
         created_count = 0
         error_count = 0
@@ -975,8 +959,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         if not network:
             network, created = Network.objects.get_or_create(name="internet")
 
-        csv_raw_data = csv_file.read()
-        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
+        csv_data = io.StringIO(csv_file.read().decode("UTF-8"))
 
         created_count = 0
         error_count = 0
@@ -1008,28 +991,18 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                     )
 
             if created_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.SUCCESS,
-                    _("Successfully created {count} hostnames.").format(count=created_count),
-                )
+                messages.success(self.request, _("Successfully created {count} hostnames.").format(count=created_count))
             if skipped_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.INFO,
-                    _("{count} hostnames already existed and were skipped.").format(count=skipped_count),
+                messages.info(
+                    self.request, _("{count} hostnames already existed and were skipped.").format(count=skipped_count)
                 )
             if error_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.WARNING,
-                    _("{count} hostnames had errors and were not created.").format(count=error_count),
+                messages.warning(
+                    self.request, _("{count} hostnames had errors and were not created.").format(count=error_count)
                 )
 
         except csv.Error as e:
-            messages.add_message(
-                self.request, messages.ERROR, _("Error parsing CSV file: {error}").format(error=str(e))
-            )
+            messages.error(self.request, _("Error parsing CSV file: {error}").format(error=str(e)))
 
         return super().form_valid(form)
 
@@ -1037,8 +1010,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 # DNS Record Delete Views
 class DNSRecordDeleteView(DeleteView):
     def get_success_url(self) -> str:
-        hostname_id = self.object.hostname_id
-        return reverse("objects:hostname_detail", kwargs={"pk": hostname_id})
+        return reverse("objects:hostname_detail", kwargs={"pk": self.object.hostname_id})
 
 
 class DNSARecordDeleteView(DNSRecordDeleteView):
@@ -1082,6 +1054,4 @@ class ScanLevelDeleteView(DeleteView):
     template_name = "delete_confirm.html"
 
     def get_success_url(self) -> str:
-        object_type = self.object.object_type
-        object_id = self.object.object_id
-        return reverse(f"objects:{object_type}_detail", kwargs={"pk": object_id})
+        return reverse(f"objects:{self.object.object_type}_detail", kwargs={"pk": self.object.object_id})

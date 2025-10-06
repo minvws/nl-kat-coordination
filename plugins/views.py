@@ -25,12 +25,8 @@ from tasks.views import TaskFilter
 
 
 class PluginFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(
-        label="Name", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
-    )
-    oci_image = django_filters.CharFilter(
-        label="Container image", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
-    )
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains", widget=forms.TextInput())
+    oci_image = django_filters.CharFilter(label="Container image", lookup_expr="icontains", widget=forms.TextInput())
     scan_level = django_filters.ChoiceFilter(label="Scan level", choices=ScanLevel.choices)
     enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
 
@@ -40,9 +36,7 @@ class PluginFilter(django_filters.FilterSet):
 
 
 class PluginVariantFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(
-        label="Name", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
-    )
+    name = django_filters.CharFilter(label="Name", lookup_expr="icontains", widget=forms.TextInput())
     scan_level = django_filters.ChoiceFilter(label="Scan level", choices=ScanLevel.choices)
 
     class Meta:
@@ -453,13 +447,9 @@ class BusinessRuleToggleView(UpdateView):
         self.object.save()
 
         if self.object.enabled:
-            messages.add_message(
-                self.request, messages.SUCCESS, _("Business rule '{}' has been enabled.").format(self.object.name)
-            )
+            messages.success(self.request, _("Business rule '{}' has been enabled.").format(self.object.name))
         else:
-            messages.add_message(
-                self.request, messages.SUCCESS, _("Business rule '{}' has been disabled.").format(self.object.name)
-            )
+            messages.success(self.request, _("Business rule '{}' has been disabled.").format(self.object.name))
 
         return redirect(self.get_success_url())
 

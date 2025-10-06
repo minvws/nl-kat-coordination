@@ -13,15 +13,7 @@ logger = get_logger(__name__)
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    # When we created this viewset we didn't have pagination enabled in the
-    # django-rest-framework settings. Enabling it afterwards would cause the API
-    # to change in an incompatible way, we should enable this when we introduce
-    # a new API version.
-    pagination_class = None
 
-    # Unfortunately django-rest-framework doesn't have support for create only
-    # fields so we have to change the serializer class depending on the request
-    # method.
     def get_serializer_class(self):
         serializer_class = self.serializer_class
         if self.request.method != "POST":
