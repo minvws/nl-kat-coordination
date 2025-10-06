@@ -12,22 +12,7 @@ from django.db.models import Max, Model, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
 from files.models import File
-from objects.models import (
-    DNSAAAARecord,
-    DNSARecord,
-    DNSCAARecord,
-    DNSCNAMERecord,
-    DNSMXRecord,
-    DNSNSRecord,
-    DNSPTRRecord,
-    DNSSRVRecord,
-    DNSTXTRecord,
-    Hostname,
-    IPAddress,
-    IPPort,
-    ScanLevel,
-    bulk_insert,
-)
+from objects.models import ScanLevel, bulk_insert
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -51,14 +36,16 @@ def recalculate_scan_profiles(depth: int = 0) -> None:
       - For IPPort the address field has max_inherit_scan_level=4
       - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 (if/once a netblock has been reintroduced)
     """
-    updates = []
+    updates: list[ScanLevel] = []
 
-    for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
-        updates.extend(calculate_updates(Hostname, model, relation="hostname_id", max_inherit=2))
-
-    updates.extend(calculate_updates(DNSNSRecord, Hostname, relation="name_server_id", max_inherit=1, from_parent=True))
-    updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
-    updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
+    # for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
+    #     updates.extend(calculate_updates(Hostname, model, relation="hostname_id", max_inherit=2))
+    #
+    # updates.extend(
+    #   calculate_updates(DNSNSRecord, Hostname, relation="name_server_id", max_inherit=1, from_parent=True)
+    # )
+    # updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
+    # updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
 
     logger.info("Recalculating %s Scan Profiles", len(updates))
 
@@ -81,7 +68,7 @@ def calculate_updates(
         updates = list(
             ScanLevel.objects.raw(
                 f"""
-                SELECT child_level._id, child_level.declared, child_level.last_changed_by, child_level.object_id,
+                SELECT child_level._id as id, child_level.declared, child_level.last_changed_by, child_level.object_id,
                 child_level.object_type, child_level.organization_id,
                 LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
                 FROM {ScanLevel._meta.db_table} child_level
@@ -264,10 +251,13 @@ def run_plugin_task(
 
         for idx_2 in range(batch_size, len(input_data) + batch_size, batch_size):
             tasks.append(
-                run_plugin_task(plugin_id, organization_code, input_data[idx:idx_2], batch=False, celery=celery)[0]
+                run_plugin_task(
+                    plugin_id, organization_code, input_data[idx:idx_2], schedule_id, batch=False, celery=celery
+                )[0]
             )
             idx = idx_2
 
+        logger.info("Created %s batched tasks of batch size %s", len(tasks), batch_size)
         return tasks
 
     task_id = uuid.uuid4()

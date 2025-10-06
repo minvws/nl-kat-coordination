@@ -535,7 +535,7 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
     context_object_name = "ipaddress"
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
-        return IPAddress.objects.select_related("network").prefetch_related("ipport_set")
+        return IPAddress.objects.prefetch_related("ipport_set")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -791,16 +791,14 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
         )
 
-        queryset = Hostname.objects.select_related("network").annotate(
-            max_scan_level=Subquery(scan_level_subquery.values("max_scan_level"))
-        )
+        queryset = Hostname.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
 
         # Apply object set filter if specified
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             try:
                 object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects().select_related("network")
+                queryset = object_set.get_query_objects()
                 # Re-apply scan level annotation to the filtered queryset
                 queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
             except ObjectSet.DoesNotExist:
@@ -834,9 +832,6 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
     model = Hostname
     template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
-
-    def get_queryset(self) -> "QuerySet[Hostname]":
-        return Hostname.objects.select_related("network")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

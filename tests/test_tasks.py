@@ -3,10 +3,10 @@ import time
 from celery import Celery
 
 from files.models import File, GenericContent
-from objects.models import Hostname, Network, ScanLevel
+from objects.models import Hostname, Network, ScanLevel, bulk_insert
 from plugins.models import Plugin
 from tasks.models import Schedule, Task, TaskResult, TaskStatus
-from tasks.tasks import process_raw_file, run_schedule
+from tasks.tasks import process_raw_file, run_plugin_task, run_schedule, run_schedule_for_organization
 
 
 def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_container):
@@ -143,3 +143,71 @@ def test_process_raw_file(xtdb, celery: Celery, organization, organization_b, do
     assert len(tasks) == 2
     assert {task.organization for task in tasks} == {organization, organization_b}
     assert Task.objects.count() == 6
+
+
+def test_batch_tasks(xtdb, celery: Celery, organization, organization_b, docker, plugin_container):
+    logs = [b"test logs"]
+    plugin_container.set_logs(logs)
+
+    plugin = Plugin.objects.create(
+        name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
+    )
+    plugin.enable()
+
+    network = Network.objects.create(name="internet")
+
+    hns = []
+    sls = []
+    for i in range(200):
+        host = Hostname(name=f"test{i}.com", network=network)
+        hns.append(host)
+        sls.append(ScanLevel(organization=organization, object_type="hostname", object_id=host.id, scan_level=2))
+
+    bulk_insert(hns)
+    bulk_insert(sls)
+
+    tasks = run_plugin_task(plugin.id, organization.code, input_data=[x.name for x in hns], celery=celery)
+
+    assert len(tasks) == 4
+    assert len(tasks[0].data["input_data"]) == 50
+    assert len(tasks[1].data["input_data"]) == 50
+    assert len(tasks[2].data["input_data"]) == 50
+    assert len(tasks[3].data["input_data"]) == 50
+
+    # We check previous tasks only when running for a schedule
+    tasks = run_plugin_task(plugin.id, organization.code, input_data=[x.name for x in hns], celery=celery)
+    assert len(tasks) == 4
+
+
+def test_batch_scheduled_tasks(xtdb, celery: Celery, organization, organization_b, docker, plugin_container, mocker):
+    mocker.patch("tasks.tasks.run_plugin")
+    logs = [b"test logs"]
+    plugin_container.set_logs(logs)
+
+    plugin = Plugin.objects.create(
+        name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
+    )
+    plugin.enable()
+    schedule = Schedule.objects.first()
+    network = Network.objects.create(name="internet")
+
+    hns = []
+    sls = []
+    for i in range(200):
+        host = Hostname(name=f"test{i}.com", network=network)
+        hns.append(host)
+        sls.append(ScanLevel(organization=organization, object_type="hostname", object_id=host.id, scan_level=2))
+
+    bulk_insert(hns)
+    bulk_insert(sls)
+
+    tasks = run_schedule_for_organization(schedule, organization, force=False, celery=celery)
+
+    assert len(tasks) == 4
+    assert len(tasks[0].data["input_data"]) == 50
+    assert len(tasks[1].data["input_data"]) == 50
+    assert len(tasks[2].data["input_data"]) == 50
+    assert len(tasks[3].data["input_data"]) == 50
+
+    tasks = run_schedule_for_organization(schedule, organization, force=False, celery=celery)
+    assert len(tasks) == 0

@@ -68,7 +68,7 @@ class Plugin(models.Model):
     scan_level = models.PositiveSmallIntegerField(choices=ScanLevel, default=ScanLevel.L4)
 
     # Task specifications
-    consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list)  # TODO: revise
+    consumes = ArrayField(models.CharField(max_length=128, blank=True), default=list, blank=True)  # TODO: revise
     recurrences = RecurrenceField(null=True, blank=True)  # If set, this is used as a default
     batch_size = models.PositiveIntegerField(
         null=True,

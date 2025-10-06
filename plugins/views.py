@@ -175,7 +175,7 @@ class PluginVariantsDetailView(PluginDetailView):
 
 class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Plugin
-    fields = ["plugin_id", "name", "description", "scan_level", "oci_image", "oci_arguments"]
+    fields = ["plugin_id", "name", "consumes", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_form.html"
 
     def get_form(self, form_class=None):
@@ -227,7 +227,7 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
-    fields = ["plugin_id", "name", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
+    fields = ["plugin_id", "name", "consumes", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
 
     def get_form(self, form_class=None):
