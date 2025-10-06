@@ -63,9 +63,9 @@ class TestOrganizationViewSet(ViewSetTest):
     client = lambda_fixture("drf_admin_client")
 
     class TestList(UsesGetMethod, UsesListEndpoint, Returns200):
-        def test_it_returns_values(self, organizations, json):
+        def test_it_returns_values(self, organizations, results):
             expected = express_organizations(organizations)
-            actual = json
+            actual = results
             assert actual == expected
 
     class TestCreate(UsesPostMethod, UsesListEndpoint, Returns201):
