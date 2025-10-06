@@ -5,7 +5,7 @@ from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema, IntField
 
-from objects.models import Finding, FindingType, Hostname, object_type_by_name
+from objects.models import Finding, FindingType, Hostname
 from plugins.models import BusinessRule
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
             try:
                 # Get the model class
-                model_class = object_type_by_name().get(rule.object_type)
+                model_class = rule.object_type.model_class()
                 if not model_class:
                     self.stdout.write(self.style.ERROR(f"  Unknown object type: {rule.object_type}"))
                     continue
@@ -99,7 +99,9 @@ class Command(BaseCommand):
                 findings_created = 0
                 for obj in matching_objects:
                     finding, created = Finding.objects.get_or_create(
-                        finding_type=finding_type, object_type=rule.object_type.lower(), object_id=obj.pk
+                        finding_type=finding_type,
+                        object_type=rule.object_type.model_class().__name__.lower(),
+                        object_id=obj.pk,
                     )
                     if created:
                         findings_created += 1

@@ -209,10 +209,10 @@ def main():
 
     record_types = DEFAULT_RECORD_TYPES if not args.record_types else get_record_types(args.record_types)
 
+    results = generic_records(args.hostname, record_types)
+
     if args.mail_server:
-        results = mail_records(args.hostname.rstrip("."))
-    else:
-        results = generic_records(args.hostname, record_types)
+        results.extend(mail_records(args.hostname.rstrip(".")))
 
     if not results:
         return
