@@ -131,11 +131,6 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td class="nowrap">
-                        <a href="{% url "plugin_detail" pk=plugin.id %}">
-                            <span class="icon ti-chevron-right"></span>
-                        </a>
-                    </td>
                     <td>
                         {% if plugin.enabled %}
                             {% if plugin.consumed_types %}

@@ -4,6 +4,7 @@ import django_filters
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, QuerySet
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
@@ -341,7 +342,9 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 class BusinessRuleFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
     enabled = django_filters.BooleanFilter(label="Enabled")
-    object_type = django_filters.CharFilter(label="Object Type", lookup_expr="iexact")
+    object_type = django_filters.ModelChoiceFilter(
+        label="Object Type", queryset=ContentType.objects.filter(app_label="objects")
+    )
 
     class Meta:
         model = BusinessRule
@@ -401,6 +404,10 @@ class BusinessRuleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Filter object_type to only show objects from the "objects" app
+        self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
+
         if self.instance and self.instance.pk:
             self.fields["finding_type_code"].initial = self.instance.finding_type_code
 

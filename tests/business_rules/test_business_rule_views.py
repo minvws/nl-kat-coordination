@@ -1,8 +1,9 @@
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from pytest_django.asserts import assertContains
 
-from objects.models import Hostname, Network
+from objects.models import Hostname, IPAddress, Network
 from plugins.models import BusinessRule
 from plugins.views import (
     BusinessRuleCreateView,
@@ -16,11 +17,14 @@ from tests.conftest import setup_request
 
 
 def test_business_rule_list_view(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+    ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+
     BusinessRule.objects.create(
         name="Test Rule 1",
         description="Test description 1",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-TEST-001",
     )
@@ -28,7 +32,7 @@ def test_business_rule_list_view(rf, superuser_member, xtdb):
         name="Test Rule 2",
         description="Test description 2",
         enabled=False,
-        object_type="IPAddress",
+        object_type=ipaddress_ct,
         query="address = '127.0.0.1'",
         finding_type_code="KAT-TEST-002",
     )
@@ -46,17 +50,19 @@ def test_business_rule_list_view(rf, superuser_member, xtdb):
 
 
 def test_business_rule_list_view_filtering(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     BusinessRule.objects.create(
         name="Enabled Rule",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-ENABLED",
     )
     BusinessRule.objects.create(
         name="Disabled Rule",
         enabled=False,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test2.com'",
         finding_type_code="KAT-DISABLED",
     )
@@ -69,6 +75,7 @@ def test_business_rule_list_view_filtering(rf, superuser_member, xtdb):
 
 
 def test_business_rule_detail_view(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
     network = Network.objects.create(name="test")
     Hostname.objects.create(network=network, name="test.com")
     Hostname.objects.create(network=network, name="example.com")
@@ -77,7 +84,7 @@ def test_business_rule_detail_view(rf, superuser_member, xtdb):
         name="Test Rule",
         description="Test description",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query='name = "test.com"',
         finding_type_code="KAT-TEST-RULE",
     )
@@ -93,6 +100,8 @@ def test_business_rule_detail_view(rf, superuser_member, xtdb):
 
 
 def test_business_rule_create_view(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     request = setup_request(
         rf.post(
             "add_business_rule",
@@ -100,7 +109,7 @@ def test_business_rule_create_view(rf, superuser_member, xtdb):
                 "name": "New Rule",
                 "description": "New description",
                 "enabled": True,
-                "object_type": "Hostname",
+                "object_type": hostname_ct.id,
                 "query": 'name = "example.com"',
                 "finding_type_code": "KAT-NEW-RULE",
             },
@@ -115,17 +124,20 @@ def test_business_rule_create_view(rf, superuser_member, xtdb):
     rule = BusinessRule.objects.get(name="New Rule")
     assert rule.description == "New description"
     assert rule.enabled is True
-    assert rule.object_type == "hostname"
+    assert rule.object_type == hostname_ct
     assert rule.query == 'name = "example.com"'
     assert rule.finding_type_code == "KAT-NEW-RULE"
 
 
 def test_business_rule_update_view(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+    ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+
     rule = BusinessRule.objects.create(
         name="Old Rule",
         description="Old description",
         enabled=False,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'old.com'",
         finding_type_code="KAT-OLD",
     )
@@ -137,7 +149,7 @@ def test_business_rule_update_view(rf, superuser_member, xtdb):
                 "name": "Updated Rule",
                 "description": "Updated description",
                 "enabled": True,
-                "object_type": "IPAddress",
+                "object_type": ipaddress_ct.id,
                 "query": 'address = "192.168.1.1"',
                 "finding_type_code": "KAT-UPDATED",
             },
@@ -152,17 +164,19 @@ def test_business_rule_update_view(rf, superuser_member, xtdb):
     assert rule.name == "Updated Rule"
     assert rule.description == "Updated description"
     assert rule.enabled is True
-    assert rule.object_type == "ipaddress"
+    assert rule.object_type == ipaddress_ct
     assert rule.query == 'address = "192.168.1.1"'
     assert rule.finding_type_code == "KAT-UPDATED"
 
 
 def test_business_rule_delete_view(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Rule to Delete",
         description="Will be deleted",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-DELETE",
     )
@@ -176,11 +190,13 @@ def test_business_rule_delete_view(rf, superuser_member, xtdb):
 
 
 def test_business_rule_toggle_view_enable(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Disabled Rule",
         description="Will be enabled",
         enabled=False,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-TOGGLE",
     )
@@ -199,11 +215,13 @@ def test_business_rule_toggle_view_enable(rf, superuser_member, xtdb):
 
 
 def test_business_rule_toggle_view_disable(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Enabled Rule",
         description="Will be disabled",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-TOGGLE-2",
     )
@@ -222,10 +240,12 @@ def test_business_rule_toggle_view_disable(rf, superuser_member, xtdb):
 
 
 def test_business_rule_toggle_view_redirects_correctly(rf, superuser_member, xtdb):
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Test Rule",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-REDIRECT",
     )
@@ -241,10 +261,12 @@ def test_business_rule_toggle_view_redirects_correctly(rf, superuser_member, xtd
 
 @pytest.mark.django_db
 def test_business_rule_finding_type_code_stored():
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Test Rule",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-TEST-CODE",
     )
@@ -260,10 +282,12 @@ def test_business_rule_finding_type_code_stored():
 
 @pytest.mark.django_db
 def test_business_rule_created_and_updated_timestamps():
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+
     rule = BusinessRule.objects.create(
         name="Timestamp Rule",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-TIMESTAMP",
     )
@@ -283,10 +307,13 @@ def test_business_rule_created_and_updated_timestamps():
 
 @pytest.mark.django_db
 def test_business_rule_unique_name_constraint():
+    hostname_ct = ContentType.objects.get_for_model(Hostname)
+    ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+
     BusinessRule.objects.create(
         name="Unique Rule",
         enabled=True,
-        object_type="Hostname",
+        object_type=hostname_ct,
         query="name = 'test.com'",
         finding_type_code="KAT-UNIQUE",
     )
@@ -295,7 +322,7 @@ def test_business_rule_unique_name_constraint():
         BusinessRule.objects.create(
             name="Unique Rule",
             enabled=False,
-            object_type="IPAddress",
+            object_type=ipaddress_ct,
             query="address = '127.0.0.1'",
             finding_type_code="KAT-UNIQUE-2",
         )
