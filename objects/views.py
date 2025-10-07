@@ -569,6 +569,16 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     fields = ["network", "address"]
     success_url = reverse_lazy("objects:ipaddress_list")
 
+    def get_initial(self):
+        initial = super().get_initial()
+        # Set default network to "internet" if it exists
+        try:
+            internet_network = Network.objects.get(name="internet")
+            initial["network"] = internet_network
+        except Network.DoesNotExist:
+            pass
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["csv_form"] = IPAddressCSVUploadForm()
@@ -932,6 +942,16 @@ class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
     template_name = "objects/hostname_create.html"
     fields = ["network", "name"]
     success_url = reverse_lazy("objects:hostname_list")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        # Set default network to "internet" if it exists
+        try:
+            internet_network = Network.objects.get(name="internet")
+            initial["network"] = internet_network
+        except Network.DoesNotExist:
+            pass
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
