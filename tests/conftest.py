@@ -164,7 +164,7 @@ def cleanup_test_files():
 
     yield
 
-    shutil.rmtree(settings.MEDIA_ROOT)
+    shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
     settings.MEDIA_ROOT = original
 
 
