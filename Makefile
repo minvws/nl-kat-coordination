@@ -24,6 +24,7 @@ clean: .env
 object-clean: .env
 	docker compose down --volumes xtdb
 	docker compose up -d
+	sleep 2
 	make seed
 
 build: .env

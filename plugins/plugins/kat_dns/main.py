@@ -235,13 +235,13 @@ def main():
     for object_path, objects in results_grouped.items():
         for obj in objects:
             if "hostname" in obj:
-                obj["hostname"] = by_name[obj["hostname"]]
+                obj["hostname"] = by_name[obj["hostname"].lower()]
             if "mail_server" in obj:
-                obj["mail_server"] = by_name[obj["mail_server"]]
+                obj["mail_server"] = by_name[obj["mail_server"].lower()]
             if "name_server" in obj:
-                obj["name_server"] = by_name[obj["name_server"]]
+                obj["name_server"] = by_name[obj["name_server"].lower()]
             if "target" in obj:
-                obj["target"] = by_name[obj["target"]]
+                obj["target"] = by_name[obj["target"].lower()]
 
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]

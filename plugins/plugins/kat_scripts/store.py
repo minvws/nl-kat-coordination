@@ -36,10 +36,10 @@ if __name__ == "__main__":
 
     if args.findings:
         results = findings(args.object_type)
-        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/finding/", headers=headers, json=results)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/finding/", headers=headers, json=results, timeout=30)
     elif args.hostnames:
         results = hostnames()
-        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/hostname/", headers=headers, json=results)
+        httpx.post(f"{os.getenv('OPENKAT_API')}/objects/hostname/", headers=headers, json=results, timeout=30)
     else:
         raise ValueError("No target type defined")
 
