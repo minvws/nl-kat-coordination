@@ -200,10 +200,11 @@ class ScanLevelUpdateForm(forms.ModelForm):
         label=_("Scan Level"),
         widget=forms.Select(attrs={"class": "scan-level-select"}),
     )
+    declared = forms.BooleanField(required=False, label=_("Declared"), widget=forms.CheckboxInput())
 
     class Meta:
         model = ScanLevel
-        fields = ["scan_level"]
+        fields = ["scan_level", "declared"]
 
     def __init__(self, *args, **kwargs):
         self.object_id = kwargs.pop("object_id", None)
@@ -213,7 +214,6 @@ class ScanLevelUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.declared = True
         instance.object_id = self.object_id
         instance.object_type = self.object_type
         instance.organization = self.organization
@@ -865,6 +865,7 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
             )
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
+        context["scan_level_update_form"] = ScanLevelUpdateForm
 
         # Add max scan level annotations for DNS records
         organization_ids = None
