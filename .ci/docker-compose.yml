@@ -4,12 +4,13 @@ services:
       context: ..
       args:
         ENVIRONMENT: dev
-        USER_UID: 1001
-        USER_GID: 1001
       target: dev
     command: pytest --cov --cov-report xml --cov-branch --cov-report=term-missing:skip-covered tests/
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      xtdb:
+        condition: service_healthy
     volumes:
       - ..:/app/openkat
     env_file:
@@ -20,8 +21,6 @@ services:
       context: ..
       args:
         ENVIRONMENT: dev
-        USER_UID: 1001
-        USER_GID: 1001
       target: dev
     command: pytest -n 0 tests/integration
     depends_on:
@@ -46,8 +45,6 @@ services:
       context: ..
       args:
         ENVIRONMENT: dev
-        USER_UID: 1001
-        USER_GID: 1001
       target: dev
     command: python3 manage.py runserver 0.0.0.0:8000
     depends_on:

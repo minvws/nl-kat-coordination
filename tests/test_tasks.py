@@ -1,6 +1,7 @@
 import time
 
 from celery import Celery
+from django.conf import settings
 
 from files.models import File, GenericContent
 from objects.models import Hostname, Network, ScanLevel, bulk_insert
@@ -57,7 +58,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert kwargs["command"] == ["test.com"]
     assert kwargs["stdout"] is False
     assert kwargs["stderr"] is True
-    assert kwargs["network"] == "openkat-test-plugin-network"
+    assert kwargs["network"] == settings.DOCKER_NETWORK
     assert kwargs["entrypoint"] == "/bin/runner"
     assert len(kwargs["volumes"]) == 1
     assert kwargs["volumes"][0].endswith("/plugins/plugins/entrypoint/main:/bin/runner")
