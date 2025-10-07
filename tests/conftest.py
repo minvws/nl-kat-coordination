@@ -1,6 +1,7 @@
 import binascii
 import json as json_module
 import logging
+import shutil
 from datetime import UTC, datetime
 from os import urandom
 from pathlib import Path
@@ -153,6 +154,18 @@ def seed_groups(db):
     Group.objects.get_or_create(name=GROUP_CLIENT)
     Group.objects.get_or_create(name=GROUP_REDTEAM)
     Group.objects.get_or_create(name=GROUP_ADMIN)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_test_files():
+    original = settings.MEDIA_ROOT
+    settings.MEDIA_ROOT = original / "test"
+    settings.MEDIA_ROOT.mkdir(exist_ok=True)
+
+    yield
+
+    shutil.rmtree(settings.MEDIA_ROOT)
+    settings.MEDIA_ROOT = original
 
 
 @pytest.fixture
