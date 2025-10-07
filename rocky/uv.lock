@@ -350,16 +350,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.1.12"
+version = "5.1.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/99/a951d93a27a5bc59fb96edbcdbc03fb9bfac51177f1bc0110888de85af3f/django-5.1.12.tar.gz", hash = "sha256:8a8991b1ec052ef6a44fefd1ef336ab8daa221287bcb91a4a17d5e1abec5bbcc", size = 10737777, upload-time = "2025-09-03T13:09:45.855Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/57/ad9905d03a2ee39064ee7ba69f8e2790db4a7ffaef9c54f95e7a8f2cb0a1/django-5.1.13.tar.gz", hash = "sha256:543ff21679f15e80edfc01fe7ea35f8291b6d4ea589433882913626a7c1cf929", size = 10742756, upload-time = "2025-10-01T14:25:41.187Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/1c/a9520c8263e980b0b9933c9b5ce8f22c9ddf007b062e4eb428b557ff0932/django-5.1.12-py3-none-any.whl", hash = "sha256:9eb695636cea3601b65690f1596993c042206729afb320ca0960b55f8ed4477b", size = 8277454, upload-time = "2025-09-03T13:09:30.997Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/f2/4b39467b74de9bb698c95232011e97dc848f490baae8d78c2e58848c4562/django-5.1.13-py3-none-any.whl", hash = "sha256:06f257f79dc4c17f3f9e23b106a4c5ed1335abecbe731e83c598c941d14fbeed", size = 8277515, upload-time = "2025-10-01T14:25:28.65Z" },
 ]
 
 [[package]]
@@ -1691,11 +1691,11 @@ wheels = [
 
 [[package]]
 name = "pyparsing"
-version = "3.2.3"
+version = "3.2.5"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/bb/22/f1129e69d94ffff626bdb5c835506b3a5b4f3d070f17ea295e12c2c6f60f/pyparsing-3.2.3.tar.gz", hash = "sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be", size = 1088608, upload-time = "2025-03-25T05:01:28.114Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/a5/181488fc2b9d093e3972d2a472855aae8a03f000592dbfce716a512b3359/pyparsing-3.2.5.tar.gz", hash = "sha256:2df8d5b7b2802ef88e8d016a2eb9c7aeaa923529cd251ed0fe4608275d4105b6", size = 1099274, upload-time = "2025-09-21T04:11:06.277Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf", size = 111120, upload-time = "2025-03-25T05:01:24.908Z" },
+    { url = "https://files.pythonhosted.org/packages/10/5e/1aa9a93198c6b64513c9d7752de7422c06402de6600a8767da1524f9570b/pyparsing-3.2.5-py3-none-any.whl", hash = "sha256:e38a4f02064cf41fe6593d328d0512495ad1f3d8a91c4f73fc401b3079a59a5e", size = 113890, upload-time = "2025-09-21T04:11:04.117Z" },
 ]
 
 [[package]]
@@ -2276,7 +2276,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.11.2,<5" },
     { name = "cron-descriptor", specifier = ">=1.4.5,<2" },
-    { name = "django", specifier = ">=5.1.12,<5.2" },
+    { name = "django", specifier = ">=5.1.13,<5.2" },
     { name = "django-components", specifier = ">=0.88,<0.89" },
     { name = "django-compressor", git = "https://github.com/dekkers/django-compressor.git?rev=csp-nonce" },
     { name = "django-csp", specifier = "~=4.0" },

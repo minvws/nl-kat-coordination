@@ -251,9 +251,9 @@ cssselect2==0.8.0 \
     --hash=sha256:46fc70ebc41ced7a32cd42d58b1884d72ade23d21e5a4eaaf022401c13f0e76e \
     --hash=sha256:7674ffb954a3b46162392aee2a3a0aedb2e14ecf99fcc28644900f4e6e3e9d3a
     # via weasyprint
-django==5.1.12 \
-    --hash=sha256:8a8991b1ec052ef6a44fefd1ef336ab8daa221287bcb91a4a17d5e1abec5bbcc \
-    --hash=sha256:9eb695636cea3601b65690f1596993c042206729afb320ca0960b55f8ed4477b
+django==5.1.13 \
+    --hash=sha256:06f257f79dc4c17f3f9e23b106a4c5ed1335abecbe731e83c598c941d14fbeed \
+    --hash=sha256:543ff21679f15e80edfc01fe7ea35f8291b6d4ea589433882913626a7c1cf929
     # via
     #   django-appconf
     #   django-components
@@ -1080,9 +1080,9 @@ pynacl==1.5.0 \
     --hash=sha256:a36d4a9dda1f19ce6e03c9a784a2921a4b726b02e1c736600ca9c22029474394 \
     --hash=sha256:a422368fc821589c228f4c49438a368831cb5bbc0eab5ebe1d7fac9dded6567b \
     --hash=sha256:e46dae94e34b085175f8abb3b0aaa7da40767865ac82c928eeb9e57e1ea8a543
-pyparsing==3.2.3 \
-    --hash=sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf \
-    --hash=sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be
+pyparsing==3.2.5 \
+    --hash=sha256:2df8d5b7b2802ef88e8d016a2eb9c7aeaa923529cd251ed0fe4608275d4105b6 \
+    --hash=sha256:e38a4f02064cf41fe6593d328d0512495ad1f3d8a91c4f73fc401b3079a59a5e
     # via rocky
 pyphen==0.17.2 \
     --hash=sha256:3a07fb017cb2341e1d9ff31b8634efb1ae4dc4b130468c7c39dd3d32e7c3affd \
