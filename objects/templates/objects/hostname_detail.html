@@ -40,7 +40,6 @@
                         <tr>
                             <th>{% translate "Type" %}</th>
                             <th>{% translate "Content" %}</th>
-                            <th>{% translate "Max Scan Level" %}</th>
                             <th>{% translate "Details" %}</th>
                             <th>{% translate "Delete" %}</th>
                         </tr>
@@ -51,14 +50,6 @@
                                 <td>A</td>
                                 <td>
                                     <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
-                                </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
                                 </td>
                                 <td></td>
                                 <td>
@@ -76,14 +67,6 @@
                                 <td>
                                     <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
                                 </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td></td>
                                 <td>
                                     <form action="{% url 'objects:delete_dnsaaaarecord' record.pk %}"
@@ -99,14 +82,6 @@
                                 <td>CNAME</td>
                                 <td>
                                     <a href="{% url 'objects:hostname_detail' record.target_id %}">{{ record.target }}</a>
-                                </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
                                 </td>
                                 <td>{% translate "Source:" %} {{ hostname.name }}</td>
                                 <td>
@@ -124,14 +99,6 @@
                                 <td>
                                     <a href="{% url 'objects:hostname_detail' record.mail_server_id %}">{{ record.mail_server }}</a>
                                 </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td>{% translate "Preference:" %} {{ record.preference }}</td>
                                 <td>
                                     <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
@@ -148,14 +115,6 @@
                                 <td>
                                     <a href="{% url 'objects:hostname_detail' record.name_server_id %}">{{ record.name_server }}</a>
                                 </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td></td>
                                 <td>
                                     <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
@@ -170,14 +129,6 @@
                             <tr>
                                 <td>CAA</td>
                                 <td>{{ record.value }}</td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td>{% translate "Flags:" %} {{ record.flags }}, {% translate "Tag:" %} {{ record.tag }}</td>
                                 <td>
                                     <form action="{% url 'objects:delete_dnscaarecord' record.pk %}"
@@ -192,14 +143,6 @@
                             <tr>
                                 <td>TXT</td>
                                 <td>{{ record.value }}</td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td>
                                     {% if record.prefix %}
                                         {% translate "Prefix:" %} {{ record.prefix }}
@@ -219,14 +162,6 @@
                                 <td>SRV</td>
                                 <td>
                                     <a href="{% url 'objects:hostname_detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
-                                </td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
                                 </td>
                                 <td>{% translate "Priority:" %} {{ record.priority }}, {% translate "Weight:" %} {{ record.weight }}</td>
                                 <td>
@@ -249,7 +184,6 @@
                         <tr>
                             <th>{% translate "Type" %}</th>
                             <th>{% translate "Content" %}</th>
-                            <th>{% translate "Max Scan Level" %}</th>
                             <th>{% translate "Details" %}</th>
                             <th>{% translate "Delete" %}</th>
                         </tr>
@@ -259,14 +193,6 @@
                             <tr>
                                 <td>PTR</td>
                                 <td>{{ record.ip_address }}</td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td></td>
                                 <td>
                                     <form action="{% url 'objects:delete_dnsptrrecord' record.pk %}"
@@ -281,14 +207,6 @@
                             <tr>
                                 <td>CNAME</td>
                                 <td>{{ hostname.name }}</td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td>
                                     {% translate "Target for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
                                 </td>
@@ -306,14 +224,6 @@
                                 <td>MX</td>
                                 <td>{{ hostname.name }}</td>
                                 <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
                                     {% translate "Mail server for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
                                 </td>
                                 <td>
@@ -329,14 +239,6 @@
                             <tr>
                                 <td>NS</td>
                                 <td>{{ hostname.name }}</td>
-                                <td>
-                                    {% if record.max_scan_level != None %}
-                                        {% include "partials/scan_level_indicator.html" with value=record.max_scan_level %}
-
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
                                 <td>
                                     {% translate "Authoritative for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
                                 </td>

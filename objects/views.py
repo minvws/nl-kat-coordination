@@ -867,65 +867,21 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["scan_level_form"] = ScanLevelAddForm
         context["scan_level_update_form"] = ScanLevelUpdateForm
 
-        # Add max scan level annotations for DNS records
-        organization_ids = None
-        if organization_codes:
-            organization_ids = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
-        def dns_record_scan_level_subquery(object_type: str) -> Subquery:
-            scan_level_filter: dict[str, Any] = {"object_type": object_type, "object_id": OuterRef("id")}
-            if organization_ids:
-                scan_level_filter["organization__in"] = organization_ids
-
-            return Subquery(
-                ScanLevel.objects.filter(**scan_level_filter)
-                .values("object_id")
-                .order_by()
-                .annotate(max_scan_level=Max("scan_level"))
-                .values("max_scan_level")
-            )
-
-        # Annotate DNS records with their own max scan levels
-        context["dnsarecord_set"] = self.object.dnsarecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsarecord")
-        )
-        context["dnsaaaarecord_set"] = self.object.dnsaaaarecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsaaaarecord")
-        )
-        context["dnscnamerecord_set"] = self.object.dnscnamerecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnscnamerecord")
-        )
-        context["dnsmxrecord_set"] = self.object.dnsmxrecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsmxrecord")
-        )
-        context["dnsnsrecord_set"] = self.object.dnsnsrecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsnsrecord")
-        )
-        context["dnsptrrecord_set"] = self.object.dnsptrrecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsptrrecord")
-        )
-        context["dnscaarecord_set"] = self.object.dnscaarecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnscaarecord")
-        )
-        context["dnstxtrecord_set"] = self.object.dnstxtrecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnstxtrecord")
-        )
-        context["dnssrvrecord_set"] = self.object.dnssrvrecord_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnssrvrecord")
-        )
+        # Add DNS records to context
+        context["dnsarecord_set"] = self.object.dnsarecord_set.all()
+        context["dnsaaaarecord_set"] = self.object.dnsaaaarecord_set.all()
+        context["dnscnamerecord_set"] = self.object.dnscnamerecord_set.all()
+        context["dnsmxrecord_set"] = self.object.dnsmxrecord_set.all()
+        context["dnsnsrecord_set"] = self.object.dnsnsrecord_set.all()
+        context["dnsptrrecord_set"] = self.object.dnsptrrecord_set.all()
+        context["dnscaarecord_set"] = self.object.dnscaarecord_set.all()
+        context["dnstxtrecord_set"] = self.object.dnstxtrecord_set.all()
+        context["dnssrvrecord_set"] = self.object.dnssrvrecord_set.all()
 
         # Reverse DNS records
-        context["dnscnamerecord_target_set"] = self.object.dnscnamerecord_target_set.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnscnamerecord")
-        )
-        context["dnsmxrecord_mailserver"] = self.object.dnsmxrecord_mailserver.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsmxrecord")
-        )
-        context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.annotate(
-            max_scan_level=dns_record_scan_level_subquery("dnsnsrecord")
-        )
+        context["dnscnamerecord_target_set"] = self.object.dnscnamerecord_target_set.all()
+        context["dnsmxrecord_mailserver"] = self.object.dnsmxrecord_mailserver.all()
+        context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.all()
 
         return context
 
