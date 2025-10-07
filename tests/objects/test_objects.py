@@ -5,15 +5,14 @@ from django.db.models import Max, OuterRef, Subquery
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import (
+    DNSAAAARecord,
     DNSARecord,
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     Hostname,
     IPAddress,
-    IPPort,
     Network,
-    Protocol,
     ScanLevel,
     bulk_insert,
     to_xtdb_dict,
@@ -98,57 +97,47 @@ def test_add_scan_level_filter_to_object_query(xtdb, organization):
     assert Hostname.objects.all().annotate(max_scan_level=subquery).filter(max_scan_level__gte=3).count() == 1
 
 
-def test_recalculate_scan_profiles(xtdb, organization):
+def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
     ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
 
-    nameserver = Hostname.objects.create(network=network, name="ns.test.com")
-    nsl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=nameserver.id)
-
-    mailserver = Hostname.objects.create(network=network, name="mail.test.com")
-    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=mailserver.id, scan_level=1)
-
     # The A record inherits level 2 from the hostname test.com
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
-    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
-    sl = ScanLevel.objects.create(organization=organization, object_type="dnsarecord", object_id=A.id, scan_level=1)
+    DNSARecord.objects.create(ip_address=ip, hostname=h)
+    ipsl = ScanLevel.objects.create(organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=1)
 
-    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False, service="unknown")
-    port_sl = ScanLevel.objects.create(organization=organization, object_type="ipport", object_id=port.id, scan_level=1)
+    # The AAAA record inherits level 2 from the hostname test.com
+    ip6 = IPAddress.objects.create(network=network, address="0.0.0.0")
+    DNSAAAARecord.objects.create(ip_address=ip6, hostname=h)
 
-    NS = DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
+    ip2 = IPAddress.objects.create(network=network, address="1.0.0.0")
+    DNSARecord.objects.create(ip_address=ip2, hostname=h)
 
-    # The MX record inherits level 1 from the hostname mail.test.com through the mail_server field
-    MX = DNSMXRecord.objects.create(mail_server=mailserver, hostname=h)
-    mxsl = ScanLevel.objects.create(organization=organization, object_type="dnsmxrecord", object_id=MX.id)
+    updates = recalculate_scan_profiles()
+    assert len(updates) == 3
 
-    recalculate_scan_profiles()
+    ipsl.refresh_from_db()
+    assert ipsl.scan_level == 2
+    assert ScanLevel.objects.filter(object_id=ip2.id, object_type="ipaddress").count() == 1
+    assert ScanLevel.objects.filter(object_id=ip6.id, object_type="ipaddress").count() == 1
 
-    sl.refresh_from_db()
-    assert sl.scan_level == 2
 
-    nsl.refresh_from_db()  # The DNSNSRecord has no scan level yet, so nothing happens. Something to implement still.
-    assert nsl.scan_level == 0
+def test_recalculate_scan_profiles_nameserver(xtdb, organization):
+    network = Network.objects.create(name="internet")
+    h = Hostname.objects.create(network=network, name="test.com")
+    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
 
-    mxsl.refresh_from_db()
-    assert mxsl.scan_level == 1
+    nameserver = Hostname.objects.create(network=network, name="ns.test.com")
+    nsl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=nameserver.id)
+    DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
-    ScanLevel.objects.create(organization=organization, object_type="dnsnsrecord", object_id=NS.id, scan_level=2)
-    recalculate_scan_profiles()
+    updates = recalculate_scan_profiles()
+    assert len(updates) == 1
 
-    nsl.refresh_from_db()  # Now we do see the effect
+    nsl.refresh_from_db()
     assert nsl.scan_level == 1
-
-    port_sl.refresh_from_db()
-    assert port_sl.scan_level == 1
-
-    ScanLevel.objects.create(organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=4)
-    recalculate_scan_profiles()
-
-    port_sl.refresh_from_db()
-    assert port_sl.scan_level == 4
 
 
 def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
@@ -157,15 +146,24 @@ def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
     h = Hostname.objects.create(network=network, name="test.com")
     ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
-    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
+    DNSARecord.objects.create(ip_address=ip, hostname=h)
     sl = ScanLevel.objects.create(
-        organization=organization, object_type="dnsarecord", object_id=A.id, scan_level=1, declared=True
+        organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=1, declared=True
     )
+    nameserver = Hostname.objects.create(network=network, name="ns.test.com")
+    nsl = ScanLevel.objects.create(
+        organization=organization, object_type="ipaddress", object_id=nameserver.id, scan_level=2, declared=True
+    )
+    DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
-    recalculate_scan_profiles()
+    updates = recalculate_scan_profiles()
+    assert len(updates) == 0
 
     sl.refresh_from_db()
     assert sl.scan_level == 1
+
+    nsl.refresh_from_db()
+    assert nsl.scan_level == 2
 
 
 def test_recalculate_scan_profiles_creates_new_profiles(xtdb, organization):
@@ -174,11 +172,12 @@ def test_recalculate_scan_profiles_creates_new_profiles(xtdb, organization):
     h = Hostname.objects.create(network=network, name="test.com")
     ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
-    A = DNSARecord.objects.create(ip_address=ip, hostname=h)
+    DNSARecord.objects.create(ip_address=ip, hostname=h)
 
-    recalculate_scan_profiles()
+    updates = recalculate_scan_profiles()
+    assert len(updates) == 1
 
-    sl = ScanLevel.objects.filter(object_id=A.id).first()
+    sl = ScanLevel.objects.filter(object_id=ip.id).first()
     assert sl.scan_level == 2
     assert sl.declared is False
 

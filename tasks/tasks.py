@@ -8,11 +8,20 @@ import structlog
 from celery import Celery
 from django.conf import settings
 from django.db import OperationalError, connections
-from django.db.models import Max, Model, OuterRef, Q, Subquery
+from django.db.models import Max, OuterRef, Q, Subquery
 from djangoql.queryset import apply_search
 
 from files.models import File
-from objects.models import ScanLevel, bulk_insert
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
+    DNSNSRecord,
+    Hostname,
+    IPAddress,
+    ScanLevel,
+    bulk_insert,
+)
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -27,84 +36,197 @@ def schedule_scan_profile_recalculations():
     recalculate_scan_profiles()
 
 
-def recalculate_scan_profiles(depth: int = 0) -> None:
+def recalculate_scan_profiles() -> list[ScanLevel]:
     """
     These are the currently implemented rules for Scan Profile:
       - For all DNSRecords, the hostname field has max_inherit_scan_level=2
       - For all DNSMXRecords, the mail_server field has max_inherit_scan_level=1
       - For all DNSNSRecords, the name_server field has max_issue_scan_level=1
-      - For IPPort the address field has max_inherit_scan_level=4
-      - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 (if/once a netblock has been reintroduced)
+      - For all DNSCNAMERecords, the hostname field has max issue/inherit=4
+      - Through ResolvedHostname, ip addresses get the same level as the hostname
+      - For IPPort the address field has max_inherit_scan_level=4 -> makes no sense: we can take the address's level
+      - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 -> same as above
+
+      But there are no plugins that scan dns records. So, we could simplify this by implementing these rules:
+      - For DNSArecords, take the max of the ip's scan level and hostname's scan level
+      - For DNSNSrecords, set the target's scan level to the hostname's scan level, with a max of 1
+      - For DNSCNAMERecords, set the target's scan level to the hostname's scan level
+
+      This reduces the number of queries from 10 to 4 and requires less recursive iterations. Note that MX records are
+      a "sink" in the sense that they do not issue scan levels, but are also not a scan target, so we can skip them.
     """
     updates: list[ScanLevel] = []
 
-    # for model in [DNSARecord, DNSAAAARecord, DNSPTRRecord, DNSCNAMERecord, DNSCAARecord, DNSTXTRecord, DNSSRVRecord]:
-    #     updates.extend(calculate_updates(Hostname, model, relation="hostname_id", max_inherit=2))
-    #
-    # updates.extend(
-    #   calculate_updates(DNSNSRecord, Hostname, relation="name_server_id", max_inherit=1, from_parent=True)
-    # )
-    # updates.extend(calculate_updates(Hostname, DNSMXRecord, relation="mail_server_id", max_inherit=1))
-    # updates.extend(calculate_updates(IPAddress, IPPort, relation="address_id", max_inherit=4))
+    # These could create an endless chain, but we just rely on multiple iterations to resolve this.
+    updates.extend(sync_cname_scan_levels())
+    updates.extend(sync_ns_scan_levels())
+    updates.extend(sync_hostname_ip_scan_levels(DNSARecord._meta.db_table))
+    updates.extend(sync_hostname_ip_scan_levels(DNSAAAARecord._meta.db_table))
 
     logger.info("Recalculating %s Scan Profiles", len(updates))
-
-    if not updates:
-        return
 
     bulk_insert(updates)
     logger.info("Recalculated %s Scan Profiles", len(updates))
 
-    if depth < 10:  # We could have an infinite recursion path: Hostname -> NS -> Hostname -> NS -> ...
-        recalculate_scan_profiles(depth + 1)
+    return updates
 
 
-def calculate_updates(
-    parent_model: type[Model], child_model: type[Model], max_inherit: int, relation: str, from_parent: bool = False
-) -> list[ScanLevel]:
-    on_clause = f"parent._id = child.{relation}" if not from_parent else f"parent.{relation} = child._id"
+def sync_hostname_ip_scan_levels(db_table: str) -> list[ScanLevel]:
+    # TODO: test multiple a records with same ip addresses and hostnames
 
     try:
-        updates = list(
-            ScanLevel.objects.raw(
-                f"""
-                SELECT child_level._id as id, child_level.declared, child_level.last_changed_by, child_level.object_id,
-                child_level.object_type, child_level.organization_id,
-                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
-                FROM {ScanLevel._meta.db_table} child_level
-                JOIN {child_model._meta.db_table} child ON child._id = child_level.object_id
-                JOIN {parent_model._meta.db_table} parent ON {on_clause}
-                JOIN {ScanLevel._meta.db_table} parent_level ON (
-                    parent_level.object_id = parent._id AND parent_level.organization_id = child_level.organization_id
-                )
-                WHERE child_level.scan_level < %(max_inherit)s
-                AND parent_level.scan_level > child_level.scan_level
-                AND child_level.declared = false
-            """,  # noqa: S608
-                {"max_inherit": max_inherit},
-            )
-        )
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(
-                f"""
-                SELECT false as declared, null as last_changed_by,
-                child._id as object_id, %(object_type)s as object_type, parent_level.organization_id as organization_id,
-                LEAST(MAX(parent_level.scan_level), %(max_inherit)s) AS scan_level
-                FROM {ScanLevel._meta.db_table} parent_level
-                JOIN {parent_model._meta.db_table} parent ON parent._id = parent_level.object_id
-                JOIN {child_model._meta.db_table} child ON {on_clause}
-                LEFT JOIN {ScanLevel._meta.db_table} child_level ON (
-                    child_level.object_id = child._id AND child_level.organization_id = parent_level.organization_id
-                )
-                WHERE child_level._id is null
+                f"""SELECT
+                CASE
+                    WHEN host_level.scan_level IS NULL or ip_level.scan_level IS NULL THEN NULL
+                    WHEN host_level.scan_level > ip_level.scan_level THEN ip_level._id
+                    WHEN ip_level.scan_level > host_level.scan_level THEN host_level._id
+                END AS id,
+                CASE
+                    WHEN host_level.scan_level IS NULL THEN hostname._id
+                    WHEN ip_level.scan_level IS NULL THEN ip._id
+                    WHEN host_level.scan_level > ip_level.scan_level THEN ip._id
+                    WHEN host_level.scan_level < ip_level.scan_level THEN hostname._id
+                END AS object_id,
+                CASE
+                    WHEN host_level.scan_level IS NULL THEN 'hostname'
+                    WHEN ip_level.scan_level IS NULL THEN 'ipaddress'
+                    WHEN host_level.scan_level > ip_level.scan_level THEN 'ipaddress'
+                    WHEN host_level.scan_level < ip_level.scan_level THEN 'hostname'
+                END AS object_type,
+                COALESCE(
+                    GREATEST(host_level.scan_level, ip_level.scan_level),
+                    host_level.scan_level,
+                    ip_level.scan_level
+                ) AS scan_level,
+                FALSE AS declared,
+                COALESCE(host_level.organization_id, ip_level.organization_id) as organization_id,
+                NULL AS last_changed_by
+            FROM {db_table} dns
+                JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.hostname_id
+                LEFT JOIN {ScanLevel._meta.db_table} host_level ON host_level.object_id = hostname._id
+                JOIN {IPAddress._meta.db_table} ip ON ip._id = dns.ip_address_id
+                LEFT JOIN {ScanLevel._meta.db_table} ip_level ON ip_level.object_id = ip._id
+            WHERE
+                (
+                    (host_level._id IS NULL OR host_level.declared is FALSE)
+                    AND (ip_level._id IS NULL OR ip_level.declared is FALSE)
+                ) AND
+                (
+                    (
+                        host_level.scan_level IS NOT NULL
+                        AND ip_level.scan_level IS NOT NULL
+                        AND ip_level.scan_level != host_level.scan_level
+                        AND ip_level.organization_id = host_level.organization_id
+                    )
+                    OR
+                    (host_level.scan_level IS NOT NULL OR ip_level.scan_level IS NOT NULL)
+            )
             """,  # noqa: S608
-                {"max_inherit": max_inherit, "object_type": child_model.__name__.lower()},
+                {},
             )
             columns = [col[0] for col in cursor.description]
-            inserts = [ScanLevel(**dict(zip(columns, row))) for row in cursor.fetchall()]
-        return updates + inserts
+            update_or_creates = []
+            for row in cursor.fetchall():
+                kwargs = dict(zip(columns, row))
+
+                if kwargs["object_id"] is None:
+                    continue
+                if kwargs["id"] is None:
+                    del kwargs["id"]
+                update_or_creates.append(ScanLevel(**kwargs))
+
+            return update_or_creates
     except OperationalError:
-        logger.error("Failed to perform scan level query", parent_model=parent_model, child_model=child_model)
+        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
+        return []
+
+
+def sync_ns_scan_levels() -> list[ScanLevel]:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""SELECT
+                    target_level._id AS id,
+                    target._id AS object_id,
+                    'hostname' AS object_type,
+                    LEAST(Max(hostname_level.scan_level), 1) AS scan_level,
+                    hostname_level.organization_id AS organization_id,
+                    FALSE AS declared,
+                    NULL AS last_changed_by
+                FROM {DNSNSRecord._meta.db_table} dns
+                    JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.hostname_id
+                    JOIN {ScanLevel._meta.db_table} hostname_level ON hostname_level.object_id = hostname._id
+                    JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
+                    LEFT JOIN {ScanLevel._meta.db_table} target_level ON (
+                    target_level.object_id = target._id
+                    AND target_level.organization_id = hostname_level.organization_id
+                )
+                WHERE hostname_level.scan_level IS NOT NULL
+                AND (
+                    target_level._id IS NULL OR
+                    (target_level.declared IS FALSE AND target_level.scan_level < LEAST(hostname_level.scan_level, 1))
+                    )
+            """,  # noqa: S608
+                {},
+            )
+            columns = [col[0] for col in cursor.description]
+            update_or_creates = []
+            for row in cursor.fetchall():
+                kwargs = dict(zip(columns, row))
+
+                if kwargs["id"] is None:
+                    del kwargs["id"]
+                update_or_creates.append(ScanLevel(**kwargs))
+
+            return update_or_creates
+    except OperationalError:
+        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
+        return []
+
+
+def sync_cname_scan_levels() -> list[ScanLevel]:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""SELECT
+                target_level._id AS id,
+                target._id AS object_id,
+                'hostname' AS object_type,
+                Max(hostname_level.scan_level) AS scan_level,
+                hostname_level.organization_id AS organization_id,
+                FALSE AS declared,
+                NULL AS last_changed_by
+                FROM {DNSCNAMERecord._meta.db_table} dns
+                    JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.target_id
+                    JOIN {ScanLevel._meta.db_table} hostname_level ON hostname_level.object_id = hostname._id
+                    JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
+                    LEFT JOIN {ScanLevel._meta.db_table} target_level ON (
+                        target_level.object_id = target._id
+                        AND target_level.organization_id = hostname_level.organization_id
+                    )
+                WHERE hostname_level.scan_level IS NOT NULL
+                AND (
+                    target_level._id IS NULL
+                    OR (target_level.declared IS FALSE AND hostname_level.scan_level > target_level.scan_level)
+                )""",  # noqa: S608
+                {},
+            )
+            columns = [col[0] for col in cursor.description]
+            update_or_creates = []
+            for row in cursor.fetchall():
+                kwargs = dict(zip(columns, row))
+
+                if kwargs["object_id"] is None:
+                    continue
+                if kwargs["id"] is None:
+                    del kwargs["id"]
+                update_or_creates.append(ScanLevel(**kwargs))
+
+            return update_or_creates
+    except OperationalError:
+        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
         return []
 
 
