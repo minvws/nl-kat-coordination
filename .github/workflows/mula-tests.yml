@@ -7,7 +7,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Run unit tests
         run: make utest
@@ -23,7 +23,7 @@ jobs:
   integration-tests:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Run integration tests
         run: make itest
@@ -44,9 +44,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: "pip" # caching pip dependencies
