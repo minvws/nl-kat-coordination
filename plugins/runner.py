@@ -107,13 +107,14 @@ class PluginRunner:
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
         tmp_file = None
+        has_placeholder = plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments)
 
         # MODE 2
         command = plugin.oci_arguments
 
         if isinstance(target, str):
             # MODE 1
-            if plugin.types_in_arguments():
+            if has_placeholder:
                 command = self.create_command(plugin.oci_arguments, target)
             else:
                 # This merges old MODE 2 into MODE 4
@@ -122,10 +123,7 @@ class PluginRunner:
         # MODE 3 & 4: List of targets
         if isinstance(target, list):
             # MODE 3: Has placeholders = sequential execution mode
-            if plugin.types_in_arguments() or any("{file}" in arg for arg in plugin.oci_arguments):
-                if len(target) == 1:
-                    return self.run(plugin_id, target[0], output, task_id, keep, cli)
-
+            if has_placeholder:
                 # TODO: auto-parallelism has hit an edge case, so it has been now turned off until the go binary
                 #  supports handling auto-parallelism:
                 #  parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
