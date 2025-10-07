@@ -9,6 +9,50 @@ from objects.models import Hostname, IPAddress, IPPort, Network, ScanLevel, bulk
 from openkat.models import Organization
 
 
+def generate(
+    organization: Organization, N: int, hostname_scan_level: int, ipaddress_scan_level: int, port_scan_level: int
+) -> tuple[list[Hostname], list[IPAddress], list[IPPort], list[ScanLevel]]:
+    network, created = Network.objects.get_or_create(name="internet")
+    ips = []
+    ports = []
+    hostnames = []
+    scan_levels = []
+
+    for i in range(N):
+        ip = IPAddress(
+            network=network,
+            address=str(socket.inet_ntoa(struct.pack(">I", random.randint(1, 0xFFFFFFFF)))),  # noqa: S311
+        )
+        ips.append(ip)
+
+        http_port = IPPort(address=ip, protocol="TCP", port=80, service="http")
+        ports.append(http_port)
+        https_port = IPPort(address=ip, protocol="TCP", port=443, service="https")
+        ports.append(https_port)
+
+        hn = Hostname(network=network, name=f"test_{i}.com")
+        hostnames.append(hn)
+
+        scan_levels.extend(
+            [
+                ScanLevel(
+                    organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=ipaddress_scan_level
+                ),
+                ScanLevel(
+                    organization=organization, object_type="hostname", object_id=hn.id, scan_level=hostname_scan_level
+                ),
+                ScanLevel(
+                    organization=organization, object_type="ipport", object_id=http_port.id, scan_level=port_scan_level
+                ),
+                ScanLevel(
+                    organization=organization, object_type="ipport", object_id=https_port.id, scan_level=port_scan_level
+                ),
+            ]
+        )
+
+    return hostnames, ips, ports, scan_levels
+
+
 class Command(BaseCommand):
     help = "Load many objects into XTDB"
 
@@ -29,51 +73,12 @@ class Command(BaseCommand):
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Create demo data for the OOI application."""
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 
-        # Create network
-        network, created = Network.objects.get_or_create(name="internet")
-        org = Organization.objects.get(code=organization_code)
-
-        # Create IP addresses
-        N = number_of_objects
-        ips = []
-        ports = []
-        hostnames = []
-        scan_levels = []
-
-        for i in range(N):
-            ip = IPAddress(
-                network=network,
-                address=str(socket.inet_ntoa(struct.pack(">I", random.randint(1, 0xFFFFFFFF)))),  # noqa: S311
-            )
-            ips.append(ip)
-
-            http_port = IPPort(address=ip, protocol="TCP", port=80, service="http")
-            ports.append(http_port)
-            https_port = IPPort(address=ip, protocol="TCP", port=443, service="https")
-            ports.append(https_port)
-
-            hn = Hostname(network=network, name=f"test_{i}.com")
-            hostnames.append(hn)
-
-            scan_levels.extend(
-                [
-                    ScanLevel(
-                        organization=org, object_type="ipaddress", object_id=ip.id, scan_level=ipaddress_scan_level
-                    ),
-                    ScanLevel(
-                        organization=org, object_type="hostname", object_id=hn.id, scan_level=hostname_scan_level
-                    ),
-                    ScanLevel(
-                        organization=org, object_type="ipport", object_id=http_port.id, scan_level=port_scan_level
-                    ),
-                    ScanLevel(
-                        organization=org, object_type="ipport", object_id=https_port.id, scan_level=port_scan_level
-                    ),
-                ]
-            )
+        organization = Organization.objects.get(code=organization_code)
+        hostnames, ips, ports, scan_levels = generate(
+            organization, number_of_objects, hostname_scan_level, ipaddress_scan_level, port_scan_level
+        )
 
         self.stdout.write(self.style.SUCCESS("Loading hostnames..."))
         bulk_insert(hostnames)

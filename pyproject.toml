@@ -50,6 +50,7 @@ dev = [
     # Pytest-common-subject which is needed by pytest-drf still depends on pkg_resources
     "setuptools<81",
     "pytest-celery>=1.2.1",
+    "pytest-benchmark>=5.0.1",
 ]
 
 [tool.uv]
@@ -70,9 +71,9 @@ relative_files = true
 omit = ["octopoes/*"]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not slow' --durations=10 -n auto --ignore=tests/integration"
+addopts = "-m 'not bench' --durations=10 -n auto --ignore=tests/integration"
 DJANGO_SETTINGS_MODULE = "openkat.settings"
-markers = ["slow: marks tests as slow"]
+markers = ["bench: benchmark tests"]
 env = [
   "D:OPENKAT_DB_HOST=localhost",
   "D:OPENKAT_XTDB_HOST=localhost",
