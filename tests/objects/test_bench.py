@@ -227,7 +227,6 @@ class HostnameQLSchema(DjangoQLSchema):
         return fields
 
 
-@pytest.mark.skip
 def test_business_rule_ipv6_webservers(bulk_data_with_dns, benchmark):
     """Benchmark: Check hostnames without IPv6 (webservers)."""
 
@@ -239,7 +238,6 @@ def test_business_rule_ipv6_webservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_ipv6_nameservers(bulk_data_with_dns, benchmark):
     """Benchmark: Check nameservers without IPv6."""
 
@@ -251,7 +249,6 @@ def test_business_rule_ipv6_nameservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_two_ipv6_nameservers(bulk_data_with_dns, benchmark):
     """Benchmark: Check domains with less than 2 IPv6 nameservers."""
 
@@ -272,7 +269,6 @@ def test_business_rule_two_ipv6_nameservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_missing_spf(bulk_data_with_dns, benchmark):
     """Benchmark: Check hostnames missing SPF records."""
 
@@ -284,7 +280,6 @@ def test_business_rule_missing_spf(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_open_sysadmin_port(bulk_data_with_dns, benchmark):
     """Benchmark: Check for open sysadmin ports (SSH, FTP, Telnet, VNC)."""
 
@@ -296,7 +291,6 @@ def test_business_rule_open_sysadmin_port(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_open_database_port(bulk_data_with_dns, benchmark):
     """Benchmark: Check for open database ports."""
 
@@ -308,7 +302,6 @@ def test_business_rule_open_database_port(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_missing_caa(bulk_data_with_dns, benchmark):
     """Benchmark: Check hostnames missing CAA records."""
 
