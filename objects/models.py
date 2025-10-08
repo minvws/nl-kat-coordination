@@ -154,7 +154,7 @@ class Hostname(Asset):
 
         mail_server = "dnsmxrecord_mailserver != None"
         name_server = "dnsnsrecord_nameserver != None"
-        root_domain = "root == True"
+        root_domain = "root = True"
 
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.CASCADE)
     name: LowerCaseCharField = LowerCaseCharField()
