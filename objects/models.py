@@ -5,7 +5,8 @@ from typing import cast
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
-from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
+from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, QuerySet, Subquery, When
+from django.db.models.query import RawQuerySet
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
@@ -318,3 +319,15 @@ def bulk_insert(objects: list[models.Model]) -> None:
         ):
             while data := fp.read():
                 copy.write(data)
+
+
+def filter_min_scan_level(qs: QuerySet, scan_level: int) -> RawQuerySet:
+    return qs.raw(
+        f"""
+        SELECT DISTINCT model.*
+        FROM {qs.model._meta.db_table} model
+        JOIN {ScanLevel._meta.db_table} sl
+        ON sl."object_id" = model."_id"
+        WHERE sl.scan_level >= %s""",  # noqa: S608
+        (scan_level,),
+    )

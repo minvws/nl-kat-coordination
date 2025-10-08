@@ -8,7 +8,7 @@ import structlog
 from celery import Celery
 from django.conf import settings
 from django.db import OperationalError, connections
-from django.db.models import Max, OuterRef, Q, Subquery
+from django.db.models import Q
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -21,6 +21,7 @@ from objects.models import (
     IPAddress,
     ScanLevel,
     bulk_insert,
+    filter_min_scan_level,
 )
 from openkat.models import Organization
 from plugins.models import Plugin
@@ -281,18 +282,8 @@ def run_schedule_for_organization(
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-        subquery = Subquery(
-            ScanLevel.objects.filter(
-                object_type=model_class.__name__.lower(), object_id=OuterRef("id"), organization=organization.pk
-            )
-            .values("object_id")
-            .annotate(
-                max_scan_level=Max("scan_level")
-            )  # Take the because we need a level at least the plugin.scan_level
-            .values("max_scan_level")
-        )
-        model_qs = model_qs.annotate(max_scan_level=subquery).filter(max_scan_level__gte=schedule.plugin.scan_level)
-        input_data = input_data.union([str(model) for model in model_qs if str(model)])
+        raw_qs = filter_min_scan_level(model_qs, schedule.plugin.scan_level)
+        input_data = input_data.union([str(model) for model in raw_qs if str(model)])
     else:
         # Non-dynamic mode: use traverse_objects to get manually added objects,
         # objects from queries, and objects from subsets

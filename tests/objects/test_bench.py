@@ -23,7 +23,7 @@ def test_query_many_hostnames(bulk_data, benchmark):
 
 
 @pytest.mark.bench
-def test_query_list_view(bulk_data, benchmark):
+def test_query_list_view_slow(bulk_data, benchmark):
     def raw():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(
@@ -34,6 +34,23 @@ def test_query_list_view(bulk_data, benchmark):
                     WHERE (V0."object_id" = ({Hostname._meta.db_table}."_id") AND V0."object_type" = 'hostname')
                     GROUP BY V0."object_id") as max_scan_level
                 FROM {Hostname._meta.db_table}
+                LIMIT 20
+            """,  # noqa: S608
+                {},
+            )
+
+    benchmark(raw)
+
+
+@pytest.mark.bench
+def test_query_list_view_fast(bulk_data, benchmark):
+    def raw():
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT  V1.*, MAX(V0."scan_level") as max_scan_level
+                FROM {Hostname._meta.db_table} V1
+                JOIN {ScanLevel._meta.db_table} V0 ON V0."object_id" = V1."_id"
                 LIMIT 20
             """,  # noqa: S608
                 {},

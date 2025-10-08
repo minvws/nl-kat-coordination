@@ -1,6 +1,6 @@
 import csv
 import io
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import django_filters
 from django import forms
@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Max, OuterRef, Q, QuerySet, Subquery
+from django.db.models import Max, Q, QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -95,33 +95,12 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     filterset_class = NetworkFilter
 
     def get_queryset(self) -> "QuerySet[Network]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "network", "object_id": OuterRef("id")}
+        queryset = super().get_queryset()
 
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
-        scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
-            .values("object_id")
-            .order_by()
-            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
-        )
-
-        queryset = Network.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-
-        # Apply object set filter if specified
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects()
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
+            object_set = ObjectSet.objects.get(id=object_set_id)
+            queryset = object_set.get_query_objects()
 
         return queryset
 
@@ -132,17 +111,30 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
         # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
+            object_set = ObjectSet.objects.get(id=object_set_id)
+            if object_set.all_objects:
+                messages.warning(
+                    self.request,
+                    _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
+                        object_set.name
+                    ),
+                )
+
+        scan_levels = ScanLevel.objects.filter(
+            object_type="network", object_id__in=[obj.id for obj in context.get("networks")]
+        )
+        if organization_codes := self.request.GET.getlist("organization"):
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
+
+        scan_levels = scan_levels.values("object_id").annotate(max_scan_level=Max("scan_level"))
+        scan_level_dict = {sl["object_id"]: sl["max_scan_level"] for sl in scan_levels}
+
+        for obj in context.get("networks"):
+            obj.max_scan_level = scan_level_dict.get(obj.id)
 
         return context
 
@@ -480,30 +472,12 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
     filterset_class = IPAddressFilter
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "ipaddress", "object_id": OuterRef("id")}
+        queryset = super().get_queryset()
 
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
-        scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
-            .values("object_id")
-            .order_by()
-            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
-        )
-
-        queryset = IPAddress.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
+        # Apply object set filter if specified
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                queryset = ObjectSet.objects.get(id=object_set_id).get_query_objects()
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
+            queryset = ObjectSet.objects.get(id=object_set_id).get_query_objects()
 
         return queryset
 
@@ -514,17 +488,28 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                obj_set = ObjectSet.objects.get(id=object_set_id)
-                if obj_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has fixed objects that are ignored (only query results are shown).').format(
-                            obj_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
+            obj_set = ObjectSet.objects.get(id=object_set_id)
+            if obj_set.all_objects:
+                messages.warning(
+                    self.request,
+                    _('"{}" has fixed objects that are ignored (only query results are shown).').format(obj_set.name),
+                )
+
+        scan_levels = ScanLevel.objects.filter(
+            object_type="ipaddress", object_id__in=[obj.id for obj in context.get("ipaddresses")]
+        )
+        if organization_codes := self.request.GET.getlist("organization"):
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
+
+        scan_levels = scan_levels.values("object_id").annotate(max_scan_level=Max("scan_level"))
+        scan_level_dict = {sl["object_id"]: sl["max_scan_level"] for sl in scan_levels}
+
+        for obj in context.get("ipaddresses"):
+            obj.max_scan_level = scan_level_dict.get(obj.id)
 
         return context
 
@@ -786,33 +771,12 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
     filterset_class = HostnameFilter
 
     def get_queryset(self) -> "QuerySet[Hostname]":
-        organization_codes = self.request.GET.getlist("organization")
-        scan_level_filter: dict[str, Any] = {"object_type": "hostname", "object_id": OuterRef("id")}
+        queryset = super().get_queryset()
 
-        if organization_codes:
-            scan_level_filter["organization__in"] = list(
-                Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
-            )
-
-        scan_level_subquery = (
-            ScanLevel.objects.filter(**scan_level_filter)
-            .values("object_id")
-            .order_by()
-            .annotate(max_scan_level=Max("scan_level"))  # collect scan levels in subquery
-        )
-
-        queryset = Hostname.objects.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-
-        # Apply object set filter if specified
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                queryset = object_set.get_query_objects()
-                # Re-apply scan level annotation to the filtered queryset
-                queryset = queryset.annotate(max_scan_level=Subquery(scan_level_subquery.values("max_scan_level")))
-            except ObjectSet.DoesNotExist:
-                pass
+            object_set = ObjectSet.objects.get(id=object_set_id)
+            queryset = object_set.get_query_objects()
 
         return queryset
 
@@ -823,17 +787,30 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
         # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
-            try:
-                object_set = ObjectSet.objects.get(id=object_set_id)
-                if object_set.all_objects:
-                    messages.warning(
-                        self.request,
-                        _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                            object_set.name
-                        ),
-                    )
-            except ObjectSet.DoesNotExist:
-                pass
+            object_set = ObjectSet.objects.get(id=object_set_id)
+            if object_set.all_objects:
+                messages.warning(
+                    self.request,
+                    _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
+                        object_set.name
+                    ),
+                )
+
+        scan_levels = ScanLevel.objects.filter(
+            object_type="hostname", object_id__in=[obj.id for obj in context.get("hostnames")]
+        )
+        if organization_codes := self.request.GET.getlist("organization"):
+            scan_levels = scan_levels.filter(
+                organization__in=list(
+                    Organization.objects.filter(code__in=organization_codes).values_list("id", flat=True)
+                )
+            )
+
+        scan_levels = scan_levels.values("object_id").annotate(max_scan_level=Max("scan_level"))
+        scan_level_dict = {sl["object_id"]: sl["max_scan_level"] for sl in scan_levels}
+
+        for obj in context.get("hostnames"):
+            obj.max_scan_level = scan_level_dict.get(obj.id)
 
         return context
 
