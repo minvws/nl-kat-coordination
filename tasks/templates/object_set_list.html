@@ -90,21 +90,6 @@
                                                 </ul>
                                             </div>
                                         {% endif %}
-                                        <div>
-                                            {% with object_count=object_set.traverse_objects|length %}
-                                                {% if object_set.traverse_objects %}
-                                                    <h5>
-                                                        {% translate "All Objects (Combined)" %} ({{ object_set.traverse_objects|slice:"10"|length }}/{{ object_count }})
-                                                    </h5>
-                                                    <ul>
-                                                        {% for object in object_set.traverse_objects|slice:"10" %}<li>{{ object }}</li>{% endfor %}
-                                                    </ul>
-                                                {% else %}
-                                                    <h5>{% translate "All Objects" %}</h5>
-                                                    <p>{% translate "There are no objects selected for this object list." %}</p>
-                                                {% endif %}
-                                            {% endwith %}
-                                        </div>
                                         <div class="button-container">
                                             {# TODO: Permissions #}
                                             <a class="button"
