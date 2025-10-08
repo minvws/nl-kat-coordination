@@ -506,6 +506,7 @@ BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that w
 
 QUEUE_NAME_SCAN_PROFILES = "scan-profiles"
 QUEUE_NAME_SCHEDULE = "schedule"
+REDIS_PASSWORD = env.str("REDIS_PASSWORD")
 
 CELERY = {
     "broker_url": env.str("REDIS_QUEUE_URI"),

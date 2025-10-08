@@ -42,6 +42,7 @@ class Command(BaseCommand):
                 "OPENKAT_DB_HOST=localhost",
                 "OPENKAT_XTDB_HOST=localhost",
                 "OPENKAT_XTDB_PORT=5433",
+                f"REDIS_QUEUE_URI=redis://:{settings.REDIS_PASSWORD}@localhost:6379/0",
             ]
 
             local_env_file = settings.BASE_DIR / ".env.local"
