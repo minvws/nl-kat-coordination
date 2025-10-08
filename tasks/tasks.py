@@ -234,11 +234,12 @@ def sync_cname_scan_levels() -> list[ScanLevel]:
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
 def reschedule() -> None:
     logger.info("Scheduling plugins")
+    tasks = []
 
     for schedule in Schedule.objects.filter(enabled=True):
-        run_schedule(schedule, force=False)
+        tasks.extend(run_schedule(schedule, force=False))
 
-    logger.info("Finished scheduling plugins")
+    logger.info("Finished scheduling %s plugins", len(tasks))
 
 
 def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -> list[Task]:
@@ -403,6 +404,9 @@ def run_plugin(
     )
     organization: Organization | None = None
     task = Task.objects.get(id=self.request.id)
+
+    if task.status == TaskStatus.CANCELLED:
+        raise RuntimeError("Trying to run cancelled task")
 
     if organization_code:
         organization = Organization.objects.get(code=organization_code)
