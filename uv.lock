@@ -564,12 +564,9 @@ dependencies = [
 [[package]]
 name = "djangoql"
 version = "0.18.1"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/donnype/djangoql.git?rev=master#51342a3e982f0cdd8f3e1bf30349caa27cce4337" }
 dependencies = [
     { name = "ply" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9e/0a/83cdb7b9d3b854b98941363153945f6c051b3bc50cd61108a85677c98c3a/djangoql-0.18.1-py2.py3-none-any.whl", hash = "sha256:51b3085a805627ebb43cfd0aa861137cdf8f69cc3c9244699718fe04a6c8e26d", size = 218209, upload-time = "2024-01-08T14:10:47.915Z" },
 ]
 
 [[package]]
@@ -874,7 +871,7 @@ requires-dist = [
     { name = "django-tagulous", specifier = ">=2.1.0" },
     { name = "django-two-factor-auth", extras = ["phonenumberslite"], specifier = ">=1.17.0" },
     { name = "django-xtdb", git = "https://github.com/dekkers/django-xtdb.git?rev=main" },
-    { name = "djangoql", specifier = ">=0.18.1" },
+    { name = "djangoql", git = "https://github.com/donnype/djangoql.git?rev=master" },
     { name = "djangorestframework", specifier = ">=3.16.0" },
     { name = "docker", specifier = ">=7.1.0" },
     { name = "drf-standardized-errors", specifier = ">=0.14.1" },

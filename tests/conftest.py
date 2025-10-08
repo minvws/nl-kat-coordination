@@ -1,4 +1,5 @@
 import binascii
+import contextlib
 import json as json_module
 import logging
 import shutil
@@ -19,6 +20,7 @@ from django.db import connections
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
+from psycopg.errors import FeatureNotSupported
 from pytest_django.lazy_django import skip_if_no_django
 from rest_framework.test import APIClient
 
@@ -386,7 +388,9 @@ def xtdb(request: pytest.FixtureRequest):
         )
         for ooi in ooi_models
     ]
-    con.ops.execute_sql_flush(erase)
+
+    with contextlib.suppress(FeatureNotSupported):
+        con.ops.execute_sql_flush(erase)
 
     yield
 

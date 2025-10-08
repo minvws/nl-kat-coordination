@@ -59,6 +59,7 @@ package = true
 
 [tool.uv.sources]
 django-xtdb = { git = "https://github.com/dekkers/django-xtdb.git", rev = "main" }
+djangoql = { git = "https://github.com/donnype/djangoql.git", rev = "master" }
 
 [build-system]
 requires = ["setuptools>=78.1.1", "wheel"]
@@ -72,9 +73,8 @@ relative_files = true
 omit = ["octopoes/*"]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not bench' --durations=10 -n auto --ignore=tests/integration"
+addopts = "--benchmark-skip --benchmark-columns='min, max, mean, stddev, ops, rounds, iterations' --benchmark-min-rounds=1 --durations=10 -n auto --ignore=tests/integration"
 DJANGO_SETTINGS_MODULE = "openkat.settings"
-markers = ["bench: benchmark tests"]
 env = [
   "D:OPENKAT_DB_HOST=localhost",
   "D:OPENKAT_XTDB_HOST=localhost",

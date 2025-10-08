@@ -17,7 +17,7 @@ from objects.models import (
     to_xtdb_dict,
 )
 from objects.views import NetworkListView
-from tasks.tasks import recalculate_scan_profiles
+from tasks.tasks import recalculate_scan_levels
 from tests.conftest import setup_request
 
 
@@ -89,7 +89,7 @@ def test_add_scan_level_filter_to_object_query(xtdb, organization):
     assert len(filter_min_scan_level(Hostname.objects.all(), 3)) == 1
 
 
-def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
+def test_recalculate_scan_levels_hostname_ip(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
@@ -107,7 +107,7 @@ def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
     ip2 = IPAddress.objects.create(network=network, address="1.0.0.0")
     DNSARecord.objects.create(ip_address=ip2, hostname=h)
 
-    updates = recalculate_scan_profiles()
+    updates = recalculate_scan_levels()
     assert len(updates) == 3
 
     ipsl.refresh_from_db()
@@ -117,14 +117,14 @@ def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
 
     ipsl.scan_level = 3
     ipsl.save()
-    updates = recalculate_scan_profiles()
+    updates = recalculate_scan_levels()
     assert len(updates) == 1
 
     hsl.refresh_from_db()
     assert hsl.scan_level == 3
 
 
-def test_recalculate_scan_profiles_nameserver(xtdb, organization):
+def test_recalculate_scan_levels_nameserver(xtdb, organization):
     network = Network.objects.create(name="internet")
     h = Hostname.objects.create(network=network, name="test.com")
     ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
@@ -133,14 +133,14 @@ def test_recalculate_scan_profiles_nameserver(xtdb, organization):
     nsl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=nameserver.id)
     DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
-    updates = recalculate_scan_profiles()
+    updates = recalculate_scan_levels()
     assert len(updates) == 1
 
     nsl.refresh_from_db()
     assert nsl.scan_level == 1
 
 
-def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
+def test_recalculate_scan_levels_does_not_change_declared(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
@@ -156,7 +156,7 @@ def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
     )
     DNSNSRecord.objects.create(name_server=nameserver, hostname=h)
 
-    updates = recalculate_scan_profiles()
+    updates = recalculate_scan_levels()
     assert len(updates) == 0
 
     sl.refresh_from_db()
@@ -166,7 +166,7 @@ def test_recalculate_scan_profiles_does_not_change_declared(xtdb, organization):
     assert nsl.scan_level == 2
 
 
-def test_recalculate_scan_profiles_creates_new_profiles(xtdb, organization):
+def test_recalculate_scan_levels_creates_new_profiles(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
@@ -174,7 +174,7 @@ def test_recalculate_scan_profiles_creates_new_profiles(xtdb, organization):
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
     DNSARecord.objects.create(ip_address=ip, hostname=h)
 
-    updates = recalculate_scan_profiles()
+    updates = recalculate_scan_levels()
     assert len(updates) == 1
 
     sl = ScanLevel.objects.filter(object_id=ip.id).first()

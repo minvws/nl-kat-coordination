@@ -195,7 +195,8 @@ def test_enabling_plugin_creates_schedule_with_predefined_object_set(xtdb):
     mail = Hostname.objects.create(network=Network.objects.create(), name="mail.com")
     DNSMXRecord.objects.create(hostname=host, mail_server=mail)
 
-    assert list(schedule.object_set.get_query_objects()) == [mail]
+    qs = schedule.object_set.get_query_objects()
+    assert list(qs) == [mail]
     assert schedule.object_set.traverse_objects() == [mail.pk]
 
 

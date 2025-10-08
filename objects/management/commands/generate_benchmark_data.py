@@ -83,9 +83,10 @@ def generate(
         hn = Hostname(network=network, name=f"test_{i}.com")
         hostnames.append(hn)
 
-        # DNS A Record
-        a_record = DNSARecord(hostname=hn, ip_address=ip, ttl=300)
-        a_records.append(a_record)
+        # DNS A Record for every 2nd host
+        if i % 2 == 0:
+            a_record = DNSARecord(hostname=hn, ip_address=ip, ttl=300)
+            a_records.append(a_record)
 
         # Additional DNS records (for business rule testing)
         if include_dns_records:

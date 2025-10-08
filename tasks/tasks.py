@@ -41,14 +41,14 @@ def schedule_scan_profile_recalculations():
         #   1. Avoid running several recalculation scripts at the same time and burn down the database
         #   2. Still take into account that there might be anomalies when a large set of objects has been changed
         with caches["default"].lock(
-            "recalculate_scan_profiles", blocking=False, timeout=3 * settings.SCAN_LEVEL_RECALCULATION_INTERVAL
+            "recalculate_scan_levels", blocking=False, timeout=3 * settings.SCAN_LEVEL_RECALCULATION_INTERVAL
         ):
-            recalculate_scan_profiles()
+            recalculate_scan_levels()
     except LockError:
         logger.warning("Recalculation already running, consider increasing SCAN_LEVEL_RECALCULATION_INTERVAL")
 
 
-def recalculate_scan_profiles() -> list[ScanLevel]:
+def recalculate_scan_levels() -> list[ScanLevel]:
     """
     These are the currently implemented rules for Scan Profile:
       - For all DNSRecords, the hostname field has max_inherit_scan_level=2
@@ -437,6 +437,7 @@ def run_plugin(
 
     try:
         out = PluginRunner().run(plugin_id, input_data, task_id=task.id)
+
         task.status = TaskStatus.COMPLETED
         task.ended_at = datetime.now(UTC)
         task.save()
