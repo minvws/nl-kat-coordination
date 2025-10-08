@@ -166,6 +166,19 @@ class PluginRunner:
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
+        client = docker.from_env()
+        container = client.containers.run(
+            image=plugin.oci_image,
+            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
+            command=command,
+            stdout=use_stdout,
+            stderr=True,
+            network=settings.DOCKER_NETWORK,
+            entrypoint=self.entrypoint,
+            volumes=[f"{self.adapter}:{self.entrypoint}"],
+            environment=environment,
+            detach=True,
+        )
 
         def handle(signalnum, stack_frame):
             container.kill(signalnum)
@@ -185,20 +198,6 @@ class PluginRunner:
             elif original_handler == signal.SIG_IGN:
                 # Signal was being ignored
                 pass
-
-        client = docker.from_env()
-        container = client.containers.run(
-            image=plugin.oci_image,
-            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
-            command=command,
-            stdout=use_stdout,
-            stderr=True,
-            network=settings.DOCKER_NETWORK,
-            entrypoint=self.entrypoint,
-            volumes=[f"{self.adapter}:{self.entrypoint}"],
-            environment=environment,
-            detach=True,
-        )
 
         signal.signal(signal.SIGTERM, handle)
 
