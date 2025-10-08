@@ -13,6 +13,7 @@ dependencies = [
   "django-filter>=25.1",
   "django-password-validators>=1.7.1",
   "django-recurrence>=1.11.1",
+  "django-redis>=6.0.0",
   "django-rest-knox>=5.0.2",
   "django-storages>=1.14.6",
   "django-structlog>=9.1.1",

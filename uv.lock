@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.12"
 
 [[package]]
@@ -455,6 +455,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-redis"
+version = "6.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "redis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/08/53/dbcfa1e528e0d6c39947092625b2c89274b5d88f14d357cee53c4d6dbbd4/django_redis-6.0.0.tar.gz", hash = "sha256:2d9cb12a20424a4c4dde082c6122f486628bae2d9c2bee4c0126a4de7fda00dd", size = 56904, upload-time = "2025-06-17T18:15:46.376Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/79/055dfcc508cfe9f439d9f453741188d633efa9eab90fc78a67b0ab50b137/django_redis-6.0.0-py3-none-any.whl", hash = "sha256:20bf0063a8abee567eb5f77f375143c32810c8700c0674ced34737f8de4e36c0", size = 33687, upload-time = "2025-06-17T18:15:34.165Z" },
+]
+
+[[package]]
 name = "django-rest-knox"
 version = "5.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -805,6 +818,7 @@ dependencies = [
     { name = "django-filter" },
     { name = "django-password-validators" },
     { name = "django-recurrence" },
+    { name = "django-redis" },
     { name = "django-rest-knox" },
     { name = "django-storages" },
     { name = "django-structlog" },
@@ -852,6 +866,7 @@ requires-dist = [
     { name = "django-filter", specifier = ">=25.1" },
     { name = "django-password-validators", specifier = ">=1.7.1" },
     { name = "django-recurrence", specifier = ">=1.11.1" },
+    { name = "django-redis", specifier = ">=6.0.0" },
     { name = "django-rest-knox", specifier = ">=5.0.2" },
     { name = "django-storages", specifier = ">=1.14.6" },
     { name = "django-structlog", specifier = ">=9.1.1" },

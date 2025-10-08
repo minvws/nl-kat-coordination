@@ -93,7 +93,7 @@ def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
     network = Network.objects.create(name="internet")
 
     h = Hostname.objects.create(network=network, name="test.com")
-    ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
+    hsl = ScanLevel.objects.create(organization=organization, object_type="hostname", object_id=h.id, scan_level=2)
 
     # The A record inherits level 2 from the hostname test.com
     ip = IPAddress.objects.create(network=network, address="0.0.0.0")
@@ -114,6 +114,14 @@ def test_recalculate_scan_profiles_hostname_ip(xtdb, organization):
     assert ipsl.scan_level == 2
     assert ScanLevel.objects.filter(object_id=ip2.id, object_type="ipaddress").count() == 1
     assert ScanLevel.objects.filter(object_id=ip6.id, object_type="ipaddress").count() == 1
+
+    ipsl.scan_level = 3
+    ipsl.save()
+    updates = recalculate_scan_profiles()
+    assert len(updates) == 1
+
+    hsl.refresh_from_db()
+    assert hsl.scan_level == 3
 
 
 def test_recalculate_scan_profiles_nameserver(xtdb, organization):
