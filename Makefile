@@ -78,7 +78,11 @@ plugins:
 
 testclean:
 	docker compose -f .ci/docker-compose.yml down --timeout 0 --remove-orphans --volumes
+ifeq ($(UNAME),Darwin)
+	docker compose -f .ci/docker-compose.yml build --pull --build-arg USER_UID="$$(id -u)"
+else
 	docker compose -f .ci/docker-compose.yml build --pull --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
+endif
 
 utest: testclean ## Run the unit tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_tests
