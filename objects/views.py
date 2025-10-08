@@ -1,5 +1,6 @@
 import csv
 import io
+import ipaddress
 from typing import TYPE_CHECKING
 
 import django_filters
@@ -7,7 +8,6 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.db import transaction
 from django.db.models import Max, Q, QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -15,7 +15,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django_filters.views import FilterView
 
-from objects.forms import HostnameCSVUploadForm, IPAddressCSVUploadForm
+from objects.forms import (
+    GenericAssetBulkCreateForm,
+    GenericAssetCSVUploadForm,
+    HostnameCSVUploadForm,
+    IPAddressCSVUploadForm,
+)
 from objects.models import (
     DNSAAAARecord,
     DNSARecord,
@@ -598,12 +603,11 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 address = row[0].strip()
 
                 try:
-                    with transaction.atomic():
-                        ipaddress, created = IPAddress.objects.get_or_create(network=network, address=address)
-                        if created:
-                            created_count += 1
-                        else:
-                            skipped_count += 1
+                    ipaddress, created = IPAddress.objects.get_or_create(network=network, address=address)
+                    if created:
+                        created_count += 1
+                    else:
+                        skipped_count += 1
                 except Exception as e:
                     error_count += 1
                     messages.add_message(
@@ -923,12 +927,11 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 name = row[0].strip()
 
                 try:
-                    with transaction.atomic():
-                        hostname, created = Hostname.objects.get_or_create(network=network, name=name)
-                        if created:
-                            created_count += 1
-                        else:
-                            skipped_count += 1
+                    hostname, created = Hostname.objects.get_or_create(network=network, name=name)
+                    if created:
+                        created_count += 1
+                    else:
+                        skipped_count += 1
                 except Exception as e:
                     error_count += 1
                     messages.add_message(
@@ -1004,3 +1007,263 @@ class ScanLevelDeleteView(DeleteView):
 
     def get_success_url(self) -> str:
         return reverse(f"objects:{self.object.object_type}_detail", kwargs={"pk": self.object.object_id})
+
+
+# Generic Asset Creation Views
+
+
+def is_valid_ip(value: str) -> bool:
+    """Check if a string is a valid IP address (IPv4 or IPv6)."""
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False
+
+
+class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
+    """View for creating IP addresses and hostnames in bulk from textarea input."""
+
+    template_name = "objects/generic_asset_create.html"
+    form_class = GenericAssetBulkCreateForm
+    success_url = reverse_lazy("objects:generic_asset_create")
+
+    def get_permission_required(self):
+        # Require both permissions since we create both types
+        return ["openkat.add_ipaddress", "openkat.add_hostname"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["csv_form"] = GenericAssetCSVUploadForm()
+        context["csv_upload_url"] = reverse_lazy("objects:generic_asset_csv_upload")
+        return context
+
+    def form_valid(self, form):
+        assets = form.cleaned_data["assets"]
+        network = form.cleaned_data.get("network")
+
+        if not network:
+            network, created = Network.objects.get_or_create(name="internet")
+
+        ip_created = 0
+        ip_skipped = 0
+        hostname_created = 0
+        hostname_skipped = 0
+        error_count = 0
+
+        for line_num, asset in enumerate(assets, 1):
+            asset = asset.strip()
+            if not asset:
+                continue
+
+            try:
+                if is_valid_ip(asset):
+                    # It's an IP address
+                    ipaddress, created = IPAddress.objects.get_or_create(network=network, address=asset)
+                    if created:
+                        ip_created += 1
+                    else:
+                        ip_skipped += 1
+                else:
+                    # Treat as hostname
+                    hostname, created = Hostname.objects.get_or_create(network=network, name=asset.lower())
+                    if created:
+                        hostname_created += 1
+                    else:
+                        hostname_skipped += 1
+            except Exception as e:
+                error_count += 1
+                messages.warning(
+                    self.request,
+                    _("Error creating asset '{asset}' on line {line_num}: {error}").format(
+                        asset=asset, line_num=line_num, error=str(e)
+                    ),
+                )
+
+        # Success messages
+        if ip_created > 0:
+            messages.success(self.request, _("Successfully created {count} IP addresses.").format(count=ip_created))
+        if hostname_created > 0:
+            messages.success(self.request, _("Successfully created {count} hostnames.").format(count=hostname_created))
+
+        # Info messages
+        if ip_skipped > 0:
+            messages.info(
+                self.request, _("{count} IP addresses already existed and were skipped.").format(count=ip_skipped)
+            )
+        if hostname_skipped > 0:
+            messages.info(
+                self.request, _("{count} hostnames already existed and were skipped.").format(count=hostname_skipped)
+            )
+
+        # Error summary
+        if error_count > 0:
+            messages.warning(
+                self.request, _("{count} assets had errors and were not created.").format(count=error_count)
+            )
+
+        return super().form_valid(form)
+
+
+class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
+    """View for CSV upload of IP addresses and hostnames with optional scan level and organization."""
+
+    template_name = "objects/generic_asset_csv_upload.html"
+    form_class = GenericAssetCSVUploadForm
+    success_url = reverse_lazy("objects:generic_asset_create")
+
+    def get_permission_required(self):
+        # Require both permissions since we create both types
+        return ["openkat.add_ipaddress", "openkat.add_hostname"]
+
+    def form_valid(self, form):
+        csv_file = form.cleaned_data["csv_file"]
+        default_network = form.cleaned_data.get("network")
+
+        if not default_network:
+            default_network, created = Network.objects.get_or_create(name="internet")
+
+        csv_data = io.StringIO(csv_file.read().decode("UTF-8"))
+
+        ip_created = 0
+        ip_skipped = 0
+        hostname_created = 0
+        hostname_skipped = 0
+        error_count = 0
+        scan_levels_set = 0
+
+        try:
+            reader = csv.reader(csv_data, delimiter=",", quotechar='"')
+            for row_num, row in enumerate(reader, 1):
+                if not row or not row[0].strip():
+                    continue  # Skip empty rows
+
+                asset = row[0].strip()
+                scan_level_value = None
+                org_code = None
+
+                # Parse optional columns
+                if len(row) >= 2 and row[1].strip():
+                    try:
+                        scan_level_value = int(row[1].strip())
+                        if scan_level_value < 0 or scan_level_value > 4:
+                            messages.warning(
+                                self.request,
+                                _(
+                                    "Row {row_num}: Invalid scan level {level}. Must be 0-4. Skipping scan level."
+                                ).format(row_num=row_num, level=scan_level_value),
+                            )
+                            scan_level_value = None
+                    except ValueError:
+                        messages.warning(
+                            self.request,
+                            _(
+                                "Row {row_num}: Invalid scan level '{value}'. Must be an integer. Skipping scan level."
+                            ).format(row_num=row_num, value=row[1].strip()),
+                        )
+
+                if len(row) >= 3 and row[2].strip():
+                    org_code = row[2].strip()
+
+                try:
+                    # Determine if IP or hostname
+                    if is_valid_ip(asset):
+                        # Create IP address
+                        ipaddress_obj, created = IPAddress.objects.get_or_create(network=default_network, address=asset)
+                        if created:
+                            ip_created += 1
+                        else:
+                            ip_skipped += 1
+
+                        # Set scan level if provided
+                        if scan_level_value is not None:
+                            organization = self._get_organization(org_code)
+                            if organization:
+                                ScanLevel.objects.update_or_create(
+                                    object_id=ipaddress_obj.id,
+                                    object_type="ipaddress",
+                                    organization=organization,
+                                    defaults={"scan_level": scan_level_value, "declared": True},
+                                )
+                                scan_levels_set += 1
+
+                    else:
+                        # Create hostname
+                        hostname_obj, created = Hostname.objects.get_or_create(
+                            network=default_network, name=asset.lower()
+                        )
+                        if created:
+                            hostname_created += 1
+                        else:
+                            hostname_skipped += 1
+
+                        # Set scan level if provided
+                        if scan_level_value is not None:
+                            organization = self._get_organization(org_code)
+                            if organization:
+                                ScanLevel.objects.update_or_create(
+                                    object_id=hostname_obj.id,
+                                    object_type="hostname",
+                                    organization=organization,
+                                    defaults={"scan_level": scan_level_value, "declared": True},
+                                )
+                                scan_levels_set += 1
+                except Exception as e:
+                    error_count += 1
+                    messages.warning(
+                        self.request,
+                        _("Error creating asset '{asset}' on row {row_num}: {error}").format(
+                            asset=asset, row_num=row_num, error=str(e)
+                        ),
+                    )
+
+            # Success messages
+            if ip_created > 0:
+                messages.success(self.request, _("Successfully created {count} IP addresses.").format(count=ip_created))
+            if hostname_created > 0:
+                messages.success(
+                    self.request, _("Successfully created {count} hostnames.").format(count=hostname_created)
+                )
+
+            # Info messages
+            if ip_skipped > 0:
+                messages.info(
+                    self.request, _("{count} IP addresses already existed and were skipped.").format(count=ip_skipped)
+                )
+            if hostname_skipped > 0:
+                messages.info(
+                    self.request,
+                    _("{count} hostnames already existed and were skipped.").format(count=hostname_skipped),
+                )
+
+            if scan_levels_set > 0:
+                messages.success(
+                    self.request, _("Successfully set scan levels for {count} assets.").format(count=scan_levels_set)
+                )
+
+            # Error summary
+            if error_count > 0:
+                messages.warning(
+                    self.request, _("{count} assets had errors and were not created.").format(count=error_count)
+                )
+
+        except csv.Error as e:
+            messages.error(self.request, _("Error parsing CSV file: {error}").format(error=str(e)))
+
+        return super().form_valid(form)
+
+    def _get_organization(self, org_code: str | None) -> Organization | None:
+        """Get organization by code, or return None if not found."""
+        if not org_code:
+            # If no org code provided, scan level cannot be set
+            # This is expected - user can provide scan level in column 2 and org in column 3
+            return None
+
+        try:
+            return Organization.objects.get(code=org_code)
+        except Organization.DoesNotExist:
+            messages.warning(
+                self.request,
+                _("Organization with code '{code}' not found. Skipping scan level for this row.").format(code=org_code),
+            )
+            return None

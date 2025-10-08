@@ -16,6 +16,9 @@
             {% if perms.openkat.add_hostname %}
                 <div class="horizontal-view toolbar">
                     <a class="button ghost" href="{% url "objects:add_hostname" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Hostname" %}</a>
+                    {% if perms.openkat.add_ipaddress %}
+                        <a class="button ghost" href="{% url "objects:generic_asset_create" %}"><span aria-hidden="true" class="icon ti-upload"></span>{% translate "Bulk Add Assets" %}</a>
+                    {% endif %}
                 </div>
             {% endif %}
             <div class="filter-container">

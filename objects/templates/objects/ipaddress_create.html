@@ -45,6 +45,16 @@
                     <button type="submit" class="button">{% translate "Upload CSV" %}</button>
                 </form>
             </div>
+            {% if perms.openkat.add_hostname %}
+                <hr>
+                <div>
+                    <h2>{% translate "Bulk Add Mixed Assets" %}</h2>
+                    <p>
+                        {% translate "Need to add both IP addresses and hostnames together? Use the bulk asset creator that auto-detects asset types and supports scan levels per row." %}
+                    </p>
+                    <a href="{% url 'objects:generic_asset_create' %}" class="button">{% translate "Go to Bulk Asset Creator" %}</a>
+                </div>
+            {% endif %}
         </section>
     </main>
 {% endblock content %}

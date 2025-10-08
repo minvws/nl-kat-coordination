@@ -5,17 +5,18 @@ from typing import Any
 
 from django.core.management.base import BaseCommand, CommandParser
 
-from objects.models import Hostname, IPAddress, IPPort, Network, ScanLevel, bulk_insert
+from objects.models import DNSARecord, Hostname, IPAddress, IPPort, Network, ScanLevel, bulk_insert
 from openkat.models import Organization
 
 
 def generate(
     organization: Organization, N: int, hostname_scan_level: int, ipaddress_scan_level: int, port_scan_level: int
-) -> tuple[list[Hostname], list[IPAddress], list[IPPort], list[ScanLevel]]:
+) -> tuple[list[Hostname], list[IPAddress], list[IPPort], list[DNSARecord], list[ScanLevel]]:
     network, created = Network.objects.get_or_create(name="internet")
     ips = []
     ports = []
     hostnames = []
+    a_records = []
     scan_levels = []
 
     for i in range(N):
@@ -32,6 +33,8 @@ def generate(
 
         hn = Hostname(network=network, name=f"test_{i}.com")
         hostnames.append(hn)
+        a_record = DNSARecord(hostname=hn, ip_address=ip)
+        a_records.append(a_record)
 
         scan_levels.extend(
             [
@@ -50,7 +53,7 @@ def generate(
             ]
         )
 
-    return hostnames, ips, ports, scan_levels
+    return hostnames, ips, ports, a_records, scan_levels
 
 
 class Command(BaseCommand):
@@ -76,7 +79,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 
         organization = Organization.objects.get(code=organization_code)
-        hostnames, ips, ports, scan_levels = generate(
+        hostnames, ips, ports, arecords, scan_levels = generate(
             organization, number_of_objects, hostname_scan_level, ipaddress_scan_level, port_scan_level
         )
 
@@ -88,6 +91,9 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Loading ipports..."))
         bulk_insert(ports)
+
+        self.stdout.write(self.style.SUCCESS("Loading DNSArecords..."))
+        bulk_insert(arecords)
 
         self.stdout.write(self.style.SUCCESS("Loading scan levels..."))
         bulk_insert(scan_levels)

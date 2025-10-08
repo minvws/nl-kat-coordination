@@ -14,6 +14,8 @@ from objects.views import (
     FindingCreateView,
     FindingDeleteView,
     FindingListView,
+    GenericAssetCreateView,
+    GenericAssetCSVUploadView,
     HostnameCreateView,
     HostnameCSVUploadView,
     HostnameDeleteView,
@@ -81,6 +83,9 @@ urlpatterns = [
     path("objects/finding/", FindingListView.as_view(), name="finding_list"),
     path("objects/finding/add/", FindingCreateView.as_view(), name="add_finding"),
     path("objects/finding/<int:pk>/delete/", FindingDeleteView.as_view(), name="delete_finding"),
+    # Generic asset creation
+    path("objects/assets/add/", GenericAssetCreateView.as_view(), name="generic_asset_create"),
+    path("objects/assets/upload-csv/", GenericAssetCSVUploadView.as_view(), name="generic_asset_csv_upload"),
     path("objects/network/", NetworkListView.as_view(), name="network_list"),
     path("objects/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
     path("objects/network/add/", NetworkCreateView.as_view(), name="add_network"),

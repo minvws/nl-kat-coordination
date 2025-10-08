@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <h1>{% translate "Upload Assets from CSV" %}</h1>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% include "partials/form/form_errors.html" with form=form %}
+
+                {{ form.as_p }}
+                <button type="submit">{% translate "Upload" %}</button>
+                <a href="{% url 'objects:generic_asset_create' %}"
+                   class="button secondary">{% translate "Cancel" %}</a>
+            </form>
+        </section>
+    </main>
+{% endblock content %}

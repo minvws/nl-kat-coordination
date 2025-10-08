@@ -7,11 +7,12 @@ from objects.models import Hostname, ScanLevel, bulk_insert
 
 @pytest.fixture
 def bulk_data(organization, xtdb):
-    hostnames, ips, ports, scan_levels = generate(organization, 50_000, 2, 2, 2)
+    hostnames, ips, ports, a_records, scan_levels = generate(organization, 50_000, 2, 2, 2)
     bulk_insert(hostnames)
     bulk_insert(ips)
     bulk_insert(ports)
     bulk_insert(scan_levels)
+    bulk_insert(a_records)
 
 
 @pytest.mark.bench
