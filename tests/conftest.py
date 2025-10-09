@@ -354,7 +354,7 @@ def drf_redteam_client(create_drf_client, redteamuser):
 # Mark tests using the xtdb fixture automatically with django_db and require access to the "xtdb" database
 def pytest_collection_modifyitems(items):
     for item in items:
-        if "xtdb" in getattr(item, "fixturenames", ()):
+        if "xtdb" in getattr(item, "fixturenames", ()) or "xtdbulk" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.django_db(databases=["xtdb", "default"]))
 
 

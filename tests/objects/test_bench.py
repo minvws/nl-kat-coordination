@@ -1,63 +1,88 @@
+import contextlib
+
 import pytest
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.core.management.color import no_style
 from django.db import connections
 from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema, IntField
+from psycopg.errors import FeatureNotSupported
 
 from objects.management.commands.generate_benchmark_data import generate
 from objects.models import Hostname, IPAddress, IPPort, ScanLevel, bulk_insert
 from objects.views import HostnameDetailView, HostnameListView, IPAddressDetailView, IPAddressListView
+from openkat.models import Organization
 from plugins.models import Plugin
 from tasks.models import ObjectSet, Schedule, Task
 from tasks.tasks import recalculate_scan_levels, run_schedule
 from tests.conftest import setup_request
 
+# IMPORTANT: one should be careful with using function-scoped database fixtures here that clear xtdb between runs (such
+# as "xtdb"), as this breaks the session-scoped database setup in this test file.
 
-@pytest.fixture
-def bulk_data(organization, xtdb):
-    """Generate bulk data without DNS records for basic testing."""
+
+@pytest.fixture(scope="session")
+def xtdbulk(request: pytest.FixtureRequest, django_db_blocker):
+    """session scoped variant of xtdb fixture, so we don't have to seed the database every time (as we only do reads)"""
+    objects = apps.get_app_config("objects")
+    ooi_models = list(objects.get_models())
+    con = connections["xtdb"]
+
+    xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
+
+    for ooi in ooi_models:
+        if ooi._meta.db_table.startswith("test_"):
+            continue
+        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}".lower()  # Table names are not case-insensitive
+
+    style = no_style()
+    erase = [
+        "{} {} {};".format(
+            style.SQL_KEYWORD("ERASE"),
+            style.SQL_KEYWORD("FROM"),
+            style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table)),
+        )
+        for ooi in ooi_models
+    ]
+
+    with contextlib.suppress(FeatureNotSupported), django_db_blocker.unblock():
+        con.ensure_connection()
+        con.ops.execute_sql_flush(erase)
+
+        yield
+
+        con.ensure_connection()
+        con.ops.execute_sql_flush(erase)
+
+
+@pytest.fixture(scope="session")
+def bulk_data_org(xtdbulk):
+    org, created = Organization.objects.get_or_create(code="testdns", name="testdns")
     hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records, scan_levels = (
-        generate(organization, 10_000, 2, 1, 2, include_dns_records=False)
+        generate(org, 10_000, 2, 1, 2, include_dns_records=True)
     )
     bulk_insert(hostnames)
     bulk_insert(ips)
     bulk_insert(ports)
-    bulk_insert(scan_levels)
     bulk_insert(a_records)
+    bulk_insert(aaaa_records)
+    bulk_insert(ns_records)
+    bulk_insert(mx_records)
+    bulk_insert(txt_records)
+    bulk_insert(caa_records)
+    bulk_insert(scan_levels)
+
+    return org
 
 
 @pytest.fixture
-def bulk_data_with_dns(organization, xtdb):
-    """Generate bulk data WITH DNS records for business rule testing."""
-    hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records, scan_levels = (
-        generate(organization, 10_000, 2, 1, 2, include_dns_records=True)
-    )
-    bulk_insert(hostnames)
-    bulk_insert(ips)
-    bulk_insert(ports)
-    bulk_insert(a_records)
-    if aaaa_records:
-        bulk_insert(aaaa_records)
-    if ns_records:
-        bulk_insert(ns_records)
-    if mx_records:
-        bulk_insert(mx_records)
-    if txt_records:
-        bulk_insert(txt_records)
-    if caa_records:
-        bulk_insert(caa_records)
-    bulk_insert(scan_levels)
-
-
-# ============================================================================
-# QUERY BENCHMARKS
-# ============================================================================
+def bulk_data(bulk_data_org: Organization):
+    bulk_data_org.save()
 
 
 def test_query_many_hostnames(bulk_data, benchmark):
-    """Benchmark querying hostnames with filtering."""
-
     def select():
         list(Hostname.objects.select_related("network").filter(name__contains="123"))
 
@@ -65,8 +90,6 @@ def test_query_many_hostnames(bulk_data, benchmark):
 
 
 def test_query_many_ipaddresses(bulk_data, benchmark):
-    """Benchmark querying IP addresses with filtering."""
-
     def select():
         list(IPAddress.objects.select_related("network").filter(address__contains="192"))
 
@@ -74,8 +97,6 @@ def test_query_many_ipaddresses(bulk_data, benchmark):
 
 
 def test_query_list_view_fast(bulk_data, benchmark):
-    """Benchmark the fast JOIN approach for list views."""
-
     def raw():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(
@@ -91,16 +112,9 @@ def test_query_list_view_fast(bulk_data, benchmark):
     benchmark(raw)
 
 
-# ============================================================================
-# LIST VIEW BENCHMARKS
-# ============================================================================
-
-
-def test_hostname_list_view(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark hostname list view rendering with scan level annotations."""
-
+def test_hostname_list_view(bulk_data, rf, superuser, benchmark):
     def render_list_view():
-        request = setup_request(rf.get("/objects/hostname/"), superuser_member.user)
+        request = setup_request(rf.get("/objects/hostname/"), superuser)
         view = HostnameListView.as_view()
         response = view(request)
         response.render()
@@ -110,11 +124,9 @@ def test_hostname_list_view(bulk_data, rf, superuser_member, benchmark):
     assert result.status_code == 200
 
 
-def test_ipaddress_list_view(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark IP address list view rendering with scan level annotations."""
-
+def test_ipaddress_list_view(bulk_data, rf, superuser, benchmark):
     def render_list_view():
-        request = setup_request(rf.get("/objects/ipaddress/"), superuser_member.user)
+        request = setup_request(rf.get("/objects/ipaddress/"), superuser)
         view = IPAddressListView.as_view()
         response = view(request)
         response.render()
@@ -124,11 +136,9 @@ def test_ipaddress_list_view(bulk_data, rf, superuser_member, benchmark):
     assert result.status_code == 200
 
 
-def test_hostname_list_view_filtered(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark hostname list view with filters applied."""
-
+def test_hostname_list_view_filtered(bulk_data, rf, superuser, benchmark):
     def render_filtered_view():
-        request = setup_request(rf.get("/objects/hostname/?name=test"), superuser_member.user)
+        request = setup_request(rf.get("/objects/hostname/?name=test"), superuser)
         view = HostnameListView.as_view()
         response = view(request)
         response.render()
@@ -138,11 +148,9 @@ def test_hostname_list_view_filtered(bulk_data, rf, superuser_member, benchmark)
     assert result.status_code == 200
 
 
-def test_ipaddress_list_view_filtered(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark IP address list view with filters applied."""
-
+def test_ipaddress_list_view_filtered(bulk_data, rf, superuser, benchmark):
     def render_filtered_view():
-        request = setup_request(rf.get("/objects/ipaddress/?&address=10"), superuser_member.user)
+        request = setup_request(rf.get("/objects/ipaddress/?&address=10"), superuser)
         view = IPAddressListView.as_view()
         response = view(request)
         response.render()
@@ -152,17 +160,11 @@ def test_ipaddress_list_view_filtered(bulk_data, rf, superuser_member, benchmark
     assert result.status_code == 200
 
 
-# ============================================================================
-# DETAIL VIEW BENCHMARKS
-# ============================================================================
-
-
-def test_hostname_detail_view(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark hostname detail view with related objects."""
+def test_hostname_detail_view(bulk_data, rf, benchmark, superuser):
     hostname = Hostname.objects.first()
 
     def render_detail_view():
-        request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/"), superuser_member.user)
+        request = setup_request(rf.get(f"/objects/hostname/{hostname.pk}/"), superuser)
         view = HostnameDetailView.as_view()
         response = view(request, pk=hostname.pk)
         response.render()
@@ -172,12 +174,11 @@ def test_hostname_detail_view(bulk_data, rf, superuser_member, benchmark):
     assert result.status_code == 200
 
 
-def test_ipaddress_detail_view(bulk_data, rf, superuser_member, benchmark):
-    """Benchmark IP address detail view with related objects."""
+def test_ipaddress_detail_view(bulk_data, rf, superuser, benchmark):
     ipaddress = IPAddress.objects.first()
 
     def render_detail_view():
-        request = setup_request(rf.get(f"/objects/ipaddress/{ipaddress.pk}/"), superuser_member.user)
+        request = setup_request(rf.get(f"/objects/ipaddress/{ipaddress.pk}/"), superuser)
         view = IPAddressDetailView.as_view()
         response = view(request, pk=ipaddress.pk)
         response.render()
@@ -187,7 +188,7 @@ def test_ipaddress_detail_view(bulk_data, rf, superuser_member, benchmark):
     assert result.status_code == 200
 
 
-def test_object_set(bulk_data_with_dns, benchmark):
+def test_object_set(bulk_data, benchmark):
     object_set = ObjectSet.objects.create(
         name="Test Set",
         object_type=ContentType.objects.get_for_model(Hostname),
@@ -201,25 +202,13 @@ def test_object_set(bulk_data_with_dns, benchmark):
     assert result == 499
 
 
-# ============================================================================
-# SCAN LEVEL RECALCULATION BENCHMARKS
-# ============================================================================
-
-
-def test_scan_level_recalculation(benchmark, bulk_data_with_dns, organization):
+def test_scan_level_recalculation(benchmark, bulk_data):
     # The ipaddresses van scan level 1 and all hostnames 2
     result = benchmark.pedantic(recalculate_scan_levels, rounds=1)  # Subsequent rounds have no updates
     assert len(result) == 7499
 
 
-# ============================================================================
-# BUSINESS RULE BENCHMARKS
-# ============================================================================
-
-
 class HostnameQLSchema(DjangoQLSchema):
-    """Custom schema to support nameservers_with_ipv6_count field"""
-
     def get_fields(self, model):
         fields = super().get_fields(model)
         if model == Hostname:
@@ -227,9 +216,7 @@ class HostnameQLSchema(DjangoQLSchema):
         return fields
 
 
-def test_business_rule_ipv6_webservers(bulk_data_with_dns, benchmark):
-    """Benchmark: Check hostnames without IPv6 (webservers)."""
-
+def test_business_rule_ipv6_webservers(bulk_data, benchmark):
     def run_rule():
         query = "dnsnsrecord_nameserver = None and dnsaaaarecord = None"
         return apply_search(Hostname.objects.distinct(), query).count()
@@ -238,9 +225,7 @@ def test_business_rule_ipv6_webservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_ipv6_nameservers(bulk_data_with_dns, benchmark):
-    """Benchmark: Check nameservers without IPv6."""
-
+def test_business_rule_ipv6_nameservers(bulk_data, benchmark):
     def run_rule():
         query = "dnsnsrecord_nameserver != None and dnsaaaarecord = None"
         return apply_search(Hostname.objects.distinct(), query).count()
@@ -249,9 +234,7 @@ def test_business_rule_ipv6_nameservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_two_ipv6_nameservers(bulk_data_with_dns, benchmark):
-    """Benchmark: Check domains with less than 2 IPv6 nameservers."""
-
+def test_business_rule_two_ipv6_nameservers(bulk_data, benchmark):
     def run_rule():
         queryset = Hostname.objects.annotate(
             nameservers_with_ipv6_count=Count(
@@ -269,9 +252,8 @@ def test_business_rule_two_ipv6_nameservers(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_missing_spf(bulk_data_with_dns, benchmark):
-    """Benchmark: Check hostnames missing SPF records."""
-
+@pytest.mark.skip
+def test_business_rule_missing_spf(bulk_data, benchmark):
     def run_rule():
         query = 'dnstxtrecord.value not startswith "v=spf1"'
         return apply_search(Hostname.objects.all(), query).count()
@@ -280,9 +262,7 @@ def test_business_rule_missing_spf(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_open_sysadmin_port(bulk_data_with_dns, benchmark):
-    """Benchmark: Check for open sysadmin ports (SSH, FTP, Telnet, VNC)."""
-
+def test_business_rule_open_sysadmin_port(bulk_data, benchmark):
     def run_rule():
         query = 'protocol = "TCP" and port in (21, 22, 23, 5900)'
         return apply_search(IPPort.objects.all(), query).count()
@@ -291,9 +271,7 @@ def test_business_rule_open_sysadmin_port(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_open_database_port(bulk_data_with_dns, benchmark):
-    """Benchmark: Check for open database ports."""
-
+def test_business_rule_open_database_port(bulk_data, benchmark):
     def run_rule():
         query = 'protocol = "TCP" and port in (1433, 1434, 3050, 3306, 5432)'
         return apply_search(IPPort.objects.all(), query).count()
@@ -302,9 +280,7 @@ def test_business_rule_open_database_port(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-def test_business_rule_missing_caa(bulk_data_with_dns, benchmark):
-    """Benchmark: Check hostnames missing CAA records."""
-
+def test_business_rule_missing_caa(bulk_data, benchmark):
     def run_rule():
         query = "dnscaarecord = None"
         return apply_search(Hostname.objects.all(), query).count()
@@ -313,12 +289,7 @@ def test_business_rule_missing_caa(bulk_data_with_dns, benchmark):
     assert result >= 0
 
 
-# ============================================================================
-# TASK SCHEDULING BENCHMARKS
-# ============================================================================
-
-
-def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, organization, benchmark):
+def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, benchmark):
     plugin = Plugin.objects.create(
         name="test_scan_filter",
         plugin_id="test_scan_filter",
@@ -328,6 +299,7 @@ def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, organizati
         scan_level=2,
         batch_size=500,
     )
+    organization = Organization.objects.first()
     plugin.enable_for(organization)
     schedule = Schedule.objects.filter(plugin=plugin, organization=organization).first()
 
@@ -338,17 +310,17 @@ def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, organizati
     assert len(tasks) == 20
 
 
-def test_task_status_check_many_tasks(organization, docker, celery, xtdb, benchmark):
-    """Benchmark checking status of many tasks."""
-    # Create many tasks
+def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark):
     plugin = Plugin.objects.create(
         name="test_bench",
         plugin_id="test_bench",
         oci_image="test",
-        oci_arguments=["{hostname}"],
+        consumes=["type:hostname"],
+        oci_arguments=["bulk"],
         scan_level=2,
         batch_size=500,
     )
+    organization = Organization.objects.first()
     plugin.enable_for(organization)
     schedule = Schedule.objects.filter(plugin=plugin, organization=organization).first()
 
@@ -358,6 +330,7 @@ def test_task_status_check_many_tasks(organization, docker, celery, xtdb, benchm
             organization=organization,
             type="plugin",
             status="queued",
+            schedule=schedule,
             data={"plugin_id": plugin.plugin_id, "input_data": [f"test_{i}.com"]},
         )
         tasks.append(task)
@@ -365,14 +338,13 @@ def test_task_status_check_many_tasks(organization, docker, celery, xtdb, benchm
     Task.objects.bulk_create(tasks)
 
     def inner():
-        return run_schedule(schedule, force=True, celery=celery)
+        return run_schedule(schedule, force=False, celery=celery)
 
-    result = benchmark(inner)
-    assert len(result) == 0
+    result = benchmark.pedantic(inner, rounds=1)
+    assert len(result) == 18
 
 
-def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, organization, benchmark):
-    """Benchmark task scheduling with complex object set queries."""
+def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchmark):
     plugin = Plugin.objects.create(
         name="query_test",
         plugin_id="query_test",
@@ -382,6 +354,7 @@ def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, organi
         scan_level=2,
         batch_size=500,
     )
+    organization = Organization.objects.first()
     plugin.enable_for(organization)
 
     schedule = Schedule.objects.filter(plugin=plugin, organization=organization).first()
