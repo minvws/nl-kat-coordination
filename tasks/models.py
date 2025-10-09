@@ -108,7 +108,9 @@ class Schedule(models.Model):
     organization = models.ForeignKey(
         "openkat.organization", on_delete=models.CASCADE, related_name="schedules", null=True, blank=True
     )
-    plugin = models.ForeignKey("plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True)
+    plugin = models.ForeignKey["Plugin"](
+        "plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True
+    )
     object_set = models.ForeignKey(ObjectSet, on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
 
     run_on = models.CharField(max_length=64, null=True, blank=True)

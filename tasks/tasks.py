@@ -275,14 +275,14 @@ def run_schedule_for_organization(
 
     if not schedule.object_set:
         if force:
-            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id, celery=celery)
+            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.pk, celery=celery)
 
         last_run = Task.objects.filter(schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
             return []
 
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.id, celery=celery)
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.pk, celery=celery)
 
     input_data: set[str] = set()
 
@@ -310,7 +310,7 @@ def run_schedule_for_organization(
         return []
 
     if force:
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)
+        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.pk, celery=celery)
 
     # Filter on the schedule and created after the previous occurrence
     last_runs = Task.objects.filter(schedule=schedule, created_at__gt=schedule.recurrences.before(now))
@@ -336,7 +336,7 @@ def run_schedule_for_organization(
     if not input_data:
         return []
 
-    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.id, celery=celery)
+    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.pk, celery=celery)
 
 
 def rerun_task(task: Task, celery: Celery = app) -> list[Task]:
@@ -436,7 +436,7 @@ def run_plugin(
     task.save()
 
     try:
-        out = PluginRunner().run(plugin_id, input_data, task_id=task.id)
+        out = PluginRunner().run(plugin_id, input_data, task_id=task.pk)
 
         task.status = TaskStatus.COMPLETED
         task.ended_at = datetime.now(UTC)
@@ -457,7 +457,7 @@ def run_plugin(
 
 def process_raw_file(file: File, handle_error: bool = False, celery: Celery = app) -> list[Task]:
     if file.type == "error" and not handle_error:
-        logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.id)
+        logger.info("Raw file %s contains an exception trace and handle_error is set to False. Skipping.", file.pk)
         return []
 
     tasks = []
@@ -469,7 +469,7 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
             if plugin.enabled_for(organization):
                 tasks.extend(
                     run_plugin_task(
-                        plugin.plugin_id, organization.code if organization else None, str(file.id), celery=celery
+                        plugin.plugin_id, organization.code if organization else None, str(file.pk), celery=celery
                     )
                 )
 
@@ -477,6 +477,6 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
 
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
         for enabled_org in plugin.enabled_organizations():
-            tasks.extend(run_plugin_task(plugin.plugin_id, enabled_org.code, str(file.id), celery=celery))
+            tasks.extend(run_plugin_task(plugin.plugin_id, enabled_org.code, str(file.pk), celery=celery))
 
     return tasks

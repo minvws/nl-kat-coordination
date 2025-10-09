@@ -149,6 +149,8 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
     template_name = "objects/network_detail.html"
     context_object_name = "network"
 
+    object: Network
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -161,7 +163,7 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="network")
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.pk, object_type="network")
         if organization_codes:
             scan_levels = scan_levels.filter(
                 organization__in=list(
@@ -524,6 +526,8 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
     template_name = "objects/ipaddress_detail.html"
     context_object_name = "ipaddress"
 
+    object: IPAddress
+
     def get_queryset(self) -> "QuerySet[IPAddress]":
         return IPAddress.objects.prefetch_related("ipport_set")
 
@@ -539,7 +543,7 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="ipaddress")
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.pk, object_type="ipaddress")
         if organization_codes:
             scan_levels = scan_levels.filter(
                 organization__in=list(
@@ -824,6 +828,8 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
     template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
 
+    object: Hostname
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -836,7 +842,7 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
 
         # Filter scan levels by selected organization only if exactly one is selected
-        scan_levels = ScanLevel.objects.filter(object_id=self.object.id, object_type="hostname")
+        scan_levels = ScanLevel.objects.filter(object_id=self.object.pk, object_type="hostname")
 
         if organization_codes:
             scan_levels = scan_levels.filter(
@@ -961,6 +967,8 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
 # DNS Record Delete Views
 class DNSRecordDeleteView(DeleteView):
+    object: DNSARecord
+
     def get_success_url(self) -> str:
         return reverse("objects:hostname_detail", kwargs={"pk": self.object.hostname_id})
 
@@ -1004,6 +1012,8 @@ class DNSSRVRecordDeleteView(DNSRecordDeleteView):
 class ScanLevelDeleteView(DeleteView):
     model = ScanLevel
     template_name = "delete_confirm.html"
+
+    object: ScanLevel
 
     def get_success_url(self) -> str:
         return reverse(f"objects:{self.object.object_type}_detail", kwargs={"pk": self.object.object_id})
@@ -1180,7 +1190,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             organization = self._get_organization(org_code)
                             if organization:
                                 ScanLevel.objects.update_or_create(
-                                    object_id=ipaddress_obj.id,
+                                    object_id=ipaddress_obj.pk,
                                     object_type="ipaddress",
                                     organization=organization,
                                     defaults={"scan_level": scan_level_value, "declared": True},
@@ -1202,7 +1212,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             organization = self._get_organization(org_code)
                             if organization:
                                 ScanLevel.objects.update_or_create(
-                                    object_id=hostname_obj.id,
+                                    object_id=hostname_obj.pk,
                                     object_type="hostname",
                                     organization=organization,
                                     defaults={"scan_level": scan_level_value, "declared": True},

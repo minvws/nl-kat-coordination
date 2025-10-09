@@ -1,6 +1,6 @@
 import tempfile
 from enum import Enum
-from typing import cast
+from typing import cast, Sequence
 
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -91,7 +91,7 @@ class ScanLevel(models.Model):
         managed = False
 
     def __str__(self) -> str:
-        return str(self.id)
+        return str(self.pk)
 
 
 class FindingType(models.Model):
@@ -290,7 +290,7 @@ class DNSSRVRecord(DNSRecordBase):
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
 
 
-def bulk_insert(objects: list[models.Model]) -> None:
+def bulk_insert(objects: Sequence[models.Model]) -> None:
     """Use COPY to efficiently bulk-insert objects into XTDB. Assumes objects have the same type, skips other types."""
 
     if not objects:

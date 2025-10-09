@@ -120,7 +120,7 @@ class PluginDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("plugin_list"), "text": _("Plugins")},
-            {"url": reverse("plugin_detail", kwargs={"pk": self.get_object().id}), "text": _("Plugin details")},
+            {"url": reverse("plugin_detail", kwargs={"pk": self.object.pk}), "text": _("Plugin details")},
         ]
 
         return context
@@ -230,13 +230,15 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     fields = ["plugin_id", "name", "consumes", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
 
+    object: Plugin
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields["description"].widget.attrs["rows"] = 3
         return form
 
     def form_invalid(self, form):
-        return reverse("plugin_detail", kwargs={"pk": self.object.id})
+        return reverse("plugin_detail", kwargs={"pk": self.object.pk})
 
     def get_queryset(self):
         return (
@@ -256,7 +258,7 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
         context["plugin"] = self.object
         context["breadcrumbs"] = [
             {"url": reverse("plugin_list"), "text": _("Plugins")},
-            {"url": reverse("plugin_detail", kwargs={"pk": self.object.id}), "text": _("Plugin details")},
+            {"url": reverse("plugin_detail", kwargs={"pk": self.object.pk}), "text": _("Plugin details")},
         ]
 
         return context
@@ -299,6 +301,8 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     fields = ["enabled"]
     template_name = "enable_disable_plugin.html"
 
+    object: EnabledPlugin
+
     def form_invalid(self, form):
         return redirect(reverse("plugin_list"))
 
@@ -314,7 +318,7 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
         # Plugin has been disabled, cancel all tasks for this plugin and organization
         for task in Task.objects.filter(
             organization=self.object.organization,
-            data__plugin_id=self.object.plugin.id,
+            data__plugin_id=self.object.plugin.pk,
             status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],
         ):
             task.cancel()
@@ -364,6 +368,8 @@ class BusinessRuleDetailView(DetailView):
     model = BusinessRule
     template_name = "plugins/business_rule_detail.html"
     context_object_name = "business_rule"
+
+    object: BusinessRule
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -420,6 +426,8 @@ class BusinessRuleCreateView(CreateView):
     form_class = BusinessRuleForm
     template_name = "plugins/business_rule_form.html"
 
+    object: BusinessRule
+
     def get_success_url(self) -> str:
         return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
 
@@ -428,6 +436,8 @@ class BusinessRuleUpdateView(UpdateView):
     model = BusinessRule
     form_class = BusinessRuleForm
     template_name = "plugins/business_rule_form.html"
+
+    object: BusinessRule
 
     def get_success_url(self) -> str:
         return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
@@ -441,6 +451,8 @@ class BusinessRuleDeleteView(DeleteView):
 class BusinessRuleToggleView(UpdateView):
     model = BusinessRule
     fields: list[str] = []
+
+    object: BusinessRule
 
     def form_valid(self, form):
         self.object.enabled = not self.object.enabled

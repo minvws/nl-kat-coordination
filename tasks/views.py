@@ -77,7 +77,7 @@ class TaskDetailView(OrganizationFilterMixin, DetailView):
         context["plugin"] = Plugin.objects.get(plugin_id=self.object.data["plugin_id"])
         context["breadcrumbs"] = [
             {"url": reverse("task_list"), "text": _("Plugins")},
-            {"url": reverse("task_detail", kwargs={"pk": self.get_object().id}), "text": _("Task details")},
+            {"url": reverse("task_detail", kwargs={"pk": self.object.pk}), "text": _("Task details")},
         ]
 
         return context
@@ -205,7 +205,7 @@ class ScheduleDetailView(OrganizationFilterMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("schedule_list"), "text": _("Schedules")},
-            {"url": reverse("schedule_detail", kwargs={"pk": self.get_object().id}), "text": _("Schedule details")},
+            {"url": reverse("schedule_detail", kwargs={"pk": self.object.pk}), "text": _("Schedule details")},
         ]
         context["form"] = ScheduleForm
 
@@ -245,6 +245,8 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Schedule
     fields = ["enabled", "recurrences", "object_set"]
+
+    object: Schedule
 
     def form_valid(self, form):
         result = super().form_valid(form)
@@ -325,22 +327,22 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
     model = ObjectSet
     PREVIEW_SIZE = 20
 
+    object: ObjectSet
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("object_set_list"), "text": _("Objects Sets")},
-            {"url": reverse("object_set_detail", kwargs={"pk": self.get_object().id}), "text": _("Object Set Detail")},
+            {"url": reverse("object_set_detail", kwargs={"pk": self.object.pk}), "text": _("Object Set Detail")},
         ]
 
-        obj: ObjectSet = self.get_object()
-
-        if obj.object_query is not None and obj.dynamic is True:
+        if self.object.object_query is not None and self.object.dynamic is True:
             # TODO: check scan profiles?
-            context["objects"] = obj.get_query_objects()[: self.PREVIEW_SIZE]
+            context["objects"] = self.object.get_query_objects()[: self.PREVIEW_SIZE]
         else:
             context["objects"] = None
 
-        context["all_objects"] = obj.object_type.model_class().objects.filter(pk__in=obj.all_objects)
+        context["all_objects"] = self.object.object_type.model_class().objects.filter(pk__in=self.object.all_objects)
 
         return context
 
@@ -403,6 +405,8 @@ class ObjectSetUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = ObjectSet
     form_class = ObjectSetForm
     template_name = "object_set_form.html"
+
+    object: ObjectSet
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("object_set_detail", kwargs={"pk": self.object.pk})

@@ -146,7 +146,7 @@ class PluginRunner:
 
         # Set IN_FILE for stdin modes (entrypoint reads this file and pipes to plugin)
         if tmp_file:
-            environment["IN_FILE"] = str(tmp_file.id)
+            environment["IN_FILE"] = str(tmp_file.pk)
 
         # Configure where plugin output should go
         if use_stdout:

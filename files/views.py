@@ -70,6 +70,8 @@ class FileCreateView(KATModelPermissionRequiredMixin, CreateView):
     fields = ["file"]
     template_name = "file_form.html"
 
+    object: File
+
     def form_invalid(self, form):
         logger.error("Failed creating file", errors=form.errors)
         return redirect(reverse("file_list"))

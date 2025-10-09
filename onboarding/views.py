@@ -157,6 +157,8 @@ class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegis
     current_step = 2
     permission_required = "openkat.add_organization"
 
+    object: Organization | None
+
     def get(self, request, *args, **kwargs):
         if member := OrganizationMember.objects.filter(user=self.request.user).first():
             return redirect(reverse("step_organization_update", kwargs={"organization_code": member.organization.code}))
