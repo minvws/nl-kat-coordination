@@ -1,6 +1,6 @@
 from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
-from djangoql.schema import DjangoQLSchema, IntField
+from djangoql.schema import DjangoQLSchema, IntField, StrField
 
 from objects.models import (
     CAATag,
@@ -74,12 +74,13 @@ rules = {
         "query": "dnsnsrecord_nameserver = None and nameservers_with_ipv6_count < 2",
         "finding_type_code": "KAT-NAMESERVER-NO-TWO-IPV6",
     },
-    "missing_spf": {
-        "name": "missing_spf",
-        "object_type": "Hostname",
-        "query": 'dnstxtrecord.value not startswith "v=spf1"',
-        "finding_type_code": "KAT-NO-SPF",
-    },
+    # TODO: spf query is not performant so we need to be able to use SQL
+    # "missing_spf": {
+    #     "name": "missing_spf",
+    #     "object_type": "Hostname",
+    #     "query": 'dnstxtrecord_value not startswith "v=spf1"',
+    #     "finding_type_code": "KAT-NO-SPF",
+    # },
     "open_sysadmin_port": {
         "name": "open_sysadmin_port",
         "object_type": "IPPort",
@@ -137,7 +138,7 @@ class HostnameQLSchema(DjangoQLSchema):
     def get_fields(self, model):
         fields = super().get_fields(model)
         if model == Hostname:
-            fields += [IntField(name="nameservers_with_ipv6_count")]
+            fields += [IntField(name="nameservers_with_ipv6_count"), StrField(name="dnstxtrecord_value")]
         return fields
 
 
@@ -220,21 +221,30 @@ def test_missing_spf(xtdb):
     network = Network.objects.create(name="test")
     hn = Hostname.objects.create(network=network, name="test.com")
 
-    hns = apply_search(Hostname.objects.all(), rules["missing_spf"]["query"])
-    assert hns.count() == 1
-    assert hns.first().name == "test.com"
+    working_query = """
+        SELECT "test_none_objects_hostname".*
+        FROM "test_none_objects_hostname"
+            LEFT JOIN "test_none_objects_dnstxtrecord"
+                ON (
+                    "test_none_objects_hostname"."_id" = "test_none_objects_dnstxtrecord"."hostname_id"
+                    AND "test_none_objects_dnstxtrecord"."value"::text LIKE 'v=spf1%%'
+                )
+        WHERE "test_none_objects_dnstxtrecord"._id IS NULL;
+    """
+    assert len(Hostname.objects.raw(working_query)) == 1
+    assert Hostname.objects.raw(working_query)[0].name == "test.com"
 
     DNSTXTRecord.objects.create(hostname=hn, value="vspf1")
-    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 1
+    assert len(Hostname.objects.raw(working_query)) == 1
 
     DNSTXTRecord.objects.create(hostname=hn, value="v=spf1")
-    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
+    assert len(Hostname.objects.raw(working_query)) == 0
 
     DNSTXTRecord.objects.create(hostname=hn, value="random")
-    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
+    assert len(Hostname.objects.raw(working_query)) == 0
 
     DNSTXTRecord.objects.create(hostname=hn, value="v=spf1 number 2")
-    assert apply_search(Hostname.objects.all(), rules["missing_spf"]["query"]).count() == 0
+    assert len(Hostname.objects.raw(working_query)) == 0
 
 
 def test_port_classification(xtdb):

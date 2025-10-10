@@ -7,7 +7,7 @@ from django.core.management.color import no_style
 from django.db import connections
 from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
-from djangoql.schema import DjangoQLSchema, IntField
+from djangoql.schema import DjangoQLSchema, IntField, StrField
 from psycopg.errors import FeatureNotSupported
 
 from objects.management.commands.generate_benchmark_data import generate
@@ -61,7 +61,7 @@ def xtdbulk(request: pytest.FixtureRequest, django_db_blocker):
 def bulk_data_org(xtdbulk):
     org, created = Organization.objects.get_or_create(code="testdns", name="testdns")
     hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records, scan_levels = (
-        generate(org, 10_000, 2, 1, 2, include_dns_records=True)
+        generate(org, 10000, 2, 1, 2, include_dns_records=True)
     )
     bulk_insert(hostnames)
     bulk_insert(ips)
@@ -212,7 +212,7 @@ class HostnameQLSchema(DjangoQLSchema):
     def get_fields(self, model):
         fields = super().get_fields(model)
         if model == Hostname:
-            fields += [IntField(name="nameservers_with_ipv6_count")]
+            fields += [IntField(name="nameservers_with_ipv6_count"), StrField(name="dnstxtrecord_value")]
         return fields
 
 
@@ -252,14 +252,23 @@ def test_business_rule_two_ipv6_nameservers(bulk_data, benchmark):
     assert result >= 0
 
 
-@pytest.mark.skip
 def test_business_rule_missing_spf(bulk_data, benchmark):
     def run_rule():
-        query = 'dnstxtrecord.value not startswith "v=spf1"'
-        return apply_search(Hostname.objects.all(), query).count()
+        working_query = """
+            SELECT "test_none_objects_hostname".*
+            FROM "test_none_objects_hostname"
+                     LEFT JOIN "test_none_objects_dnstxtrecord"
+            ON (
+               "test_none_objects_hostname"."_id" = "test_none_objects_dnstxtrecord"."hostname_id"
+                   AND "test_none_objects_dnstxtrecord"."value"::text LIKE 'v=spf1%%'
+               )
+            WHERE "test_none_objects_dnstxtrecord"._id IS NULL
+        """
+
+        return len([x for x in Hostname.objects.raw(working_query)])
 
     result = benchmark(run_rule)
-    assert result >= 0
+    assert result == 10783
 
 
 def test_business_rule_open_sysadmin_port(bulk_data, benchmark):
