@@ -293,8 +293,9 @@ def run_schedule_for_organization(
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-        raw_qs = filter_min_scan_level(model_qs, schedule.plugin.scan_level)
-        input_data = input_data.union([str(model) for model in raw_qs if str(model)])
+        model_all = {str(model) for model in model_qs}
+        raw_all = {str(model) for model in filter_min_scan_level(model_qs, schedule.plugin.scan_level)}
+        input_data = input_data.union(model_all.intersection(raw_all))
     else:
         # Non-dynamic mode: use traverse_objects to get manually added objects,
         # objects from queries, and objects from subsets
