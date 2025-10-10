@@ -31,8 +31,15 @@ app.conf.beat_schedule = {
         "task": "tasks.tasks.schedule_scan_profile_recalculations",
         "schedule": settings.SCAN_LEVEL_RECALCULATION_INTERVAL,
         "args": tuple(),
-        "options": {"queue": settings.QUEUE_NAME_SCHEDULE},
+        "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
     },
+    # TODO: turn on when more efficient
+    # "schedule-business-rule-recalculations": {
+    #     "task": "tasks.tasks.schedule_business_rule_recalculations",
+    #     "schedule": settings.BUSINESS_RULE_RECALCULATION_INTERVAL,
+    #     "args": tuple(),
+    #     "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
+    # },
     "reschedule": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,

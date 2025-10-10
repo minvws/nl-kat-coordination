@@ -23,7 +23,8 @@ from objects.models import (
     filter_min_scan_level,
 )
 from openkat.models import Organization
-from plugins.models import Plugin
+from plugins.models import BusinessRule, Plugin
+from plugins.plugins.business_rules import run_rules
 from plugins.runner import PluginRunner
 from tasks.celery import app
 from tasks.models import Schedule, Task, TaskStatus
@@ -31,7 +32,7 @@ from tasks.models import Schedule, Task, TaskStatus
 logger = structlog.get_logger(__name__)
 
 
-@app.task(queue=settings.QUEUE_NAME_SCAN_PROFILES)
+@app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
 def schedule_scan_profile_recalculations():
     try:
         # Create a Lock that lives for three times the settings.SCAN_LEVEL_RECALCULATION_INTERVAL at most, to:
@@ -42,7 +43,21 @@ def schedule_scan_profile_recalculations():
         ):
             recalculate_scan_levels()
     except LockError:
-        logger.warning("Recalculation already running, consider increasing SCAN_LEVEL_RECALCULATION_INTERVAL")
+        logger.warning("Scan level calculation is running, consider increasing SCAN_LEVEL_RECALCULATION_INTERVAL")
+
+
+@app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
+def schedule_business_rule_recalculations():
+    try:
+        # Create a Lock that lives for three times the settings.SCAN_LEVEL_RECALCULATION_INTERVAL at most, to:
+        #   1. Avoid running several recalculation scripts at the same time and burn down the database
+        #   2. Still take into account that there might be anomalies when a large set of objects has been changed
+        with caches["default"].lock(
+            "recalculate_business_rules", blocking=False, timeout=3 * settings.BUSINESS_RULE_RECALCULATION_INTERVAL
+        ):
+            run_rules(BusinessRule.objects.all(), False)
+    except LockError:
+        logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")
 
 
 def recalculate_scan_levels() -> list[ScanLevel]:

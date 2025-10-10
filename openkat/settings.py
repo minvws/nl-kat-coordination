@@ -509,11 +509,12 @@ SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
 WORKERS = env.int("WORKERS", default=2)
 SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL", default=60)
+BUSINESS_RULE_RECALCULATION_INTERVAL = env.int("BUSINESS_RULE_RECALCULATION_INTERVAL", default=60)
 SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
 PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
 BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
 
-QUEUE_NAME_SCAN_PROFILES = "scan-profiles"
+QUEUE_NAME_RECALCULATIONS = "recalculations"
 QUEUE_NAME_SCHEDULE = "schedule"
 REDIS_PASSWORD = env.str("REDIS_PASSWORD")
 
@@ -525,6 +526,6 @@ CELERY = {
     "event_serializer": "json",
     "accept_content": ["application/json", "application/x-python-serialize"],
     "result_accept_content": ["application/json", "application/x-python-serialize"],
-    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_SCAN_PROFILES), Queue(QUEUE_NAME_SCHEDULE)),
+    "task_queues": (Queue("celery"), Queue(QUEUE_NAME_RECALCULATIONS), Queue(QUEUE_NAME_SCHEDULE)),
     "worker_concurrency": WORKERS,
 }
