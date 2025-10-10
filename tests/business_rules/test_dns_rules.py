@@ -1,3 +1,5 @@
+import time
+
 from django.db.models import Case, Count, F, When
 from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema, IntField, StrField
@@ -220,6 +222,7 @@ def test_at_least_two_ipv6_name_servers_query(xtdb):
 def test_missing_spf(xtdb):
     network = Network.objects.create(name="test")
     hn = Hostname.objects.create(network=network, name="test.com")
+    time.sleep(0.1)
 
     working_query = """
         SELECT "test_none_objects_hostname".*
