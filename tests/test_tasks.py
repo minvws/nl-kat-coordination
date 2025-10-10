@@ -1,7 +1,10 @@
+import operator
 import time
+from functools import reduce
 
 from celery import Celery
 from django.conf import settings
+from django.db.models import Q
 
 from files.models import File, GenericContent
 from objects.models import Hostname, Network, ScanLevel, bulk_insert
@@ -180,11 +183,8 @@ def test_batch_tasks(xtdb, celery: Celery, organization, organization_b, docker,
     assert len(tasks) == 4
 
 
-def test_batch_scheduled_tasks(xtdb, celery: Celery, organization, organization_b, docker, plugin_container, mocker):
+def test_batch_scheduled_tasks(xtdb, celery: Celery, organization, organization_b, mocker):
     mocker.patch("tasks.tasks.run_plugin")
-    logs = [b"test logs"]
-    plugin_container.set_logs(logs)
-
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
@@ -212,3 +212,35 @@ def test_batch_scheduled_tasks(xtdb, celery: Celery, organization, organization_
 
     tasks = run_schedule_for_organization(schedule, organization, force=False, celery=celery)
     assert len(tasks) == 0
+
+
+def test_find_intersecting_input_data(organization):
+    data = ["1.com"]
+    Task.objects.create(organization=organization, type="plugin", data={"plugin_id": "test", "input_data": data})
+
+    data = ["3.com", "4.com", "5.com"]
+    Task.objects.create(organization=organization, type="plugin", data={"plugin_id": "test", "input_data": data})
+
+    data = ["4.com", "5.com"]
+    Task.objects.create(organization=organization, type="plugin", data={"plugin_id": "test", "input_data": data})
+
+    # old style vs new style
+    target = ["0.com"]
+    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 0
+    assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 0
+
+    target = ["1.com"]
+    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 1
+    assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 1
+
+    target = ["4.com"]
+    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
+    assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2
+
+    target = ["4.com", "5.com"]
+    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
+    assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2
+
+    target = ["4.com", "5.com", "6.com"]
+    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
+    assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2

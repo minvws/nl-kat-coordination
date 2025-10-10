@@ -58,10 +58,15 @@ def xtdbulk(request: pytest.FixtureRequest, django_db_blocker):
 
 
 @pytest.fixture(scope="session")
-def bulk_data_org(xtdbulk):
+def N():
+    return 50_000
+
+
+@pytest.fixture(scope="session")
+def bulk_data_org(xtdbulk, N):
     org, created = Organization.objects.get_or_create(code="testdns", name="testdns")
     hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records, scan_levels = (
-        generate(org, 10000, 2, 1, 2, include_dns_records=True)
+        generate(org, N, 2, 1, 2, include_dns_records=True)
     )
     bulk_insert(hostnames)
     bulk_insert(ips)
@@ -112,7 +117,7 @@ def test_query_list_view_fast(bulk_data, benchmark):
     benchmark(raw)
 
 
-def test_hostname_list_view(bulk_data, rf, superuser, benchmark):
+def test_hostname_list_view(bulk_data, rf, superuser, benchmark, N):
     def render_list_view():
         request = setup_request(rf.get("/objects/hostname/"), superuser)
         view = HostnameListView.as_view()
@@ -124,7 +129,7 @@ def test_hostname_list_view(bulk_data, rf, superuser, benchmark):
     assert result.status_code == 200
 
 
-def test_ipaddress_list_view(bulk_data, rf, superuser, benchmark):
+def test_ipaddress_list_view(bulk_data, rf, superuser, benchmark, N):
     def render_list_view():
         request = setup_request(rf.get("/objects/ipaddress/"), superuser)
         view = IPAddressListView.as_view()
@@ -136,7 +141,7 @@ def test_ipaddress_list_view(bulk_data, rf, superuser, benchmark):
     assert result.status_code == 200
 
 
-def test_hostname_list_view_filtered(bulk_data, rf, superuser, benchmark):
+def test_hostname_list_view_filtered(bulk_data, rf, superuser, benchmark, N):
     def render_filtered_view():
         request = setup_request(rf.get("/objects/hostname/?name=test"), superuser)
         view = HostnameListView.as_view()
@@ -148,7 +153,7 @@ def test_hostname_list_view_filtered(bulk_data, rf, superuser, benchmark):
     assert result.status_code == 200
 
 
-def test_ipaddress_list_view_filtered(bulk_data, rf, superuser, benchmark):
+def test_ipaddress_list_view_filtered(bulk_data, rf, superuser, benchmark, N):
     def render_filtered_view():
         request = setup_request(rf.get("/objects/ipaddress/?&address=10"), superuser)
         view = IPAddressListView.as_view()
@@ -160,7 +165,7 @@ def test_ipaddress_list_view_filtered(bulk_data, rf, superuser, benchmark):
     assert result.status_code == 200
 
 
-def test_hostname_detail_view(bulk_data, rf, benchmark, superuser):
+def test_hostname_detail_view(bulk_data, rf, benchmark, superuser, N):
     hostname = Hostname.objects.first()
 
     def render_detail_view():
@@ -174,7 +179,7 @@ def test_hostname_detail_view(bulk_data, rf, benchmark, superuser):
     assert result.status_code == 200
 
 
-def test_ipaddress_detail_view(bulk_data, rf, superuser, benchmark):
+def test_ipaddress_detail_view(bulk_data, rf, superuser, benchmark, N):
     ipaddress = IPAddress.objects.first()
 
     def render_detail_view():
@@ -188,7 +193,7 @@ def test_ipaddress_detail_view(bulk_data, rf, superuser, benchmark):
     assert result.status_code == 200
 
 
-def test_object_set(bulk_data, benchmark):
+def test_object_set(bulk_data, benchmark, N):
     object_set = ObjectSet.objects.create(
         name="Test Set",
         object_type=ContentType.objects.get_for_model(Hostname),
@@ -199,13 +204,13 @@ def test_object_set(bulk_data, benchmark):
         return object_set.get_query_objects().count()
 
     result = benchmark.pedantic(inner, rounds=1)
-    assert result == 499
+    assert result == N // 20 - 1
 
 
-def test_scan_level_recalculation(benchmark, bulk_data):
+def test_scan_level_recalculation(benchmark, bulk_data, N):
     # The ipaddresses van scan level 1 and all hostnames 2
     result = benchmark.pedantic(recalculate_scan_levels, rounds=1)  # Subsequent rounds have no updates
-    assert len(result) == 7499
+    assert len(result) == N // 2 + N // 4 - 1  # Half of the hostnames have a DNSARecord, 5% a nameserver (off by 1)
 
 
 class HostnameQLSchema(DjangoQLSchema):
@@ -252,7 +257,7 @@ def test_business_rule_two_ipv6_nameservers(bulk_data, benchmark):
     assert result >= 0
 
 
-def test_business_rule_missing_spf(bulk_data, benchmark):
+def test_business_rule_missing_spf(bulk_data, benchmark, N):
     def run_rule():
         working_query = """
             SELECT "test_none_objects_hostname".*
@@ -268,7 +273,8 @@ def test_business_rule_missing_spf(bulk_data, benchmark):
         return len([x for x in Hostname.objects.raw(working_query)])
 
     result = benchmark(run_rule)
-    assert result == 10783
+    nr_hostnames = N + N // 20 + N // 10  # Regular + name servers + mail servers
+    assert result == nr_hostnames - round(N // 14) - 3  # 1 in 14 hostnames have an SPF record, and minus 3 works
 
 
 def test_business_rule_open_sysadmin_port(bulk_data, benchmark):
@@ -298,7 +304,7 @@ def test_business_rule_missing_caa(bulk_data, benchmark):
     assert result >= 0
 
 
-def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, benchmark):
+def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, benchmark, N):
     plugin = Plugin.objects.create(
         name="test_scan_filter",
         plugin_id="test_scan_filter",
@@ -316,10 +322,10 @@ def test_task_scheduling_scan_level_filter(bulk_data, docker, celery, benchmark)
         return run_schedule(schedule, force=True, celery=celery)
 
     tasks = benchmark(inner)
-    assert len(tasks) == 20
+    assert len(tasks) == N / 500
 
 
-def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark):
+def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark, N):
     plugin = Plugin.objects.create(
         name="test_bench",
         plugin_id="test_bench",
@@ -350,10 +356,10 @@ def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark):
         return run_schedule(schedule, force=False, celery=celery)
 
     result = benchmark.pedantic(inner, rounds=1)
-    assert len(result) == 18
+    assert len(result) == N // 500 - 2
 
 
-def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchmark):
+def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchmark, N):
     plugin = Plugin.objects.create(
         name="query_test",
         plugin_id="query_test",
@@ -374,4 +380,4 @@ def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchm
         return run_schedule(schedule, force=True, celery=celery)
 
     result = benchmark(schedule_with_query)
-    assert len(result) == 20
+    assert len(result) == N // 500

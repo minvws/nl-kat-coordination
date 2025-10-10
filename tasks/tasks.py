@@ -1,7 +1,5 @@
-import operator
 import uuid
 from datetime import UTC, datetime
-from functools import reduce
 
 import celery
 import structlog
@@ -9,7 +7,6 @@ from celery import Celery
 from django.conf import settings
 from django.core.cache import caches
 from django.db import OperationalError, connections
-from django.db.models import Q
 from djangoql.queryset import apply_search
 from redis.exceptions import LockError  # type: ignore
 
@@ -89,6 +86,7 @@ def sync_hostname_ip_scan_levels(db_table: str) -> list[ScanLevel]:
 
     try:
         with connections["xtdb"].cursor() as cursor:
+            # Do hostname -> ip and ip -> hostname at the same time, based on the highest scan level.
             cursor.execute(
                 f"""SELECT
                 CASE
@@ -316,11 +314,7 @@ def run_schedule_for_organization(
     last_runs = Task.objects.filter(schedule=schedule, created_at__gt=schedule.recurrences.before(now))
 
     if input_data:
-        # Join the input data targets into a large or-query, checking for task with any of the targets as input
-        filters = reduce(
-            operator.or_, [Q(data__input_data__icontains=target) | Q(data__input_data=target) for target in input_data]
-        )
-        last_runs = last_runs.filter(filters)
+        last_runs = last_runs.filter(data__input_data__has_any_keys=input_data)
 
     skip = set()
 
@@ -359,8 +353,14 @@ def run_plugin_task(
     batch: bool = True,
     celery: Celery = app,
 ) -> list[Task]:
+    inputs: list[str] | None = None
+
     if isinstance(input_data, set):
-        input_data = list(input_data)
+        inputs = list(input_data)
+    elif isinstance(input_data, str):
+        inputs = [input_data]
+    else:
+        inputs = input_data
 
     # Get plugin to check for plugin-specific batch_size
     try:
@@ -371,14 +371,14 @@ def run_plugin_task(
         # Fall back to global setting if plugin not found
         batch_size = settings.BATCH_SIZE
 
-    if batch and isinstance(input_data, list) and batch_size > 0 and len(input_data) > batch_size:
+    if batch and isinstance(inputs, list) and batch_size > 0 and len(inputs) > batch_size:
         tasks = []
         idx = 0
 
-        for idx_2 in range(batch_size, len(input_data) + batch_size, batch_size):
+        for idx_2 in range(batch_size, len(inputs) + batch_size, batch_size):
             tasks.append(
                 run_plugin_task(
-                    plugin_id, organization_code, input_data[idx:idx_2], schedule_id, batch=False, celery=celery
+                    plugin_id, organization_code, inputs[idx:idx_2], schedule_id, batch=False, celery=celery
                 )[0]
             )
             idx = idx_2
@@ -393,11 +393,11 @@ def run_plugin_task(
         schedule_id=schedule_id,
         organization=Organization.objects.get(code=organization_code) if organization_code else None,
         status=TaskStatus.QUEUED,
-        data={"plugin_id": plugin_id, "input_data": input_data},  # TODO
+        data={"plugin_id": plugin_id, "input_data": inputs},  # TODO
     )
 
     run_plugin.bind(celery)  # Make sure to bind the right celery instance to be able to test these tasks.
-    async_result = run_plugin.apply_async((plugin_id, organization_code, input_data), task_id=str(task_id))
+    async_result = run_plugin.apply_async((plugin_id, organization_code, inputs), task_id=str(task_id))
     task._async_result = async_result
 
     return [task]
@@ -405,7 +405,7 @@ def run_plugin_task(
 
 @app.task(bind=True)
 def run_plugin(
-    self: celery.Task, plugin_id: str, organization_code: str | None = None, input_data: str | list[str] | None = None
+    self: celery.Task, plugin_id: str, organization_code: str | None = None, input_data: list[str] | None = None
 ) -> str:
     logger.debug(
         "Starting plugin task",
@@ -414,6 +414,7 @@ def run_plugin(
         plugin_id=plugin_id,
         input_data=input_data,
     )
+
     organization: Organization | None = None
     task = Task.objects.get(id=self.request.id)
 
