@@ -14,7 +14,9 @@ class OrganizationEditView(OrganizationPermissionRequiredMixin, OrganizationView
     template_name = "organizations/organization_edit.html"
     permission_required = "openkat.change_organization"
 
-    def get_object(self):
+    object: Organization
+
+    def get_object(self, queryset=None):
         return self.model.objects.get(code=self.kwargs["organization_code"])
 
     def get_success_url(self):

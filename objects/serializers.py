@@ -40,11 +40,11 @@ def object_by_code(object_code: str | None, object_id: int | None, object_type: 
         return object_id
 
     if object_type.lower() == "hostname":
-        object_id = Hostname.objects.get(name=object_code).id  # TODO: handle network
+        object_id = Hostname.objects.get(name=object_code).pk  # TODO: handle network
     if object_type.lower() == "ipaddress":
-        object_id = IPAddress.objects.get(address=object_code).id  # TODO: handle network
+        object_id = IPAddress.objects.get(address=object_code).pk  # TODO: handle network
     if object_type.lower() == "network":
-        object_id = Network.objects.get(name=object_code).id
+        object_id = Network.objects.get(name=object_code).pk
 
     return object_id
 

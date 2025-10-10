@@ -53,7 +53,7 @@ class OrganizationMemberEditView(
             {
                 "url": reverse(
                     "organization_member_edit",
-                    kwargs={"organization_code": self.organization.code, "pk": self.object.id},
+                    kwargs={"organization_code": self.organization.code, "pk": self.object.pk},
                 ),
                 "text": _("Edit member"),
             },

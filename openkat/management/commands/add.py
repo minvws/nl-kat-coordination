@@ -136,7 +136,7 @@ class Command(BaseCommand):
         file_obj = File.objects.create(file=ContentFile(content, name=file_name))
 
         self.stdout.write(
-            self.style.SUCCESS(f"File uploaded successfully: ID={file_obj.id}, Path={file_obj.file.name}")
+            self.style.SUCCESS(f"File uploaded successfully: ID={file_obj.pk}, Path={file_obj.file.name}")
         )
         tasks = process_raw_file(file_obj)
         self.stdout.write(self.style.SUCCESS(f"File processing started, created {len(tasks)} tasks"))

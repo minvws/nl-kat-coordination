@@ -121,16 +121,16 @@ def generate(
         scan_levels.extend(
             [
                 ScanLevel(
-                    organization=organization, object_type="ipaddress", object_id=ip.id, scan_level=ipaddress_scan_level
+                    organization=organization, object_type="ipaddress", object_id=ip.pk, scan_level=ipaddress_scan_level
                 ),
                 ScanLevel(
-                    organization=organization, object_type="hostname", object_id=hn.id, scan_level=hostname_scan_level
+                    organization=organization, object_type="hostname", object_id=hn.pk, scan_level=hostname_scan_level
                 ),
                 ScanLevel(
-                    organization=organization, object_type="ipport", object_id=http_port.id, scan_level=port_scan_level
+                    organization=organization, object_type="ipport", object_id=http_port.pk, scan_level=port_scan_level
                 ),
                 ScanLevel(
-                    organization=organization, object_type="ipport", object_id=https_port.id, scan_level=port_scan_level
+                    organization=organization, object_type="ipport", object_id=https_port.pk, scan_level=port_scan_level
                 ),
             ]
         )
