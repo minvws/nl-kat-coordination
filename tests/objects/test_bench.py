@@ -381,3 +381,16 @@ def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchm
 
     result = benchmark(schedule_with_query)
     assert len(result) == N // 500
+
+
+def test_count_hostnames_over_time(bulk_data, benchmark, N):
+    def inner():
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT count(*), months from (select _id, extract(month from _valid_from) as months
+                from {Hostname._meta.db_table}) as subq group by months""",  # noqa: S608
+                {},
+            )
+
+    benchmark(inner)
