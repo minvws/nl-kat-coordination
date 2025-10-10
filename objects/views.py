@@ -403,7 +403,6 @@ class FindingListView(OrganizationFilterMixin, FilterView):
     context_object_name = "findings"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = FindingFilter
-    ordering = ["-id"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
