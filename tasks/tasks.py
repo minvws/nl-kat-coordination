@@ -186,14 +186,14 @@ def sync_ns_scan_levels() -> list[ScanLevel]:
                     JOIN {ScanLevel._meta.db_table} hostname_level ON hostname_level.object_id = hostname._id
                     JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
                     LEFT JOIN {ScanLevel._meta.db_table} target_level ON (
-                    target_level.object_id = target._id
-                    AND target_level.organization_id = hostname_level.organization_id
-                )
+                        target_level.object_id = target._id
+                        AND target_level.organization_id = hostname_level.organization_id
+                    )
                 WHERE hostname_level.scan_level IS NOT NULL
                 AND (
                     target_level._id IS NULL OR
-                    (target_level.declared IS FALSE AND target_level.scan_level < LEAST(hostname_level.scan_level, 1))
-                    )
+                    (target_level.declared IS FALSE AND target_level.scan_level != LEAST(hostname_level.scan_level, 1))
+                )
             """,  # noqa: S608
                 {},
             )
@@ -235,7 +235,7 @@ def sync_cname_scan_levels() -> list[ScanLevel]:
                 WHERE hostname_level.scan_level IS NOT NULL
                 AND (
                     target_level._id IS NULL
-                    OR (target_level.declared IS FALSE AND hostname_level.scan_level > target_level.scan_level)
+                    OR (target_level.declared IS FALSE AND hostname_level.scan_level != target_level.scan_level)
                 )""",  # noqa: S608
                 {},
             )
