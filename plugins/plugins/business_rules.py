@@ -270,10 +270,8 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
     total_findings = 0
 
     for rule in rules:
-        logger.info("\nProcessing rule: %s", rule.name)
-        logger.debug("Object Type: %s", rule.object_type)
+        logger.debug("Processing rule: %s", rule.name)
         logger.debug("Query: %s", rule.query)
-        logger.debug("Finding Type: %s", rule.finding_type_code)
 
         try:
             # Get the model class
@@ -336,11 +334,11 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
 
             bulk_insert(findings)
 
-            logger.info("Created %s new findings", len(findings))
+            logger.debug("Created %s new findings", len(findings))
         except Exception:
             logger.exception("Error processing business rule %s", rule.name)
 
     if dry_run:
-        logger.warning("\n[DRY RUN] Would have created findings for %s objects", total_findings)
+        logger.warning("[DRY RUN] Would have created findings for %s objects", total_findings)
     else:
-        logger.info("\nCompleted, created %s new findings", total_findings)
+        logger.info("Completed business rule recalculation, created %s new findings", total_findings)
