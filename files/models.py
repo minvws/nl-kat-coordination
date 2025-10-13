@@ -6,11 +6,8 @@ from django.core.files.base import ContentFile
 from django.db import models
 
 
-def raw_file_name(instance: "File", path: str | None = None) -> str | None:
-    if path:
-        return f"files/{datetime.date.today()}/{instance.type}/{path}"
-
-    return None
+def raw_file_name(instance: "File", path: str) -> str:
+    return f"files/{datetime.date.today()}/{instance.type}/{path}"
 
 
 class File(models.Model):

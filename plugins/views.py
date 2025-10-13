@@ -107,6 +107,8 @@ class PluginDetailView(DetailView):
     template_name = "plugin.html"
     model = Plugin
 
+    object: Plugin
+
     def get_queryset(self):
         return (
             super()
@@ -138,7 +140,7 @@ class PluginScansDetailView(PluginDetailView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_tasks(self):
-        return Task.objects.filter(data__plugin_id=self.get_object().plugin_id)
+        return Task.objects.filter(data__plugin_id=self.object.plugin_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -154,7 +156,7 @@ class PluginVariantsDetailView(PluginDetailView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_variants(self):
-        return Plugin.objects.filter(oci_image=self.get_object().oci_image)
+        return Plugin.objects.filter(oci_image=self.object.oci_image)
 
     def filter_variants(self, filterset):
         variants = (

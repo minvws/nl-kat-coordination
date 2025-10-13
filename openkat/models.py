@@ -10,6 +10,7 @@ from django.contrib.auth.models import AbstractBaseUser, Group, Permission, Perm
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.fields.related_descriptors import RelatedManager
 from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
@@ -123,18 +124,21 @@ class Organization(models.Model):
             ("can_enable_disable_schedule", "Can enable or disable schedules"),
         )
 
-    def save(self, **kwargs):
-        super().save(**kwargs)
+    def save(
+        self,
+        force_insert: bool = False,
+        force_update: bool = False,
+        using: str | None = None,
+        update_fields: Iterable[str] | None = None,
+    ) -> None:
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         # XTDB does not return the id after INSERT, so we need to tell Django
         # that by setting db_returning_fields to empty.
         orig = self._meta.db_returning_fields
         self._meta.db_returning_fields = []
         try:
-            # We change kwargs so that we override the arguments if they are already given in kwargs
-            kwargs["using"] = "xtdb"
-            kwargs["force_insert"] = True
-            super().save(**kwargs)
+            super().save(force_insert=True, force_update=force_update, using="xtdb", update_fields=update_fields)
         finally:
             self._meta.db_returning_fields = orig
 
@@ -287,6 +291,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["full_name"]
 
     objects = UserManager()
+
+    members: RelatedManager["OrganizationMember"]
 
     EVENT_CODES = {"created": 900101, "updated": 900102, "deleted": 900103}
 
