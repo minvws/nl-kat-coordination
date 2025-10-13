@@ -47,19 +47,21 @@ def xtdbulk(request: pytest.FixtureRequest, django_db_blocker):
         for ooi in ooi_models
     ]
 
-    with contextlib.suppress(FeatureNotSupported), django_db_blocker.unblock():
-        con.ensure_connection()
-        con.ops.execute_sql_flush(erase)
+    with django_db_blocker.unblock():
+        with contextlib.suppress(FeatureNotSupported):
+            con.ensure_connection()
+            con.ops.execute_sql_flush(erase)
 
         yield
 
-        con.ensure_connection()
-        con.ops.execute_sql_flush(erase)
+        with contextlib.suppress(FeatureNotSupported):
+            con.ensure_connection()
+            con.ops.execute_sql_flush(erase)
 
 
 @pytest.fixture(scope="session")
 def N():
-    return 50_000
+    return 100_000
 
 
 @pytest.fixture(scope="session")
@@ -380,7 +382,8 @@ def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchm
         return run_schedule(schedule, force=True, celery=celery)
 
     result = benchmark(schedule_with_query)
-    assert len(result) == N // 500
+    how_many_times_is_123_in_1_to_N = len([x for x in range(N) if "123" in str(x)])
+    assert len(result) == how_many_times_is_123_in_1_to_N // 500 + 1
 
 
 def test_count_hostnames_over_time(bulk_data, benchmark, N):
