@@ -271,9 +271,9 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
 
     for rule in rules:
         logger.info("\nProcessing rule: %s", rule.name)
-        logger.info("Object Type: %s", rule.object_type)
-        logger.info("Query: %s", rule.query)
-        logger.info("Finding Type: %s", rule.finding_type_code)
+        logger.debug("Object Type: %s", rule.object_type)
+        logger.debug("Query: %s", rule.query)
+        logger.debug("Finding Type: %s", rule.finding_type_code)
 
         try:
             # Get the model class
@@ -284,8 +284,6 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
 
             # Get or create the finding type
             finding_type, created = FindingType.objects.get_or_create(code=rule.finding_type_code)
-            if created:
-                logger.info("Created new finding type: %s", rule.finding_type_code)
 
             # Build the queryset
             queryset = model_class.objects.all()
@@ -316,7 +314,7 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
                 matching_objects = queryset.raw(rule.query)
                 match_count = len(matching_objects)
 
-            logger.info("Matching objects: %s", match_count)
+            logger.debug("Matching objects: %s", match_count)
 
             # Create findings for matching objects
             findings = []
@@ -345,4 +343,4 @@ def run_rules(rules: Sequence[BusinessRule], dry_run: bool = False) -> None:
     if dry_run:
         logger.warning("\n[DRY RUN] Would have created findings for %s objects", total_findings)
     else:
-        logger.info("\nCompleted! Created %s new findings", total_findings)
+        logger.info("\nCompleted, created %s new findings", total_findings)
