@@ -274,7 +274,7 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("plugin_list"))
 
     def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
+        redirect_url = self.request.POST.get("current_url")
 
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url

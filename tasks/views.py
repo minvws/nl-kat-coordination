@@ -72,6 +72,8 @@ class TaskDetailView(OrganizationFilterMixin, DetailView):
     template_name = "task.html"
     model = Task
 
+    object: Task
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugin"] = Plugin.objects.get(plugin_id=self.object.data["plugin_id"])
@@ -201,6 +203,8 @@ class ScheduleDetailView(OrganizationFilterMixin, DetailView):
     template_name = "schedule.html"
     model = Schedule
 
+    object: Schedule
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
@@ -216,6 +220,8 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Schedule
     fields = ["plugin", "object_set", "organization", "recurrences", "enabled"]
     template_name = "schedule_form.html"
+
+    object: Schedule
 
     def form_valid(self, form):
         self.object = form.save()
@@ -282,7 +288,7 @@ class ScheduleDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("schedule_list"))
 
     def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
+        redirect_url = self.request.POST.get("current_url")
 
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url
@@ -419,7 +425,7 @@ class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("object_set_list"))
 
     def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
+        redirect_url = self.request.POST.get("current_url")
 
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url
