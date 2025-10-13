@@ -1,6 +1,7 @@
 import tempfile
+from collections.abc import Sequence
 from enum import Enum
-from typing import cast, Sequence
+from typing import cast
 
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
