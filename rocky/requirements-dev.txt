@@ -239,9 +239,9 @@ coverage==7.9.2 \
     --hash=sha256:fae939811e14e53ed8a9818dad51d434a41ee09df9305663735f2e2d2d7d959b \
     --hash=sha256:ff0d9eae8cdfcd58fe7893b88993723583a6ce4dfbfd9f29e001922544f95615
     # via pytest-cov
-cron-descriptor==1.4.5 \
-    --hash=sha256:736b3ae9d1a99bc3dbfc5b55b5e6e7c12031e7ba5de716625772f8b02dcd6013 \
-    --hash=sha256:f51ce4ffc1d1f2816939add8524f206c376a42c87a5fca3091ce26725b3b1bca
+cron-descriptor==2.0.6 \
+    --hash=sha256:3a1c0d837c0e5a32e415f821b36cf758eb92d510e6beff8fbfe4fa16573d93d6 \
+    --hash=sha256:e39d2848e1d8913cfb6e3452e701b5eec662ee18bea8cc5aa53ee1a7bb217157
     # via rocky
 cssbeautifier==1.15.4 \
     --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
