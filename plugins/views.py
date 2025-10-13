@@ -13,6 +13,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
+from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
 
 from objects.models import FindingType
@@ -383,11 +384,16 @@ class BusinessRuleDetailView(DetailView):
             return context
 
         queryset = model_class.objects.all()
+        context["matching_objects"] = []
 
         try:
-            matching_objects = apply_search(queryset, self.object.query)
-            context["matching_objects"] = matching_objects[:20]  # Limit to 100 for preview
-            context["total_count"] = matching_objects.count()
+            queryset = model_class.objects.all()
+            context["matching_objects"] = apply_search(queryset, self.object.query)[:20]
+        except DjangoQLParserError:
+            try:
+                context["matching_objects"] = queryset.raw(self.object.query)[:20]
+            except Exception as e:
+                context["query_error"] = str(e)
         except Exception as e:
             context["query_error"] = str(e)
 

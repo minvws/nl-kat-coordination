@@ -33,13 +33,12 @@ app.conf.beat_schedule = {
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
     },
-    # TODO: turn on when more efficient
-    # "schedule-business-rule-recalculations": {
-    #     "task": "tasks.tasks.schedule_business_rule_recalculations",
-    #     "schedule": settings.BUSINESS_RULE_RECALCULATION_INTERVAL,
-    #     "args": tuple(),
-    #     "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
-    # },
+    "schedule-business-rule-recalculations": {
+        "task": "tasks.tasks.schedule_business_rule_recalculations",
+        "schedule": settings.BUSINESS_RULE_RECALCULATION_INTERVAL,
+        "args": tuple(),
+        "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
+    },
     "reschedule": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,

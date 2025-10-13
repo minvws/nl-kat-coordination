@@ -91,12 +91,6 @@
                         <strong>{% translate "Query Error:" %}</strong> {{ query_error }}
                     </div>
                 {% else %}
-                    <p>
-                        {% translate "Total matching objects:" %} <strong>{{ total_count }}</strong>
-                        {% if total_count > 100 %}
-                            {% translate "(showing first 100)" %}
-                        {% endif %}
-                    </p>
                     {% if matching_objects %}
                         <div class="horizontal-scroll">
                             <table>
