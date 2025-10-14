@@ -391,10 +391,20 @@ class NetworkScanLevelAddView(KATModelPermissionRequiredMixin, FormView):
 
 class FindingFilter(django_filters.FilterSet):
     finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="icontains")
+    object_search = django_filters.CharFilter(label="Object", method="filter_object_search")
+    finding_type__score__gte = django_filters.NumberFilter(
+        label="Minimum Score", field_name="finding_type__score", lookup_expr="gte"
+    )
 
     class Meta:
         model = Finding
-        fields = ["finding_type__code"]
+        fields = ["finding_type__code", "object_search", "finding_type__score__gte"]
+
+    def filter_object_search(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        return queryset.filter(object_human_readable__icontains=value)
 
 
 class FindingListView(OrganizationFilterMixin, FilterView):
@@ -403,6 +413,9 @@ class FindingListView(OrganizationFilterMixin, FilterView):
     context_object_name = "findings"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = FindingFilter
+
+    def get_queryset(self) -> "QuerySet[Finding]":
+        return super().get_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

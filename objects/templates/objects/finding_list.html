@@ -33,6 +33,7 @@
                         <thead>
                             <tr>
                                 <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Score" %}</th>
                                 <th>{% translate "Object" %}</th>
                                 <th></th>
                             </tr>
@@ -43,6 +44,7 @@
                                     <td>
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
                                     </td>
+                                    <td>{{ finding.finding_type.score|default:"-" }}</td>
                                     <td>
                                         <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
                                     </td>
