@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractBaseUser, Group, Permission, Perm
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.fields.related_descriptors import RelatedManager
+from django.db.models.manager import Manager
 from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
@@ -292,7 +292,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    members: RelatedManager["OrganizationMember"]
+    members: Manager["OrganizationMember"]
 
     EVENT_CODES = {"created": 900101, "updated": 900102, "deleted": 900103}
 
@@ -308,7 +308,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Lists the user's OrganizationMembers including the related Organizations.
         """
-        return self.members.select_related("organization")
+        return list(self.members.select_related("organization"))
 
     @property
     def can_access_all_organizations(self) -> bool:

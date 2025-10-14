@@ -6,8 +6,18 @@ import structlog
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
-from django.db.models import Case, F, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
-from django.db.models.fields.related_descriptors import RelatedManager
+from django.db.models import (
+    Case,
+    F,
+    Model,
+    OuterRef,
+    Q,
+    QuerySet,
+    Subquery,
+    UniqueConstraint,
+    When,
+    Manager,
+)
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
@@ -84,7 +94,7 @@ class Plugin(models.Model):
 
     objects = PluginQuerySet.as_manager()
 
-    enabled_plugins: RelatedManager["EnabledPlugin"]
+    enabled_plugins: Manager["EnabledPlugin"]
 
     def repository(self) -> str | None:
         if not self.oci_arguments:
