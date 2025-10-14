@@ -46,15 +46,19 @@ class ScanLevelEnum(models.IntegerChoices):
 MAX_SCAN_LEVEL = max(scan_level.value for scan_level in cast("type[Enum]", ScanLevelEnum))
 
 
-class XTDBMixin:
+class XTDBModel(models.Model):
     _valid_from: models.DateTimeField = models.DateTimeField(null=True, blank=True, db_column="_valid_from")
+
+    class Meta:
+        managed = False
+        abstract = True
 
     @property
     def last_seen(self):
         return self._valid_from
 
 
-class Asset(models.Model, XTDBMixin):
+class Asset(XTDBModel):
     class Meta:
         managed = False
         abstract = True
@@ -81,7 +85,7 @@ class ManagerWithGenericObjectForeignKey(Manager):
         )
 
 
-class ScanLevel(models.Model, XTDBMixin):
+class ScanLevel(XTDBModel):
     # TODO: On_delete should be CASCADE or PROTECT, but deletion tests will then
     # fail because XTDB does not know the table if we haven't inserted anything
     # yet.
@@ -103,7 +107,7 @@ class ScanLevel(models.Model, XTDBMixin):
         return str(self.pk)
 
 
-class FindingType(models.Model, XTDBMixin):
+class FindingType(XTDBModel):
     code = models.CharField()
     score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
     description = models.CharField(null=True)
@@ -112,7 +116,7 @@ class FindingType(models.Model, XTDBMixin):
         managed = False
 
 
-class Finding(models.Model, XTDBMixin):
+class Finding(XTDBModel):
     finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
 
     object_type: LowerCaseCharField = LowerCaseCharField()
@@ -143,7 +147,7 @@ class Protocol(models.TextChoices):
     UDP = "UDP", "UDP"
 
 
-class IPPort(models.Model, XTDBMixin):
+class IPPort(XTDBModel):
     address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.CASCADE)
     protocol: models.CharField = models.CharField(choices=Protocol)
     port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(65535)])
@@ -207,7 +211,7 @@ class Hostname(Asset):
         super().save(*args, **kwargs)
 
 
-class DNSRecordBase(models.Model, XTDBMixin):
+class DNSRecordBase(XTDBModel):
     ttl: models.IntegerField = models.IntegerField()
 
     class Meta:

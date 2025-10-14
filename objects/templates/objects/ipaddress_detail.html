@@ -53,6 +53,7 @@
                                 <th>{% translate "Protocol" %}</th>
                                 <th>{% translate "Service" %}</th>
                                 <th>{% translate "TLS" %}</th>
+                                <th>{% translate "Last Seen" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,6 +69,13 @@
                                             {% translate "No" %}
                                         {% else %}
                                             {% translate "Unknown" %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if port.last_seen %}
+                                            {{ port.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
                                         {% endif %}
                                     </td>
                                 </tr>
