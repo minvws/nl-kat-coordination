@@ -254,6 +254,34 @@
                     </tbody>
                 </table>
             </div>
+            <div class="horizontal-scroll">
+                <h2>{% translate "Findings" %}</h2>
+                {% if findings %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "Findings" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Score" %}</th>
+                                <th>{% translate "Description" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for finding in findings %}
+                                <tr>
+                                    <td>
+                                        <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
+                                    </td>
+                                    <td>{{ finding.finding_type.score|default:"-" }}</td>
+                                    <td>{{ finding.finding_type.description|default:"-" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>{% translate "No findings for this hostname." %}</p>
+                {% endif %}
+            </div>
             <div>
                 <h2>{% translate "Scan Levels" %}</h2>
                 <form class="inline layout-wide"

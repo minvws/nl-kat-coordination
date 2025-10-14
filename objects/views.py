@@ -175,6 +175,9 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
+        # Add findings for this network
+        context["findings"] = Finding.objects.filter(object_type="network", object_id=self.object.pk)
+
         return context
 
 
@@ -569,6 +572,9 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
         context["scan_levels"] = scan_levels
         context["scan_level_form"] = ScanLevelAddForm
 
+        # Add findings for this IP address
+        context["findings"] = Finding.objects.filter(object_type="ipaddress", object_id=self.object.pk)
+
         return context
 
 
@@ -885,6 +891,9 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["dnscnamerecord_target_set"] = self.object.dnscnamerecord_target_set.all()
         context["dnsmxrecord_mailserver"] = self.object.dnsmxrecord_mailserver.all()
         context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.all()
+
+        # Add findings for this hostname
+        context["findings"] = Finding.objects.filter(object_type="hostname", object_id=self.object.pk)
 
         return context
 
