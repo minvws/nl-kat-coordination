@@ -107,6 +107,8 @@ class PluginDetailView(DetailView):
     template_name = "plugin.html"
     model = Plugin
 
+    object: Plugin
+
     def get_queryset(self):
         return (
             super()
@@ -138,7 +140,7 @@ class PluginScansDetailView(PluginDetailView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_tasks(self):
-        return Task.objects.filter(data__plugin_id=self.get_object().plugin_id)
+        return Task.objects.filter(data__plugin_id=self.object.plugin_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -154,7 +156,7 @@ class PluginVariantsDetailView(PluginDetailView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
 
     def get_variants(self):
-        return Plugin.objects.filter(oci_image=self.get_object().oci_image)
+        return Plugin.objects.filter(oci_image=self.object.oci_image)
 
     def filter_variants(self, filterset):
         variants = (
@@ -272,7 +274,7 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("plugin_list"))
 
     def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
+        redirect_url = self.request.POST.get("current_url")
 
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url

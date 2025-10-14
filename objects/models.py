@@ -96,9 +96,9 @@ class ScanLevel(models.Model):
 
 
 class FindingType(models.Model):
-    code: models.CharField = models.CharField()
-    score: models.CharField = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
-    description: models.CharField = models.CharField(null=True)
+    code = models.CharField()
+    score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
+    description = models.CharField(null=True)
 
     class Meta:
         managed = False
@@ -150,6 +150,19 @@ class IPPort(models.Model):
 
 
 class Hostname(Asset):
+    dnsarecord_set: models.Manager["DNSARecord"]
+    dnsaaaarecord_set: models.Manager["DNSAAAARecord"]
+    dnscnamerecord_set: models.Manager["DNSCNAMERecord"]
+    dnsmxrecord_set: models.Manager["DNSMXRecord"]
+    dnsnsrecord_set: models.Manager["DNSNSRecord"]
+    dnsptrrecord_set: models.Manager["DNSPTRRecord"]
+    dnscaarecord_set: models.Manager["DNSCAARecord"]
+    dnstxtrecord_set: models.Manager["DNSTXTRecord"]
+    dnssrvrecord_set: models.Manager["DNSSRVRecord"]
+    dnscnamerecord_target_set: models.Manager["DNSCNAMERecord"]
+    dnsmxrecord_mailserver: models.Manager["DNSMXRecord"]
+    dnsnsrecord_nameserver: models.Manager["DNSNSRecord"]
+
     class Q:
         """A set of useful DjangoQL queries for Hostname"""
 
@@ -197,6 +210,8 @@ class DNSRecordBase(models.Model):
 class DNSARecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.CASCADE)
     ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+
+    hostname_id: int | None
 
     def __str__(self) -> str:
         return f"{self.hostname} A {self.ip_address}"
