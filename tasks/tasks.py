@@ -79,6 +79,7 @@ def recalculate_scan_levels() -> list[ScanLevel]:
       This reduces the number of queries from 10 to 4 and requires less recursive iterations. Note that MX records are
       a "sink" in the sense that they do not issue scan levels, but are also not a scan target, so we can skip them.
     """
+    logger.info("Recalculating Scan Profiles...")
     updates: list[ScanLevel] = []
 
     # These could create an endless chain, but we just rely on multiple iterations to resolve this.
@@ -327,21 +328,13 @@ def run_schedule_for_organization(
         return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.pk, celery=celery)
 
     # Filter on the schedule and created after the previous occurrence
-    last_runs = Task.objects.filter(schedule=schedule, created_at__gt=schedule.recurrences.before(now))
+    last_runs = Task.objects.filter(
+        schedule=schedule, created_at__gt=schedule.recurrences.before(now), data__plugin_id=schedule.plugin.plugin_id
+    )
 
     if input_data:
-        last_runs = last_runs.filter(data__input_data__has_any_keys=input_data)
-
-    skip = set()
-
-    for target in last_runs.values_list("data__input_data", flat=True):
-        if isinstance(target, list):
-            skip |= set(target)
-        else:
-            skip.add(target)
-
-    # filter out these targets
-    input_data = set(input_data) - skip
+        for targets in last_runs.values_list("data__input_data", flat=True):
+            input_data -= set(targets)
 
     if not input_data:
         return []

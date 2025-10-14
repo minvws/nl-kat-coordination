@@ -70,6 +70,7 @@ class Command(BaseCommand):
                     "finding_type_code": rule_data["finding_type_code"],
                     "object_type": ContentType.objects.get_for_model(object_type_by_name()[rule_data["object_type"]]),
                     "query": rule_data["query"],
+                    "inverse_query": rule_data.get("inverse_query"),
                 },
             )
 

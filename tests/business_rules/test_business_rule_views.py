@@ -111,6 +111,7 @@ def test_business_rule_create_view(rf, superuser_member, xtdb):
                 "enabled": True,
                 "object_type": hostname_ct.id,
                 "query": 'name = "example.com"',
+                "inverse_query": 'inverse name = "example.com"',
                 "finding_type_code": "KAT-NEW-RULE",
             },
         ),
@@ -126,6 +127,7 @@ def test_business_rule_create_view(rf, superuser_member, xtdb):
     assert rule.enabled is True
     assert rule.object_type == hostname_ct
     assert rule.query == 'name = "example.com"'
+    assert rule.inverse_query == 'inverse name = "example.com"'
     assert rule.finding_type_code == "KAT-NEW-RULE"
 
 
@@ -151,6 +153,7 @@ def test_business_rule_update_view(rf, superuser_member, xtdb):
                 "enabled": True,
                 "object_type": ipaddress_ct.id,
                 "query": 'address = "192.168.1.1"',
+                "inverse_query": 'inverse address = "192.168.1.1"',
                 "finding_type_code": "KAT-UPDATED",
             },
         ),
@@ -166,6 +169,7 @@ def test_business_rule_update_view(rf, superuser_member, xtdb):
     assert rule.enabled is True
     assert rule.object_type == ipaddress_ct
     assert rule.query == 'address = "192.168.1.1"'
+    assert rule.inverse_query == 'inverse address = "192.168.1.1"'
     assert rule.finding_type_code == "KAT-UPDATED"
 
 

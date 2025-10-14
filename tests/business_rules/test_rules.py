@@ -1,11 +1,15 @@
 import time
 
+from django.db import connections
+
 from objects.models import (
     CAATag,
     DNSAAAARecord,
     DNSCAARecord,
     DNSNSRecord,
     DNSTXTRecord,
+    Finding,
+    FindingType,
     Hostname,
     IPAddress,
     IPPort,
@@ -192,3 +196,292 @@ def test_domain_owner_verification(xtdb):
     assert len(Hostname.objects.raw(get_rules()["domain_owner_verification"]["query"])) == 2
     assert hn in list(Hostname.objects.raw(get_rules()["domain_owner_verification"]["query"]))
     assert hn2 in list(Hostname.objects.raw(get_rules()["domain_owner_verification"]["query"]))
+
+
+def test_ipv6_webservers_inverse_query(xtdb):
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-WEBSERVER-NO-IPV6")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    ip = IPAddress.objects.create(network=network, address="2001:ab8:d0cb::")
+    DNSAAAARecord.objects.create(hostname=hn, ip_address=ip)
+
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["ipv6_webservers"]["inverse_query"])
+
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_ipv6_nameservers_inverse_query(xtdb):
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+    ns = Hostname.objects.create(network=network, name="ns1.test.com")
+    DNSNSRecord.objects.create(hostname=hn, name_server=ns)
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NAMESERVER-NO-IPV6")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=ns.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Add IPv6 support to nameserver
+    ip = IPAddress.objects.create(network=network, address="2001:ab8:d0cb::")
+    DNSAAAARecord.objects.create(hostname=ns, ip_address=ip)
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["ipv6_nameservers"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_two_ipv6_nameservers_inverse_query(xtdb):
+    """Test that inverse query removes findings when second IPv6 nameserver is added"""
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+    ip = IPAddress.objects.create(network=network, address="2001:ab8:d0cb::")
+
+    ns1 = Hostname.objects.create(network=network, name="ns1.test.com")
+    ns2 = Hostname.objects.create(network=network, name="ns2.test.com")
+    DNSNSRecord.objects.create(hostname=hn, name_server=ns1)
+    DNSNSRecord.objects.create(hostname=hn, name_server=ns2)
+
+    # Add IPv6 to first nameserver only
+    DNSAAAARecord.objects.create(hostname=ns1, ip_address=ip)
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NAMESERVER-NO-TWO-IPV6")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Add IPv6 to second nameserver
+    DNSAAAARecord.objects.create(hostname=ns2, ip_address=ip)
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["two_ipv6_nameservers"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_missing_spf_inverse_query(xtdb):
+    """Test that inverse query removes findings when SPF record is added"""
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-SPF")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Add SPF record
+    DNSTXTRecord.objects.create(hostname=hn, value="v=spf1 -all")
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["missing_spf"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_open_sysadmin_port_inverse_query(xtdb):
+    """Test that inverse query removes findings when sysadmin port is closed"""
+    network = Network.objects.create(name="test")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-OPEN-SYSADMIN-PORT")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Close the port
+    port.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["open_sysadmin_port"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_open_database_port_inverse_query(xtdb):
+    """Test that inverse query removes findings when database port is closed"""
+    network = Network.objects.create(name="test")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=5432, tls=False, service="postgres")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-OPEN-DATABASE-PORT")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Close the port
+    port.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["open_database_port"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_open_remote_desktop_port_inverse_query(xtdb):
+    """Test that inverse query removes findings when RDP port is closed"""
+    network = Network.objects.create(name="test")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=3389, tls=False, service="rdp")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-REMOTE-DESKTOP-PORT")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Close the port
+    port.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["open_remote_desktop_port"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_open_uncommon_port_inverse_query(xtdb):
+    """Test that inverse query removes findings when uncommon port is closed"""
+    network = Network.objects.create(name="test")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=12345, tls=False, service="custom")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-UNCOMMON-OPEN-PORT")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Close the port
+    port.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["open_uncommon_port"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_open_common_port_inverse_query(xtdb):
+    """Test that inverse query removes findings when common port is closed"""
+    network = Network.objects.create(name="test")
+    ip = IPAddress.objects.create(network=network, address="127.0.0.1")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False, service="http")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-COMMON-OPEN-PORT")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Close the port
+    port.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["open_common_port"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_missing_caa_inverse_query(xtdb):
+    """Test that inverse query removes findings when CAA record is added"""
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-CAA")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Add CAA record
+    DNSCAARecord.objects.create(hostname=hn, flags=0, tag=CAATag.ISSUE, value="letsencrypt.org")
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["missing_caa"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_missing_dmarc_inverse_query(xtdb):
+    """Test that inverse query removes findings when DMARC record is added"""
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-DMARC")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Add DMARC record
+    DNSTXTRecord.objects.create(hostname=hn, value="v=DMARC1; p=none;", prefix="_dmarc")
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["missing_dmarc"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()
+
+
+def test_domain_owner_verification_inverse_query(xtdb):
+    """Test that inverse query removes findings when pending nameserver is removed"""
+    network = Network.objects.create(name="test")
+    hn = Hostname.objects.create(network=network, name="test.com")
+    pending = Hostname.objects.create(network=network, name="ns1.registrant-verification.ispapi.net")
+    ns_record = DNSNSRecord.objects.create(hostname=hn, name_server=pending)
+
+    # Create finding type and finding
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-DOMAIN-OWNERSHIP-PENDING")
+    finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
+
+    # Verify finding exists
+    assert Finding.objects.filter(pk=finding.pk).exists()
+
+    # Remove the pending nameserver
+    ns_record.delete()
+
+    # Run inverse query
+    with connections["xtdb"].cursor() as cursor:
+        cursor.execute(get_rules()["domain_owner_verification"]["inverse_query"])
+
+    # Verify finding was deleted
+    assert not Finding.objects.filter(pk=finding.pk).exists()

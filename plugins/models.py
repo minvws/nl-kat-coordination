@@ -291,7 +291,8 @@ class BusinessRule(models.Model):
     enabled = models.BooleanField(default=True)
     finding_type_code = models.CharField(max_length=100)
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    query = models.TextField()
+    query = models.TextField(help_text="Query to find objects that should get a finding")
+    inverse_query = models.TextField(help_text="Query to remove findings that no longer apply")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

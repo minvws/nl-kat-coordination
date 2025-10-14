@@ -405,8 +405,12 @@ class BusinessRuleForm(forms.ModelForm):
 
     class Meta:
         model = BusinessRule
-        fields = ["name", "description", "enabled", "object_type", "query", "finding_type_code"]
-        widgets = {"description": forms.Textarea(attrs={"rows": 3}), "query": forms.Textarea(attrs={"rows": 5})}
+        fields = ["name", "description", "enabled", "object_type", "query", "inverse_query", "finding_type_code"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "query": forms.Textarea(attrs={"rows": 5}),
+            "inverse_query": forms.Textarea(attrs={"rows": 5}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,10 +1,7 @@
-import operator
 import time
-from functools import reduce
 
 from celery import Celery
 from django.conf import settings
-from django.db.models import Q
 
 from files.models import File, GenericContent
 from objects.models import Hostname, Network, ScanLevel, bulk_insert
@@ -226,21 +223,16 @@ def test_find_intersecting_input_data(organization):
 
     # old style vs new style
     target = ["0.com"]
-    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 0
     assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 0
 
     target = ["1.com"]
-    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 1
     assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 1
 
     target = ["4.com"]
-    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
     assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2
 
     target = ["4.com", "5.com"]
-    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
     assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2
 
     target = ["4.com", "5.com", "6.com"]
-    assert Task.objects.filter(reduce(operator.or_, [Q(data__input_data__icontains=x) for x in target])).count() == 2
     assert Task.objects.filter(data__input_data__has_any_keys=target).count() == 2
