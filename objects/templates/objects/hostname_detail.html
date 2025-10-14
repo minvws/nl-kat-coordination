@@ -29,6 +29,16 @@
                                 <a href="{% url 'objects:network_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                             </dd>
                         </div>
+                        <div>
+                            <dt>{% translate "Last Seen" %}</dt>
+                            <dd>
+                                {% if hostname.last_seen %}
+                                    {{ hostname.last_seen|date:"Y-m-d H:i:s" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+                        </div>
                     </dl>
                 </div>
             </div>
@@ -264,6 +274,7 @@
                                 <th>{% translate "Finding Type" %}</th>
                                 <th>{% translate "Score" %}</th>
                                 <th>{% translate "Description" %}</th>
+                                <th>{% translate "Last Seen" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,6 +285,13 @@
                                     </td>
                                     <td>{{ finding.finding_type.score|default:"-" }}</td>
                                     <td>{{ finding.finding_type.description|default:"-" }}</td>
+                                    <td>
+                                        {% if finding.last_seen %}
+                                            {{ finding.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

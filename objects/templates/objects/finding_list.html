@@ -35,6 +35,7 @@
                                 <th>{% translate "Finding Type" %}</th>
                                 <th>{% translate "Score" %}</th>
                                 <th>{% translate "Object" %}</th>
+                                <th>{% translate "Last Seen" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -47,6 +48,13 @@
                                     <td>{{ finding.finding_type.score|default:"-" }}</td>
                                     <td>
                                         <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
+                                    </td>
+                                    <td>
+                                        {% if finding.last_seen %}
+                                            {{ finding.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <form action="{% url 'objects:delete_finding' finding.pk %}" method="post">

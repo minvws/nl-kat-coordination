@@ -20,8 +20,8 @@ class OrganizationMemberEditView(
 
     def test_func(self):
         return (
-            not self.object.user.is_superuser or self.request.user.is_superuser
-        ) and self.object.organization == self.organization
+            not self.get_object().user.is_superuser or self.request.user.is_superuser
+        ) and self.get_object().organization == self.organization
 
     def get_form(self, form_class=None):
         form = super().get_form()

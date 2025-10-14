@@ -162,7 +162,7 @@ def seed_groups(db):
 def cleanup_test_files():
     original = settings.MEDIA_ROOT
     settings.MEDIA_ROOT = original / "test"
-    settings.MEDIA_ROOT.mkdir(exist_ok=True)
+    settings.MEDIA_ROOT.mkdir(exist_ok=True, parents=True)
 
     yield
 

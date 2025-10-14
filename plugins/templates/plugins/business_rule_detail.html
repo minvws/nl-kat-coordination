@@ -64,6 +64,16 @@
                             </dd>
                         </div>
                         <div>
+                            <dt>{% translate "Inverse Query" %}</dt>
+                            <dd>
+                                {% if business_rule.inverse_query %}
+                                    <code>{{ business_rule.inverse_query|wordwrap:100|linebreaksbr }}</code>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
                             <dt>{% translate "Finding Type" %}</dt>
                             <dd>
                                 <span class="label tags-color-1-light">{{ business_rule.finding_type_code }}</span>
