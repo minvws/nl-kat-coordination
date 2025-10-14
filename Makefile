@@ -1,4 +1,4 @@
-.PHONY: build build-openkat build-openkat-frontend run test export_migrations debian clean entrypoint plugins
+.PHONY: build run test export_migrations debian clean entrypoint plugins up
 
 UNAME := $(shell uname)
 
@@ -13,9 +13,14 @@ exec := docker compose exec -T openkat
 kat:
 	make kat_parallel -j 4
 
-kat_parallel: frontend build new-images
+up: build
 	docker compose up -d
+	$(exec) python manage.py createsuperuser --no-input || $(exec) python manage.py createsuperuser --no-input
 	make init -j 4
+	make seed
+
+kat_parallel: frontend up images
+init: messages static
 
 clean: .env
 	docker compose down --timeout 0 --volumes --remove-orphans
@@ -42,11 +47,6 @@ reset:
 login:
 	@OPENKAT_DB_HOST=localhost python manage.py login
 
-dashboards:
-	docker compose run --rm openkat python manage.py dashboards
-
-init: user seed messages sync static
-
 user:
 	-$(exec) python manage.py createsuperuser --no-input
 
@@ -56,9 +56,6 @@ seed:
 messages:
 	$(exec) python manage.py compilemessages
 
-sync:
-	-$(exec) python manage.py sync
-
 static:
 	-$(exec) python manage.py collectstatic
 
@@ -67,7 +64,7 @@ frontend:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-new-images: entrypoint plugins
+images: entrypoint plugins
 
 entrypoint: plugins/plugins/entrypoint/main
 plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go

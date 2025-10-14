@@ -9,6 +9,7 @@ from objects.models import Hostname, Network, object_type_by_name
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
 from plugins.models import BusinessRule
 from plugins.plugins.business_rules import get_rules
+from plugins.sync import sync
 from tasks.models import ObjectSet
 
 
@@ -36,6 +37,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.setup_kat_groups()
         self.setup_group_permissions()
+        self.seed_objects()
+        self.seed_business_rules()
+        sync()
+
+    def seed_objects(self):
         Network.objects.get_or_create(name="internet")
         ObjectSet.objects.get_or_create(
             name="mail_server",
@@ -58,7 +64,6 @@ class Command(BaseCommand):
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.root_domain,
         )
-        self.seed_business_rules()
 
     def seed_business_rules(self):
         for rule_data in get_rules().values():

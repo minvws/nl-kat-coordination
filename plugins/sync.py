@@ -4,19 +4,11 @@ from pathlib import Path
 
 import structlog
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from pydantic import BaseModel, Field, TypeAdapter
 
 from plugins.models import EnabledPlugin, Plugin
 
 logger = structlog.get_logger(__name__)
-
-
-class Command(BaseCommand):
-    help = "New sync all local plugins."
-
-    def handle(self, *args, **options):
-        sync()
 
 
 class NewPlugin(BaseModel):
