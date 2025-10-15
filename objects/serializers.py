@@ -32,7 +32,7 @@ class GetOrCreateSerializer(serializers.ModelSerializer):
 class FindingTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingType
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 def object_by_code(object_code: str | None, object_id: int | None, object_type: str) -> int | None:
@@ -68,13 +68,13 @@ class FindingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Finding
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Network
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class HostnameSerializer(serializers.ModelSerializer):
@@ -93,13 +93,13 @@ class HostnameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hostname
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class ScanLevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanLevel
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class IPAddressSerializer(serializers.ModelSerializer):
@@ -119,64 +119,64 @@ class IPAddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IPAddress
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class IPPortSerializer(GetOrCreateSerializer):
     class Meta:
         model = IPPort
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSARecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSAAAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSAAAARecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSPTRRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSPTRRecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSCNAMERecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCNAMERecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSMXRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSMXRecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSNSRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSNSRecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSCAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCAARecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSTXTRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSTXTRecord
-        fields = "__all__"
+        exclude = ["_valid_from"]
 
 
 class DNSSRVRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSSRVRecord
-        fields = "__all__"
+        exclude = ["_valid_from"]

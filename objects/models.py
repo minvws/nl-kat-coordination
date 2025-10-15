@@ -7,6 +7,7 @@ from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
 from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, QuerySet, Subquery, When
+from django.db.models.expressions import RawSQL
 from django.db.models.query import RawQuerySet
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
@@ -24,6 +25,9 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 def to_xtdb_dict(model: Model) -> dict:
     mod = model_to_dict(model, exclude=["id"])
     mod["_id"] = model.pk
+
+    if "_valid_from" in mod:
+        del mod["_valid_from"]
 
     for field in model._meta.fields:
         if not isinstance(field, ForeignKey):
@@ -47,7 +51,11 @@ MAX_SCAN_LEVEL = max(scan_level.value for scan_level in cast("type[Enum]", ScanL
 
 
 class XTDBModel(models.Model):
-    _valid_from: models.DateTimeField = models.DateTimeField(null=True, blank=True, db_column="_valid_from")
+    # This seems to be the only way to avoid Django trying to set the field in any instance, while still being able to
+    # query the field.
+    _valid_from: models.DateTimeField = models.GeneratedField(
+        expression=RawSQL("_valid_from", ()), output_field=models.DateTimeField(), db_persist=False
+    )
 
     class Meta:
         managed = False
