@@ -418,7 +418,7 @@ class FindingListView(OrganizationFilterMixin, FilterView):
     filterset_class = FindingFilter
 
     def get_queryset(self) -> "QuerySet[Finding]":
-        return super().get_queryset()
+        return super().get_queryset().prefetch_related("finding_type")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
