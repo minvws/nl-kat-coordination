@@ -55,7 +55,7 @@ def schedule_business_rule_recalculations():
         with caches["default"].lock(
             "recalculate_business_rules", blocking=False, timeout=3 * settings.BUSINESS_RULE_RECALCULATION_INTERVAL
         ):
-            run_rules(BusinessRule.objects.all(), False)
+            run_rules(BusinessRule.objects.filter(enabled=True), False)
     except LockError:
         logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")
 
