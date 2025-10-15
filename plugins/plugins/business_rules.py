@@ -509,15 +509,16 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
             else:
                 schema = DjangoQLSchema
 
-            # Apply the inverse query
-            start = time.time()
-            try:
-                with connections["xtdb"].cursor() as cursor:
-                    cursor.execute(rule.inverse_query)
-            except DatabaseError as e:
-                logger.error("Failed to run inverse query: %s", str(e))
+            if rule.inverse_query:
+                # Apply the inverse query
+                start = time.time()
+                try:
+                    with connections["xtdb"].cursor() as cursor:
+                        cursor.execute(rule.inverse_query)
+                except DatabaseError as e:
+                    logger.error("Failed to run inverse query: %s", str(e))
 
-            logger.debug("Inverse query executed in %s seconds", time.time() - start)
+                logger.debug("Inverse query executed in %s seconds", time.time() - start)
 
             # Apply the query
             start = time.time()

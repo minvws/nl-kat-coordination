@@ -29,8 +29,8 @@ from objects.models import (
 )
 from objects.views import HostnameDetailView, HostnameListView, IPAddressDetailView, IPAddressListView
 from openkat.models import Organization
-from plugins.models import Plugin
-from plugins.plugins.business_rules import get_rules
+from plugins.models import BusinessRule, Plugin
+from plugins.plugins.business_rules import get_rules, run_rules
 from tasks.models import ObjectSet, Schedule, Task
 from tasks.tasks import recalculate_scan_levels, run_schedule
 from tests.conftest import setup_request
@@ -131,6 +131,45 @@ def test_query_list_view_fast(bulk_data, benchmark):
             """,  # noqa: S608
                 {},
             )
+
+    benchmark(raw)
+
+
+@pytest.mark.skip("The query itself already takes more than a minute to run")
+def test_filtered_findings_view(bulk_data, benchmark):
+    def raw():
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT COUNT(*) AS "__count" FROM {Finding._meta.db_table} f
+                    WHERE UPPER(
+                    CASE
+                    WHEN (f."object_type" = 'hostname') THEN (
+                        SELECT U0."name" AS "name" FROM {Hostname._meta.db_table} U0
+                        WHERE U0."_id" = (f."object_id")
+                    )
+                    WHEN (f."object_type" = 'ipaddress')
+                         THEN (SELECT U0."address" AS "address" FROM {IPAddress._meta.db_table} U0
+                         WHERE U0."_id" = (f."object_id")
+                    )
+                    WHEN (f."object_type" = 'network')
+                        THEN (SELECT U0."name" AS "name" FROM {Network._meta.db_table} U0
+                        WHERE U0."_id" = (f."object_id")
+                    )
+                    ELSE NULL END
+                ) LIKE UPPER('%%223.%%');
+            """,  # noqa: S608
+                {},
+            )
+
+    ct = ContentType.objects.get_for_model(Hostname)
+    rules = [get_rules()["ipv6_webservers"], get_rules()["ipv6_nameservers"]]
+    run_rules(
+        [
+            BusinessRule(name=rule["name"], finding_type_code="test", object_type=ct, query=rule["query"])
+            for rule in rules
+        ]
+    )
 
     benchmark(raw)
 

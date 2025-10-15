@@ -6,18 +6,7 @@ import structlog
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import DatabaseError, models
-from django.db.models import (
-    Case,
-    F,
-    Model,
-    OuterRef,
-    Q,
-    QuerySet,
-    Subquery,
-    UniqueConstraint,
-    When,
-    Manager,
-)
+from django.db.models import Case, F, Manager, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
@@ -305,7 +294,7 @@ class BusinessRule(models.Model):
     finding_type_code = models.CharField(max_length=100)
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     query = models.TextField(help_text="Query to find objects that should get a finding")
-    inverse_query = models.TextField(help_text="Query to remove findings that no longer apply")
+    inverse_query = models.TextField(help_text="Query to remove findings that no longer apply", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
