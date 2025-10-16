@@ -306,7 +306,7 @@ class ScheduleRunView(PermissionRequiredMixin, View):
 
 
 class ObjectSetFilter(django_filters.FilterSet):
-    object_query = django_filters.CharFilter(label="Object Query", lookup_expr="icontains")
+    object_query = django_filters.CharFilter(label="Object query", lookup_expr="icontains")
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
     description = django_filters.CharFilter(label="Description", lookup_expr="icontains")
 

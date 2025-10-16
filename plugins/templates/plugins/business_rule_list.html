@@ -8,22 +8,26 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
+            <div class="introduction">
                 <div>
-                    <h1>{% translate "Business Rules" %}</h1>
-                </div>
-            </div>
-            <div class="horizontal-view toolbar">
-                <a class="button ghost" href="{% url "add_business_rule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Business Rule" %}</a>
-            </div>
-            <form class="inline layout-wide" method="get">
-                <div class="horizontal-view">
-                    {{ filter.form.as_p }}
-                    <p class="action-buttons">
-                        <button type="submit" class="icon ti-search"></button>
+                    <h1>{% translate "Business rules" %}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
                     </p>
                 </div>
-            </form>
+                <div class="horizontal-view toolbar">
+                    <a class="button ghost" href="{% url "add_business_rule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add business rule" %}</a>
+                </div>
+            </div>
+             <div class="filter-container">
+                <form class="inline layout-wide" method="get">
+                    {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
+                </form>
+            </div>
             <div>
                 <div class="horizontal-scroll sticky-column">
                     <table class="nowrap">
@@ -31,8 +35,8 @@
                             <tr>
                                 <th>{% translate "Name" %}</th>
                                 <th>{% translate "Description" %}</th>
-                                <th>{% translate "Object Type" %}</th>
-                                <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Object type" %}</th>
+                                <th>{% translate "Finding type" %}</th>
                                 <th>{% translate "Enabled" %}</th>
                                 <th>{% translate "Created" %}</th>
                                 <th>{% translate "Actions" %}</th>

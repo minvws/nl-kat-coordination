@@ -342,14 +342,14 @@ class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 
 class BusinessRuleFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    enabled = django_filters.BooleanFilter(label="Enabled")
+    enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
     object_type = django_filters.ModelChoiceFilter(
-        label="Object Type", queryset=ContentType.objects.filter(app_label="objects")
+        label="Object type", queryset=ContentType.objects.filter(app_label="objects")
     )
 
     class Meta:
         model = BusinessRule
-        fields = ["name", "enabled", "object_type"]
+        fields = ["name", "object_type", "enabled"]
 
 
 class BusinessRuleListView(FilterView):
