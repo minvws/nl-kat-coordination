@@ -17,7 +17,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
-    plugin.enable_for(organization)
+    plugin.schedule_for(organization)
     schedule = Schedule.objects.filter(plugin=plugin).first()
 
     assert schedule.object_set.name == "All hostnames"
@@ -70,7 +70,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     plugin2 = Plugin.objects.create(
         name="test2", plugin_id="test2", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
-    plugin2.enable()
+    plugin2.schedule()
     schedule = Schedule.objects.filter(plugin=plugin2).first()
     assert schedule.object_set.name == "All hostnames"
     assert schedule.object_set.object_query == ""
@@ -92,7 +92,7 @@ def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugi
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
-    plugin.enable()
+    plugin.schedule()
     schedule = Schedule.objects.filter(plugin=plugin).first()
 
     assert schedule.object_set.name == "All hostnames"
@@ -114,7 +114,7 @@ def test_process_raw_file(xtdb, celery: Celery, organization, organization_b, do
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", consumes=["file:testfile"], oci_image="T", oci_arguments=["{file}"], scan_level=2
     )
-    plugin.enable()
+    plugin.schedule()
 
     f = File.objects.create(file=GenericContent(b"1234"), type="old")
     f.type = "testfile"  # Avoid the process_raw_file signal
@@ -151,7 +151,7 @@ def test_batch_tasks(xtdb, celery: Celery, organization, organization_b, docker,
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
-    plugin.enable()
+    plugin.schedule()
 
     network = Network.objects.create(name="internet")
 
@@ -180,7 +180,7 @@ def test_batch_scheduled_tasks(xtdb, celery: Celery, organization, organization_
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
     )
-    plugin.enable()
+    plugin.schedule()
     schedule = Schedule.objects.first()
     network = Network.objects.create(name="internet")
 

@@ -169,11 +169,14 @@ def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -
         logger.debug("No plugin defined for schedule, skipping")
         return []
 
-    orgs = schedule.plugin.enabled_organizations() if not schedule.organization else [schedule.organization]
-    tasks = []
+    # Run for the specific organization if one is set on the schedule
+    if schedule.organization:
+        return run_schedule_for_organization(schedule, schedule.organization, force, celery=celery)
 
-    for org in orgs:
-        tasks.extend(run_schedule_for_organization(schedule, org, force, celery=celery))
+    # If organization is None (global schedule), run for all organizations
+    tasks = []
+    for organization in Organization.objects.all():
+        tasks.extend(run_schedule_for_organization(schedule, organization, force, celery=celery))
 
     return tasks
 
@@ -329,12 +332,16 @@ def run_plugin(
 
     plugin = Plugin.objects.filter(plugin_id=plugin_id).first()
 
-    if not plugin or not plugin.enabled_for(organization):
+    if not plugin:
         task.status = TaskStatus.FAILED
         task.save()
-        raise RuntimeError(f"Plugin {plugin_id} is not enabled for {organization_code}")
+        raise RuntimeError(f"Plugin {plugin_id} not found")
 
-        Task.objects.filter(id=self.request.id).update(status=TaskStatus.RUNNING)
+    # Check if plugin has enabled schedules for this organization
+    if not plugin.has_enabled_schedules(organization):
+        task.status = TaskStatus.FAILED
+        task.save()
+        raise RuntimeError(f"Plugin {plugin_id} has no enabled schedules for {organization_code}")
 
     task.status = TaskStatus.RUNNING
     task.save()
@@ -370,7 +377,7 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
         organization = file.task_result.task.organization
 
         for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
-            if plugin.enabled_for(organization):
+            if plugin.has_enabled_schedules(organization):
                 tasks.extend(
                     run_plugin_task(
                         plugin.plugin_id, organization.code if organization else None, str(file.pk), celery=celery
@@ -379,8 +386,24 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
 
         return tasks
 
+    # For files without a task result, check all organizations with enabled schedules
     for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
-        for enabled_org in plugin.enabled_organizations():
-            tasks.extend(run_plugin_task(plugin.plugin_id, enabled_org.code, str(file.pk), celery=celery))
+        enabled_orgs = (
+            Schedule.objects.filter(plugin=plugin, enabled=True).values_list("organization", flat=True).distinct()
+        )
+
+        # Check if there's a global schedule (organization=None)
+        has_global_schedule = None in enabled_orgs
+
+        if has_global_schedule:
+            # If there's a global schedule, create tasks for all organizations
+            for org in Organization.objects.all():
+                tasks.extend(run_plugin_task(plugin.plugin_id, org.code, str(file.pk), celery=celery))
+        else:
+            # Otherwise, only create tasks for specific organizations
+            for org_id in enabled_orgs:
+                if org_id:
+                    org = Organization.objects.get(pk=org_id)
+                    tasks.extend(run_plugin_task(plugin.plugin_id, org.code, str(file.pk), celery=celery))
 
     return tasks

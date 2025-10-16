@@ -6,7 +6,7 @@ import structlog
 from django.conf import settings
 from pydantic import BaseModel, Field, TypeAdapter
 
-from plugins.models import EnabledPlugin, Plugin
+from plugins.models import Plugin
 
 logger = structlog.get_logger(__name__)
 
@@ -58,7 +58,6 @@ def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
 
 def sync() -> list[Plugin]:
     plugins = []
-    enabled_plugins = []
 
     for path, package in _find_packages_in_path_containing_files(
         settings.BASE_DIR / "plugins" / "plugins", ("plugin.json",)
@@ -76,7 +75,6 @@ def sync() -> list[Plugin]:
             version=definition.get("version"),
         )
         plugins.append(plugin)
-        enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
     for parsed_plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
@@ -93,9 +91,6 @@ def sync() -> list[Plugin]:
         )
         plugins.append(plugin)
 
-        if any("{file}" in arg for arg in plugin.oci_arguments):
-            enabled_plugins.append(EnabledPlugin(enabled=True, plugin=plugin, organization=None))
-
     created_plugins = Plugin.objects.bulk_create(
         plugins,
         update_conflicts=True,
@@ -111,6 +106,5 @@ def sync() -> list[Plugin]:
             "version",
         ],
     )
-    EnabledPlugin.objects.bulk_create(enabled_plugins, ignore_conflicts=True)
 
     return created_plugins

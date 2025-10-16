@@ -7,8 +7,6 @@ from plugins.views import (
     BusinessRuleListView,
     BusinessRuleToggleView,
     BusinessRuleUpdateView,
-    EnabledPluginUpdateView,
-    EnabledPluginView,
     PluginCreateView,
     PluginDeleteView,
     PluginDetailView,
@@ -28,8 +26,6 @@ urlpatterns = [
     path("plugins/<int:pk>/scans", PluginScansDetailView.as_view(), name="plugin_detail_scans"),
     path("plugins/<int:pk>/variants", PluginVariantsDetailView.as_view(), name="plugin_detail_variants"),
     path("plugins/<slug:pk>/delete", PluginDeleteView.as_view(), name="delete_plugin"),
-    path("enabled-plugin/", EnabledPluginView.as_view(), name="plugin_enabled"),
-    path("enabled-plugin/<slug:pk>/", EnabledPluginUpdateView.as_view(), name="edit_enabled_plugin"),
     # Business Rule views
     path("business-rules/", BusinessRuleListView.as_view(), name="business_rule_list"),
     path("business-rules/add/", BusinessRuleCreateView.as_view(), name="add_business_rule"),
