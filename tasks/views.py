@@ -4,6 +4,7 @@ import django_filters
 import recurrence
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import OuterRef, Subquery
@@ -159,6 +160,44 @@ class TaskCancelView(PermissionRequiredMixin, View):
         Task.objects.get(pk=task_id).cancel()
 
         return redirect(reverse("task_list"))
+
+
+class TaskCancelAllView(PermissionRequiredMixin, View):
+    permission_required = ("tasks.change_tasks",)
+
+    def post(self, request, *args, **kwargs):
+        organization_codes = request.GET.getlist("organization")  # Only cancel tasks for the filtered organizations
+        query = Task.objects.filter(status__in=[TaskStatus.QUEUED, TaskStatus.PENDING])
+
+        # Apply organization filter if present
+        if organization_codes:
+            query = query.filter(organization__code__in=organization_codes)
+        elif not request.user.can_access_all_organizations:
+            query = query.filter(organization__members__user=request.user)
+
+        if query.count() == 0:
+            messages.warning(request, _("No tasks found matching the criteria."))
+            return redirect(reverse("task_list"))
+
+        # Cancel tasks
+        cancelled_count = 0
+        for task in query:
+            try:
+                task.cancel()
+                cancelled_count += 1
+            except Exception as e:
+                messages.error(
+                    request, _("Failed to cancel task {task_id}: {error}").format(task_id=task.id, error=str(e))
+                )
+
+        messages.success(request, _("Successfully cancelled {count} task(s).").format(count=cancelled_count))
+
+        redirect_url = reverse("task_list")
+
+        if organization_codes:
+            redirect_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        return redirect(redirect_url)
 
 
 class ScheduleFilter(django_filters.FilterSet):

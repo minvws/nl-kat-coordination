@@ -5,7 +5,20 @@
     <form class="inline layout-wide" method="get">
         {{ filter.form.as_p }}
         <button type="submit">{% translate "Apply" %}</button>
+        <button type="submit"
+                class="button ghost destructive"
+                form="cancel-all-tasks-form">
+            <span class="icon ti-x"></span>{% translate "Cancel Queued Tasks" %}
+        </button>
     </form>
+    {% if perms.tasks.change_tasks %}
+        <form action="{% url 'cancel_all_tasks' %}{% if filtered_organization_codes %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}{% endif %}"
+              method="post"
+              id="cancel-all-tasks-form">
+            {% csrf_token %}
+            {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+        </form>
+    {% endif %}
 </div>
 {% if not task_list %}
     <div>
