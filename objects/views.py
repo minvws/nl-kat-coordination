@@ -249,15 +249,15 @@ class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
 
 
 class FindingFilter(django_filters.FilterSet):
-    finding_type__code = django_filters.CharFilter(label="Finding Type", lookup_expr="icontains")
+    finding_type__code = django_filters.CharFilter(label="Finding type", lookup_expr="icontains")
     object_search = django_filters.CharFilter(label="Object", method="filter_object_search")
     finding_type__score__gte = django_filters.NumberFilter(
-        label="Minimum Score", field_name="finding_type__score", lookup_expr="gte"
+        label="Minimum score", field_name="finding_type__score", lookup_expr="gte"
     )
 
     class Meta:
         model = Finding
-        fields = ["finding_type__code", "object_search", "finding_type__score__gte"]
+        fields = ["finding_type__code", "finding_type__score__gte", "object_search"]
 
     def filter_object_search(self, queryset, name, value):
         if not value:

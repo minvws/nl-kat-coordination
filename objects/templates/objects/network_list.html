@@ -8,16 +8,23 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
+            {% include "objects/object_introduction.html" %}
+            {% include "objects/object_tabs.html" with view="networks" %}
+            <div class="introduction">
                 <div>
-                    <h1>{% translate "Networks" %}</h1>
+                    <h2>{% translate "Networks" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
+                {% if perms.openkat.add_network %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost" href="{% url "objects:add_network" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Network" %}</a>
+                    </div>
+                {% endif %}
             </div>
-            {% if perms.openkat.add_network %}
-                <div class="horizontal-view toolbar">
-                    <a class="button ghost" href="{% url "objects:add_network" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Network" %}</a>
-                </div>
-            {% endif %}
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
