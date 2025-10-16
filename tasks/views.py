@@ -87,7 +87,7 @@ class TaskDetailView(OrganizationFilterMixin, DetailView):
 
 
 class TaskForm(ModelForm):
-    plugin = forms.ModelChoiceField(Plugin.objects.with_enabled().filter(enabled=True))
+    plugin = forms.ModelChoiceField(Plugin.objects.all())
     input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
     input_ips = forms.ModelMultipleChoiceField(IPAddress.objects.all(), required=False)
 
@@ -104,8 +104,8 @@ class TaskForm(ModelForm):
         else:
             organization = self.cleaned_data["organization"]
 
-        if not plugin.enabled_for(organization):
-            raise ValueError(f"Plugin not enabled for organization {organization.name}")
+        if not plugin.has_enabled_schedules(organization):
+            raise ValueError(f"Plugin has no enabled schedules for organization {organization.name}")
 
         # TODO: fix, ips, etc.
         input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}

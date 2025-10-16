@@ -5,8 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q, QuerySet
-from django.db.models.functions import Coalesce
+from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -18,10 +17,9 @@ from djangoql.queryset import apply_search
 
 from objects.models import FindingType
 from openkat.mixins import OrganizationFilterMixin
-from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
-from plugins.models import BusinessRule, EnabledPlugin, Plugin, PluginQuerySet, ScanLevel
-from tasks.models import Task, TaskStatus
+from plugins.models import BusinessRule, Plugin, ScanLevel
+from tasks.models import Task
 from tasks.views import TaskFilter
 
 
@@ -29,11 +27,10 @@ class PluginFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains", widget=forms.TextInput())
     oci_image = django_filters.CharFilter(label="Container image", lookup_expr="icontains", widget=forms.TextInput())
     scan_level = django_filters.ChoiceFilter(label="Scan level", choices=ScanLevel.choices)
-    enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
 
     class Meta:
         model = Plugin
-        fields = ["name", "oci_image", "scan_level", "enabled"]
+        fields = ["name", "oci_image", "scan_level"]
 
 
 class PluginVariantFilter(django_filters.FilterSet):
@@ -53,25 +50,7 @@ class PluginListView(OrganizationFilterMixin, FilterView):
     filterset_class = PluginFilter
 
     def get_queryset(self) -> QuerySet:
-        plugins: PluginQuerySet = Plugin.objects.all()
-        organization_codes = self.request.GET.getlist("organization")
-
-        if not self.request.user.can_access_all_organizations:
-            organizations = Organization.objects.filter(members__user=self.request.user)
-        else:
-            organizations = Organization.objects.all()
-
-        if organization_codes:
-            organizations = organizations.filter(code__in=organization_codes)
-
-            if organizations.count() == 1:
-                plugins = plugins.with_enabled(organizations.first())
-            else:
-                plugins = plugins.with_enabled(None)
-        elif not self.request.user.can_access_all_organizations:
-            plugins = plugins.with_enabled(organizations.first())
-        else:
-            plugins = plugins.with_enabled(None)
+        plugins = Plugin.objects.all()
 
         order_by = self.request.GET.get("order_by", "name")
         sorting_order = self.request.GET.get("sorting_order", "asc")
@@ -88,18 +67,6 @@ class PluginListView(OrganizationFilterMixin, FilterView):
         context["sorting_order"] = self.request.GET.get("sorting_order", "asc")
         context["sorting_order_class"] = "ascending" if context["sorting_order"] == "asc" else "descending"
 
-        # Determine if enable/disable actions should be allowed
-        organization_codes = self.request.GET.getlist("organization")
-        if organization_codes:
-            organizations = Organization.objects.filter(code__in=organization_codes)
-            context["enable_disable_allowed"] = organizations.count() == 1
-            if organizations.count() == 1:
-                context["selected_organization"] = organizations.first()
-        else:
-            context["enable_disable_allowed"] = True
-            if not self.request.user.can_access_all_organizations:
-                context["selected_organization"] = Organization.objects.filter(members__user=self.request.user).first()
-
         return context
 
 
@@ -108,16 +75,6 @@ class PluginDetailView(DetailView):
     model = Plugin
 
     object: Plugin
-
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
-            .annotate(
-                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
-            )
-        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -159,14 +116,7 @@ class PluginVariantsDetailView(PluginDetailView):
         return Plugin.objects.filter(oci_image=self.object.oci_image)
 
     def filter_variants(self, filterset):
-        variants = (
-            filterset.qs.filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
-            .annotate(
-                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
-            )
-            .order_by("name")
-        )
-        return variants
+        return filterset.qs.order_by("name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -243,16 +193,6 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     def form_invalid(self, form):
         return reverse("plugin_detail", kwargs={"pk": self.object.pk})
 
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(Q(enabled_plugins__organization=None) | Q(enabled_plugins__isnull=True))
-            .annotate(
-                enabled=Coalesce("enabled_plugins__enabled", False), enabled_id=Coalesce("enabled_plugins__id", None)
-            )
-        )
-
     def get_success_url(self, **kwargs):
         return reverse("plugin_detail", kwargs={"pk": self.object.pk})
 
@@ -275,64 +215,6 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         redirect_url = self.request.POST.get("current_url")
-
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
-
-        return reverse_lazy("plugin_list")
-
-
-class EnabledPluginView(KATModelPermissionRequiredMixin, CreateView):
-    model = EnabledPlugin
-    fields = ["enabled", "plugin", "organization"]
-    template_name = "enable_disable_plugin.html"
-
-    def form_invalid(self, form):
-        return redirect(reverse("plugin_list"))
-
-    def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
-
-        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
-            return redirect_url
-
-        return reverse_lazy("plugin_list")
-
-
-class EnabledPluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
-    model = EnabledPlugin
-    fields = ["enabled"]
-    template_name = "enable_disable_plugin.html"
-
-    object: EnabledPlugin
-
-    def form_invalid(self, form):
-        return redirect(reverse("plugin_list"))
-
-    def form_valid(self, form):
-        result = super().form_valid(form)
-
-        if self.object.enabled:
-            messages.add_message(
-                self.request, messages.SUCCESS, _("Plugin '{}' has been enabled.").format(self.object.plugin.name)
-            )
-            return result
-
-        # Plugin has been disabled, cancel all tasks for this plugin and organization
-        for task in Task.objects.filter(
-            organization=self.object.organization,
-            data__plugin_id=self.object.plugin.pk,
-            status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],
-        ):
-            task.cancel()
-
-        messages.add_message(
-            self.request, messages.SUCCESS, _("Plugin '{}' has been disabled.").format(self.object.plugin.name)
-        )
-        return result
-
-    def get_success_url(self, **kwargs):
-        redirect_url = self.get_form().data.get("current_url")
 
         if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
             return redirect_url

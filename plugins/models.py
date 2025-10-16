@@ -5,13 +5,13 @@ import recurrence
 import structlog
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
-from django.db import DatabaseError, models
-from django.db.models import Case, F, Manager, Model, OuterRef, Q, QuerySet, Subquery, UniqueConstraint, When
+from django.db import models
+from django.db.models import Model, QuerySet
 from docker.utils import parse_repository_tag
 from recurrence.fields import RecurrenceField
 
 from objects.models import Hostname, IPAddress, object_type_by_name
-from openkat.models import Organization, OrganizationMember
+from openkat.models import Organization
 from tasks.models import ObjectSet, Schedule
 
 logger = structlog.get_logger(__name__)
@@ -23,39 +23,6 @@ class ScanLevel(models.IntegerChoices):
     L2 = 2
     L3 = 3
     L4 = 4
-
-
-class PluginQuerySet(models.QuerySet):
-    def with_enabled(self, organization: Organization | None = None) -> "PluginQuerySet":
-        """
-        We have the EnabledPlugin model that tells whether a plugin is enabled for an organization. If the
-        organization is None, the plugin is enabled for all organizations. However, the organization-specific case
-        should take precedence. That's why we treat globally enabled and "specifically" enabled as separate cases.
-        """
-
-        global_subquery = EnabledPlugin.objects.filter(Q(organization=None), plugin=OuterRef("pk"))
-        subquery = EnabledPlugin.objects.filter(Q(organization=organization), plugin=OuterRef("pk"))
-
-        qs = self.annotate(
-            global_enabled=Subquery(global_subquery.values("enabled")),
-            global_enabled_id=Subquery(global_subquery.values("pk")),
-            specific_enabled=Subquery(subquery.values("enabled")),
-            specific_enabled_id=Subquery(subquery.values("pk")),
-        ).annotate(
-            enabled=Case(
-                When(
-                    specific_enabled__isnull=False, then=F("specific_enabled")
-                ),  # Check if there is an org-specific setting
-                When(global_enabled__isnull=False, then=F("global_enabled")),  # Fall back on global configuration
-                default=False,  # Default to False
-            ),
-            enabled_id=Case(
-                When(specific_enabled_id__isnull=False, then=F("specific_enabled_id")),
-                When(global_enabled_id__isnull=False, then=F("global_enabled_id")),
-            ),
-        )
-
-        return qs
 
 
 class Plugin(models.Model):
@@ -81,9 +48,7 @@ class Plugin(models.Model):
     oci_arguments = ArrayField(models.CharField(max_length=256, blank=True), default=list)
     version = models.CharField(max_length=16, null=True)
 
-    objects = PluginQuerySet.as_manager()
-
-    enabled_plugins: Manager["EnabledPlugin"]
+    objects = models.Manager()
 
     def repository(self) -> str | None:
         if not self.oci_arguments:
@@ -154,92 +119,54 @@ class Plugin(models.Model):
 
         return list(results)
 
-    def enabled_organizations(self) -> QuerySet:
-        orgs = Organization.objects.filter(enabled_plugins__plugin=self, enabled_plugins__enabled=True)
+    def has_enabled_schedules(self, organization: Organization | None = None) -> bool:
+        """Check if this plugin has any enabled schedules for the given organization."""
+        # Check for schedules matching the specific organization
+        if Schedule.objects.filter(plugin=self, organization=organization, enabled=True).exists():
+            return True
 
-        if not self.enabled_plugins.filter(organization=None, enabled=True).exists():
-            return orgs
-
-        # This plugin is globally enabled
-        return orgs.union(Organization.objects.difference(Organization.objects.filter(enabled_plugins__plugin=self)))
-
-    def enabled_for(self, organization: Organization | None) -> bool:
-        enabled_plugin = self.enabled_plugins.filter(organization=organization).first()
-
-        if enabled_plugin:
-            return enabled_plugin.enabled
-
-        enabled_plugin = self.enabled_plugins.filter(organization=None).first()
-
-        if enabled_plugin:
-            return enabled_plugin.enabled
+        # If organization is not None, also check for global schedules (organization=None)
+        if organization is not None:
+            return Schedule.objects.filter(plugin=self, organization=None, enabled=True).exists()
 
         return False
 
-    def enable(self) -> "EnabledPlugin":
-        return self.enable_for(None)
+    def enabled_organizations(self) -> QuerySet:
+        """Get all organizations that have enabled schedules for this plugin."""
+        # Get organizations with schedules
+        orgs_with_schedules = Organization.objects.filter(schedules__plugin=self, schedules__enabled=True)
 
-    def disable(self) -> "EnabledPlugin":
-        return self.disable_for(None)
+        # Check if there are global (organization=None) schedules
+        has_global_schedules = Schedule.objects.filter(plugin=self, organization=None, enabled=True).exists()
 
-    def enable_for(self, organization: Organization | None) -> "EnabledPlugin":
-        enabled_plugin, created = EnabledPlugin.objects.get_or_create(plugin=self, organization=organization)
-        enabled_plugin.enabled = True
-        enabled_plugin.save()
+        if not has_global_schedules:
+            return orgs_with_schedules
 
-        return enabled_plugin
+        # If globally scheduled, return all organizations
+        return Organization.objects.all()
 
-    def disable_for(self, organization: Organization | None) -> "EnabledPlugin":
-        enabled_plugin, created = EnabledPlugin.objects.get_or_create(plugin=self, organization=organization)
-        enabled_plugin.enabled = False
-        enabled_plugin.save()
+    def enable(self) -> list[Schedule]:
+        """Create schedules for this plugin globally (organization=None). Alias for schedule()."""
+        return self.schedule_for(None)
 
-        return enabled_plugin
+    def enable_for(self, organization: Organization | None) -> list[Schedule]:
+        """Create schedules for this plugin for a specific organization. Alias for schedule_for()."""
+        return self.schedule_for(organization)
 
-    def __str__(self):
-        return f"{self.plugin_id}"
+    def schedule(self) -> list[Schedule]:
+        """Create schedules for this plugin globally (organization=None)."""
+        return self.schedule_for(None)
 
-
-class PluginSettings(models.Model):
-    settings = models.JSONField(default=dict)  # TODO: encoder/decoder with for datatimes?
-    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="plugin_settings")
-    organizations = models.ManyToManyField("openkat.organization", related_name="plugin_settings")
-
-
-class EnabledPlugin(models.Model):
-    enabled = models.BooleanField(default=False)
-    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="enabled_plugins")
-    organization = models.ForeignKey(
-        "openkat.organization", on_delete=models.CASCADE, related_name="enabled_plugins", null=True, blank=True
-    )
-
-    class Meta:
-        constraints = [
-            UniqueConstraint(fields=["plugin", "organization"], name="unique_enabled_per_organization"),
-            UniqueConstraint(fields=["plugin"], condition=Q(organization=None), name="unique_global_enabled"),
-        ]
-
-    def can_scan(self, member: OrganizationMember) -> bool:
-        return member.has_perm("openkat.can_scan_organization")
-
-    def save(self, *args, **kwargs):
-        if self.enabled:
-            try:
-                self.initialize_schedules()
-            except DatabaseError:
-                logger.warning("Could not aligns schedules for plugin: %s", self)
-                raise
-
-        return super().save(*args, **kwargs)
-
-    def initialize_schedules(self):
-        schedules = Schedule.objects.filter(plugin=self.plugin, organization=self.organization)
+    def schedule_for(self, organization: Organization | None) -> list[Schedule]:
+        """Create schedules for this plugin for a specific organization."""
+        # Check if schedules already exist
+        schedules = Schedule.objects.filter(plugin=self, organization=organization)
 
         if schedules.exists():
-            return
+            return list(schedules)
 
         queries = []
-        consumed_types = self.plugin.consumed_types()
+        consumed_types = self.consumed_types()
 
         if Hostname in consumed_types:
             consumed_types.remove(Hostname)
@@ -260,31 +187,45 @@ class EnabledPlugin(models.Model):
             )
             object_sets.append(new)
 
+        created_schedules = []
         for object_set in object_sets:
-            Schedule.objects.create(
-                plugin=self.plugin,
-                enabled=self.enabled,
+            schedule = Schedule.objects.create(
+                plugin=self,
+                enabled=True,
                 object_set=object_set,
-                organization=self.organization,
-                recurrences=self.plugin.recurrences
-                if self.plugin.recurrences and str(self.plugin.recurrences)
+                organization=organization,
+                recurrences=self.recurrences
+                if self.recurrences and str(self.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
                     dtstart=datetime.datetime.now(datetime.UTC),
                 ),
             )
+            created_schedules.append(schedule)
 
         if not object_sets:
-            Schedule.objects.create(
-                plugin=self.plugin,
-                enabled=self.enabled,
-                organization=self.organization,
-                recurrences=self.plugin.recurrences
-                if self.plugin.recurrences and str(self.plugin.recurrences)
+            schedule = Schedule.objects.create(
+                plugin=self,
+                enabled=True,
+                organization=organization,
+                recurrences=self.recurrences
+                if self.recurrences and str(self.recurrences)
                 else recurrence.Recurrence(
                     rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.datetime.now(datetime.UTC)
                 ),
             )
+            created_schedules.append(schedule)
+
+        return created_schedules
+
+    def __str__(self):
+        return f"{self.plugin_id}"
+
+
+class PluginSettings(models.Model):
+    settings = models.JSONField(default=dict)  # TODO: encoder/decoder with for datatimes?
+    plugin = models.ForeignKey(Plugin, on_delete=models.CASCADE, related_name="plugin_settings")
+    organizations = models.ManyToManyField("openkat.organization", related_name="plugin_settings")
 
 
 class BusinessRule(models.Model):

@@ -42,16 +42,7 @@
                               class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                     </button>
                 </th>
-                <th scope="col"
-                    class="sortable"
-                    {% if order_by == "enabled" %}aria-sort="{{ sorting_order_class }}"{% endif %}>
-                    <button form="plugin_list" name="order_by" value="enabled" class="sort">
-                        {% translate "Actions" %}
-                        <span aria-hidden="true"
-                              class="{% if order_by == "enabled" and sorting_order == "asc" %} icon ti-chevron-up {% elif order_by == "enabled" and sorting_order == "desc" %} icon ti-chevron-down {% else %} icon ti-direction {% endif %}"></span>
-                    </button>
-                </th>
-                <th scope="col"></th>
+                <th scope="col">{% translate "Actions" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -92,61 +83,16 @@
 
                     </td>
                     <td>
-                        {% if perms.openkat.add_enabledplugin %}
-                            {% if enable_disable_allowed %}
-                                <form action="{% if not plugin.enabled_id %} {% url "plugin_enabled" %} {% else %} {% url "edit_enabled_plugin" pk=plugin.enabled_id %} {% endif %}"
-                                      method="post"
-                                      class="inline">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
-                                    <input type="hidden"
-                                           name="organization"
-                                           value="{% if selected_organization %}{{ selected_organization.id }}{% endif %}">
-                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
-                                    <input type="hidden"
-                                           name="enabled"
-                                           value="{% if not plugin.enabled %}true{% else %}false{% endif %}">
-                                    <button type="submit"
-                                            class="button ghost {% if plugin.enabled %}destructive{% else %}plugin-enabled{% endif %}">
-                                        {% if not plugin.enabled %}
-                                            {% translate "Enable" %}
-                                        {% else %}
-                                            {% translate "Disable" %}
-                                        {% endif %}
-                                    </button>
-                                </form>
-                            {% else %}
-                                <button type="button"
-                                        class="button ghost"
-                                        disabled
-                                        title="{% translate "Select a single organization to enable/disable plugins" %}">
-                                    {% translate "Enable/Disable" %}
-                                </button>
-                            {% endif %}
-                        {% else %}
-                            {% if plugin.enabled %}
-                                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-                            {% else %}
-                                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if plugin.enabled %}
-                            {% if plugin.consumed_types %}
-                                <a href="{% url 'add_task' %}?plugin={{ plugin.id }}">
-                                    <button type="submit">{% translate "Run" %}</button>
-                                </a>
-                            {% elif not plugin.files_in_arguments %}
-                                <form action="{% url 'add_task' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden"
-                                           name="organization"
-                                           value="{% if selected_organization %}{{ selected_organization.id }}{% endif %}">
-                                    <input type="hidden" name="plugin" value="{{ plugin.id }}">
-                                    <button type="submit">{% translate "Run" %}</button>
-                                </form>
-                            {% endif %}
+                        {% if plugin.consumed_types %}
+                            <a href="{% url 'add_task' %}?plugin={{ plugin.id }}">
+                                <button type="submit">{% translate "Run" %}</button>
+                            </a>
+                        {% elif not plugin.files_in_arguments %}
+                            <form action="{% url 'add_task' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="plugin" value="{{ plugin.id }}">
+                                <button type="submit">{% translate "Run" %}</button>
+                            </form>
                         {% endif %}
                     </td>
                 </tr>
