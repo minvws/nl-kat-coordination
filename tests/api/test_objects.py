@@ -72,20 +72,23 @@ def test_network_api(drf_client, xtdb):
         "count": 2,
         "next": None,
         "previous": None,
-        "results": [{"id": net.pk, "name": "internet"}, {"id": net2.pk, "name": "internet2"}],
+        "results": [
+            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
+            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
+        ],
     }
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net2.pk, "name": "internet2"},
-        {"id": net.pk, "name": "internet"},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
     ]
     network = {"name": "internet3"}
     net3 = drf_client.post("/api/v1/objects/network/", json=network).json()
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net3["id"], "name": "internet3"},
-        {"id": net2.pk, "name": "internet2"},
-        {"id": net.pk, "name": "internet"},
+        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
     ]
 
 
@@ -96,14 +99,28 @@ def test_hostname_api(drf_client, xtdb):
 
     hn = Hostname.objects.create(network=network, name="test.com")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True}
+        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True, "declared": False, "scan_level": None}
     ]
 
     hostname = {"network": "internet", "name": "test2.com"}
     hn2 = drf_client.post("/api/v1/objects/hostname/", json=hostname).json()
     assert drf_client.get("/api/v1/objects/hostname/?ordering=name").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True},
-        {"id": hn2["id"], "name": "test2.com", "network_id": network.pk, "root": True},
+        {
+            "id": hn.pk,
+            "name": "test.com",
+            "network_id": network.pk,
+            "root": True,
+            "declared": False,
+            "scan_level": None,
+        },
+        {
+            "id": hn2["id"],
+            "name": "test2.com",
+            "network_id": network.pk,
+            "root": True,
+            "declared": False,
+            "scan_level": None,
+        },
     ]
 
     response = drf_client.post("/api/v1/objects/hostname/", json={"name": "test.com"})
@@ -116,7 +133,7 @@ def test_ip_api(drf_client, xtdb):
     ip = {"network": "internet", "address": "127.0.0.1"}
     ip_res = drf_client.post("/api/v1/objects/ipaddress/", json=ip).json()
     assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
-        {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1"}
+        {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1", "declared": False, "scan_level": None}
     ]
 
     ipport = {"address": ip_res["id"], "protocol": "TCP", "port": 80, "service": "http"}

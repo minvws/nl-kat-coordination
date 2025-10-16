@@ -24,7 +24,6 @@ from objects.models import (
     IPPort,
     Network,
     Protocol,
-    ScanLevel,
     bulk_insert,
 )
 from objects.views import HostnameDetailView, HostnameListView, IPAddressDetailView, IPAddressListView
@@ -83,8 +82,8 @@ def N():
 @pytest.fixture(scope="session")
 def bulk_data_org(xtdbulk, N):
     org, created = Organization.objects.get_or_create(code="testdns", name="testdns")
-    hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records, scan_levels = (
-        generate(org, N, 2, 1, 2, include_dns_records=True)
+    hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records = generate(
+        N, 2, 1, include_dns_records=True
     )
     bulk_insert(hostnames)
     bulk_insert(ips)
@@ -95,7 +94,6 @@ def bulk_data_org(xtdbulk, N):
     bulk_insert(mx_records)
     bulk_insert(txt_records)
     bulk_insert(caa_records)
-    bulk_insert(scan_levels)
 
     return org
 
@@ -117,22 +115,6 @@ def test_query_many_ipaddresses(bulk_data, benchmark):
         list(IPAddress.objects.select_related("network").filter(address__contains="192"))
 
     benchmark(select)
-
-
-def test_query_list_view_fast(bulk_data, benchmark):
-    def raw():
-        with connections["xtdb"].cursor() as cursor:
-            cursor.execute(
-                f"""
-                SELECT  V1.*, MAX(V0."scan_level") as max_scan_level
-                FROM {Hostname._meta.db_table} V1
-                JOIN {ScanLevel._meta.db_table} V0 ON V0."object_id" = V1."_id"
-                LIMIT 20
-            """,  # noqa: S608
-                {},
-            )
-
-    benchmark(raw)
 
 
 @pytest.mark.skip("The query itself already takes more than a minute to run")

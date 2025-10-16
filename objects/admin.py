@@ -14,21 +14,20 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
-    ScanLevel,
 )
 
 
 @admin.register(Network)
 class NetworkAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    search_fields = ("name",)
+    list_display = ("name", "scan_level", "declared")
+    search_fields = ("name", "scan_level", "declared")
     ordering = ("name",)
 
 
 @admin.register(IPAddress)
 class IPAddressAdmin(admin.ModelAdmin):
-    list_display = ("address", "network")
-    list_filter = ("network",)
+    list_display = ("address", "network", "scan_level", "declared")
+    list_filter = ("network", "scan_level", "declared")
     search_fields = ("address",)
     ordering = ("address",)
 
@@ -43,18 +42,10 @@ class IPPortAdmin(admin.ModelAdmin):
 
 @admin.register(Hostname)
 class HostnameAdmin(admin.ModelAdmin):
-    list_display = ("name", "network")
-    list_filter = ("network",)
+    list_display = ("name", "network", "scan_level", "declared")
+    list_filter = ("network", "scan_level", "declared")
     search_fields = ("name",)
     ordering = ("name",)
-
-
-@admin.register(ScanLevel)
-class ScanLevelAdmin(admin.ModelAdmin):
-    list_display = ("id", "organization", "scan_level", "declared", "last_changed_by")
-    list_filter = ("organization", "scan_level", "declared")
-    search_fields = ("id",)
-    ordering = ("id",)
 
 
 @admin.register(DNSARecord)

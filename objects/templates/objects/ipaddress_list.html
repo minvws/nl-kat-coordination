@@ -59,7 +59,7 @@
                             <tr>
                                 <th>{% translate "Address" %}</th>
                                 <th>{% translate "Network" %}</th>
-                                <th>{% translate "Max Scan Level" %}</th>
+                                <th>{% translate "Scan Level" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
                                 <th></th>
                             </tr>
@@ -74,8 +74,8 @@
                                         <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a>
                                     </td>
                                     <td>
-                                        {% if ipaddress.max_scan_level != None %}
-                                            {% include "partials/scan_level_indicator.html" with value=ipaddress.max_scan_level %}
+                                        {% if ipaddress.scan_level != None %}
+                                            {% include "partials/scan_level_indicator.html" with value=ipaddress.scan_level %}
 
                                         {% else %}
                                             -

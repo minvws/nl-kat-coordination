@@ -16,19 +16,12 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
-    ScanLevel,
     bulk_insert,
 )
-from openkat.models import Organization
 
 
 def generate(
-    organization: Organization,
-    N: int,
-    hostname_scan_level: int,
-    ipaddress_scan_level: int,
-    port_scan_level: int,
-    include_dns_records: bool = False,
+    N: int, hostname_scan_level: int, ipaddress_scan_level: int, include_dns_records: bool = False
 ) -> tuple[
     list[Hostname],
     list[IPAddress],
@@ -39,7 +32,6 @@ def generate(
     list[DNSMXRecord],
     list[DNSTXTRecord],
     list[DNSCAARecord],
-    list[ScanLevel],
 ]:
     network, created = Network.objects.get_or_create(name="internet")
     ips = []
@@ -52,19 +44,19 @@ def generate(
     mx_records = []
     txt_records = []
     caa_records = []
-    scan_levels = []
 
     for i in range(N):
         # IPv4
         ip = IPAddress(
             network=network,
             address=str(socket.inet_ntoa(struct.pack(">I", random.randint(1, 0xFFFFFFFF)))),  # noqa: S311
+            scan_level=ipaddress_scan_level,
         )
         ips.append(ip)
 
         # IPv6 (every 5th host gets IPv6)
         if include_dns_records and i % 5 == 0:
-            ipv6 = IPAddress(network=network, address=f"2001:db8:{i:04x}::{i:04x}")
+            ipv6 = IPAddress(network=network, address=f"2001:db8:{i:04x}::{i:04x}", scan_level=ipaddress_scan_level)
             ips_v6.append(ipv6)
 
         # Ports
@@ -80,7 +72,7 @@ def generate(
             ports.append(IPPort(address=ip, protocol="TCP", port=3306, service="mysql"))  # Database port
 
         # Hostname
-        hn = Hostname(network=network, name=f"test_{i}.com")
+        hn = Hostname(network=network, name=f"test_{i}.com", scan_level=hostname_scan_level)
         hostnames.append(hn)
 
         # DNS A Record for every 2nd host
@@ -96,7 +88,7 @@ def generate(
 
             # NS records for nameservers (every 20th)
             if i % 20 == 0 and i > 0:
-                ns_hostname = Hostname(network=network, name=f"ns{i}.test.com")
+                ns_hostname = Hostname(network=network, name=f"ns{i}.test.com", scan_level=hostname_scan_level)
                 hostnames.append(ns_hostname)
                 ns_records.append(DNSNSRecord(hostname=hn, name_server=ns_hostname, ttl=300))
 
@@ -117,47 +109,16 @@ def generate(
             if i % 25 == 0:
                 caa_records.append(DNSCAARecord(hostname=hn, flags=0, tag="issue", value="letsencrypt.org", ttl=300))
 
-        # Scan levels
-        scan_levels.extend(
-            [
-                ScanLevel(
-                    organization=organization, object_type="ipaddress", object_id=ip.pk, scan_level=ipaddress_scan_level
-                ),
-                ScanLevel(
-                    organization=organization, object_type="hostname", object_id=hn.pk, scan_level=hostname_scan_level
-                ),
-                ScanLevel(
-                    organization=organization, object_type="ipport", object_id=http_port.pk, scan_level=port_scan_level
-                ),
-                ScanLevel(
-                    organization=organization, object_type="ipport", object_id=https_port.pk, scan_level=port_scan_level
-                ),
-            ]
-        )
-
-    return (
-        hostnames,
-        ips + ips_v6,
-        ports,
-        a_records,
-        aaaa_records,
-        ns_records,
-        mx_records,
-        txt_records,
-        caa_records,
-        scan_levels,
-    )
+    return (hostnames, ips + ips_v6, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records)
 
 
 class Command(BaseCommand):
     help = "Load many objects into XTDB"
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument("-o", dest="organization_code", type=str)
         parser.add_argument("-n", dest="number_of_objects", type=int, default=100_000)
         parser.add_argument("-hs", dest="hostname_scan_level", type=int, default=2)
         parser.add_argument("-is", dest="ipaddress_scan_level", type=int, default=2)
-        parser.add_argument("-ps", dest="port_scan_level", type=int, default=2)
         parser.add_argument(
             "--with-dns",
             "-d",
@@ -171,17 +132,14 @@ class Command(BaseCommand):
         number_of_objects: int,
         hostname_scan_level: int,
         ipaddress_scan_level: int,
-        port_scan_level: int,
-        organization_code: str,
         include_dns: bool = False,
         *args: Any,
         **kwargs: Any,
     ) -> None:
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 
-        organization = Organization.objects.get(code=organization_code)
-        hosts, ips, ports, arecords, aaaa_records, ns_records, mx_records, txt_records, caa_records, levels = generate(
-            organization, number_of_objects, hostname_scan_level, ipaddress_scan_level, port_scan_level, include_dns
+        hosts, ips, ports, arecords, aaaa_records, ns_records, mx_records, txt_records, caa_records = generate(
+            number_of_objects, hostname_scan_level, ipaddress_scan_level, include_dns
         )
 
         self.stdout.write(self.style.SUCCESS("Loading hostnames..."))
@@ -213,5 +171,4 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("Loading DNSCAArecords..."))
                 bulk_insert(caa_records)
 
-        self.stdout.write(self.style.SUCCESS("Loading scan levels..."))
-        bulk_insert(levels)
+        self.stdout.write(self.style.SUCCESS("Done loading benchmark data"))

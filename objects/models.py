@@ -6,16 +6,15 @@ from typing import cast
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
-from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, QuerySet, Subquery, When
+from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
 from django.db.models.expressions import RawSQL
-from django.db.models.query import RawQuerySet
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from psycopg import sql
 from tldextract import tldextract
 from transit.writer import Writer
 
-from openkat.models import LowerCaseCharField, Organization
+from openkat.models import LowerCaseCharField
 
 
 def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
@@ -93,28 +92,6 @@ class ManagerWithGenericObjectForeignKey(Manager):
         )
 
 
-class ScanLevel(XTDBModel):
-    # TODO: On_delete should be CASCADE or PROTECT, but deletion tests will then
-    # fail because XTDB does not know the table if we haven't inserted anything
-    # yet.
-    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
-    scan_level: models.IntegerField = models.IntegerField(
-        default=0, validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)]
-    )
-    declared: models.BooleanField = models.BooleanField(default=False)
-    last_changed_by: models.PositiveBigIntegerField = models.PositiveBigIntegerField(null=True, blank=True)
-
-    object_type: LowerCaseCharField = LowerCaseCharField()
-    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-    objects = ManagerWithGenericObjectForeignKey()
-
-    class Meta:
-        managed = False
-
-    def __str__(self) -> str:
-        return str(self.pk)
-
-
 class FindingType(XTDBModel):
     code = models.CharField()
     score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
@@ -137,6 +114,10 @@ class Finding(XTDBModel):
 
 class Network(Asset):
     name: LowerCaseCharField = LowerCaseCharField()
+    scan_level: models.IntegerField = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
+    )
+    declared: models.BooleanField = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
@@ -145,6 +126,10 @@ class Network(Asset):
 class IPAddress(Asset):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.CASCADE)
     address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True)
+    scan_level: models.IntegerField = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
+    )
+    declared: models.BooleanField = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.address
@@ -193,6 +178,10 @@ class Hostname(Asset):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.CASCADE)
     name: LowerCaseCharField = LowerCaseCharField()
     root: models.BooleanField = models.BooleanField(default=False)
+    scan_level: models.IntegerField = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
+    )
+    declared: models.BooleanField = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         if self.name is None:  # TODO: fix, this  can happen for some reason...
@@ -355,15 +344,3 @@ def bulk_insert(objects: Sequence[models.Model]) -> None:
         ):
             while data := fp.read():
                 copy.write(data)
-
-
-def filter_min_scan_level(qs: QuerySet, scan_level: int) -> RawQuerySet:
-    return qs.raw(
-        f"""
-        SELECT DISTINCT model.*
-        FROM {qs.model._meta.db_table} model
-        JOIN {ScanLevel._meta.db_table} sl
-        ON sl."object_id" = model."_id"
-        WHERE sl.scan_level >= %s""",  # noqa: S608
-        (scan_level,),
-    )

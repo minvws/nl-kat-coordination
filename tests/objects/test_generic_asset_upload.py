@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from objects.models import Hostname, IPAddress, Network, ScanLevel
+from objects.models import Hostname, IPAddress, Network
 from objects.views import GenericAssetCreateView, GenericAssetCSVUploadView, is_valid_ip
 from tests.conftest import setup_request
 
@@ -45,10 +45,7 @@ def test_generic_asset_csv_upload_basic(rf, superuser_member, xtdb):
 
 
 def test_generic_asset_csv_upload_with_scan_level(rf, superuser_member, xtdb):
-    organization = superuser_member.organization
-    org_code = organization.code
-
-    csv_content = f"192.168.1.1,2,{org_code}\nexample.com,3,{org_code}".encode()
+    csv_content = b"192.168.1.1,2\nexample.com,3"
     csv_file = BytesIO(csv_content)
     csv_file.name = "assets.csv"
 
@@ -63,15 +60,11 @@ def test_generic_asset_csv_upload_with_scan_level(rf, superuser_member, xtdb):
     ip = IPAddress.objects.first()
     hostname = Hostname.objects.first()
 
-    scan_level_ip = ScanLevel.objects.get(object_id=ip.id, object_type="ipaddress", organization=organization)
-    assert scan_level_ip.scan_level == 2
-    assert scan_level_ip.declared is True
+    assert ip.scan_level == 2
+    assert ip.declared is True
 
-    scan_level_hostname = ScanLevel.objects.get(
-        object_id=hostname.id, object_type="hostname", organization=organization
-    )
-    assert scan_level_hostname.scan_level == 3
-    assert scan_level_hostname.declared is True
+    assert hostname.scan_level == 3
+    assert hostname.declared is True
 
 
 def test_generic_asset_csv_upload_ipv6(rf, superuser_member, xtdb):

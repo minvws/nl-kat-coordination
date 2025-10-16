@@ -11,17 +11,7 @@ from djangoql.queryset import apply_search
 from redis.exceptions import LockError  # type: ignore
 
 from files.models import File
-from objects.models import (
-    DNSAAAARecord,
-    DNSARecord,
-    DNSCNAMERecord,
-    DNSNSRecord,
-    Hostname,
-    IPAddress,
-    ScanLevel,
-    bulk_insert,
-    filter_min_scan_level,
-)
+from objects.models import DNSAAAARecord, DNSARecord, DNSCNAMERecord, DNSNSRecord, Hostname, IPAddress
 from openkat.models import Organization
 from plugins.models import BusinessRule, Plugin
 from plugins.plugins.business_rules import run_rules
@@ -60,201 +50,107 @@ def schedule_business_rule_recalculations():
         logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")
 
 
-def recalculate_scan_levels() -> list[ScanLevel]:
+def recalculate_scan_levels():
     """
-    These are the currently implemented rules for Scan Profile:
-      - For all DNSRecords, the hostname field has max_inherit_scan_level=2
-      - For all DNSMXRecords, the mail_server field has max_inherit_scan_level=1
-      - For all DNSNSRecords, the name_server field has max_issue_scan_level=1
-      - For all DNSCNAMERecords, the hostname field has max issue/inherit=4
-      - Through ResolvedHostname, ip addresses get the same level as the hostname
-      - For IPPort the address field has max_inherit_scan_level=4 -> makes no sense: we can take the address's level
-      - TODO: For IPAddress the netblock field has max_inherit_scan_level=4 -> same as above
-
-      But there are no plugins that scan dns records. So, we could simplify this by implementing these rules:
-      - For DNSArecords, take the max of the ip's scan level and hostname's scan level
-      - For DNSNSrecords, set the target's scan level to the hostname's scan level, with a max of 1
+    Recalculate scan levels based on DNS relationships:
+      - For DNSArecords, sync hostname scan level with IP address scan level (bidirectional)
+      - For DNSNSrecords, set the name server's scan level to the hostname's scan level, with a max of 1
       - For DNSCNAMERecords, set the target's scan level to the hostname's scan level
 
-      This reduces the number of queries from 10 to 4 and requires less recursive iterations. Note that MX records are
-      a "sink" in the sense that they do not issue scan levels, but are also not a scan target, so we can skip them.
+    These updates respect the 'declared' flag - only non-declared scan levels are updated.
     """
     logger.info("Recalculating Scan Profiles...")
-    updates: list[ScanLevel] = []
 
     # These could create an endless chain, but we just rely on multiple iterations to resolve this.
-    updates.extend(sync_cname_scan_levels())
-    updates.extend(sync_ns_scan_levels())
-    updates.extend(sync_hostname_ip_scan_levels(DNSARecord._meta.db_table))
-    updates.extend(sync_hostname_ip_scan_levels(DNSAAAARecord._meta.db_table))
+    sync_cname_scan_levels()
+    sync_ns_scan_levels()
+    sync_hostname_ip_scan_levels(DNSARecord._meta.db_table)
+    sync_hostname_ip_scan_levels(DNSAAAARecord._meta.db_table)
 
-    if updates:
-        logger.info("Found %s updates", len(updates))
-
-    bulk_insert(updates)
-    logger.info("Recalculated %s Scan Profiles", len(updates))
-
-    return updates
+    logger.info("Recalculated Scan Profiles")
 
 
-def sync_hostname_ip_scan_levels(db_table: str) -> list[ScanLevel]:
-    # TODO: test multiple a records with same ip addresses and hostnames
-
+def sync_hostname_ip_scan_levels(db_table: str) -> None:
+    """
+    Synchronize scan levels between hostnames and IP addresses based on DNS A/AAAA records.
+    Returns the number of objects updated.
+    """
     try:
         with connections["xtdb"].cursor() as cursor:
-            # Do hostname -> ip and ip -> hostname at the same time, based on the highest scan level.
+            # Update IPs where hostname has higher scan level and IP is not declared
             cursor.execute(
-                f"""SELECT
-                CASE
-                    WHEN host_level.scan_level IS NULL or ip_level.scan_level IS NULL THEN NULL
-                    WHEN host_level.scan_level > ip_level.scan_level THEN ip_level._id
-                    WHEN ip_level.scan_level > host_level.scan_level THEN host_level._id
-                END AS id,
-                CASE
-                    WHEN host_level.scan_level IS NULL THEN hostname._id
-                    WHEN ip_level.scan_level IS NULL THEN ip._id
-                    WHEN host_level.scan_level > ip_level.scan_level THEN ip._id
-                    WHEN host_level.scan_level < ip_level.scan_level THEN hostname._id
-                END AS object_id,
-                CASE
-                    WHEN host_level.scan_level IS NULL THEN 'hostname'
-                    WHEN ip_level.scan_level IS NULL THEN 'ipaddress'
-                    WHEN host_level.scan_level > ip_level.scan_level THEN 'ipaddress'
-                    WHEN host_level.scan_level < ip_level.scan_level THEN 'hostname'
-                END AS object_type,
-                COALESCE(
-                    GREATEST(host_level.scan_level, ip_level.scan_level),
-                    host_level.scan_level,
-                    ip_level.scan_level
-                ) AS scan_level,
-                FALSE AS declared,
-                COALESCE(host_level.organization_id, ip_level.organization_id) as organization_id,
-                NULL AS last_changed_by
-            FROM {db_table} dns
-                JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.hostname_id
-                LEFT JOIN {ScanLevel._meta.db_table} host_level ON host_level.object_id = hostname._id
-                JOIN {IPAddress._meta.db_table} ip ON ip._id = dns.ip_address_id
-                LEFT JOIN {ScanLevel._meta.db_table} ip_level ON ip_level.object_id = ip._id
-            WHERE
-                (
-                    (host_level._id IS NULL OR host_level.declared is FALSE)
-                    AND (ip_level._id IS NULL OR ip_level.declared is FALSE)
-                ) AND
-                (
-                    (
-                        host_level.scan_level IS NOT NULL
-                        AND ip_level.scan_level IS NOT NULL
-                        AND ip_level.scan_level != host_level.scan_level
-                        AND ip_level.organization_id = host_level.organization_id
-                    )
-                    OR
-                    (host_level.scan_level IS NOT NULL OR ip_level.scan_level IS NOT NULL)
+                f"""
+                INSERT INTO {IPAddress._meta.db_table} (_id, address, network_id, scan_level, declared)
+                select target._id, target.address, target.network_id, source.scan_level, false
+                FROM {Hostname._meta.db_table} source
+                JOIN {db_table} dns on source._id = dns.hostname_id
+                JOIN {IPAddress._meta.db_table}
+                target ON target._id = dns.ip_address_id
+                WHERE source.scan_level IS NOT NULL AND target.declared IS FALSE
+                AND (target.scan_level is null or target.scan_level < source.scan_level);
+                """  # noqa: S608
             )
-            """,  # noqa: S608
-                {},
+
+            # Update hostnames where IP has higher scan level and hostname is not declared
+            cursor.execute(
+                f"""
+                INSERT INTO {Hostname._meta.db_table} (_id, address, network_id, scan_level, declared)
+                select target._id, target.address, target.network_id, source.scan_level, false
+                FROM {IPAddress._meta.db_table} source
+                JOIN {db_table} dns on source._id = dns.ip_address_id
+                JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
+                WHERE source.scan_level IS NOT NULL AND target.declared IS FALSE
+                AND (target.scan_level is null or target.scan_level < source.scan_level);
+                """  # noqa: S608
             )
-            columns = [col[0] for col in cursor.description]
-            update_or_creates = []
-            for row in cursor.fetchall():
-                kwargs = dict(zip(columns, row))
-
-                if kwargs["object_id"] is None:
-                    continue
-                if kwargs["id"] is None:
-                    del kwargs["id"]
-                update_or_creates.append(ScanLevel(**kwargs))
-
-            return update_or_creates
     except OperationalError:
-        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
-        return []
+        logger.exception("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
 
 
-def sync_ns_scan_levels() -> list[ScanLevel]:
+def sync_ns_scan_levels() -> None:
+    """
+    Sync scan levels to name servers via NS records.
+    Name server scan level is set to the hostname's scan level, with a max of 1.
+    Returns the number of objects updated.
+    """
     try:
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(
-                f"""SELECT
-                    target_level._id AS id,
-                    target._id AS object_id,
-                    'hostname' AS object_type,
-                    LEAST(Max(hostname_level.scan_level), 1) AS scan_level,
-                    hostname_level.organization_id AS organization_id,
-                    FALSE AS declared,
-                    NULL AS last_changed_by
-                FROM {DNSNSRecord._meta.db_table} dns
-                    JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.hostname_id
-                    JOIN {ScanLevel._meta.db_table} hostname_level ON hostname_level.object_id = hostname._id
-                    JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
-                    LEFT JOIN {ScanLevel._meta.db_table} target_level ON (
-                        target_level.object_id = target._id
-                        AND target_level.organization_id = hostname_level.organization_id
-                    )
-                WHERE hostname_level.scan_level IS NOT NULL
-                AND (
-                    target_level._id IS NULL OR
-                    (target_level.declared IS FALSE AND target_level.scan_level != LEAST(hostname_level.scan_level, 1))
-                )
-            """,  # noqa: S608
-                {},
+                f"""
+                INSERT INTO {Hostname._meta.db_table} (_id, name, network_id, root, scan_level, declared)
+                select target._id, target.name, target.network_id, target.root, LEAST(source.scan_level, 1), false
+                FROM {Hostname._meta.db_table} source
+                JOIN {DNSNSRecord._meta.db_table} dns on source._id = dns.hostname_id
+                JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
+                WHERE source.scan_level IS NOT NULL AND target.declared IS FALSE
+                AND (target.scan_level is null or  target.scan_level != LEAST(source.scan_level, 1));
+                """  # noqa: S608
             )
-            columns = [col[0] for col in cursor.description]
-            update_or_creates = []
-            for row in cursor.fetchall():
-                kwargs = dict(zip(columns, row))
-
-                if kwargs["id"] is None:
-                    del kwargs["id"]
-                update_or_creates.append(ScanLevel(**kwargs))
-
-            return update_or_creates
     except OperationalError:
-        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
-        return []
+        logger.exception("Failed to perform NS scan level query")
 
 
-def sync_cname_scan_levels() -> list[ScanLevel]:
+def sync_cname_scan_levels() -> None:
+    """
+    Sync scan levels to CNAME targets.
+    Target hostname scan level is set to the max of all source hostname scan levels.
+    Returns the number of objects updated.
+    """
     try:
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(
-                f"""SELECT
-                target_level._id AS id,
-                target._id AS object_id,
-                'hostname' AS object_type,
-                Max(hostname_level.scan_level) AS scan_level,
-                hostname_level.organization_id AS organization_id,
-                FALSE AS declared,
-                NULL AS last_changed_by
-                FROM {DNSCNAMERecord._meta.db_table} dns
-                    JOIN {Hostname._meta.db_table} hostname ON hostname._id = dns.target_id
-                    JOIN {ScanLevel._meta.db_table} hostname_level ON hostname_level.object_id = hostname._id
-                    JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
-                    LEFT JOIN {ScanLevel._meta.db_table} target_level ON (
-                        target_level.object_id = target._id
-                        AND target_level.organization_id = hostname_level.organization_id
-                    )
-                WHERE hostname_level.scan_level IS NOT NULL
-                AND (
-                    target_level._id IS NULL
-                    OR (target_level.declared IS FALSE AND hostname_level.scan_level != target_level.scan_level)
-                )""",  # noqa: S608
-                {},
+                f"""
+                INSERT INTO {Hostname._meta.db_table} (_id, name, network_id, root, scan_level, declared)
+                select target._id, target.name, target.network_id, target.root, source.scan_level, false
+                FROM {Hostname._meta.db_table} source
+                JOIN {DNSCNAMERecord._meta.db_table} dns on source._id = dns.target_id
+                JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
+                WHERE source.scan_level IS NOT NULL AND target.declared IS FALSE
+                AND target.scan_level is null or  target.scan_level != source.scan_level;
+                """  # noqa: S608
             )
-            columns = [col[0] for col in cursor.description]
-            update_or_creates = []
-            for row in cursor.fetchall():
-                kwargs = dict(zip(columns, row))
-
-                if kwargs["object_id"] is None:
-                    continue
-                if kwargs["id"] is None:
-                    del kwargs["id"]
-                update_or_creates.append(ScanLevel(**kwargs))
-
-            return update_or_creates
     except OperationalError:
-        logger.error("Failed to perform scan level query", parent_model=Hostname, child_model=IPAddress)
-        return []
+        logger.exception("Failed to perform CNAME scan level query")
 
 
 @app.task(queue=settings.QUEUE_NAME_SCHEDULE)
@@ -304,14 +200,12 @@ def run_schedule_for_organization(
         # Dynamic mode: query objects of the specified type, optionally filtered by query,
         # then filter by scan level
         model_class = schedule.object_set.object_type.model_class()
-        model_qs = model_class.objects.all()
+        model_qs = model_class.objects.filter(scan_level__gte=schedule.plugin.scan_level)
 
         if schedule.object_set.object_query:
             model_qs = apply_search(model_qs, schedule.object_set.object_query)
 
-        model_all = {str(model) for model in model_qs}
-        raw_all = {str(model) for model in filter_min_scan_level(model_qs, schedule.plugin.scan_level)}
-        input_data = input_data.union(model_all.intersection(raw_all))
+        input_data = {str(model) for model in model_qs}
     else:
         # Non-dynamic mode: use traverse_objects to get manually added objects,
         # objects from queries, and objects from subsets

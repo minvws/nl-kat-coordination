@@ -18,7 +18,6 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
-    ScanLevel,
 )
 
 
@@ -93,12 +92,6 @@ class HostnameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hostname
-        exclude = ["_valid_from"]
-
-
-class ScanLevelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ScanLevel
         exclude = ["_valid_from"]
 
 

@@ -21,22 +21,18 @@ from objects.views import (
     HostnameDeleteView,
     HostnameDetailView,
     HostnameListView,
-    HostnameScanLevelAddView,
     HostnameScanLevelUpdateView,
     IPAddressCreateView,
     IPAddressCSVUploadView,
     IPAddressDeleteView,
     IPAddressDetailView,
     IPAddressListView,
-    IPAddressScanLevelAddView,
     IPAddressScanLevelUpdateView,
     NetworkCreateView,
     NetworkDeleteView,
     NetworkDetailView,
     NetworkListView,
-    NetworkScanLevelAddView,
     NetworkScanLevelUpdateView,
-    ScanLevelDeleteView,
 )
 from objects.viewsets import (
     DNSAAAARecordViewSet,
@@ -90,9 +86,8 @@ urlpatterns = [
     path("objects/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
     path("objects/network/add/", NetworkCreateView.as_view(), name="add_network"),
     path("objects/network/<int:pk>/delete/", NetworkDeleteView.as_view(), name="delete_network"),
-    path("objects/network/<int:pk>/add-scan-level/", NetworkScanLevelAddView.as_view(), name="add_network_scan_level"),
     path(
-        "objects/network/<int:pk>/update-scan-level/<int:organization_id>/",
+        "objects/network/<int:pk>/update-scan-level/",
         NetworkScanLevelUpdateView.as_view(),
         name="update_network_scan_level",
     ),
@@ -102,12 +97,7 @@ urlpatterns = [
     path("objects/ipaddress/upload-csv/", IPAddressCSVUploadView.as_view(), name="ipaddress_csv_upload"),
     path("objects/ipaddress/<int:pk>/delete/", IPAddressDeleteView.as_view(), name="delete_ipaddress"),
     path(
-        "objects/ipaddress/<int:pk>/add-scan-level/",
-        IPAddressScanLevelAddView.as_view(),
-        name="add_ipaddress_scan_level",
-    ),
-    path(
-        "objects/ipaddress/<int:pk>/update-scan-level/<int:organization_id>/",
+        "objects/ipaddress/<int:pk>/update-scan-level/",
         IPAddressScanLevelUpdateView.as_view(),
         name="update_ipaddress_scan_level",
     ),
@@ -117,10 +107,7 @@ urlpatterns = [
     path("objects/hostname/upload-csv/", HostnameCSVUploadView.as_view(), name="hostname_csv_upload"),
     path("objects/hostname/<int:pk>/delete/", HostnameDeleteView.as_view(), name="delete_hostname"),
     path(
-        "objects/hostname/<int:pk>/add-scan-level/", HostnameScanLevelAddView.as_view(), name="add_hostname_scan_level"
-    ),
-    path(
-        "objects/hostname/<int:pk>/update-scan-level/<int:organization_id>/",
+        "objects/hostname/<int:pk>/update-scan-level/",
         HostnameScanLevelUpdateView.as_view(),
         name="update_hostname_scan_level",
     ),
@@ -134,6 +121,4 @@ urlpatterns = [
     path("objects/dnscaarecord/<int:pk>/delete/", DNSCAARecordDeleteView.as_view(), name="delete_dnscaarecord"),
     path("objects/dnstxtrecord/<int:pk>/delete/", DNSTXTRecordDeleteView.as_view(), name="delete_dnstxtrecord"),
     path("objects/dnssrvrecord/<int:pk>/delete/", DNSSRVRecordDeleteView.as_view(), name="delete_dnssrvrecord"),
-    # Scan level delete view
-    path("objects/scanlevel/<int:pk>/delete/", ScanLevelDeleteView.as_view(), name="delete_scanlevel"),
 ]
