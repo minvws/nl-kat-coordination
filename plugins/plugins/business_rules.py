@@ -11,6 +11,7 @@ from djangoql.schema import DjangoQLSchema, IntField
 from objects.models import (
     DNSAAAARecord,
     DNSCAARecord,
+    DNSMXRecord,
     DNSNSRecord,
     DNSTXTRecord,
     Finding,
@@ -59,13 +60,13 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-WEBSERVER-NO-IPV6'
-                    )
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     INNER JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                     LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     WHERE ns._id IS NULL
+                    AND f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-WEBSERVER-NO-IPV6'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-WEBSERVER-NO-IPV6",
@@ -89,12 +90,12 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-NAMESERVER-NO-IPV6'
-                    )
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     INNER JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     INNER JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
+                    WHERE f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-NAMESERVER-NO-IPV6'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-NAMESERVER-NO-IPV6",
@@ -121,15 +122,15 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-NAMESERVER-NO-TWO-IPV6'
-                    )
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     INNER JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                     INNER JOIN {Hostname._meta.db_table} nshost ON hns.name_server_id = nshost._id
                     INNER JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = nshost._id
                     LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     WHERE ns._id IS NULL
+                    AND f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-NAMESERVER-NO-TWO-IPV6'
+                    )
                     GROUP BY f._id
                     HAVING COUNT(DISTINCT dns._id) >= 2
                 );
@@ -158,10 +159,12 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON f.finding_type_id = ft._id AND ft.code = 'KAT-NO-SPF'
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     INNER JOIN {DNSTXTRecord._meta.db_table} dns ON h."_id" = dns."hostname_id"
                     WHERE dns."value"::text LIKE_REGEX 'v=spf1.*' FLAG 'i'
+                    AND f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-NO-SPF'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-NO-SPF",
@@ -184,15 +187,15 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-OPEN-SYSADMIN-PORT'
-                    )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.object_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
                         port.address_id = ip._id AND
                         port.port IN ({", ".join(str(x) for x in SA_TCP_PORTS)})
                     )
                     WHERE port._id IS NULL
+                    AND f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-OPEN-SYSADMIN-PORT'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-OPEN-SYSADMIN-PORT",
@@ -355,11 +358,11 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-NO-CAA'
-                    )
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     INNER JOIN {DNSCAARecord._meta.db_table} dns ON dns.hostname_id = h._id
+                    WHERE f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-NO-CAA'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-NO-CAA",
@@ -378,7 +381,7 @@ def get_rules():
                  ) h
                      LEFT JOIN {Hostname._meta.db_table} root_h ON
                 (root_h.network_id = h.network_id AND root_h.root = true
-                    AND (h.name = root_h.name OR h.name LIKE '%%.' || root_h.name))
+                    AND h.name LIKE '%%.' || root_h.name)
                      LEFT JOIN {DNSTXTRecord._meta.db_table} direct_dmarc ON
                 (
                     direct_dmarc.hostname_id = h._id
@@ -396,29 +399,33 @@ def get_rules():
             "inverse_query": f"""
                 DELETE FROM {Finding._meta.db_table}
                 WHERE _id IN (
-                    SELECT f._id
-                    FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-NO-DMARC'
-                    )
-                    INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
-                    LEFT JOIN {Hostname._meta.db_table} root_h ON (
-                        root_h.network_id = h.network_id
-                        AND root_h.root = true
-                        AND (h.name = root_h.name OR h.name LIKE '%%.' || root_h.name)
-                    )
-                    LEFT JOIN {DNSTXTRecord._meta.db_table} direct_dmarc ON (
-                        direct_dmarc.hostname_id = h._id
-                        AND direct_dmarc.prefix = '_dmarc'
-                        AND direct_dmarc.value LIKE_REGEX 'v=dmarc1.*' FLAG 'i'
-                    )
-                    LEFT JOIN {DNSTXTRecord._meta.db_table} root_dmarc ON (
-                        root_dmarc.hostname_id = root_h._id
-                        AND root_dmarc.prefix = '_dmarc'
-                        AND root_dmarc.value LIKE_REGEX 'v=dmarc1.*' FLAG 'i'
-                    )
-                    WHERE COALESCE(direct_dmarc._id, root_dmarc._id) IS NOT NULL
-                );
+                WITH mail_servers as (
+                    select h.* from {Hostname._meta.db_table} h
+                    INNER JOIN {DNSMXRecord._meta.db_table} mx on h._id = mx.mail_server_id
+                )
+                SELECT f._id
+                FROM {Finding._meta.db_table} f
+                INNER JOIN {FindingType._meta.db_table} ft ON (
+                    f.finding_type_id = ft._id AND ft.code = 'KAT-NO-DMARC'
+                )
+                INNER JOIN mail_servers h ON h._id = f.object_id
+                LEFT JOIN {Hostname._meta.db_table} root_h ON (
+                    root_h.network_id = h.network_id
+                    AND root_h.root = true
+                    AND h.name LIKE '%%.' || root_h.name
+                )
+                LEFT JOIN {DNSTXTRecord._meta.db_table} direct_dmarc ON (
+                    direct_dmarc.hostname_id = h._id
+                    AND direct_dmarc.prefix = '_dmarc'
+                    AND direct_dmarc.value LIKE_REGEX 'v=dmarc1.*' FLAG 'i'
+                )
+                LEFT JOIN {DNSTXTRecord._meta.db_table} root_dmarc ON (
+                    root_dmarc.hostname_id = root_h._id
+                    AND root_dmarc.prefix = '_dmarc'
+                    AND root_dmarc.value LIKE_REGEX 'v=dmarc1.*' FLAG 'i'
+                )
+                WHERE COALESCE(direct_dmarc._id, root_dmarc._id) IS NOT NULL
+            );
             """,  # noqa: S608
             "finding_type_code": "KAT-NO-DMARC",
         },
@@ -441,9 +448,6 @@ def get_rules():
                 WHERE _id IN (
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
-                    INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-DOMAIN-OWNERSHIP-PENDING'
-                    )
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                     LEFT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                     LEFT JOIN {Hostname._meta.db_table} nsh ON (
@@ -451,6 +455,9 @@ def get_rules():
                         nsh.name IN ({", ".join(f"'{x}'" for x in INDICATORS)})
                     )
                     WHERE nsh._id IS NULL
+                    AND f.finding_type_id = (
+                        select _id from {FindingType._meta.db_table} where code = 'KAT-DOMAIN-OWNERSHIP-PENDING'
+                    )
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-DOMAIN-OWNERSHIP-PENDING",

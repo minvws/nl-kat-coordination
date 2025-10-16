@@ -28,7 +28,9 @@ def schedule_scan_profile_recalculations():
         # Create a Lock to:
         #   1. Avoid running several recalculation scripts at the same time and burn down the database
         #   2. Still take into account that there might be anomalies when a large set of objects has been changed
-        with caches["default"].lock("recalculate_scan_levels", blocking=False):
+        with caches["default"].lock(
+            "recalculate_scan_levels", blocking=False, timeout=10 * settings.SCAN_LEVEL_RECALCULATION_INTERVAL
+        ):
             recalculate_scan_levels()
     except LockError:
         logger.warning("Scan level calculation is running, consider increasing SCAN_LEVEL_RECALCULATION_INTERVAL")
@@ -40,7 +42,9 @@ def schedule_business_rule_recalculations():
         # Create a Lock that lives for three times the settings.SCAN_LEVEL_RECALCULATION_INTERVAL at most, to:
         #   1. Avoid running several recalculation scripts at the same time and burn down the database
         #   2. Still take into account that there might be anomalies when a large set of objects has been changed
-        with caches["default"].lock("recalculate_business_rules", blocking=False):
+        with caches["default"].lock(
+            "recalculate_business_rules", blocking=False, timeout=10 * settings.BUSINESS_RULE_RECALCULATION_INTERVAL
+        ):
             run_rules(BusinessRule.objects.filter(enabled=True), False)
     except LockError:
         logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")

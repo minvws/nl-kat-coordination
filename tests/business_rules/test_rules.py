@@ -6,6 +6,7 @@ from objects.models import (
     CAATag,
     DNSAAAARecord,
     DNSCAARecord,
+    DNSMXRecord,
     DNSNSRecord,
     DNSTXTRecord,
     Finding,
@@ -442,7 +443,9 @@ def test_missing_caa_inverse_query(xtdb):
 def test_missing_dmarc_inverse_query(xtdb):
     """Test that inverse query removes findings when DMARC record is added"""
     network = Network.objects.create(name="test")
-    hn = Hostname.objects.create(network=network, name="test.com")
+    h = Hostname.objects.create(network=network, name="test.com")
+    hn = Hostname.objects.create(network=network, name="mx.test.com")
+    DNSMXRecord.objects.create(hostname=h, mail_server=hn)
 
     # Create finding type and finding
     finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-DMARC")
