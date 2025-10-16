@@ -1,11 +1,13 @@
+import json
 import logging
+from pathlib import Path
 
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
-from objects.models import Hostname, Network, object_type_by_name
+from objects.models import FindingType, Hostname, Network, object_type_by_name
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
 from plugins.models import BusinessRule
 from plugins.plugins.business_rules import get_rules
@@ -38,6 +40,7 @@ class Command(BaseCommand):
         self.setup_kat_groups()
         self.setup_group_permissions()
         self.seed_objects()
+        self.seed_finding_types()
         self.seed_business_rules()
         sync()
 
@@ -64,6 +67,32 @@ class Command(BaseCommand):
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.root_domain,
         )
+
+    def seed_finding_types(self):
+        # Find the finding_types.json file
+        base_dir = Path(__file__).resolve().parent.parent.parent.parent
+        finding_types_path = base_dir / "plugins" / "plugins" / "finding_types.json"
+
+        if not finding_types_path.exists():
+            self.stdout.write(self.style.WARNING(f"Finding types file not found at {finding_types_path}"))
+            return
+
+        with finding_types_path.open() as f:
+            finding_types_data = json.load(f)
+
+        for code, data in finding_types_data.items():
+            FindingType.objects.update_or_create(
+                code=code,
+                defaults={
+                    "name": data.get("name"),
+                    "description": data.get("description"),
+                    "source": data.get("source"),
+                    "risk": data.get("risk"),
+                    "impact": data.get("impact"),
+                    "recommendation": data.get("recommendation"),
+                    "score": None,  # Can be calculated from risk if needed
+                },
+            )
 
     def seed_business_rules(self):
         for rule_data in get_rules().values():

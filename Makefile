@@ -15,7 +15,8 @@ kat:
 
 up: build
 	docker compose up -d
-	$(exec) python manage.py createsuperuser --no-input || $(exec) python manage.py createsuperuser --no-input
+	sleep 2
+	$(exec) python manage.py createsuperuser --no-input || (sleep 2 && $(exec) python manage.py createsuperuser --no-input)
 	make init -j 4
 	make seed
 

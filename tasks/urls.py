@@ -12,6 +12,7 @@ from tasks.views import (
     ScheduleListView,
     ScheduleRunView,
     ScheduleUpdateView,
+    TaskCancelAllView,
     TaskCancelView,
     TaskCreateView,
     TaskDetailView,
@@ -22,6 +23,7 @@ from tasks.views import (
 urlpatterns = [
     path("tasks/", TaskListView.as_view(), name="task_list"),
     path("tasks/add/", TaskCreateView.as_view(), name="add_task"),
+    path("tasks/cancel-all/", TaskCancelAllView.as_view(), name="cancel_all_tasks"),
     path("tasks/<slug:pk>/", TaskDetailView.as_view(), name="task_detail"),
     path("tasks/<slug:task_id>/reschedule/", TaskRescheduleView.as_view(), name="reschedule_task"),
     path("tasks/<slug:task_id>/cancel/", TaskCancelView.as_view(), name="cancel_task"),
