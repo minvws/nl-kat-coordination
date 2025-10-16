@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div class="introduction">
+    <div>
+        <h1>{% translate "Objects" %}</h1>
+        <p>
+            {% blocktranslate trimmed %}
+                Page description. Add more information about this page.
+            {% endblocktranslate %}
+        </p>
+    </div>
+    {% if perms.openkat.add_ipaddress %}
+        <div class="horizontal-view toolbar">
+            <a class="button ghost" href="{% url "objects:generic_asset_create" %}"><span aria-hidden="true" class="icon ti-upload"></span>{% translate "Bulk Add Assets" %}</a>
+        </div>
+    {% endif %}
+</div>

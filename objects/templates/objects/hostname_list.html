@@ -8,19 +8,22 @@
 
     <main id="main-content">
         <section>
-            <div class="fifty-fifty">
+            {% include "objects/object_introduction.html" %}
+            {% include "objects/object_tabs.html" with view="hostnames" %}
+        
+            <div class="introduction">
                 <div>
-                    <h1>{% translate "Hostnames" %}</h1>
+                    <h2>{% translate "Hostnames" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Page description. Add more information about this page.
+                        {% endblocktranslate %}
+                    </p>
                 </div>
-            </div>
-            {% if perms.openkat.add_hostname %}
-                <div class="horizontal-view toolbar">
+                {% if perms.openkat.add_hostname %}
                     <a class="button ghost" href="{% url "objects:add_hostname" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add Hostname" %}</a>
-                    {% if perms.openkat.add_ipaddress %}
-                        <a class="button ghost" href="{% url "objects:generic_asset_create" %}"><span aria-hidden="true" class="icon ti-upload"></span>{% translate "Bulk Add Assets" %}</a>
-                    {% endif %}
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
