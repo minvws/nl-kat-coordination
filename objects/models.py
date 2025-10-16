@@ -94,8 +94,13 @@ class ManagerWithGenericObjectForeignKey(Manager):
 
 class FindingType(XTDBModel):
     code = models.CharField()
+    name = models.CharField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    source = models.CharField(null=True, blank=True)
+    risk = models.CharField(null=True, blank=True)
+    impact = models.TextField(null=True, blank=True)
+    recommendation = models.TextField(null=True, blank=True)
     score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
-    description = models.CharField(null=True)
 
     class Meta:
         managed = False
