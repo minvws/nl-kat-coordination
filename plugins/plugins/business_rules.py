@@ -11,7 +11,6 @@ from djangoql.schema import DjangoQLSchema, IntField
 from objects.models import (
     DNSAAAARecord,
     DNSCAARecord,
-    DNSMXRecord,
     DNSNSRecord,
     DNSTXTRecord,
     Finding,
@@ -399,16 +398,12 @@ def get_rules():
             "inverse_query": f"""
                 DELETE FROM {Finding._meta.db_table}
                 WHERE _id IN (
-                WITH mail_servers as (
-                    select h.* from {Hostname._meta.db_table} h
-                    INNER JOIN {DNSMXRecord._meta.db_table} mx on h._id = mx.mail_server_id
-                )
                 SELECT f._id
                 FROM {Finding._meta.db_table} f
                 INNER JOIN {FindingType._meta.db_table} ft ON (
                     f.finding_type_id = ft._id AND ft.code = 'KAT-NO-DMARC'
                 )
-                INNER JOIN mail_servers h ON h._id = f.object_id
+                INNER JOIN {Hostname._meta.db_table} h ON h._id = f.object_id
                 LEFT JOIN {Hostname._meta.db_table} root_h ON (
                     root_h.network_id = h.network_id
                     AND root_h.root = true
