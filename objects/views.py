@@ -14,6 +14,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django_filters.views import FilterView
+from djangoql.exceptions import DjangoQLParserError
+from djangoql.queryset import apply_search
 
 from objects.forms import (
     GenericAssetBulkCreateForm,
@@ -57,10 +59,12 @@ class NetworkFilter(django_filters.FilterSet):
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
+    declared = django_filters.BooleanFilter(label="Declared")
+    query = django_filters.CharFilter(label="Query", method="filter_by_query")
 
     class Meta:
         model = Network
-        fields = ["name", "object_set", "scan_level"]
+        fields = ["name", "object_set", "declared", "query", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -89,6 +93,15 @@ class NetworkFilter(django_filters.FilterSet):
                 q_objects |= Q(scan_level=level)
 
         return queryset.filter(q_objects)
+
+    def filter_by_query(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        try:
+            return apply_search(queryset, value)
+        except DjangoQLParserError:
+            return queryset
 
 
 class NetworkListView(OrganizationFilterMixin, FilterView):
@@ -309,10 +322,12 @@ class IPAddressFilter(django_filters.FilterSet):
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
+    declared = django_filters.BooleanFilter(label="Declared")
+    query = django_filters.CharFilter(label="Query", method="filter_by_query")
 
     class Meta:
         model = IPAddress
-        fields = ["address", "object_set", "scan_level"]
+        fields = ["address", "object_set", "declared", "query", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -342,6 +357,15 @@ class IPAddressFilter(django_filters.FilterSet):
                 q_objects |= Q(scan_level=level)
 
         return queryset.filter(q_objects)
+
+    def filter_by_query(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        try:
+            return apply_search(queryset, value)
+        except DjangoQLParserError:
+            return queryset
 
 
 class IPAddressListView(OrganizationFilterMixin, FilterView):
@@ -549,10 +573,12 @@ class HostnameFilter(django_filters.FilterSet):
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
+    declared = django_filters.BooleanFilter(label="Declared")
+    query = django_filters.CharFilter(label="Query", method="filter_by_query")
 
     class Meta:
         model = Hostname
-        fields = ["name", "object_set", "scan_level"]
+        fields = ["name", "object_set", "declared", "query", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -582,6 +608,15 @@ class HostnameFilter(django_filters.FilterSet):
                 q_objects |= Q(scan_level=level)
 
         return queryset.filter(q_objects)
+
+    def filter_by_query(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        try:
+            return apply_search(queryset, value)
+        except DjangoQLParserError:
+            return queryset
 
 
 class HostnameListView(OrganizationFilterMixin, FilterView):

@@ -45,7 +45,7 @@ class Command(BaseCommand):
         sync()
 
     def seed_objects(self):
-        Network.objects.get_or_create(name="internet")
+        Network.objects.get_or_create(name="internet", declared=True)
         ObjectSet.objects.get_or_create(
             name="mail_server",
             description="Mail servers are hostnames that have an MX record pointed to them.",
