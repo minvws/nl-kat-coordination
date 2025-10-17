@@ -21,7 +21,7 @@ from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import BusinessRule, Plugin, ScanLevel
 from tasks.models import Schedule, Task
-from tasks.tasks import run_business_rule
+from tasks.tasks import run_business_rules
 from tasks.views import TaskFilter
 
 
@@ -500,7 +500,7 @@ class BusinessRuleRunView(DetailView):
         self.object = self.get_object()
 
         # Trigger the business rule to run in the background
-        run_business_rule.delay(self.object.pk)
+        run_business_rules.delay([self.object.pk])
 
         messages.success(
             self.request,

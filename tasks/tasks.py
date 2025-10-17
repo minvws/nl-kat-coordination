@@ -37,7 +37,7 @@ def schedule_scan_profile_recalculations():
 
 
 @app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
-def schedule_business_rule_recalculations():
+def schedule_business_rule_recalculations(from_trigger: bool = False) -> None:
     try:
         # Create a Lock that lives for three times the settings.SCAN_LEVEL_RECALCULATION_INTERVAL at most, to:
         #   1. Avoid running several recalculation scripts at the same time and burn down the database
@@ -47,20 +47,28 @@ def schedule_business_rule_recalculations():
         ):
             run_rules(BusinessRule.objects.filter(enabled=True), False)
     except LockError:
-        logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")
+        if not from_trigger:
+            logger.warning(
+                "Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL"
+            )
+        else:
+            logger.debug(
+                "Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL"
+            )
 
 
 @app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
-def run_business_rule(business_rule_id: int) -> None:
-    try:
-        business_rule = BusinessRule.objects.get(pk=business_rule_id)
-        logger.info("Running business rule: %s", business_rule.name)
-        run_rules([business_rule], False)
-        logger.info("Completed business rule: %s", business_rule.name)
-    except BusinessRule.DoesNotExist:
-        logger.error("Business rule %s not found", business_rule_id)
-    except Exception:
-        logger.exception("Error running business rule %s", business_rule_id)
+def run_business_rules(business_rule_ids: list[int]) -> None:
+    for business_rule_id in business_rule_ids:
+        try:
+            business_rule = BusinessRule.objects.get(pk=business_rule_id)
+            logger.info("Running business rule: %s", business_rule.name)
+            run_rules([business_rule], False)
+            logger.info("Completed business rule: %s", business_rule.name)
+        except BusinessRule.DoesNotExist:
+            logger.error("Business rule %s not found", business_rule_id)
+        except Exception:
+            logger.exception("Error running business rule %s", business_rule_id)
 
 
 def recalculate_scan_levels():
