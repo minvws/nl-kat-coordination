@@ -158,16 +158,11 @@ def seed_groups(db):
     Group.objects.get_or_create(name=GROUP_ADMIN)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def cleanup_test_files():
-    original = settings.MEDIA_ROOT
-    settings.MEDIA_ROOT = original / "test"
-    settings.MEDIA_ROOT.mkdir(exist_ok=True, parents=True)
-
+@pytest.fixture(autouse=True)
+def cleanup_test_files(settings):
+    settings.MEDIA_ROOT = settings.MEDIA_ROOT / "test"
     yield
-
     shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-    settings.MEDIA_ROOT = original
 
 
 @pytest.fixture
