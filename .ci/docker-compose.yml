@@ -75,6 +75,8 @@ services:
     image: "ghcr.io/xtdb/xtdb:nightly-20250912"
     environment:
       - XTDB_LOGGING_LEVEL=DEBUG
+    ports:
+        - "127.0.0.1:5435:5432"
 
   redis:
     restart: on-failure
