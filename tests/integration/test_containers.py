@@ -14,7 +14,6 @@ def test_hello_world():
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")
     assert "Hello from Docker!" in hello_world
-
     assert File.objects.count() == 0
 
     new_out = PluginRunner().run(plugin.plugin_id, None)

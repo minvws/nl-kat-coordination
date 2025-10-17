@@ -348,7 +348,7 @@ if USE_S3:
     AWS_S3_FILE_OVERWRITE = False
     STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / env.str("MEDIA_ROOT_PATH", "media")
 MEDIA_URL = "media/"
 
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False

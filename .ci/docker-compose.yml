@@ -22,7 +22,7 @@ services:
       args:
         ENVIRONMENT: dev
       target: dev
-    command: pytest -n 0 tests/integration
+    command: sh -c "sleep 1 && pytest -n 0 tests/integration"
     depends_on:
       - postgres
       - redis
@@ -33,7 +33,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HOST_MOUNT_DIR=${PWD}
-      - DATABASE_MIGRATION=true
+      - DATABASE_MIGRATION=false
     env_file:
       - .env.test
     networks:
@@ -56,7 +56,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HOST_MOUNT_DIR=${PWD}
-      - DATABASE_MIGRATION=false
+      - DATABASE_MIGRATION=true
+      - MEDIA_ROOT_PATH=media/test
     env_file:
       - .env.test
     networks:
@@ -96,6 +97,7 @@ networks:
         - subnet: 172.24.0.0/16
           gateway: 172.24.0.1
   plugins:
+    name: ci-openkat-plugin-network
     enable_ipv6: true
     ipam:
       config:
