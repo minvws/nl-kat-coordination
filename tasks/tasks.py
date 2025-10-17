@@ -1,3 +1,4 @@
+import time
 import uuid
 from datetime import UTC, datetime
 
@@ -45,6 +46,13 @@ def schedule_business_rule_recalculations(from_trigger: bool = False) -> None:
         with caches["default"].lock(
             "recalculate_business_rules", blocking=False, timeout=10 * settings.BUSINESS_RULE_RECALCULATION_INTERVAL
         ):
+            if from_trigger:
+                # If a plugin posts hostname updates, this task gets scheduled. But potentially that plugin also posts
+                # DNS updates 200ms later. If we run recalculations before that, we miss the DNS updates as the lock
+                # makes sure we skip later updates.
+                logger.info("Delaying recalculation to potentially fill a batch of updates in one run...")
+                time.sleep(5)
+
             run_rules(BusinessRule.objects.filter(enabled=True), False)
     except LockError:
         if not from_trigger:
