@@ -47,10 +47,9 @@ dependencies = [
     "opentelemetry-util-http",
     "structlog>=25.3.0,<26",
     "django-structlog>=9.1.1,<10",
-    "cron-descriptor>=1.4.5,<2",
+    "cron-descriptor>=2",
     "structlog>=25.3.0,<26",
     "django-structlog>=9.1.1,<10",
-    "cron-descriptor>=1.4.5,<2",
     "weasyprint>=66",
 ]
 
