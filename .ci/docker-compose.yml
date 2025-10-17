@@ -68,6 +68,8 @@ services:
     image: docker.io/library/postgres:15
     env_file:
       - .env.test
+    ports:
+      - "127.0.0.1:5434:5432"
 
   xtdb:
     image: "ghcr.io/xtdb/xtdb:nightly-20250912"
