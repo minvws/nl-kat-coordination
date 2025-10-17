@@ -12,12 +12,15 @@ from objects.models import (
     DNSMXRecord,
     DNSNSRecord,
     DNSTXTRecord,
+    Finding,
+    FindingType,
     Hostname,
     IPAddress,
     IPPort,
     Network,
     bulk_insert,
 )
+from plugins.plugins.business_rules import get_rules
 
 
 def generate(
@@ -32,6 +35,8 @@ def generate(
     list[DNSMXRecord],
     list[DNSTXTRecord],
     list[DNSCAARecord],
+    list[Finding],
+    list[FindingType],
 ]:
     network, created = Network.objects.get_or_create(name="internet")
     ips = []
@@ -44,6 +49,9 @@ def generate(
     mx_records = []
     txt_records = []
     caa_records = []
+    findings = []
+    finding_types = [FindingType(code=val["finding_type_code"]) for key, val in get_rules().items()]
+    by_code = {ft.code: ft for ft in finding_types}
 
     for i in range(N):
         # IPv4
@@ -54,10 +62,19 @@ def generate(
         )
         ips.append(ip)
 
+        # Hostname
+        hn = Hostname(network=network, name=f"test_{i}.com", scan_level=hostname_scan_level)
+        hostnames.append(hn)
+
         # IPv6 (every 5th host gets IPv6)
         if include_dns_records and i % 5 == 0:
             ipv6 = IPAddress(network=network, address=f"2001:db8:{i:04x}::{i:04x}", scan_level=ipaddress_scan_level)
             ips_v6.append(ipv6)
+            if i % 50 == 0:
+                finding = Finding(
+                    finding_type=by_code["KAT-WEBSERVER-NO-IPV6"], object_type="hostname", object_id=hn.pk
+                )
+                findings.append(finding)  # False finding
 
         # Ports
         http_port = IPPort(address=ip, protocol="TCP", port=80, service="http")
@@ -65,15 +82,29 @@ def generate(
         https_port = IPPort(address=ip, protocol="TCP", port=443, service="https")
         ports.append(https_port)
 
+        if i % 200 == 0:
+            finding = Finding(finding_type=by_code["KAT-OPEN-SYSADMIN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            findings.append(finding)  # False finding
+            finding = Finding(finding_type=by_code["KAT-OPEN-DATABASE-PORT"], object_type="ipaddress", object_id=ip.pk)
+            findings.append(finding)  # False finding
+            finding = Finding(finding_type=by_code["KAT-REMOTE-DESKTOP-PORT"], object_type="ipaddress", object_id=ip.pk)
+            findings.append(finding)  # False finding
+            finding = Finding(finding_type=by_code["KAT-UNCOMMON-OPEN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            findings.append(finding)  # False finding
+            finding = Finding(finding_type=by_code["KAT-COMMON-OPEN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            findings.append(finding)  # True finding
+            finding = Finding(finding_type=by_code["KAT-NO-DMARC"], object_type="hostname", object_id=hn.pk)
+            findings.append(finding)  # True finding
+            finding = Finding(
+                finding_type=by_code["KAT-DOMAIN-OWNERSHIP-PENDING"], object_type="hostname", object_id=hn.pk
+            )
+            findings.append(finding)  # False finding
+
         # Add some varied ports for business rule testing
         if i % 10 == 0:
             ports.append(IPPort(address=ip, protocol="TCP", port=22, service="ssh"))  # Sysadmin port
         if i % 15 == 0:
             ports.append(IPPort(address=ip, protocol="TCP", port=3306, service="mysql"))  # Database port
-
-        # Hostname
-        hn = Hostname(network=network, name=f"test_{i}.com", scan_level=hostname_scan_level)
-        hostnames.append(hn)
 
         # DNS A Record for every 2nd host
         if i % 2 == 0:
@@ -91,6 +122,15 @@ def generate(
                 ns_hostname = Hostname(network=network, name=f"ns{i}.test.com", scan_level=hostname_scan_level)
                 hostnames.append(ns_hostname)
                 ns_records.append(DNSNSRecord(hostname=hn, name_server=ns_hostname, ttl=300))
+                if i % 100 == 0:
+                    finding = Finding(
+                        finding_type=by_code["KAT-NAMESERVER-NO-IPV6"], object_type="hostname", object_id=ns_hostname.pk
+                    )
+                    findings.append(finding)  # False finding
+                    finding = Finding(
+                        finding_type=by_code["KAT-NAMESERVER-NO-TWO-IPV6"], object_type="hostname", object_id=hn.pk
+                    )
+                    findings.append(finding)
 
             # MX records for mail servers (every 10th)
             if i % 10 == 0 and i > 0:
@@ -102,14 +142,33 @@ def generate(
             if i % 7 == 0:
                 if i % 14 == 0:
                     txt_records.append(DNSTXTRecord(hostname=hn, value="v=spf1 include:_spf.example.com ~all", ttl=300))
+                    if i % 50 == 0:
+                        finding = Finding(finding_type=by_code["KAT-NO-SPF"], object_type="hostname", object_id=hn.pk)
+                        findings.append(finding)  # False finding
                 else:
                     txt_records.append(DNSTXTRecord(hostname=hn, value="v=DKIM1; k=rsa; p=...", ttl=300))
 
             # CAA records (every 25th)
             if i % 25 == 0:
+                if i % 200 == 0:
+                    finding = Finding(finding_type=by_code["KAT-NO-CAA"], object_type="hostname", object_id=hn.pk)
+                    findings.append(finding)  # False finding
+
                 caa_records.append(DNSCAARecord(hostname=hn, flags=0, tag="issue", value="letsencrypt.org", ttl=300))
 
-    return (hostnames, ips + ips_v6, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records)
+    return (
+        hostnames,
+        ips + ips_v6,
+        ports,
+        a_records,
+        aaaa_records,
+        ns_records,
+        mx_records,
+        txt_records,
+        caa_records,
+        findings,
+        finding_types,
+    )
 
 
 class Command(BaseCommand):
@@ -138,8 +197,8 @@ class Command(BaseCommand):
     ) -> None:
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 
-        hosts, ips, ports, arecords, aaaa_records, ns_records, mx_records, txt_records, caa_records = generate(
-            number_of_objects, hostname_scan_level, ipaddress_scan_level, include_dns
+        hosts, ips, ports, arecords, aaaa_records, ns_records, mx_records, txt_records, caa_records, findings, _ = (
+            generate(number_of_objects, hostname_scan_level, ipaddress_scan_level, include_dns)
         )
 
         self.stdout.write(self.style.SUCCESS("Loading hostnames..."))
@@ -170,5 +229,8 @@ class Command(BaseCommand):
             if caa_records:
                 self.stdout.write(self.style.SUCCESS("Loading DNSCAArecords..."))
                 bulk_insert(caa_records)
+
+        self.stdout.write(self.style.SUCCESS("Loading Findings..."))
+        bulk_insert(findings)
 
         self.stdout.write(self.style.SUCCESS("Done loading benchmark data"))

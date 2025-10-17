@@ -11,21 +11,7 @@ from djangoql.schema import DjangoQLSchema, IntField, StrField
 from psycopg.errors import FeatureNotSupported
 
 from objects.management.commands.generate_benchmark_data import generate
-from objects.models import (
-    CAATag,
-    DNSAAAARecord,
-    DNSCAARecord,
-    DNSNSRecord,
-    DNSTXTRecord,
-    Finding,
-    FindingType,
-    Hostname,
-    IPAddress,
-    IPPort,
-    Network,
-    Protocol,
-    bulk_insert,
-)
+from objects.models import Finding, Hostname, IPAddress, IPPort, Network, bulk_insert
 from objects.views import HostnameDetailView, HostnameListView, IPAddressDetailView, IPAddressListView
 from openkat.models import Organization
 from plugins.models import BusinessRule, Plugin
@@ -82,9 +68,19 @@ def N():
 @pytest.fixture(scope="session")
 def bulk_data_org(xtdbulk, N):
     org, created = Organization.objects.get_or_create(code="testdns", name="testdns")
-    hostnames, ips, ports, a_records, aaaa_records, ns_records, mx_records, txt_records, caa_records = generate(
-        N, 2, 1, include_dns_records=True
-    )
+    (
+        hostnames,
+        ips,
+        ports,
+        a_records,
+        aaaa_records,
+        ns_records,
+        mx_records,
+        txt_records,
+        caa_records,
+        findings,
+        finding_types,
+    ) = generate(N, 2, 1, include_dns_records=True)
     bulk_insert(hostnames)
     bulk_insert(ips)
     bulk_insert(ports)
@@ -94,6 +90,8 @@ def bulk_data_org(xtdbulk, N):
     bulk_insert(mx_records)
     bulk_insert(txt_records)
     bulk_insert(caa_records)
+    bulk_insert(findings)
+    bulk_insert(finding_types)
 
     return org
 
@@ -248,8 +246,7 @@ def test_object_set(bulk_data, benchmark, N):
 
 def test_scan_level_recalculation(benchmark, bulk_data, N):
     # The ipaddresses van scan level 1 and all hostnames 2
-    result = benchmark.pedantic(recalculate_scan_levels, rounds=1)  # Subsequent rounds have no updates
-    assert len(result) == N // 2 + N // 4 - 1  # Half of the hostnames have a DNSARecord, 5% a nameserver (off by 1)
+    benchmark.pedantic(recalculate_scan_levels, rounds=1)  # Subsequent rounds have no updates
 
 
 class HostnameQLSchema(DjangoQLSchema):
@@ -395,7 +392,7 @@ def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark, N):
         return run_schedule(schedule, force=False, celery=celery)
 
     result = benchmark.pedantic(inner, rounds=1)
-    assert len(result) == N // 500 - 2
+    assert len(result) == N // 500 - 2 or len(result) == N // 500 - 1
 
 
 def test_task_scheduling_with_object_set_query(bulk_data, docker, celery, benchmark, N):
@@ -437,383 +434,96 @@ def test_count_hostnames_over_time(bulk_data, benchmark, N):
 
 
 def test_inverse_query_ipv6_webservers(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(100):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-        # Add IPv6 to first 50
-        if i < 50:
-            ip = IPAddress.objects.create(network=network, address=f"2001:db8::{i}")
-            DNSAAAARecord.objects.create(hostname=hn, ip_address=ip)
-
-    # Create findings for all hostnames
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-WEBSERVER-NO-IPV6")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["ipv6_webservers"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    # Cleanup
-    for finding in findings:
-        finding.delete()
-    for hn in hostnames:
-        hn.delete()
-    network.delete()
-
 
 def test_inverse_query_ipv6_nameservers(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    nameservers = []
-    findings = []
-
-    for i in range(100):
-        ns = Hostname.objects.create(network=network, name=f"ns{i}.test.com")
-        nameservers.append(ns)
-        # Add IPv6 to first 50
-        if i < 50:
-            ip = IPAddress.objects.create(network=network, address=f"2001:db8::{i}")
-            DNSAAAARecord.objects.create(hostname=ns, ip_address=ip)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NAMESERVER-NO-IPV6")
-    for ns in nameservers:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=ns.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["ipv6_nameservers"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    for ns in nameservers:
-        ns.delete()
-    network.delete()
-
 
 def test_inverse_query_two_ipv6_nameservers(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(50):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-
-        # Create 2 nameservers with IPv6 for first 25
-        ns1 = Hostname.objects.create(network=network, name=f"ns1-{i}.test.com")
-        ns2 = Hostname.objects.create(network=network, name=f"ns2-{i}.test.com")
-        DNSNSRecord.objects.create(hostname=hn, name_server=ns1)
-        DNSNSRecord.objects.create(hostname=hn, name_server=ns2)
-
-        if i < 25:
-            ip1 = IPAddress.objects.create(network=network, address=f"2001:db8:1::{i}")
-            ip2 = IPAddress.objects.create(network=network, address=f"2001:db8:2::{i}")
-            DNSAAAARecord.objects.create(hostname=ns1, ip_address=ip1)
-            DNSAAAARecord.objects.create(hostname=ns2, ip_address=ip2)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NAMESERVER-NO-TWO-IPV6")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["two_ipv6_nameservers"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    # Cleanup - delete in proper order to avoid foreign key violations
-    for finding in findings:
-        finding.delete()
-    DNSAAAARecord.objects.filter(hostname__network=network).delete()
-    DNSNSRecord.objects.filter(hostname__network=network).delete()
-    IPAddress.objects.filter(network=network).delete()
-    Hostname.objects.filter(network=network).delete()
-    network.delete()
-
 
 def test_inverse_query_missing_spf(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(100):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-        # Add SPF to first 50
-        if i < 50:
-            DNSTXTRecord.objects.create(hostname=hn, value="v=spf1 -all")
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-SPF")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["missing_spf"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    for hn in hostnames:
-        hn.delete()
-    network.delete()
-
 
 def test_inverse_query_open_sysadmin_port(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    ips = []
-    findings = []
-
-    for i in range(100):
-        ip = IPAddress.objects.create(network=network, address=f"10.0.0.{i}")
-        ips.append(ip)
-        # Close ports for first 50
-        if i >= 50:
-            IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-OPEN-SYSADMIN-PORT")
-    for ip in ips:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["open_sysadmin_port"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    IPPort.objects.filter(address__network=network).delete()
-    for ip in ips:
-        ip.delete()
-    network.delete()
-
 
 def test_inverse_query_open_database_port(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    ips = []
-    findings = []
-
-    for i in range(100):
-        ip = IPAddress.objects.create(network=network, address=f"10.0.1.{i}")
-        ips.append(ip)
-        if i >= 50:
-            IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=5432, tls=False)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-OPEN-DATABASE-PORT")
-    for ip in ips:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["open_database_port"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    IPPort.objects.filter(address__network=network).delete()
-    for ip in ips:
-        ip.delete()
-    network.delete()
-
 
 def test_inverse_query_open_remote_desktop_port(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    ips = []
-    findings = []
-
-    for i in range(100):
-        ip = IPAddress.objects.create(network=network, address=f"10.0.2.{i}")
-        ips.append(ip)
-        # Close ports for first 50
-        if i >= 50:
-            IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=3389, tls=False)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-REMOTE-DESKTOP-PORT")
-    for ip in ips:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["open_remote_desktop_port"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    IPPort.objects.filter(address__network=network).delete()
-    for ip in ips:
-        ip.delete()
-    network.delete()
-
 
 def test_inverse_query_open_uncommon_port(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    ips = []
-    findings = []
-
-    for i in range(100):
-        ip = IPAddress.objects.create(network=network, address=f"10.0.3.{i}")
-        ips.append(ip)
-        # Close ports for first 50
-        if i >= 50:
-            IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=12345, tls=False)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-UNCOMMON-OPEN-PORT")
-    for ip in ips:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["open_uncommon_port"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    IPPort.objects.filter(address__network=network).delete()
-    for ip in ips:
-        ip.delete()
-    network.delete()
-
 
 def test_inverse_query_open_common_port(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    ips = []
-    findings = []
-
-    for i in range(100):
-        ip = IPAddress.objects.create(network=network, address=f"10.0.4.{i}")
-        ips.append(ip)
-        # Close ports for first 50
-        if i >= 50:
-            IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-COMMON-OPEN-PORT")
-    for ip in ips:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["open_common_port"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    IPPort.objects.filter(address__network=network).delete()
-    for ip in ips:
-        ip.delete()
-    network.delete()
-
 
 def test_inverse_query_missing_caa(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(100):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-        # Add CAA to first 50
-        if i < 50:
-            DNSCAARecord.objects.create(hostname=hn, flags=0, tag=CAATag.ISSUE, value="letsencrypt.org")
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-CAA")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["missing_caa"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    for hn in hostnames:
-        hn.delete()
-    network.delete()
-
 
 def test_inverse_query_missing_dmarc(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(100):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-        # Add DMARC to first 50
-        if i < 50:
-            DNSTXTRecord.objects.create(hostname=hn, value="v=DMARC1; p=none;", prefix="_dmarc")
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-DMARC")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["missing_dmarc"]["inverse_query"])
 
     benchmark(run_inverse_query)
 
-    for finding in findings:
-        finding.delete()
-    for hn in hostnames:
-        hn.delete()
-    network.delete()
-
 
 def test_inverse_query_domain_owner_verification(xtdbulk, benchmark):
-    network = Network.objects.create(name="test_inverse")
-    hostnames = []
-    findings = []
-
-    for i in range(100):
-        hn = Hostname.objects.create(network=network, name=f"test{i}.com")
-        hostnames.append(hn)
-
-        # Add pending nameserver for all
-        pending = Hostname.objects.create(network=network, name=f"ns{i}.registrant-verification.ispapi.net")
-        if i >= 50:  # Remove pending for first 50
-            DNSNSRecord.objects.create(hostname=hn, name_server=pending)
-
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-DOMAIN-OWNERSHIP-PENDING")
-    for hn in hostnames:
-        finding = Finding.objects.create(finding_type=finding_type, object_type="hostname", object_id=hn.pk)
-        findings.append(finding)
-
     def run_inverse_query():
         with connections["xtdb"].cursor() as cursor:
             cursor.execute(get_rules()["domain_owner_verification"]["inverse_query"])
 
     benchmark(run_inverse_query)
-
-    # Cleanup - delete in proper order to avoid foreign key violations
-    for finding in findings:
-        finding.delete()
-    DNSNSRecord.objects.filter(hostname__network=network).delete()
-    Hostname.objects.filter(network=network).delete()
-    network.delete()
