@@ -20,6 +20,7 @@ from openkat.mixins import OrganizationFilterMixin
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import BusinessRule, Plugin, ScanLevel
 from tasks.models import Task
+from tasks.tasks import run_business_rule
 from tasks.views import TaskFilter
 
 
@@ -325,6 +326,12 @@ class BusinessRuleCreateView(CreateView):
     def get_success_url(self) -> str:
         return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("business_rule_list"), "text": _("Business Rules")}]
+
+        return context
+
 
 class BusinessRuleUpdateView(UpdateView):
     model = BusinessRule
@@ -335,6 +342,12 @@ class BusinessRuleUpdateView(UpdateView):
 
     def get_success_url(self) -> str:
         return reverse("business_rule_detail", kwargs={"pk": self.object.pk})
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [{"url": reverse("business_rule_list"), "text": _("Business Rules")}]
+
+        return context
 
 
 class BusinessRuleDeleteView(DeleteView):
@@ -366,3 +379,29 @@ class BusinessRuleToggleView(UpdateView):
             return redirect_url
 
         return reverse_lazy("business_rule_list")
+
+
+class BusinessRuleRunView(DetailView):
+    object: BusinessRule
+    model = BusinessRule
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Trigger the business rule to run in the background
+        run_business_rule.delay(self.object.pk)
+
+        messages.success(
+            self.request,
+            _("Business rule '{}' has been queued for execution in the background.").format(self.object.name),
+        )
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        redirect_url = self.request.POST.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse("business_rule_detail", kwargs={"pk": self.object.pk})

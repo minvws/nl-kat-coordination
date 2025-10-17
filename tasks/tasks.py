@@ -50,6 +50,19 @@ def schedule_business_rule_recalculations():
         logger.warning("Business rule calculation is running, consider increasing BUSINESS_RULE_RECALCULATION_INTERVAL")
 
 
+@app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
+def run_business_rule(business_rule_id: int) -> None:
+    try:
+        business_rule = BusinessRule.objects.get(pk=business_rule_id)
+        logger.info("Running business rule: %s", business_rule.name)
+        run_rules([business_rule], False)
+        logger.info("Completed business rule: %s", business_rule.name)
+    except BusinessRule.DoesNotExist:
+        logger.error("Business rule %s not found", business_rule_id)
+    except Exception:
+        logger.exception("Error running business rule %s", business_rule_id)
+
+
 def recalculate_scan_levels():
     """
     Recalculate scan levels based on DNS relationships:

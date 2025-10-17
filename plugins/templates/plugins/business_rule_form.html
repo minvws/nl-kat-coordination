@@ -45,6 +45,12 @@
                     <p class="help-text">{% translate "DjangoQL query string" %}</p>
                 </div>
                 <div class="form-row">
+                    <label for="{{ form.inverse_query.id_for_label }}">{{ form.inverse_query.label }}:</label>
+                    {{ form.inverse_query }}
+                    {% if form.inverse_query.errors %}<span class="form-error">{{ form.inverse_query.errors }}</span>{% endif %}
+                    <p class="help-text">{% translate "SQL query to remove findings when conditions no longer match" %}</p>
+                </div>
+                <div class="form-row">
                     <label for="{{ form.finding_type_code.id_for_label }}">{{ form.finding_type_code.label }}:</label>
                     {{ form.finding_type_code }}
                     {% if form.finding_type_code.errors %}<span class="form-error">{{ form.finding_type_code.errors }}</span>{% endif %}

@@ -21,7 +21,7 @@
                     <a class="button ghost" href="{% url "add_business_rule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add business rule" %}</a>
                 </div>
             </div>
-             <div class="filter-container">
+            <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
                     {{ filter.form.as_p }}
@@ -38,8 +38,6 @@
                                 <th>{% translate "Object type" %}</th>
                                 <th>{% translate "Finding type" %}</th>
                                 <th>{% translate "Enabled" %}</th>
-                                <th>{% translate "Created" %}</th>
-                                <th>{% translate "Actions" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,17 +66,6 @@
                                                 {% endif %}
                                             </button>
                                         </form>
-                                    </td>
-                                    <td>{{ rule.created_at|date:"Y-m-d H:i" }}</td>
-                                    <td>
-                                        <div class="horizontal-view">
-                                            <a href="{% url "edit_business_rule" rule.pk %}"
-                                               class="icon ti-pencil action-button">{% translate "Edit" %}</a>
-                                            <form action="{% url 'delete_business_rule' rule.pk %}" method="post">
-                                                {% csrf_token %}
-                                                <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                            </form>
-                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
