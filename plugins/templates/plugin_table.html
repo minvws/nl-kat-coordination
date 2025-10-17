@@ -42,6 +42,7 @@
                               class="icon ti-{% if order_by == "scan_level" and sorting_order == "asc" %}chevron-up{% elif order_by == "scan_level" and sorting_order == "desc" %}chevron-down{% else %}direction{% endif %}"></span>
                     </button>
                 </th>
+                <th scope="col">{% translate "Schedule" %}</th>
                 <th scope="col">{% translate "Actions" %}</th>
             </tr>
         </thead>
@@ -81,6 +82,24 @@
                     <td>
                         {% include "scan_level_indicator.html" with value=plugin.scan_level %}
 
+                    </td>
+                    <td>
+                        {% if perms.openkat.add_enabledplugin %}
+                            <form action="{% url 'schedule_plugin' plugin.pk %}"
+                                  method="post"
+                                  class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
+                                {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                                {% if plugin.id in plugins_with_schedules %}
+                                    <input type="hidden" name="action" value="cancel">
+                                    <button type="submit" class="button ghost destructive">{% translate "Cancel" %}</button>
+                                {% else %}
+                                    <input type="hidden" name="action" value="schedule">
+                                    <button type="submit" class="button ghost">{% translate "Schedule" %}</button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
                     </td>
                     <td>
                         {% if plugin.consumed_types %}

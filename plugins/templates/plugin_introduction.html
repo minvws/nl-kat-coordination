@@ -17,6 +17,26 @@
             {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
         </div>
+        {% if perms.openkat.add_enabledplugin %}
+            <div class="horizontal-view">
+                <form action="{% url 'schedule_plugin' plugin.pk %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="current_url" value="{{ request.get_full_path }}">
+                    {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                    {% if has_schedules %}
+                        <input type="hidden" name="action" value="cancel">
+                        <button type="submit" class="button ghost destructive">
+                            <span aria-hidden="true" class="icon ti-calendar-x"></span>{% translate "Cancel" %}
+                        </button>
+                    {% else %}
+                        <input type="hidden" name="action" value="schedule">
+                        <button type="submit" class="button">
+                            <span aria-hidden="true" class="icon ti-calendar"></span>{% translate "Schedule" %}
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+        {% endif %}
     </div>
     <div class="image-square">
         <div class="image-container">

@@ -17,9 +17,10 @@ from djangoql.queryset import apply_search
 
 from objects.models import FindingType
 from openkat.mixins import OrganizationFilterMixin
+from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import BusinessRule, Plugin, ScanLevel
-from tasks.models import Task
+from tasks.models import Schedule, Task
 from tasks.tasks import run_business_rule
 from tasks.views import TaskFilter
 
@@ -68,10 +69,30 @@ class PluginListView(OrganizationFilterMixin, FilterView):
         context["sorting_order"] = self.request.GET.get("sorting_order", "asc")
         context["sorting_order_class"] = "ascending" if context["sorting_order"] == "asc" else "descending"
 
+        # Check which plugins have schedules for filtered organizations
+        organization_codes = self.request.GET.getlist("organization")
+        plugins_with_schedules = set()
+
+        if organization_codes:
+            organizations = Organization.objects.filter(code__in=organization_codes)
+            # Get all plugins that have schedules for these organizations
+            schedule_plugin_ids = (
+                Schedule.objects.filter(organization__in=organizations).values_list("plugin_id", flat=True).distinct()
+            )
+            plugins_with_schedules = set(schedule_plugin_ids)
+        else:
+            # Get all plugins that have global schedules
+            schedule_plugin_ids = (
+                Schedule.objects.filter(organization=None).values_list("plugin_id", flat=True).distinct()
+            )
+            plugins_with_schedules = set(schedule_plugin_ids)
+
+        context["plugins_with_schedules"] = plugins_with_schedules
+
         return context
 
 
-class PluginDetailView(DetailView):
+class PluginDetailView(OrganizationFilterMixin, DetailView):
     template_name = "plugin.html"
     model = Plugin
 
@@ -83,6 +104,17 @@ class PluginDetailView(DetailView):
             {"url": reverse("plugin_list"), "text": _("Plugins")},
             {"url": reverse("plugin_detail", kwargs={"pk": self.object.pk}), "text": _("Plugin details")},
         ]
+
+        # Check if schedules exist for filtered organizations
+        organization_codes = self.request.GET.getlist("organization")
+        if organization_codes:
+            organizations = Organization.objects.filter(code__in=organization_codes)
+            context["has_schedules"] = Schedule.objects.filter(
+                plugin=self.object, organization__in=organizations
+            ).exists()
+        else:
+            # Check for global schedules
+            context["has_schedules"] = Schedule.objects.filter(plugin=self.object, organization=None).exists()
 
         return context
 
@@ -221,6 +253,85 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
             return redirect_url
 
         return reverse_lazy("plugin_list")
+
+
+class PluginScheduleView(DetailView):
+    model = Plugin
+
+    object: Plugin
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Get filtered organizations from request
+        organization_codes = self.request.POST.getlist("organization")
+        action = self.request.POST.get("action", "schedule")
+
+        if action == "unschedule":
+            # Delete existing schedules
+            if organization_codes:
+                organizations = Organization.objects.filter(code__in=organization_codes)
+                deleted_count = Schedule.objects.filter(plugin=self.object, organization__in=organizations).delete()[0]
+
+                if len(organizations) == 1:
+                    messages.success(
+                        self.request,
+                        _("Plugin '{}' has been unscheduled for organization '{}'.").format(
+                            self.object.name, organizations[0].code
+                        ),
+                    )
+                else:
+                    messages.success(
+                        self.request,
+                        _("Plugin '{}' has been unscheduled for {} organizations ({} schedules deleted).").format(
+                            self.object.name, len(organizations), deleted_count
+                        ),
+                    )
+            else:
+                # Delete global schedules
+                deleted_count = Schedule.objects.filter(plugin=self.object, organization=None).delete()[0]
+                messages.success(
+                    self.request,
+                    _("Plugin '{}' has been unscheduled globally ({} schedules deleted).").format(
+                        self.object.name, deleted_count
+                    ),
+                )
+        else:
+            # Schedule the plugin
+            if organization_codes:
+                # Schedule for specific organizations
+                organizations = Organization.objects.filter(code__in=organization_codes)
+                for organization in organizations:
+                    self.object.schedule_for(organization)
+
+                if len(organizations) == 1:
+                    messages.success(
+                        self.request,
+                        _("Plugin '{}' has been scheduled for organization '{}'.").format(
+                            self.object.name, organizations[0].code
+                        ),
+                    )
+                else:
+                    messages.success(
+                        self.request,
+                        _("Plugin '{}' has been scheduled for {} organizations.").format(
+                            self.object.name, len(organizations)
+                        ),
+                    )
+            else:
+                # Schedule globally (for all organizations)
+                self.object.schedule()
+                messages.success(self.request, _("Plugin '{}' has been scheduled globally.").format(self.object.name))
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        redirect_url = self.request.POST.get("current_url")
+
+        if redirect_url and url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+            return redirect_url
+
+        return reverse("plugin_detail", kwargs={"pk": self.object.pk})
 
 
 class BusinessRuleFilter(django_filters.FilterSet):

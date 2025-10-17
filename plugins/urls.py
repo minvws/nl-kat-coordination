@@ -14,6 +14,7 @@ from plugins.views import (
     PluginIdDetailView,
     PluginListView,
     PluginScansDetailView,
+    PluginScheduleView,
     PluginUpdateView,
     PluginVariantsDetailView,
 )
@@ -26,6 +27,7 @@ urlpatterns = [
     path("plugins/<int:pk>/edit", PluginUpdateView.as_view(), name="update_plugin"),
     path("plugins/<int:pk>/scans", PluginScansDetailView.as_view(), name="plugin_detail_scans"),
     path("plugins/<int:pk>/variants", PluginVariantsDetailView.as_view(), name="plugin_detail_variants"),
+    path("plugins/<int:pk>/schedule/", PluginScheduleView.as_view(), name="schedule_plugin"),
     path("plugins/<slug:pk>/delete", PluginDeleteView.as_view(), name="delete_plugin"),
     # Business Rule views
     path("business-rules/", BusinessRuleListView.as_view(), name="business_rule_list"),
