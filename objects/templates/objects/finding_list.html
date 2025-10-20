@@ -36,10 +36,12 @@
                     <table class="nowrap">
                         <thead>
                             <tr>
+                                <th>{% translate "Severity" %}</th>
                                 <th>{% translate "Finding type" %}</th>
-                                <th>{% translate "Score" %}</th>
                                 <th>{% translate "Object" %}</th>
+                                <th>{% translate "Risk score" %}</th>
                                 <th>{% translate "Last seen" %}</th>
+                                <th>{% translate "Delete" %}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -47,11 +49,16 @@
                             {% for finding in findings %}
                                 <tr>
                                     <td>
+                                        <span class="{{ finding.finding_type.risk }}">{{ finding.finding_type.risk|capfirst }}</span>
+                                    </td>
+                                    <td>
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
                                     </td>
-                                    <td>{{ finding.finding_type.score|default:"-" }}</td>
                                     <td>
                                         <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
+                                    </td>
+                                    <td>
+                                        {{ finding.finding_type.score|default:"-" }}
                                     </td>
                                     <td>
                                         {% if finding.last_seen %}
@@ -66,7 +73,54 @@
                                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                                         </form>
                                     </td>
+                                    <td class="actions sticky-cell">
+                                        <button type="button"
+                                                class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    </td>
                                 </tr>
+                                <tr class="expando-row">
+                                        <td colspan="7">
+                                            <div>
+                                                <dl>
+                                                    <div>
+                                                        <dt>{% translate "Description" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.description }}
+                                                        </dd>
+                                                    </div>
+                                                    {% if finding.finding_type.recommendation %}
+                                                        <div>
+                                                            <dt>{% translate "Recommendation" %}</dt>
+                                                            <dd>
+                                                                {{ finding.finding_type.recommendation }}
+                                                            </dd>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if finding.finding_type.impact %}
+                                                        <div>
+                                                            <dt>{% translate "Impact" %}</dt>
+                                                            <dd>
+                                                                {{ finding.finding_type.impact }}
+                                                            </dd>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if finding.finding_type.source %}
+                                                        <div>
+                                                            <dt>{% translate "Source" %}</dt>
+                                                            <dd>
+                                                                {{ finding.finding_type.source }}
+                                                            </dd>
+                                                        </div>
+                                                    {% endif %}
+                                                </dl>
+                                            </div>
+                                        </td>
+                                    </tr>
                             {% endfor %}
                         </tbody>
                     </table>
