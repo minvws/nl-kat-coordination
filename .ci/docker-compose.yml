@@ -76,7 +76,7 @@ services:
     environment:
       - XTDB_LOGGING_LEVEL=DEBUG
     ports:
-        - "127.0.0.1:5435:5432"
+      - "127.0.0.1:5435:5432"
 
   redis:
     restart: on-failure
