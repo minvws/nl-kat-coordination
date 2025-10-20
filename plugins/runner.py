@@ -225,7 +225,7 @@ class PluginRunner:
             tmp_file.delete()
 
         if exit_status != 0:
-            raise ContainerError(container, exit_status, command, container.image, stderr_out.decode())
+            raise ContainerError(container, exit_status, command, str(container.image), stderr_out.decode())
 
         signal.signal(signal.SIGTERM, original_handler)
 
