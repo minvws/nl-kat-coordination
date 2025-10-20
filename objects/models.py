@@ -1,6 +1,7 @@
 import tempfile
 from collections.abc import Sequence
 from enum import Enum
+from functools import total_ordering
 from typing import cast
 
 from django.apps import apps
@@ -349,3 +350,32 @@ def bulk_insert(objects: Sequence[models.Model]) -> None:
         ):
             while data := fp.read():
                 copy.write(data)
+
+
+severity_order = ["recommendation", "low", "medium", "high", "critical"]
+
+
+@total_ordering
+class RiskLevelSeverity(Enum):
+    """Represents the risk level severity of findings"""
+
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    RECOMMENDATION = "recommendation"
+
+    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+        return severity_order.index(self.value) > severity_order.index(other.value)
+
+    def __str__(self) -> str:
+        return self.value
+
+
+SEVERITY_SCORE_LOOKUP = {
+    RiskLevelSeverity.CRITICAL.value: 10.0,
+    RiskLevelSeverity.HIGH.value: 8.9,
+    RiskLevelSeverity.MEDIUM.value: 6.9,
+    RiskLevelSeverity.LOW.value: 3.9,
+    RiskLevelSeverity.RECOMMENDATION.value: 0.0,
+}

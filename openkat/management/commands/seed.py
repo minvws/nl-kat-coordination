@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
-from objects.models import FindingType, Hostname, Network, object_type_by_name
+from objects.models import SEVERITY_SCORE_LOOKUP, FindingType, Hostname, Network, object_type_by_name
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
 from plugins.models import BusinessRule
 from plugins.plugins.business_rules import get_rules
@@ -69,7 +69,6 @@ class Command(BaseCommand):
         )
 
     def seed_finding_types(self):
-        # Find the finding_types.json file
         base_dir = Path(__file__).resolve().parent.parent.parent.parent
         finding_types_path = base_dir / "plugins" / "plugins" / "finding_types.json"
 
@@ -90,7 +89,7 @@ class Command(BaseCommand):
                     "risk": data.get("risk"),
                     "impact": data.get("impact"),
                     "recommendation": data.get("recommendation"),
-                    "score": None,  # Can be calculated from risk if needed
+                    "score": SEVERITY_SCORE_LOOKUP.get(data.get("risk", "").lower()),
                 },
             )
 
