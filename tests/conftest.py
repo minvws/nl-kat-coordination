@@ -353,8 +353,8 @@ def pytest_collection_modifyitems(items):
             item.add_marker(pytest.mark.django_db(databases=["xtdb", "default"]))
 
 
-@pytest.fixture(scope="function")
-def xtdb(request: pytest.FixtureRequest):
+@pytest.fixture
+def xtdb(request: pytest.FixtureRequest, mocker):
     """
     Make sure openkat-test-api and openkat_integration in .ci/docker-compose.yml use the same database:
     Since openkat_integration calls pytest, it creates a test database by default within ci_postgres, where the
@@ -387,7 +387,8 @@ def xtdb(request: pytest.FixtureRequest):
     with contextlib.suppress(FeatureNotSupported):
         con.ops.execute_sql_flush(erase)
 
-    yield
+    with mocker.patch("openkat.signals.schedule_business_rule_recalculations"):  # disable this signal
+        yield
 
     con.ops.execute_sql_flush(erase)
 
