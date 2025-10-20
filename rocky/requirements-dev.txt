@@ -788,9 +788,9 @@ pathspec==0.12.1 \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
     --hash=sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712
     # via djlint
-phonenumbers==9.0.9 \
-    --hash=sha256:13b91aa153f87675902829b38a556bad54824f9c121b89588bbb5fa8550d97ef \
-    --hash=sha256:c640545019a07e68b0bea57a5fede6eef45c7391165d28935f45615f9a567a5b
+phonenumbers==9.0.16 \
+    --hash=sha256:3c019f10305c311005672f3a0cea4139fef0b949319a60635ee803cfaef4a2e2 \
+    --hash=sha256:4002542d987c453b333b54450a9f60a280ed7ec932afd7d5fa8dbe6c2379f10a
     # via rocky
 pillow==11.3.0 \
     --hash=sha256:023f6d2d11784a465f09fd09a34b150ea4672e85fb3d05931d89f373ab14abb2 \
