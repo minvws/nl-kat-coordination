@@ -1,8 +1,12 @@
 {
-  "plugin_id": "parse-rpki",
-  "name": "RPKI Parser",
+  "plugin_id": "rpki",
+  "name": "RPKI",
   "description": "Parses RPKI data into findings.",
-  "consumes": [],
+  "consumes": [
+    "type:ipaddress"
+  ],
+  "batch_size": 500,
+  "scan_level": 1,
   "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
   "oci_arguments": [
     "uv",

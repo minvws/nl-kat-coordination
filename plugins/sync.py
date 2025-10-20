@@ -18,6 +18,7 @@ class NewPlugin(BaseModel):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     recurrences: str | None = None
+    batch_size: int | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)
     version: str | None = None
@@ -70,6 +71,7 @@ def sync() -> list[Plugin]:
             description=definition.get("description"),
             consumes=definition.get("consumes", []),
             recurrences=definition.get("recurrences"),
+            batch_size=definition.get("batch_size"),
             oci_image=definition.get("oci_image"),
             oci_arguments=definition.get("oci_arguments", []),
             version=definition.get("version"),
@@ -85,6 +87,7 @@ def sync() -> list[Plugin]:
             description=parsed_plugin.description,
             consumes=list(parsed_plugin.consumes),
             recurrences=parsed_plugin.recurrences,
+            batch_size=parsed_plugin.batch_size,
             oci_image=parsed_plugin.oci_image,
             oci_arguments=parsed_plugin.oci_arguments,
             version=parsed_plugin.version,
@@ -101,6 +104,7 @@ def sync() -> list[Plugin]:
             "scan_level",
             "consumes",
             "recurrences",
+            "batch_size",
             "oci_image",
             "oci_arguments",
             "version",
