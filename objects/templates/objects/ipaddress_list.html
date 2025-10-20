@@ -10,14 +10,10 @@
         <section>
             {% include "objects/object_introduction.html" %}
             {% include "objects/object_tabs.html" with view="ipaddresses" %}
+
             <div class="introduction">
                 <div>
                     <h2>{% translate "IP addresses" %}</h2>
-                    <p>
-                        {% blocktranslate trimmed %}
-                            Page description. Add more information about this page.
-                        {% endblocktranslate %}
-                    </p>
                 </div>
                 {% if perms.openkat.add_ipaddress %}
                     <div class="horizontal-view toolbar">

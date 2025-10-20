@@ -10,14 +10,10 @@
         <section>
             {% include "objects/object_introduction.html" %}
             {% include "objects/object_tabs.html" with view="networks" %}
+
             <div class="introduction">
                 <div>
                     <h2>{% translate "Networks" %}</h2>
-                    <p>
-                        {% blocktranslate trimmed %}
-                            Page description. Add more information about this page.
-                        {% endblocktranslate %}
-                    </p>
                 </div>
                 {% if perms.openkat.add_network %}
                     <div class="horizontal-view toolbar">
