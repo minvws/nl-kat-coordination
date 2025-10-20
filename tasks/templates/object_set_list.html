@@ -10,21 +10,6 @@
         <section>
             {% include "objects/object_introduction.html" %}
             {% include "objects/object_tabs.html" with view="object_sets" %}
-            <div class="introduction">
-                <div>
-                    <h2>{% translate "Object sets" %}</h2>
-                    <p>
-                        {% blocktranslate trimmed %}
-                            Page description. Add more information about this page.
-                        {% endblocktranslate %}
-                    </p>
-                </div>
-                {% if perms.openkat.add_object_set %}
-                    <div class="horizontal-view toolbar">
-                        <a class="button ghost" href="{% url "add_object_set" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add object set" %}</a>
-                    </div>
-                {% endif %}
-            </div>
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {{ filter.form.as_p }}
