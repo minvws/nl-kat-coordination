@@ -79,20 +79,10 @@ def sync() -> list[Plugin]:
         plugins.append(plugin)
 
     plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
-    for parsed_plugin in plugins_type_adapter.validate_json(plugins_path.read_text()):
-        plugin = Plugin(
-            plugin_id=parsed_plugin.plugin_id,
-            name=parsed_plugin.name,
-            scan_level=parsed_plugin.scan_level,
-            description=parsed_plugin.description,
-            consumes=list(parsed_plugin.consumes),
-            recurrences=parsed_plugin.recurrences,
-            batch_size=parsed_plugin.batch_size,
-            oci_image=parsed_plugin.oci_image,
-            oci_arguments=parsed_plugin.oci_arguments,
-            version=parsed_plugin.version,
-        )
-        plugins.append(plugin)
+    plugins.extend(get_plugins_from_json(plugins_path))
+
+    nuclei_plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "nuclei_plugins.json")
+    plugins.extend(get_plugins_from_json(nuclei_plugins_path))
 
     created_plugins = Plugin.objects.bulk_create(
         plugins,
@@ -112,3 +102,21 @@ def sync() -> list[Plugin]:
     )
 
     return created_plugins
+
+
+def get_plugins_from_json(nuclei_plugins_path: Path) -> list[Plugin]:
+    return [
+        Plugin(
+            plugin_id=parsed_plugin.plugin_id,
+            name=parsed_plugin.name,
+            scan_level=parsed_plugin.scan_level,
+            description=parsed_plugin.description,
+            consumes=list(parsed_plugin.consumes),
+            recurrences=parsed_plugin.recurrences,
+            batch_size=parsed_plugin.batch_size,
+            oci_image=parsed_plugin.oci_image,
+            oci_arguments=parsed_plugin.oci_arguments,
+            version=parsed_plugin.version,
+        )
+        for parsed_plugin in plugins_type_adapter.validate_json(nuclei_plugins_path.read_text())
+    ]

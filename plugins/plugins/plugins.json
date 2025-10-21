@@ -147,35 +147,6 @@
     ]
   },
   {
-    "plugin_id": "nuclei-expired-ssl",
-    "name": "Nuclei Expired TLS Certificate",
-    "scan_level": 2,
-    "oci_image": "projectdiscovery/nuclei:v3.4.10",
-    "oci_arguments": [
-      "nuclei",
-      "-t",
-      "ssl/expired-ssl.yaml",
-      "-j",
-      "-u",
-      "{hostname}"
-    ]
-  },
-  {
-    "plugin_id": "nuclei-tls-version",
-    "name": "Nuclei TLS",
-    "scan_level": 2,
-    "consumes": [
-      "type:hostname"
-    ],
-    "oci_image": "projectdiscovery/nuclei:v3.4.10",
-    "oci_arguments": [
-      "nuclei",
-      "-t",
-      "ssl/tls-version.yaml",
-      "-j"
-    ]
-  },
-  {
     "plugin_id": "subfinder",
     "name": "Subfinder",
     "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",
@@ -221,34 +192,6 @@
       "-oX",
       "-",
       "{ipaddress}"
-    ]
-  },
-  {
-    "plugin_id": "parse-nuclei-tls-version",
-    "name": "Nuclei Findings",
-    "description": "Parses nuclei tls version data to create KATFindings.",
-    "consumes": [
-      "file:nuclei-tls-version"
-    ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
-    "oci_arguments": [
-      "sh",
-      "-c",
-      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], .host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f -t hostname"
-    ]
-  },
-  {
-    "plugin_id": "parse-nuclei-expired-ssl",
-    "name": "Nuclei Expired SSL Findings",
-    "description": "Parses nuclei expired ssl data to create KATFindings.",
-    "consumes": [
-      "file:nuclei-expired-ssl"
-    ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
-    "oci_arguments": [
-      "sh",
-      "-c",
-      "uv run cat.py {file} | grep \"{.*}\" | jq '[\"KAT-CERTIFICATE-EXPIRED\", .host] | @tsv' -r | uv run store.py -f -t hostname"
     ]
   }
 ]

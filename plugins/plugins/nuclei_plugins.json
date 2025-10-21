@@ -1,0 +1,164 @@
+[
+  {
+    "plugin_id": "nuclei-expired-ssl",
+    "name": "Nuclei Expired TLS Certificate",
+    "scan_level": 2,
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "ssl/expired-ssl.yaml",
+      "-j",
+      "-u",
+      "{hostname}"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-tls-version",
+    "name": "Nuclei TLS",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "ssl/tls-version.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-telnet-detect",
+    "name": "Nuclei Telnet Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/telnet-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-ibm-d2b-database-server",
+    "name": "Nuclei Database server",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/ibm-d2b-database-server.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-openssh-detect",
+    "name": "Nuclei Openssh Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/openssh-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-rdp-detect",
+    "name": "Nuclei Rdp Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/rdp-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-mongodb-detect",
+    "name": "Nuclei Mongodb Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/mongodb-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-mysql-detect",
+    "name": "Nuclei Mysql Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/mysql-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "nuclei-pgsql-detect",
+    "name": "Nuclei Pgsql Detect",
+    "scan_level": 2,
+    "consumes": [
+      "type:hostname"
+    ],
+    "oci_image": "projectdiscovery/nuclei:v3.4.10",
+    "oci_arguments": [
+      "nuclei",
+      "-t",
+      "network/detection/pgsql-detect.yaml",
+      "-j"
+    ]
+  },
+  {
+    "plugin_id": "parse-nuclei-tls-version",
+    "name": "Nuclei Findings",
+    "description": "Parses nuclei tls version data to create KATFindings.",
+    "consumes": [
+      "file:nuclei-tls-version"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "sh",
+      "-c",
+      "uv run cat.py {file} | grep \"{.*}\" | jq '[.\"extracted-results\"[], .host] | @tsv' -r | sed -e 's/tls12/KAT-TLS-1.2-SUPPORT/g' -e 's/tls13/KAT-TLS-1.3-SUPPORT/g' | grep KAT | uv run store.py -f -t hostname"
+    ]
+  },
+  {
+    "plugin_id": "parse-nuclei-expired-ssl",
+    "name": "Nuclei Expired SSL Findings",
+    "description": "Parses nuclei expired ssl data to create KATFindings.",
+    "consumes": [
+      "file:nuclei-expired-ssl"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "sh",
+      "-c",
+      "uv run cat.py {file} | grep \"{.*}\" | jq '[\"KAT-CERTIFICATE-EXPIRED\", .host] | @tsv' -r | uv run store.py -f -t hostname"
+    ]
+  }
+]
