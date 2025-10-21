@@ -20,7 +20,6 @@ from django_filters.views import FilterView
 
 from objects.models import Hostname, IPAddress
 from openkat.mixins import OrganizationFilterMixin
-from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
 from tasks.models import ObjectSet, Schedule, Task, TaskStatus
@@ -31,10 +30,11 @@ class TaskFilter(django_filters.FilterSet):
     data = django_filters.CharFilter(
         label="Input object", lookup_expr="icontains", widget=forms.TextInput(attrs={"autocomplete": "off"})
     )
+    type = django_filters.ChoiceFilter(label="Task type", choices=[("plugin", "Plugin"), ("report", "Report")])
 
     class Meta:
         model = Task
-        fields = ["status", "data"]
+        fields = ["status", "type", "data"]
 
 
 class TaskListView(OrganizationFilterMixin, FilterView):
@@ -97,15 +97,6 @@ class TaskForm(ModelForm):
 
     def save(self, *args, **kwargs):
         plugin = self.cleaned_data["plugin"]
-
-        if self.cleaned_data["organization"] is None:
-            # TODO: handle..
-            organization = Organization.objects.first()
-        else:
-            organization = self.cleaned_data["organization"]
-
-        if not plugin.has_enabled_schedules(organization):
-            raise ValueError(f"Plugin has no enabled schedules for organization {organization.name}")
 
         # TODO: fix, ips, etc.
         input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}
@@ -204,10 +195,11 @@ class ScheduleFilter(django_filters.FilterSet):
     plugin__plugin_id = django_filters.CharFilter(label="Plugin", lookup_expr="icontains")
     input = django_filters.CharFilter(label="Input", lookup_expr="icontains")
     enabled = django_filters.ChoiceFilter(label="State", choices=((True, "Enabled"), (False, "Disabled")))
+    task_type = django_filters.ChoiceFilter(label="Task type", choices=[("plugin", "Plugin"), ("report", "Report")])
 
     class Meta:
         model = Schedule
-        fields = ["plugin__plugin_id", "object_set", "enabled"]
+        fields = ["plugin__plugin_id", "task_type", "object_set", "enabled"]
 
 
 class ScheduleListView(OrganizationFilterMixin, FilterView):
@@ -339,7 +331,7 @@ class ScheduleRunView(PermissionRequiredMixin, View):
     permission_required = ("schedules.add_schedules",)
 
     def post(self, request, schedule_id, *args, **kwargs):
-        run_schedule(Schedule.objects.get(pk=schedule_id))
+        run_schedule(Schedule.objects.get(pk=schedule_id), force=True)
 
         return redirect(reverse("task_list"))
 

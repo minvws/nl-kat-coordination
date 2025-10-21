@@ -66,6 +66,7 @@ urlpatterns += i18n_patterns(
     path("", include("tasks.urls"), name="tasks"),
     path("", include("files.urls"), name="files"),
     path("", include("objects.urls"), name="objects"),
+    path("reports/", include("reports.urls"), name="reports"),
     path("privacy-statement/", PrivacyStatementView.as_view(), name="privacy_statement"),
     path("organizations/", OrganizationListView.as_view(), name="organization_list"),
     path("organizations/add/", OrganizationAddView.as_view(), name="organization_add"),

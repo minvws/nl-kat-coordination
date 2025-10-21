@@ -1,0 +1,85 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>Report: {{ report.name }}</h1>
+                    {% if report.description %}<p>{{ report.description }}</p>{% endif %}
+                </div>
+                <div class="horizontal-view toolbar">
+                    <a class="button"
+                       target="_blank"
+                       href="{% url 'download_report' report.id %}">
+                        <span class="icon ti-download"></span>{% translate "Download PDF" %}
+                    </a>
+                    <a class="button ghost" href="{% url 'report_html' report.id %}">
+                        <span class="icon ti-file"></span>{% translate "View as HTML" %}
+                    </a>
+                    <a class="button ghost" href="{% url 'report_data' report.id %}">
+                        <span class="icon ti-download"></span>{% translate "Download Data (JSON)" %}
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Report Information" %}</h2>
+                <dl>
+                    <dt>{% translate "Report ID" %}</dt>
+                    <dd>
+                        {{ report.id }}
+                    </dd>
+                    <dt>{% translate "Created" %}</dt>
+                    <dd>
+                        {{ report.created_at }}
+                    </dd>
+                    <dt>{% translate "Created By" %}</dt>
+                    <dd>
+                        {{ report.created_by|default:"-" }}
+                    </dd>
+                    {% if report.organizations.exists %}
+                        <dt>{% translate "Organizations" %}</dt>
+                        <dd>
+                            <ul>
+                                {% for org in report.organizations.all %}<li>{{ org.name }}</li>{% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if report.finding_types %}
+                        <dt>{% translate "Finding Types" %}</dt>
+                        <dd>
+                            <ul>
+                                {% for ft in report.finding_types %}<li>{{ ft }}</li>{% endfor %}
+                            </ul>
+                        </dd>
+                    {% endif %}
+                    {% if report.minimum_risk_score %}
+                        <dt>{% translate "Minimum Risk Score" %}</dt>
+                        <dd>
+                            {{ report.minimum_risk_score }}
+                        </dd>
+                    {% endif %}
+                    {% if report.object_set %}
+                        <dt>{% translate "Object Set" %}</dt>
+                        <dd>
+                            <a href="{% url 'object_set_detail' report.object_set.id %}">{{ report.object_set.name }}</a>
+                        </dd>
+                    {% endif %}
+                    <dt>{% translate "File" %}</dt>
+                    <dd>
+                        {% if report.file %}
+                            {{ report.file.file.name }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

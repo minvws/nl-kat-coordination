@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load task_extras %}
 
 <div class="filter-container">
     <form class="inline layout-wide" method="get">
@@ -31,7 +32,7 @@
                 <tr>
                     <th scope="col">{% translate "Input objects" %}</th>
                     {% if not plugin %}
-                        <th scope="col">{% translate "Plugin" %}</th>
+                        <th scope="col">{% translate "Plugin/Report" %}</th>
                     {% endif %}
                     <th scope="col">{% translate "Status" %}</th>
                     <th scope="col">{% translate "Completion date" %}</th>
@@ -43,7 +44,15 @@
                 {% for task in task_list %}
                     <tr data-task-id="{{ task.id }}">
                         <td>
-                            {% if task.data.input_data|get_type == 'str' %}
+                            {% if task.type == 'report' %}
+                                {% with object_set=task.data.object_set_id|get_object_set %}
+                                    {% if object_set %}
+                                        <a href="{% url 'object_set_detail' pk=object_set.pk %}">{{ object_set.name }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% endwith %}
+                            {% elif task.data.input_data|get_type == 'str' %}
                                 <span class="label tags-color-3-light">{{ task.data.input_data }}</span>
                             {% elif task.data.input_data|get_type == 'list' and task.data.input_data|length >= 1 %}
                                 <span class="label tags-color-1-light">{{ task.data.input_data|first }}</span>
@@ -54,7 +63,15 @@
                         </td>
                         {% if not plugin %}
                             <td>
-                                {% if task.plugin_name %}
+                                {% if task.type == 'report' %}
+                                    {% with task.task_results.first as result %}
+                                        {% if result.file.report %}
+                                            <a href="{% url 'report_detail' pk=result.file.report.id %}">Report: {{ result.file.report.name }}</a>
+                                        {% else %}
+                                            {% translate "Report" %}
+                                        {% endif %}
+                                    {% endwith %}
+                                {% elif task.plugin_name %}
                                     <a href="{% url "plugin_id_detail" task.data.plugin_id %}">{{ task.plugin_name }}</a>
                                 {% else %}
                                     -
@@ -133,22 +150,62 @@
                                 {% endif %}
                             </div>
                             <div>
-                                {% with input_count=task.data.input_data|length %}
-                                    {% if task.data.input_data %}
-                                        {% if task.data.input_data|get_type == 'str' %}
+                                {% if task.type == 'report' %}
+                                    <h5>{% translate "Report data" %}</h5>
+                                    <dl>
+                                        <dt>{% translate "Name" %}</dt>
+                                        <dd>
+                                            {{ task.data.name|default:"-" }}
+                                        </dd>
+                                        <dt>{% translate "Description" %}</dt>
+                                        <dd>
+                                            {{ task.data.description|default:"-" }}
+                                        </dd>
+                                        <dt>{% translate "Organization codes" %}</dt>
+                                        <dd>
+                                            {{ task.data.organization_codes|join:", "|default:"-" }}
+                                        </dd>
+                                        <dt>{% translate "Finding types" %}</dt>
+                                        <dd>
+                                            {{ task.data.finding_types|join:", "|default:"-" }}
+                                        </dd>
+                                        <dt>{% translate "Minimum risk score" %}</dt>
+                                        <dd>
+                                            {{ task.data.minimum_risk_score|default:"-" }}
+                                        </dd>
+                                        <dt>{% translate "Object set ID" %}</dt>
+                                        <dd>
+                                            {% if task.data.object_set_id %}
+                                                {% with object_set=task.data.object_set_id|get_object_set %}
+                                                    {% if object_set %}
+                                                        <a href="{% url 'object_set_detail' pk=object_set.pk %}">{{ object_set.name }}</a>
+                                                    {% else %}
+                                                        {{ task.data.object_set_id }}
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                {% else %}
+                                    {% with input_count=task.data.input_data|length %}
+                                        {% if task.data.input_data %}
+                                            {% if task.data.input_data|get_type == 'str' %}
+                                                <h5>{% translate "Input data" %}</h5>
+                                                {{ task.data.input_data }}
+                                            {% elif task.data.input_data|get_type == 'list' %}
+                                                <h5>{% translate "Input objects" %} ({{ task.data.input_data|slice:"10"|length }}/{{ input_count }})</h5>
+                                                <ul>
+                                                    {% for object in task.data.input_data|slice:"10" %}<li>{{ object }}</li>{% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        {% else %}
                                             <h5>{% translate "Input data" %}</h5>
-                                            {{ task.data.input_data }}
-                                        {% elif task.data.input_data|get_type == 'list' %}
-                                            <h5>{% translate "Input objects" %} ({{ task.data.input_data|slice:"10"|length }}/{{ input_count }})</h5>
-                                            <ul>
-                                                {% for object in task.data.input_data|slice:"10" %}<li>{{ object }}</li>{% endfor %}
-                                            </ul>
+                                            <p>{% translate "This task does not need any input objects." %}</p>
                                         {% endif %}
-                                    {% else %}
-                                        <h5>{% translate "Input data" %}</h5>
-                                        <p>{% translate "This task does not need any input objects." %}</p>
-                                    {% endif %}
-                                {% endwith %}
+                                    {% endwith %}
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

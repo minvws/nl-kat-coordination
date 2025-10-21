@@ -1,0 +1,236 @@
+{% extends base_template %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% if not is_pdf %}
+        {% include "header.html" %}
+
+    {% endif %}
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>Report: {{ report_name }}</h1>
+                    {% if description %}
+                        <p>
+                            <strong>{% translate "Description" %}:</strong> {{ description }}
+                        </p>
+                    {% endif %}
+                    <p>
+                        <strong>{% translate "Generated" %}:</strong> {{ generated_at }}
+                    </p>
+                    {% if organizations %}
+                        <p>
+                            <strong>{% translate "Organizations" %}:</strong> {{ organizations|join:", " }}
+                        </p>
+                    {% endif %}
+                </div>
+                {% if not is_pdf %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button" href="{% url 'report_detail' object.id %}">
+                            <span class="icon ti-arrow-left"></span>{% translate "Back to Report Details" %}
+                        </a>
+                        <a class="button ghost" href="{% url 'download_report' object.id %}">
+                            <span class="icon ti-download"></span>{% translate "Download PDF" %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                <h2>{% translate "Overview" %}</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>{% translate "Networks" %}</dt>
+                            <dd>
+                                {{ metrics.general.total_networks }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Hostnames" %}</dt>
+                            <dd>
+                                {{ metrics.general.total_hostnames }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "IP Addresses" %}</dt>
+                            <dd>
+                                {{ metrics.general.total_ip_addresses }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Total Findings" %}</dt>
+                            <dd>
+                                {{ metrics.general.total_findings }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Findings" %}</h2>
+                <p>
+                    <strong>{{ metrics.findings.total_findings }}</strong> {% translate "findings across" %}
+                    <strong>{{ metrics.findings.total_assets_scanned }}</strong> {% translate "assets" %}
+                </p>
+                {% if metrics.findings.by_type %}
+                    <h3>{% translate "Findings by Type" %}</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Finding Type" %}</th>
+                                <th>{% translate "Risk Score" %}</th>
+                                <th>{% translate "Count" %}</th>
+                                <th>{% translate "Affected Assets" %}</th>
+                                <th>{% translate "Percentage" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for finding in metrics.findings.by_type %}
+                                <tr>
+                                    <td>{{ finding.name }}</td>
+                                    <td>
+                                        {% if finding.score >= 9.0 %}
+                                            <span class="{% if is_pdf %}risk-critical{% else %}label tags-color-critical{% endif %}">{{ finding.score }}</span>
+                                        {% elif finding.score >= 7.0 %}
+                                            <span class="{% if is_pdf %}risk-high{% else %}label tags-color-high{% endif %}">{{ finding.score }}</span>
+                                        {% elif finding.score >= 4.0 %}
+                                            <span class="{% if is_pdf %}risk-medium{% else %}label tags-color-medium{% endif %}">{{ finding.score }}</span>
+                                        {% else %}
+                                            <span class="{% if is_pdf %}risk-low{% else %}label tags-color-low{% endif %}">{{ finding.score }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ finding.count }}</td>
+                                    <td>{{ finding.affected_assets }}</td>
+                                    <td>{{ finding.affected_percentage|floatformat:1 }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                {% if metrics.findings.biggest_offenders %}
+                    <h3>{% translate "Assets with Most Findings (Top 10)" %}</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Asset ID" %}</th>
+                                <th>{% translate "Type" %}</th>
+                                <th>{% translate "Finding Count" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offender in metrics.findings.biggest_offenders %}
+                                <tr>
+                                    <td>{{ offender.object_id }}</td>
+                                    <td>{{ offender.object_type }}</td>
+                                    <td>{{ offender.finding_count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            <div>
+                <h2>{% translate "DNS" %}</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>{% translate "Hostnames" %}</dt>
+                            <dd>
+                                {{ metrics.dns.total_hostnames }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Root Domains" %}</dt>
+                            <dd>
+                                {{ metrics.dns.root_domains }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "Name Servers" %}</dt>
+                            <dd>
+                                {{ metrics.dns.name_servers }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div>
+                <h2>{% translate "Ports" %}</h2>
+                <p>
+                    <strong>{{ metrics.ports.total_open_ports }}</strong> {% translate "open ports on" %}
+                    <strong>{{ metrics.ports.unique_ips_with_ports }}</strong> {% translate "IP addresses" %}
+                </p>
+                <h3>{% translate "Top 20 Most Common Open Ports" %}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Port" %}</th>
+                            <th>{% translate "Protocol" %}</th>
+                            <th>{% translate "Count" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for port in metrics.ports.top_ports %}
+                            <tr>
+                                <td>{{ port.port }}</td>
+                                <td>{{ port.protocol }}</td>
+                                <td>{{ port.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <h3>{% translate "Ports by Protocol" %}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Protocol" %}</th>
+                            <th>{% translate "Count" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proto in metrics.ports.by_protocol %}
+                            <tr>
+                                <td>{{ proto.protocol }}</td>
+                                <td>{{ proto.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h2>{% translate "IPv6" %}</h2>
+                <div>
+                    <dl>
+                        <div>
+                            <dt>{% translate "Total IP Addresses" %}</dt>
+                            <dd>
+                                {{ metrics.ipv6.total_ip_addresses }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "IPv4 Addresses" %}</dt>
+                            <dd>
+                                {{ metrics.ipv6.ipv4_addresses }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "IPv6 Addresses" %}</dt>
+                            <dd>
+                                {{ metrics.ipv6.ipv6_addresses }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{% translate "IPv6 Adoption" %}</dt>
+                            <dd>
+                                {{ metrics.ipv6.ipv6_percentage|floatformat:1 }}%
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

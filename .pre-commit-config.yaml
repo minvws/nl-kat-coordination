@@ -116,7 +116,10 @@ repos:
           ^.*/templates/.*$ |
           ^reports/report_types/.*/.*\.html
           )
-        exclude: '^openkat/templates/admin/.*\.html$'
+        exclude: |
+          (?x)(
+          ^openkat/templates/admin/.*\.html
+          )
 
       - id: djlint-django
         files: |
@@ -124,7 +127,11 @@ repos:
           ^.*/templates/.*$ |
           ^reports/report_types/.*/.*\.html
           )
-        exclude: '^openkat/templates/admin/.*\.html$'
+        exclude: |
+          (?x)(
+          ^openkat/templates/admin/.*\.html$ |
+          ^reports/templates/reports/.*_pdf\.html
+          )
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
     rev: v16.24.0
