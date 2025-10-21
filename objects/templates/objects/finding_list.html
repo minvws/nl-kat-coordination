@@ -57,7 +57,13 @@
                                     <td>
                                         <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
                                     </td>
-                                    <td>{{ finding.finding_type.score|default:"-" }}</td>
+                                    <td>
+                                        {% if finding.finding_type.score != None %}
+                                            {{ finding.finding_type.score }}
+                                        </td>
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                     <td>
                                         {% if finding.last_seen %}
                                             {{ finding.last_seen|date:"Y-m-d H:i" }}

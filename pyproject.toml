@@ -20,6 +20,7 @@ dependencies = [
   "django-stubs-ext>=5.2.5",
   "django-tagulous>=2.1.0",
   "django-two-factor-auth[phonenumberslite]>=1.17.0",
+  "django-weasyprint>=2.4.0",
   "django-xtdb==0.0.2",
   "django>=5.2.0,<6.0",
   "djangoql>=0.18.1",
@@ -34,6 +35,7 @@ dependencies = [
   "structlog>=25.3.0",
   "tldextract>=5.3.0",
   "transit-python2>=0.8.321",
+  "weasyprint>=63.1",
   "whitenoise[brotli]>=6.5.0",
 ]
 
@@ -70,7 +72,7 @@ openkat = "manage:openkat"
 
 [tool.coverage.run]
 relative_files = true
-omit = ["octopoes/*"]
+omit = ["tests/*"]
 
 [tool.pytest.ini_options]
 addopts = "--benchmark-skip --benchmark-max-time=0.5 --benchmark-columns='min, max, mean, rounds' --benchmark-min-rounds=1 --durations=10 -n auto --ignore=tests/integration"
@@ -116,6 +118,8 @@ module = [
   "transit.*",
   "two_factor.*",
   "whitenoise.*",
+  "weasyprint.*",
+  "django_weasyprint.*",
 ]
 ignore_missing_imports = true
 

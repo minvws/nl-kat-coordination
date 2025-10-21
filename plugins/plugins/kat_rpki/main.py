@@ -9,6 +9,7 @@
 import json
 import os
 import socket
+import sys
 from binascii import hexlify
 from json import JSONDecodeError
 
@@ -21,7 +22,7 @@ def ipv6_to_int(ipv6_addr):
     return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
 
 
-def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str, str]]:
+def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> list[dict[str, str]]:
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),  # parse CIDR to prefix as an integer
@@ -41,12 +42,12 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str
     )
 
     # Create a pl.LazyFrame out of the object list of IPAddresses
-    ip4s_lazy = pl.LazyFrame(
-        [ipaddr for ipaddr in ips if "." in ipaddr["address"]], schema=["id", "address"]
-    ).with_columns(intip4=ip.ipv4_to_numeric("address"))
-    ip6s_lazy = pl.LazyFrame(
-        [ipaddr for ipaddr in ips if ":" in ipaddr["address"]], schema=["id", "address"]
-    ).with_columns(intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128))
+    ip4s_lazy = pl.LazyFrame([ipaddr for ipaddr in ips if "." in ipaddr], schema=["address"]).with_columns(
+        intip4=ip.ipv4_to_numeric("address")
+    )
+    ip6s_lazy = pl.LazyFrame([ipaddr for ipaddr in ips if ":" in ipaddr], schema=["address"]).with_columns(
+        intip6=pl.col("address").map_elements(ipv6_to_int, return_dtype=pl.Int128)
+    )
     ip4s_lazy.collect()
     ip6s_lazy.collect()
 
@@ -64,7 +65,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str
         pl.col("bintip") + pl2 ** (32 - pl.col("bintprefix")) >= pl.col("intip4") + 1,
     )
     bgp_rpki_v4 = bgp_new_v4.join(new_v4, left_on=["address", "ASN"], right_on=["address", "asn"], how="left").filter(
-        pl.col("id_right").is_null()
+        pl.col("intip4_right").is_null()
     )
 
     new_v6 = ip6s_lazy.join_where(
@@ -78,7 +79,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str
         pl.col("bintip") >= pl.col("intip6") - pl2 ** (128 - pl.col("bintprefix")) + 1,
     )
     bgp_rpki_v6 = bgp_new_v6.join(new_v6, left_on=["address", "ASN"], right_on=["address", "asn"], how="left").filter(
-        pl.col("id_right").is_null()
+        pl.col("intip6_right").is_null()
     )
 
     results = []
@@ -86,20 +87,20 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[dict]) -> list[dict[str
     ip4s_without_rpki = ip4s_lazy.join(new_v4, on="address", how="left").filter(pl.col("prefix").is_null())
     ip6s_without_rpki = ip6s_lazy.join(new_v6, on="address", how="left").filter(pl.col("prefix").is_null())
 
-    for pk, address in ip4s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        f = dict(finding_type_code="KAT-NO-RPKI", object_code=pk, object_type="ipaddress")
+    for address in ip4s_without_rpki.select("address").collect().iter_rows():
+        f = dict(finding_type_code="KAT-NO-RPKI", object_code=address[0], object_type="ipaddress")
         results.append(f)
 
-    for pk, address in ip6s_without_rpki.select(["id", "address"]).collect().iter_rows():
-        f = dict(finding_type_code="KAT-NO-RPKI", object_code=pk, object_type="ipaddress")
+    for address in ip6s_without_rpki.select("address").collect().iter_rows():
+        f = dict(finding_type_code="KAT-NO-RPKI", object_code=address[0], object_type="ipaddress")
         results.append(f)
 
-    for pk, address in bgp_rpki_v4.select(["id", "address"]).collect().iter_rows():
-        f = dict(finding_type_code="KAT-INVALID-RPKI", object_code=pk, object_type="ipaddress")
+    for address in bgp_rpki_v4.select("address").collect().iter_rows():
+        f = dict(finding_type_code="KAT-INVALID-RPKI", object_code=address[0], object_type="ipaddress")
         results.append(f)
 
-    for pk, address in bgp_rpki_v6.select(["id", "address"]).collect().iter_rows():
-        f = dict(finding_type_code="KAT-INVALID-RPKI", object_code=pk, object_type="ipaddress")
+    for address in bgp_rpki_v6.select("address").collect().iter_rows():
+        f = dict(finding_type_code="KAT-INVALID-RPKI", object_code=address[0], object_type="ipaddress")
         results.append(f)
 
     return results
@@ -120,29 +121,6 @@ def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
     return rpki_lazy
 
 
-def get_all_objects_of_type(client: httpx.Client, object_type: str) -> list[dict]:
-    """Iterate through the object API to collect all objects of type object_type"""
-
-    offset = 0
-    limit = 500
-    results = []
-
-    while True:
-        new = client.get(f"/objects/{object_type.lower()}/", params={"offset": offset, "limit": limit}).json()
-
-        if not new["results"]:
-            break
-
-        results.extend(new["results"])
-
-        if len(new["results"]) < limit:
-            break
-
-        offset += limit
-
-    return results
-
-
 if __name__ == "__main__":
     token = os.getenv("OPENKAT_TOKEN")
     if not token:
@@ -154,12 +132,17 @@ if __name__ == "__main__":
 
     headers = {"Authorization": "Token " + token}
     client = httpx.Client(base_url=base_url, headers=headers)
-    oois = run(
-        download_lazyframe(client, "rpki-download"),
-        download_lazyframe(client, "bgp-download"),
-        get_all_objects_of_type(client, "IPAddress"),
-    )
 
-    client.post("/objects/findings/", json=oois)
+    ips = []
+
+    if len(sys.argv) > 1:
+        ips = sys.argv[1:]
+    else:
+        for line in sys.stdin.readlines():
+            ips.append(line.strip())
+
+    oois = run(download_lazyframe(client, "rpki-download"), download_lazyframe(client, "bgp-download"), ips)
+
+    client.post("/objects/finding/", json=oois, timeout=30)
 
     print(json.dumps(oois))  # noqa: T201

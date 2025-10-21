@@ -103,18 +103,22 @@ class ObjectSet(models.Model):
 class Schedule(models.Model):
     enabled = models.BooleanField(default=True)
     recurrences = recurrence.fields.RecurrenceField(null=True, blank=True)
+    task_type = models.CharField(max_length=32, default="plugin")  # "plugin" or "report"
 
-    # TODO: multiple organizations?
     organization = models.ForeignKey(
         "openkat.organization", on_delete=models.CASCADE, related_name="schedules", null=True, blank=True
     )
     plugin = models.ForeignKey["Plugin"](
-        "plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True
+        "plugins.plugin", on_delete=models.CASCADE, related_name="schedules", null=True, blank=True
     )
     object_set = models.ForeignKey(ObjectSet, on_delete=models.CASCADE, related_name="schedules", null=True, blank=True)
-
     run_on = models.CharField(max_length=64, null=True, blank=True)
     operation = models.CharField(max_length=16, choices=Operation, null=True, blank=True)
+
+    # Report-specific fields
+    report_name = models.CharField(max_length=255, null=True, blank=True)
+    report_description = models.TextField(blank=True)
+    report_finding_types = ArrayField(models.CharField(max_length=255), default=list, blank=True)
 
     def run(self):
         # Import here to prevent circular imports

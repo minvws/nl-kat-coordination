@@ -42,5 +42,5 @@ class PluginContent(ContentFile):
 
 
 class ReportContent(ContentFile):
-    def __init__(self, content: str | bytes):
-        super().__init__(content, name=f"reports/{uuid.uuid4()}")
+    def __init__(self, content: str | bytes, name: str):
+        super().__init__(content, name=f"reports/{name}.pdf")

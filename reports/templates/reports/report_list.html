@@ -1,0 +1,97 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="introduction">
+                <div>
+                    <h1>{% translate "Reports" %}</h1>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            View and generate security reports for your organizations. Reports include findings, DNS information, open ports, and IPv6 statistics.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                {% if perms.reports.add_report %}
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost" href="{% url "add_report" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Create Report" %}</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="filter-container">
+                <form class="inline layout-wide" method="get">
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
+                </form>
+            </div>
+            {% if not report_list %}
+                <div>
+                    <p>{% translate "No reports have been found." %}</p>
+                </div>
+            {% else %}
+                <div class="horizontal-scroll sticky-column">
+                    <table class="nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">{% translate "Name" %}</th>
+                                <th scope="col">{% translate "Description" %}</th>
+                                <th scope="col">{% translate "Created" %}</th>
+                                <th scope="col">{% translate "Schedule" %}</th>
+                                <th scope="col">{% translate "HTML" %}</th>
+                                <th scope="col">{% translate "PDF" %}</th>
+                                <th scope="col">{% translate "JSON" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in report_list %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'report_detail' report.id %}">{{ report.name }}</a>
+                                    </td>
+                                    <td>{{ report.description|default:"-"|truncatewords:10 }}</td>
+                                    <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        {% with task_result=report.file.task_result %}
+                                            {% if task_result and task_result.task and task_result.task.schedule %}
+                                                <a href="{% url 'schedule_detail' task_result.task.schedule.id %}">
+                                                    {{ task_result.task.schedule.report_name|default:task_result.task.schedule.id }}
+                                                </a>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td class="nowrap">
+                                        <a href="{% url 'report_html' report.id %}"
+                                           title="{% translate "View as HTML" %}">
+                                            <span class="icon ti-code"></span>
+                                        </a>
+                                    </td>
+                                    <td class="nowrap">
+                                        <a href="{% url 'download_report' report.id %}"
+                                           title="{% translate "Download PDF" %}">
+                                            <span class="icon ti-download"></span>
+                                        </a>
+                                    </td>
+                                    <td class="nowrap">
+                                        <a href="{% url 'report_data' report.id %}"
+                                           title="{% translate "Download JSON" %}">
+                                            <span class="icon ti-download"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}

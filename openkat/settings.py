@@ -166,6 +166,7 @@ INSTALLED_APPS = [
     "files",
     "plugins",
     "objects",
+    "reports",
     "django_password_validators",
     "django_password_validators.password_history",
     "rest_framework",
@@ -204,7 +205,7 @@ ROOT_URLCONF = "openkat.urls"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{env.str('REDIS_HOST')}/1",
+        "LOCATION": f"redis://:{env.str('REDIS_PASSWORD')}@{env.str('REDIS_HOST')}:6379/1",
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     }
 }
@@ -476,8 +477,6 @@ TAG_COLORS = [
 ]
 
 TAG_BORDER_TYPES = [("plain", _("Plain")), ("solid", _("Solid")), ("dashed", _("Dashed")), ("dotted", _("Dotted"))]
-
-WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
 

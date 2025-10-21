@@ -66,6 +66,11 @@
                             <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
                                {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Business rules" %}</a>
                         </li>
+                        <li>
+                            {% url "report_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <div>

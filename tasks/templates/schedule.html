@@ -20,8 +20,7 @@
                           method="post"
                           class="post-form">
                         {% csrf_token %}
-                        {{ form.media }}
-                        {{ form.recurrences }}
+                        {{ form }}
                         <button type="submit">Submit</button>
                     </form>
                 </div>

@@ -13,12 +13,13 @@ from redis.exceptions import LockError  # type: ignore
 
 from files.models import File
 from objects.models import DNSAAAARecord, DNSARecord, DNSCNAMERecord, DNSNSRecord, Hostname, IPAddress
-from openkat.models import Organization
+from openkat.models import Organization, User
 from plugins.models import BusinessRule, Plugin
 from plugins.plugins.business_rules import run_rules
 from plugins.runner import PluginRunner
+from reports.generator import ReportPDFGenerator
 from tasks.celery import app
-from tasks.models import Schedule, Task, TaskStatus
+from tasks.models import ObjectSet, Schedule, Task, TaskResult, TaskStatus
 
 logger = structlog.get_logger(__name__)
 
@@ -194,37 +195,63 @@ def reschedule() -> None:
 
 
 def run_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -> list[Task]:
+    # Handle report tasks differently from plugin tasks
+    if schedule.task_type == "report":
+        return run_report_schedule(schedule, force, celery=celery)
+
     if not schedule.plugin:
         logger.debug("No plugin defined for schedule, skipping")
         return []
 
-    # Run for the specific organization if one is set on the schedule
+    return run_schedule_for_organization(schedule, schedule.organization, force, celery=celery)
+
+
+def run_report_schedule(schedule: Schedule, force: bool = True, celery: Celery = app) -> list[Task]:
+    now = datetime.now(UTC)
+
+    # Check if we need to run based on recurrence rules
+    if not force and schedule.recurrences:
+        last_run = Task.objects.filter(schedule=schedule, type="report").order_by("-created_at").first()
+        if last_run and not schedule.recurrences.between(last_run.created_at, now):
+            logger.debug("Report schedule '%s' has already run recently", schedule.id)
+            return []
+
     if schedule.organization:
-        return run_schedule_for_organization(schedule, schedule.organization, force, celery=celery)
+        organization_codes = [schedule.organization.code]
+    else:
+        # If no specific organization, generate report for all organizations
+        organization_codes = list(Organization.objects.values_list("code", flat=True))
 
-    # If organization is None (global schedule), run for all organizations
-    tasks = []
-    for organization in Organization.objects.all():
-        tasks.extend(run_schedule_for_organization(schedule, organization, force, celery=celery))
+    # Run the report task
+    task = run_report_task(
+        name=schedule.report_name or f"Scheduled Report {schedule.id}",
+        description=schedule.report_description,
+        organization_codes=organization_codes,
+        finding_types=schedule.report_finding_types,
+        object_set_id=schedule.object_set.id if schedule.object_set else None,
+        schedule_id=schedule.id,
+        celery=celery,
+    )
 
-    return tasks
+    return [task]
 
 
 def run_schedule_for_organization(
-    schedule: Schedule, organization: Organization, force: bool = True, celery: Celery = app
+    schedule: Schedule, organization: Organization | None, force: bool = True, celery: Celery = app
 ) -> list[Task]:
     now = datetime.now(UTC)
+    code = None if organization is None else organization.code
 
     if not schedule.object_set:
         if force:
-            return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.pk, celery=celery)
+            return run_plugin_task(schedule.plugin.plugin_id, code, None, schedule.pk, celery=celery)
 
         last_run = Task.objects.filter(schedule=schedule, data__input_data=None).order_by("-created_at").first()
         if last_run and not schedule.recurrences.between(last_run.created_at, now):
             logger.debug("Plugin '%s' has already run recently", schedule.plugin.plugin_id)
             return []
 
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, None, schedule.pk, celery=celery)
+        return run_plugin_task(schedule.plugin.plugin_id, code, None, schedule.pk, celery=celery)
 
     input_data: set[str] = set()
 
@@ -251,7 +278,7 @@ def run_schedule_for_organization(
         return []
 
     if force:
-        return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.pk, celery=celery)
+        return run_plugin_task(schedule.plugin.plugin_id, code, input_data, schedule.pk, celery=celery)
 
     # Filter on the schedule and created after the previous occurrence
     last_runs = Task.objects.filter(
@@ -265,19 +292,35 @@ def run_schedule_for_organization(
     if not input_data:
         return []
 
-    return run_plugin_task(schedule.plugin.plugin_id, organization.code, input_data, schedule.pk, celery=celery)
+    return run_plugin_task(schedule.plugin.plugin_id, code, input_data, schedule.pk, celery=celery)
 
 
 def rerun_task(task: Task, celery: Celery = app) -> list[Task]:
-    plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
+    # Handle different task types
+    if task.type == "report":
+        # Import here to avoid circular imports
 
-    return run_plugin_task(
-        plugin.plugin_id,
-        task.organization.code if task.organization else None,
-        task.data["input_data"],
-        None,
-        celery=celery,
-    )
+        # Rerun report task with same parameters
+        return [
+            run_report_task(
+                name=task.data.get("name", "Rerun Report"),
+                description=task.data.get("description", ""),
+                organization_codes=task.data.get("organization_codes", []),
+                finding_types=task.data.get("finding_types", []),
+                object_set_id=task.data.get("object_set_id"),
+            )
+        ]
+    else:
+        # Handle plugin tasks
+        plugin = Plugin.objects.get(plugin_id=task.data["plugin_id"])
+
+        return run_plugin_task(
+            plugin.plugin_id,
+            task.organization.code if task.organization else None,
+            task.data["input_data"],
+            None,
+            celery=celery,
+        )
 
 
 def run_plugin_task(
@@ -366,12 +409,6 @@ def run_plugin(
         task.save()
         raise RuntimeError(f"Plugin {plugin_id} not found")
 
-    # Check if plugin has enabled schedules for this organization
-    if not plugin.has_enabled_schedules(organization):
-        task.status = TaskStatus.FAILED
-        task.save()
-        raise RuntimeError(f"Plugin {plugin_id} has no enabled schedules for {organization_code}")
-
     task.status = TaskStatus.RUNNING
     task.save()
 
@@ -401,6 +438,8 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
         return []
 
     tasks = []
+
+    logger.info("Processing Raw file %s", file.pk)
 
     if hasattr(file, "task_result") and file.task_result is not None:
         organization = file.task_result.task.organization
@@ -436,3 +475,119 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
                     tasks.extend(run_plugin_task(plugin.plugin_id, org.code, str(file.pk), celery=celery))
 
     return tasks
+
+
+def run_report_task(
+    name: str,
+    description: str = "",
+    organization_codes: list[str] | None = None,
+    finding_types: list[str] | None = None,
+    object_set_id: int | None = None,
+    schedule_id: int | None = None,
+    user_id: int | None = None,
+    celery: Celery = app,
+) -> Task:
+    """Create and queue a report generation task"""
+    task_id = uuid.uuid4()
+
+    # Get the organization (for single org mode) - use first org if multiple
+    organization = None
+    if organization_codes and len(organization_codes) > 0:
+        organization = Organization.objects.filter(code=organization_codes[0]).first()
+
+    task = Task.objects.create(
+        id=task_id,
+        type="report",
+        schedule_id=schedule_id,
+        organization=organization,
+        status=TaskStatus.QUEUED,
+        data={
+            "name": name,
+            "description": description,
+            "organization_codes": organization_codes or [],
+            "finding_types": finding_types or [],
+            "object_set_id": object_set_id,
+            "user_id": user_id,
+        },
+    )
+
+    create_report.bind(celery)
+    async_result = create_report.apply_async(
+        (name, description, organization_codes, finding_types, object_set_id, user_id), task_id=str(task_id)
+    )
+    task._async_result = async_result
+
+    return task
+
+
+@app.task(bind=True)
+def create_report(
+    self: celery.Task,
+    name: str,
+    description: str = "",
+    organization_codes: list[str] | None = None,
+    finding_types: list[str] | None = None,
+    object_set_id: int | None = None,
+    user_id: int | None = None,
+) -> str:
+    """Celery task for generating a report"""
+    logger.info(
+        "Starting report generation task", task_id=self.request.id, name=name, organization_codes=organization_codes
+    )
+
+    task = Task.objects.get(id=self.request.id)
+
+    if task.status == TaskStatus.CANCELLED:
+        raise RuntimeError("Trying to run cancelled task")
+
+    task.status = TaskStatus.RUNNING
+    task.save()
+
+    try:
+        # Get organizations if codes provided
+        organizations = None
+        if organization_codes:
+            organizations = Organization.objects.filter(code__in=organization_codes)
+
+        # Get object set if provided
+        object_set = None
+        if object_set_id:
+            object_set = ObjectSet.objects.get(id=object_set_id)
+
+        # Get user if provided
+        user = None
+        if user_id:
+            user = User.objects.get(id=user_id)
+
+        # Generate the report
+        generator = ReportPDFGenerator(
+            name=name,
+            description=description,
+            organizations=organizations,
+            finding_types=finding_types,
+            object_set=object_set,
+            user=user,
+        )
+        report = generator.generate_pdf_report()
+
+        # Create TaskResult to link file back to task
+        TaskResult.objects.create(task=task, file=report.file)
+
+        task.status = TaskStatus.COMPLETED
+        task.ended_at = datetime.now(UTC)
+        task.save()
+
+        logger.info("Report generation completed successfully", task_id=self.request.id, report_id=report.id)
+        return f"Report generated successfully: {report.id}"
+
+    except Exception as e:
+        task.refresh_from_db(fields=["status"])
+
+        if task.status != TaskStatus.CANCELLED:
+            task.status = TaskStatus.FAILED
+
+        task.ended_at = datetime.now(UTC)
+        task.save()
+
+        logger.exception("Report generation failed", task_id=self.request.id, error=str(e))
+        raise

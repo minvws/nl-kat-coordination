@@ -174,8 +174,11 @@ class OnboardingOrganizationSetupView(PermissionRequiredMixin, IntroductionRegis
         return self.get(request, *args, **kwargs)
 
     def get_success_url(self) -> str:
-        self.create_first_member(self.object)
-        return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": self.object.code})
+        if self.object:
+            self.create_first_member(self.object)
+            return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": self.object.code})
+
+        raise Organization.DoesNotExist
 
     def form_valid(self, form):
         org_name = form.cleaned_data["name"]
