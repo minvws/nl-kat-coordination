@@ -43,7 +43,7 @@ def mail_records(hostname: str) -> list:
         {"object_type": "Hostname", "network": "internet", "name": root_domain, "root": True},
     ]
 
-    for domain in [root_domain, hostname]:
+    for domain in {root_domain, hostname}:
         dmarc_results = get_email_security_records(resolver, domain, "_dmarc")
 
         # dkim_res = get_email_security_records(resolver, hostname, "_domainkey")
