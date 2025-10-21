@@ -9,7 +9,10 @@ from plugins.runner import PluginRunner
 @pytest.mark.django_db(transaction=True)
 def test_hello_world():
     plugin = Plugin.objects.create(
-        name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
+        name="testing plugins",
+        plugin_id="test",
+        oci_image="hello-world:linux",
+        oci_arguments=["/hello"],
     )
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -30,7 +33,10 @@ def test_hello_world():
 @pytest.mark.django_db(transaction=True)
 def test_input_output():
     plugin = Plugin.objects.create(
-        name="Test Plugin", plugin_id="cat-plugin", oci_image="alpine:latest", oci_arguments=["/bin/cat"]
+        name="Test Plugin",
+        plugin_id="cat-plugin",
+        oci_image="alpine:latest",
+        oci_arguments=["/bin/cat"],
     )
 
     output = PluginRunner().run(plugin.plugin_id, "hello world^C", output="-")
@@ -65,11 +71,41 @@ def test_with_multiple_file_inputs():
         name="Cat Two Files",
         plugin_id="cat-two-files",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", "{file/" + str(f1.pk) + "}", "{file/" + str(f2.pk) + "}"],
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
     )
 
     output = PluginRunner().run(plugin.plugin_id, None, output="-")
     assert output == "first\nsecond\n"
+
+
+@pytest.mark.django_db(transaction=True)
+def test_with_multiple_file_inputs_file_output():
+    f1 = File.objects.create(file=ContentFile("first\n", "f1.txt"), type="txt")
+    f2 = File.objects.create(file=ContentFile("second\n", "f2.txt"), type="txt")
+
+    plugin = Plugin.objects.create(
+        name="Cat Two Files (file output)",
+        plugin_id="cat-two-files-file-out",
+        oci_image="alpine:latest",
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
+    )
+
+    result = PluginRunner().run(plugin.plugin_id, None)
+    assert "Upload completed. Server responded with: 201 Created" in result
+
+    # find the output file by partial name (input files are also present)
+    out_files = File.objects.filter(file__contains="cat-two-files-file-out/stdout")
+    assert out_files.exists()
+    out_file = out_files.first()
+    assert out_file.file.read().decode() == "first\nsecond\n"
 
 
 @pytest.mark.django_db(transaction=True)
