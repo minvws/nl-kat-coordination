@@ -39,7 +39,7 @@
                     <table rf-selector="table-scan-history" class="nowrap">
                         <thead>
                             <tr>
-                                <th scope="col">{% translate "Plugin" %}</th>
+                                <th scope="col">{% translate "Plugin or Report" %}</th>
                                 <th scope="col">{% translate "Object set" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Schedule" %}</th>
@@ -53,6 +53,8 @@
                                     <td>
                                         {% if schedule.plugin %}
                                             <a href="{% url "plugin_detail" pk=schedule.plugin.id %}">{{ schedule.plugin.plugin_id }}</a>
+                                        {% elif schedule.report_name %}
+                                            {{ schedule.report_name }}
                                         {% else %}
                                             -
                                         {% endif %}

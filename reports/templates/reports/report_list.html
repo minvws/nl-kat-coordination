@@ -19,7 +19,7 @@
                 </div>
                 {% if perms.reports.add_report %}
                     <div class="horizontal-view toolbar">
-                        <a class="button ghost" href="{% url "add_report" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Generate Report" %}</a>
+                        <a class="button ghost" href="{% url "add_report" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Create Report" %}</a>
                     </div>
                 {% endif %}
             </div>
@@ -41,6 +41,7 @@
                                 <th scope="col">{% translate "Name" %}</th>
                                 <th scope="col">{% translate "Description" %}</th>
                                 <th scope="col">{% translate "Created" %}</th>
+                                <th scope="col">{% translate "Schedule" %}</th>
                                 <th scope="col">{% translate "HTML" %}</th>
                                 <th scope="col">{% translate "PDF" %}</th>
                                 <th scope="col">{% translate "JSON" %}</th>
@@ -54,6 +55,17 @@
                                     </td>
                                     <td>{{ report.description|default:"-"|truncatewords:10 }}</td>
                                     <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        {% with task_result=report.file.task_result %}
+                                            {% if task_result and task_result.task and task_result.task.schedule %}
+                                                <a href="{% url 'schedule_detail' task_result.task.schedule.id %}">
+                                                    {{ task_result.task.schedule.report_name|default:task_result.task.schedule.id }}
+                                                </a>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
                                     <td class="nowrap">
                                         <a href="{% url 'report_html' report.id %}"
                                            title="{% translate "View as HTML" %}">

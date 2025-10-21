@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import django_filters
+import recurrence
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -18,16 +19,27 @@ from objects.models import FindingType
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from reports.models import Report
-from tasks.models import ObjectSet
+from tasks.models import ObjectSet, Schedule
 from tasks.tasks import run_report_task
 
 
 class ReportFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    scheduled = django_filters.BooleanFilter(label="Scheduled", method="filter_scheduled")
 
     class Meta:
         model = Report
-        fields = ["name"]
+        fields = ["name", "scheduled"]
+
+    def filter_scheduled(self, queryset, name, value):
+        """Filter reports by whether they have an associated schedule"""
+        if value is True:
+            # Reports that have a schedule (via file -> task_result -> task -> schedule)
+            return queryset.filter(file__task_result__task__schedule__isnull=False)
+        elif value is False:
+            # Reports that don't have a schedule
+            return queryset.filter(file__task_result__task__schedule__isnull=True)
+        return queryset
 
 
 class ReportListView(OrganizationFilterMixin, FilterView):
@@ -46,6 +58,9 @@ class ReportListView(OrganizationFilterMixin, FilterView):
             # Filter reports by user's accessible organizations
             user_orgs = Organization.objects.filter(members__user=self.request.user)
             qs = qs.filter(organizations__in=user_orgs).distinct()
+
+        # Optimize query to fetch schedule information
+        qs = qs.select_related("file__task_result__task__schedule")
 
         return qs
 
@@ -111,8 +126,26 @@ class ReportCreateForm(forms.Form):
 
     name = forms.CharField(max_length=255, required=True, label=_("Report Name"))
     description = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), required=False, label=_("Description"))
+
+    # Scheduling options
+    GENERATION_CHOICES = [("now", _("Generate Now")), ("schedule", _("Schedule Report"))]
+    generation_type = forms.ChoiceField(
+        choices=GENERATION_CHOICES,
+        initial="now",
+        widget=forms.RadioSelect,
+        label=_("When to generate"),
+        help_text=_("Generate the report immediately or schedule it to run periodically"),
+    )
+
+    # Organizations field - used for both immediate and scheduled reports
     organizations = forms.ModelMultipleChoiceField(
-        queryset=Organization.objects.none(), required=False, label=_("Organizations")
+        queryset=Organization.objects.none(),
+        required=False,
+        label=_("Organizations"),
+        help_text=_(
+            "Select organizations. For scheduled reports, a separate schedule will be created for each organization. "
+            "Leave empty to include all organizations."
+        ),
     )
     finding_types = forms.MultipleChoiceField(required=False, label=_("Finding Types"))
     object_set = forms.ModelChoiceField(queryset=ObjectSet.objects.none(), required=False, label=_("Object Set"))
@@ -158,28 +191,82 @@ class ReportCreateView(PermissionRequiredMixin, CreateView):
         # Extract form data
         name = form.cleaned_data["name"]
         description = form.cleaned_data["description"]
-        organizations = form.cleaned_data["organizations"]
+        generation_type = form.cleaned_data["generation_type"]
         finding_types = form.cleaned_data["finding_types"]
         object_set = form.cleaned_data["object_set"]
 
-        # Get organization codes
-        organization_codes = [org.code for org in organizations] if organizations else []
+        if generation_type == "schedule":
+            # Create schedules for periodic report generation
+            organizations = form.cleaned_data.get("organizations")
 
-        # Trigger report generation task
-        task = run_report_task(
-            name=name,
-            description=description,
-            organization_codes=organization_codes,
-            finding_types=list(finding_types) if finding_types else [],
-            object_set_id=object_set.id if object_set else None,
-        )
+            # If organizations are selected, create a schedule for each
+            # If no organizations are selected, create one schedule for all
+            schedules_to_create = []
 
-        messages.success(
-            self.request,
-            _(f"Report generation task created: {task.id}. You'll be able to download the report once it's completed."),
-        )
+            if organizations:
+                # Create a schedule for each selected organization
+                for organization in organizations:
+                    schedules_to_create.append({"organization": organization, "name_suffix": f" - {organization.name}"})
+            else:
+                # Create one schedule for all organizations
+                schedules_to_create.append({"organization": None, "name_suffix": ""})
 
-        return redirect(self.get_success_url())
+            created_schedules = []
+            for schedule_info in schedules_to_create:
+                schedule = Schedule.objects.create(
+                    enabled=True,
+                    recurrences=recurrence.Recurrence(
+                        rrules=[recurrence.Rule(recurrence.DAILY)], dtstart=datetime.now(UTC)
+                    ),
+                    task_type="report",
+                    organization=schedule_info["organization"],
+                    object_set=object_set,
+                    report_name=name + schedule_info["name_suffix"],
+                    report_description=description,
+                    report_finding_types=list(finding_types) if finding_types else [],
+                )
+                created_schedules.append(schedule)
+
+            if len(created_schedules) == 1:
+                messages.success(
+                    self.request,
+                    _(
+                        "Report schedule created successfully. The report will be generated daily. "
+                        "You can edit the schedule to change the recurrence."
+                    ),
+                )
+                return redirect(reverse("schedule_detail", kwargs={"pk": created_schedules[0].pk}))
+            else:
+                messages.success(
+                    self.request,
+                    _(
+                        f"Created {len(created_schedules)} report schedules (one per organization). "
+                        f"Each will be generated daily. You can view them in the schedules list."
+                    ),
+                )
+                return redirect(reverse("schedule_list"))
+        else:
+            # Generate report immediately
+            organizations = form.cleaned_data["organizations"]
+
+            # Get organization codes
+            organization_codes = [org.code for org in organizations] if organizations else []
+
+            # Trigger report generation task
+            task = run_report_task(
+                name=name,
+                description=description,
+                organization_codes=organization_codes,
+                finding_types=list(finding_types) if finding_types else [],
+                object_set_id=object_set.id if object_set else None,
+            )
+
+            messages.success(
+                self.request,
+                _(f"Report task created: {task.id}. You'll be able to download the report once it's completed."),
+            )
+
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         redirect_url = self.request.POST.get("current_url")

@@ -18,7 +18,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
 
-from objects.models import Hostname, IPAddress
+from objects.models import FindingType, Hostname, IPAddress
 from openkat.mixins import OrganizationFilterMixin
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
@@ -225,9 +225,47 @@ class ScheduleListView(OrganizationFilterMixin, FilterView):
 
 
 class ScheduleForm(ModelForm):
+    # Add finding types field for reports
+    report_finding_types_choices = forms.MultipleChoiceField(
+        required=False,
+        label=_("Finding Types"),
+        help_text=_("Select finding types to include in the report (only for report schedules)"),
+    )
+
     class Meta:
         model = Schedule
-        fields = ["enabled", "recurrences", "object_set"]
+        fields = ["enabled", "recurrences", "object_set", "report_name", "report_description"]
+        widgets = {"report_description": forms.Textarea(attrs={"rows": 3})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Load finding types for the multi-select field
+        try:
+            finding_type_choices = [
+                (ft.code, f"{ft.name or ft.code} ({ft.code})")
+                for ft in FindingType.objects.all().order_by("name")
+                if ft.code
+            ]
+            self.fields["report_finding_types_choices"].choices = finding_type_choices
+
+            # Set initial values if instance exists
+            if self.instance and self.instance.pk and self.instance.report_finding_types:
+                self.initial["report_finding_types_choices"] = self.instance.report_finding_types
+        except Exception:
+            self.fields["report_finding_types_choices"].choices = []
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Save the finding types from the multi-select field
+        if "report_finding_types_choices" in self.cleaned_data:
+            instance.report_finding_types = list(self.cleaned_data["report_finding_types_choices"])
+
+        if commit:
+            instance.save()
+
+        return instance
 
 
 class ScheduleDetailView(OrganizationFilterMixin, DetailView):
@@ -249,21 +287,66 @@ class ScheduleDetailView(OrganizationFilterMixin, DetailView):
 
 class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Schedule
-    fields = ["plugin", "object_set", "organization", "recurrences", "enabled"]
+    fields = [
+        "task_type",
+        "plugin",
+        "object_set",
+        "organization",
+        "recurrences",
+        "enabled",
+        "report_name",
+        "report_description",
+    ]
     template_name = "schedule_form.html"
 
     object: Schedule
 
-    def form_valid(self, form):
-        self.object = form.save()
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
 
+        # Add finding types field for reports
+        finding_type_choices = [
+            (ft.code, f"{ft.name or ft.code} ({ft.code})")
+            for ft in FindingType.objects.all().order_by("name")
+            if ft.code
+        ]
+
+        form.fields["report_finding_types"] = forms.MultipleChoiceField(
+            required=False,
+            label=_("Finding Types"),
+            choices=finding_type_choices,
+            help_text=_("Select finding types to include in the report (only for report schedules)"),
+        )
+
+        # Add widget for report_description
+        form.fields["report_description"].widget = forms.Textarea(attrs={"rows": 3})
+
+        return form
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+
+        # Handle report finding types
+        if "report_finding_types" in form.cleaned_data:
+            self.object.report_finding_types = list(form.cleaned_data["report_finding_types"])
+
+        # Set task_type based on whether plugin or report fields are filled
+        if not self.object.task_type:
+            if self.object.plugin:
+                self.object.task_type = "plugin"
+            elif self.object.report_name:
+                self.object.task_type = "report"
+
+        # Set default recurrence if not provided
         if self.object.recurrences and str(self.object.recurrences):
+            self.object.save()
             return super().form_valid(form)
+
         if self.object.plugin and self.object.plugin.recurrences and str(self.object.plugin.recurrences):
             self.object.recurrences = self.object.plugin.recurrences
         else:
             self.object.recurrences = recurrence.Recurrence(
-                rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default for plugins
+                rrules=[recurrence.Rule(recurrence.DAILY)],  # Daily scheduling is the default
                 dtstart=datetime.now(UTC),
             )
 
@@ -281,17 +364,46 @@ class ScheduleCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 class ScheduleUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Schedule
-    fields = ["enabled", "recurrences", "object_set"]
+    fields = ["enabled", "recurrences", "object_set", "report_name", "report_description"]
+    template_name = "schedule_form.html"
 
     object: Schedule
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        # Add finding types field for reports
+        finding_type_choices = [
+            (ft.code, f"{ft.name or ft.code} ({ft.code})")
+            for ft in FindingType.objects.all().order_by("name")
+            if ft.code
+        ]
+
+        form.fields["report_finding_types"] = forms.MultipleChoiceField(
+            required=False,
+            label=_("Finding Types"),
+            choices=finding_type_choices,
+            initial=self.object.report_finding_types if self.object.report_finding_types else [],
+            help_text=_("Select finding types to include in the report (only for report schedules)"),
+        )
+
+        # Add widget for report_description
+        if "report_description" in form.fields:
+            form.fields["report_description"].widget = forms.Textarea(attrs={"rows": 3})
+
+        return form
+
     def form_valid(self, form):
+        # Handle report finding types before saving
+        if "report_finding_types" in form.cleaned_data:
+            self.object.report_finding_types = list(form.cleaned_data["report_finding_types"])
+
         result = super().form_valid(form)
 
         if self.object.enabled:
             return result
 
-        # Plugin has been disabled, cancel all tasks related to the schedule
+        # Schedule has been disabled, cancel all tasks related to the schedule
         for task in Task.objects.filter(
             schedule=self.object,
             status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED],

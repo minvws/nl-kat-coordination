@@ -10,10 +10,10 @@
         <section>
             <div class="introduction">
                 <div>
-                    <h1>{% translate "Generate New Report" %}</h1>
+                    <h1>{% translate "Create New Report" %}</h1>
                     <p>
                         {% blocktranslate trimmed %}
-                            Configure and generate a new security report. Select the organizations, finding types, and other filters to customize your report.
+                            Configure a new security report. You can generate it immediately or schedule it to run periodically. Select the organizations, finding types, and other filters to customize your report.
                         {% endblocktranslate %}
                     </p>
                 </div>
@@ -43,15 +43,19 @@
                     </div>
                 </fieldset>
                 <fieldset>
+                    <legend>{% translate "Generation Options" %}</legend>
+                    <div class="form-group">
+                        <label>{{ form.generation_type.label }}</label>
+                        {{ form.generation_type }}
+                        {% if form.generation_type.help_text %}<p class="help-text">{{ form.generation_type.help_text }}</p>{% endif %}
+                    </div>
+                </fieldset>
+                <fieldset>
                     <legend>{% translate "Report Filters" %}</legend>
                     <div class="form-group">
                         <label for="{{ form.organizations.id_for_label }}">{{ form.organizations.label }}</label>
                         {{ form.organizations }}
-                        {% if form.organizations.help_text %}
-                            <p class="help-text">{{ form.organizations.help_text }}</p>
-                        {% else %}
-                            <p class="help-text">{% translate "Leave empty to include all organizations you have access to." %}</p>
-                        {% endif %}
+                        {% if form.organizations.help_text %}<p class="help-text">{{ form.organizations.help_text }}</p>{% endif %}
                     </div>
                     <div class="form-group">
                         <label for="{{ form.finding_types.id_for_label }}">{{ form.finding_types.label }}</label>
@@ -60,17 +64,6 @@
                             <p class="help-text">{{ form.finding_types.help_text }}</p>
                         {% else %}
                             <p class="help-text">{% translate "Leave empty to include all finding types." %}</p>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label for="{{ form.minimum_risk_score.id_for_label }}">{{ form.minimum_risk_score.label }}</label>
-                        {{ form.minimum_risk_score }}
-                        {% if form.minimum_risk_score.help_text %}
-                            <p class="help-text">{{ form.minimum_risk_score.help_text }}</p>
-                        {% else %}
-                            <p class="help-text">
-                                {% translate "Only include findings with a risk score equal to or higher than this value (0.0 - 10.0)." %}
-                            </p>
                         {% endif %}
                     </div>
                     <div class="form-group">
@@ -85,7 +78,7 @@
                 </fieldset>
                 <div class="button-container">
                     <button type="submit" class="button">
-                        <span class="icon ti-file-text"></span>{% translate "Generate Report" %}
+                        <span class="icon ti-file-text"></span>{% translate "Create Report" %}
                     </button>
                     <a href="{% url 'report_list' %}" class="button ghost">{% translate "Cancel" %}</a>
                 </div>

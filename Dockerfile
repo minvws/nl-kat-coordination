@@ -53,7 +53,7 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 # The secret key isn't used by the commands, but Django won't work do anything
 # without it
 
-RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" && \
+RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" REDIS_HOST="redis://localhost/fake" && \
     python manage.py collectstatic -l && python manage.py compilemessages
 
 RUN rm -rf tests
