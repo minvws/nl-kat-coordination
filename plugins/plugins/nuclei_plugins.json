@@ -84,7 +84,7 @@
     "oci_arguments": [
       "nuclei",
       "-t",
-      "network/detection/rdp-detect.yaml",
+      "network/detection/rdp-detection.yaml",
       "-j"
     ]
   },
