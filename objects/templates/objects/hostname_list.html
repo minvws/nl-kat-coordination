@@ -8,8 +8,9 @@
 
     <main id="main-content">
         <section>
-            {% include "objects/object_introduction.html" %}
-            {% include "objects/object_tabs.html" with view="hostnames" %}
+            {% include "objects/object_list_introduction.html" %}
+            {% include "objects/object_list_tabs.html" with view="hostnames" %}
+
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}

@@ -12,25 +12,32 @@
                 <div>
                     <h1>{% translate "IP address:" %} {{ ipaddress.address }}</h1>
                 </div>
+                <div class="horizontal-view toolbar">
+                    <form action="{% url 'objects:delete_ipaddress' ipaddress.pk %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="ghost destructive">{% translate "Delete" %}</button>
+                    </form>
+                </div>
             </div>
             <div>
-                <h2>Details</h2>
+                <h2>{% translate "Details" %}</h2>
                 <div>
                     <dl>
                         <div>
-                            <dt>Address</dt>
+                            <dt>{% translate "Address" %}</dt>
                             <dd>
                                 {{ ipaddress.address }}
                             </dd>
                         </div>
                         <div>
-                            <dt>Network</dt>
+                            <dt>{% translate "Network" %}</dt>
                             <dd>
                                 <a href="{% url 'objects:network_detail' ipaddress.network.pk %}">{{ ipaddress.network.name }}</a>
                             </dd>
                         </div>
                         <div>
-                            <dt>{% translate "Last Seen" %}</dt>
+                            <dt>{% translate "Last seen" %}</dt>
                             <dd>
                                 {% if ipaddress.last_seen %}
                                     {{ ipaddress.last_seen|date:"Y-m-d H:i:s" }}
@@ -40,7 +47,7 @@
                             </dd>
                         </div>
                         <div>
-                            <dt>{% translate "Scan Level" %}</dt>
+                            <dt>{% translate "Scan level" %}</dt>
                             <dd>
                                 {% if ipaddress.scan_level != None %}
                                     {% include "partials/scan_level_indicator.html" with value=ipaddress.scan_level %}
@@ -57,7 +64,7 @@
                 </div>
             </div>
             <div>
-                <h2>{% translate "Set Scan Level" %}</h2>
+                <h2>{% translate "Set scan level" %}</h2>
                 <form method="post"
                       action="{% url 'objects:update_ipaddress_scan_level' ipaddress.pk %}">
                     {% csrf_token %}
@@ -70,7 +77,7 @@
                 </form>
             </div>
             <div class="horizontal-scroll">
-                <h2>{% translate "IP Ports" %}</h2>
+                <h2>{% translate "IP ports" %}</h2>
                 {% if ipaddress.ipport_set.all %}
                     <table>
                         <caption class="visually-hidden">{% translate "IP ports" %}</caption>
@@ -120,26 +127,76 @@
                         <caption class="visually-hidden">{% translate "Findings" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate "Finding Type" %}</th>
-                                <th>{% translate "Score" %}</th>
-                                <th>{% translate "Description" %}</th>
-                                <th>{% translate "Last Seen" %}</th>
+                                <th>{% translate "Severity" %}</th>
+                                <th>{% translate "Finding type" %}</th>
+                                <th>{% translate "Risk score" %}</th>
+                                <th>{% translate "Last seen" %}</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for finding in findings %}
                                 <tr>
                                     <td>
+                                        <span class="{{ finding.finding_type.risk }}">{{ finding.finding_type.risk|default:"-"|capfirst }}</span>
+                                    </td>
+                                    <td>
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
                                     </td>
                                     <td>{{ finding.finding_type.score|default:"-" }}</td>
-                                    <td>{{ finding.finding_type.description|default:"-" }}</td>
                                     <td>
                                         {% if finding.last_seen %}
                                             {{ finding.last_seen|date:"Y-m-d H:i" }}
                                         {% else %}
                                             -
                                         {% endif %}
+                                    </td>
+                                    <td class="actions sticky-cell">
+                                        <button type="button"
+                                                class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="expando-row">
+                                    <td colspan="4">
+                                        <div>
+                                            <dl>
+                                                <div>
+                                                    <dt>{% translate "Description" %}</dt>
+                                                    <dd>
+                                                        {{ finding.finding_type.description|default:"-" }}
+                                                    </dd>
+                                                </div>
+                                                {% if finding.finding_type.recommendation %}
+                                                    <div>
+                                                        <dt>{% translate "Recommendation" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.recommendation }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                                {% if finding.finding_type.impact %}
+                                                    <div>
+                                                        <dt>{% translate "Impact" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.impact }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                                {% if finding.finding_type.source %}
+                                                    <div>
+                                                        <dt>{% translate "Source" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.source }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                            </dl>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
