@@ -72,7 +72,7 @@ openkat = "manage:openkat"
 
 [tool.coverage.run]
 relative_files = true
-omit = ["octopoes/*"]
+omit = ["tests/*"]
 
 [tool.pytest.ini_options]
 addopts = "--benchmark-skip --benchmark-max-time=0.5 --benchmark-columns='min, max, mean, rounds' --benchmark-min-rounds=1 --durations=10 -n auto --ignore=tests/integration"
