@@ -4,6 +4,7 @@ import signal
 import uuid
 from datetime import UTC, timedelta
 from pathlib import Path
+from typing import Literal
 
 import docker
 from django.conf import settings
@@ -30,7 +31,7 @@ class PluginRunner:
         self,
         plugin_id: str,
         target: str | list[str] | None,
-        output: str = "file",
+        output: Literal["file", "-"] = "file",
         task_id: uuid.UUID | None = None,
         keep: bool = False,
         cli: bool = False,

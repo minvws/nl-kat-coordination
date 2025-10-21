@@ -270,7 +270,7 @@ class FindingFilter(django_filters.FilterSet):
 
     class Meta:
         model = Finding
-        fields = ["finding_type__code", "finding_type__score__gte", "object_search"]
+        fields = ["finding_type__code", "object_search", "finding_type__score__gte"]
 
     def filter_object_search(self, queryset, name, value):
         if not value:
