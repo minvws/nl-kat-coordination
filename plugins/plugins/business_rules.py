@@ -40,6 +40,21 @@ INDICATORS = [
 
 def get_rules():
     return {
+        "invalid_findings": {
+            "name": "invalid_findings",
+            "description": "Deletes findings with an invalid finding type.",
+            "object_type": "hostname",
+            "query": "",
+            "inverse_query": f"""
+             DELETE FROM {Finding._meta.db_table}
+             WHERE _id IN (
+                 SELECT f._id
+                 FROM {Finding._meta.db_table} f
+                 LEFT JOIN {FindingType._meta.db_table} ft on f.finding_type_id = ft._id
+                 WHERE ft._id IS NULL
+             );""",  # noqa: S608
+            "finding_type_code": None,
+        },
         "ipv6_webservers": {
             "name": "ipv6_webservers",
             "description": "Checks if webserver has IPv6 support",
@@ -66,8 +81,7 @@ def get_rules():
                     AND f.finding_type_id = (
                         select _id from {FindingType._meta.db_table} where code = 'KAT-WEBSERVER-NO-IPV6'
                     )
-                );
-            """,  # noqa: S608
+                );""",  # noqa: S608
             "finding_type_code": "KAT-WEBSERVER-NO-IPV6",
         },
         "ipv6_nameservers": {
@@ -481,36 +495,6 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
         logger.debug("Inverse Query: %s", rule.inverse_query)
 
         try:
-            # Get the model class
-            model_class = rule.object_type.model_class()
-            if not model_class:
-                logger.error("Unknown object type: %s", rule.object_type)
-                continue
-
-            # Get or create the finding type
-            finding_type, created = FindingType.objects.get_or_create(code=rule.finding_type_code)
-
-            # Build the queryset
-            queryset = model_class.objects.all()
-
-            # Special handling for Hostname queries that need annotations
-            if model_class == Hostname and "nameservers_with_ipv6_count" in rule.query:
-                queryset = queryset.annotate(
-                    nameservers_with_ipv6_count=Count(
-                        Case(
-                            When(
-                                dnsnsrecord__name_server__dnsaaaarecord__isnull=False,
-                                then=F("dnsnsrecord__name_server_id"),
-                            ),
-                            default=None,
-                        ),
-                        distinct=True,
-                    )
-                )
-                schema = HostnameQLSchema
-            else:
-                schema = DjangoQLSchema
-
             if rule.inverse_query:
                 # Apply the inverse query
                 start = time.time()
@@ -522,39 +506,70 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
 
                 logger.debug("Inverse query executed in %s seconds", time.time() - start)
 
-            # Apply the query
-            start = time.time()
-            try:
-                matching_objects = apply_search(queryset, rule.query, schema)
-                match_count = matching_objects.count()
-            except DjangoQLParserError:
-                matching_objects = queryset.raw(rule.query)
-                match_count = len(matching_objects)
+            if rule.finding_type_code and rule.query:
+                # Get the model class
+                model_class = rule.object_type.model_class()
+                if not model_class:
+                    logger.error("Unknown object type: %s", rule.object_type)
+                    continue
 
-            logger.debug("Query executed in %s seconds", time.time() - start)
-            logger.debug("Matching objects: %s", match_count)
+                # Get or create the finding type
+                finding_type, created = FindingType.objects.get_or_create(code=rule.finding_type_code)
 
-            # Create findings for matching objects
-            findings = []
+                # Build the queryset
+                queryset = model_class.objects.all()
 
-            for obj in matching_objects:
-                findings.append(
-                    Finding(
-                        finding_type=finding_type,
-                        object_type=rule.object_type.model_class().__name__.lower(),
-                        object_id=obj.pk,
+                # Special handling for Hostname queries that need annotations
+                if model_class == Hostname and "nameservers_with_ipv6_count" in rule.query:
+                    queryset = queryset.annotate(
+                        nameservers_with_ipv6_count=Count(
+                            Case(
+                                When(
+                                    dnsnsrecord__name_server__dnsaaaarecord__isnull=False,
+                                    then=F("dnsnsrecord__name_server_id"),
+                                ),
+                                default=None,
+                            ),
+                            distinct=True,
+                        )
                     )
-                )
+                    schema = HostnameQLSchema
+                else:
+                    schema = DjangoQLSchema
 
-            total_findings += len(findings)
+                # Apply the query
+                start = time.time()
+                try:
+                    matching_objects = apply_search(queryset, rule.query, schema)
+                    match_count = matching_objects.count()
+                except DjangoQLParserError:
+                    matching_objects = queryset.raw(rule.query)
+                    match_count = len(matching_objects)
 
-            if dry_run:
-                logger.warning("[DRY RUN] Skipping finding creation")
-                continue
+                logger.debug("Query executed in %s seconds", time.time() - start)
+                logger.debug("Matching objects: %s", match_count)
 
-            bulk_insert(findings)
+                # Create findings for matching objects
+                findings = []
 
-            logger.debug("Created %s new findings", len(findings))
+                for obj in matching_objects:
+                    findings.append(
+                        Finding(
+                            finding_type=finding_type,
+                            object_type=rule.object_type.model_class().__name__.lower(),
+                            object_id=obj.pk,
+                        )
+                    )
+
+                total_findings += len(findings)
+
+                if dry_run:
+                    logger.warning("[DRY RUN] Skipping finding creation")
+                    continue
+
+                bulk_insert(findings)
+
+                logger.debug("Created %s new findings", len(findings))
         except Exception:
             logger.exception("Error processing business rule %s", rule.name)
 
