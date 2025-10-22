@@ -323,7 +323,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-COMMON-OPEN-PORT')
+                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-OPEN-COMMON-PORT')
                 )
             where f._id is null and (
                 (port.protocol = 'TCP' and port.port in ({", ".join(str(x) for x in ALL_COMMON_TCP)}))
@@ -337,7 +337,7 @@ def get_rules():
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
                     INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-COMMON-OPEN-PORT'
+                        f.finding_type_id = ft._id AND ft.code = 'KAT-OPEN-COMMON-PORT'
                     )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.object_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
@@ -351,7 +351,7 @@ def get_rules():
                     WHERE port._id IS NULL
                 );
             """,  # noqa: S608
-            "finding_type_code": "KAT-COMMON-OPEN-PORT",
+            "finding_type_code": "KAT-OPEN-COMMON-PORT",
         },
         "missing_caa": {
             "name": "missing_caa",
