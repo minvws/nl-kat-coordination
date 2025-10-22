@@ -12,25 +12,32 @@
                 <div>
                     <h1>{% translate "Hostname:" %} {{ hostname.name }}</h1>
                 </div>
+                <div class="horizontal-view toolbar">
+                    <form action="{% url 'objects:delete_hostname' hostname.pk %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="ghost destructive">{% translate "Delete" %}</button>
+                    </form>
+                </div>
             </div>
             <div>
-                <h2>Details</h2>
+                <h2>{% translate "Details" %}</h2>
                 <div>
                     <dl>
                         <div>
-                            <dt>Address</dt>
+                            <dt>{% translate "Hostname" %}</dt>
                             <dd>
                                 {{ hostname.name }}
                             </dd>
                         </div>
                         <div>
-                            <dt>Network</dt>
+                            <dt>{% translate "Network" %}</dt>
                             <dd>
                                 <a href="{% url 'objects:network_detail' hostname.network.pk %}">{{ hostname.network.name }}</a>
                             </dd>
                         </div>
                         <div>
-                            <dt>{% translate "Last Seen" %}</dt>
+                            <dt>{% translate "Last seen" %}</dt>
                             <dd>
                                 {% if hostname.last_seen %}
                                     {{ hostname.last_seen|date:"Y-m-d H:i:s" }}
@@ -40,7 +47,7 @@
                             </dd>
                         </div>
                         <div>
-                            <dt>{% translate "Scan Level" %}</dt>
+                            <dt>{% translate "Scan level" %}</dt>
                             <dd>
                                 {% if hostname.scan_level != None %}
                                     {% include "partials/scan_level_indicator.html" with value=hostname.scan_level %}
@@ -57,7 +64,7 @@
                 </div>
             </div>
             <div>
-                <h2>{% translate "Set Scan Level" %}</h2>
+                <h2>{% translate "Edit scan level" %}</h2>
                 <form method="post"
                       action="{% url 'objects:update_hostname_scan_level' hostname.pk %}">
                     {% csrf_token %}
@@ -70,312 +77,320 @@
                 </form>
             </div>
             <div class="horizontal-scroll">
-                <h2>{% translate "DNS Records" %}</h2>
-                <table>
-                    <caption class="visually-hidden">{% translate "DNS records" %}</caption>
-                    <thead>
-                        <tr>
-                            <th>{% translate "Type" %}</th>
-                            <th>{% translate "Content" %}</th>
-                            <th>{% translate "Details" %}</th>
-                            <th>{% translate "Last Seen" %}</th>
-                            <th>{% translate "Delete" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in dnsarecord_set %}
+                <h2>{% translate "DNS records" %}</h2>
+                {% if dnsarecord_set or dnsaaaarecord_set or dnscnamerecord_set or dnsmxrecord_set or dnsnsrecord_set or dnscaarecord_set or dnstxtrecord_set or dnssrvrecord_set %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "DNS records" %}</caption>
+                        <thead>
                             <tr>
-                                <td>A</td>
-                                <td>
-                                    <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
-                                </td>
-                                <td></td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsarecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
+                                <th>{% translate "Type" %}</th>
+                                <th>{% translate "Content" %}</th>
+                                <th>{% translate "Details" %}</th>
+                                <th>{% translate "Last Seen" %}</th>
+                                <th>{% translate "Delete" %}</th>
                             </tr>
-                        {% endfor %}
-                        {% for record in dnsaaaarecord_set %}
-                            <tr>
-                                <td>AAAA</td>
-                                <td>
-                                    <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
-                                </td>
-                                <td></td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsaaaarecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnscnamerecord_set %}
-                            <tr>
-                                <td>CNAME</td>
-                                <td>
-                                    <a href="{% url 'objects:hostname_detail' record.target_id %}">{{ record.target }}</a>
-                                </td>
-                                <td>{% translate "Source:" %} {{ hostname.name }}</td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnsmxrecord_set %}
-                            <tr>
-                                <td>MX</td>
-                                <td>
-                                    <a href="{% url 'objects:hostname_detail' record.mail_server_id %}">{{ record.mail_server }}</a>
-                                </td>
-                                <td>{% translate "Preference:" %} {{ record.preference }}</td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnsnsrecord_set %}
-                            <tr>
-                                <td>NS</td>
-                                <td>
-                                    <a href="{% url 'objects:hostname_detail' record.name_server_id %}">{{ record.name_server }}</a>
-                                </td>
-                                <td></td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnscaarecord_set %}
-                            <tr>
-                                <td>CAA</td>
-                                <td>{{ record.value }}</td>
-                                <td>{% translate "Flags:" %} {{ record.flags }}, {% translate "Tag:" %} {{ record.tag }}</td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnscaarecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnstxtrecord_set %}
-                            <tr>
-                                <td>TXT</td>
-                                <td>{{ record.value }}</td>
-                                <td>
-                                    {% if record.prefix %}
-                                        {% translate "Prefix:" %} {{ record.prefix }}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnstxtrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnssrvrecord_set %}
-                            <tr>
-                                <td>SRV</td>
-                                <td>
-                                    <a href="{% url 'objects:hostname_detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
-                                </td>
-                                <td>{% translate "Priority:" %} {{ record.priority }}, {% translate "Weight:" %} {{ record.weight }}</td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnssrvrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for record in dnsarecord_set %}
+                                <tr>
+                                    <td>A</td>
+                                    <td>
+                                        <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsarecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnsaaaarecord_set %}
+                                <tr>
+                                    <td>AAAA</td>
+                                    <td>
+                                        <a href="{% url 'objects:ipaddress_detail' record.ip_address_id %}">{{ record.ip_address }}</a>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsaaaarecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnscnamerecord_set %}
+                                <tr>
+                                    <td>CNAME</td>
+                                    <td>
+                                        <a href="{% url 'objects:hostname_detail' record.target_id %}">{{ record.target }}</a>
+                                    </td>
+                                    <td>{% translate "Source:" %} {{ hostname.name }}</td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnsmxrecord_set %}
+                                <tr>
+                                    <td>MX</td>
+                                    <td>
+                                        <a href="{% url 'objects:hostname_detail' record.mail_server_id %}">{{ record.mail_server }}</a>
+                                    </td>
+                                    <td>{% translate "Preference:" %} {{ record.preference }}</td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnsnsrecord_set %}
+                                <tr>
+                                    <td>NS</td>
+                                    <td>
+                                        <a href="{% url 'objects:hostname_detail' record.name_server_id %}">{{ record.name_server }}</a>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnscaarecord_set %}
+                                <tr>
+                                    <td>CAA</td>
+                                    <td>{{ record.value }}</td>
+                                    <td>{% translate "Flags:" %} {{ record.flags }}, {% translate "Tag:" %} {{ record.tag }}</td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnscaarecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnstxtrecord_set %}
+                                <tr>
+                                    <td>TXT</td>
+                                    <td>{{ record.value }}</td>
+                                    <td>
+                                        {% if record.prefix %}
+                                            {% translate "Prefix:" %} {{ record.prefix }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnstxtrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnssrvrecord_set %}
+                                <tr>
+                                    <td>SRV</td>
+                                    <td>
+                                        <a href="{% url 'objects:hostname_detail' record.target_hostname_id %}">{{ record.target_hostname }}</a>:{{ record.port }}
+                                    </td>
+                                    <td>{% translate "Priority:" %} {{ record.priority }}, {% translate "Weight:" %} {{ record.weight }}</td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnssrvrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    {% translate "No DNS records have been found for this hostname." %}
+                {% endif %}
             </div>
             <div class="horizontal-scroll">
-                <h2>{% translate "Reverse DNS Records" %}</h2>
-                <table>
-                    <caption class="visually-hidden">{% translate "Reverse DNS records" %}</caption>
-                    <thead>
-                        <tr>
-                            <th>{% translate "Type" %}</th>
-                            <th>{% translate "Content" %}</th>
-                            <th>{% translate "Details" %}</th>
-                            <th>{% translate "Last Seen" %}</th>
-                            <th>{% translate "Delete" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in dnsptrrecord_set %}
+                <h2>{% translate "Reverse DNS records" %}</h2>
+                {% if dnsptrrecord_set or dnscnamerecord_target_set or dnsmxrecord_mailserver or dnsnsrecord_nameserver %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "Reverse DNS records" %}</caption>
+                        <thead>
                             <tr>
-                                <td>PTR</td>
-                                <td>{{ record.ip_address }}</td>
-                                <td></td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsptrrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
+                                <th>{% translate "Type" %}</th>
+                                <th>{% translate "Content" %}</th>
+                                <th>{% translate "Details" %}</th>
+                                <th>{% translate "Last Seen" %}</th>
+                                <th>{% translate "Delete" %}</th>
                             </tr>
-                        {% endfor %}
-                        {% for record in dnscnamerecord_target_set %}
-                            <tr>
-                                <td>CNAME</td>
-                                <td>{{ hostname.name }}</td>
-                                <td>
-                                    {% translate "Target for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
-                                </td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnsmxrecord_mailserver %}
-                            <tr>
-                                <td>MX</td>
-                                <td>{{ hostname.name }}</td>
-                                <td>
-                                    {% translate "Mail server for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
-                                </td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for record in dnsnsrecord_nameserver %}
-                            <tr>
-                                <td>NS</td>
-                                <td>{{ hostname.name }}</td>
-                                <td>
-                                    {% translate "Authoritative for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
-                                </td>
-                                <td>
-                                    {% if record.last_seen %}
-                                        {{ record.last_seen|date:"Y-m-d H:i" }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
-                                          method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for record in dnsptrrecord_set %}
+                                <tr>
+                                    <td>PTR</td>
+                                    <td>{{ record.ip_address }}</td>
+                                    <td></td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsptrrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnscnamerecord_target_set %}
+                                <tr>
+                                    <td>CNAME</td>
+                                    <td>{{ hostname.name }}</td>
+                                    <td>
+                                        {% translate "Target for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                    </td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnsmxrecord_mailserver %}
+                                <tr>
+                                    <td>MX</td>
+                                    <td>{{ hostname.name }}</td>
+                                    <td>
+                                        {% translate "Mail server for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a> ({% translate "Preference:" %} {{ record.preference }})
+                                    </td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% for record in dnsnsrecord_nameserver %}
+                                <tr>
+                                    <td>NS</td>
+                                    <td>{{ hostname.name }}</td>
+                                    <td>
+                                        {% translate "Authoritative for:" %} <a href="{% url 'objects:hostname_detail' record.hostname_id %}">{{ record.hostname }}</a>
+                                    </td>
+                                    <td>
+                                        {% if record.last_seen %}
+                                            {{ record.last_seen|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    {% translate "No reverse DNS records have been found for this hostname." %}
+                {% endif %}
             </div>
             <div class="horizontal-scroll">
                 <h2>{% translate "Findings" %}</h2>
@@ -384,26 +399,76 @@
                         <caption class="visually-hidden">{% translate "Findings" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate "Finding Type" %}</th>
-                                <th>{% translate "Score" %}</th>
-                                <th>{% translate "Description" %}</th>
-                                <th>{% translate "Last Seen" %}</th>
+                                <th>{% translate "Severity" %}</th>
+                                <th>{% translate "Finding type" %}</th>
+                                <th>{% translate "Risk score" %}</th>
+                                <th>{% translate "Last seen" %}</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for finding in findings %}
                                 <tr>
                                     <td>
+                                        <span class="{{ finding.finding_type.risk }}">{{ finding.finding_type.risk|default:"-"|capfirst }}</span>
+                                    </td>
+                                    <td>
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
                                     </td>
                                     <td>{{ finding.finding_type.score|default:"-" }}</td>
-                                    <td>{{ finding.finding_type.description|default:"-" }}</td>
                                     <td>
                                         {% if finding.last_seen %}
                                             {{ finding.last_seen|date:"Y-m-d H:i" }}
                                         {% else %}
                                             -
                                         {% endif %}
+                                    </td>
+                                    <td class="actions sticky-cell">
+                                        <button type="button"
+                                                class="expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="expando-row">
+                                    <td colspan="4">
+                                        <div>
+                                            <dl>
+                                                <div>
+                                                    <dt>{% translate "Description" %}</dt>
+                                                    <dd>
+                                                        {{ finding.finding_type.description|default:"-" }}
+                                                    </dd>
+                                                </div>
+                                                {% if finding.finding_type.recommendation %}
+                                                    <div>
+                                                        <dt>{% translate "Recommendation" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.recommendation }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                                {% if finding.finding_type.impact %}
+                                                    <div>
+                                                        <dt>{% translate "Impact" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.impact }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                                {% if finding.finding_type.source %}
+                                                    <div>
+                                                        <dt>{% translate "Source" %}</dt>
+                                                        <dd>
+                                                            {{ finding.finding_type.source }}
+                                                        </dd>
+                                                    </div>
+                                                {% endif %}
+                                            </dl>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

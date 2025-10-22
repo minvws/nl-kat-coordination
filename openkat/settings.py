@@ -205,7 +205,7 @@ ROOT_URLCONF = "openkat.urls"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{env.str('REDIS_HOST')}/1",
+        "LOCATION": f"redis://:{env.str('REDIS_PASSWORD')}@{env.str('REDIS_HOST')}:6379/1",
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     }
 }

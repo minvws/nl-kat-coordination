@@ -49,7 +49,7 @@
                             {% for finding in findings %}
                                 <tr>
                                     <td>
-                                        <span class="{{ finding.finding_type.risk }}">{{ finding.finding_type.risk|capfirst }}</span>
+                                        <span class="{{ finding.finding_type.risk }}">{{ finding.finding_type.risk|default:"-"|capfirst }}</span>
                                     </td>
                                     <td>
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
@@ -88,13 +88,13 @@
                                     </td>
                                 </tr>
                                 <tr class="expando-row">
-                                    <td colspan="7">
+                                    <td colspan="4">
                                         <div>
                                             <dl>
                                                 <div>
                                                     <dt>{% translate "Description" %}</dt>
                                                     <dd>
-                                                        {{ finding.finding_type.description }}
+                                                        {{ finding.finding_type.description|default:"-" }}
                                                     </dd>
                                                 </div>
                                                 {% if finding.finding_type.recommendation %}
