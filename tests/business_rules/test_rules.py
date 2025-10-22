@@ -400,7 +400,7 @@ def test_open_common_port_inverse_query(xtdb):
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=80, tls=False, service="http")
 
     # Create finding type and finding
-    finding_type, _ = FindingType.objects.get_or_create(code="KAT-COMMON-OPEN-PORT")
+    finding_type, _ = FindingType.objects.get_or_create(code="KAT-OPEN-COMMON-PORT")
     finding = Finding.objects.create(finding_type=finding_type, object_type="ipaddress", object_id=ip.pk)
 
     # Verify finding exists
