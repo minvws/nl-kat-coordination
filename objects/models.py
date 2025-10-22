@@ -30,11 +30,14 @@ def to_xtdb_dict(model: Model) -> dict:
         del mod["_valid_from"]
 
     for field in model._meta.fields:
-        if not isinstance(field, ForeignKey):
+        if isinstance(field, ForeignKey):
+            mod[field.name + "_id"] = mod[field.name]
+            del mod[field.name]
             continue
 
-        mod[field.name + "_id"] = mod[field.name]
-        del mod[field.name]
+    for mm_field in model._meta.many_to_many:
+        mod[mm_field.name] = [item.id for item in mod[mm_field.name]]
+        continue
 
     return mod
 
