@@ -10,7 +10,10 @@ from objects.models import (
     FindingType,
     Hostname,
     IPAddress,
+    IPPort,
     Network,
+    Protocol,
+    Software,
     bulk_insert,
     to_xtdb_dict,
 )
@@ -232,6 +235,11 @@ def test_bulk_insert_networks(xtdb):
 def test_to_dict(xtdb):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
+    ip = IPAddress.objects.create(network=net, address="2001:ab8:d0cb::")
+    port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
+    sw = Software.objects.create(name="openssh")
+    sw.ports.add(port)
+    sw.save()
 
     assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id, "declared": False, "scan_level": None}
     assert to_xtdb_dict(host) == {
@@ -242,6 +250,7 @@ def test_to_dict(xtdb):
         "declared": False,
         "scan_level": None,
     }
+    assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "ports": [port.id], "version": None}
 
 
 def test_bulk_insert_hostnames(xtdb):

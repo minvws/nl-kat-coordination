@@ -18,6 +18,7 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
+    Software,
     bulk_insert,
 )
 from plugins.plugins.business_rules import get_rules
@@ -37,6 +38,7 @@ def generate(
     list[DNSCAARecord],
     list[Finding],
     list[FindingType],
+    list[Software],
 ]:
     network, created = Network.objects.get_or_create(name="internet")
     ips = []
@@ -52,6 +54,7 @@ def generate(
     findings = []
     finding_types = [FindingType(code=val["finding_type_code"]) for key, val in get_rules().items()]
     by_code = {ft.code: ft for ft in finding_types}
+    software = [Software(name="old-js-lib", version="v-2.1.3"), Software(name="old-wordpress-plugin", version="0.1")]
 
     for i in range(N):
         # IPv4
@@ -82,6 +85,9 @@ def generate(
         https_port = IPPort(address=ip, protocol="TCP", port=443, service="https")
         ports.append(https_port)
 
+        if i % 1000 == 0:
+            software[0].ports.add(https_port)
+
         if i % 200 == 0:
             finding = Finding(finding_type=by_code["KAT-OPEN-SYSADMIN-PORT"], object_type="ipaddress", object_id=ip.pk)
             findings.append(finding)  # False finding
@@ -91,7 +97,7 @@ def generate(
             findings.append(finding)  # False finding
             finding = Finding(finding_type=by_code["KAT-UNCOMMON-OPEN-PORT"], object_type="ipaddress", object_id=ip.pk)
             findings.append(finding)  # False finding
-            finding = Finding(finding_type=by_code["KAT-COMMON-OPEN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-OPEN-COMMON-PORT"], object_type="ipaddress", object_id=ip.pk)
             findings.append(finding)  # True finding
             finding = Finding(finding_type=by_code["KAT-NO-DMARC"], object_type="hostname", object_id=hn.pk)
             findings.append(finding)  # True finding
@@ -168,6 +174,7 @@ def generate(
         caa_records,
         findings,
         finding_types,
+        software,
     )
 
 
@@ -197,9 +204,20 @@ class Command(BaseCommand):
     ) -> None:
         self.stdout.write(self.style.SUCCESS("Loading benchmark data..."))
 
-        hosts, ips, ports, arecords, aaaa_records, ns_records, mx_records, txt_records, caa_records, findings, _ = (
-            generate(number_of_objects, hostname_scan_level, ipaddress_scan_level, include_dns)
-        )
+        (
+            hosts,
+            ips,
+            ports,
+            arecords,
+            aaaa_records,
+            ns_records,
+            mx_records,
+            txt_records,
+            caa_records,
+            findings,
+            _,
+            software,
+        ) = generate(number_of_objects, hostname_scan_level, ipaddress_scan_level, include_dns)
 
         self.stdout.write(self.style.SUCCESS("Loading hostnames..."))
         bulk_insert(hosts)
@@ -232,5 +250,8 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Loading Findings..."))
         bulk_insert(findings)
+
+        self.stdout.write(self.style.SUCCESS("Loading Software..."))
+        bulk_insert(software)
 
         self.stdout.write(self.style.SUCCESS("Done loading benchmark data"))

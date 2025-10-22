@@ -51,6 +51,7 @@ from objects.viewsets import (
     IPPortViewSet,
     NetworkViewSet,
     ObjectViewSet,
+    SoftwareViewSet,
 )
 
 app_name = "objects"
@@ -63,6 +64,7 @@ object_router.register(r"network", NetworkViewSet, basename="network")
 object_router.register(r"hostname", HostnameViewSet, basename="hostname")
 object_router.register(r"ipaddress", IPAddressViewSet, basename="ipaddress")
 object_router.register(r"ipport", IPPortViewSet, basename="ipport")
+object_router.register(r"software", SoftwareViewSet, basename="software")
 
 object_router.register(r"dnsarecord", DNSARecordViewSet, basename="dnsarecord")
 object_router.register(r"dnsaaaarecord", DNSAAAARecordViewSet, basename="dnsaaaarecord")

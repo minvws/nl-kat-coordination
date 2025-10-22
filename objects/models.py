@@ -324,6 +324,13 @@ class DNSSRVRecord(DNSRecordBase):
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
 
 
+class Software(XTDBModel):
+    name = models.CharField()
+    version = models.CharField(null=True, blank=True)
+    cpe = models.CharField(null=True, blank=True)
+    ports = models.ManyToManyField(IPPort, blank=True, related_name="software")
+
+
 def bulk_insert(objects: Sequence[models.Model]) -> None:
     """Use COPY to efficiently bulk-insert objects into XTDB. Assumes objects have the same type, skips other types."""
 

@@ -21,6 +21,7 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
+    Software,
 )
 from objects.serializers import (
     DNSAAAARecordSerializer,
@@ -38,6 +39,7 @@ from objects.serializers import (
     IPAddressSerializer,
     IPPortSerializer,
     NetworkSerializer,
+    SoftwareSerializer,
 )
 from openkat.permissions import KATMultiModelPermissions
 from openkat.viewsets import ManyModelViewSet
@@ -108,6 +110,12 @@ class IPPortViewSet(ManyModelViewSet):
     serializer_class = IPPortSerializer
     queryset = IPPort.objects.all()
     filterset_fields = ("address", "protocol", "port", "tls", "service")
+
+
+class SoftwareViewSet(ManyModelViewSet):
+    serializer_class = SoftwareSerializer
+    queryset = Software.objects.all()
+    filterset_fields = ("name", "version", "cpi", "ports")
 
 
 class DNSARecordViewSet(ManyModelViewSet):

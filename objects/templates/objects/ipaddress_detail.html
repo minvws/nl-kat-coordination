@@ -113,6 +113,36 @@
                     <p>{% translate "No ports found for this IP address." %}</p>
                 {% endif %}
             </div>
+            <div>
+                <h2>{% translate "Software" %}</h2>
+                {% if ipaddress.ipport_set.all %}
+                    <table>
+                        <caption class="visually-hidden">{% translate "Software" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Port" %}</th>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "Version" %}</th>
+                                <th>{% translate "CPE" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for port in ipaddress.ipport_set.all %}
+                                {% for software in port.software.all %}
+                                    <tr>
+                                        <td>{{ port.port }}</td>
+                                        <td>{{ software.name }}</td>
+                                        <td>{{ software.version }}</td>
+                                        <td>{{ software.cpe }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>{% translate "No software found for this IP address." %}</p>
+                {% endif %}
+            </div>
             <div class="horizontal-scroll">
                 <h2>{% translate "Findings" %}</h2>
                 {% if findings %}

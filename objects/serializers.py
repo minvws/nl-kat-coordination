@@ -18,6 +18,7 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
+    Software,
 )
 
 
@@ -118,6 +119,12 @@ class IPAddressSerializer(serializers.ModelSerializer):
 class IPPortSerializer(GetOrCreateSerializer):
     class Meta:
         model = IPPort
+        exclude = ["_valid_from"]
+
+
+class SoftwareSerializer(GetOrCreateSerializer):
+    class Meta:
+        model = Software
         exclude = ["_valid_from"]
 
 
