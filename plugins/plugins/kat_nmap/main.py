@@ -59,32 +59,17 @@ def run(file_id: str) -> list[dict[str, str | int]]:
     results = []
     logging.info("Parsing %d Nmap-xml(s).", len(raw_splitted))
 
-    response = client.get("/objects/network/", params={"name": "internet", "limit": 1}).json()
-
-    if not response["results"]:
-        internet = client.post("/objects/network/", json={"name": "internet"}).json()
-    else:
-        internet = response["results"][0]
-
-    by_address = {}
-
     for nmap_output in raw_splitted:
         parsed = NmapParser.parse_fromstring(nmap_output)
         ports_scanned = get_ports_scanned(parsed)
 
         for host in parsed.hosts:
             new_ports = get_ip_ports_and_service(host)
-            response = client.get("/objects/ipaddress/", params={"address": str(host.address), "limit": 1}).json()
+            address = client.post(
+                "/objects/ipaddress/", json={"address": str(host.address), "network": "internet"}
+            ).json()
 
-            if not response["results"]:
-                address = client.post(
-                    "/objects/ipaddress/", json={"address": str(host.address), "network": internet["id"]}
-                ).json()
-            else:
-                address = response["results"][0]
-
-            by_address[address["address"]] = address["id"]
-            not_closed = [ooi["port"] for ooi in new_ports if ooi["state"] != "closed"]
+            not_closed = [ooi["port"] for ooi in new_ports if ooi.pop("state") != "closed"]
             idx = 0
             batch_size = 250
 
@@ -102,10 +87,6 @@ def run(file_id: str) -> list[dict[str, str | int]]:
                 idx = idx_2
 
             results.extend(new_ports)
-
-    for port in results:
-        if "address" in port:
-            port["address"] = by_address[port["address"]]
 
     client.post("/objects/ipport/", json=results)
 

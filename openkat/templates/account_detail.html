@@ -48,7 +48,7 @@
                     </div>
                     {% if organization_member.acknowledged_clearance_level >= 0 %}
                         <div>
-                            <dt>{% translate "Permission to set OOI clearance levels" %}</dt>
+                            <dt>{% translate "Permission to set Object Clearance levels" %}</dt>
                             <dd>
                                 L{{ organization_member.acknowledged_clearance_level }}
                             </dd>
@@ -57,7 +57,7 @@
                 </dl>
             </div>
             {% if perms.openkat.can_set_clearance_level %}
-                <h2>{% translate "OOI clearance" %}</h2>
+                <h2>{% translate "Object Clearance" %}</h2>
                 {% with tcl=organization_member.trusted_clearance_level acl=organization_member.acknowledged_clearance_level %}
                     <section>
                         <div>
@@ -75,7 +75,7 @@
                                 </p>
                                 <p class="explanation"
                                    role="group"
-                                   aria-label="{% translate "Explanation OOI Clearance" %}">
+                                   aria-label="{% translate "Explanation Object Clearance" %}">
                                     {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
                                 </p>
                                 {% blocktranslate asvar btn_text_withdraw_tcl trimmed %}
@@ -86,10 +86,10 @@
                             {% else %}
                                 <p class="explanation"
                                    role="group"
-                                   aria-label="{% translate "Explanation OOI clearance" %}">
+                                   aria-label="{% translate "Explanation Object Clearance" %}">
                                     {% blocktranslate trimmed %}
                                         You are granted clearance for level L{{ tcl }} by your admin.
-                                        Before you can change OOI clearance levels up to this level,
+                                        Before you can change Object Clearance levels up to this level,
                                         you need to accept this permission.
                                         Remember: <strong>with great power comes great responsibility.</strong>
                                     {% endblocktranslate %}

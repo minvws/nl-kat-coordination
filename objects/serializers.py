@@ -96,6 +96,12 @@ class HostnameSerializer(serializers.ModelSerializer):
         exclude = ["_valid_from"]
 
 
+class SoftwareSerializer(GetOrCreateSerializer):
+    class Meta:
+        model = Software
+        exclude = ["_valid_from"]
+
+
 class IPAddressSerializer(serializers.ModelSerializer):
     network = CharField(write_only=True)
     network_id = PrimaryKeyRelatedField(source="network", read_only=True)
@@ -117,14 +123,28 @@ class IPAddressSerializer(serializers.ModelSerializer):
 
 
 class IPPortSerializer(GetOrCreateSerializer):
+    address = CharField(write_only=True)
+    address_id = PrimaryKeyRelatedField(source="address", read_only=True)
+    software = SoftwareSerializer(many=True, default=[])
+
+    def create(self, validated_data):
+        address = validated_data.pop("address")
+
+        ip, created = IPAddress.objects.get_or_create(address=address)
+
+        port = validated_data.pop("port")
+        software = validated_data.pop("software")
+        ipport, created = IPPort.objects.get_or_create(address=ip, port=port, defaults=validated_data)
+
+        for s in software:
+            name = s.pop("name")
+            obj, created = Software.objects.get_or_create(name=name, defaults=s)
+            ipport.software.add(obj)
+
+        return ipport
+
     class Meta:
         model = IPPort
-        exclude = ["_valid_from"]
-
-
-class SoftwareSerializer(GetOrCreateSerializer):
-    class Meta:
-        model = Software
         exclude = ["_valid_from"]
 
 

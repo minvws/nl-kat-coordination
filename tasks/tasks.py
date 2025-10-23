@@ -445,12 +445,11 @@ def process_raw_file(file: File, handle_error: bool = False, celery: Celery = ap
         organization = file.task_result.task.organization
 
         for plugin in Plugin.objects.filter(consumes__contains=[f"file:{file.type}"]):
-            if plugin.has_enabled_schedules(organization):
-                tasks.extend(
-                    run_plugin_task(
-                        plugin.plugin_id, organization.code if organization else None, str(file.pk), celery=celery
-                    )
+            tasks.extend(
+                run_plugin_task(
+                    plugin.plugin_id, organization.code if organization else None, str(file.pk), celery=celery
                 )
+            )
 
         return tasks
 

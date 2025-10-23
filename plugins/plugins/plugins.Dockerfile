@@ -7,4 +7,5 @@ COPY ./plugins/plugins/kat_dns/ ./kat_dns
 COPY ./plugins/plugins/kat_nmap/ ./kat_nmap
 COPY ./plugins/plugins/kat_rpki/ ./kat_rpki
 COPY ./plugins/plugins/kat_dnssec/ ./kat_dnssec
+COPY ./plugins/plugins/kat_nuclei/ ./kat_nuclei
 COPY ./plugins/plugins/kat_scripts/ ./

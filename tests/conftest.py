@@ -300,17 +300,7 @@ def hostname(xtdb):
 
 @pytest.fixture
 def task_db(organization) -> TaskDB:
-    return TaskDB.objects.create(
-        organization=organization,
-        type="boefje",
-        data={
-            "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-            "boefje": {"id": "test-boefje", "name": "TestBoefje", "version": None},
-            "input_ooi": "Network|testnetwork",
-            "organization": organization.code,
-        },
-        status="completed",
-    )
+    return TaskDB.objects.create(organization=organization, type="plugin", data={}, status="completed")
 
 
 def setup_request(request, user):
@@ -363,25 +353,25 @@ def xtdb(request: pytest.FixtureRequest, mocker):
     as a callback service.
     """
     objects = apps.get_app_config("objects")
-    ooi_models = list(objects.get_models())
+    object_models = list(objects.get_models())
     con = connections["xtdb"]
     con.connect()
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
-    for ooi in ooi_models:
-        if ooi._meta.db_table.startswith("test_"):
+    for obj in object_models:
+        if obj._meta.db_table.startswith("test_"):
             continue
-        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}".lower()  # Table names are not case-insensitive
+        obj._meta.db_table = f"test_{xdist_suffix}_{obj._meta.db_table}".lower()  # Table names are not case-insensitive
 
     style = no_style()
     erase = [
         "{} {} {};".format(
             style.SQL_KEYWORD("ERASE"),
             style.SQL_KEYWORD("FROM"),
-            style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table)),
+            style.SQL_FIELD(con.ops.quote_name(obj._meta.db_table)),
         )
-        for ooi in ooi_models
+        for obj in object_models
     ]
 
     with contextlib.suppress(FeatureNotSupported):
