@@ -28,6 +28,8 @@ from objects.views import (
     IPAddressDetailView,
     IPAddressListView,
     IPAddressScanLevelUpdateView,
+    IPPortDeleteView,
+    IPPortSoftwareDeleteView,
     NetworkCreateView,
     NetworkDeleteView,
     NetworkDetailView,
@@ -123,4 +125,11 @@ urlpatterns = [
     path("objects/dnscaarecord/<int:pk>/delete/", DNSCAARecordDeleteView.as_view(), name="delete_dnscaarecord"),
     path("objects/dnstxtrecord/<int:pk>/delete/", DNSTXTRecordDeleteView.as_view(), name="delete_dnstxtrecord"),
     path("objects/dnssrvrecord/<int:pk>/delete/", DNSSRVRecordDeleteView.as_view(), name="delete_dnssrvrecord"),
+    # IPPort and Software delete views
+    path("objects/ipport/<int:pk>/delete/", IPPortDeleteView.as_view(), name="delete_ipport"),
+    path(
+        "objects/ipport/<int:port_pk>/software/<int:pk>/delete/",
+        IPPortSoftwareDeleteView.as_view(),
+        name="delete_ipport_software",
+    ),
 ]

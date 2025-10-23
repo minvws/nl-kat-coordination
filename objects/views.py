@@ -36,8 +36,10 @@ from objects.models import (
     Finding,
     Hostname,
     IPAddress,
+    IPPort,
     Network,
     ScanLevelEnum,
+    Software,
 )
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
@@ -792,7 +794,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
 
 # DNS Record Delete Views
-class DNSRecordDeleteView(DeleteView):
+class DNSRecordDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     object: DNSARecord
 
     def get_success_url(self) -> str:
@@ -833,6 +835,37 @@ class DNSTXTRecordDeleteView(DNSRecordDeleteView):
 
 class DNSSRVRecordDeleteView(DNSRecordDeleteView):
     model = DNSSRVRecord
+
+
+class IPPortDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = IPPort
+
+    def get_success_url(self) -> str:
+        return reverse("objects:ipaddress_detail", kwargs={"pk": self.object.address_id})
+
+
+class IPPortSoftwareDeleteView(KATModelPermissionRequiredMixin, DeleteView):
+    model = Software
+    http_method_names = ["post"]
+
+    def form_valid(self, form):
+        self.object = self.get_object()
+        port_id = self.kwargs.get("port_pk")
+
+        try:
+            port = IPPort.objects.get(pk=port_id)
+            port.software.remove(self.object)
+            return redirect(self.get_success_url())
+        except IPPort.DoesNotExist:
+            return redirect(reverse("objects:ipaddress_list"))
+
+    def get_success_url(self) -> str:
+        port_id = self.kwargs.get("port_pk")
+        try:
+            port = IPPort.objects.get(pk=port_id)
+            return reverse("objects:ipaddress_detail", kwargs={"pk": port.address_id})
+        except IPPort.DoesNotExist:
+            return reverse("objects:ipaddress_list")
 
 
 def is_valid_ip(value: str) -> bool:

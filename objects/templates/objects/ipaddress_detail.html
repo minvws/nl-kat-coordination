@@ -88,6 +88,7 @@
                                 <th>{% translate "Service" %}</th>
                                 <th>{% translate "TLS" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
+                                <th>{% translate "Delete" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,6 +113,13 @@
                                             -
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        <form action="{% url 'objects:delete_ipport' port.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -131,6 +139,7 @@
                                 <th>{% translate "Name" %}</th>
                                 <th>{% translate "Version" %}</th>
                                 <th>{% translate "CPE" %}</th>
+                                <th>{% translate "Delete" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -141,6 +150,13 @@
                                         <td>{{ software.name }}</td>
                                         <td>{{ software.version }}</td>
                                         <td>{{ software.cpe }}</td>
+                                        <td>
+                                            <form action="{% url 'objects:delete_ipport_software' port.pk software.pk %}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
