@@ -1,0 +1,27 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            {% include "objects/network_detail_introduction.html" with view="scan_level" %}
+
+            <div>
+                <h2>{% translate "Edit scan level" %}</h2>
+                <div class="filter-container">
+                    <form method="post"
+                          class="inline layout-wide"
+                          action="{% url 'objects:update_network_scan_level' network.pk %}">
+                        {% csrf_token %}
+                        {{ scan_level_form }}
+                        <button type="submit">{% translate "Update" %}</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<div class="introduction">
+    <div>
+        <h1>{% translate "IP address:" %} {{ ipaddress.address }}</h1>
+        <p>
+            {% blocktranslate trimmed %}
+                Page description. Add more information about this page.
+            {% endblocktranslate %}
+        </p>
+    </div>
+    <div class="horizontal-view toolbar">
+        <form action="{% url 'objects:delete_ipaddress' ipaddress.pk %}"
+              method="post">
+            {% csrf_token %}
+            <button type="submit" class="ghost destructive">{% translate "Delete" %}</button>
+        </form>
+    </div>
+</div>
+<nav class="tabs"
+     aria-label="{% translate "List of views for plugin detail page" %}">
+    <ul>
+        <li {% if view == "details" %}aria-current="page"{% endif %}>
+            <a href="{% url "objects:ipaddress_detail" pk=ipaddress.pk %}">{% translate "Details" %}</a>
+        </li>
+        <li {% if view == "scan_level" %}aria-current="page"{% endif %}>
+            <a href="{% url "objects:ipaddress_scan_level_detail" pk=ipaddress.pk %}">{% translate "Scan level" %}</a>
+        </li>
+    </ul>
+</nav>

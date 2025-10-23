@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<div class="introduction">
+    <div>
+        <h1>{% translate "Network:" %} {{ network.name }}</h1>
+        <p>
+            {% blocktranslate trimmed %}
+                Page description. Add more information about this page.
+            {% endblocktranslate %}
+        </p>
+    </div>
+    <div class="horizontal-view toolbar">
+        <form action="{% url 'objects:delete_network' network.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="ghost destructive">{% translate "Delete" %}</button>
+        </form>
+    </div>
+</div>
+<nav class="tabs"
+     aria-label="{% translate "List of views for plugin detail page" %}">
+    <ul>
+        <li {% if view == "details" %}aria-current="page"{% endif %}>
+            <a href="{% url "objects:network_detail" pk=network.pk %}">{% translate "Details" %}</a>
+        </li>
+        <li {% if view == "scan_level" %}aria-current="page"{% endif %}>
+            <a href="{% url "objects:network_scan_level_detail" pk=network.pk %}">{% translate "Scan level" %}</a>
+        </li>
+    </ul>
+</nav>

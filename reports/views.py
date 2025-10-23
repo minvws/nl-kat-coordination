@@ -124,11 +124,11 @@ class ReportHTMLView(OrganizationFilterMixin, DetailView):
 class ReportCreateForm(forms.Form):
     """Form for creating a new report"""
 
-    name = forms.CharField(max_length=255, required=True, label=_("Report Name"))
+    name = forms.CharField(max_length=255, required=True, label=_("Report name"))
     description = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), required=False, label=_("Description"))
 
     # Scheduling options
-    GENERATION_CHOICES = [("now", _("Generate Now")), ("schedule", _("Schedule Report"))]
+    GENERATION_CHOICES = [("now", _("Generate now")), ("schedule", _("Schedule report"))]
     generation_type = forms.ChoiceField(
         choices=GENERATION_CHOICES,
         initial="now",
@@ -147,8 +147,8 @@ class ReportCreateForm(forms.Form):
             "Leave empty to include all organizations."
         ),
     )
-    finding_types = forms.MultipleChoiceField(required=False, label=_("Finding Types"))
-    object_set = forms.ModelChoiceField(queryset=ObjectSet.objects.none(), required=False, label=_("Object Set"))
+    finding_types = forms.MultipleChoiceField(required=False, label=_("Finding types"))
+    object_set = forms.ModelChoiceField(queryset=ObjectSet.objects.none(), required=False, label=_("Object set"))
 
     def __init__(self, *args, **kwargs):
         # Remove 'instance' if passed (CreateView passes it but Form doesn't accept it)

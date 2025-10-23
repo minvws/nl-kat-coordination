@@ -164,6 +164,27 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
         # Add findings for this network
         context["findings"] = Finding.objects.filter(object_type="network", object_id=self.object.pk)
 
+        return context
+
+
+class NetworkScanLevelDetailView(OrganizationFilterMixin, DetailView):
+    model = Network
+    template_name = "objects/network_detail_scan_level.html"
+    context_object_name = "network"
+
+    object: Network
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:network_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
+
         # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
@@ -435,6 +456,33 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
         return context
 
 
+class IPAddressScanLevelDetailView(OrganizationFilterMixin, DetailView):
+    model = IPAddress
+    template_name = "objects/ipaddress_detail_scan_level.html"
+    context_object_name = "ipaddress"
+
+    object: IPAddress
+
+    def get_queryset(self) -> "QuerySet[IPAddress]":
+        return IPAddress.objects.prefetch_related("ipport_set")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:ipaddress_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
+
+        # Add scan level form
+        context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+
+        return context
+
+
 class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = IPAddress
     template_name = "objects/ipaddress_create.html"
@@ -694,6 +742,30 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
 
         # Add findings for this hostname
         context["findings"] = Finding.objects.filter(object_type="hostname", object_id=self.object.pk)
+
+        # Add scan level form
+        context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+
+        return context
+
+
+class HostnameScanLevelDetailView(OrganizationFilterMixin, DetailView):
+    model = Hostname
+    template_name = "objects/hostname_detail_scan_level.html"
+    context_object_name = "hostname"
+
+    object: Hostname
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:hostname_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
 
         # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
