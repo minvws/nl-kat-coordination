@@ -12,6 +12,7 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
+    Software,
 )
 
 
@@ -136,9 +137,19 @@ def test_ip_api(drf_client, xtdb):
         {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1", "declared": False, "scan_level": None}
     ]
 
-    ipport = {"address": ip_res["id"], "protocol": "TCP", "port": 80, "service": "http"}
+    ipport = {"address": ip_res["address"], "protocol": "TCP", "port": 80, "service": "http"}
     port_res = drf_client.post("/api/v1/objects/ipport/", json=ipport).json()
-    assert drf_client.get("/api/v1/objects/ipport/").json()["results"] == [ipport | {"id": port_res["id"], "tls": None}]
+    assert drf_client.get("/api/v1/objects/ipport/").json()["results"] == [
+        {
+            "id": port_res["id"],
+            "address_id": ip_res["id"],
+            "tls": None,
+            "port": 80,
+            "service": "http",
+            "protocol": "TCP",
+            "software": [],
+        }
+    ]
 
 
 def test_generic_api_saves_unrelated_objects(drf_client, xtdb):
@@ -178,10 +189,50 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
     ips = [{"network": "internet", "address": "127.0.0.1"}, {"network": "internet", "address": "127.0.0.2"}]
     ports = [{"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "http"}]
 
-    drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "ipport": ports})
+    response = drf_client.post("/api/v1/objects/", json={"ipaddress": ips, "ipport": ports})
+    assert response.status_code == 201
 
     assert IPAddress.objects.count() == 2
-    assert IPPort.objects.count() == 0  # TODO: fix
+    assert IPPort.objects.count() == 1
+
+    data = {
+        "ipaddress": [{"address": "134.209.85.72", "network": "internet"}],
+        "ipport": [
+            {"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "mysql", "software": [{"name": "mysql"}]}
+        ],
+    }
+    response = drf_client.post("/api/v1/objects/", json=data)
+    assert response.status_code == 201
+
+    assert IPPort.objects.count() == 1
+    assert IPPort.objects.first().software.count() == 1
+    assert Software.objects.count() == 1
+
+    data = {
+        "ipaddress": [{"address": "134.209.85.72", "network": "internet"}],
+        "ipport": [
+            {
+                "address": "127.0.0.1",
+                "protocol": "TCP",
+                "port": 80,
+                "service": "mysql",
+                "software": [{"name": "mongodb"}],
+            }
+        ],
+    }
+
+    response = drf_client.post("/api/v1/objects/", json=data)
+    assert response.status_code == 201
+
+    assert IPPort.objects.count() == 1
+    assert IPPort.objects.first().software.count() == 2
+    assert Software.objects.count() == 2
+
+    response = drf_client.post("/api/v1/objects/", json=data)
+    assert response.status_code == 201
+    assert IPPort.objects.count() == 1
+    assert IPPort.objects.first().software.count() == 2
+    assert Software.objects.count() == 2
 
 
 def test_bulk_create(drf_client, xtdb):

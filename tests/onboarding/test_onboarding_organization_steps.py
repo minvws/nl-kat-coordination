@@ -34,7 +34,7 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, hostname):
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
     # TODO: fix
-    # assertContains(response, "OOI clearance for " + hostname.name)
+    # assertContains(response, "Object clearance for " + hostname.name)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
     # assertContains(response, "Fierce")
@@ -53,7 +53,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, hostname):
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    # assertContains(response, "Setup scan - OOI clearance for " + hostname.name)
+    # assertContains(response, "Setup scan - Object clearance for " + hostname.name)
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")

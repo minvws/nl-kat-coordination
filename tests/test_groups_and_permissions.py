@@ -30,8 +30,8 @@ def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member
     assert response_redteam.status_code == 200
     assert response_client.status_code == 200
 
-    # There is already text having OOI clearance outside the perms sections, so header tags must be included
-    check_text = "<h2>OOI clearance</h2>"
+    # There is already text having clearance outside the perms sections, so header tags must be included
+    check_text = "<h2>Object Clearance</h2>"
 
     assertContains(response_superuser, check_text)
     assertContains(response_redteam, check_text)

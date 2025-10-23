@@ -20,9 +20,7 @@ def config_loggers(*args, **kwargs):
 def cancel_all_tasks(*args, **kwargs):
     from tasks.models import Task, TaskStatus  # noqa: PLC0415
 
-    for task in Task.objects.filter(
-        status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.DISPATCHED]
-    ):
+    for task in Task.objects.filter(status__in=[TaskStatus.PENDING, TaskStatus.QUEUED, TaskStatus.RUNNING]):
         task.cancel()
 
 

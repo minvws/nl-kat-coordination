@@ -49,12 +49,15 @@
                                 <th scope="col">{% translate "Created date" %}</th>
                                 <th scope="col">{% translate "Organization" %}</th>
                                 <th scope="col">{% translate "Download" %}</th>
+                                <th scope="col">{% translate "View" %}</th>
                                 <th scope="col">{% translate "Actions" %}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for file in file_list %}
-                                <tr data-file-id="{{ file.id }}">
+                                <tr data-file-id="{{ file.id }}"
+                                    data-file-url="{{ file.file.url }}"
+                                    data-file-type="{{ file.type }}">
                                     <td>{{ file.id }}</td>
                                     <td>{{ file.path.name }}</td>
                                     <td>{{ file.path.parent|cut:'files/' }}</td>
@@ -81,11 +84,23 @@
                                         <a href="{{ file.file.url }}"><span class="icon ti-download"></span></a>
                                     </td>
                                     <td>
+                                        <button type="button"
+                                                class="button-file-raw action-button expando-button"
+                                                data-icon-open-class="icon ti-chevron-down"
+                                                data-icon-close-class="icon ti-chevron-up"
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
+                                        </button>
+                                    </td>
+                                    <td>
                                         <!-- djlint:off T001 -->
                                         <a href="{% url 'add_plugin' %}?oci_arguments={file/{{ file.id }}}"
                                            class="button ghost small">{% translate "Add plugin" %}</a>
                                         <!-- djlint:on -->
                                     </td>
+                                </tr>
+                                <tr class="expando-row">
+                                    <td colspan="100%"></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -97,3 +112,9 @@
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/taskDetails.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/tabs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

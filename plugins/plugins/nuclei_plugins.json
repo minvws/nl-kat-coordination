@@ -148,6 +148,29 @@
     ]
   },
   {
+    "plugin_id": "parse-nuclei-detection",
+    "name": "Nuclei Detection",
+    "description": "Parses nuclei detection to software.",
+    "consumes": [
+      "file:nuclei-expired-ssl",
+      "file:nuclei-tls-version",
+      "file:nuclei-telnet-detect",
+      "file:nuclei-ibm-d2b-database-server",
+      "file:nuclei-openssh-detect",
+      "file:nuclei-rdp-detect",
+      "file:nuclei-mongodb-detect",
+      "file:nuclei-mysql-detect",
+      "file:nuclei-pgsql-detect"
+    ],
+    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_nuclei/main.py",
+      "{file}"
+    ]
+  },
+  {
     "plugin_id": "parse-nuclei-expired-ssl",
     "name": "Nuclei Expired SSL Findings",
     "description": "Parses nuclei expired ssl data to create KATFindings.",
