@@ -90,7 +90,6 @@ class Migration(migrations.Migration):
                         choices=[
                             ("pending", "Pending"),
                             ("queued", "Queued"),
-                            ("dispatched", "Dispatched"),
                             ("running", "Running"),
                             ("completed", "Completed"),
                             ("failed", "Failed"),

@@ -11,9 +11,7 @@ class Command(BaseCommand):
     help = "Cancel and optionally delete (queued) tasks from the database"
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument(
-            "--running", "-r", action="store_true", help="Also cancel running/dispatched tasks besides queued"
-        )
+        parser.add_argument("--running", "-r", action="store_true", help="Also cancel running tasks besides queued")
         parser.add_argument(
             "--delete", "-d", action="store_true", help="Delete the task database entries after canceling"
         )
@@ -25,7 +23,7 @@ class Command(BaseCommand):
         # Determine which statuses to cancel
         statuses = [TaskStatus.QUEUED]
         if options["running"]:
-            statuses.extend([TaskStatus.RUNNING, TaskStatus.DISPATCHED])
+            statuses.extend([TaskStatus.RUNNING])
 
         # Build the query
         query = Task.objects.filter(status__in=statuses)
@@ -40,7 +38,7 @@ class Command(BaseCommand):
             return
 
         # Confirm action
-        status_text = "queued" if not options["running"] else "queued, running, and dispatched"
+        status_text = "queued" if not options["running"] else "queued and running"
         action_text = "cancel and delete" if options["delete"] else "cancel"
         org_text = f" for organization '{options['organization']}'" if options["organization"] else ""
 

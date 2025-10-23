@@ -17,14 +17,10 @@ class TaskStatus(models.TextChoices):
     # Task has been created but not yet queued
     PENDING = "pending"
 
-    # Task has been pushed onto queue and is ready to be picked up
+    # Task has been pushed onto the queue
     QUEUED = "queued"
 
     # Task has been picked up by a worker
-    DISPATCHED = "dispatched"
-
-    # Task has been picked up by a worker, and the worker indicates that it is
-    # running.
     RUNNING = "running"
 
     # Task has been completed
