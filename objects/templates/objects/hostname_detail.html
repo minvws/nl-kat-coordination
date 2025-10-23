@@ -8,18 +8,8 @@
 
     <main id="main-content">
         <section>
-            <div class="introduction">
-                <div>
-                    <h1>{% translate "Hostname:" %} {{ hostname.name }}</h1>
-                </div>
-                <div class="horizontal-view toolbar">
-                    <form action="{% url 'objects:delete_hostname' hostname.pk %}"
-                          method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="ghost destructive">{% translate "Delete" %}</button>
-                    </form>
-                </div>
-            </div>
+            {% include "objects/hostname_detail_introduction.html" with view="details" %}
+
             <div>
                 <h2>{% translate "Details" %}</h2>
                 <div>
@@ -37,6 +27,29 @@
                             </dd>
                         </div>
                         <div>
+                            <dt>{% translate "Scan level" %}</dt>
+                            <dd>
+                                {% if hostname.scan_level != None %}
+                                    {% include "partials/scan_level_indicator.html" with value=hostname.scan_level %}
+
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+                        </div>
+                        {% if hostname.scan_level != None %}
+                            <div>
+                                <dt>{% translate "Scan type" %}</dt>
+                                <dd>
+                                    {% if hostname.declared %}
+                                        {% translate "Declared" %}
+                                    {% else %}
+                                        {% translate "Inherited" %}
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        {% endif %}
+                        <div>
                             <dt>{% translate "Last seen" %}</dt>
                             <dd>
                                 {% if hostname.last_seen %}
@@ -46,35 +59,8 @@
                                 {% endif %}
                             </dd>
                         </div>
-                        <div>
-                            <dt>{% translate "Scan level" %}</dt>
-                            <dd>
-                                {% if hostname.scan_level != None %}
-                                    {% include "partials/scan_level_indicator.html" with value=hostname.scan_level %}
-
-                                    {% if hostname.declared %}
-                                        ({% translate "Declared" %})
-                                    {% endif %}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </dd>
-                        </div>
                     </dl>
                 </div>
-            </div>
-            <div>
-                <h2>{% translate "Edit scan level" %}</h2>
-                <form method="post"
-                      action="{% url 'objects:update_hostname_scan_level' hostname.pk %}">
-                    {% csrf_token %}
-                    <div class="horizontal-view">
-                        {{ scan_level_form }}
-                        <p class="action-buttons">
-                            <button type="submit" class="button">{% translate "Update" %}</button>
-                        </p>
-                    </div>
-                </form>
             </div>
             <div class="horizontal-scroll">
                 <h2>{% translate "DNS records" %}</h2>

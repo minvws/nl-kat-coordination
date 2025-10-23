@@ -10,7 +10,7 @@
         <section>
             <div class="introduction">
                 <div>
-                    <h1>{% translate "Create New Report" %}</h1>
+                    <h1>{% translate "Generate report" %}</h1>
                     <p>
                         {% blocktranslate trimmed %}
                             Configure a new security report. You can generate it immediately or schedule it to run periodically. Select the organizations, finding types, and other filters to customize your report.
@@ -30,7 +30,7 @@
                     </div>
                 {% endif %}
                 <fieldset>
-                    <legend>{% translate "Report Configuration" %}</legend>
+                    <legend>{% translate "Report configuration" %}</legend>
                     <div class="form-group">
                         <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
                         {{ form.name }}
@@ -43,7 +43,7 @@
                     </div>
                 </fieldset>
                 <fieldset>
-                    <legend>{% translate "Generation Options" %}</legend>
+                    <legend>{% translate "Generation options" %}</legend>
                     <div class="form-group">
                         <label>{{ form.generation_type.label }}</label>
                         {{ form.generation_type }}
@@ -51,7 +51,7 @@
                     </div>
                 </fieldset>
                 <fieldset>
-                    <legend>{% translate "Report Filters" %}</legend>
+                    <legend>{% translate "Report filters" %}</legend>
                     <div class="form-group">
                         <label for="{{ form.organizations.id_for_label }}">{{ form.organizations.label }}</label>
                         {{ form.organizations }}
@@ -78,7 +78,7 @@
                 </fieldset>
                 <div class="button-container">
                     <button type="submit" class="button">
-                        <span class="icon ti-file-text"></span>{% translate "Create Report" %}
+                        <span class="icon ti-file-text"></span>{% translate "Generate report" %}
                     </button>
                     <a href="{% url 'report_list' %}" class="button ghost">{% translate "Cancel" %}</a>
                 </div>
