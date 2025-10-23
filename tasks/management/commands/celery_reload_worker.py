@@ -1,4 +1,3 @@
-import logging
 import os
 import shlex
 import signal
@@ -6,12 +5,13 @@ import subprocess
 import sys
 from typing import Any
 
+import structlog
 from django.core.management.base import BaseCommand, CommandParser
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV, get_reloader, restart_with_reloader, start_django
 
 from tasks.celery import cancel_all_tasks
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 def restart_celery(celery_cmd: str) -> None:

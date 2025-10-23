@@ -180,6 +180,9 @@ def test_findings(rf, superuser_member, xtdb):
     response = FindingListView.as_view()(request)
     assertContains(response, "test.com")
 
+    host.delete()
+    assert Finding.objects.count() == 0
+
 
 def test_update_get_or_create(xtdb):
     net = Network.objects.create(name="internet")

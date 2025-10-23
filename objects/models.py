@@ -4,6 +4,7 @@ from enum import Enum
 from functools import total_ordering
 from typing import cast
 
+import structlog
 from django.apps import apps
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
@@ -11,11 +12,13 @@ from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterR
 from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
-from psycopg import sql
+from psycopg import DatabaseError, sql
 from tldextract import tldextract
 from transit.writer import Writer
 
 from openkat.models import LowerCaseCharField
+
+logger = structlog.get_logger(__name__)
 
 
 def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
@@ -73,6 +76,13 @@ class Asset(XTDBModel):
     class Meta:
         managed = False
         abstract = True
+
+    def delete(self, *args, **kwargs):
+        try:
+            Finding.objects.filter(object_id=self.pk).delete()
+        except DatabaseError:
+            logger.warning("Failed to delete Findings for %s", self)
+        return super().delete(*args, **kwargs)
 
 
 class ManagerWithGenericObjectForeignKey(Manager):

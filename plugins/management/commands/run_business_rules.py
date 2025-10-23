@@ -1,11 +1,10 @@
-import logging
-
+import structlog
 from django.core.management import BaseCommand
 
 from plugins.models import BusinessRule
 from plugins.plugins.business_rules import run_rules
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class Command(BaseCommand):

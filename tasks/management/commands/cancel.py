@@ -1,10 +1,9 @@
-import logging
-
+import structlog
 from django.core.management.base import BaseCommand, CommandParser
 
 from tasks.models import Task, TaskStatus
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class Command(BaseCommand):
