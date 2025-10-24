@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            {% include "objects/ipaddress_detail_introduction.html" with view="tasks" %}
+
+            <div>
+                <h2>{% translate "Recent tasks" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        This tab shows plugin tasks that have this IP address in their input data.
+                    {% endblocktranslate %}
+                </p>
+                {% include "task_table.html" %}
+
+            </div>
+        </section>
+    </main>
+{% endblock content %}

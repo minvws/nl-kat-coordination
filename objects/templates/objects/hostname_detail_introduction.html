@@ -26,5 +26,8 @@
         <li {% if view == "scan_level" %}aria-current="page"{% endif %}>
             <a href="{% url "objects:hostname_scan_level_detail" pk=hostname.pk %}">{% translate "Scan level" %}</a>
         </li>
+        <li {% if view == "tasks" %}aria-current="page"{% endif %}>
+            <a href="{% url "objects:hostname_tasks_detail" pk=hostname.pk %}">{% translate "Recent tasks" %}</a>
+        </li>
     </ul>
 </nav>

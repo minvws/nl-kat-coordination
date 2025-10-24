@@ -8,11 +8,12 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q, QuerySet
+from django.db.models import OuterRef, Q, QuerySet, Subquery
+from django.db.models.fields.json import KeyTextTransform
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, DeleteView, DetailView, FormView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView
 from django_filters.views import FilterView
 from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
@@ -44,7 +45,8 @@ from objects.models import (
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
-from tasks.models import ObjectSet
+from plugins.models import Plugin
+from tasks.models import ObjectSet, Task
 
 if TYPE_CHECKING:
     from django.db.models.query import QuerySet
@@ -769,6 +771,74 @@ class HostnameScanLevelDetailView(OrganizationFilterMixin, DetailView):
 
         # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+
+        return context
+
+
+class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
+    model = Task
+    template_name = "objects/hostname_detail_tasks.html"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    ordering = ["-created_at"]
+
+    def get_queryset(self) -> "QuerySet[Task]":
+        hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
+        qs = Task.objects.filter(data__input_data__has_any_keys=[str(hostname.name)])
+        qs = qs.annotate(
+            plugin_name=Subquery(
+                Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
+            )
+        )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
+        context["hostname"] = hostname
+
+        # Build breadcrumb URL with organization parameters
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:hostname_list")
+
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
+
+        return context
+
+
+class IPAddressTasksDetailView(OrganizationFilterMixin, ListView):
+    """Show tasks related to a specific IP address."""
+
+    model = Task
+    template_name = "objects/ipaddress_detail_tasks.html"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    ordering = ["-created_at"]
+
+    def get_queryset(self) -> "QuerySet[Task]":
+        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
+        qs = Task.objects.filter(data__input_data__has_any_keys=[str(ipaddress.address)])
+        qs = qs.annotate(
+            plugin_name=Subquery(
+                Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
+            )
+        )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
+        context["ipaddress"] = ipaddress
+
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:ipaddress_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
 
         return context
 
