@@ -55,58 +55,10 @@ if TYPE_CHECKING:
 
 class NetworkFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
-    object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
-    )
-    scan_level = django_filters.MultipleChoiceFilter(
-        label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
-        method="filter_by_scan_level",
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
-    )
-    declared = django_filters.BooleanFilter(label="Declared")
-    query = django_filters.CharFilter(label="Query", method="filter_by_query")
 
     class Meta:
         model = Network
-        fields = ["name", "object_set", "declared", "query", "scan_level"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        network_ct = ContentType.objects.get_for_model(Network)
-        queryset = ObjectSet.objects.filter(object_type=network_ct)
-        if queryset.exists():
-            self.filters["object_set"].queryset = queryset
-        else:
-            # Hide the filter if no object sets exist
-            del self.filters["object_set"]
-
-    def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
-        return queryset
-
-    def filter_by_scan_level(self, queryset, name, value):
-        if not value:
-            return queryset
-
-        q_objects = Q()
-
-        for level in value:
-            if level == "none":
-                q_objects |= Q(scan_level__isnull=True)
-            else:
-                q_objects |= Q(scan_level=level)
-
-        return queryset.filter(q_objects)
-
-    def filter_by_query(self, queryset, name, value):
-        if not value:
-            return queryset
-
-        try:
-            return apply_search(queryset, value)
-        except DjangoQLParserError:
-            return queryset
+        fields = ["name"]
 
 
 class NetworkListView(OrganizationFilterMixin, FilterView):
@@ -142,44 +94,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
                     _('"{}" has static objects that are ignored. Only the query is applied.').format(object_set.name),
                 )
 
-        # Add data for bulk actions
-        network_ct = ContentType.objects.get_for_model(Network)
-        context["object_sets"] = ObjectSet.objects.filter(object_type=network_ct)
-        context["scan_levels"] = ScanLevelEnum
-        context["plugins"] = Plugin.objects.filter(consumes__contains=["Network"])
-
         return context
-
-    def post(self, request, *args, **kwargs):
-        action_type = request.POST.get("action")
-        selected_ids = request.POST.getlist("network")
-
-        if not selected_ids:
-            messages.warning(request, _("No networks selected."))
-            return redirect(reverse("objects:network_list"))
-
-        if action_type == "set-scan-level":
-            scan_level = request.POST.get("scan-level")
-            if scan_level == "none":
-                # Remove scan level
-                updated_count = Network.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
-                messages.success(request, _("Removed scan level for {} networks.").format(updated_count))
-            elif scan_level:
-                # Set scan level
-                updated_count = Network.objects.filter(pk__in=selected_ids).update(
-                    scan_level=int(scan_level), declared=True
-                )
-                messages.success(request, _("Updated scan level for {} networks.").format(updated_count))
-            else:
-                messages.warning(request, _("No scan level selected."))
-        elif action_type == "delete":
-            try:
-                Network.objects.filter(pk__in=selected_ids).delete()
-                messages.success(request, _("Deleted {} networks.").format(len(selected_ids)))
-            except DatabaseError:
-                messages.warning(request, _("Failed to delete networks."))
-
-        return redirect(reverse("objects:network_list"))
 
 
 class NetworkDetailView(OrganizationFilterMixin, DetailView):

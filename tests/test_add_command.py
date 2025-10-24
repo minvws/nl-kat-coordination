@@ -7,7 +7,6 @@ from objects.models import Hostname, IPAddress, Network
 
 
 def test_add_file_from_path(xtdb, tmp_path):
-    """Test uploading a file from a file path."""
     out = StringIO()
 
     f = tmp_path / "tst.txt"
@@ -22,7 +21,6 @@ def test_add_file_from_path(xtdb, tmp_path):
 
 
 def test_add_file_from_stdin(xtdb, monkeypatch):
-    """Test uploading a file from stdin."""
     stdin = StringIO("stdin test data")
     stdin.buffer = stdin
     monkeypatch.setattr("sys.stdin", stdin)
@@ -38,7 +36,6 @@ def test_add_file_from_stdin(xtdb, monkeypatch):
 
 
 def test_add_single_hostname(xtdb):
-    """Test adding a single hostname via command line argument."""
     out = StringIO()
     call_command("add", "-H", "test.com", stdout=out)
 
@@ -49,7 +46,6 @@ def test_add_single_hostname(xtdb):
 
 
 def test_add_multiple_hostnames_from_stdin(xtdb, monkeypatch):
-    """Test adding multiple hostnames from stdin."""
     stdin = StringIO("test.com\nexample.org\nfoo.bar\n")
     monkeypatch.setattr("sys.stdin", stdin)
     monkeypatch.setattr("sys.stdin.isatty", lambda: False)
@@ -65,8 +61,6 @@ def test_add_multiple_hostnames_from_stdin(xtdb, monkeypatch):
 
 
 def test_add_hostname_duplicate(xtdb):
-    """Test that adding duplicate hostname is handled gracefully."""
-    # Add first time
     out1 = StringIO()
     call_command("add", "-H", "test.com", stdout=out1)
     assert "Created hostname: test.com" in out1.getvalue()
@@ -80,7 +74,6 @@ def test_add_hostname_duplicate(xtdb):
 
 
 def test_add_single_network(xtdb):
-    """Test adding a single network via command line argument."""
     out = StringIO()
     call_command("add", "-N", "10.0.0.0/8", stdout=out)
 
@@ -90,7 +83,6 @@ def test_add_single_network(xtdb):
 
 
 def test_add_multiple_networks_from_stdin(xtdb, monkeypatch):
-    """Test adding multiple networks from stdin."""
     stdin = StringIO("192.168.0.0/16\n10.0.0.0/8\n172.16.0.0/12\n")
     monkeypatch.setattr("sys.stdin", stdin)
     monkeypatch.setattr("sys.stdin.isatty", lambda: False)
@@ -105,7 +97,6 @@ def test_add_multiple_networks_from_stdin(xtdb, monkeypatch):
 
 
 def test_add_single_ip(xtdb):
-    """Test adding a single IP address via command line argument."""
     out = StringIO()
     call_command("add", "-I", "192.168.1.1", stdout=out)
 
@@ -115,7 +106,6 @@ def test_add_single_ip(xtdb):
 
 
 def test_add_multiple_ips_from_stdin(xtdb, monkeypatch):
-    """Test adding multiple IP addresses from stdin."""
     stdin = StringIO("192.168.1.1\n192.168.1.2\n192.168.1.3\n")
     monkeypatch.setattr("sys.stdin", stdin)
     monkeypatch.setattr("sys.stdin.isatty", lambda: False)
@@ -131,7 +121,6 @@ def test_add_multiple_ips_from_stdin(xtdb, monkeypatch):
 
 
 def test_add_with_custom_network_name(xtdb):
-    """Test adding hostnames and IPs with a custom network name."""
     out = StringIO()
     call_command("add", "-H", "test.com", "--network-name", "internal", stdout=out)
 
@@ -146,8 +135,6 @@ def test_add_with_custom_network_name(xtdb):
 
 
 def test_add_ip_duplicate(xtdb):
-    """Test that adding duplicate IP is handled gracefully."""
-    # Add first time
     out1 = StringIO()
     call_command("add", "-I", "192.168.1.1", stdout=out1)
     assert "Created IP: 192.168.1.1" in out1.getvalue()
@@ -161,7 +148,6 @@ def test_add_ip_duplicate(xtdb):
 
 
 def test_add_multiple_flags_error(xtdb):
-    """Test that using multiple flags at once returns an error."""
     err = StringIO()
     call_command("add", "-H", "test.com", "-N", "10.0.0.0/8", stderr=err)
 
@@ -169,7 +155,6 @@ def test_add_multiple_flags_error(xtdb):
 
 
 def test_add_hostname_empty_stdin_error(xtdb, monkeypatch):
-    """Test that using -H flag without value and empty stdin returns an error."""
     monkeypatch.setattr("sys.stdin.isatty", lambda: True)
 
     err = StringIO()
@@ -179,8 +164,6 @@ def test_add_hostname_empty_stdin_error(xtdb, monkeypatch):
 
 
 def test_add_network_duplicate(xtdb):
-    """Test that adding duplicate network is handled gracefully."""
-    # Add first time
     out1 = StringIO()
     call_command("add", "-N", "192.168.0.0/24", stdout=out1)
     assert "Created network: 192.168.0.0/24" in out1.getvalue()
@@ -193,7 +176,6 @@ def test_add_network_duplicate(xtdb):
 
 
 def test_add_file_nonexistent_path(xtdb):
-    """Test that providing a nonexistent file path returns an error."""
     err = StringIO()
     call_command("add", "/nonexistent/file.txt", stderr=err)
 
@@ -202,7 +184,6 @@ def test_add_file_nonexistent_path(xtdb):
 
 
 def test_add_hostnames_with_empty_lines(xtdb, monkeypatch):
-    """Test that empty lines in stdin are properly filtered out."""
     stdin = StringIO("test.com\n\nexample.org\n\n\nfoo.bar\n")
     monkeypatch.setattr("sys.stdin", stdin)
     monkeypatch.setattr("sys.stdin.isatty", lambda: False)

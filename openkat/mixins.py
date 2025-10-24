@@ -19,8 +19,6 @@ from openkat.exceptions import (
 from openkat.models import Indemnification, Organization, OrganizationMember
 
 
-# There are modified versions of PermLookupDict and PermWrapper from
-# django.contrib.auth.context_processor.
 class OrganizationPermLookupDict:
     def __init__(self, organization_member, app_label):
         self.organization_member, self.app_label = organization_member, app_label
@@ -107,20 +105,12 @@ class OrganizationView(ContextMixin, View):
         context = super().get_context_data(**kwargs)
         context["organization"] = self.organization
         context["organization_member"] = self.organization_member
-        context["may_update_clearance_level"] = self.may_update_clearance_level
         context["indemnification_present"] = self.indemnification_present
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
     def indemnification_error(self):
         return messages.error(self.request, f"Indemnification not present at organization {self.organization}.")
-
-    @property
-    def may_update_clearance_level(self) -> bool:
-        if not self.indemnification_present:
-            return False
-
-        return self.organization_member.has_clearance_level(0)
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
