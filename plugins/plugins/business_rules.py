@@ -477,7 +477,7 @@ def get_rules():
     for software in ["mysql", "mongodb", "openssh", "rdp", "pgsql", "telnet", "db2"]:
         rules[f"{software}_detection"] = {
             "name": f"{software}_detection",
-            "description": "Checks for software that should not be running.",
+            "description": f"Checks is {software} is running on the IPAddress.",
             "object_type": "ipaddress",
             "query": f"""
             SELECT distinct ip.*
