@@ -691,9 +691,6 @@ class ObjectSetUpdateView(KATModelPermissionRequiredMixin, UpdateView):
 class ObjectSetDeleteView(KATModelPermissionRequiredMixin, DeleteView):
     model = ObjectSet
 
-    def form_invalid(self, form):
-        return redirect(reverse("object_set_list"))
-
     def get_success_url(self, **kwargs):
         redirect_url = self.request.POST.get("current_url")
 

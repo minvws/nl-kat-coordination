@@ -2,9 +2,12 @@ import time
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
+from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.models import Hostname, Network
 from tasks.models import ObjectSet
+from tasks.views import ObjectSetDetailView
+from tests.conftest import setup_request
 
 
 def test_traverse_objects_with_all_objects(xtdb):
@@ -22,6 +25,29 @@ def test_traverse_objects_with_all_objects(xtdb):
     )
 
     assert set(object_set.traverse_objects()) == {hostname1.pk, hostname2.pk}
+
+
+def test_object_set_detail_view(rf, superuser, organization, organization_b):
+    network = Network.objects.create(name="internet")
+
+    hostname1 = Hostname.objects.create(network=network, name="test1.example.com")
+    hostname2 = Hostname.objects.create(network=network, name="test2.example.com")
+    Hostname.objects.create(network=network, name="test3.example.com")
+    time.sleep(0.1)
+    object_set = ObjectSet.objects.create(
+        name="Test Set",
+        object_type=ContentType.objects.get_for_model(Hostname),
+        all_objects=[hostname1.pk, hostname2.pk],
+    )
+
+    request = setup_request(rf.get("object_set_detail"), superuser)
+    response = ObjectSetDetailView.as_view()(request, pk=object_set.pk)
+
+    assert response.status_code == 200
+    assertContains(response, "Test Set")
+    assertContains(response, "test1.example.com")
+    assertContains(response, "test2.example.com")
+    assertNotContains(response, "test3.example.com")
 
 
 def test_traverse_objects_with_query(xtdb):

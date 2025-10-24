@@ -7,8 +7,8 @@ from pytest_django.asserts import assertContains
 
 from objects.models import Hostname, Network
 from plugins.models import Plugin
-from tasks.models import ObjectSet, Task
-from tasks.views import ObjectSetCreateView, TaskCreateView, TaskListView
+from tasks.models import ObjectSet, Task, TaskStatus
+from tasks.views import ObjectSetCreateView, TaskCancelAllView, TaskCreateView, TaskListView
 from tests.conftest import setup_request
 
 
@@ -207,3 +207,30 @@ def test_task_list_view(rf, superuser, organization, organization_b):
     assertContains(response, a.pk)
     assertContains(response, b.pk)
     assertContains(response, "test_plugin")
+
+
+def test_task_cancel_all_view(rf, superuser_member, xtdb, organization, organization_b, mocker):
+    mock_cancel = mocker.patch("tasks.models.Task.cancel")
+
+    Task.objects.create(organization=organization, type="plugin", data={}, status=TaskStatus.QUEUED)
+    Task.objects.create(organization=organization, type="plugin", data={}, status=TaskStatus.PENDING)
+    Task.objects.create(organization=organization, type="plugin", data={}, status=TaskStatus.COMPLETED)
+    Task.objects.create(organization=organization_b, type="plugin", data={}, status=TaskStatus.QUEUED)
+    time.sleep(0.1)
+
+    request = setup_request(rf.post("task_cancel_all"), superuser_member.user)
+    response = TaskCancelAllView.as_view()(request)
+
+    assert response.status_code == 302
+    assert "/tasks/" in response.url
+    assert mock_cancel.call_count == 3
+
+    mock_cancel.reset_mock()
+
+    request = setup_request(
+        rf.post("task_cancel_all", query_params={"organization": [organization.code]}), superuser_member.user
+    )
+    response = TaskCancelAllView.as_view()(request)
+
+    assert response.status_code == 302
+    assert mock_cancel.call_count == 2
