@@ -80,6 +80,7 @@ def bulk_data_org(xtdbulk, N):
         caa_records,
         findings,
         finding_types,
+        software,
     ) = generate(N, 2, 1, include_dns_records=True)
     bulk_insert(hostnames)
     bulk_insert(ips)
@@ -92,6 +93,7 @@ def bulk_data_org(xtdbulk, N):
     bulk_insert(caa_records)
     bulk_insert(findings)
     bulk_insert(finding_types)
+    bulk_insert(software)
 
     return org
 

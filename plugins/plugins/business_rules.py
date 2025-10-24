@@ -534,7 +534,6 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
 
         try:
             if rule.inverse_query:
-                # Apply the inverse query
                 start = time.time()
                 try:
                     with connections["xtdb"].cursor() as cursor:

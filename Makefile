@@ -88,10 +88,8 @@ utest: testclean ## Run the unit tests.
 itest: testclean ## Run the integration tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration
 
-bench: testclean ## Run the report benchmark.
-	docker compose -f .ci/docker-compose.yml run --rm openkat_integration \
-	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
-	docker compose -f .ci/docker-compose.yml stop
+bench:
+	pytest -n 0 --benchmark-only tests/objects/test_bench.py
 
 languages:
 # Extracts strings to `.pot` file which should be translated

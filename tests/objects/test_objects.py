@@ -2,6 +2,7 @@ import time
 
 from pytest_django.asserts import assertContains, assertNotContains
 
+from objects.management.commands.generate_benchmark_data import generate
 from objects.models import (
     DNSAAAARecord,
     DNSARecord,
@@ -266,3 +267,15 @@ def test_bulk_insert_hostnames(xtdb):
 
     bulk_insert([host, host1, host2, host3])
     assert Hostname.objects.count() == 4
+
+
+def test_generate_benchmark_data(xtdb):
+    objects = generate(10, 1, 1, True)
+    for object_t in objects:
+        bulk_insert(object_t)
+
+    assert Network.objects.count() == 1
+    assert Hostname.objects.count() == 10
+    assert IPAddress.objects.count() == 12
+    assert DNSARecord.objects.count() == 5
+    assert Software.objects.count() == 2
