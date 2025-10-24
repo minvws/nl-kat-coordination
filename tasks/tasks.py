@@ -280,6 +280,38 @@ def run_schedule_for_organization(
     return run_plugin_task(schedule.plugin.plugin_id, code, input_data, schedule.pk, celery=celery)
 
 
+def run_plugin_on_object_set(
+    object_set: ObjectSet, plugin: Plugin, organization: Organization | None, force: bool = True, celery: Celery = app
+) -> list[Task]:
+    now = datetime.now(UTC)
+    code = None if organization is None else organization.code
+
+    input_data: set[str] = set()
+    object_pks = object_set.traverse_objects(scan_level__gte=plugin.scan_level)
+    if object_pks:
+        model_class = object_set.object_type.model_class()
+        model_qs = model_class.objects.filter(pk__in=object_pks)
+        input_data = input_data.union([str(model) for model in model_qs if str(model)])
+
+    if not input_data:
+        return []
+
+    if force or not plugin.recurrences:
+        return run_plugin_task(plugin.plugin_id, code, input_data, None, celery=celery)
+
+    # Filter on the schedule and created after the previous occurrence
+    last_runs = Task.objects.filter(created_at__gt=plugin.recurrences.before(now), data__plugin_id=plugin.plugin_id)
+
+    if input_data:
+        for targets in last_runs.values_list("data__input_data", flat=True):
+            input_data -= set(targets)
+
+    if not input_data:
+        return []
+
+    return run_plugin_task(plugin.plugin_id, code, input_data, None, celery=celery)
+
+
 def rerun_task(task: Task, celery: Celery = app) -> list[Task]:
     # Handle different task types
     if task.type == "report":

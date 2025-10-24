@@ -23,7 +23,7 @@ from openkat.mixins import OrganizationFilterMixin
 from openkat.permissions import KATModelPermissionRequiredMixin
 from plugins.models import Plugin
 from tasks.models import ObjectSet, Schedule, Task, TaskStatus
-from tasks.tasks import rerun_task, run_plugin_task, run_schedule
+from tasks.tasks import rerun_task, run_plugin_on_object_set, run_plugin_task, run_schedule
 
 
 class TaskFilter(django_filters.FilterSet):
@@ -88,6 +88,7 @@ class TaskDetailView(OrganizationFilterMixin, DetailView):
 
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.all())
+    object_set = forms.ModelChoiceField(ObjectSet.objects.all(), required=False, label="Object Set")
     input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
     input_ips = forms.ModelMultipleChoiceField(IPAddress.objects.all(), required=False)
 
@@ -97,7 +98,21 @@ class TaskForm(ModelForm):
 
     def save(self, *args, **kwargs):
         plugin = self.cleaned_data["plugin"]
+        object_set = self.cleaned_data.get("object_set")
+        organization = self.cleaned_data.get("organization")
 
+        # If object_set is provided, use run_plugin_on_object_set
+        if object_set:
+            tasks = run_plugin_on_object_set(
+                object_set=object_set, plugin=plugin, organization=organization, force=True
+            )
+
+            if tasks:
+                return tasks[0]
+
+            return None
+
+        # Otherwise use individual objects
         # TODO: fix, ips, etc.
         input_hostnames = {str(model) for model in self.cleaned_data["input_hostnames"]}
         input_ips = {str(model) for model in self.cleaned_data["input_ips"]}
@@ -107,7 +122,7 @@ class TaskForm(ModelForm):
 
         return run_plugin_task(
             plugin.plugin_id,
-            None if self.cleaned_data["organization"] is None else self.cleaned_data["organization"].code,
+            None if organization is None else organization.code,
             list(input_hostnames) + list(input_ips),
             batch=False,
         )[0]
