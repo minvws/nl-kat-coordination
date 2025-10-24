@@ -482,7 +482,11 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             messages.warning(request, _("No IP addresses selected."))
             return redirect(reverse("objects:ipaddress_list"))
 
-        if action_type == "set-scan-level":
+        if action_type == "scan":
+            # Redirect to task creation page with selected IP addresses
+            url = reverse("add_task") + "?" + "&".join([f"input_ips={selected}" for selected in selected_ids])
+            return redirect(url)
+        elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")
             if scan_level == "none":
                 # Remove scan level
@@ -799,7 +803,11 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             messages.warning(request, _("No hostnames selected."))
             return redirect(reverse("objects:hostname_list"))
 
-        if action_type == "set-scan-level":
+        if action_type == "scan":
+            # Redirect to task creation page with selected hostnames
+            url = reverse("add_task") + "?" + "&".join([f"input_hostnames={selected}" for selected in selected_ids])
+            return redirect(url)
+        elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")
             if scan_level == "none":
                 # Remove scan level
