@@ -11,6 +11,10 @@
             {% include "objects/object_list_introduction.html" %}
             {% include "objects/object_list_tabs.html" with view="ipaddresses" %}
 
+            {#            <div class="horizontal-view">#}
+            {#                {% include "objects/object_list_tabs.html" with view="ipaddresses" %}#}
+            {#                {% include "objects/add_object.html" %}#}
+            {#            </div>#}
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
@@ -43,10 +47,23 @@
                 </form>
             </div>
             <div>
+                <form method="post"
+                      id="ipaddress_list_form"
+                      class="inline layout-wide checkboxes_required">
+                    {% csrf_token %}
+                </form>
                 <div class="horizontal-scroll sticky-column">
                     <table class="nowrap">
                         <thead>
                             <tr>
+                                <th>
+                                    <form>
+                                        <input class="toggle-all"
+                                               data-toggle-target="ipaddress"
+                                               type="checkbox"
+                                               form="ipaddress_list_form">
+                                    </form>
+                                </th>
                                 <th>{% translate "Address" %}</th>
                                 <th>{% translate "Network" %}</th>
                                 <th>{% translate "Scan Level" %}</th>
@@ -57,6 +74,14 @@
                         <tbody>
                             {% for ipaddress in ipaddresses %}
                                 <tr>
+                                    <td>
+                                        <form>
+                                            <input type="checkbox"
+                                                   name="ipaddress"
+                                                   form="ipaddress_list_form"
+                                                   value="{{ ipaddress.pk }}">
+                                        </form>
+                                    </td>
                                     <td>
                                         <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.address }}</a>
                                     </td>
@@ -80,9 +105,14 @@
                                     </td>
                                     <td>
                                         <form action="{% url 'objects:delete_ipaddress' ipaddress.pk %}"
-                                              method="post">
+                                              method="post"
+                                              id="object-delete-{{ ipaddress.pk }}">
                                             {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                            <button type="submit"
+                                                    form="object-delete-{{ ipaddress.pk }}"
+                                                    class="icon ti-trash action-button">
+                                                {% translate "Delete" %}
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -90,9 +120,37 @@
                         </tbody>
                     </table>
                 </div>
+                {% if ipaddresses %}
+                    <form>
+                        <fieldset form="ipaddress_list_form">
+                            <div class="horizontal-view">
+                                <button type="submit"
+                                        class="dropdown-button ghost destructive"
+                                        name="action"
+                                        value="delete"
+                                        form="ipaddress_list_form">{% translate "Delete" %}</button>
+                                <select id="scan-level" name="scan-level" form="ipaddress_list_form">
+                                    <option value="">{% translate "Select scan level..." %}</option>
+                                    <option value="none">{% translate "Remove scan level" %}</option>
+                                    {% for level in scan_levels %}<option value="{{ level.value }}">{{ level.label }}</option>{% endfor %}
+                                </select>
+                                <button type="submit"
+                                        class="dropdown-button"
+                                        name="action"
+                                        value="set-scan-level"
+                                        form="ipaddress_list_form">{% translate "Set scan level" %}</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                {% endif %}
             </div>
             {% include "partials/list_paginator.html" %}
 
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

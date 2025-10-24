@@ -8,6 +8,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.db import DatabaseError
 from django.db.models import OuterRef, Q, QuerySet, Subquery
 from django.db.models.fields.json import KeyTextTransform
 from django.shortcuts import redirect
@@ -115,6 +116,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NetworkFilter
     ordering = ["-id"]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[Network]":
         queryset = super().get_queryset()
@@ -142,7 +144,44 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
                     ),
                 )
 
+        # Add data for bulk actions
+        network_ct = ContentType.objects.get_for_model(Network)
+        context["object_sets"] = ObjectSet.objects.filter(object_type=network_ct)
+        context["scan_levels"] = ScanLevelEnum
+        context["plugins"] = Plugin.objects.filter(consumes__contains=["Network"])
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        action_type = request.POST.get("action")
+        selected_ids = request.POST.getlist("network")
+
+        if not selected_ids:
+            messages.warning(request, _("No networks selected."))
+            return redirect(reverse("objects:network_list"))
+
+        if action_type == "set-scan-level":
+            scan_level = request.POST.get("scan-level")
+            if scan_level == "none":
+                # Remove scan level
+                updated_count = Network.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
+                messages.success(request, _("Removed scan level for {} networks.").format(updated_count))
+            elif scan_level:
+                # Set scan level
+                updated_count = Network.objects.filter(pk__in=selected_ids).update(
+                    scan_level=int(scan_level), declared=True
+                )
+                messages.success(request, _("Updated scan level for {} networks.").format(updated_count))
+            else:
+                messages.warning(request, _("No scan level selected."))
+        elif action_type == "delete":
+            try:
+                Network.objects.filter(pk__in=selected_ids).delete()
+                messages.success(request, _("Deleted {} networks.").format(len(selected_ids)))
+            except DatabaseError:
+                messages.warning(request, _("Failed to delete networks."))
+
+        return redirect(reverse("objects:network_list"))
 
 
 class NetworkDetailView(OrganizationFilterMixin, DetailView):
@@ -400,6 +439,7 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = IPAddressFilter
     ordering = ["-id"]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
         queryset = super().get_queryset()
@@ -425,7 +465,44 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
                     _('"{}" has fixed objects that are ignored (only query results are shown).').format(obj_set.name),
                 )
 
+        # Add data for bulk actions
+        ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+        context["object_sets"] = ObjectSet.objects.filter(object_type=ipaddress_ct)
+        context["scan_levels"] = ScanLevelEnum
+        context["plugins"] = Plugin.objects.filter(consumes__contains=["IPAddress"])
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        action_type = request.POST.get("action")
+        selected_ids = request.POST.getlist("ipaddress")
+
+        if not selected_ids:
+            messages.warning(request, _("No IP addresses selected."))
+            return redirect(reverse("objects:ipaddress_list"))
+
+        if action_type == "set-scan-level":
+            scan_level = request.POST.get("scan-level")
+            if scan_level == "none":
+                # Remove scan level
+                updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
+                messages.success(request, _("Removed scan level for {} IP addresses.").format(updated_count))
+            elif scan_level:
+                # Set scan level
+                updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(
+                    scan_level=int(scan_level), declared=True
+                )
+                messages.success(request, _("Updated scan level for {} IP addresses.").format(updated_count))
+            else:
+                messages.warning(request, _("No scan level selected."))
+        elif action_type == "delete":
+            try:
+                IPAddress.objects.filter(pk__in=selected_ids).delete()
+                messages.success(request, _("Deleted {} IP addresses.").format(len(selected_ids)))
+            except DatabaseError:
+                messages.warning(request, _("Failed to delete IP addresses."))
+
+        return redirect(reverse("objects:ipaddress_list"))
 
 
 class IPAddressDetailView(OrganizationFilterMixin, DetailView):
@@ -678,6 +755,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = HostnameFilter
     ordering = ["-id"]
+    http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[Hostname]":
         queryset = super().get_queryset()
@@ -705,7 +783,43 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
                     ),
                 )
 
+        # Add data for bulk actions
+        context["object_sets"] = ObjectSet.objects.filter(object_type=ContentType.objects.get_for_model(Hostname))
+        context["scan_levels"] = ScanLevelEnum
+        context["plugins"] = Plugin.objects.filter(consumes__contains=["Hostname"])
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        action_type = request.POST.get("action")
+        selected_ids = request.POST.getlist("hostname")
+
+        if not selected_ids:
+            messages.warning(request, _("No hostnames selected."))
+            return redirect(reverse("objects:hostname_list"))
+
+        if action_type == "set-scan-level":
+            scan_level = request.POST.get("scan-level")
+            if scan_level == "none":
+                # Remove scan level
+                updated_count = Hostname.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
+                messages.success(request, _("Removed scan level for {} hostnames.").format(updated_count))
+            elif scan_level:
+                # Set scan level
+                updated_count = Hostname.objects.filter(pk__in=selected_ids).update(
+                    scan_level=int(scan_level), declared=True
+                )
+                messages.success(request, _("Updated scan level for {} hostnames.").format(updated_count))
+            else:
+                messages.warning(request, _("No scan level selected."))
+        elif action_type == "delete":
+            try:
+                Hostname.objects.filter(pk__in=selected_ids).delete()
+                messages.success(request, _("Deleted {} hostnames.").format(len(selected_ids)))
+            except DatabaseError:
+                messages.warning(request, _("No plugin selected."))
+
+        return redirect(reverse("objects:hostname_list"))
 
 
 class HostnameDetailView(OrganizationFilterMixin, DetailView):

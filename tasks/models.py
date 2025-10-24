@@ -68,21 +68,16 @@ class ObjectSet(models.Model):
 
     def traverse_objects(self, depth: int = 0, max_depth: int = 3, **filters: Any) -> list[int]:
         # TODO: handle cycles
-        # TODO: configurable max_depth
 
-        # Start with manually added objects from all_objects field
         all_objects = list(self.all_objects)
 
-        # Add objects from object_query
         query_objects = self.get_query_objects(**filters)
         all_objects.extend([x.pk for x in query_objects])
 
-        # Add objects from subsets if we haven't exceeded max depth
         if depth < max_depth:
             for subset in self.subsets.all():
                 all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
 
-        # Remove duplicates while preserving order
         seen = set()
         unique_objects = []
         for obj in all_objects:

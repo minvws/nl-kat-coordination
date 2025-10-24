@@ -11,6 +11,11 @@
             {% include "objects/object_list_introduction.html" %}
             {% include "objects/object_list_tabs.html" with view="networks" %}
 
+            {# TODO: consider alternative approach with compacter view: #}
+            {#            <div class="horizontal-view">#}
+            {#                {% include "objects/object_list_tabs.html" with view="networks" %}#}
+            {#                {% include "objects/add_object.html" %}#}
+            {#            </div>#}
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
@@ -43,10 +48,23 @@
                 </form>
             </div>
             <div>
+                <form method="post"
+                      id="network_list_form"
+                      class="inline layout-wide checkboxes_required">
+                    {% csrf_token %}
+                </form>
                 <div class="horizontal-scroll sticky-column">
                     <table class="nowrap">
                         <thead>
                             <tr>
+                                <th>
+                                    <form>
+                                        <input class="toggle-all"
+                                               data-toggle-target="network"
+                                               type="checkbox"
+                                               form="network_list_form">
+                                    </form>
+                                </th>
                                 <th>{% translate "Name" %}</th>
                                 <th>{% translate "Scan Level" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
@@ -56,6 +74,14 @@
                         <tbody>
                             {% for network in networks %}
                                 <tr>
+                                    <td>
+                                        <form>
+                                            <input type="checkbox"
+                                                   name="network"
+                                                   form="network_list_form"
+                                                   value="{{ network.pk }}">
+                                        </form>
+                                    </td>
                                     <td>
                                         <a href="{% url 'objects:network_detail' network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ network.name }}</a>
                                     </td>
@@ -75,9 +101,15 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <form action="{% url 'objects:delete_network' network.pk %}" method="post">
+                                        <form action="{% url 'objects:delete_network' network.pk %}"
+                                              method="post"
+                                              id="object-delete-{{ network.pk }}">
                                             {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
+                                            <button type="submit"
+                                                    form="object-delete-{{ network.pk }}"
+                                                    class="icon ti-trash action-button">
+                                                {% translate "Delete" %}
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
@@ -85,9 +117,37 @@
                         </tbody>
                     </table>
                 </div>
+                {% if networks %}
+                    <form>
+                        <fieldset form="network_list_form">
+                            <div class="horizontal-view">
+                                <button type="submit"
+                                        class="dropdown-button ghost destructive"
+                                        name="action"
+                                        value="delete"
+                                        form="network_list_form">{% translate "Delete" %}</button>
+                                <select id="scan-level" name="scan-level" form="network_list_form">
+                                    <option value="">{% translate "Select scan level..." %}</option>
+                                    <option value="none">{% translate "Remove scan level" %}</option>
+                                    {% for level in scan_levels %}<option value="{{ level.value }}">{{ level.label }}</option>{% endfor %}
+                                </select>
+                                <button type="submit"
+                                        class="dropdown-button"
+                                        name="action"
+                                        value="set-scan-level"
+                                        form="network_list_form">{% translate "Set scan level" %}</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                {% endif %}
             </div>
             {% include "partials/list_paginator.html" %}
 
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

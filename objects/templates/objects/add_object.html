@@ -1,0 +1,39 @@
+{% load static %}
+{% load i18n %}
+
+<div class="dropdown">
+    <button aria-controls="export-add"
+            aria-expanded="false"
+            class="dropdown-button ghost">
+        {% translate "Add" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+    </button>
+    <div id="export-add" class="dropdown-list">
+        <ul>
+            {% if perms.openkat.add_hostname %}
+                <li>
+                    <a href="{% url "objects:add_hostname" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Hostname" %}</a>
+                </li>
+            {% endif %}
+            {% if perms.openkat.add_ipaddress %}
+                <li>
+                    <a href="{% url "objects:add_ipaddress" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "IP address" %}</a>
+                </li>
+            {% endif %}
+            {% if perms.openkat.add_network %}
+                <li>
+                    <a href="{% url "objects:add_network" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Network" %}</a>
+                </li>
+            {% endif %}
+            {% if perms.openkat.add_object_set %}
+                <li>
+                    <a href="{% url "add_object_set" %}"><span aria-hidden="true" class="icon ti-folder-plus"></span>{% translate "Add object set" %}</a>
+                </li>
+            {% endif %}
+            {% if perms.openkat.add_ipaddress %}
+                <li>
+                    <a href="{% url "objects:generic_asset_create" %}"><span aria-hidden="true" class="icon ti-file-upload"></span>{% translate "Multiple assets" %}</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
