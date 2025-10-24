@@ -136,8 +136,19 @@ class TaskCreateView(KATModelPermissionRequiredMixin, CreateView):
     def get_initial(self):
         initial = super().get_initial()
 
-        if self.request.method == "GET" and "plugin" in self.request.GET:
-            initial["plugin"] = self.request.GET.get("plugin")
+        if self.request.method == "GET":
+            if "plugin" in self.request.GET:
+                initial["plugin"] = self.request.GET.get("plugin")
+
+            # Handle pre-selected hostnames from bulk action
+            if "input_hostnames" in self.request.GET:
+                hostname_ids = self.request.GET.getlist("input_hostnames")
+                initial["input_hostnames"] = Hostname.objects.filter(pk__in=hostname_ids)
+
+            # Handle pre-selected IP addresses from bulk action
+            if "input_ips" in self.request.GET:
+                ip_ids = self.request.GET.getlist("input_ips")
+                initial["input_ips"] = IPAddress.objects.filter(pk__in=ip_ids)
 
         return initial
 
@@ -509,16 +520,27 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
         return context
 
 
+class ObjectSetTypeSelectionForm(forms.Form):
+    """Simple form for selecting object type as first step of object set creation"""
+
+    object_type = forms.ModelChoiceField(
+        queryset=ContentType.objects.filter(app_label="objects"),
+        label=_("Object Type"),
+        help_text=_("Select the type of objects this set will contain"),
+    )
+
+
 class ObjectSetForm(ModelForm):
     all_objects = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={"size": "10"}),
         required=False,
         help_text="Select objects manually. These will be combined with objects from the query.",
     )
+    query_all = forms.BooleanField(required=False, label=_("All of this object type"))
 
     class Meta:
         model = ObjectSet
-        fields = ["name", "description", "object_type", "object_query", "all_objects"]
+        fields = ["name", "description", "object_type", "query_all", "object_query", "all_objects"]
         widgets = {"description": forms.Textarea(attrs={"rows": 3}), "object_query": forms.Textarea(attrs={"rows": 3})}
 
     def __init__(self, *args, **kwargs):
@@ -527,23 +549,68 @@ class ObjectSetForm(ModelForm):
         self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
         object_type = None
 
+        # Check if instance has empty string query (means "All")
+        if self.instance and self.instance.pk and self.instance.object_query == "":
+            self.initial["query_all"] = True
+
+        # Check for object_type in various sources
         if self.instance and self.instance.pk and self.instance.object_type:
             object_type = self.instance.object_type
         elif self.data.get("object_type"):
+            # POST data
             object_type = ContentType.objects.filter(pk=self.data.get("object_type")).first()
+        elif kwargs.get("initial", {}).get("object_type"):
+            # Initial data from GET params
+            object_type = kwargs["initial"]["object_type"]
 
         if object_type:
+            # Make object_type field disabled once it's been selected
+            self.fields["object_type"].disabled = True
+            self.fields["object_type"].widget.attrs["readonly"] = True
+            self.fields["object_type"].help_text = _("Object type cannot be changed after selection")
+
             model_class = object_type.model_class()
             if model_class:
-                objects = model_class.objects.all()
-                choices = [(obj.pk, str(obj)) for obj in objects]
-                self.fields["all_objects"].choices = choices
+                # Check if objects were pre-selected from bulk action
+                preselected_object_ids = kwargs.get("initial", {}).get("all_objects")
 
-                if self.instance and self.instance.all_objects:
-                    self.initial["all_objects"] = [str(pk) for pk in self.instance.all_objects]
+                if preselected_object_ids:
+                    # Only show pre-selected objects (from bulk action)
+                    objects = model_class.objects.filter(pk__in=preselected_object_ids)
+                    choices = [(obj.pk, str(obj)) for obj in objects]
+                    self.fields["all_objects"].choices = choices
+                    self.initial["all_objects"] = preselected_object_ids
+                    self.fields["all_objects"].help_text = _("Objects selected from bulk action.")
+                else:
+                    # Show all objects (normal flow)
+                    objects = model_class.objects.all()
+                    choices = [(obj.pk, str(obj)) for obj in objects]
+                    self.fields["all_objects"].choices = choices
+
+                    # Pre-select objects from existing instance
+                    if self.instance and self.instance.all_objects:
+                        self.initial["all_objects"] = [str(pk) for pk in self.instance.all_objects]
         else:
             self.fields["all_objects"].choices = []
             self.fields["all_objects"].help_text += " (Select an object type first to see available objects.)"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        object_query = cleaned_data.get("object_query")
+        query_all = cleaned_data.get("query_all")
+
+        # Handle object_query based on query_all checkbox
+        if not object_query or object_query.strip() == "":
+            # Query field is empty
+            if query_all:
+                # "All" checkbox is checked - save as empty string
+                cleaned_data["object_query"] = ""
+            else:
+                # "All" checkbox is not checked - save as None
+                cleaned_data["object_query"] = None
+        # If object_query has content, keep it as-is
+
+        return cleaned_data
 
     def clean_all_objects(self):
         return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
@@ -551,8 +618,55 @@ class ObjectSetForm(ModelForm):
 
 class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = ObjectSet
-    form_class = ObjectSetForm
     template_name = "object_set_form.html"
+
+    def get_form_class(self):
+        # Step 1: If no object_type in GET params, show type selection form
+        if "object_type" not in self.request.GET and self.request.method == "GET":
+            return ObjectSetTypeSelectionForm
+        # Step 2: Show full form with object_type pre-selected
+        return ObjectSetForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.get_form_class() == ObjectSetTypeSelectionForm:
+            kwargs.pop("instance", None)
+
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        if "object_type" in self.request.GET:
+            try:
+                object_type_id = self.request.GET.get("object_type")
+                object_type = ContentType.objects.get(pk=object_type_id)
+                initial["object_type"] = object_type
+
+                if "objects" in self.request.GET:
+                    object_ids = self.request.GET.getlist("objects")
+                    initial["all_objects"] = object_ids
+            except (ContentType.DoesNotExist, ValueError):
+                pass
+
+        return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["show_type_selection"] = "object_type" not in self.request.GET and self.request.method == "GET"
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if "object_type" in request.POST and "name" not in request.POST:
+            form = ObjectSetTypeSelectionForm(request.POST)
+            if form.is_valid():
+                object_type_id = form.cleaned_data["object_type"].pk
+                return redirect(f"{reverse('add_object_set')}?object_type={object_type_id}")
+            else:
+                return self.render_to_response(self.get_context_data(form=form))
+
+        return super().post(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         redirect_url = self.get_form().data.get("current_url")

@@ -10,7 +10,7 @@
         <section>
             <div class="introduction">
                 <div>
-                    <h1>{{ objectset.name }}</h1>
+                    <h1>Object Set: {{ objectset.name }}</h1>
                     <p>{% translate objectset.description %}</p>
                 </div>
                 <div class="horizontal-view toolbar">
@@ -46,14 +46,19 @@
                 </div>
             {% endif %}
             <div>
-                <h2>{% translate "Manually Added Objects" %}</h2>
-                {% if objectset.all_objects %}
+                <h2>{% translate "Static Objects" %}</h2>
+                {% if all_objects %}
                     <ul>
-                        {% for object in objectset.all_objects %}<li>{{ object }}</li>{% endfor %}
+                        {% for object in all_objects %}
+                            <li>
+                                {% with object|to_class_name|lower as model_name %}
+                                    <a href="{% url "objects:"|add:model_name|add:"_detail" pk=object.id %}">{{ object }}</a>
+                                {% endwith %}
+                            </li>
+                        {% endfor %}
                     </ul>
-                    <p>{% translate "Count:" %} {{ objectset.all_objects|length }}</p>
                 {% else %}
-                    <p>{% translate "No manually added objects." %}</p>
+                    <p>{% translate "No static objects." %}</p>
                 {% endif %}
             </div>
         </section>

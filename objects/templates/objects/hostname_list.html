@@ -121,14 +121,9 @@
                     </table>
                 </div>
                 {% if hostnames %}
-                    <form>
+                    <form class="inline layout-wide">
                         <fieldset form="hostname_list_form">
                             <div class="horizontal-view">
-                                <button type="submit"
-                                        class="dropdown-button ghost destructive"
-                                        name="action"
-                                        value="delete"
-                                        form="hostname_list_form">{% translate "Delete" %}</button>
                                 <select id="scan-level" name="scan-level" form="hostname_list_form">
                                     <option value="">{% translate "Select scan level..." %}</option>
                                     <option value="none">{% translate "Remove scan level" %}</option>
@@ -139,6 +134,19 @@
                                         name="action"
                                         value="set-scan-level"
                                         form="hostname_list_form">{% translate "Set scan level" %}</button>
+                                <button type="submit"
+                                        class="ghost"
+                                        name="action"
+                                        value="create-object-set"
+                                        form="hostname_list_form">
+                                    <span class="icon ti-plus"></span>
+                                    {% translate "Create object set" %}
+                                </button>
+                                <button type="submit"
+                                        class="dropdown-button ghost destructive"
+                                        name="action"
+                                        value="delete"
+                                        form="hostname_list_form">{% translate "Delete" %}</button>
                                 <button type="submit"
                                         class="dropdown-button"
                                         name="action"

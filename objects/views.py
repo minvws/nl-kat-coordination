@@ -139,9 +139,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
             if object_set.all_objects:
                 messages.warning(
                     self.request,
-                    _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                        object_set.name
-                    ),
+                    _('"{}" has static objects that are ignored. Only the query is applied.').format(object_set.name),
                 )
 
         # Add data for bulk actions
@@ -486,6 +484,15 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             # Redirect to task creation page with selected IP addresses
             url = reverse("add_task") + "?" + "&".join([f"input_ips={selected}" for selected in selected_ids])
             return redirect(url)
+        elif action_type == "create-object-set":
+            # Redirect to object set creation with selected IP addresses
+            ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+            url = (
+                reverse("add_object_set")
+                + f"?object_type={ipaddress_ct.pk}&"
+                + "&".join([f"objects={selected}" for selected in selected_ids])
+            )
+            return redirect(url)
         elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")
             if scan_level == "none":
@@ -783,9 +790,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             if object_set.all_objects:
                 messages.warning(
                     self.request,
-                    _('"{}" has manually added objects that are ignored. Only the query is applied.').format(
-                        object_set.name
-                    ),
+                    _('"{}" has static objects that are ignored. Only the query is applied.').format(object_set.name),
                 )
 
         # Add data for bulk actions
@@ -806,6 +811,15 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
         if action_type == "scan":
             # Redirect to task creation page with selected hostnames
             url = reverse("add_task") + "?" + "&".join([f"input_hostnames={selected}" for selected in selected_ids])
+            return redirect(url)
+        elif action_type == "create-object-set":
+            # Redirect to object set creation with selected hostnames
+            hostname_ct = ContentType.objects.get_for_model(Hostname)
+            url = (
+                reverse("add_object_set")
+                + f"?object_type={hostname_ct.pk}&"
+                + "&".join([f"objects={selected}" for selected in selected_ids])
+            )
             return redirect(url)
         elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")

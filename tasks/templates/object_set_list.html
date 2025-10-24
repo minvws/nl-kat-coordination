@@ -71,7 +71,7 @@
                                         {% if object_set.all_objects %}
                                             <div>
                                                 <h5>
-                                                    {% translate "Manually Added Objects" %} ({{ object_set.all_objects|slice:"10"|length }}/{{ object_set.all_objects|length }})
+                                                    {% translate "Static Objects" %} ({{ object_set.all_objects|slice:"10"|length }}/{{ object_set.all_objects|length }})
                                                 </h5>
                                                 <ul>
                                                     {% for object in object_set.all_objects|slice:"10" %}<li>{{ object }}</li>{% endfor %}
