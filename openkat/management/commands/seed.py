@@ -9,7 +9,7 @@ from django.core.management import BaseCommand
 
 from objects.models import SEVERITY_SCORE_LOOKUP, FindingType, Hostname, Network, object_type_by_name
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
-from plugins.models import BusinessRule
+from plugins.models import BusinessRule, Plugin
 from plugins.plugins.business_rules import get_rules
 from plugins.sync import sync
 from tasks.models import ObjectSet
@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
     def seed_business_rules(self):
         for rule_data in get_rules().values():
-            BusinessRule.objects.update_or_create(
+            rule, created = BusinessRule.objects.update_or_create(
                 name=rule_data["name"],
                 defaults={
                     "description": rule_data["description"],
@@ -103,6 +103,8 @@ class Command(BaseCommand):
                     "inverse_query": rule_data.get("inverse_query"),
                 },
             )
+            rule.requires.set([Plugin.objects.get(plugin_id=require) for require in rule_data.get("requires", [])])
+            rule.save()
 
         logging.info("Business rules seeded successfully")
 

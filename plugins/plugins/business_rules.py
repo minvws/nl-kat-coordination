@@ -22,6 +22,7 @@ from objects.models import (
     bulk_insert,
 )
 from plugins.models import BusinessRule
+from tasks.models import Task
 
 logger = structlog.get_logger(__name__)
 
@@ -60,6 +61,7 @@ def get_rules():
             "name": "ipv6_webservers",
             "description": "Checks if webserver has IPv6 support",
             "object_type": "hostname",
+            "requires": ["dns"],
             "query": f"""
                  SELECT distinct h.*
                  FROM {Hostname._meta.db_table} h
@@ -89,6 +91,7 @@ def get_rules():
             "name": "ipv6_nameservers",
             "description": "Checks if nameserver has IPv6 support",
             "object_type": "hostname",
+            "requires": ["dns"],
             "query": f"""
                 SELECT distinct h.*
                 FROM {Hostname._meta.db_table} h
@@ -122,7 +125,7 @@ def get_rules():
                 SELECT distinct h.*
                  FROM {Hostname._meta.db_table} h
                       LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
-                      LEFT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
+                      RIGHT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                       LEFT JOIN {Hostname._meta.db_table} nshost ON hns.name_server_id = nshost._id
                       LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = nshost._id
                  LEFT JOIN {Finding._meta.db_table} f on (f.object_id = h._id and f.finding_type_id = (
@@ -155,6 +158,7 @@ def get_rules():
             "name": "missing_spf",
             "description": "Checks is the hostname has valid SPF records",
             "object_type": "hostname",
+            "requires": ["dns"],
             "query": f"""
                 SELECT distinct h.*
                 FROM {Hostname._meta.db_table} h
@@ -358,6 +362,7 @@ def get_rules():
             "name": "missing_caa",
             "description": "Checks if a hostname has a CAA record",
             "object_type": "hostname",
+            "requires": ["dns"],
             "query": f"""
             SELECT distinct h.*
             FROM {Hostname._meta.db_table} h
@@ -385,6 +390,7 @@ def get_rules():
             "name": "missing_dmarc",
             "description": "Checks is mail servers have DMARC records",
             "object_type": "hostname",
+            "requires": ["dns"],
             "query": f"""
                 SELECT h.*
                 FROM (
@@ -480,16 +486,16 @@ def get_rules():
             "description": f"Checks is {software} is running on the IPAddress.",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
-            FROM {IPAddress._meta.db_table} ip
-                JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
-                JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
-                JOIN {Software._meta.db_table} software ON software_port.software_id = software._id
-                LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
-                   select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-EXPOSED-SOFTWARE')
-                )
-            where f._id is null and lower(software.name) like '%%{software}%%';
-        """,  # noqa: S608
+                SELECT distinct ip.*
+                FROM {IPAddress._meta.db_table} ip
+                    JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
+                    JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
+                    JOIN {Software._meta.db_table} software ON software_port.software_id = software._id
+                    LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
+                       select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-EXPOSED-SOFTWARE')
+                    )
+                where f._id is null and lower(software.name) like '%%{software}%%';
+            """,  # noqa: S608
             "inverse_query": f"""
             DELETE FROM {Finding._meta.db_table}
             WHERE _id IN (
@@ -550,13 +556,9 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
                     logger.error("Unknown object type: %s", rule.object_type)
                     continue
 
-                # Get or create the finding type
                 finding_type, created = FindingType.objects.get_or_create(code=rule.finding_type_code)
-
-                # Build the queryset
                 queryset = model_class.objects.all()
 
-                # Special handling for Hostname queries that need annotations
                 if model_class == Hostname and "nameservers_with_ipv6_count" in rule.query:
                     queryset = queryset.annotate(
                         nameservers_with_ipv6_count=Count(
@@ -586,10 +588,26 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
                 logger.debug("Query executed in %s seconds", time.time() - start)
                 logger.debug("Matching objects: %s", match_count)
 
-                # Create findings for matching objects
                 findings = []
 
-                for obj in matching_objects:
+                matching_objects_with_required = set()
+                tasks = Task.objects.filter(type="plugin")
+
+                if rule.requires.exists():
+                    for obj in matching_objects:
+                        valid = True
+                        for plugin in rule.requires.all():
+                            if not tasks.filter(
+                                data__plugin_id=plugin.plugin_id, data__input_data__has_any_keys=[str(obj)]
+                            ).exists():
+                                valid = False
+
+                        if valid:
+                            matching_objects_with_required.add(obj)
+                else:
+                    matching_objects_with_required = matching_objects
+
+                for obj in matching_objects_with_required:
                     findings.append(
                         Finding(
                             finding_type=finding_type,
