@@ -24,7 +24,7 @@ from openkat.forms import MemberRegistrationForm, OnboardingOrganizationUpdateFo
 from openkat.messaging import clearance_level_warning_dns_report
 from openkat.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
-from openkat.views.account import OOIClearanceMixin
+from openkat.views.account import ObjectClearanceMixin
 from openkat.views.indemnification_add import IndemnificationAddView
 
 logger = structlog.get_logger(__name__)
@@ -104,7 +104,7 @@ class OnboardingClearanceLevelIntroductionView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi"] = self.request.GET.get("ooi", "")
+        context["object"] = self.request.GET.get("object", "")
         context["plugins"] = self.get_boefjes_tiles()
         return context
 
@@ -113,7 +113,7 @@ class OnboardingAcknowledgeClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
-    OOIClearanceMixin,
+    ObjectClearanceMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -128,7 +128,7 @@ class OnboardingAcknowledgeClearanceLevelView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi"] = self.request.GET.get("ooi", "")
+        context["object"] = self.request.GET.get("object", "")
         context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
 

@@ -18,10 +18,10 @@ from objects.models import (
 
 
 class Command(BaseCommand):
-    help = "Load demo data into the OOI database"
+    help = "Load demo data into the Object database"
 
     def handle(self, *_args: Any, **_options: Any) -> None:  # noqa: C901, PLR0912, PLR0915
-        """Create demo data for the OOI application."""
+        """Create demo data for the Object application."""
         self.stdout.write(self.style.SUCCESS("Loading demo data..."))
 
         # Create network

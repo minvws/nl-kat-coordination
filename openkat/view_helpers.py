@@ -2,7 +2,6 @@ from typing import Any, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from django.http import HttpRequest
-from django.http.response import HttpResponseRedirectBase
 from django.urls.base import reverse, reverse_lazy
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
@@ -25,19 +24,6 @@ def url_with_querystring(path: str, doseq: bool = False, /, **kwargs: Any) -> st
             )
         )
     )
-
-
-def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: Any) -> str:
-    if ooi_id:
-        kwargs["ooi_id"] = ooi_id
-
-    if "query" in kwargs:
-        kwargs["query"] = {key: value for key, value in kwargs["query"] if key not in kwargs}
-        kwargs.update(kwargs["query"])
-
-        del kwargs["query"]
-
-    return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
 
 
 class Breadcrumb(TypedDict):
@@ -114,19 +100,3 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
                 "text": _("Members"),
             }
         ]
-
-
-class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
-    organization: Organization
-
-    def build_breadcrumbs(self) -> list[Breadcrumb]:
-        return [
-            {
-                "url": reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            }
-        ]
-
-
-class PostRedirect(HttpResponseRedirectBase):
-    status_code = 307

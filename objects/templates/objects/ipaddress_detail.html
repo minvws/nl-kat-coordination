@@ -100,8 +100,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <form action="{% url 'objects:delete_ipport' port.pk %}"
-                                              method="post">
+                                        <form action="{% url 'objects:delete_ipport' port.pk %}" method="post">
                                             {% csrf_token %}
                                             <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
                                         </form>

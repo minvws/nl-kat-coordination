@@ -27,7 +27,7 @@ def test_onboarding_introduction(request, member, rf):
 def test_onboarding_clearance_level_introduction(rf, redteam_member, hostname):
     Plugin.objects.create(plugin_id="fierce", name="Fierce")
     response = OnboardingClearanceLevelIntroductionView.as_view()(
-        setup_request(rf.get("step_clearance_level_introduction", {"ooi": hostname.pk}), redteam_member.user),
+        setup_request(rf.get("step_clearance_level_introduction", {"object": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -47,7 +47,7 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, hostname):
 
 def test_onboarding_acknowledge_clearance_level(rf, redteam_member, hostname):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": hostname.pk}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"object": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -74,7 +74,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, hostname):
     redteam_member.save()
 
     response_accept = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": hostname.pk}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"object": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -90,7 +90,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, hostname):
 @pytest.mark.parametrize("clearance_level", [-1, 0])
 def test_onboarding_acknowledge_clearance_level_no_clearance(rf, redteam_member, clearance_level, hostname):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": hostname.pk}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"object": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -100,7 +100,7 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(rf, redteam_member,
     redteam_member.save()
 
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": hostname.pk}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"object": hostname.pk}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
     assertContains(response, "Unfortunately you cannot continue the onboarding.")

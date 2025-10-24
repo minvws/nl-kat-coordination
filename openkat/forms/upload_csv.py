@@ -7,7 +7,7 @@ CSV_ERRORS = {
     "no_file": _("No file selected"),
     "empty_file": _("The uploaded file is empty."),
     "bad_columns": _("The number of columns do not meet the requirements."),
-    "bad_ooi_type": _("OOI Type in CSV does not meet the criteria."),
+    "bad_object_type": _("Object Type in CSV does not meet the criteria."),
     "csv_error": _("An error has occurred during the parsing of the csv file:"),
 }
 

@@ -28,24 +28,24 @@ from tests.conftest import setup_request
 def xtdbulk(request: pytest.FixtureRequest, django_db_blocker):
     """session scoped variant of xtdb fixture, so we don't have to seed the database every time (as we only do reads)"""
     objects = apps.get_app_config("objects")
-    ooi_models = list(objects.get_models())
+    object_models = list(objects.get_models())
     con = connections["xtdb"]
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
-    for ooi in ooi_models:
-        if ooi._meta.db_table.startswith("test_"):
+    for obj in object_models:
+        if obj._meta.db_table.startswith("test_"):
             continue
-        ooi._meta.db_table = f"test_{xdist_suffix}_{ooi._meta.db_table}".lower()  # Table names are not case-insensitive
+        obj._meta.db_table = f"test_{xdist_suffix}_{obj._meta.db_table}".lower()  # Table names are not case-insensitive
 
     style = no_style()
     erase = [
         "{} {} {};".format(
             style.SQL_KEYWORD("ERASE"),
             style.SQL_KEYWORD("FROM"),
-            style.SQL_FIELD(con.ops.quote_name(ooi._meta.db_table)),
+            style.SQL_FIELD(con.ops.quote_name(obj._meta.db_table)),
         )
-        for ooi in ooi_models
+        for obj in object_models
     ]
 
     with django_db_blocker.unblock():

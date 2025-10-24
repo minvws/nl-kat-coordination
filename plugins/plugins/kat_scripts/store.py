@@ -20,7 +20,7 @@ def hostnames() -> list[dict]:
 
 
 if __name__ == "__main__":
-    """ expects sys.stdin to have a newline separated list of finding_type_ids and ooi pks, separated by a tab """
+    """ expects sys.stdin to have a newline separated list of finding_type_ids and object pks, separated by a tab """
     parser = argparse.ArgumentParser(description="Optional app description", add_help=False)
     parser.add_argument("-f", "--findings", action="store_true")
     parser.add_argument("-t", "--object_type")

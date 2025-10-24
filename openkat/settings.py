@@ -228,7 +228,7 @@ TEMPLATES = [
             ],
             "builtins": [
                 "django_components.templatetags.component_tags",
-                "openkat.templatetags.ooi_extra",
+                "openkat.templatetags.object_extra",
                 "openkat.templatetags.objects",
             ],
             "loaders": [

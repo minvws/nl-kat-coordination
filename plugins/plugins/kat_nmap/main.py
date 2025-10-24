@@ -69,7 +69,7 @@ def run(file_id: str) -> list[dict[str, str | int]]:
                 "/objects/ipaddress/", json={"address": str(host.address), "network": "internet"}
             ).json()
 
-            not_closed = [ooi["port"] for ooi in new_ports if ooi.pop("state") != "closed"]
+            not_closed = [obj["port"] for obj in new_ports if obj.pop("state") != "closed"]
             idx = 0
             batch_size = 250
 

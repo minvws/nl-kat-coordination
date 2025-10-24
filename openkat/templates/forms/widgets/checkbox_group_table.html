@@ -9,7 +9,7 @@
                 <tr>
                     <th>
                         {# TODO: data-toggle-target is not model-agnostic like the rest of the table #}
-                        {% if widget.options|length > 1 %}<input class="toggle-all" data-toggle-target="ooi" type="checkbox">{% endif %}
+                        {% if widget.options|length > 1 %}<input class="toggle-all" data-toggle-target="object" type="checkbox">{% endif %}
                     </th>
                     {% for column_name in widget.column_names %}<th>{{ column_name }}</th>{% endfor %}
                 </tr>

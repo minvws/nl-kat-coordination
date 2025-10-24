@@ -12,7 +12,7 @@
                 <h1>{% translate "OpenKAT Introduction" %}</h1>
                 {% include "partials/stepper.html" %}
 
-                <h2>{% translate "Setup scan - Object Clearance for" %} {{ ooi }}</h2>
+                <h2>{% translate "Setup scan - Object Clearance for" %} {{ object }}</h2>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 {% blocktranslate trimmed %}
                     OpenKAT has a permission system that allows administrators to
@@ -37,7 +37,7 @@
                             </br>
                             Your administrator has trusted you with a clearance level of <strong>L{{ tcl }}</strong>.
                         </br>
-                        You need at least a clearance level of <strong>L{{ dns_report_least_clearance_level }}</strong> to scan <strong>{{ ooi }}</strong>
+                        You need at least a clearance level of <strong>L{{ dns_report_least_clearance_level }}</strong> to scan <strong>{{ object }}</strong>
                     </br>
                     Contact your administrator to receive a higher clearance.
                 {% endblocktranslate %}

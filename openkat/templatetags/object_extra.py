@@ -5,8 +5,6 @@ from urllib import parse
 
 from django import template
 
-from openkat.view_helpers import get_ooi_url
-
 register = template.Library()
 
 
@@ -38,11 +36,6 @@ def get_scan_levels() -> list[str]:
 @register.filter()
 def get_type(x: Any) -> Any:
     return type(x).__name__
-
-
-@register.simple_tag()
-def ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: str) -> str:
-    return get_ooi_url(routename, ooi_id, organization_code, **kwargs)
 
 
 @register.filter()

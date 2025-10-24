@@ -42,7 +42,7 @@
                             {% endblocktranslate %}
                         </p>
                         <p>
-                            {% for ooi_type in plugin.consumes %}<span class="label tags-color-1-light">{{ ooi_type }}</span>{% endfor %}
+                            {% for object_type in plugin.consumes %}<span class="label tags-color-1-light">{{ object_type }}</span>{% endfor %}
                         </p>
                     {% else %}
                         {% blocktranslate trimmed with plugin_name=plugin.name %}

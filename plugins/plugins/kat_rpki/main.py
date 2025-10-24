@@ -141,8 +141,8 @@ if __name__ == "__main__":
         for line in sys.stdin.readlines():
             ips.append(line.strip())
 
-    oois = run(download_lazyframe(client, "rpki-download"), download_lazyframe(client, "bgp-download"), ips)
+    results = run(download_lazyframe(client, "rpki-download"), download_lazyframe(client, "bgp-download"), ips)
 
-    client.post("/objects/finding/", json=oois, timeout=30)
+    client.post("/objects/finding/", json=results, timeout=30)
 
-    print(json.dumps(oois))  # noqa: T201
+    print(json.dumps(results))  # noqa: T201
