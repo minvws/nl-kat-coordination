@@ -89,6 +89,8 @@ def recalculate_scan_levels():
     These updates respect the 'declared' flag - only non-declared scan levels are updated.
     """
     logger.info("Recalculating Scan Profiles...")
+    # TODO: when a nameserver inherits L1 and its ips L1 as well, setting the original hostname to L0 will have no
+    #   effect since the ip will increase the level to L1..
 
     # These could create an endless chain, but we just rely on multiple iterations to resolve this.
     sync_cname_scan_levels()
@@ -123,8 +125,8 @@ def sync_hostname_ip_scan_levels(db_table: str) -> None:
             # Update hostnames where IP has higher scan level and hostname is not declared
             cursor.execute(
                 f"""
-                INSERT INTO {Hostname._meta.db_table} (_id, address, network_id, scan_level, declared)
-                select target._id, target.address, target.network_id, source.scan_level, false
+                INSERT INTO {Hostname._meta.db_table} (_id, name, network_id, scan_level, declared)
+                select target._id, target.name, target.network_id, source.scan_level, false
                 FROM {IPAddress._meta.db_table} source
                 JOIN {db_table} dns on source._id = dns.ip_address_id
                 JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
