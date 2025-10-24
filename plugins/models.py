@@ -182,9 +182,7 @@ class Plugin(models.Model):
 
         # This is possibly the first time enabling the plugin for the organization
         for object_type, query, name in queries:
-            new, created = ObjectSet.objects.get_or_create(
-                name=name, object_type=object_type, object_query=query, dynamic=True
-            )
+            new, created = ObjectSet.objects.get_or_create(name=name, object_type=object_type, object_query=query)
             object_sets.append(new)
 
         created_schedules = []

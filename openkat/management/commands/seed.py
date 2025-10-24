@@ -49,21 +49,18 @@ class Command(BaseCommand):
         ObjectSet.objects.get_or_create(
             name="mail_server",
             description="Mail servers are hostnames that have an MX record pointed to them.",
-            dynamic=True,
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.mail_server,
         )
         ObjectSet.objects.get_or_create(
             name="name_server",
             description="Name servers are hostnames that have an NS record pointed to them.",
-            dynamic=True,
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.name_server,
         )
         ObjectSet.objects.get_or_create(
             name="root_domains",
             description="Root domains are hostnames that represent the registered domain (e.g., example.com).",
-            dynamic=True,
             object_type=ContentType.objects.get_for_model(Hostname),
             object_query=Hostname.Q.root_domain,
         )

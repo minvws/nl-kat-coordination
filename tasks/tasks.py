@@ -8,7 +8,6 @@ from celery import Celery
 from django.conf import settings
 from django.core.cache import caches
 from django.db import OperationalError, connections
-from djangoql.queryset import apply_search
 from redis.exceptions import LockError  # type: ignore
 
 from files.models import File
@@ -254,25 +253,11 @@ def run_schedule_for_organization(
         return run_plugin_task(schedule.plugin.plugin_id, code, None, schedule.pk, celery=celery)
 
     input_data: set[str] = set()
-
-    if schedule.object_set.object_query is not None and schedule.object_set.dynamic is True:
-        # Dynamic mode: query objects of the specified type, optionally filtered by query,
-        # then filter by scan level
+    object_pks = schedule.object_set.traverse_objects(scan_level__gte=schedule.plugin.scan_level)
+    if object_pks:
         model_class = schedule.object_set.object_type.model_class()
-        model_qs = model_class.objects.filter(scan_level__gte=schedule.plugin.scan_level)
-
-        if schedule.object_set.object_query:
-            model_qs = apply_search(model_qs, schedule.object_set.object_query)
-
-        input_data = {str(model) for model in model_qs}
-    else:
-        # Non-dynamic mode: use traverse_objects to get manually added objects,
-        # objects from queries, and objects from subsets
-        object_pks = schedule.object_set.traverse_objects()
-        if object_pks:
-            model_class = schedule.object_set.object_type.model_class()
-            model_qs = model_class.objects.filter(pk__in=object_pks)
-            input_data = input_data.union([str(model) for model in model_qs if str(model)])
+        model_qs = model_class.objects.filter(pk__in=object_pks)
+        input_data = input_data.union([str(model) for model in model_qs if str(model)])
 
     if not input_data:
         return []

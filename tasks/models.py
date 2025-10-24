@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 import recurrence.fields
 from celery import Celery
@@ -44,7 +45,6 @@ class ObjectSet(models.Model):
 
     name = models.CharField(max_length=100, blank=True, null=True, unique=True)
     description = models.TextField(blank=True)
-    dynamic = models.BooleanField(default=False)  # TODO
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_query = models.TextField(null=True, blank=True)
 
@@ -52,11 +52,11 @@ class ObjectSet(models.Model):
     all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
-    def get_query_objects(self) -> QuerySet:
+    def get_query_objects(self, **filters: Any) -> QuerySet:
         if self.object_query is None:
             return self.object_type.model_class().objects.none()
 
-        qs = self.object_type.model_class().objects.all()
+        qs = self.object_type.model_class().objects.all().filter(**filters)
 
         if self.object_query == "":
             return qs
@@ -66,7 +66,7 @@ class ObjectSet(models.Model):
         except DjangoQLParserError:
             return qs
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3) -> list[int]:
+    def traverse_objects(self, depth: int = 0, max_depth: int = 3, **filters: Any) -> list[int]:
         # TODO: handle cycles
         # TODO: configurable max_depth
 
@@ -74,7 +74,7 @@ class ObjectSet(models.Model):
         all_objects = list(self.all_objects)
 
         # Add objects from object_query
-        query_objects = self.get_query_objects()
+        query_objects = self.get_query_objects(**filters)
         all_objects.extend([x.pk for x in query_objects])
 
         # Add objects from subsets if we haven't exceeded max depth

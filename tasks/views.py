@@ -484,8 +484,7 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
             {"url": reverse("object_set_detail", kwargs={"pk": self.object.pk}), "text": _("Object Set Detail")},
         ]
 
-        if self.object.object_query is not None and self.object.dynamic is True:
-            # TODO: check scan profiles?
+        if self.object.object_query is not None:
             context["objects"] = self.object.get_query_objects()[: self.PREVIEW_SIZE]
         else:
             context["objects"] = None
@@ -504,7 +503,7 @@ class ObjectSetForm(ModelForm):
 
     class Meta:
         model = ObjectSet
-        fields = ["name", "description", "object_type", "object_query", "all_objects", "dynamic"]
+        fields = ["name", "description", "object_type", "object_query", "all_objects"]
         widgets = {"description": forms.Textarea(attrs={"rows": 3}), "object_query": forms.Textarea(attrs={"rows": 3})}
 
     def __init__(self, *args, **kwargs):
