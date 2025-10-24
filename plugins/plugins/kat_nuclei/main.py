@@ -31,16 +31,21 @@ def run(file_id: str) -> dict[str, list] | None:
 
         if info["template-id"].endswith("-detect"):
             software = info["template-id"].rstrip("-detect")
-            results_grouped["ipaddress"].append({"address": info["ip"], "network": "internet"})
-            results_grouped["ipport"].append(
-                {
-                    "address": info["ip"],
-                    "protocol": info["type"].upper(),
-                    "port": int(info["port"]),
-                    "service": software,
-                    "software": [{"name": software}],
-                }
-            )
+        elif info["template-id"] == "ibm-d2b-database-server":
+            software = "db2"
+        else:
+            continue  # template id not recognized
+
+        results_grouped["ipaddress"].append({"address": info["ip"], "network": "internet"})
+        results_grouped["ipport"].append(
+            {
+                "address": info["ip"],
+                "protocol": info["type"].upper(),
+                "port": int(info["port"]),
+                "service": software,
+                "software": [{"name": software}],
+            }
+        )
 
     if not results_grouped["ipaddress"]:
         return None

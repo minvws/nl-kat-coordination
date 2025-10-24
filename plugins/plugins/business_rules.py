@@ -18,6 +18,7 @@ from objects.models import (
     Hostname,
     IPAddress,
     IPPort,
+    Software,
     bulk_insert,
 )
 from plugins.models import BusinessRule
@@ -39,7 +40,7 @@ INDICATORS = [
 
 
 def get_rules():
-    return {
+    rules = {
         "invalid_findings": {
             "name": "invalid_findings",
             "description": "Deletes findings with an invalid finding type.",
@@ -472,6 +473,43 @@ def get_rules():
             "finding_type_code": "KAT-DOMAIN-OWNERSHIP-PENDING",
         },
     }
+
+    for software in ["mysql", "mongodb", "openssh", "rdp", "pgsql", "telnet", "db2"]:
+        rules[f"{software}_detection"] = {
+            "name": f"{software}_detection",
+            "description": "Checks for software that should not be running.",
+            "object_type": "ipaddress",
+            "query": f"""
+            SELECT distinct ip.*
+            FROM {IPAddress._meta.db_table} ip
+                JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
+                JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
+                JOIN {Software._meta.db_table} software ON software_port.software_id = software._id
+                LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
+                   select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-EXPOSED-SOFTWARE')
+                )
+            where f._id is null and lower(software.name) like '%%{software}%%';
+        """,  # noqa: S608
+            "inverse_query": f"""
+            DELETE FROM {Finding._meta.db_table}
+            WHERE _id IN (
+                SELECT f._id
+                FROM {Finding._meta.db_table} f
+                INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.object_id
+                LEFT JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
+                LEFT JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
+                LEFT JOIN {Software._meta.db_table} software ON (
+                    software_port.software_id = software._id AND lower(software.name) like '%%{software}%%'
+                )
+                WHERE software._id is NULL
+                AND f.finding_type_id = (
+                    select _id from {FindingType._meta.db_table} where code = 'KAT-EXPOSED-SOFTWARE'
+                )
+            );""",  # noqa: S608
+            "finding_type_code": "KAT-EXPOSED-SOFTWARE",
+        }
+
+    return rules
 
 
 class HostnameQLSchema(DjangoQLSchema):

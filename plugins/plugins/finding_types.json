@@ -255,11 +255,19 @@
     "impact": "Depending on the malware this could be anything from eavesdropping to a ransomware attack.",
     "recommendation": "Alert your CERT to verify if your systems are compromised."
   },
-  "KAT-EXPOSED-SOFTWARE": {
+  "KAT-EXPOSED-ADMIN-SOFTWARE": {
     "name": "Administrative software identified",
     "description": "This software is often used for administrative purposes and should not be exposed to the Internet. This could be an easy entry point into your organisations environment.",
     "source": "Check your OpenKAT install on what software was identified.",
     "risk": "critical",
+    "impact": "Impact depends on the identified software.",
+    "recommendation": "Move the software to a more secure location and/or make it only accessible through a VPN."
+  },
+  "KAT-EXPOSED-SOFTWARE": {
+    "name": "Exposed software identified",
+    "description": "This software should not be exposed to the Internet. This could be an easy entry point into your organisations environment.",
+    "source": "Check your OpenKAT install on what software was identified.",
+    "risk": "high",
     "impact": "Impact depends on the identified software.",
     "recommendation": "Move the software to a more secure location and/or make it only accessible through a VPN."
   },
