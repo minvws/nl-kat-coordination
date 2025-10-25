@@ -2,8 +2,11 @@ import pytest
 from django.core.files.base import ContentFile
 
 from files.models import File
+from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
+from tasks.models import Schedule
+from tasks.tasks import process_raw_file
 
 
 @pytest.mark.django_db(transaction=True)
@@ -165,6 +168,26 @@ def test_non_zero_exit_does_not_create_file():
         PluginRunner().run(plugin.plugin_id, None, output="-")
 
     assert File.objects.count() == 0
+
+
+@pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
+def test_process_raw_file_single_task():
+    plugin = Plugin.objects.create(
+        name="Test Plugin",
+        plugin_id="test-process-raw-file",
+        oci_image="alpine:latest",
+        oci_arguments=["/bin/cat"],
+        consumes=["file:txt"],
+    )
+    file = File.objects.create(file=ContentFile(b"", name="test-file.txt"))
+
+    organization = Organization.objects.create(name="Test", code="test")
+    Schedule.objects.create(plugin=plugin, enabled=True, organization=organization)
+
+    tasks = process_raw_file(file)
+    assert len(tasks) == 1
+    assert tasks[0].data["plugin_id"] == plugin.plugin_id
+    assert tasks[0].organization == organization
 
 
 # test with file input ("{file"})

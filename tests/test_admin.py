@@ -175,7 +175,7 @@ def test_authtoken_admin_change_view(admin_client, auth_token):
     data = {
         "user": auth_token.user.pk,
         "name": "Updated Token Name",
-        "expiry": auth_token.expiry.strftime("%Y-%m-%d %H:%M:%S") if auth_token.expiry else "",
+        "expiry": (auth_token.expiry.strftime("%Y-%m-%d %H:%M:%S") if auth_token.expiry else ""),
     }
     response = admin_client.post(url, data)
     assert response.status_code == 302  # Redirect after successful update

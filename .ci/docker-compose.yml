@@ -40,7 +40,7 @@ services:
       - default
       - plugins
 
-  openkat-test-api:
+  openkat-test-api: &openkat
     build:
       context: ..
       args:
@@ -91,6 +91,18 @@ services:
       retries: 4
     env_file:
       - .env.test
+    ports:
+      - "6379:6379"
+
+  worker:
+    <<: *openkat
+    restart: unless-stopped
+    command: python manage.py celery_reload_worker "celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=INFO"
+    env_file:
+      - .env.test
+    environment:
+      - DATABASE_MIGRATION=false
+      - HOST_MOUNT_DIR=${PWD}
 
 networks:
   default:

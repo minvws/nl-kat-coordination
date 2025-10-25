@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import shlex
 import signal
 import uuid
@@ -233,7 +234,9 @@ class PluginRunner:
         if out is None:
             return ""
 
-        return b"".join(out).decode()
+        # return b"".join(out).decode()
+        # Normalize to an iterator of byte chunks; if `out` is raw bytes, wrap it so join works uniformly.
+        return b"".join(itertools.chain([out] if isinstance(out, (bytes, bytearray)) else out)).decode()
 
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         """
