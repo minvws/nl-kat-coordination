@@ -247,14 +247,6 @@ class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 
 class ScanLevelFilterMixin:
-    scan_level = django_filters.MultipleChoiceFilter(
-        label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "None")],
-        method="filter_by_scan_level",
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
-    )
-    declared = django_filters.BooleanFilter(label="Declared")
-
     def filter_by_scan_level(self, queryset, name, value):
         if not value:
             return queryset
@@ -270,12 +262,19 @@ class ScanLevelFilterMixin:
         return queryset.filter(q_objects)
 
 
-class IPAddressFilter(django_filters.FilterSet, ScanLevelFilterMixin):
+class IPAddressFilter(ScanLevelFilterMixin, django_filters.FilterSet):
     address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
     object_set = django_filters.ModelChoiceFilter(
         label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
     query = django_filters.CharFilter(label="Query", method="filter_by_query")
+    scan_level = django_filters.MultipleChoiceFilter(
+        label="Scan level",
+        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        method="filter_by_scan_level",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
+    )
+    declared = django_filters.BooleanFilter(label="Declared")
 
     class Meta:
         model = IPAddress
@@ -550,12 +549,19 @@ class IPAddressScanLevelUpdateView(BaseScanLevelUpdateView):
     detail_url_name = "objects:ipaddress_detail"
 
 
-class HostnameFilter(django_filters.FilterSet, ScanLevelFilterMixin):
+class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
     name = django_filters.CharFilter(label="Hostname", lookup_expr="icontains")
     object_set = django_filters.ModelChoiceFilter(
         label="Object set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
     query = django_filters.CharFilter(label="Query", method="filter_by_query")
+    scan_level = django_filters.MultipleChoiceFilter(
+        label="Scan level",
+        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        method="filter_by_scan_level",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
+    )
+    declared = django_filters.BooleanFilter(label="Declared")
 
     class Meta:
         model = Hostname
