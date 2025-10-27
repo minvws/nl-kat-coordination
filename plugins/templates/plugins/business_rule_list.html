@@ -27,6 +27,7 @@
                     {{ filter.form.as_p }}
                     <button type="submit">{% translate "Apply" %}</button>
                 </form>
+                <a class="button plain" href="{% url "business_rule_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
             <div>
                 <div class="horizontal-scroll sticky-column">

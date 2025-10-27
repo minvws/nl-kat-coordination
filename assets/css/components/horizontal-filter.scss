@@ -1,10 +1,19 @@
+.filter-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--colors-grey-200);
+  padding-bottom: 1rem;
+
+  a,
+  button {
+    align-self: flex-end;
+    white-space: nowrap;
+  }
+}
+
 .filter-container > form {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-
-  p,
-  button {
-    align-self: flex-end;
-  }
 }

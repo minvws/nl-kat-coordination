@@ -48,10 +48,12 @@ form {
     }
   }
 
-  /* Horizontal scan level filter checkboxes */
-  .scan-level-filter-checkboxes {
-    span {
-      margin-right: 0.3rem;
+  .scan-level-filter {
+    white-space: nowrap;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
     }
   }
 }

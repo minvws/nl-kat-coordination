@@ -11,19 +11,15 @@
             {% include "objects/object_list_introduction.html" %}
             {% include "objects/object_list_tabs.html" with view="networks" %}
 
-            {# TODO: consider alternative approach with compacter view: #}
-            {#            <div class="horizontal-view">#}
-            {#                {% include "objects/object_list_tabs.html" with view="networks" %}#}
-            {#                {% include "objects/add_object.html" %}#}
-            {#            </div>#}
             <div class="filter-container">
-                <form class="inline" method="get">
+                <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
                     <div class="horizontal-view">
-                        {{ filter.form }}
+                        {{ filter.form.as_p }}
                         <button type="submit">{% translate "Apply" %}</button>
                     </div>
                 </form>
+                <a class="button plain" href="{% url "objects:network_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
             <div>
                 <div class="horizontal-scroll sticky-column">

@@ -24,24 +24,23 @@
                     </div>
                 {% endif %}
             </div>
-            <div>
-                <div class="filter-container">
-                    <form class="inline layout-wide" method="get">
-                        {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
-                        {{ filter.form.as_p }}
-                        <button type="submit">{% translate "Apply" %}</button>
-                    </form>
-                </div>
-                {% include "plugin_table.html" %}
-
-                <div>
-                    <p>
-                        <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
-                    </p>
-                </div>
-                {% include "partials/list_paginator.html" %}
-
+            <div class="filter-container">
+                <form class="inline layout-wide" method="get">
+                    {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                    {{ filter.form.as_p }}
+                    <button type="submit">{% translate "Apply" %}</button>
+                </form>
+                <a class="button plain" href="{% url "plugin_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
+            {% include "plugin_table.html" %}
+
+            <div>
+                <p>
+                    <strong>{{ object_list|length }}</strong> Plugin{{ object_list|pluralize:"s" }} {% translate "available" %}
+                </p>
+            </div>
+            {% include "partials/list_paginator.html" %}
+
         </section>
     </main>
 {% endblock content %}

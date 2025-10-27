@@ -28,6 +28,7 @@
                     {{ filter.form.as_p }}
                     <button type="submit">{% translate "Apply" %}</button>
                 </form>
+                <a class="button plain" href="{% url "schedule_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
             {% if not schedule_list %}
                 <div>

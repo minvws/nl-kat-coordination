@@ -11,40 +11,31 @@
             {% include "objects/object_list_introduction.html" %}
             {% include "objects/object_list_tabs.html" with view="hostnames" %}
 
-            {#            <div class="horizontal-view">#}
-            {#                {% include "objects/object_list_tabs.html" with view="hostnames" %}#}
-            {#                {% include "objects/add_object.html" %}#}
-            {#            </div>#}
             <div class="filter-container">
                 <form class="inline layout-wide" method="get">
                     {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
-                    <div class="horizontal-view">
-                        {% for field in filter.form %}
-                            {% if field.name == 'scan_level' %}
-                                <div>
-                                    <label>{{ field.label }}:</label>
-                                    <span class="scan-level-filter-checkboxes">
-                                        {% for choice_value, choice_label in field.field.choices %}
-                                            <span>
-                                                <input type="checkbox"
-                                                       name="{{ field.name }}"
-                                                       value="{{ choice_value }}"
-                                                       {% if field.value and choice_value|stringformat:"s" in field.value %}checked{% endif %}>
-                                                <span>{{ choice_label }}</span>
-                                            </span>
-                                        {% endfor %}
-                                    </span>
-                                </div>
-                            {% else %}
-                                <p>
-                                    {{ field.label_tag }}
-                                    {{ field }}
-                                </p>
-                            {% endif %}
-                        {% endfor %}
-                        <button type="submit">{% translate "Apply" %}</button>
-                    </div>
+                    {% for field in filter.form %}
+                        {% if field.name == "scan_level" %}
+                            <p class="scan-level-filter">
+                                <label>{{ field.label }}:</label>
+                                {% for choice_value, choice_label in field.field.choices %}
+                                    <input type="checkbox"
+                                           name="{{ field.name }}"
+                                           value="{{ choice_value }}"
+                                           {% if field.value and choice_value|stringformat:"s" in field.value %}checked{% endif %}>
+                                    {{ choice_label }}
+                                {% endfor %}
+                            </p>
+                        {% else %}
+                            <p>
+                                {{ field.label_tag }}
+                                {{ field }}
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                    <button type="submit">{% translate "Apply" %}</button>
                 </form>
+                <a class="button plain" href="{% url "objects:hostname_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
             <div>
                 <form method="post"

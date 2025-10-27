@@ -14,6 +14,7 @@ input[type="reset"] {
     }
 
     .icon {
+      --link-icon-text-color: var(--colors-blue-600);
       &:hover {
         color: var(--colors-blue-700);
       }

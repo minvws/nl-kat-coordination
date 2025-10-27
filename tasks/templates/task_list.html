@@ -27,23 +27,30 @@
                 <form class="inline layout-wide" method="get">
                     {{ filter.form.as_p }}
                     <button type="submit">{% translate "Apply" %}</button>
-                    <button type="submit"
-                            class="button ghost destructive"
-                            form="cancel-all-tasks-form">
-                        <span class="icon ti-x"></span>{% translate "Cancel queued tasks" %}
-                    </button>
                 </form>
-                {% if perms.tasks.change_tasks %}
-                    <form action="{% url 'cancel_all_tasks' %}{% if filtered_organization_codes %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}{% endif %}"
-                          method="post"
-                          id="cancel-all-tasks-form">
-                        {% csrf_token %}
-                        {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
-                    </form>
-                {% endif %}
+                <a class="button plain" href="{% url "task_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
-            {% include "task_table.html" %}
+            <div>
+                <div class="horizontal-view toolbar">
+                    {% if perms.tasks.change_tasks %}
+                        <button form="cancel_all_tasks_form"
+                                type="submit"
+                                class="button ghost destructive">
+                            <span class="icon ti-x"></span>{% translate "Cancel queued tasks" %}
+                        </button>
+                    {% endif %}
+                </div>
+                {% include "task_table.html" %}
 
+            </div>
+            {% if perms.tasks.change_tasks %}
+                <form id="cancel_all_tasks_form"
+                      action="{% url 'cancel_all_tasks' %}{% if filtered_organization_codes %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}{% endif %}"
+                      method="post">
+                    {% csrf_token %}
+                    {% for code in filtered_organization_codes %}<input type="hidden" name="organization" value="{{ code }}">{% endfor %}
+                </form>
+            {% endif %}
         </section>
     </main>
 {% endblock content %}
