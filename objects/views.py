@@ -291,11 +291,11 @@ class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 class IPAddressFilter(django_filters.FilterSet):
     address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
     object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
+        label="Object set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
     scan_level = django_filters.MultipleChoiceFilter(
         label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        choices=list(ScanLevelEnum.choices) + [("none", "None")],
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
@@ -618,13 +618,13 @@ class IPAddressScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
 
 
 class HostnameFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
+    name = django_filters.CharFilter(label="Hostname", lookup_expr="icontains")
     object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
+        label="Object set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
     scan_level = django_filters.MultipleChoiceFilter(
         label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        choices=list(ScanLevelEnum.choices) + [("none", "None")],
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )

@@ -88,7 +88,7 @@ class TaskDetailView(OrganizationFilterMixin, DetailView):
 
 class TaskForm(ModelForm):
     plugin = forms.ModelChoiceField(Plugin.objects.all())
-    object_set = forms.ModelChoiceField(ObjectSet.objects.all(), required=False, label="Object Set")
+    object_set = forms.ModelChoiceField(ObjectSet.objects.all(), required=False, label="Object set")
     input_hostnames = forms.ModelMultipleChoiceField(Hostname.objects.all(), required=False)
     input_ips = forms.ModelMultipleChoiceField(IPAddress.objects.all(), required=False)
 
@@ -507,7 +507,7 @@ class ObjectSetDetailView(OrganizationFilterMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {"url": reverse("object_set_list"), "text": _("Objects Sets")},
-            {"url": reverse("object_set_detail", kwargs={"pk": self.object.pk}), "text": _("Object Set Detail")},
+            {"url": reverse("object_set_detail", kwargs={"pk": self.object.pk}), "text": _("Object set detail")},
         ]
 
         if self.object.object_query is not None:
