@@ -6,6 +6,9 @@ from typing import cast
 
 import structlog
 from django.apps import apps
+from django.contrib.postgres import lookups
+from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields.array import ArrayRHSMixin
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
 from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
@@ -339,6 +342,25 @@ class Software(XTDBModel):
     version = models.CharField(null=True, blank=True)
     cpe = models.CharField(null=True, blank=True)
     ports = models.ManyToManyField(IPPort, blank=True, related_name="software")
+
+
+class XTDBArrayField(ArrayField):
+    def get_placeholder(self, value, compiler, connection):
+        return "%s"
+
+
+@XTDBArrayField.register_lookup
+class XTDBArrayContains(ArrayRHSMixin, lookups.DataContains):
+    def as_sql(self, *args, **kwargs):
+        return "super().as_sql(self, *args, **kwargs)"
+
+
+class TaskObjects(XTDBModel):
+    task_id = models.BigIntegerField()
+    type = models.CharField(max_length=32, default="plugin")
+    plugin_id = models.CharField(max_length=64)
+    input_objects = XTDBArrayField(models.CharField(), default=list)
+    output_object = models.BigIntegerField()
 
 
 def bulk_insert(objects: Sequence[models.Model]) -> None:
