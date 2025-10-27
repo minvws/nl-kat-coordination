@@ -87,6 +87,19 @@
                             </dd>
                         </div>
                         <div>
+                            <dt>{% translate "Required Plugins" %}</dt>
+                            <dd>
+                                {% if business_rule.requires.exists %}
+                                    {% for plugin in business_rule.requires.all %}
+                                        <a href="{% url "plugin_detail" plugin.id %}">{{ plugin.name }}</a>
+                                        {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+                        </div>
+                        <div>
                             <dt>{% translate "Created" %}</dt>
                             <dd>
                                 {{ business_rule.created_at|date }}

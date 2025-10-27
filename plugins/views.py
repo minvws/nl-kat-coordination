@@ -401,7 +401,16 @@ class BusinessRuleForm(forms.ModelForm):
 
     class Meta:
         model = BusinessRule
-        fields = ["name", "description", "enabled", "object_type", "query", "inverse_query", "finding_type_code"]
+        fields = [
+            "name",
+            "description",
+            "enabled",
+            "requires",
+            "object_type",
+            "query",
+            "inverse_query",
+            "finding_type_code",
+        ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
             "query": forms.Textarea(attrs={"rows": 5}),
@@ -424,6 +433,7 @@ class BusinessRuleForm(forms.ModelForm):
 
         if commit:
             instance.save()
+            self.save_m2m()  # Save many-to-many relationships (like requires)
         return instance
 
 
