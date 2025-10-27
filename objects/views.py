@@ -270,7 +270,7 @@ class IPAddressFilter(ScanLevelFilterMixin, django_filters.FilterSet):
     query = django_filters.CharFilter(label="Query", method="filter_by_query")
     scan_level = django_filters.MultipleChoiceFilter(
         label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        choices=list(ScanLevelEnum.choices) + [("none", "None")],
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
@@ -278,7 +278,7 @@ class IPAddressFilter(ScanLevelFilterMixin, django_filters.FilterSet):
 
     class Meta:
         model = IPAddress
-        fields = ["address", "object_set", "declared", "query", "scan_level"]
+        fields = ["address", "object_set", "query", "declared", "scan_level"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -557,7 +557,7 @@ class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
     query = django_filters.CharFilter(label="Query", method="filter_by_query")
     scan_level = django_filters.MultipleChoiceFilter(
         label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
+        choices=list(ScanLevelEnum.choices) + [("none", "None")],
         method="filter_by_scan_level",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
