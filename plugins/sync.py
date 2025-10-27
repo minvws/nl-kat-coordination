@@ -23,9 +23,6 @@ class NewPlugin(BaseModel):
     oci_arguments: list[str] = Field(default_factory=list)
     version: str | None = None
 
-    def __str__(self):
-        return f"{self.plugin_id}:{self.version}"
-
 
 plugins_type_adapter = TypeAdapter(list[NewPlugin])
 
@@ -60,9 +57,7 @@ def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
 def sync() -> list[Plugin]:
     plugins = []
 
-    for path, package in _find_packages_in_path_containing_files(
-        settings.BASE_DIR / "plugins" / "plugins", ("plugin.json",)
-    ):
+    for path, _ in _find_packages_in_path_containing_files(settings.BASE_DIR / "plugins/plugins", ("plugin.json",)):
         definition = json.loads(path.joinpath("plugin.json").read_text())
         plugin = Plugin(
             plugin_id=definition.get("plugin_id"),
@@ -78,13 +73,9 @@ def sync() -> list[Plugin]:
         )
         plugins.append(plugin)
 
-    plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")
-    plugins.extend(get_plugins_from_json(plugins_path))
-
-    nuclei_plugins_path = Path(settings.BASE_DIR / "plugins" / "plugins" / "nuclei_plugins.json")
-    plugins.extend(get_plugins_from_json(nuclei_plugins_path))
-
-    created_plugins = Plugin.objects.bulk_create(
+    plugins.extend(get_plugins_from_json(Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")))
+    plugins.extend(get_plugins_from_json(Path(settings.BASE_DIR / "plugins" / "plugins" / "nuclei_plugins.json")))
+    return Plugin.objects.bulk_create(
         plugins,
         update_conflicts=True,
         unique_fields=["plugin_id"],
@@ -100,8 +91,6 @@ def sync() -> list[Plugin]:
             "version",
         ],
     )
-
-    return created_plugins
 
 
 def get_plugins_from_json(nuclei_plugins_path: Path) -> list[Plugin]:

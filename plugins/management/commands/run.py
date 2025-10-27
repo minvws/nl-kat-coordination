@@ -27,14 +27,13 @@ class Command(BaseCommand):
             "Useful for debugging. Note: to run the command, make sure to set the OPENKAT_TOKEN environment "
             "variable first to a personal auth token",
         )
-        parser.add_argument("--parallelism", "-p", dest="parallelism", type=int, help="Level of auto-parallelism.")
 
-    def handle(self, plugin_id, targets, output, keep, cli, parallelism, *args, **options):
+    def handle(self, plugin_id, targets, output, keep, cli, *args, **options):
         if cli:
             output = "-"
 
         with capture_logs():
-            logs = PluginRunner().run(plugin_id, targets, output, keep=keep, cli=cli, parallelism=parallelism)
+            logs = PluginRunner().run(plugin_id, targets, output, keep=keep, cli=cli)
 
         if str(output) == "-":
             self.stdout.write(logs)

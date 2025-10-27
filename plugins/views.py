@@ -53,7 +53,6 @@ class PluginListView(OrganizationFilterMixin, FilterView):
 
     def get_queryset(self) -> QuerySet:
         plugins = Plugin.objects.all()
-
         order_by = self.request.GET.get("order_by", "name")
         sorting_order = self.request.GET.get("sorting_order", "asc")
 
@@ -69,19 +68,15 @@ class PluginListView(OrganizationFilterMixin, FilterView):
         context["sorting_order"] = self.request.GET.get("sorting_order", "asc")
         context["sorting_order_class"] = "ascending" if context["sorting_order"] == "asc" else "descending"
 
-        # Check which plugins have schedules for filtered organizations
         organization_codes = self.request.GET.getlist("organization")
-        plugins_with_schedules = set()
 
         if organization_codes:
             organizations = Organization.objects.filter(code__in=organization_codes)
-            # Get all plugins that have schedules for these organizations
             schedule_plugin_ids = (
                 Schedule.objects.filter(organization__in=organizations).values_list("plugin_id", flat=True).distinct()
             )
             plugins_with_schedules = set(schedule_plugin_ids)
         else:
-            # Get all plugins that have global schedules
             schedule_plugin_ids = (
                 Schedule.objects.filter(organization=None).values_list("plugin_id", flat=True).distinct()
             )
@@ -95,7 +90,6 @@ class PluginListView(OrganizationFilterMixin, FilterView):
 class PluginDetailView(OrganizationFilterMixin, DetailView):
     template_name = "plugin.html"
     model = Plugin
-
     object: Plugin
 
     def get_context_data(self, **kwargs):
@@ -105,7 +99,6 @@ class PluginDetailView(OrganizationFilterMixin, DetailView):
             {"url": reverse("plugin_detail", kwargs={"pk": self.object.pk}), "text": _("Plugin details")},
         ]
 
-        # Check if schedules exist for filtered organizations
         organization_codes = self.request.GET.getlist("organization")
         if organization_codes:
             organizations = Organization.objects.filter(code__in=organization_codes)
@@ -172,25 +165,20 @@ class PluginCreateView(KATModelPermissionRequiredMixin, CreateView):
     def get_form_kwargs(self):
         if self.request.method == "POST" and "plugin_id" in self.request.GET:
             if "duplicate" in self.request.GET and self.request.GET["duplicate"]:
-                # Do not set self.object as we want to create a new plugin
                 return super().get_form_kwargs()
 
-            # Will perform an update instead of a Create
             self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])
             return super().get_form_kwargs()
 
         if "plugin_id" in self.request.GET:
-            # Will provide the form with initial values from this plugin
             self.object = Plugin.objects.get(pk=self.request.GET["plugin_id"])
 
         kwargs = super().get_form_kwargs()
 
-        # If we are duplicating a plugin, we should make sure a unique plugin id and name are chosen
         if "duplicate" in self.request.GET and self.request.GET["duplicate"]:
             kwargs["initial"]["plugin_id"] = None
             kwargs["initial"]["name"] = None
 
-        # Pre-fill oci_arguments from query parameter (e.g., from file list "Add to plugin" button)
         if "oci_arguments" in self.request.GET:
             oci_arg = self.request.GET["oci_arguments"]
             if "initial" not in kwargs:
@@ -215,7 +203,6 @@ class PluginUpdateView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
     fields = ["plugin_id", "name", "consumes", "description", "scan_level", "batch_size", "oci_image", "oci_arguments"]
     template_name = "plugin_settings.html"
-
     object: Plugin
 
     def get_form(self, form_class=None):
@@ -258,17 +245,13 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 class PluginScheduleView(DetailView):
     model = Plugin
 
-    object: Plugin
-
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        # Get filtered organizations from request
         organization_codes = self.request.POST.getlist("organization")
         action = self.request.POST.get("action", "schedule")
 
         if action == "unschedule":
-            # Delete existing schedules
             if organization_codes:
                 organizations = Organization.objects.filter(code__in=organization_codes)
                 deleted_count = Schedule.objects.filter(plugin=self.object, organization__in=organizations).delete()[0]
@@ -288,7 +271,6 @@ class PluginScheduleView(DetailView):
                         ),
                     )
             else:
-                # Delete global schedules
                 deleted_count = Schedule.objects.filter(plugin=self.object, organization=None).delete()[0]
                 messages.success(
                     self.request,
@@ -297,7 +279,6 @@ class PluginScheduleView(DetailView):
                     ),
                 )
         else:
-            # Schedule the plugin
             if organization_codes:
                 # Schedule for specific organizations
                 organizations = Organization.objects.filter(code__in=organization_codes)
@@ -319,7 +300,6 @@ class PluginScheduleView(DetailView):
                         ),
                     )
             else:
-                # Schedule globally (for all organizations)
                 self.object.schedule()
                 messages.success(self.request, _("Plugin '{}' has been scheduled globally.").format(self.object.name))
 
@@ -420,7 +400,6 @@ class BusinessRuleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Filter object_type to only show objects from the "objects" app
         self.fields["object_type"].queryset = ContentType.objects.filter(app_label="objects")
 
         if self.instance and self.instance.pk:
@@ -433,7 +412,7 @@ class BusinessRuleForm(forms.ModelForm):
 
         if commit:
             instance.save()
-            self.save_m2m()  # Save many-to-many relationships (like requires)
+            self.save_m2m()
         return instance
 
 
@@ -508,8 +487,6 @@ class BusinessRuleRunView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-
-        # Trigger the business rule to run in the background
         run_business_rules.delay([self.object.pk])
 
         messages.success(

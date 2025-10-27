@@ -18,7 +18,7 @@ from openkat.models import AuthToken, User
 from plugins.models import Plugin
 
 
-class PluginRunner:
+class PluginRunner:  # TODO: auto-parallelism?
     def __init__(
         self,
         override_entrypoint: str = "/bin/runner",  # Path to the entrypoint binary inside the container.
@@ -36,7 +36,6 @@ class PluginRunner:
         task_id: uuid.UUID | None = None,
         keep: bool = False,
         cli: bool = False,
-        parallelism: int | None = None,  # TODO: auto-parallelism
     ) -> str:
         """
         Execute a plugin with different execution modes based on target type and plugin configuration.
@@ -234,7 +233,6 @@ class PluginRunner:
         if out is None:
             return ""
 
-        # return b"".join(out).decode()
         # Normalize to an iterator of byte chunks; if `out` is raw bytes, wrap it so join works uniformly.
         return b"".join(itertools.chain([out] if isinstance(out, (bytes, bytearray)) else out)).decode()
 

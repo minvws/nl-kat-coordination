@@ -53,6 +53,24 @@ if TYPE_CHECKING:
     from django.db.models.query import QuerySet
 
 
+class ObjectScanLevelForm(forms.Form):
+    scan_level = forms.ChoiceField(
+        choices=[("", "-")] + list(ScanLevelEnum.choices),
+        required=False,
+        label=_("Scan Level"),
+        widget=forms.Select(attrs={"class": "scan-level-select"}),
+    )
+    declared = forms.BooleanField(required=False, label=_("Declared"), widget=forms.CheckboxInput())
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance", None)
+        super().__init__(*args, **kwargs)
+
+        if self.instance:
+            self.fields["scan_level"].initial = self.instance.scan_level if self.instance.scan_level is not None else ""
+            self.fields["declared"].initial = self.instance.declared
+
+
 class NetworkFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
 
@@ -68,7 +86,6 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NetworkFilter
     ordering = ["-id"]
-    http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[Network]":
         queryset = super().get_queryset()
@@ -84,7 +101,6 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:network_list"), "text": _("Networks")}]
 
-        # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             object_set = ObjectSet.objects.get(id=object_set_id)
@@ -101,21 +117,17 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
     model = Network
     template_name = "objects/network_detail.html"
     context_object_name = "network"
-
     object: Network
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:network_list")
         if organization_codes:
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-
-        # Add findings for this network
         context["findings"] = Finding.objects.filter(object_type="network", object_id=self.object.pk)
 
         return context
@@ -125,21 +137,17 @@ class NetworkScanLevelDetailView(OrganizationFilterMixin, DetailView):
     model = Network
     template_name = "objects/network_detail_scan_level.html"
     context_object_name = "network"
-
     object: Network
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:network_list")
         if organization_codes:
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-
-        # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
@@ -160,24 +168,30 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("objects:network_list"))
 
 
-class ObjectScanLevelForm(forms.Form):
-    """Simple form for setting scan level directly on an object"""
+class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ObjectScanLevelForm
 
-    scan_level = forms.ChoiceField(
-        choices=[("", "-")] + list(ScanLevelEnum.choices),
-        required=False,
-        label=_("Scan Level"),
-        widget=forms.Select(attrs={"class": "scan-level-select"}),
-    )
-    declared = forms.BooleanField(required=False, label=_("Declared"), widget=forms.CheckboxInput())
+    def get_success_url(self):
+        return reverse("objects:network_detail", kwargs={"pk": self.kwargs.get("pk")})
 
-    def __init__(self, *args, **kwargs):
-        self.instance = kwargs.pop("instance", None)
-        super().__init__(*args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = Network.objects.get(pk=self.kwargs.get("pk"))
+        return kwargs
 
-        if self.instance:
-            self.fields["scan_level"].initial = self.instance.scan_level if self.instance.scan_level is not None else ""
-            self.fields["declared"].initial = self.instance.declared
+    def form_valid(self, form):
+        network = Network.objects.get(pk=self.kwargs.get("pk"))
+        scan_level_value = form.cleaned_data["scan_level"]
+
+        if scan_level_value == "":
+            network.scan_level = None
+        else:
+            network.scan_level = int(scan_level_value)
+        network.declared = form.cleaned_data["declared"]
+        network.save()
+
+        messages.success(self.request, _("Scan level updated successfully"))
+        return super().form_valid(form)
 
 
 class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
@@ -188,51 +202,18 @@ class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
-        kwargs["instance"] = hostname
+        kwargs["instance"] = Hostname.objects.get(pk=self.kwargs.get("pk"))
         return kwargs
 
     def form_valid(self, form):
         hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
         scan_level_value = form.cleaned_data["scan_level"]
-        declared = form.cleaned_data["declared"]
-
-        # Update scan level
         if scan_level_value == "":
             hostname.scan_level = None
         else:
             hostname.scan_level = int(scan_level_value)
-        hostname.declared = declared
+        hostname.declared = form.cleaned_data["declared"]
         hostname.save()
-
-        messages.success(self.request, _("Scan level updated successfully"))
-        return super().form_valid(form)
-
-
-class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
-    form_class = ObjectScanLevelForm
-
-    def get_success_url(self):
-        return reverse("objects:network_detail", kwargs={"pk": self.kwargs.get("pk")})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        network = Network.objects.get(pk=self.kwargs.get("pk"))
-        kwargs["instance"] = network
-        return kwargs
-
-    def form_valid(self, form):
-        network = Network.objects.get(pk=self.kwargs.get("pk"))
-        scan_level_value = form.cleaned_data["scan_level"]
-        declared = form.cleaned_data["declared"]
-
-        # Update scan level
-        if scan_level_value == "":
-            network.scan_level = None
-        else:
-            network.scan_level = int(scan_level_value)
-        network.declared = declared
-        network.save()
 
         messages.success(self.request, _("Scan level updated successfully"))
         return super().form_valid(form)
@@ -288,11 +269,7 @@ class FindingDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("objects:finding_list"))
 
 
-class IPAddressFilter(django_filters.FilterSet):
-    address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
-    object_set = django_filters.ModelChoiceFilter(
-        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
-    )
+class ScanLevelFilterMixin:
     scan_level = django_filters.MultipleChoiceFilter(
         label="Scan level",
         choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
@@ -300,26 +277,6 @@ class IPAddressFilter(django_filters.FilterSet):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
     )
     declared = django_filters.BooleanFilter(label="Declared")
-    query = django_filters.CharFilter(label="Query", method="filter_by_query")
-
-    class Meta:
-        model = IPAddress
-        fields = ["address", "object_set", "declared", "query", "scan_level"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Filter object sets by IPAddress content type
-        ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
-        queryset = ObjectSet.objects.filter(object_type=ipaddress_ct)
-        if queryset.exists():
-            self.filters["object_set"].queryset = queryset
-        else:
-            # Hide the filter if no object sets exist
-            del self.filters["object_set"]
-
-    def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
-        return queryset
 
     def filter_by_scan_level(self, queryset, name, value):
         if not value:
@@ -334,6 +291,30 @@ class IPAddressFilter(django_filters.FilterSet):
                 q_objects |= Q(scan_level=level)
 
         return queryset.filter(q_objects)
+
+
+class IPAddressFilter(django_filters.FilterSet, ScanLevelFilterMixin):
+    address = django_filters.CharFilter(label="Address", lookup_expr="icontains")
+    object_set = django_filters.ModelChoiceFilter(
+        label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
+    )
+    query = django_filters.CharFilter(label="Query", method="filter_by_query")
+
+    class Meta:
+        model = IPAddress
+        fields = ["address", "object_set", "declared", "query", "scan_level"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
+        queryset = ObjectSet.objects.filter(object_type=ipaddress_ct)
+        if queryset.exists():
+            self.filters["object_set"].queryset = queryset
+        else:
+            del self.filters["object_set"]
+
+    def filter_by_object_set(self, queryset, name, value):
+        return queryset
 
     def filter_by_query(self, queryset, name, value):
         if not value:
@@ -356,8 +337,6 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
         queryset = super().get_queryset()
-
-        # Apply object set filter if specified
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             queryset = ObjectSet.objects.get(id=object_set_id).get_query_objects()
@@ -368,7 +347,6 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:ipaddress_list"), "text": _("IPAddresses")}]
 
-        # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             obj_set = ObjectSet.objects.get(id=object_set_id)
@@ -378,7 +356,6 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
                     _('"{}" has fixed objects that are ignored (only query results are shown).').format(obj_set.name),
                 )
 
-        # Add data for bulk actions
         ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
         context["object_sets"] = ObjectSet.objects.filter(object_type=ipaddress_ct)
         context["scan_levels"] = ScanLevelEnum
@@ -395,11 +372,9 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             return redirect(reverse("objects:ipaddress_list"))
 
         if action_type == "scan":
-            # Redirect to task creation page with selected IP addresses
             url = reverse("add_task") + "?" + "&".join([f"input_ips={selected}" for selected in selected_ids])
             return redirect(url)
         elif action_type == "create-object-set":
-            # Redirect to object set creation with selected IP addresses
             ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
             url = (
                 reverse("add_object_set")
@@ -410,11 +385,9 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")
             if scan_level == "none":
-                # Remove scan level
                 updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
                 messages.success(request, _("Removed scan level for {} IP addresses.").format(updated_count))
             elif scan_level:
-                # Set scan level
                 updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(
                     scan_level=int(scan_level), declared=True
                 )
@@ -435,7 +408,6 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
     model = IPAddress
     template_name = "objects/ipaddress_detail.html"
     context_object_name = "ipaddress"
-
     object: IPAddress
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
@@ -444,18 +416,13 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:ipaddress_list")
         if organization_codes:
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
-
-        # Add findings for this IP address
         context["findings"] = Finding.objects.filter(object_type="ipaddress", object_id=self.object.pk)
-
-        # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
@@ -465,7 +432,6 @@ class IPAddressScanLevelDetailView(OrganizationFilterMixin, DetailView):
     model = IPAddress
     template_name = "objects/ipaddress_detail_scan_level.html"
     context_object_name = "ipaddress"
-
     object: IPAddress
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
@@ -474,16 +440,42 @@ class IPAddressScanLevelDetailView(OrganizationFilterMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:ipaddress_list")
         if organization_codes:
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
-
-        # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+
+        return context
+
+
+class IPAddressTasksDetailView(OrganizationFilterMixin, ListView):
+    model = Task
+    template_name = "objects/ipaddress_detail_tasks.html"
+    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
+    ordering = ["-created_at"]
+
+    def get_queryset(self) -> "QuerySet[Task]":
+        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
+        return Task.objects.filter(data__input_data__has_any_keys=[str(ipaddress.address)]).annotate(
+            plugin_name=Subquery(
+                Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
+        context["ipaddress"] = ipaddress
+
+        organization_codes = self.request.GET.getlist("organization")
+        breadcrumb_url = reverse("objects:ipaddress_list")
+        if organization_codes:
+            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
+
+        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
 
         return context
 
@@ -496,7 +488,6 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        # Set default network to "internet" if it exists
         try:
             internet_network = Network.objects.get(name="internet")
             initial["network"] = internet_network
@@ -533,7 +524,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             reader = csv.reader(csv_data, delimiter=",", quotechar='"')
             for row_num, row in enumerate(reader, 1):
                 if not row or not row[0].strip():
-                    continue  # Skip empty rows
+                    continue
 
                 address = row[0].strip()
 
@@ -545,37 +536,26 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                         skipped_count += 1
                 except Exception as e:
                     error_count += 1
-                    messages.add_message(
+                    messages.warning(
                         self.request,
-                        messages.WARNING,
                         _("Error creating IP address '{address}' on row {row_num}: {error}").format(
                             address=address, row_num=row_num, error=str(e)
                         ),
                     )
 
             if created_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.SUCCESS,
-                    _("Successfully created {count} IP addresses.").format(count=created_count),
+                messages.success(
+                    self.request, _("Successfully created {count} IP addresses.").format(count=created_count)
                 )
             if skipped_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.INFO,
-                    _("{count} IP addresses already existed and were skipped.").format(count=skipped_count),
-                )
+                messages.info(self.request, _("{count} IP addresses already existed.").format(count=skipped_count))
             if error_count > 0:
-                messages.add_message(
-                    self.request,
-                    messages.WARNING,
-                    _("{count} IP addresses had errors and were not created.").format(count=error_count),
+                messages.warning(
+                    self.request, _("{count} IP addresses had errors and were not created.").format(count=error_count)
                 )
 
         except csv.Error as e:
-            messages.add_message(
-                self.request, messages.ERROR, _("Error parsing CSV file: {error}").format(error=str(e))
-            )
+            messages.error(self.request, _("Error parsing CSV file: {error}").format(error=str(e)))
 
         return super().form_valid(form)
 
@@ -603,32 +583,23 @@ class IPAddressScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
     def form_valid(self, form):
         ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
         scan_level_value = form.cleaned_data["scan_level"]
-        declared = form.cleaned_data["declared"]
 
-        # Update scan level
         if scan_level_value == "":
             ipaddress.scan_level = None
         else:
             ipaddress.scan_level = int(scan_level_value)
-        ipaddress.declared = declared
+        ipaddress.declared = form.cleaned_data["declared"]
         ipaddress.save()
 
         messages.success(self.request, _("Scan level updated successfully"))
         return super().form_valid(form)
 
 
-class HostnameFilter(django_filters.FilterSet):
+class HostnameFilter(django_filters.FilterSet, ScanLevelFilterMixin):
     name = django_filters.CharFilter(label="Name", lookup_expr="icontains")
     object_set = django_filters.ModelChoiceFilter(
         label="Object Set", queryset=ObjectSet.objects.none(), empty_label="All objects", method="filter_by_object_set"
     )
-    scan_level = django_filters.MultipleChoiceFilter(
-        label="Scan level",
-        choices=list(ScanLevelEnum.choices) + [("none", "No scan level")],
-        method="filter_by_scan_level",
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "scan-level-filter-checkboxes"}),
-    )
-    declared = django_filters.BooleanFilter(label="Declared")
     query = django_filters.CharFilter(label="Query", method="filter_by_query")
 
     class Meta:
@@ -637,32 +608,15 @@ class HostnameFilter(django_filters.FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filter object sets by Hostname content type
         hostname_ct = ContentType.objects.get_for_model(Hostname)
         queryset = ObjectSet.objects.filter(object_type=hostname_ct)
         if queryset.exists():
             self.filters["object_set"].queryset = queryset
         else:
-            # Hide the filter if no object sets exist
             del self.filters["object_set"]
 
     def filter_by_object_set(self, queryset, name, value):
-        # This method is called by django-filters, but we handle filtering in the view
         return queryset
-
-    def filter_by_scan_level(self, queryset, name, value):
-        if not value:
-            return queryset
-
-        q_objects = Q()
-
-        for level in value:
-            if level == "none":
-                q_objects |= Q(scan_level__isnull=True)
-            else:
-                q_objects |= Q(scan_level=level)
-
-        return queryset.filter(q_objects)
 
     def filter_by_query(self, queryset, name, value):
         if not value:
@@ -697,7 +651,6 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [{"url": reverse("objects:hostname_list"), "text": _("Hostnames")}]
 
-        # Add warning if object set has manual objects that are being ignored
         object_set_id = self.request.GET.get("object_set")
         if object_set_id:
             object_set = ObjectSet.objects.get(id=object_set_id)
@@ -707,7 +660,6 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
                     _('"{}" has static objects that are ignored. Only the query is applied.').format(object_set.name),
                 )
 
-        # Add data for bulk actions
         context["object_sets"] = ObjectSet.objects.filter(object_type=ContentType.objects.get_for_model(Hostname))
         context["scan_levels"] = ScanLevelEnum
         context["plugins"] = Plugin.objects.filter(consumes__contains=["Hostname"])
@@ -716,34 +668,28 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
 
     def post(self, request, *args, **kwargs):
         action_type = request.POST.get("action")
-        selected_ids = request.POST.getlist("hostname")
+        selected = request.POST.getlist("hostname")
 
-        if not selected_ids:
+        if not selected:
             messages.warning(request, _("No hostnames selected."))
             return redirect(reverse("objects:hostname_list"))
 
         if action_type == "scan":
-            # Redirect to task creation page with selected hostnames
-            url = reverse("add_task") + "?" + "&".join([f"input_hostnames={selected}" for selected in selected_ids])
+            url = reverse("add_task") + "?" + "&".join([f"input_hostnames={selected}" for selected in selected])
             return redirect(url)
         elif action_type == "create-object-set":
-            # Redirect to object set creation with selected hostnames
-            hostname_ct = ContentType.objects.get_for_model(Hostname)
+            ct = ContentType.objects.get_for_model(Hostname)
             url = (
-                reverse("add_object_set")
-                + f"?object_type={hostname_ct.pk}&"
-                + "&".join([f"objects={selected}" for selected in selected_ids])
+                reverse("add_object_set") + f"?object_type={ct.pk}&" + "&".join([f"objects={_id}" for _id in selected])
             )
             return redirect(url)
         elif action_type == "set-scan-level":
             scan_level = request.POST.get("scan-level")
             if scan_level == "none":
-                # Remove scan level
-                updated_count = Hostname.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
+                updated_count = Hostname.objects.filter(pk__in=selected).update(scan_level=None, declared=False)
                 messages.success(request, _("Removed scan level for {} hostnames.").format(updated_count))
             elif scan_level:
-                # Set scan level
-                updated_count = Hostname.objects.filter(pk__in=selected_ids).update(
+                updated_count = Hostname.objects.filter(pk__in=selected).update(
                     scan_level=int(scan_level), declared=True
                 )
                 messages.success(request, _("Updated scan level for {} hostnames.").format(updated_count))
@@ -751,8 +697,8 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
                 messages.warning(request, _("No scan level selected."))
         elif action_type == "delete":
             try:
-                Hostname.objects.filter(pk__in=selected_ids).delete()
-                messages.success(request, _("Deleted {} hostnames.").format(len(selected_ids)))
+                Hostname.objects.filter(pk__in=selected).delete()
+                messages.success(request, _("Deleted {} hostnames.").format(len(selected)))
             except DatabaseError:
                 messages.warning(request, _("No plugin selected."))
 
@@ -763,13 +709,11 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
     model = Hostname
     template_name = "objects/hostname_detail.html"
     context_object_name = "hostname"
-
     object: Hostname
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:hostname_list")
         if organization_codes:
@@ -777,7 +721,6 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
 
-        # Add DNS records to context
         context["dnsarecord_set"] = self.object.dnsarecord_set.all()
         context["dnsaaaarecord_set"] = self.object.dnsaaaarecord_set.all()
         context["dnscnamerecord_set"] = self.object.dnscnamerecord_set.all()
@@ -788,15 +731,10 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["dnstxtrecord_set"] = self.object.dnstxtrecord_set.all()
         context["dnssrvrecord_set"] = self.object.dnssrvrecord_set.all()
 
-        # Reverse DNS records
         context["dnscnamerecord_target_set"] = self.object.dnscnamerecord_target_set.all()
         context["dnsmxrecord_mailserver"] = self.object.dnsmxrecord_mailserver.all()
         context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.all()
-
-        # Add findings for this hostname
         context["findings"] = Finding.objects.filter(object_type="hostname", object_id=self.object.pk)
-
-        # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
@@ -812,15 +750,12 @@ class HostnameScanLevelDetailView(OrganizationFilterMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:hostname_list")
         if organization_codes:
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
-
-        # Add scan level form
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
@@ -834,21 +769,17 @@ class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
 
     def get_queryset(self) -> "QuerySet[Task]":
         hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
-        qs = Task.objects.filter(data__input_data__has_any_keys=[str(hostname.name)])
-        qs = qs.annotate(
+        return Task.objects.filter(data__input_data__has_any_keys=[str(hostname.name)]).annotate(
             plugin_name=Subquery(
                 Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
             )
         )
-
-        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
         context["hostname"] = hostname
 
-        # Build breadcrumb URL with organization parameters
         organization_codes = self.request.GET.getlist("organization")
         breadcrumb_url = reverse("objects:hostname_list")
 
@@ -856,40 +787,6 @@ class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
-
-        return context
-
-
-class IPAddressTasksDetailView(OrganizationFilterMixin, ListView):
-    """Show tasks related to a specific IP address."""
-
-    model = Task
-    template_name = "objects/ipaddress_detail_tasks.html"
-    paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
-    ordering = ["-created_at"]
-
-    def get_queryset(self) -> "QuerySet[Task]":
-        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
-        qs = Task.objects.filter(data__input_data__has_any_keys=[str(ipaddress.address)])
-        qs = qs.annotate(
-            plugin_name=Subquery(
-                Plugin.objects.filter(plugin_id=KeyTextTransform("plugin_id", OuterRef("data"))).values("name")
-            )
-        )
-
-        return qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
-        context["ipaddress"] = ipaddress
-
-        organization_codes = self.request.GET.getlist("organization")
-        breadcrumb_url = reverse("objects:ipaddress_list")
-        if organization_codes:
-            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
-
-        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
 
         return context
 
@@ -910,7 +807,6 @@ class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        # Set default network to "internet" if it exists
         try:
             internet_network = Network.objects.get(name="internet")
             initial["network"] = internet_network
@@ -935,7 +831,6 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         csv_file = form.cleaned_data["csv_file"]
         network = form.cleaned_data.get("network")
 
-        # Default to "internet" network if not specified
         if not network:
             network, created = Network.objects.get_or_create(name="internet")
 
@@ -961,9 +856,8 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                         skipped_count += 1
                 except Exception as e:
                     error_count += 1
-                    messages.add_message(
+                    messages.warning(
                         self.request,
-                        messages.WARNING,
                         _("Error creating hostname '{name}' on row {row_num}: {error}").format(
                             name=name, row_num=row_num, error=str(e)
                         ),
@@ -972,9 +866,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             if created_count > 0:
                 messages.success(self.request, _("Successfully created {count} hostnames.").format(count=created_count))
             if skipped_count > 0:
-                messages.info(
-                    self.request, _("{count} hostnames already existed and were skipped.").format(count=skipped_count)
-                )
+                messages.info(self.request, _("{count} hostnames already existed.").format(count=skipped_count))
             if error_count > 0:
                 messages.warning(
                     self.request, _("{count} hostnames had errors and were not created.").format(count=error_count)
@@ -986,10 +878,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
 
-# DNS Record Delete Views
 class DNSRecordDeleteView(KATModelPermissionRequiredMixin, DeleteView):
-    object: DNSARecord
-
     def get_success_url(self) -> str:
         return reverse("objects:hostname_detail", kwargs={"pk": self.object.hostname_id})
 
@@ -1071,14 +960,11 @@ def is_valid_ip(value: str) -> bool:
 
 
 class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
-    """View for creating IP addresses and hostnames in bulk from textarea input."""
-
     template_name = "objects/generic_asset_create.html"
     form_class = GenericAssetBulkCreateForm
     success_url = reverse_lazy("objects:generic_asset_create")
 
     def get_permission_required(self):
-        # Require both permissions since we create both types
         return ["openkat.add_ipaddress", "openkat.add_hostname"]
 
     def get_context_data(self, **kwargs):
@@ -1107,14 +993,12 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
 
             try:
                 if is_valid_ip(asset):
-                    # It's an IP address
                     ipaddress, created = IPAddress.objects.get_or_create(network=network, address=asset)
                     if created:
                         ip_created += 1
                     else:
                         ip_skipped += 1
                 else:
-                    # Treat as hostname
                     hostname, created = Hostname.objects.get_or_create(network=network, name=asset.lower())
                     if created:
                         hostname_created += 1
@@ -1129,23 +1013,16 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
                     ),
                 )
 
-        # Success messages
         if ip_created > 0:
             messages.success(self.request, _("Successfully created {count} IP addresses.").format(count=ip_created))
         if hostname_created > 0:
             messages.success(self.request, _("Successfully created {count} hostnames.").format(count=hostname_created))
 
-        # Info messages
         if ip_skipped > 0:
-            messages.info(
-                self.request, _("{count} IP addresses already existed and were skipped.").format(count=ip_skipped)
-            )
+            messages.info(self.request, _("{count} IP addresses already existed.").format(count=ip_skipped))
         if hostname_skipped > 0:
-            messages.info(
-                self.request, _("{count} hostnames already existed and were skipped.").format(count=hostname_skipped)
-            )
+            messages.info(self.request, _("{count} hostnames already existed.").format(count=hostname_skipped))
 
-        # Error summary
         if error_count > 0:
             messages.warning(
                 self.request, _("{count} assets had errors and were not created.").format(count=error_count)
@@ -1155,14 +1032,11 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
 
 
 class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
-    """View for CSV upload of IP addresses and hostnames with optional scan level and organization."""
-
     template_name = "objects/generic_asset_csv_upload.html"
     form_class = GenericAssetCSVUploadForm
     success_url = reverse_lazy("objects:generic_asset_create")
 
     def get_permission_required(self):
-        # Require both permissions since we create both types
         return ["openkat.add_ipaddress", "openkat.add_hostname"]
 
     def form_valid(self, form):
@@ -1211,16 +1085,13 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                         )
 
                 try:
-                    # Determine if IP or hostname
                     if is_valid_ip(asset):
-                        # Create IP address
                         ipaddress_obj, created = IPAddress.objects.get_or_create(network=default_network, address=asset)
                         if created:
                             ip_created += 1
                         else:
                             ip_skipped += 1
 
-                        # Set scan level if provided
                         if scan_level_value is not None:
                             ipaddress_obj.scan_level = scan_level_value
                             ipaddress_obj.declared = True
@@ -1228,7 +1099,6 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             scan_levels_set += 1
 
                     else:
-                        # Create hostname
                         hostname_obj, created = Hostname.objects.get_or_create(
                             network=default_network, name=asset.lower()
                         )
@@ -1253,7 +1123,6 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                         ),
                     )
 
-            # Success messages
             if ip_created > 0:
                 messages.success(self.request, _("Successfully created {count} IP addresses.").format(count=ip_created))
             if hostname_created > 0:
@@ -1261,23 +1130,16 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                     self.request, _("Successfully created {count} hostnames.").format(count=hostname_created)
                 )
 
-            # Info messages
             if ip_skipped > 0:
-                messages.info(
-                    self.request, _("{count} IP addresses already existed and were skipped.").format(count=ip_skipped)
-                )
+                messages.info(self.request, _("{count} IP addresses already existed.").format(count=ip_skipped))
             if hostname_skipped > 0:
-                messages.info(
-                    self.request,
-                    _("{count} hostnames already existed and were skipped.").format(count=hostname_skipped),
-                )
+                messages.info(self.request, _("{count} hostnames already existed.").format(count=hostname_skipped))
 
             if scan_levels_set > 0:
                 messages.success(
                     self.request, _("Successfully set scan levels for {count} assets.").format(count=scan_levels_set)
                 )
 
-            # Error summary
             if error_count > 0:
                 messages.warning(
                     self.request, _("{count} assets had errors and were not created.").format(count=error_count)
@@ -1289,10 +1151,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
     def _get_organization(self, org_code: str | None) -> Organization | None:
-        """Get organization by code, or return None if not found."""
         if not org_code:
-            # If no org code provided, scan level cannot be set
-            # This is expected - user can provide scan level in column 2 and org in column 3
             return None
 
         try:
