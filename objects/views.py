@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
-from django.db.models import OuterRef, Q, QuerySet, Subquery
+from django.db.models import Model, OuterRef, Q, QuerySet, Subquery
 from django.db.models.fields.json import KeyTextTransform
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -69,6 +69,29 @@ class ObjectScanLevelForm(forms.Form):
         if self.instance:
             self.fields["scan_level"].initial = self.instance.scan_level if self.instance.scan_level is not None else ""
             self.fields["declared"].initial = self.instance.declared
+
+
+class BaseScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
+    form_class = ObjectScanLevelForm
+    model: Model
+    detail_url_name: str
+
+    def get_success_url(self):
+        return reverse(self.detail_url_name, kwargs={"pk": self.kwargs.get("pk")})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.model.objects.get(pk=self.kwargs.get("pk"))
+        return kwargs
+
+    def form_valid(self, form):
+        obj = self.model.objects.get(pk=self.kwargs.get("pk"))
+        obj.scan_level = None if form.cleaned_data["scan_level"] == "" else int(form.cleaned_data["scan_level"])
+        obj.declared = form.cleaned_data["declared"]
+        obj.save()
+
+        messages.success(self.request, _("Scan level updated successfully"))
+        return super().form_valid(form)
 
 
 class NetworkFilter(django_filters.FilterSet):
@@ -168,55 +191,9 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("objects:network_list"))
 
 
-class NetworkScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
-    form_class = ObjectScanLevelForm
-
-    def get_success_url(self):
-        return reverse("objects:network_detail", kwargs={"pk": self.kwargs.get("pk")})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["instance"] = Network.objects.get(pk=self.kwargs.get("pk"))
-        return kwargs
-
-    def form_valid(self, form):
-        network = Network.objects.get(pk=self.kwargs.get("pk"))
-        scan_level_value = form.cleaned_data["scan_level"]
-
-        if scan_level_value == "":
-            network.scan_level = None
-        else:
-            network.scan_level = int(scan_level_value)
-        network.declared = form.cleaned_data["declared"]
-        network.save()
-
-        messages.success(self.request, _("Scan level updated successfully"))
-        return super().form_valid(form)
-
-
-class HostnameScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
-    form_class = ObjectScanLevelForm
-
-    def get_success_url(self):
-        return reverse("objects:hostname_detail", kwargs={"pk": self.kwargs.get("pk")})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["instance"] = Hostname.objects.get(pk=self.kwargs.get("pk"))
-        return kwargs
-
-    def form_valid(self, form):
-        hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
-        scan_level_value = form.cleaned_data["scan_level"]
-        if scan_level_value == "":
-            hostname.scan_level = None
-        else:
-            hostname.scan_level = int(scan_level_value)
-        hostname.declared = form.cleaned_data["declared"]
-        hostname.save()
-
-        messages.success(self.request, _("Scan level updated successfully"))
-        return super().form_valid(form)
+class NetworkScanLevelUpdateView(BaseScanLevelUpdateView):
+    model = Network
+    detail_url_name = "objects:network_detail"
 
 
 class FindingFilter(django_filters.FilterSet):
@@ -568,31 +545,9 @@ class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return redirect(reverse("objects:ipaddress_list"))
 
 
-class IPAddressScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
-    form_class = ObjectScanLevelForm
-
-    def get_success_url(self):
-        return reverse("objects:ipaddress_detail", kwargs={"pk": self.kwargs.get("pk")})
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
-        kwargs["instance"] = ipaddress
-        return kwargs
-
-    def form_valid(self, form):
-        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
-        scan_level_value = form.cleaned_data["scan_level"]
-
-        if scan_level_value == "":
-            ipaddress.scan_level = None
-        else:
-            ipaddress.scan_level = int(scan_level_value)
-        ipaddress.declared = form.cleaned_data["declared"]
-        ipaddress.save()
-
-        messages.success(self.request, _("Scan level updated successfully"))
-        return super().form_valid(form)
+class IPAddressScanLevelUpdateView(BaseScanLevelUpdateView):
+    model = IPAddress
+    detail_url_name = "objects:ipaddress_detail"
 
 
 class HostnameFilter(django_filters.FilterSet, ScanLevelFilterMixin):
@@ -789,6 +744,11 @@ class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Hostnames")}]
 
         return context
+
+
+class HostnameScanLevelUpdateView(BaseScanLevelUpdateView):
+    model = Hostname
+    detail_url_name = "objects:hostname_detail"
 
 
 class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
