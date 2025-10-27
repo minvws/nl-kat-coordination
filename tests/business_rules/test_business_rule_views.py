@@ -108,7 +108,7 @@ def test_business_rule_create_view(rf, superuser_member, xtdb):
             {
                 "name": "New Rule",
                 "description": "New description",
-                "enabled": True,
+                "enabled": "on",
                 "object_type": hostname_ct.id,
                 "query": 'name = "example.com"',
                 "inverse_query": 'inverse name = "example.com"',
@@ -150,7 +150,7 @@ def test_business_rule_update_view(rf, superuser_member, xtdb):
             {
                 "name": "Updated Rule",
                 "description": "Updated description",
-                "enabled": True,
+                "enabled": "on",
                 "object_type": ipaddress_ct.id,
                 "query": 'address = "192.168.1.1"',
                 "inverse_query": 'inverse address = "192.168.1.1"',

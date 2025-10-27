@@ -230,7 +230,7 @@ class BusinessRule(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     enabled = models.BooleanField(default=True)
-    requires = ManyToManyField(Plugin, related_name="required_by")
+    requires = ManyToManyField(Plugin, related_name="required_by", blank=True)
     finding_type_code = models.CharField(max_length=100, null=True, blank=True)
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     query = models.TextField(help_text="Query to find objects that should get a finding", blank=True, null=True)
