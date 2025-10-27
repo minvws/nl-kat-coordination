@@ -12,7 +12,17 @@
             {% include "plugin_tabs.html" with view="general" %}
 
             <div>
-                <h2>{% translate "General" %}</h2>
+                <div class="introduction">
+                    <div>
+                        <h2>{% translate "General" %}</h2>
+                    </div>
+                    <div class="horizontal-view toolbar">
+                        <a class="button ghost"
+                           href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
+                            {% translate "View results" %}<span class="icon ti-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
                 <div>
                     <h3>{% translate "Container image" %}</h3>
                     <p>
@@ -50,12 +60,6 @@
                         {% endblocktranslate %}
                     {% endif %}
                 </div>
-            </div>
-            <div class="horizontal-view toolbar">
-                <a class="button ghost"
-                   href="{% url 'file_list' %}?plugin_id={{ plugin.plugin_id }}">
-                    {% translate "View results" %}<span class="icon ti-chevron-right"></span>
-                </a>
             </div>
         </section>
     </main>
