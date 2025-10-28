@@ -15,6 +15,7 @@ from objects.models import (
     Network,
     Protocol,
     Software,
+    XTDBOrganization,
     bulk_insert,
     to_xtdb_dict,
 )
@@ -23,7 +24,7 @@ from tasks.tasks import recalculate_scan_levels, sync_ns_scan_levels
 from tests.conftest import setup_request
 
 
-def test_query_hostname(xtdb):
+def test_query_hostname(xtdb, organization):
     network = Network.objects.create(name="internet")
     Hostname.objects.create(network=network, name="test.com")
     time.sleep(0.1)
@@ -32,6 +33,11 @@ def test_query_hostname(xtdb):
     assert networks.count() == 1
     networks = Network.objects.filter(hostname__name="none.com")
     assert networks.count() == 0
+
+    network.organizations.add(XTDBOrganization.objects.get(pk=organization.pk))
+    network.save()
+    assert Network.objects.filter(organizations__in=[]).count() == 0
+    assert Network.objects.filter(organizations__pk__in=[organization.pk]).count() == 1
 
 
 def test_recalculate_scan_levels_hostname_ip(xtdb, organization):
