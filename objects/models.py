@@ -26,7 +26,7 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 
 
 def to_xtdb_dict(model: Model) -> dict:
-    mod = model_to_dict(model, exclude=["id"])
+    mod = model_to_dict(model, exclude=["id", "organizations"])
     mod["_id"] = model.pk
 
     if "_valid_from" in mod:
@@ -39,8 +39,8 @@ def to_xtdb_dict(model: Model) -> dict:
             continue
 
     for mm_field in model._meta.many_to_many:
-        mod[mm_field.name] = [item.id for item in mod[mm_field.name]]
-        continue
+        if mm_field.name != "organizations":
+            del mod[mm_field.name]
 
     return mod
 
@@ -125,7 +125,9 @@ class Finding(XTDBModel):
 
     object_type: LowerCaseCharField = LowerCaseCharField()
     object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-    organizations = models.ManyToManyField(Organization, blank=True, related_name="findings", through="FindingOrganization")
+    organizations = models.ManyToManyField(
+        Organization, blank=True, related_name="findings", through="FindingOrganization"
+    )
     objects = ManagerWithGenericObjectForeignKey()
 
     class Meta:
@@ -143,7 +145,9 @@ class Network(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
-    organizations = models.ManyToManyField(Organization, blank=True, related_name="networks", through="NetworkOrganization")
+    organizations = models.ManyToManyField(
+        Organization, blank=True, related_name="networks", through="NetworkOrganization"
+    )
 
     def __str__(self) -> str:
         return self.name
@@ -161,7 +165,9 @@ class IPAddress(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
-    organizations = models.ManyToManyField(Organization, blank=True, related_name="ipaddresses", through="IPAddressOrganization")
+    organizations = models.ManyToManyField(
+        Organization, blank=True, related_name="ipaddresses", through="IPAddressOrganization"
+    )
 
     def __str__(self) -> str:
         return self.address
@@ -219,7 +225,9 @@ class Hostname(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
-    organizations = models.ManyToManyField(Organization, blank=True, related_name="hostnames", through="HostnameOrganization")
+    organizations = models.ManyToManyField(
+        Organization, blank=True, related_name="hostnames", through="HostnameOrganization"
+    )
 
     def __str__(self) -> str:
         if self.name is None:  # TODO: fix, this  can happen for some reason...

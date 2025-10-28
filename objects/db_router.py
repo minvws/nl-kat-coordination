@@ -6,13 +6,21 @@ class XTDBRouter:
     route_app_labels = {"objects"}
 
     def db_for_read(self, model, **hints):
-        if model._meta.app_label in self.route_app_labels:
+        if (
+            model._meta.app_label in self.route_app_labels
+            or hints.get("instance") is not None
+            and hints.get("instance")._meta.app_label in self.route_app_labels
+        ):
             return "xtdb"
         else:
             return "default"
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label in self.route_app_labels:
+        if (
+            model._meta.app_label in self.route_app_labels
+            or hints.get("instance") is not None
+            and hints.get("instance")._meta.app_label in self.route_app_labels
+        ):
             return "xtdb"
         else:
             return "default"
