@@ -219,6 +219,7 @@ class FindingListView(OrganizationFilterMixin, FilterView):
     context_object_name = "findings"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = FindingFilter
+    ordering = ["-_valid_from"]
 
     def get_queryset(self) -> "QuerySet[Finding]":
         return super().get_queryset().prefetch_related("finding_type")

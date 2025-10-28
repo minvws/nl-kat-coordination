@@ -128,7 +128,7 @@ def get_rules():
                       RIGHT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                       LEFT JOIN {Hostname._meta.db_table} nshost ON hns.name_server_id = nshost._id
                       LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = nshost._id
-                 LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
+                      LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
                     select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NAMESERVER-NO-TWO-IPV6')
                  )
                  where f._id is null and ns._id is null
