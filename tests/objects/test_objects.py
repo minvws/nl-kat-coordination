@@ -37,6 +37,8 @@ def test_query_hostname(xtdb, organization):
 
     networks = Network.objects.filter(hostname__organizations=organization)
     assert networks.count() == 1
+    nets = Network.objects.select_related("organizations").values()
+    assert len(nets) == 1
 
 
 def test_recalculate_scan_levels_hostname_ip(xtdb, organization):
