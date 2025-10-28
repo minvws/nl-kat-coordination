@@ -28,6 +28,10 @@ class OrganizationAdmin(admin.ModelAdmin):
         else:
             return []
 
+    def get_deleted_objects(self, objs, request):
+        # TODO: Implement this for both the PostgreSQL and XTDB database backends.
+        return [], {}, set(), []
+
 
 @admin.register(OrganizationMember)
 class OrganizationMemberAdmin(admin.ModelAdmin):
