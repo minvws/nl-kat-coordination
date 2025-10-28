@@ -105,7 +105,6 @@ def collect_all_metrics(
     finding_types: list[str] | None = None,
     object_set: ObjectSet | None = None,
 ) -> dict[str, Any]:
-    """Collect all metrics for a security report"""
     logger.info("Starting report metrics collection")
 
     metrics = {
@@ -134,7 +133,6 @@ def collect_findings_metrics(
     finding_types: list[str] | None = None,
     object_set: ObjectSet | None = None,
 ) -> dict[str, Any]:
-    """Collect findings-related metrics"""
     findings = _get_base_finding_query(finding_types)
 
     # Count findings by type

@@ -15,9 +15,7 @@ class Report(models.Model):
         "tasks.ObjectSet", on_delete=models.SET_NULL, related_name="reports", null=True, blank=True
     )
 
-    # Store the complete report data for HTML rendering
     data = models.JSONField(default=dict, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

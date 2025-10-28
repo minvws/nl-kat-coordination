@@ -212,6 +212,7 @@ def organization_attribution():
     """
     logger.info("Running organization attribution...")
 
+    # TODO: networks?
     attribute_findings()
     attribute_through_cnames()
     attribute_through_ns()
