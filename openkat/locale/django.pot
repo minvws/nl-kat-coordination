@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-21 12:29+0000\n"
+"POT-Creation-Date: 2025-10-28 19:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,7 +42,9 @@ msgid "Files"
 msgstr ""
 
 #: files/templates/file_list.html
-#: objects/templates/objects/object_introduction.html
+#: objects/templates/objects/hostname_detail_introduction.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
+#: objects/templates/objects/network_detail_introduction.html
 #: plugins/templates/plugins/business_rule_list.html
 #: tasks/templates/schedule_list.html tasks/templates/task_list.html
 msgid "Page description. Add more information about this page."
@@ -60,8 +62,20 @@ msgstr ""
 #: plugins/templates/plugins/business_rule_list.html
 #: reports/templates/reports/report_list.html
 #: tasks/templates/object_set_list.html tasks/templates/schedule_list.html
-#: tasks/templates/task_table.html
+#: tasks/templates/task_list.html
 msgid "Apply"
+msgstr ""
+
+#: files/templates/file_list.html objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_list.html
+#: plugins/templates/plugin_list.html plugins/templates/plugin_variants.html
+#: plugins/templates/plugins/business_rule_list.html
+#: reports/templates/reports/report_list.html
+#: tasks/templates/object_set_list.html tasks/templates/schedule_list.html
+#: tasks/templates/task_list.html
+msgid "Clear all"
 msgstr ""
 
 #: files/templates/file_list.html
@@ -81,6 +95,8 @@ msgid "Location"
 msgstr ""
 
 #: files/templates/file_list.html objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 msgid "Source"
 msgstr ""
 
@@ -88,9 +104,8 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
-#: files/templates/file_list.html reports/views.py
-#: tasks/templates/schedule_list.html tasks/templates/task_table.html
-#: openkat/templates/account_detail.html
+#: files/templates/file_list.html tasks/templates/schedule_list.html
+#: tasks/templates/task_table.html openkat/templates/account_detail.html
 msgid "Organization"
 msgstr ""
 
@@ -98,23 +113,33 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+#: files/templates/file_list.html
+msgid "View"
+msgstr ""
+
 #: files/templates/file_list.html plugins/templates/plugin_table.html
 #: openkat/templates/organizations/organization_settings.html
 msgid "Actions"
 msgstr ""
 
+#: files/templates/file_list.html objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: plugins/templates/plugin_variants.html tasks/templates/object_set_list.html
+#: tasks/templates/schedule_list.html tasks/templates/task_table.html
+msgid "Close details"
+msgstr ""
+
+#: files/templates/file_list.html objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: plugins/templates/plugin_variants.html tasks/templates/object_set_list.html
+#: tasks/templates/schedule_list.html tasks/templates/task_table.html
+msgid "Open details"
+msgstr ""
+
 #: files/templates/file_list.html plugins/templates/plugin_list.html
 msgid "Add plugin"
-msgstr ""
-
-#: objects/forms.py objects/templates/objects/hostname_list.html
-#: objects/templates/objects/ipaddress_list.html
-#: objects/templates/objects/object_introduction.html
-msgid "Network"
-msgstr ""
-
-#: objects/forms.py
-msgid "Select network for all hostnames. Defaults to 'internet' network."
 msgstr ""
 
 #: objects/forms.py
@@ -123,7 +148,8 @@ msgstr ""
 
 #: objects/forms.py
 #, python-brace-format
-msgid "Row {row_num} has {col_count} columns. Expected 1 column (name)."
+msgid ""
+"Row {row_num} has {col_count} columns. Expected 1 column ({column_name})."
 msgstr ""
 
 #: objects/forms.py
@@ -131,13 +157,20 @@ msgstr ""
 msgid "Error parsing CSV: {error}"
 msgstr ""
 
-#: objects/forms.py
-msgid "Select network for all IP addresses. Defaults to 'internet' network."
+#: objects/forms.py objects/templates/objects/add_object.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Network"
 msgstr ""
 
 #: objects/forms.py
-#, python-brace-format
-msgid "Row {row_num} has {col_count} columns. Expected 1 column (address)."
+msgid "Select network for all hostnames. Defaults to 'internet' network."
+msgstr ""
+
+#: objects/forms.py
+msgid "Select network for all IP addresses. Defaults to 'internet' network."
 msgstr ""
 
 #: objects/forms.py
@@ -165,14 +198,45 @@ msgstr ""
 #: objects/forms.py
 #, python-brace-format
 msgid ""
-"Row {row_num} has {col_count} columns. Expected 1-3 columns (asset, "
-"scan_level, organization)."
+"Row {num} has {col} columns. Expected 1-3 columns (asset, scan_level, "
+"organization)."
+msgstr ""
+
+#: objects/models.py openkat/models.py
+msgid "The name of the organisation"
+msgstr ""
+
+#: objects/models.py openkat/models.py
+msgid ""
+"A slug containing only lower-case unicode letters, numbers, hyphens or "
+"underscores that will be used in URLs and paths"
+msgstr ""
+
+#: objects/templates/objects/add_object.html
+msgid "Add"
+msgstr ""
+
+#: objects/templates/objects/add_object.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_list.html
+msgid "Hostname"
+msgstr ""
+
+#: objects/templates/objects/add_object.html
+msgid "IP address"
+msgstr ""
+
+#: objects/templates/objects/add_object.html
+msgid "Add object set"
+msgstr ""
+
+#: objects/templates/objects/add_object.html
+msgid "Multiple assets"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
 #: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html objects/views.py
+#: objects/templates/objects/ipaddress_detail.html objects/views.py
 #: reports/templates/reports/report_html.html openkat/templates/header.html
 msgid "Findings"
 msgstr ""
@@ -190,11 +254,14 @@ msgid "Add finding"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
-#: openkat/templates/organizations/organization_crisis_room.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 msgid "Severity"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 #: plugins/templates/plugins/business_rule_list.html
 msgid "Finding type"
 msgstr ""
@@ -205,17 +272,26 @@ msgid "Object"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 msgid "Risk score"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
 msgid "Last seen"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
 #: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_detail_introduction.html
 #: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
 #: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_detail_introduction.html
 #: objects/templates/objects/network_list.html
 #: plugins/templates/plugins/business_rule_detail.html
 #: tasks/templates/object_set_list.html tasks/templates/schedule_list.html
@@ -224,23 +300,8 @@ msgid "Delete"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
-#: plugins/templates/plugin_variants.html tasks/templates/object_set_list.html
-#: tasks/templates/schedule_list.html tasks/templates/task_table.html
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Close details"
-msgstr ""
-
-#: objects/templates/objects/finding_list.html
-#: plugins/templates/plugin_variants.html tasks/templates/object_set_list.html
-#: tasks/templates/schedule_list.html tasks/templates/task_table.html
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Open details"
-msgstr ""
-
-#: objects/templates/objects/finding_list.html
 #: objects/templates/objects/hostname_detail.html
 #: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html
 #: plugins/templates/plugin_table.html
 #: plugins/templates/plugins/business_rule_detail.html
 #: plugins/templates/plugins/business_rule_list.html
@@ -252,10 +313,14 @@ msgid "Description"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 msgid "Recommendation"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
 msgid "Impact"
 msgstr ""
 
@@ -412,25 +477,30 @@ msgid "Go to Bulk Asset Creator"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-msgid "Hostname:"
+#: objects/templates/objects/hostname_detail_introduction.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
+#: objects/templates/objects/network_detail.html
+#: objects/templates/objects/network_detail_introduction.html
+#: plugins/templates/plugins/business_rule_detail.html
+msgid "Details"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/hostname_detail_introduction.html
 #: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
 #: objects/templates/objects/network_detail.html
-#: objects/templates/objects/network_list.html
-msgid "Last Seen"
+#: objects/templates/objects/network_detail_introduction.html
+#: plugins/templates/plugin_introduction.html
+#: plugins/templates/plugin_table.html plugins/templates/plugin_variants.html
+msgid "Scan level"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_detail.html
-#: objects/templates/objects/network_list.html objects/views.py
-msgid "Scan Level"
+msgid "Scan type"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
@@ -442,17 +512,7 @@ msgstr ""
 #: objects/templates/objects/hostname_detail.html
 #: objects/templates/objects/ipaddress_detail.html
 #: objects/templates/objects/network_detail.html
-msgid "Set Scan Level"
-msgstr ""
-
-#: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html
-msgid "Update"
-msgstr ""
-
-#: objects/templates/objects/hostname_detail.html
-msgid "DNS Records"
+msgid "Inherited"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
@@ -461,7 +521,6 @@ msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
 #: reports/templates/reports/report_html.html
-#: openkat/templates/partials/explanations.html
 msgid "Type"
 msgstr ""
 
@@ -470,9 +529,11 @@ msgid "Content"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-#: plugins/templates/plugins/business_rule_detail.html
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Details"
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_list.html
+msgid "Last Seen"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
@@ -504,7 +565,7 @@ msgid "Weight:"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-msgid "Reverse DNS Records"
+msgid "No DNS records have been found for this hostname."
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
@@ -524,26 +585,77 @@ msgid "Authoritative for:"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html
-#: plugins/templates/plugins/business_rule_detail.html
-#: reports/templates/reports/report_html.html
-msgid "Finding Type"
-msgstr ""
-
-#: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html
-msgid "Score"
+msgid "No reverse DNS records have been found for this hostname."
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
 msgid "No findings for this hostname."
 msgstr ""
 
+#: objects/templates/objects/hostname_detail_introduction.html
+msgid "Hostname:"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_introduction.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
+#: objects/templates/objects/network_detail_introduction.html
+#: plugins/templates/plugin_tabs.html
+msgid "List of views for plugin detail page"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_introduction.html
+#: objects/templates/objects/hostname_detail_tasks.html
+#: objects/templates/objects/ipaddress_detail_introduction.html
+#: objects/templates/objects/ipaddress_detail_tasks.html
+msgid "Recent tasks"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+#: objects/templates/objects/network_detail_scan_level.html
+msgid "Edit scan level"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+#: objects/templates/objects/network_detail_scan_level.html
+msgid "Update"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_tasks.html
+msgid ""
+"This tab shows plugin tasks that have this hostname in their input data."
+msgstr ""
+
 #: objects/templates/objects/hostname_list.html
-#: objects/templates/objects/object_introduction.html
-msgid "Hostname"
+#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_list.html objects/views.py
+msgid "Scan Level"
+msgstr ""
+
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Select scan level..."
+msgstr ""
+
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Remove scan level"
+msgstr ""
+
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Set scan level"
+msgstr ""
+
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Create object set"
+msgstr ""
+
+#: objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+msgid "Scan"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_create.html
@@ -570,11 +682,9 @@ msgid "One column per row with the IP address"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_detail.html
-msgid "IP address:"
-msgstr ""
-
-#: objects/templates/objects/ipaddress_detail.html
-msgid "IP Ports"
+#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_detail.html
+msgid "Address"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_detail.html
@@ -617,21 +727,10 @@ msgid "No ports found for this IP address."
 msgstr ""
 
 #: objects/templates/objects/ipaddress_detail.html
-msgid "No findings for this IP address."
+msgid "Software"
 msgstr ""
 
-#: objects/templates/objects/ipaddress_list.html
-msgid "Address"
-msgstr ""
-
-#: objects/templates/objects/network_detail.html
-msgid "Network:"
-msgstr ""
-
-#: objects/templates/objects/network_detail.html
-msgid "No findings for this network."
-msgstr ""
-
+#: objects/templates/objects/ipaddress_detail.html
 #: objects/templates/objects/network_list.html
 #: plugins/templates/plugin_table.html plugins/templates/plugin_variants.html
 #: plugins/templates/plugins/business_rule_detail.html
@@ -644,60 +743,73 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: objects/templates/objects/object_introduction.html
+#: objects/templates/objects/ipaddress_detail.html
+#: plugins/templates/plugin_table.html openkat/templates/health.html
+msgid "Version"
+msgstr ""
+
+#: objects/templates/objects/ipaddress_detail.html
+msgid "CPE"
+msgstr ""
+
+#: objects/templates/objects/ipaddress_detail.html
+msgid "No software found for this IP address."
+msgstr ""
+
+#: objects/templates/objects/ipaddress_detail.html
+msgid "No findings for this IP address."
+msgstr ""
+
+#: objects/templates/objects/ipaddress_detail_introduction.html
+msgid "IP address:"
+msgstr ""
+
+#: objects/templates/objects/ipaddress_detail_tasks.html
+msgid ""
+"This tab shows plugin tasks that have this IP address in their input data."
+msgstr ""
+
+#: objects/templates/objects/network_detail_introduction.html
+msgid "Network:"
+msgstr ""
+
+#: objects/templates/objects/object_list_introduction.html
 #: openkat/templates/admin/delete_confirmation.html
 #: openkat/templates/admin/delete_selected_confirmation.html
-#: openkat/templates/header.html openkat/view_helpers.py
+#: openkat/templates/header.html
 msgid "Objects"
 msgstr ""
 
-#: objects/templates/objects/object_introduction.html
-msgid "Add"
-msgstr ""
-
-#: objects/templates/objects/object_introduction.html
-msgid "IP address"
-msgstr ""
-
-#: objects/templates/objects/object_introduction.html
-msgid "Add object set"
-msgstr ""
-
-#: objects/templates/objects/object_introduction.html
-msgid "Multiple assets"
-msgstr ""
-
-#: objects/templates/objects/object_tabs.html
+#: objects/templates/objects/object_list_tabs.html
 msgid "List of views for objects page"
 msgstr ""
 
-#: objects/templates/objects/object_tabs.html objects/views.py
+#: objects/templates/objects/object_list_tabs.html objects/views.py
 #: reports/templates/reports/report_html.html
 msgid "Hostnames"
 msgstr ""
 
-#: objects/templates/objects/object_tabs.html
+#: objects/templates/objects/object_list_tabs.html
 #: reports/templates/reports/report_html.html
 msgid "IP addresses"
 msgstr ""
 
-#: objects/templates/objects/object_tabs.html objects/views.py
+#: objects/templates/objects/object_list_tabs.html objects/views.py
 #: reports/templates/reports/report_html.html
 msgid "Networks"
 msgstr ""
 
-#: objects/templates/objects/object_tabs.html
+#: objects/templates/objects/object_list_tabs.html
+#: tasks/templates/object_set_list.html
 msgid "Object sets"
 msgstr ""
 
 #: objects/views.py
-msgid ""
-"\"{}\" has manually added objects that are ignored. Only the query is "
-"applied."
+msgid "Scan level updated successfully"
 msgstr ""
 
 #: objects/views.py
-msgid "Scan level updated successfully"
+msgid "\"{}\" has static objects that are ignored. Only the query is applied."
 msgstr ""
 
 #: objects/views.py
@@ -707,6 +819,30 @@ msgstr ""
 #: objects/views.py
 msgid ""
 "\"{}\" has fixed objects that are ignored (only query results are shown)."
+msgstr ""
+
+#: objects/views.py
+msgid "No IP addresses selected."
+msgstr ""
+
+#: objects/views.py
+msgid "Removed scan level for {} IP addresses."
+msgstr ""
+
+#: objects/views.py
+msgid "Updated scan level for {} IP addresses."
+msgstr ""
+
+#: objects/views.py
+msgid "No scan level selected."
+msgstr ""
+
+#: objects/views.py
+msgid "Deleted {} IP addresses."
+msgstr ""
+
+#: objects/views.py
+msgid "Failed to delete IP addresses."
 msgstr ""
 
 #: objects/views.py
@@ -721,7 +857,7 @@ msgstr ""
 
 #: objects/views.py
 #, python-brace-format
-msgid "{count} IP addresses already existed and were skipped."
+msgid "{count} IP addresses already existed."
 msgstr ""
 
 #: objects/views.py
@@ -732,6 +868,26 @@ msgstr ""
 #: objects/views.py
 #, python-brace-format
 msgid "Error parsing CSV file: {error}"
+msgstr ""
+
+#: objects/views.py
+msgid "No hostnames selected."
+msgstr ""
+
+#: objects/views.py
+msgid "Removed scan level for {} hostnames."
+msgstr ""
+
+#: objects/views.py
+msgid "Updated scan level for {} hostnames."
+msgstr ""
+
+#: objects/views.py
+msgid "Deleted {} hostnames."
+msgstr ""
+
+#: objects/views.py
+msgid "No plugin selected."
 msgstr ""
 
 #: objects/views.py
@@ -746,7 +902,7 @@ msgstr ""
 
 #: objects/views.py
 #, python-brace-format
-msgid "{count} hostnames already existed and were skipped."
+msgid "{count} hostnames already existed."
 msgstr ""
 
 #: objects/views.py
@@ -793,7 +949,7 @@ msgid ""
 "Organization with code '{code}' not found. Skipping scan level for this row."
 msgstr ""
 
-#: onboarding/forms.py openkat/templates/partials/explanations.html
+#: onboarding/forms.py
 msgid "Clearance level"
 msgstr ""
 
@@ -1187,7 +1343,7 @@ msgstr ""
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
-msgid "Setup scan - OOI clearance for"
+msgid "Setup scan - Object Clearance for"
 msgstr ""
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
@@ -1271,7 +1427,7 @@ msgid ""
 "has trusted you with a clearance level of <strong>L%(tcl)s</strong>. </br> "
 "You need at least a clearance level of "
 "<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
-"<strong>%(ooi)s</strong> </br> Contact your administrator to receive a "
+"<strong>%(object)s</strong> </br> Contact your administrator to receive a "
 "higher clearance."
 msgstr ""
 
@@ -1311,8 +1467,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3f_set_clearance_level.html
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-#: openkat/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr ""
 
@@ -1438,6 +1592,11 @@ msgstr ""
 msgid "General"
 msgstr ""
 
+#: plugins/templates/plugin.html tasks/templates/task.html
+#: tasks/templates/task_table.html
+msgid "View results"
+msgstr ""
+
 #: plugins/templates/plugin.html plugins/templates/plugin_table.html
 #: plugins/templates/plugin_variants.html
 msgid "Container image"
@@ -1468,25 +1627,14 @@ msgstr ""
 msgid "%(plugin_name)s does not need any input objects."
 msgstr ""
 
-#: plugins/templates/plugin.html tasks/templates/task.html
-#: tasks/templates/task_table.html
-msgid "View results"
-msgstr ""
-
-#: plugins/templates/plugin_form.html
-#: plugins/templates/plugins/business_rule_form.html
-#: tasks/templates/object_set_form.html
+#: plugins/templates/plugin_form.html tasks/templates/object_set_form.html
 msgid "Save"
 msgstr ""
 
 #: plugins/templates/plugin_introduction.html
-#: plugins/templates/plugin_table.html plugins/templates/plugin_variants.html
-msgid "Scan level"
-msgstr ""
-
-#: plugins/templates/plugin_introduction.html
-#: plugins/templates/plugin_table.html tasks/templates/schedule_list.html
-#: tasks/templates/task_table.html
+#: plugins/templates/plugin_table.html
+#: reports/templates/reports/report_list.html
+#: tasks/templates/schedule_list.html tasks/templates/task_table.html
 msgid "Schedule"
 msgstr ""
 
@@ -1552,10 +1700,6 @@ msgstr ""
 msgid "Discard changes"
 msgstr ""
 
-#: plugins/templates/plugin_table.html openkat/templates/health.html
-msgid "Version"
-msgstr ""
-
 #: plugins/templates/plugin_table.html
 msgid "No container image"
 msgstr ""
@@ -1567,10 +1711,6 @@ msgstr ""
 #: plugins/templates/plugin_table.html
 #: plugins/templates/plugins/business_rule_detail.html
 msgid "Run"
-msgstr ""
-
-#: plugins/templates/plugin_tabs.html
-msgid "List of views for plugin detail page"
 msgstr ""
 
 #: plugins/templates/plugin_tabs.html plugins/templates/plugin_variants.html
@@ -1625,9 +1765,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: plugins/templates/plugins/business_rule_detail.html
-#: tasks/templates/object_set_list.html
-#: openkat/templates/partials/explanations.html
+#: plugins/templates/plugins/business_rule_detail.html tasks/views.py
 msgid "Object Type"
 msgstr ""
 
@@ -1638,6 +1776,15 @@ msgstr ""
 
 #: plugins/templates/plugins/business_rule_detail.html
 msgid "Inverse Query"
+msgstr ""
+
+#: plugins/templates/plugins/business_rule_detail.html
+#: reports/templates/reports/report_html.html
+msgid "Finding Type"
+msgstr ""
+
+#: plugins/templates/plugins/business_rule_detail.html
+msgid "Required Plugins"
 msgstr ""
 
 #: plugins/templates/plugins/business_rule_detail.html
@@ -1671,24 +1818,13 @@ msgstr ""
 msgid "Add business rule"
 msgstr ""
 
-#: plugins/templates/plugins/business_rule_form.html
-msgid "Model name (e.g., Hostname, IPPort)"
-msgstr ""
-
-#: plugins/templates/plugins/business_rule_form.html
-msgid "DjangoQL query string"
-msgstr ""
-
-#: plugins/templates/plugins/business_rule_form.html
-msgid "SQL query to remove findings when conditions no longer match"
-msgstr ""
-
 #: plugins/templates/plugins/business_rule_list.html
 #: openkat/templates/header.html
 msgid "Business rules"
 msgstr ""
 
 #: plugins/templates/plugins/business_rule_list.html
+#: tasks/templates/object_set_list.html
 msgid "Object type"
 msgstr ""
 
@@ -1772,7 +1908,7 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
-#: reports/templates/reports/report_detail.html reports/views.py tasks/views.py
+#: reports/templates/reports/report_detail.html tasks/views.py
 msgid "Finding Types"
 msgstr ""
 
@@ -1781,7 +1917,8 @@ msgid "Minimum Risk Score"
 msgstr ""
 
 #: reports/templates/reports/report_detail.html reports/views.py
-msgid "Object Set"
+#: tasks/templates/schedule_list.html
+msgid "Object set"
 msgstr ""
 
 #: reports/templates/reports/report_detail.html
@@ -1789,25 +1926,27 @@ msgid "File"
 msgstr ""
 
 #: reports/templates/reports/report_form.html
-msgid "Generate New Report"
+#: reports/templates/reports/report_list.html
+msgid "Generate report"
 msgstr ""
 
 #: reports/templates/reports/report_form.html
 msgid ""
-"Configure and generate a new security report. Select the organizations, "
-"finding types, and other filters to customize your report."
+"Configure a new security report. You can generate it immediately or schedule "
+"it to run periodically. Select the organizations, finding types, and other "
+"filters to customize your report."
 msgstr ""
 
 #: reports/templates/reports/report_form.html
-msgid "Report Configuration"
+msgid "Report configuration"
 msgstr ""
 
 #: reports/templates/reports/report_form.html
-msgid "Report Filters"
+msgid "Generation options"
 msgstr ""
 
 #: reports/templates/reports/report_form.html
-msgid "Leave empty to include all organizations you have access to."
+msgid "Report filters"
 msgstr ""
 
 #: reports/templates/reports/report_form.html
@@ -1815,18 +1954,7 @@ msgid "Leave empty to include all finding types."
 msgstr ""
 
 #: reports/templates/reports/report_form.html
-msgid ""
-"Only include findings with a risk score equal to or higher than this value "
-"(0.0 - 10.0)."
-msgstr ""
-
-#: reports/templates/reports/report_form.html
 msgid "Optionally select an object set to limit the report to specific assets."
-msgstr ""
-
-#: reports/templates/reports/report_form.html
-#: reports/templates/reports/report_list.html
-msgid "Generate Report"
 msgstr ""
 
 #: reports/templates/reports/report_html.html
@@ -1968,15 +2096,15 @@ msgid "HTML View"
 msgstr ""
 
 #: reports/views.py
-msgid "Report Name"
+msgid "Report name"
 msgstr ""
 
 #: reports/views.py
-msgid "Generate Now"
+msgid "Generate now"
 msgstr ""
 
 #: reports/views.py
-msgid "Schedule Report"
+msgid "Schedule report"
 msgstr ""
 
 #: reports/views.py
@@ -1988,17 +2116,23 @@ msgid "Generate the report immediately or schedule it to run periodically"
 msgstr ""
 
 #: reports/views.py
-msgid "Leave empty to include all organizations"
+msgid ""
+"Select organizations. For scheduled reports, a separate schedule will be "
+"created for each organization. Leave empty to include all organizations."
 msgstr ""
 
-#: reports/views.py
-msgid "Select multiple organizations for immediate report generation"
+#: reports/views.py tasks/templates/task_table.html
+msgid "Finding types"
 msgstr ""
 
 #: reports/views.py
 msgid ""
 "Report schedule created successfully. The report will be generated daily. "
 "You can edit the schedule to change the recurrence."
+msgstr ""
+
+#: reports/views.py
+msgid "Each will be generated daily. You can view them in the schedules list."
 msgstr ""
 
 #: tasks/templates/object_set.html
@@ -2018,19 +2152,11 @@ msgid "Preview"
 msgstr ""
 
 #: tasks/templates/object_set.html tasks/templates/object_set_list.html
-msgid "Manually Added Objects"
+msgid "Static Objects"
 msgstr ""
 
 #: tasks/templates/object_set.html
-msgid "Count:"
-msgstr ""
-
-#: tasks/templates/object_set.html
-msgid "No manually added objects."
-msgstr ""
-
-#: tasks/templates/object_set_list.html
-msgid "Object Sets"
+msgid "No static objects."
 msgstr ""
 
 #: tasks/templates/object_set_list.html
@@ -2038,11 +2164,11 @@ msgid "There are no object sets."
 msgstr ""
 
 #: tasks/templates/object_set_list.html
-msgid "Object Query"
+msgid "Object query"
 msgstr ""
 
 #: tasks/templates/object_set_list.html
-msgid "Manual Objects"
+msgid "Manual objects"
 msgstr ""
 
 #: tasks/templates/object_set_list.html
@@ -2078,11 +2204,7 @@ msgid "There are no Schedules."
 msgstr ""
 
 #: tasks/templates/schedule_list.html
-msgid "Plugin"
-msgstr ""
-
-#: tasks/templates/schedule_list.html
-msgid "Object set"
+msgid "Plugin or Report"
 msgstr ""
 
 #: tasks/templates/schedule_list.html
@@ -2150,7 +2272,7 @@ msgstr ""
 msgid "Add task"
 msgstr ""
 
-#: tasks/templates/task_table.html
+#: tasks/templates/task_list.html
 msgid "Cancel queued tasks"
 msgstr ""
 
@@ -2172,10 +2294,6 @@ msgstr ""
 
 #: tasks/templates/task_table.html
 msgid "Organization codes"
-msgstr ""
-
-#: tasks/templates/task_table.html
-msgid "Finding types"
 msgstr ""
 
 #: tasks/templates/task_table.html
@@ -2218,7 +2336,23 @@ msgid "Objects Sets"
 msgstr ""
 
 #: tasks/views.py
-msgid "Object Set Detail"
+msgid "Object set detail"
+msgstr ""
+
+#: tasks/views.py
+msgid "Select the type of objects this set will contain"
+msgstr ""
+
+#: tasks/views.py
+msgid "All of this object type"
+msgstr ""
+
+#: tasks/views.py
+msgid "Object type cannot be changed after selection"
+msgstr ""
+
+#: tasks/views.py
+msgid "Objects selected from bulk action."
 msgstr ""
 
 #: openkat/admin.py
@@ -2470,7 +2604,7 @@ msgid "The number of columns do not meet the requirements."
 msgstr ""
 
 #: openkat/forms/upload_csv.py
-msgid "OOI Type in CSV does not meet the criteria."
+msgid "Object Type in CSV does not meet the criteria."
 msgstr ""
 
 #: openkat/forms/upload_csv.py
@@ -2490,16 +2624,6 @@ msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
-msgstr ""
-
-#: openkat/models.py
-msgid "The name of the organisation"
-msgstr ""
-
-#: openkat/models.py
-msgid ""
-"A slug containing only lower-case unicode letters, numbers, hyphens or "
-"underscores that will be used in URLs and paths"
 msgstr ""
 
 #: openkat/models.py
@@ -2709,11 +2833,11 @@ msgid "Member type"
 msgstr ""
 
 #: openkat/templates/account_detail.html
-msgid "Permission to set OOI clearance levels"
+msgid "Permission to set Object Clearance levels"
 msgstr ""
 
 #: openkat/templates/account_detail.html
-msgid "OOI clearance"
+msgid "Object Clearance"
 msgstr ""
 
 #: openkat/templates/account_detail.html
@@ -2727,7 +2851,7 @@ msgid "You have currently accepted clearance up to level"
 msgstr ""
 
 #: openkat/templates/account_detail.html
-msgid "Explanation OOI Clearance"
+msgid "Explanation Object Clearance"
 msgstr ""
 
 #: openkat/templates/account_detail.html
@@ -2742,14 +2866,10 @@ msgid "Withdraw L%(acl)s clearance and responsibility"
 msgstr ""
 
 #: openkat/templates/account_detail.html
-msgid "Explanation OOI clearance"
-msgstr ""
-
-#: openkat/templates/account_detail.html
 #, python-format
 msgid ""
 "You are granted clearance for level L%(tcl)s by your admin. Before you can "
-"change OOI clearance levels up to this level, you need to accept this "
+"change Object Clearance levels up to this level, you need to accept this "
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
@@ -2888,7 +3008,6 @@ msgid "Health"
 msgstr ""
 
 #: openkat/templates/forms/widgets/checkbox_group_table.html
-#: openkat/templates/organizations/organization_crisis_room.html
 msgid "Object list"
 msgstr ""
 
@@ -2898,16 +3017,6 @@ msgstr ""
 #: openkat/templates/partials/form/field_input_multiselect.html
 #: openkat/templates/partials/form/field_input_radio.html
 msgid "Required"
-msgstr ""
-
-#: openkat/templates/graph-d3.html
-msgid ""
-"Click a circle to collapse / expand the tree, click the text to view the "
-"tree from that OOI and hover over the text to see details."
-msgstr ""
-
-#: openkat/templates/graph-d3.html
-msgid "Tree graph"
 msgstr ""
 
 #: openkat/templates/header.html
@@ -2958,10 +3067,6 @@ msgstr ""
 
 #: openkat/templates/indemnification_present.html
 msgid "Go to Objects"
-msgstr ""
-
-#: openkat/templates/indemnification_present.html
-msgid "Go to"
 msgstr ""
 
 #: openkat/templates/landing_page.html
@@ -3042,85 +3147,6 @@ msgid ""
 "is committed to the appropriate protection and use of personal information "
 "(sometimes referred to as \"personal data\", \"personally identifiable "
 "information\" or \"PII\") that has been collected online."
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Crisis room"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#: openkat/templates/organizations/organization_settings.html
-msgid "indemnification warning"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#, python-format
-msgid ""
-"<strong>Warning:</strong> Indemnification is not set for this organization. "
-"Go to the <a href=\"%(organization_settings)s\">organization settings page</"
-"a> to add one."
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid ""
-"An overview of the top 10 most severe findings OpenKAT found. Check the "
-"detail section for additional severity information."
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Top 10 most severe Findings"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Showing "
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#: openkat/templates/partials/pagination.html
-msgid "of"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "findings"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Findings table"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Finding"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#, python-format
-msgid "Show details for %(finding)s"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#, python-format
-msgid "Show details for %(finding_type)s"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "OOI type:"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-#, python-format
-msgid "Show %(ooi_type)s objects"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "Source OOI:"
-msgstr ""
-
-#: openkat/templates/organizations/organization_crisis_room.html
-msgid "No findings have been identified yet."
 msgstr ""
 
 #: openkat/templates/organizations/organization_edit.html
@@ -3266,6 +3292,10 @@ msgid ""
 msgstr ""
 
 #: openkat/templates/organizations/organization_settings.html
+msgid "indemnification warning"
+msgstr ""
+
+#: openkat/templates/organizations/organization_settings.html
 msgid ""
 "<strong>Warning:</strong> Indemnification is not set for this organization."
 msgstr ""
@@ -3273,22 +3303,6 @@ msgstr ""
 #: openkat/templates/organizations/organization_settings.html
 #: openkat/views/indemnification_add.py
 msgid "Add indemnification"
-msgstr ""
-
-#: openkat/templates/partials/explanations.html
-msgid "Clearance level inheritance"
-msgstr ""
-
-#: openkat/templates/partials/explanations.html
-msgid "OOI"
-msgstr ""
-
-#: openkat/templates/partials/explanations.html
-msgid "Origin"
-msgstr ""
-
-#: openkat/templates/partials/explanations.html
-msgid "Show clearance level inheritance"
 msgstr ""
 
 #: openkat/templates/partials/form/checkbox_group_table_form.html
@@ -3441,6 +3455,10 @@ msgstr ""
 
 #: openkat/templates/partials/page-meta.html
 msgid "Logged in as:"
+msgstr ""
+
+#: openkat/templates/partials/pagination.html
+msgid "of"
 msgstr ""
 
 #: openkat/templates/partials/pagination.html
@@ -3607,65 +3625,6 @@ msgstr ""
 
 #: openkat/templates/scan.html
 msgid "Scan profile"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid "Current clearance level"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid "Inactive"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid "Declared:"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-#, python-format
-msgid ""
-"This means that this object will be scanned by Boefjes with scan level "
-"%(scan_level)s and lower. Setting the clearance level from “declared” to "
-"“inherit” means that this object will inherit its level from neighbouring "
-"objects. This means that the clearance level might stay the same, increase, "
-"or decrease depending on other declared clearance levels. Clearance levels "
-"of objects that inherit from this clearance level will also be recalculated."
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level to inherit"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid "Empty:"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_detail.html
-msgid ""
-"This object has a clearance level of \"L0\". This means that this object "
-"will not be scanned by any Boefje until that Boefje is run manually for this "
-"object again. Objects with a clearance level higher than \"L0\" will be "
-"scanned automatically by Boefjes with corresponding scan levels."
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_reset.html
-msgid "Set clearance level for:"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_reset.html
-msgid "Setting the scan level from \\"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_reset.html
-msgid "You are about to set the clearance level from \\"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_reset.html
-msgid "Are you sure?"
-msgstr ""
-
-#: openkat/templates/scan_profiles/scan_profile_reset.html
-msgid "Yes, set to inherit"
 msgstr ""
 
 #: openkat/templates/two_factor/_wizard_actions.html
@@ -3911,27 +3870,6 @@ msgstr ""
 msgid "These are the criteria for CSV upload:"
 msgstr ""
 
-#: openkat/templates/upload_raw.html
-msgid "Upload raw file"
-msgstr ""
-
-#: openkat/templates/upload_raw.html
-msgid "Automate the creation of multiple objects by uploading a raw file."
-msgstr ""
-
-#: openkat/templates/upload_raw.html
-msgid ""
-"An input OOI can be selected for the normalizer to attach newly yielded OOIs "
-"to. If no input OOI was used for the raw file, a placeholder ExternalScan "
-"OOI can be used. ExternalScan OOIs can be created from the objects page. "
-"When a new version of the raw file is generated, the same ExternalScan OOI "
-"should be chosen to ensure that old results are overwritten."
-msgstr ""
-
-#: openkat/templates/upload_raw.html
-msgid "Upload raw"
-msgstr ""
-
 #: openkat/validators.py
 msgid ""
 "Your password must contain at least the following but longer passwords are "
@@ -4066,10 +4004,6 @@ msgstr ""
 #: openkat/views/organization_member_list.py
 #, python-format
 msgid "Unblocked member %s successfully."
-msgstr ""
-
-#: openkat/views/page_actions.py
-msgid "Could not process your request, action required."
 msgstr ""
 
 #: openkat/views/password_reset.py
