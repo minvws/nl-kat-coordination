@@ -234,9 +234,6 @@ class Hostname(Asset):
     )
 
     def __str__(self) -> str:
-        if self.name is None:  # TODO: fix, this  can happen for some reason...
-            return ""
-
         return self.name
 
     def save(self, *args, **kwargs):
