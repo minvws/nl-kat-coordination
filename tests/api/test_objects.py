@@ -25,7 +25,9 @@ def test_finding_api(drf_client, xtdb, organization):
         "count": 1,
         "next": None,
         "previous": None,
-        "results": [{"id": f.pk, "object_id": net.id, "object_type": "network", "finding_type": ft.code}],
+        "results": [
+            {"id": f.pk, "object_id": net.id, "object_type": "network", "finding_type": ft.code, "organizations": []}
+        ],
     }
 
     hn = Hostname.objects.create(network=net, name="test.com")
@@ -74,22 +76,22 @@ def test_network_api(drf_client, xtdb):
         "next": None,
         "previous": None,
         "results": [
-            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
-            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
+            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
+            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
         ],
     }
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
     network = {"name": "internet3"}
     net3 = drf_client.post("/api/v1/objects/network/", json=network).json()
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None},
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
+        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
 
 
@@ -100,7 +102,15 @@ def test_hostname_api(drf_client, xtdb):
 
     hn = Hostname.objects.create(network=network, name="test.com")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True, "declared": False, "scan_level": None}
+        {
+            "id": hn.pk,
+            "name": "test.com",
+            "network_id": network.pk,
+            "root": True,
+            "declared": False,
+            "scan_level": None,
+            "organizations": [],
+        }
     ]
 
     hostname = {"network": "internet", "name": "test2.com"}
@@ -113,6 +123,7 @@ def test_hostname_api(drf_client, xtdb):
             "root": True,
             "declared": False,
             "scan_level": None,
+            "organizations": [],
         },
         {
             "id": hn2["id"],
@@ -121,6 +132,7 @@ def test_hostname_api(drf_client, xtdb):
             "root": True,
             "declared": False,
             "scan_level": None,
+            "organizations": [],
         },
     ]
 
@@ -134,7 +146,14 @@ def test_ip_api(drf_client, xtdb):
     ip = {"network": "internet", "address": "127.0.0.1"}
     ip_res = drf_client.post("/api/v1/objects/ipaddress/", json=ip).json()
     assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
-        {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1", "declared": False, "scan_level": None}
+        {
+            "id": ip_res["id"],
+            "network_id": net.pk,
+            "address": "127.0.0.1",
+            "declared": False,
+            "scan_level": None,
+            "organizations": [],
+        }
     ]
 
     ipport = {"address": ip_res["address"], "protocol": "TCP", "port": 80, "service": "http"}

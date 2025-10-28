@@ -63,7 +63,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                 SELECT distinct h.*
+                 SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                           LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                           LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
@@ -93,7 +93,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM {Hostname._meta.db_table} h
                    RIGHT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                    LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
@@ -122,7 +122,7 @@ def get_rules():
             "description": "Checks if a hostname has at least two nameservers supporting IPv6",
             "object_type": "hostname",
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                       LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                       RIGHT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
@@ -160,7 +160,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM {Hostname._meta.db_table} h
                          LEFT JOIN {DNSTXTRecord._meta.db_table} dns
                            ON (
@@ -364,7 +364,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-            SELECT distinct h.*
+            SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
             FROM {Hostname._meta.db_table} h
                      LEFT JOIN {DNSCAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                      LEFT JOIN {Finding._meta.db_table} f on (f.object_id = h._id and f.finding_type_id = (
@@ -392,7 +392,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT h.*
+                SELECT h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM (
                      select host.* from {Hostname._meta.db_table} host
                         LEFT JOIN {Finding._meta.db_table} f on (f.object_id = host._id and f.finding_type_id = (
@@ -450,7 +450,7 @@ def get_rules():
             "description": "Checks if the hostname has pending ownership",
             "object_type": "hostname",
             "query": f"""
-                 SELECT distinct h.*
+                 SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                   JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                   JOIN {Hostname._meta.db_table} nsh ON hns.name_server_id = nsh._id

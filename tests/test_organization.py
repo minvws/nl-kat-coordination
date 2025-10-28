@@ -471,7 +471,6 @@ def test_organization_delete(xtdb):
     net = Network.objects.create(name="test")
     net.organizations.set([organization])
     net.save()
-    net.refresh_from_db()
     assert net.organizations.first() == organization
 
     organization.delete(using="default")

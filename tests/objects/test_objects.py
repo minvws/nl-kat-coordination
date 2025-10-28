@@ -23,15 +23,20 @@ from tasks.tasks import recalculate_scan_levels, sync_ns_scan_levels
 from tests.conftest import setup_request
 
 
-def test_query_hostname(xtdb):
+def test_query_hostname(xtdb, organization):
     network = Network.objects.create(name="internet")
-    Hostname.objects.create(network=network, name="test.com")
+    hostname = Hostname.objects.create(network=network, name="test.com")
     time.sleep(0.1)
 
     networks = Network.objects.filter(hostname__name="test.com")
     assert networks.count() == 1
     networks = Network.objects.filter(hostname__name="none.com")
     assert networks.count() == 0
+    hostname.organizations.add(organization)
+    hostname.save()
+
+    networks = Network.objects.filter(hostname__organizations=organization)
+    assert networks.count() == 1
 
 
 def test_recalculate_scan_levels_hostname_ip(xtdb, organization):
