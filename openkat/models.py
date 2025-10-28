@@ -9,7 +9,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, Group, Permission, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import models, router
+from django.db.models.deletion import Collector
 from django.db.models.functions import Lower
 from django.db.models.manager import Manager
 from django.urls import reverse
@@ -141,6 +142,18 @@ class Organization(models.Model):
             super().save(force_insert=True, force_update=force_update, using="xtdb", update_fields=update_fields)
         finally:
             self._meta.db_returning_fields = orig
+
+    def delete(self, using=None, keep_parents=False):
+        if not self._is_pk_set():
+            raise ValueError(
+                "%s object can't be deleted because its %s attribute is set "
+                "to None." % (self._meta.object_name, self._meta.pk.attname)
+            )
+        using = using or router.db_for_write(self.__class__, instance=self)
+        collector = Collector(using=using, origin=self)
+        collector.collect([self], keep_parents=keep_parents, collect_related=False)
+
+        return collector.delete()
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])
