@@ -31,7 +31,7 @@ def finding_type(xtdb):
 @pytest.fixture
 def finding(xtdb, finding_type, hostname):
     """Create a test finding"""
-    return Finding.objects.create(finding_type=finding_type, object_id=hostname.id, object_type="Hostname")
+    return Finding.objects.create(finding_type=finding_type, hostname=hostname)
 
 
 @pytest.fixture
@@ -343,8 +343,8 @@ def test_report_with_multiple_findings(xtdb, organization):
         host = Hostname.objects.create(name=f"test{i}.com", network=network)
         hosts.append(host)
 
-        Finding.objects.create(finding_type=ft1, object_id=host.id, object_type="Hostname")
-        Finding.objects.create(finding_type=ft2, object_id=host.id, object_type="Hostname")
+        Finding.objects.create(finding_type=ft1, hostname=host)
+        Finding.objects.create(finding_type=ft2, hostname=host)
 
     metrics = collect_all_metrics()
 

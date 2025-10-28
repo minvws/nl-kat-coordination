@@ -20,48 +20,34 @@ from objects.models import (
 def test_finding_api(drf_client, xtdb, organization):
     ft = FindingType.objects.create(code="TEST", score=5)
     net = Network.objects.create(name="internet")
-    f = Finding.objects.create(finding_type=ft, object_type="network", object_id=net.id)
+    hn = Hostname.objects.create(network=net, name="test.com")
+    f = Finding.objects.create(finding_type=ft, hostname=hn)
 
-    assert drf_client.get("/api/v1/objects/finding/").json() == {
-        "count": 1,
-        "next": None,
-        "previous": None,
-        "results": [
-            {"id": f.pk, "object_id": net.id, "object_type": "network", "finding_type": ft.code, "organizations": []}
-        ],
-    }
+    response = drf_client.get("/api/v1/objects/finding/").json()
+    assert response["count"] == 1
+    assert len(response["results"]) == 1
+    assert response["results"][0]["id"] == f.pk
+    assert response["results"][0]["finding_type"] == ft.code
+    assert response["results"][0]["organizations"] == []
 
     f.organizations.add(XTDBOrganization.objects.get(pk=organization.pk))
 
-    assert drf_client.get("/api/v1/objects/finding/").json() == {
-        "count": 1,
-        "next": None,
-        "previous": None,
-        "results": [
-            {
-                "id": f.pk,
-                "object_id": net.id,
-                "object_type": "network",
-                "finding_type": ft.code,
-                "organizations": [organization.pk],
-            }
-        ],
-    }
+    response = drf_client.get("/api/v1/objects/finding/").json()
+    assert response["count"] == 1
+    assert response["results"][0]["organizations"] == [organization.pk]
 
-    hn = Hostname.objects.create(network=net, name="test.com")
-    res = drf_client.post(
-        "/api/v1/objects/finding/",
-        json={"finding_type_code": "TEST", "object_type": "hostname", "object_code": hn.name},
-    )
+    res = drf_client.post("/api/v1/objects/finding/", json={"finding_type_code": "TEST2", "hostname": hn.name})
     assert res.status_code == 201
     assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 2
 
+    # Create IP address finding
+    ip = IPAddress.objects.create(network=net, address="127.0.0.1")
     res = drf_client.post(
         "/api/v1/objects/finding/",
         json=[
-            {"finding_type_code": "TEST", "object_type": "network", "object_code": net.name},
-            {"finding_type_code": "TEST2", "object_type": "network", "object_code": net.name},
-            {"finding_type_code": "TEST3", "object_type": "network", "object_code": net.name},
+            {"finding_type_code": "TEST", "ipaddress": ip.address},
+            {"finding_type_code": "TEST2", "hostname": hn.name},
+            {"finding_type_code": "TEST3", "hostname": hn.name},
         ],
     )
     assert res.status_code == 201

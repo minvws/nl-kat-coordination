@@ -135,7 +135,7 @@ def test_findings(rf, superuser_member, xtdb):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     finding_type = FindingType.objects.create(code="KAT-TEST-LIST-VIEW", score=3.1)
-    Finding.objects.create(object_id=host.id, object_type="hostname", finding_type=finding_type)
+    Finding.objects.create(hostname=host, finding_type=finding_type)
 
     request = setup_request(rf.get("objects:finding_list"), superuser_member.user)
     response = FindingListView.as_view()(request)

@@ -15,7 +15,7 @@ from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.translation import gettext_lazy as _
-from psycopg import DatabaseError, sql
+from psycopg import sql
 from tldextract import tldextract
 from transit.writer import Writer
 
@@ -109,66 +109,42 @@ class Asset(XTDBModel):
         managed = False
         abstract = True
 
-    def delete(self, *args, **kwargs):
-        try:
-            Finding.objects.filter(object_id=self.pk).delete()
-        except DatabaseError:
-            logger.warning("Failed to delete Findings for %s", self)
-        return super().delete(*args, **kwargs)
-
 
 class ManagerWithGenericObjectForeignKey(Manager):
-    """GenericForeignKey-like behavior. (We could consider writing a custom GenericForeignKey as well at one point.)"""
+    """Provides object_human_readable annotation for Finding model with hostname/address fields."""
 
     def get_queryset(self):
-        ref = OuterRef("object_id")
+        hostname_ref = OuterRef("hostname_id")
+        address_ref = OuterRef("address_id")
 
         return (
             super()
             .get_queryset()
             .annotate(
                 object_human_readable=Case(
-                    When(object_type="hostname", then=Subquery(Hostname.objects.filter(pk=ref).values("name"))),
-                    When(object_type="ipaddress", then=Subquery(IPAddress.objects.filter(pk=ref).values("address"))),
-                    When(object_type="network", then=Subquery(Network.objects.filter(pk=ref).values("name"))),
+                    When(
+                        hostname__isnull=False, then=Subquery(Hostname.objects.filter(pk=hostname_ref).values("name"))
+                    ),
+                    When(
+                        address__isnull=False, then=Subquery(IPAddress.objects.filter(pk=address_ref).values("address"))
+                    ),
                     default=None,
                     output_field=CharField(),
-                )
+                ),
+                object_type=Case(
+                    When(hostname__isnull=False, then=models.Value("hostname")),
+                    When(address__isnull=False, then=models.Value("ipaddress")),
+                    default=None,
+                    output_field=CharField(),
+                ),
+                object_id=Case(
+                    When(hostname__isnull=False, then=models.F("hostname_id")),
+                    When(address__isnull=False, then=models.F("address_id")),
+                    default=None,
+                    output_field=models.BigIntegerField(),
+                ),
             )
         )
-
-
-class FindingType(XTDBModel):
-    code = models.CharField()
-    name = models.CharField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    source = models.CharField(null=True, blank=True)
-    risk = models.CharField(null=True, blank=True)
-    impact = models.TextField(null=True, blank=True)
-    recommendation = models.TextField(null=True, blank=True)
-    score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
-
-    class Meta:
-        managed = False
-
-
-class Finding(XTDBModel):
-    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
-
-    object_type: LowerCaseCharField = LowerCaseCharField()
-    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-    organizations = models.ManyToManyField(
-        XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
-    )
-    objects = ManagerWithGenericObjectForeignKey()
-
-    class Meta:
-        managed = False
-
-
-class FindingOrganization(XTDBModel):
-    finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
-    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class Network(Asset):
@@ -288,6 +264,33 @@ class Hostname(Asset):
 
 class HostnameOrganization(XTDBModel):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
+
+
+class FindingType(XTDBModel):
+    code = models.CharField()
+    name = models.CharField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    source = models.CharField(null=True, blank=True)
+    risk = models.CharField(null=True, blank=True)
+    impact = models.TextField(null=True, blank=True)
+    recommendation = models.TextField(null=True, blank=True)
+    score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
+
+
+class Finding(XTDBModel):
+    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, null=True, on_delete=models.CASCADE)
+    address: models.ForeignKey = models.ForeignKey(IPAddress, null=True, on_delete=models.CASCADE)
+
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
+    )
+    objects = ManagerWithGenericObjectForeignKey()
+
+
+class FindingOrganization(XTDBModel):
+    finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 

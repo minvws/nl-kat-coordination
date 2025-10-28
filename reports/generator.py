@@ -3,7 +3,7 @@ from typing import Any
 
 import structlog
 import weasyprint
-from django.db.models import Count, Q, QuerySet
+from django.db.models import CharField, Count, F, Q, QuerySet, Value
 from django.template.loader import render_to_string
 from django_weasyprint.utils import django_url_fetcher
 
@@ -144,10 +144,35 @@ def collect_findings_metrics(
         .order_by("-finding_type__score", "-count")
     )
 
-    # Find assets with most findings, group by object_id to count findings per asset
-    offenders = (
-        findings.values("object_id", "object_type").annotate(finding_count=Count("id")).order_by("-finding_count")[:10]
+    # Find assets with most findings - query hostnames and IPs separately to avoid CASE in GROUP BY
+    hostname_offenders = (
+        findings.filter(hostname__isnull=False)
+        .values("hostname_id", "hostname__name")
+        .annotate(
+            finding_count=Count("id"),
+            object_id=F("hostname_id"),
+            object_type=Value("hostname", output_field=CharField()),
+            object_name=F("hostname__name"),
+        )
+        .order_by("-finding_count")[:10]
     )
+
+    address_offenders = (
+        findings.filter(address__isnull=False)
+        .values("address_id", "address__address")
+        .annotate(
+            finding_count=Count("id"),
+            object_id=F("address_id"),
+            object_type=Value("ipaddress", output_field=CharField()),
+            object_name=F("address__address"),
+        )
+        .order_by("-finding_count")[:10]
+    )
+
+    # Combine, sort by finding count, and limit to top 10
+    offenders = sorted(
+        list(hostname_offenders) + list(address_offenders), key=lambda x: x["finding_count"], reverse=True
+    )[:10]
 
     finding_types_details = {}
     for ft in FindingType.objects.filter(code__in=[f["finding_type__code"] for f in findings_by_type]):
@@ -166,8 +191,14 @@ def collect_findings_metrics(
         ft_code = finding_data["finding_type__code"]
         count = finding_data["count"]
 
-        # Count unique assets affected by this finding type
-        affected_assets = findings.filter(finding_type__code=ft_code).values("object_id").distinct().count()
+        # Count unique assets affected by this finding type (count hostnames and addresses separately)
+        affected_hostnames = (
+            findings.filter(finding_type__code=ft_code, hostname__isnull=False).values("hostname_id").distinct().count()
+        )
+        affected_addresses = (
+            findings.filter(finding_type__code=ft_code, address__isnull=False).values("address_id").distinct().count()
+        )
+        affected_assets = affected_hostnames + affected_addresses
 
         findings_stats.append(
             {
