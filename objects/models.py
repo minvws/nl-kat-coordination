@@ -5,18 +5,21 @@ from functools import total_ordering
 from typing import cast
 
 import structlog
+import tagulous.models
 from django.apps import apps
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
 from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
 from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
+from django.utils.translation import gettext_lazy as _
 from psycopg import DatabaseError, sql
 from tldextract import tldextract
 from transit.writer import Writer
 
-from openkat.models import LowerCaseCharField
+from openkat.models import ORGANIZATION_CODE_LENGTH, LowerCaseCharField, LowerCaseSlugField
 
 logger = structlog.get_logger(__name__)
 
@@ -72,6 +75,35 @@ class XTDBModel(models.Model):
         return self._valid_from
 
 
+class XTDBOrganizationTag(tagulous.models.TagTreeModel):
+    COLOR_CHOICES = settings.TAG_COLORS
+    BORDER_TYPE_CHOICES = settings.TAG_BORDER_TYPES
+
+    color = models.CharField(choices=COLOR_CHOICES, max_length=20, default=COLOR_CHOICES[0][0])
+    border_type = models.CharField(choices=BORDER_TYPE_CHOICES, max_length=20, default=BORDER_TYPE_CHOICES[0][0])
+
+    class TagMeta:
+        force_lowercase = True
+        protect_all = True
+
+
+class XTDBOrganization(XTDBModel):
+    name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
+    code = LowerCaseSlugField(
+        max_length=ORGANIZATION_CODE_LENGTH,
+        unique=True,
+        allow_unicode=True,
+        help_text=_(
+            "A slug containing only lower-case unicode letters, numbers, hyphens or underscores "
+            "that will be used in URLs and paths"
+        ),
+    )
+    tags = tagulous.models.TagField(to=XTDBOrganizationTag, blank=True)
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+
 class Asset(XTDBModel):
     class Meta:
         managed = False
@@ -125,10 +157,18 @@ class Finding(XTDBModel):
 
     object_type: LowerCaseCharField = LowerCaseCharField()
     object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
+    )
     objects = ManagerWithGenericObjectForeignKey()
 
     class Meta:
         managed = False
+
+
+class FindingOrganization(XTDBModel):
+    finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class Network(Asset):
@@ -137,9 +177,17 @@ class Network(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="networks", through="NetworkOrganization"
+    )
 
     def __str__(self) -> str:
         return self.name
+
+
+class NetworkOrganization(XTDBModel):
+    network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class IPAddress(Asset):
@@ -149,9 +197,17 @@ class IPAddress(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="ipaddresses", through="IPAddressOrganization"
+    )
 
     def __str__(self) -> str:
         return self.address
+
+
+class IPAddressOrganization(XTDBModel):
+    ipaddress: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class Protocol(models.TextChoices):
@@ -201,6 +257,9 @@ class Hostname(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="hostnames", through="HostnameOrganization"
+    )
 
     def __str__(self) -> str:
         if self.name is None:  # TODO: fix, this  can happen for some reason...
@@ -225,6 +284,11 @@ class Hostname(Asset):
                     root_hostname.save(update_fields=["root"])
 
         super().save(*args, **kwargs)
+
+
+class HostnameOrganization(XTDBModel):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class DNSRecordBase(XTDBModel):

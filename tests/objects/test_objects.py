@@ -243,10 +243,14 @@ def test_to_dict(xtdb):
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
     sw = Software.objects.create(name="openssh")
     port.software.add(sw)
-    # sw.ports.add(port)
-    # sw.save()
     port.save()
-    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id, "declared": False, "scan_level": None}
+    assert to_xtdb_dict(net) == {
+        "name": "internet",
+        "_id": net.id,
+        "declared": False,
+        "scan_level": None,
+        "organizations": [],
+    }
     assert to_xtdb_dict(host) == {
         "name": "test.com",
         "network_id": net.id,
@@ -254,6 +258,7 @@ def test_to_dict(xtdb):
         "root": True,
         "declared": False,
         "scan_level": None,
+        "organizations": [],
     }
     assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "ports": [port.id], "version": None}
 

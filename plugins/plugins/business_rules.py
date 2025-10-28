@@ -63,7 +63,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                 SELECT distinct h.*
+                 SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                           LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                           LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
@@ -93,7 +93,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM {Hostname._meta.db_table} h
                    RIGHT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                    LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
@@ -122,7 +122,7 @@ def get_rules():
             "description": "Checks if a hostname has at least two nameservers supporting IPv6",
             "object_type": "hostname",
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                       LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                       RIGHT JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
@@ -160,7 +160,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT distinct h.*
+                SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM {Hostname._meta.db_table} h
                          LEFT JOIN {DNSTXTRecord._meta.db_table} dns
                            ON (
@@ -192,7 +192,7 @@ def get_rules():
             "description": "Detect open sysadmin ports",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
+            SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
@@ -223,7 +223,7 @@ def get_rules():
             "description": "Detect open database ports",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
+            SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
             FROM {IPAddress._meta.db_table} ip
             JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
             LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
@@ -254,7 +254,7 @@ def get_rules():
             "description": "Detect open RDP ports",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
+            SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
@@ -285,7 +285,7 @@ def get_rules():
             "description": "Detect open uncommon ports",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
+            SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
@@ -324,7 +324,7 @@ def get_rules():
             "description": "Checks for open common ports",
             "object_type": "ipaddress",
             "query": f"""
-            SELECT distinct ip.*
+            SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.object_id = ip._id and f.finding_type_id = (
@@ -364,7 +364,7 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-            SELECT distinct h.*
+            SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
             FROM {Hostname._meta.db_table} h
                      LEFT JOIN {DNSCAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                      LEFT JOIN {Finding._meta.db_table} f on (f.object_id = h._id and f.finding_type_id = (
@@ -392,9 +392,10 @@ def get_rules():
             "object_type": "hostname",
             "requires": ["dns"],
             "query": f"""
-                SELECT h.*
+                SELECT h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                 FROM (
-                     select host.* from {Hostname._meta.db_table} host
+                     select host._id, host.name, host.network_id, host.root, host.declared, host.scan_level
+                        from {Hostname._meta.db_table} host
                         LEFT JOIN {Finding._meta.db_table} f on (f.object_id = host._id and f.finding_type_id = (
                          select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NO-DMARC')
                          ) where f._id is null
@@ -450,7 +451,7 @@ def get_rules():
             "description": "Checks if the hostname has pending ownership",
             "object_type": "hostname",
             "query": f"""
-                 SELECT distinct h.*
+                 SELECT distinct h._id, h.name, h.network_id, h.root, h.declared, h.scan_level
                  FROM {Hostname._meta.db_table} h
                   JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                   JOIN {Hostname._meta.db_table} nsh ON hns.name_server_id = nsh._id
@@ -486,7 +487,7 @@ def get_rules():
             "description": f"Checks is {software} is running on the IPAddress.",
             "object_type": "ipaddress",
             "query": f"""
-                SELECT distinct ip.*
+                SELECT distinct ip._id, ip.address, ip.declared, ip.network_id, ip.scan_level
                 FROM {IPAddress._meta.db_table} ip
                     JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                     JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
