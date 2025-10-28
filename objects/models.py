@@ -16,7 +16,7 @@ from psycopg import DatabaseError, sql
 from tldextract import tldextract
 from transit.writer import Writer
 
-from openkat.models import LowerCaseCharField
+from openkat.models import LowerCaseCharField, Organization
 
 logger = structlog.get_logger(__name__)
 
@@ -125,10 +125,16 @@ class Finding(XTDBModel):
 
     object_type: LowerCaseCharField = LowerCaseCharField()
     object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
+    organizations = models.ManyToManyField(Organization, blank=True, related_name="findings", through="FindingOrganization")
     objects = ManagerWithGenericObjectForeignKey()
 
     class Meta:
         managed = False
+
+
+class FindingOrganization(XTDBModel):
+    finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class Network(Asset):
@@ -137,9 +143,15 @@ class Network(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(Organization, blank=True, related_name="networks", through="NetworkOrganization")
 
     def __str__(self) -> str:
         return self.name
+
+
+class NetworkOrganization(XTDBModel):
+    network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class IPAddress(Asset):
@@ -149,9 +161,15 @@ class IPAddress(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(Organization, blank=True, related_name="ipaddresses", through="IPAddressOrganization")
 
     def __str__(self) -> str:
         return self.address
+
+
+class IPAddressOrganization(XTDBModel):
+    ipaddress: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class Protocol(models.TextChoices):
@@ -201,6 +219,7 @@ class Hostname(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(Organization, blank=True, related_name="hostnames", through="HostnameOrganization")
 
     def __str__(self) -> str:
         if self.name is None:  # TODO: fix, this  can happen for some reason...
@@ -225,6 +244,11 @@ class Hostname(Asset):
                     root_hostname.save(update_fields=["root"])
 
         super().save(*args, **kwargs)
+
+
+class HostnameOrganization(XTDBModel):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class DNSRecordBase(XTDBModel):
