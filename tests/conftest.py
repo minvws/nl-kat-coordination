@@ -72,6 +72,11 @@ def fixture_configure_structlog(log_output):
     structlog.configure(processors=[log_output])
 
 
+@pytest.fixture(autouse=True)
+def configure_staticfiles(settings):
+    settings.STORAGES["staticfiles"] = {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}
+
+
 @pytest.fixture
 def valid_time():
     return datetime(2010, 10, 10, 10, 10, 10, tzinfo=UTC)
