@@ -211,7 +211,7 @@ class OrganizationFilterMixin:
                 if hasattr(queryset.model, "organization"):
                     queryset = queryset.filter(organization__in=organizations)
                 if hasattr(queryset.model, "organizations"):
-                    queryset = queryset.filter(organizations__pk__in=[org.id for org in organizations])
+                    queryset = queryset.filter(organizations__pk__in=[org.id for org in organizations]).distinct()
                 elif hasattr(queryset.model, "organization_id"):
                     queryset = queryset.filter(organization_id__in=[org.id for org in organizations])
             else:
