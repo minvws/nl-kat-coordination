@@ -16,6 +16,8 @@ from objects.models import (
     DNSARecord,
     DNSCNAMERecord,
     DNSNSRecord,
+    Finding,
+    FindingOrganization,
     Hostname,
     HostnameOrganization,
     IPAddress,
@@ -210,12 +212,44 @@ def organization_attribution():
     """
     logger.info("Running organization attribution...")
 
+    attribute_findings()
     attribute_through_cnames()
     attribute_through_ns()
     attribute_through_ip_hostname(DNSARecord._meta.db_table)
     attribute_through_ip_hostname(DNSAAAARecord._meta.db_table)
 
     logger.info("Finished organization attribution.")
+
+
+def attribute_findings() -> None:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+                f"""
+                INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {Hostname._meta.db_table} source
+                RIGHT JOIN {Finding._meta.db_table} target on source._id = target.hostname_id
+                RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
+                LEFT JOIN {FindingOrganization._meta.db_table} otarget ON target._id = otarget.finding_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+                f"""
+                INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {IPAddress._meta.db_table} source
+                RIGHT JOIN {Finding._meta.db_table} target on source._id = target.address_id
+                RIGHT JOIN {IPAddressOrganization._meta.db_table} osource ON source._id = osource.ipaddress_id
+                LEFT JOIN {FindingOrganization._meta.db_table} otarget ON target._id = otarget.finding_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+    except OperationalError:
+        logger.exception("Failed to perform finding attribution query")
 
 
 def attribute_through_cnames() -> None:
@@ -230,6 +264,7 @@ def attribute_through_cnames() -> None:
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
                 RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
                 LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
                 WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
@@ -249,6 +284,7 @@ def attribute_through_ns() -> None:
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
                 RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
                 LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
                 WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
@@ -268,6 +304,7 @@ def attribute_through_ip_hostname(db_table: str) -> None:
                 RIGHT JOIN {IPAddress._meta.db_table} target ON target._id = dns.ip_address_id
                 RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
                 LEFT JOIN {IPAddressOrganization._meta.db_table} otarget ON target._id = otarget.ipaddress_id
+                AND osource.organization_id = otarget.organization_id
                 WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
@@ -280,6 +317,7 @@ def attribute_through_ip_hostname(db_table: str) -> None:
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
                 RIGHT JOIN {IPAddressOrganization._meta.db_table} osource ON source._id = osource.ipaddress_id
                 LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
                 WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
