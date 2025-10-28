@@ -31,10 +31,10 @@ def run(file_id: str) -> list[dict[str, str]]:
 
     # [S] self sig OK; [B] bogus; [T] trusted; [U] unsigned
     if result_line.startswith("[U]"):
-        finding = {"object_type": "Hostname", "object_code": domain, "finding_type_code": "KAT-NO-DNSSEC"}
+        finding = {"hostname": domain, "finding_type_code": "KAT-NO-DNSSEC"}
         results.append(finding)
     elif result_line.startswith("[S]") or result_line.startswith("[B]"):
-        finding = {"object_type": "Hostname", "object_code": domain, "finding_type_code": "KAT-INVALID-DNSSEC"}
+        finding = {"hostname": domain, "finding_type_code": "KAT-INVALID-DNSSEC"}
         results.append(finding)
 
     client.post("/objects/finding/", json=results)

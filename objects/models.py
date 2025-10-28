@@ -29,7 +29,7 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 
 
 def to_xtdb_dict(model: Model) -> dict:
-    mod = model_to_dict(model, exclude=["id"])
+    mod = model_to_dict(model, exclude=["id"] + [field.name for field in model._meta.many_to_many])
     mod["_id"] = model.pk
 
     if "_valid_from" in mod:
@@ -40,10 +40,6 @@ def to_xtdb_dict(model: Model) -> dict:
             mod[field.name + "_id"] = mod[field.name]
             del mod[field.name]
             continue
-
-    for mm_field in model._meta.many_to_many:
-        mod[mm_field.name] = [item.id for item in mod[mm_field.name]]
-        continue
 
     return mod
 
