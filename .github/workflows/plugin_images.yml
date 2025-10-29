@@ -40,7 +40,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/openkat/plugins
           tags: |
             type=ref,event=branch,prefix=branch-
-            type=semver,pattern=v{{version}},match=v(\d+.\d+.\d+.*)$
+            type=semver,pattern=v{{version}},match=plugins-v(\d+.\d+.\d+.*)$
             type=ref,event=pr
 
       - name: Login to GitHub Container Registry
