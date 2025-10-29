@@ -37,118 +37,118 @@
                 </form>
                 <a class="button plain" href="{% url "objects:ipaddress_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
-            <div>
-                <form method="post"
-                      id="ipaddress_list_form"
-                      class="inline layout-wide checkboxes_required">
-                    {% csrf_token %}
-                </form>
-                <div class="horizontal-scroll sticky-column">
-                    <table class="nowrap">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <form>
-                                        <input class="toggle-all"
-                                               data-toggle-target="ipaddress"
-                                               type="checkbox"
-                                               form="ipaddress_list_form">
-                                    </form>
-                                </th>
-                                <th>{% translate "Address" %}</th>
-                                <th>{% translate "Network" %}</th>
-                                <th>{% translate "Scan Level" %}</th>
-                                <th>{% translate "Last Seen" %}</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ipaddress in ipaddresses %}
-                                <tr>
-                                    <td>
-                                        <form>
-                                            <input type="checkbox"
-                                                   name="ipaddress"
-                                                   form="ipaddress_list_form"
-                                                   value="{{ ipaddress.pk }}">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.address }}</a>
-                                    </td>
-                                    <td>
-                                        {% comment %} <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a> {% endcomment %}
-                                    </td>
-                                    <td>
-                                        {% if ipaddress.scan_level != None %}
-                                            {% include "partials/scan_level_indicator.html" with value=ipaddress.scan_level %}
-
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if ipaddress.last_seen %}
-                                            {{ ipaddress.last_seen|date:"Y-m-d H:i" }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_ipaddress' ipaddress.pk %}"
-                                              method="post"
-                                              id="object-delete-{{ ipaddress.pk }}">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                    form="object-delete-{{ ipaddress.pk }}"
-                                                    class="icon ti-trash action-button">
-                                                {% translate "Delete" %}
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% if ipaddresses %}
-                    <form class="inline layout-wide">
-                        <fieldset form="ipaddress_list_form">
-                            <div class="horizontal-view">
-                                <select id="scan-level" name="scan-level" form="ipaddress_list_form">
-                                    <option value="">{% translate "Select scan level..." %}</option>
-                                    <option value="none">{% translate "Remove scan level" %}</option>
-                                    {% for level in scan_levels %}<option value="{{ level.value }}">{{ level.label }}</option>{% endfor %}
-                                </select>
-                                <button type="submit"
-                                        class="dropdown-button"
-                                        name="action"
-                                        value="set-scan-level"
-                                        form="ipaddress_list_form">{% translate "Set scan level" %}</button>
-                                <button type="submit"
-                                        class="ghost"
-                                        name="action"
-                                        value="create-object-set"
-                                        form="ipaddress_list_form">
-                                    <span class="icon ti-plus"></span>
-                                    {% translate "Create object set" %}
-                                </button>
-                                <button type="submit"
-                                        class="dropdown-button ghost destructive"
-                                        name="action"
-                                        value="delete"
-                                        form="ipaddress_list_form">{% translate "Delete" %}</button>
-                                <button type="submit"
-                                        class="dropdown-button"
-                                        name="action"
-                                        value="scan"
-                                        form="ipaddress_list_form">{% translate "Scan" %}</button>
+            {% if ipaddresses %}
+                <div>
+                    <div class="horizontal-view toolbar">
+                        <form method="post"
+                            id="ipaddress_list_form"
+                            class="inline checkboxes_required">
+                            {% csrf_token %}
+                        </form>
+                        {% include "objects/modals/delete_bulk_objects_modal.html" with form="ipaddress_list_form" %}
+                        {% include "objects/modals/edit_scan_level_modal.html" with form="ipaddress_list_form" type="object_list" %}
+                        <div class="dropdown">
+                            <button aria-controls="action-dropdown"
+                                    aria-expanded="false"
+                                    class="dropdown-button ghost">
+                                {% translate "Actions" %}
+                                <span aria-hidden="true" class="icon ti-chevron-down"></span>
+                            </button>
+                            <div id="action-dropdown" class="dropdown-list left">
+                                <ul>
+                                    <li>
+                                        <button type="submit" name="action" value="scan" form="ipaddress_list_form">
+                                            <i class="icon ti-zoom-scan"></i>{% translate "Scan" %}
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="submit"
+                                                name="action"
+                                                value="create-object-set"
+                                                form="ipaddress_list_form">
+                                            <i class="icon ti-library-plus"></i>{% translate "Create object set" %}
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <a href="#edit-scan-level-modal"><i class="icon ti-paw"></i>{% translate "Set scan level" %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="#delete-objects-modal" class="destructive"><i class="icon ti-trash"></i>{% translate "Delete" %}</a>
+                                    </li>
+                                </ul>
                             </div>
-                        </fieldset>
-                    </form>
-                {% endif %}
-            </div>
-            {% include "partials/list_paginator.html" %}
+                        </div>
+                    </div>
+                    <div class="horizontal-scroll sticky-column">
+                        <table class="nowrap">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <form>
+                                            <input class="toggle-all"
+                                                data-toggle-target="ipaddress"
+                                                type="checkbox"
+                                                form="ipaddress_list_form">
+                                        </form>
+                                    </th>
+                                    <th>{% translate "Address" %}</th>
+                                    <th>{% translate "Network" %}</th>
+                                    <th>{% translate "Scan level" %}</th>
+                                    <th>{% translate "Scan type" %}</th>
+                                    <th>{% translate "Last seen" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ipaddress in ipaddresses %}
+                                    <tr>
+                                        <td>
+                                            <form>
+                                                <input type="checkbox"
+                                                    name="ipaddress"
+                                                    form="ipaddress_list_form"
+                                                    value="{{ ipaddress.pk }}">
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.address }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a>
+                                        </td>
+                                        <td>
+                                            {% if ipaddress.scan_level != None %}
+                                                {% include "partials/scan_level_indicator.html" with value=ipaddress.scan_level %}
+
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ipaddress.declared != None %}
+                                                {% if ipaddress.declared %}
+                                                    {% translate "Declared" %}
+                                                {% else %}
+                                                    {% translate "Inherited" %}
+                                                {% endif %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ipaddress.last_seen %}
+                                                {{ ipaddress.last_seen|date:"Y-m-d H:i" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% include "partials/list_paginator.html" %}
+            {% endif %}
 
         </section>
     </main>
@@ -157,4 +157,9 @@
     {{ block.super }}
     <script src="{% static "js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/choiceToggle.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "modal/script.js" %}"
+            nonce="{{ request.csp_nonce }}"
+            type="module"></script>
 {% endblock html_at_end_body %}

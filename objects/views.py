@@ -352,6 +352,7 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         context["object_sets"] = ObjectSet.objects.filter(object_type=ipaddress_ct)
         context["scan_levels"] = ScanLevelEnum
         context["plugins"] = Plugin.objects.filter(consumes__contains=["IPAddress"])
+        context["edit_scan_level_form"] = ObjectScanLevelForm
 
         return context
 
@@ -375,11 +376,12 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
-            scan_level = request.POST.get("scan-level")
-            if scan_level == "none":
+            scan_level = request.POST.get("scan_level")
+            scan_type = request.POST.get("declared")
+            if scan_type == "inherited":
                 updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(scan_level=None, declared=False)
                 messages.success(request, _("Removed scan level for {} IP addresses.").format(updated_count))
-            elif scan_level:
+            elif scan_type == "declared" and scan_level:
                 updated_count = IPAddress.objects.filter(pk__in=selected_ids).update(
                     scan_level=int(scan_level), declared=True
                 )
