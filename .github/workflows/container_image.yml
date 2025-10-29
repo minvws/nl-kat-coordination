@@ -8,6 +8,7 @@ on:
       - "v2"
     tags:
       - "*"
+      - "!plugins/v*"
   pull_request:
 
 jobs:
@@ -27,7 +28,7 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/nl-kat-openkat
           tags: |
-            type=ref,event=branch
+            type=ref,event=branch,prefix=branch-
             type=ref,event=tag
             type=ref,event=pr
 

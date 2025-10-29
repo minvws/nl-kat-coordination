@@ -28,6 +28,7 @@
                             <tr>
                                 <th>{% translate "Name" %}</th>
                                 <th>{% translate "Scan Level" %}</th>
+                                <th>{% translate "Scan type" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
                                 <th></th>
                             </tr>
@@ -42,6 +43,17 @@
                                         {% if network.scan_level != None %}
                                             {% include "partials/scan_level_indicator.html" with value=network.scan_level %}
 
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if network.declared != None %}
+                                            {% if network.declared %}
+                                                {% translate "Declared" %}
+                                            {% else %}
+                                                {% translate "Inherited" %}
+                                            {% endif %}
                                         {% else %}
                                             -
                                         {% endif %}
