@@ -42,11 +42,11 @@
                     <div class="horizontal-view toolbar">
                         <form method="post"
                               id="hostname_list_form"
-                              class="inline layout-wide checkboxes_required">
+                              class="inline checkboxes_required">
                             {% csrf_token %}
                         </form>
-                        {% include "objects/modals/delete_bulk_objects_modal.html" %}
-                        {% include "objects/modals/edit_scan_level_modal.html" %}
+                        {% include "objects/modals/delete_bulk_objects_modal.html" with form="hostname_list_form" %}
+                        {% include "objects/modals/edit_scan_level_modal.html" with form="hostname_list_form" type="object_list" %}
 
                         <div class="dropdown">
                             <button aria-controls="action-dropdown"

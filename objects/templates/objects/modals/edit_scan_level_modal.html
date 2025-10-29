@@ -37,7 +37,7 @@
                     {% endif %}
                 </label>
                 <div>
-                    {{ field|with_form_attr:"hostname_list_form" }}
+                    {{ field|with_form_attr:form }}
                     {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
                     {% include "partials/form/field_input_errors.html" %}
 
@@ -51,7 +51,7 @@
 <button type="submit"
         name="action"
         value="set-scan-level"
-        form="hostname_list_form">{% translate "Save changes" %}</button>
+        form={{ form }}>{% translate "Save changes" %}</button>
 <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
 {% endfill %}
 {% endcomponent %}
