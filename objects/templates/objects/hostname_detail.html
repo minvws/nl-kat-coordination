@@ -73,7 +73,6 @@
                                 <th>{% translate "Content" %}</th>
                                 <th>{% translate "Details" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
-                                <th>{% translate "Delete" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,13 +90,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsarecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnsaaaarecord_set %}
@@ -113,13 +105,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsaaaarecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -137,13 +122,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnsmxrecord_set %}
@@ -159,13 +137,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -183,13 +154,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnscaarecord_set %}
@@ -203,13 +167,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnscaarecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -229,13 +186,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnstxtrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnssrvrecord_set %}
@@ -251,13 +201,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnssrvrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -278,7 +221,6 @@
                                 <th>{% translate "Content" %}</th>
                                 <th>{% translate "Details" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
-                                <th>{% translate "Delete" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -293,13 +235,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsptrrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -317,13 +252,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnscnamerecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnsmxrecord_mailserver %}
@@ -340,13 +268,6 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsmxrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
-                                    </td>
                                 </tr>
                             {% endfor %}
                             {% for record in dnsnsrecord_nameserver %}
@@ -362,13 +283,6 @@
                                         {% else %}
                                             -
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_dnsnsrecord' record.pk %}"
-                                              method="post">
-                                            {% csrf_token %}
-                                            <button type="submit" class="icon ti-trash action-button">{% translate "Delete" %}</button>
-                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}

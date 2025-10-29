@@ -84,7 +84,7 @@ class ObjectScanLevelForm(forms.Form):
 
         if self.instance:
             self.fields["scan_level"].initial = self.instance.scan_level if self.instance.scan_level is not None else ""
-            self.fields["declared"].initial = self.instance.declared
+            self.fields["declared"].initial = "declared" if self.instance.declared else "inherited"
 
 
 class BaseScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
@@ -102,8 +102,8 @@ class BaseScanLevelUpdateView(KATModelPermissionRequiredMixin, FormView):
 
     def form_valid(self, form):
         obj = self.model.objects.get(pk=self.kwargs.get("pk"))
-        obj.scan_level = None if form.cleaned_data["scan_level"] == "" else int(form.cleaned_data["scan_level"])
-        obj.declared = form.cleaned_data["declared"]
+        obj.scan_level = None if form.cleaned_data["declared"] == "inherited" else int(form.cleaned_data["scan_level"])
+        obj.declared = form.cleaned_data["declared"] == "declared"
         obj.save()
 
         messages.success(self.request, _("Scan level updated successfully"))
@@ -167,26 +167,6 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-
-        return context
-
-
-class NetworkScanLevelDetailView(OrganizationFilterMixin, DetailView):
-    model = Network
-    template_name = "objects/network_detail_scan_level.html"
-    context_object_name = "network"
-    object: Network
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        organization_codes = self.request.GET.getlist("organization")
-        breadcrumb_url = reverse("objects:network_list")
-        if organization_codes:
-            breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
-
-        context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-        context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
 
@@ -352,7 +332,7 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
         context["object_sets"] = ObjectSet.objects.filter(object_type=ipaddress_ct)
         context["scan_levels"] = ScanLevelEnum
         context["plugins"] = Plugin.objects.filter(consumes__contains=["IPAddress"])
-        context["edit_scan_level_form"] = ObjectScanLevelForm
+        context["scan_level_form"] = ObjectScanLevelForm
 
         return context
 
@@ -564,7 +544,7 @@ class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 
 class IPAddressScanLevelUpdateView(BaseScanLevelUpdateView):
     model = IPAddress
-    detail_url_name = "objects:ipaddress_detail"
+    detail_url_name = "objects:ipaddress_scan_level_detail"
 
 
 class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
@@ -642,7 +622,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
         context["object_sets"] = ObjectSet.objects.filter(object_type=ContentType.objects.get_for_model(Hostname))
         context["scan_levels"] = ScanLevelEnum
         context["plugins"] = Plugin.objects.filter(consumes__contains=["Hostname"])
-        context["edit_scan_level_form"] = ObjectScanLevelForm
+        context["scan_level_form"] = ObjectScanLevelForm
 
         return context
 
@@ -774,7 +754,7 @@ class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
 
 class HostnameScanLevelUpdateView(BaseScanLevelUpdateView):
     model = Hostname
-    detail_url_name = "objects:hostname_detail"
+    detail_url_name = "objects:hostname_scan_level_detail"
 
 
 class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):

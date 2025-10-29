@@ -16,14 +16,10 @@
         </form>
     </div>
 </div>
-<nav class="tabs"
-     aria-label="{% translate "List of views for plugin detail page" %}">
+{% comment %} <nav class="tabs" aria-label="{% translate "List of views for plugin detail page" %}">
     <ul>
         <li {% if view == "details" %}aria-current="page"{% endif %}>
             <a href="{% url "objects:network_detail" pk=network.pk %}">{% translate "Details" %}</a>
         </li>
-        <li {% if view == "scan_level" %}aria-current="page"{% endif %}>
-            <a href="{% url "objects:network_scan_level_detail" pk=network.pk %}">{% translate "Scan level" %}</a>
-        </li>
     </ul>
-</nav>
+</nav> {% endcomment %}
