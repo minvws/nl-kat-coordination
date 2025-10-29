@@ -9,7 +9,7 @@ on:
       - "v2"
     tags:
       - "*"
-      - "!plugins-v*"
+      - "!plugins-*"
   pull_request:
 
 jobs:
