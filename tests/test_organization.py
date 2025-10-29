@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
+from objects.models import Network, XTDBOrganization
 from openkat.models import DENY_ORGANIZATION_CODES, Indemnification, Organization, OrganizationMember
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.organization_add import OrganizationAddView
@@ -463,3 +464,14 @@ def test_organization_tags(organization):
     organization.tags = []
     organization.save()
     assert list(organization.tags.all()) == []
+
+
+def test_organization_delete(xtdb):
+    organization = Organization.objects.create(name="deletetest", code="deletetest", tags=["testtag4"])
+    net = Network.objects.create(name="test")
+    net.organizations.add(XTDBOrganization.objects.get(pk=organization.pk))
+    net.save()
+    net.refresh_from_db()
+    assert net.organizations.first() == XTDBOrganization.objects.get(pk=organization.pk)
+
+    organization.delete(using="default")

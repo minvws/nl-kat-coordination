@@ -11,7 +11,18 @@ from django.db import OperationalError, connections
 from redis.exceptions import LockError  # type: ignore
 
 from files.models import File
-from objects.models import DNSAAAARecord, DNSARecord, DNSCNAMERecord, DNSNSRecord, Hostname, IPAddress
+from objects.models import (
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
+    DNSNSRecord,
+    Finding,
+    FindingOrganization,
+    Hostname,
+    HostnameOrganization,
+    IPAddress,
+    IPAddressOrganization,
+)
 from openkat.models import Organization, User
 from plugins.models import BusinessRule, Plugin
 from plugins.plugins.business_rules import run_rules
@@ -35,6 +46,17 @@ def schedule_scan_profile_recalculations():
             recalculate_scan_levels()
     except LockError:
         logger.warning("Scan level calculation is running, consider increasing SCAN_LEVEL_RECALCULATION_INTERVAL")
+
+
+@app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
+def schedule_attribution():
+    try:
+        with caches["default"].lock(
+            "organization_attribution", blocking=False, timeout=10 * settings.ATTRIBUTION_INTERVAL
+        ):
+            organization_attribution()
+    except LockError:
+        logger.warning("Organization attribution is running, consider increasing ATTRIBUTION_INTERVAL")
 
 
 @app.task(queue=settings.QUEUE_NAME_RECALCULATIONS)
@@ -178,6 +200,126 @@ def sync_cname_scan_levels() -> None:
                 JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
                 WHERE source.scan_level IS NOT NULL AND target.declared IS FALSE
                 AND target.scan_level is null or  target.scan_level != source.scan_level;
+                """  # noqa: S608
+            )
+    except OperationalError:
+        logger.exception("Failed to perform CNAME scan level query")
+
+
+def organization_attribution():
+    """
+    Attribute through the same models as the scan levels.
+    """
+    logger.info("Running organization attribution...")
+
+    # TODO: networks?
+    attribute_findings()
+    attribute_through_cnames()
+    attribute_through_ns()
+    attribute_through_ip_hostname(DNSARecord._meta.db_table)
+    attribute_through_ip_hostname(DNSAAAARecord._meta.db_table)
+
+    logger.info("Finished organization attribution.")
+
+
+def attribute_findings() -> None:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+                f"""
+                INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {Hostname._meta.db_table} source
+                RIGHT JOIN {Finding._meta.db_table} target on source._id = target.hostname_id
+                RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
+                LEFT JOIN {FindingOrganization._meta.db_table} otarget ON target._id = otarget.finding_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+                f"""
+                INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {IPAddress._meta.db_table} source
+                RIGHT JOIN {Finding._meta.db_table} target on source._id = target.address_id
+                RIGHT JOIN {IPAddressOrganization._meta.db_table} osource ON source._id = osource.ipaddress_id
+                LEFT JOIN {FindingOrganization._meta.db_table} otarget ON target._id = otarget.finding_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+    except OperationalError:
+        logger.exception("Failed to perform finding attribution query")
+
+
+def attribute_through_cnames() -> None:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+                f"""
+                INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {Hostname._meta.db_table} source
+                RIGHT JOIN {DNSCNAMERecord._meta.db_table} dns on source._id = dns.target_id
+                RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
+                RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
+                LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+    except OperationalError:
+        logger.exception("Failed to perform CNAME scan level query")
+
+
+def attribute_through_ns() -> None:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {Hostname._meta.db_table} source
+                RIGHT JOIN {DNSNSRecord._meta.db_table} dns on source._id = dns.hostname_id
+                RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
+                RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
+                LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+    except OperationalError:
+        logger.exception("Failed to perform CNAME scan level query")
+
+
+def attribute_through_ip_hostname(db_table: str) -> None:
+    try:
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(
+                f"""
+                INSERT INTO {IPAddressOrganization._meta.db_table} (_id, ipaddress_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {Hostname._meta.db_table} source
+                RIGHT JOIN {db_table} dns on source._id = dns.hostname_id
+                RIGHT JOIN {IPAddress._meta.db_table} target ON target._id = dns.ip_address_id
+                RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
+                LEFT JOIN {IPAddressOrganization._meta.db_table} otarget ON target._id = otarget.ipaddress_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
+                """  # noqa: S608
+            )
+            cursor.execute(
+                f"""
+                INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
+                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                FROM {IPAddress._meta.db_table} source
+                RIGHT JOIN {db_table} dns on source._id = dns.ip_address_id
+                RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
+                RIGHT JOIN {IPAddressOrganization._meta.db_table} osource ON source._id = osource.ipaddress_id
+                LEFT JOIN {HostnameOrganization._meta.db_table} otarget ON target._id = otarget.hostname_id
+                AND osource.organization_id = otarget.organization_id
+                WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
     except OperationalError:

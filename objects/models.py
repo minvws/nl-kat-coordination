@@ -5,18 +5,21 @@ from functools import total_ordering
 from typing import cast
 
 import structlog
+import tagulous.models
 from django.apps import apps
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
 from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
 from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
-from psycopg import DatabaseError, sql
+from django.utils.translation import gettext_lazy as _
+from psycopg import sql
 from tldextract import tldextract
 from transit.writer import Writer
 
-from openkat.models import LowerCaseCharField
+from openkat.models import ORGANIZATION_CODE_LENGTH, LowerCaseCharField, LowerCaseSlugField
 
 logger = structlog.get_logger(__name__)
 
@@ -26,7 +29,7 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 
 
 def to_xtdb_dict(model: Model) -> dict:
-    mod = model_to_dict(model, exclude=["id"])
+    mod = model_to_dict(model, exclude=["id"] + [field.name for field in model._meta.many_to_many])
     mod["_id"] = model.pk
 
     if "_valid_from" in mod:
@@ -37,10 +40,6 @@ def to_xtdb_dict(model: Model) -> dict:
             mod[field.name + "_id"] = mod[field.name]
             del mod[field.name]
             continue
-
-    for mm_field in model._meta.many_to_many:
-        mod[mm_field.name] = [item.id for item in mod[mm_field.name]]
-        continue
 
     return mod
 
@@ -72,63 +71,76 @@ class XTDBModel(models.Model):
         return self._valid_from
 
 
+class XTDBOrganizationTag(tagulous.models.TagTreeModel):
+    COLOR_CHOICES = settings.TAG_COLORS
+    BORDER_TYPE_CHOICES = settings.TAG_BORDER_TYPES
+
+    color = models.CharField(choices=COLOR_CHOICES, max_length=20, default=COLOR_CHOICES[0][0])
+    border_type = models.CharField(choices=BORDER_TYPE_CHOICES, max_length=20, default=BORDER_TYPE_CHOICES[0][0])
+
+    class TagMeta:
+        force_lowercase = True
+        protect_all = True
+
+
+class XTDBOrganization(XTDBModel):
+    name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
+    code = LowerCaseSlugField(
+        max_length=ORGANIZATION_CODE_LENGTH,
+        unique=True,
+        allow_unicode=True,
+        help_text=_(
+            "A slug containing only lower-case unicode letters, numbers, hyphens or underscores "
+            "that will be used in URLs and paths"
+        ),
+    )
+    tags = tagulous.models.TagField(to=XTDBOrganizationTag, blank=True)
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+
 class Asset(XTDBModel):
     class Meta:
         managed = False
         abstract = True
 
-    def delete(self, *args, **kwargs):
-        try:
-            Finding.objects.filter(object_id=self.pk).delete()
-        except DatabaseError:
-            logger.warning("Failed to delete Findings for %s", self)
-        return super().delete(*args, **kwargs)
-
 
 class ManagerWithGenericObjectForeignKey(Manager):
-    """GenericForeignKey-like behavior. (We could consider writing a custom GenericForeignKey as well at one point.)"""
+    """Provides object_human_readable annotation for Finding model with hostname/address fields."""
 
     def get_queryset(self):
-        ref = OuterRef("object_id")
+        hostname_ref = OuterRef("hostname_id")
+        address_ref = OuterRef("address_id")
 
         return (
             super()
             .get_queryset()
             .annotate(
                 object_human_readable=Case(
-                    When(object_type="hostname", then=Subquery(Hostname.objects.filter(pk=ref).values("name"))),
-                    When(object_type="ipaddress", then=Subquery(IPAddress.objects.filter(pk=ref).values("address"))),
-                    When(object_type="network", then=Subquery(Network.objects.filter(pk=ref).values("name"))),
+                    When(
+                        hostname__isnull=False, then=Subquery(Hostname.objects.filter(pk=hostname_ref).values("name"))
+                    ),
+                    When(
+                        address__isnull=False, then=Subquery(IPAddress.objects.filter(pk=address_ref).values("address"))
+                    ),
                     default=None,
                     output_field=CharField(),
-                )
+                ),
+                object_type=Case(
+                    When(hostname__isnull=False, then=models.Value("hostname")),
+                    When(address__isnull=False, then=models.Value("ipaddress")),
+                    default=None,
+                    output_field=CharField(),
+                ),
+                object_id=Case(
+                    When(hostname__isnull=False, then=models.F("hostname_id")),
+                    When(address__isnull=False, then=models.F("address_id")),
+                    default=None,
+                    output_field=models.BigIntegerField(),
+                ),
             )
         )
-
-
-class FindingType(XTDBModel):
-    code = models.CharField()
-    name = models.CharField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    source = models.CharField(null=True, blank=True)
-    risk = models.CharField(null=True, blank=True)
-    impact = models.TextField(null=True, blank=True)
-    recommendation = models.TextField(null=True, blank=True)
-    score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
-
-    class Meta:
-        managed = False
-
-
-class Finding(XTDBModel):
-    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
-
-    object_type: LowerCaseCharField = LowerCaseCharField()
-    object_id: models.PositiveBigIntegerField = models.PositiveBigIntegerField()
-    objects = ManagerWithGenericObjectForeignKey()
-
-    class Meta:
-        managed = False
 
 
 class Network(Asset):
@@ -137,9 +149,17 @@ class Network(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="networks", through="NetworkOrganization"
+    )
 
     def __str__(self) -> str:
         return self.name
+
+
+class NetworkOrganization(XTDBModel):
+    network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class IPAddress(Asset):
@@ -149,9 +169,17 @@ class IPAddress(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="ipaddresses", through="IPAddressOrganization"
+    )
 
     def __str__(self) -> str:
         return self.address
+
+
+class IPAddressOrganization(XTDBModel):
+    ipaddress: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class Protocol(models.TextChoices):
@@ -201,11 +229,11 @@ class Hostname(Asset):
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
     declared: models.BooleanField = models.BooleanField(default=False)
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="hostnames", through="HostnameOrganization"
+    )
 
     def __str__(self) -> str:
-        if self.name is None:  # TODO: fix, this  can happen for some reason...
-            return ""
-
         return self.name
 
     def save(self, *args, **kwargs):
@@ -225,6 +253,38 @@ class Hostname(Asset):
                     root_hostname.save(update_fields=["root"])
 
         super().save(*args, **kwargs)
+
+
+class HostnameOrganization(XTDBModel):
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
+
+
+class FindingType(XTDBModel):
+    code = models.CharField()
+    name = models.CharField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    source = models.CharField(null=True, blank=True)
+    risk = models.CharField(null=True, blank=True)
+    impact = models.TextField(null=True, blank=True)
+    recommendation = models.TextField(null=True, blank=True)
+    score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
+
+
+class Finding(XTDBModel):
+    finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
+    hostname: models.ForeignKey = models.ForeignKey(Hostname, null=True, on_delete=models.CASCADE)
+    address: models.ForeignKey = models.ForeignKey(IPAddress, null=True, on_delete=models.CASCADE)
+
+    organizations = models.ManyToManyField(
+        XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
+    )
+    objects = ManagerWithGenericObjectForeignKey()
+
+
+class FindingOrganization(XTDBModel):
+    finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
+    organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
 
 class DNSRecordBase(XTDBModel):

@@ -1,4 +1,4 @@
-name: Build the containerized boefje images
+name: Build the plugin image(s)
 
 on:
   push:
@@ -9,43 +9,24 @@ on:
     tags:
       - "*"
     paths:
-      - katalogus/boefjes/**
-      - katalogus/images/**
-      - .github/workflows/containerized_boefjes.yml
+      - plugins/plugins/**
+      - .github/workflows/plugin_images.yml
   pull_request:
     paths:
-      - katalogus/boefjes/kat_nmap_tcp/**
-      - katalogus/boefjes/kat_nmap_udp/**
-      - katalogus/boefjes/kat_dnssec/**
-      - katalogus/boefjes/kat_nikto/**
-      - katalogus/boefjes/kat_export_http/**
-      - katalogus/images/**
-      - .github/workflows/containerized_boefjes.yml
+      - plugins/plugins/**
+      - .github/workflows/plugin_images.yml
 
 jobs:
-  build_containerized_boefjes:
+  build_plugin_images:
     permissions:
       contents: read
       packages: write
     strategy:
       matrix:
         include:
-          - dockerfile: katalogus/boefjes/kat_nmap_tcp/boefje.Dockerfile
-            image: openkat/nmap
-          - dockerfile: katalogus/boefjes/kat_dnssec/boefje.Dockerfile
-            image: openkat/dns-sec
-          - dockerfile: katalogus/boefjes/kat_export_http/boefje.Dockerfile
-            image: openkat/export-http
-          - dockerfile: katalogus/boefjes/kat_nikto/boefje.Dockerfile
-            image: openkat/nikto
-          - dockerfile: katalogus/images/generic.Dockerfile
-            image: openkat/generic
+          - dockerfile: plugins/plugins/plugins.Dockerfile
+            image: openkat/plugins
     runs-on: ubuntu-24.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,17 +36,6 @@ jobs:
         id: buildx
         with:
           driver-opts: network=host
-
-      - name: Build the boefje base image for ${{ matrix.image }}
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
-        with:
-          file: katalogus/images/base.Dockerfile
-          # We don't push as this is an intermediate image that handles common operations for most boefjes
-          load: true
-          push: true
-          tags: localhost:5000/openkat/boefje-base:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Docker meta
         id: meta
@@ -94,7 +64,5 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-contexts: |
-            openkat/boefje-base:latest=docker-image://localhost:5000/openkat/boefje-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

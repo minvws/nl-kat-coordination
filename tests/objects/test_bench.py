@@ -5,13 +5,11 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.color import no_style
 from django.db import connections
-from django.db.models import Case, Count, F, When
-from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema, IntField, StrField
 from psycopg.errors import FeatureNotSupported
 
 from objects.management.commands.generate_benchmark_data import generate
-from objects.models import Finding, Hostname, IPAddress, IPPort, Network, bulk_insert
+from objects.models import Finding, Hostname, IPAddress, Network, bulk_insert
 from objects.views import HostnameDetailView, HostnameListView, IPAddressDetailView, IPAddressListView
 from openkat.models import Organization
 from plugins.models import BusinessRule, Plugin
@@ -261,8 +259,10 @@ class HostnameQLSchema(DjangoQLSchema):
 
 def test_business_rule_ipv6_webservers(bulk_data, benchmark):
     def run_rule():
-        query = "dnsnsrecord_nameserver = None and dnsaaaarecord = None"
-        return apply_search(Hostname.objects.distinct(), query).count()
+        rule = get_rules()["ipv6_webservers"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0
@@ -270,8 +270,10 @@ def test_business_rule_ipv6_webservers(bulk_data, benchmark):
 
 def test_business_rule_ipv6_nameservers(bulk_data, benchmark):
     def run_rule():
-        query = "dnsnsrecord_nameserver != None and dnsaaaarecord = None"
-        return apply_search(Hostname.objects.distinct(), query).count()
+        rule = get_rules()["ipv6_nameservers"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0
@@ -279,17 +281,10 @@ def test_business_rule_ipv6_nameservers(bulk_data, benchmark):
 
 def test_business_rule_two_ipv6_nameservers(bulk_data, benchmark):
     def run_rule():
-        queryset = Hostname.objects.annotate(
-            nameservers_with_ipv6_count=Count(
-                Case(
-                    When(dnsnsrecord__name_server__dnsaaaarecord__isnull=False, then=F("dnsnsrecord__name_server_id")),
-                    default=None,
-                ),
-                distinct=True,
-            )
-        )
-        query = "dnsnsrecord_nameserver = None and nameservers_with_ipv6_count < 2"
-        return apply_search(queryset, query, HostnameQLSchema).count()
+        rule = get_rules()["two_ipv6_nameservers"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0
@@ -297,18 +292,10 @@ def test_business_rule_two_ipv6_nameservers(bulk_data, benchmark):
 
 def test_business_rule_missing_spf(bulk_data, benchmark, N):
     def run_rule():
-        working_query = """
-            SELECT "test_none_objects_hostname".*
-            FROM "test_none_objects_hostname"
-                     LEFT JOIN "test_none_objects_dnstxtrecord"
-            ON (
-               "test_none_objects_hostname"."_id" = "test_none_objects_dnstxtrecord"."hostname_id"
-                   AND "test_none_objects_dnstxtrecord"."value"::text LIKE 'v=spf1%%'
-               )
-            WHERE "test_none_objects_dnstxtrecord"._id IS NULL
-        """
-
-        return len([x for x in Hostname.objects.raw(working_query)])
+        rule = get_rules()["missing_spf"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     nr_hostnames = N + N // 20 + N // 10  # Regular + name servers + mail servers
@@ -317,8 +304,10 @@ def test_business_rule_missing_spf(bulk_data, benchmark, N):
 
 def test_business_rule_open_sysadmin_port(bulk_data, benchmark):
     def run_rule():
-        query = 'protocol = "TCP" and port in (21, 22, 23, 5900)'
-        return apply_search(IPPort.objects.all(), query).count()
+        rule = get_rules()["open_sysadmin_port"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0
@@ -326,8 +315,10 @@ def test_business_rule_open_sysadmin_port(bulk_data, benchmark):
 
 def test_business_rule_open_database_port(bulk_data, benchmark):
     def run_rule():
-        query = 'protocol = "TCP" and port in (1433, 1434, 3050, 3306, 5432)'
-        return apply_search(IPPort.objects.all(), query).count()
+        rule = get_rules()["open_database_port"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0
@@ -335,8 +326,10 @@ def test_business_rule_open_database_port(bulk_data, benchmark):
 
 def test_business_rule_missing_caa(bulk_data, benchmark):
     def run_rule():
-        query = "dnscaarecord = None"
-        return apply_search(Hostname.objects.all(), query).count()
+        rule = get_rules()["missing_caa"]
+        with connections["xtdb"].cursor() as cursor:
+            cursor.execute(rule["query"])
+            return len(cursor.fetchall())
 
     result = benchmark(run_rule)
     assert result >= 0

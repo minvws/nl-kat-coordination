@@ -3,7 +3,7 @@ from typing import Any
 
 import structlog
 import weasyprint
-from django.db.models import Count, Q, QuerySet
+from django.db.models import CharField, Count, F, QuerySet, Value
 from django.template.loader import render_to_string
 from django_weasyprint.utils import django_url_fetcher
 
@@ -17,13 +17,11 @@ logger = structlog.get_logger(__name__)
 
 
 class ReportPDFGenerator:
-    """Service for generating PDF reports"""
-
     def __init__(
         self,
         name: str,
         description: str = "",
-        organizations: list[Organization] | None = None,
+        organizations: list[Organization] | QuerySet[Organization] | None = None,
         finding_types: list[str] | None = None,
         object_set: ObjectSet | None = None,
         user: User | None = None,
@@ -101,11 +99,10 @@ class ReportPDFGenerator:
 
 
 def collect_all_metrics(
-    organizations: QuerySet[Organization] | None = None,
+    organizations: list[Organization] | QuerySet[Organization] | None = None,
     finding_types: list[str] | None = None,
     object_set: ObjectSet | None = None,
 ) -> dict[str, Any]:
-    """Collect all metrics for a security report"""
     logger.info("Starting report metrics collection")
 
     metrics = {
@@ -120,34 +117,60 @@ def collect_all_metrics(
     return metrics
 
 
-def _get_base_finding_query(finding_types: list[str] | None = None) -> QuerySet:
+def _get_base_finding_query(
+    finding_types: list[str] | None = None, organizations: list[Organization] | QuerySet[Organization] | None = None
+) -> QuerySet:
     query = Finding.objects.select_related("finding_type").all()
 
     if finding_types:
         query = query.filter(finding_type__code__in=finding_types)
 
+    if organizations:
+        query = query.filter(organizations__pk__in=[org.pk for org in organizations])
+
     return query
 
 
 def collect_findings_metrics(
-    organizations: QuerySet[Organization] | None = None,
+    organizations: list[Organization] | QuerySet[Organization] | None = None,
     finding_types: list[str] | None = None,
     object_set: ObjectSet | None = None,
 ) -> dict[str, Any]:
-    """Collect findings-related metrics"""
-    findings = _get_base_finding_query(finding_types)
+    findings = _get_base_finding_query(finding_types, organizations)
 
-    # Count findings by type
     findings_by_type = (
         findings.values("finding_type__code", "finding_type__name", "finding_type__score")
         .annotate(count=Count("id"))
         .order_by("-finding_type__score", "-count")
     )
 
-    # Find assets with most findings, group by object_id to count findings per asset
-    offenders = (
-        findings.values("object_id", "object_type").annotate(finding_count=Count("id")).order_by("-finding_count")[:10]
+    hostname_offenders = (
+        findings.filter(hostname__isnull=False)
+        .values("hostname_id", "hostname__name")
+        .annotate(
+            finding_count=Count("id"),
+            object_id=F("hostname_id"),
+            object_type=Value("hostname", output_field=CharField()),
+            object_name=F("hostname__name"),
+        )
+        .order_by("-finding_count")[:10]
     )
+
+    address_offenders = (
+        findings.filter(address__isnull=False)
+        .values("address_id", "address__address")
+        .annotate(
+            finding_count=Count("id"),
+            object_id=F("address_id"),
+            object_type=Value("ipaddress", output_field=CharField()),
+            object_name=F("address__address"),
+        )
+        .order_by("-finding_count")[:10]
+    )
+
+    offenders = sorted(
+        list(hostname_offenders) + list(address_offenders), key=lambda x: x["finding_count"], reverse=True
+    )[:10]
 
     finding_types_details = {}
     for ft in FindingType.objects.filter(code__in=[f["finding_type__code"] for f in findings_by_type]):
@@ -166,9 +189,14 @@ def collect_findings_metrics(
         ft_code = finding_data["finding_type__code"]
         count = finding_data["count"]
 
-        # Count unique assets affected by this finding type
-        affected_assets = findings.filter(finding_type__code=ft_code).values("object_id").distinct().count()
-
+        # Count unique assets affected by this finding type (count hostnames and addresses separately)
+        affected_hostnames = (
+            findings.filter(finding_type__code=ft_code, hostname__isnull=False).values("hostname_id").distinct().count()
+        )
+        affected_addresses = (
+            findings.filter(finding_type__code=ft_code, address__isnull=False).values("address_id").distinct().count()
+        )
+        affected_assets = affected_hostnames + affected_addresses
         findings_stats.append(
             {
                 "code": ft_code,
@@ -190,41 +218,32 @@ def collect_findings_metrics(
 
 
 def collect_dns_metrics(
-    organizations: QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
+    organizations: list[Organization] | QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
 ) -> dict[str, Any]:
-    """Collect DNS-related metrics"""
-    # Filter by organization if needed
     dns_query = Hostname.objects.all()
     ns_query = DNSNSRecord.objects.all()
 
-    # Count root domains (hostnames where root=True or name doesn't contain subdomain)
-    root_domains = dns_query.filter(root=True).count()
+    if organizations:
+        dns_query = dns_query.filter(organizations__pk__in=[org.pk for org in organizations])
+        ns_query = ns_query.filter(hostname__organizations__pk__in=[org.pk for org in organizations])
 
-    # Count name servers
+    root_domains = dns_query.filter(root=True).count()
     name_servers = ns_query.values("name_server_id").distinct().count()
 
-    # Count total hostnames
-    total_hostnames = dns_query.count()
-
-    return {"total_hostnames": total_hostnames, "root_domains": root_domains, "name_servers": name_servers}
+    return {"total_hostnames": dns_query.count(), "root_domains": root_domains, "name_servers": name_servers}
 
 
 def collect_ports_metrics(
-    organizations: QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
+    organizations: list[Organization] | QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
 ) -> dict[str, Any]:
-    """Collect port-related metrics"""
     port_query = IPPort.objects.all()
 
-    # Count open ports
+    if organizations:
+        port_query = port_query.filter(address__organizations__pk__in=[org.pk for org in organizations])
+
     total_open_ports = port_query.count()
-
-    # Count unique IP addresses with open ports
     ips_with_open_ports = port_query.values("address_id").distinct().count()
-
-    # Get port distribution (top 20 most common ports)
     port_distribution = port_query.values("port", "protocol").annotate(count=Count("id")).order_by("-count")[:20]
-
-    # Count by protocol
     by_protocol = port_query.values("protocol").annotate(count=Count("id")).order_by("-count")
 
     return {
@@ -236,58 +255,55 @@ def collect_ports_metrics(
 
 
 def collect_ipv6_metrics(
-    organizations: QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
+    organizations: list[Organization] | QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
 ) -> dict[str, Any]:
-    """Collect IPv6-related metrics"""
     ip_query = IPAddress.objects.all()
 
-    # Count IPv6 addresses (addresses containing ':')
+    if organizations:
+        ip_query = ip_query.filter(organizations__pk__in=[org.pk for org in organizations])
+
     ipv6_count = ip_query.filter(address__contains=":").count()
-
-    # Count IPv4 addresses (addresses containing '.')
-    ipv4_count = ip_query.filter(address__contains=".").count()
-
     total_ips = ip_query.count()
 
     return {
         "ipv6_addresses": ipv6_count,
-        "ipv4_addresses": ipv4_count,
+        "ipv4_addresses": ip_query.filter(address__contains=".").count(),
         "total_ip_addresses": total_ips,
         "ipv6_percentage": (ipv6_count / total_ips * 100) if total_ips > 0 else 0,
     }
 
 
 def collect_general_metrics(
-    organizations: QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
+    organizations: list[Organization] | QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
 ) -> dict[str, Any]:
-    """Collect general asset metrics"""
-    asset_query = Q()
+    total_networks = Network.objects.all()
+    total_hostnames = Hostname.objects.all()
+    total_ips = IPAddress.objects.all()
 
-    total_networks = Network.objects.filter(asset_query).count()
-    total_hostnames = Hostname.objects.filter(asset_query).count()
-    total_ips = IPAddress.objects.filter(asset_query).count()
-
-    # Handle both QuerySet and list for organizations
     if organizations:
         org_count = len(organizations) if isinstance(organizations, list) else organizations.count()
+        total_networks = total_networks.filter(organizations__pk__in=[org.pk for org in organizations])
+        total_hostnames = total_hostnames.filter(organizations__pk__in=[org.pk for org in organizations])
+        total_ips = total_ips.filter(organizations__pk__in=[org.pk for org in organizations])
     else:
         org_count = 0
 
     return {
-        "total_networks": total_networks,
-        "total_hostnames": total_hostnames,
-        "total_ip_addresses": total_ips,
+        "total_networks": total_networks.count(),
+        "total_hostnames": total_hostnames.count(),
+        "total_ip_addresses": total_ips.count(),
         "organizations_count": org_count,
     }
 
 
 def _count_total_assets(
-    organizations: QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
+    organizations: list[Organization] | QuerySet[Organization] | None = None, object_set: ObjectSet | None = None
 ) -> int:
-    """Count total assets (hostnames + IP addresses)"""
-    asset_query = Q()
+    total_hostnames = Hostname.objects.all()
+    total_ips = IPAddress.objects.all()
 
-    total_hostnames = Hostname.objects.filter(asset_query).count()
-    total_ips = IPAddress.objects.filter(asset_query).count()
+    if organizations:
+        total_hostnames = total_hostnames.filter(organizations__pk__in=[org.pk for org in organizations])
+        total_ips = total_ips.filter(organizations__pk__in=[org.pk for org in organizations])
 
-    return total_hostnames + total_ips
+    return total_hostnames.count() + total_ips.count()

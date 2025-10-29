@@ -74,9 +74,7 @@ def generate(
             ipv6 = IPAddress(network=network, address=f"2001:db8:{i:04x}::{i:04x}", scan_level=ipaddress_scan_level)
             ips_v6.append(ipv6)
             if i % 50 == 0:
-                finding = Finding(
-                    finding_type=by_code["KAT-WEBSERVER-NO-IPV6"], object_type="hostname", object_id=hn.pk
-                )
+                finding = Finding(finding_type=by_code["KAT-WEBSERVER-NO-IPV6"], hostname=hn)
                 findings.append(finding)  # False finding
 
         # Ports
@@ -89,21 +87,19 @@ def generate(
             software[0].ports.add(https_port)
 
         if i % 200 == 0:
-            finding = Finding(finding_type=by_code["KAT-OPEN-SYSADMIN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-OPEN-SYSADMIN-PORT"], address=ip)
             findings.append(finding)  # False finding
-            finding = Finding(finding_type=by_code["KAT-OPEN-DATABASE-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-OPEN-DATABASE-PORT"], address=ip)
             findings.append(finding)  # False finding
-            finding = Finding(finding_type=by_code["KAT-REMOTE-DESKTOP-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-REMOTE-DESKTOP-PORT"], address=ip)
             findings.append(finding)  # False finding
-            finding = Finding(finding_type=by_code["KAT-UNCOMMON-OPEN-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-UNCOMMON-OPEN-PORT"], address=ip)
             findings.append(finding)  # False finding
-            finding = Finding(finding_type=by_code["KAT-OPEN-COMMON-PORT"], object_type="ipaddress", object_id=ip.pk)
+            finding = Finding(finding_type=by_code["KAT-OPEN-COMMON-PORT"], address=ip)
             findings.append(finding)  # True finding
-            finding = Finding(finding_type=by_code["KAT-NO-DMARC"], object_type="hostname", object_id=hn.pk)
+            finding = Finding(finding_type=by_code["KAT-NO-DMARC"], hostname=hn)
             findings.append(finding)  # True finding
-            finding = Finding(
-                finding_type=by_code["KAT-DOMAIN-OWNERSHIP-PENDING"], object_type="hostname", object_id=hn.pk
-            )
+            finding = Finding(finding_type=by_code["KAT-DOMAIN-OWNERSHIP-PENDING"], hostname=hn)
             findings.append(finding)  # False finding
 
         # Add some varied ports for business rule testing
@@ -129,13 +125,9 @@ def generate(
                 hostnames.append(ns_hostname)
                 ns_records.append(DNSNSRecord(hostname=hn, name_server=ns_hostname, ttl=300))
                 if i % 100 == 0:
-                    finding = Finding(
-                        finding_type=by_code["KAT-NAMESERVER-NO-IPV6"], object_type="hostname", object_id=ns_hostname.pk
-                    )
+                    finding = Finding(finding_type=by_code["KAT-NAMESERVER-NO-IPV6"], hostname=ns_hostname)
                     findings.append(finding)  # False finding
-                    finding = Finding(
-                        finding_type=by_code["KAT-NAMESERVER-NO-TWO-IPV6"], object_type="hostname", object_id=hn.pk
-                    )
+                    finding = Finding(finding_type=by_code["KAT-NAMESERVER-NO-TWO-IPV6"], hostname=hn)
                     findings.append(finding)
 
             # MX records for mail servers (every 10th)
@@ -149,7 +141,7 @@ def generate(
                 if i % 14 == 0:
                     txt_records.append(DNSTXTRecord(hostname=hn, value="v=spf1 include:_spf.example.com ~all", ttl=300))
                     if i % 50 == 0:
-                        finding = Finding(finding_type=by_code["KAT-NO-SPF"], object_type="hostname", object_id=hn.pk)
+                        finding = Finding(finding_type=by_code["KAT-NO-SPF"], hostname=hn)
                         findings.append(finding)  # False finding
                 else:
                     txt_records.append(DNSTXTRecord(hostname=hn, value="v=DKIM1; k=rsa; p=...", ttl=300))
@@ -157,7 +149,7 @@ def generate(
             # CAA records (every 25th)
             if i % 25 == 0:
                 if i % 200 == 0:
-                    finding = Finding(finding_type=by_code["KAT-NO-CAA"], object_type="hostname", object_id=hn.pk)
+                    finding = Finding(finding_type=by_code["KAT-NO-CAA"], hostname=hn)
                     findings.append(finding)  # False finding
 
                 caa_records.append(DNSCAARecord(hostname=hn, flags=0, tag="issue", value="letsencrypt.org", ttl=300))

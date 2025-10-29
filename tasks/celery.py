@@ -37,6 +37,12 @@ app.conf.beat_schedule = {
         "args": tuple(),
         "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
     },
+    "schedule-organization-attribution": {
+        "task": "tasks.tasks.schedule_attribution",
+        "schedule": settings.ATTRIBUTION_INTERVAL,
+        "args": tuple(),
+        "options": {"queue": settings.QUEUE_NAME_RECALCULATIONS},
+    },
     "reschedule": {
         "task": "tasks.tasks.reschedule",
         "schedule": settings.SCHEDULE_INTERVAL,

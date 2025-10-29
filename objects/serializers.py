@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.fields import CharField, IntegerField
+from rest_framework.fields import CharField
 from rest_framework.relations import PrimaryKeyRelatedField, SlugRelatedField
 
 from objects.models import (
@@ -35,35 +35,32 @@ class FindingTypeSerializer(serializers.ModelSerializer):
         exclude = ["_valid_from"]
 
 
-def object_by_code(object_code: str | None, object_id: int | None, object_type: str) -> int | None:
-    if not object_code:
-        return object_id
-
-    if object_type.lower() == "hostname":
-        object_id = Hostname.objects.get(name=object_code).pk  # TODO: handle network
-    if object_type.lower() == "ipaddress":
-        object_id = IPAddress.objects.get(address=object_code).pk  # TODO: handle network
-    if object_type.lower() == "network":
-        object_id = Network.objects.get(name=object_code).pk
-
-    return object_id
-
-
 class FindingSerializer(serializers.ModelSerializer):
     finding_type = SlugRelatedField(slug_field="code", read_only=True)
     finding_type_code = CharField(write_only=True)
-    object_code = CharField(write_only=True, required=False)
-    object_id = IntegerField(required=False)
+
+    hostname = CharField(write_only=True, required=False, allow_null=True)
+    ipaddress = CharField(write_only=True, required=False, allow_null=True)
+
+    hostname_id = PrimaryKeyRelatedField(source="hostname", read_only=True)
+    address_id = PrimaryKeyRelatedField(source="address", read_only=True)
 
     def create(self, validated_data):
-        object_id = object_by_code(
-            validated_data.pop("object_code", None),
-            validated_data.pop("object_id", None),
-            validated_data["object_type"],
-        )
+        hostname_name = validated_data.pop("hostname", None)
+        ipaddress_str = validated_data.pop("ipaddress", None)
+
+        hostname_obj = None
+        address_obj = None
+
+        if hostname_name:
+            hostname_obj = Hostname.objects.get(name=hostname_name)
+        elif ipaddress_str:
+            address_obj = IPAddress.objects.get(address=ipaddress_str)
 
         ft, created = FindingType.objects.get_or_create(code=validated_data.pop("finding_type_code"))
-        f, created = Finding.objects.get_or_create(finding_type=ft, object_id=object_id, **validated_data)
+        f, created = Finding.objects.get_or_create(
+            finding_type=ft, hostname=hostname_obj, address=address_obj, **validated_data
+        )
         return f
 
     class Meta:

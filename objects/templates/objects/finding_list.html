@@ -56,7 +56,13 @@
                                         <span class="label tags-color-1-light">{{ finding.finding_type.code }}</span>
                                     </td>
                                     <td>
-                                        <a href="{% url "objects:"|add:finding.object_type|lower|add:"_detail" pk=finding.object_id %}">{{ finding.object_human_readable }}</a>
+                                        {% if finding.hostname %}
+                                            <a href="{% url "objects:hostname_detail" pk=finding.hostname.pk %}">{{ finding.hostname.name }}</a>
+                                        {% elif finding.address %}
+                                            <a href="{% url "objects:ipaddress_detail" pk=finding.address.pk %}">{{ finding.address.address }}</a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if finding.finding_type.score != None %}

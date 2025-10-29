@@ -13,35 +13,41 @@ from objects.models import (
     IPPort,
     Network,
     Software,
+    XTDBOrganization,
 )
 
 
 def test_finding_api(drf_client, xtdb, organization):
     ft = FindingType.objects.create(code="TEST", score=5)
     net = Network.objects.create(name="internet")
-    f = Finding.objects.create(finding_type=ft, object_type="network", object_id=net.id)
-
-    assert drf_client.get("/api/v1/objects/finding/").json() == {
-        "count": 1,
-        "next": None,
-        "previous": None,
-        "results": [{"id": f.pk, "object_id": net.id, "object_type": "network", "finding_type": ft.code}],
-    }
-
     hn = Hostname.objects.create(network=net, name="test.com")
-    res = drf_client.post(
-        "/api/v1/objects/finding/",
-        json={"finding_type_code": "TEST", "object_type": "hostname", "object_code": hn.name},
-    )
+    f = Finding.objects.create(finding_type=ft, hostname=hn)
+
+    response = drf_client.get("/api/v1/objects/finding/").json()
+    assert response["count"] == 1
+    assert len(response["results"]) == 1
+    assert response["results"][0]["id"] == f.pk
+    assert response["results"][0]["finding_type"] == ft.code
+    assert response["results"][0]["organizations"] == []
+
+    f.organizations.add(XTDBOrganization.objects.get(pk=organization.pk))
+
+    response = drf_client.get("/api/v1/objects/finding/").json()
+    assert response["count"] == 1
+    assert response["results"][0]["organizations"] == [organization.pk]
+
+    res = drf_client.post("/api/v1/objects/finding/", json={"finding_type_code": "TEST2", "hostname": hn.name})
     assert res.status_code == 201
     assert drf_client.get("/api/v1/objects/finding/").json()["count"] == 2
 
+    # Create IP address finding
+    ip = IPAddress.objects.create(network=net, address="127.0.0.1")
     res = drf_client.post(
         "/api/v1/objects/finding/",
         json=[
-            {"finding_type_code": "TEST", "object_type": "network", "object_code": net.name},
-            {"finding_type_code": "TEST2", "object_type": "network", "object_code": net.name},
-            {"finding_type_code": "TEST3", "object_type": "network", "object_code": net.name},
+            {"finding_type_code": "TEST", "ipaddress": ip.address},
+            {"finding_type_code": "TEST2", "hostname": hn.name},
+            {"finding_type_code": "TEST3", "hostname": hn.name},
         ],
     )
     assert res.status_code == 201
@@ -74,22 +80,22 @@ def test_network_api(drf_client, xtdb):
         "next": None,
         "previous": None,
         "results": [
-            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
-            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
+            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
+            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
         ],
     }
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
     network = {"name": "internet3"}
     net3 = drf_client.post("/api/v1/objects/network/", json=network).json()
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None},
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None},
+        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
 
 
@@ -100,7 +106,15 @@ def test_hostname_api(drf_client, xtdb):
 
     hn = Hostname.objects.create(network=network, name="test.com")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
-        {"id": hn.pk, "name": "test.com", "network_id": network.pk, "root": True, "declared": False, "scan_level": None}
+        {
+            "id": hn.pk,
+            "name": "test.com",
+            "network_id": network.pk,
+            "root": True,
+            "declared": False,
+            "scan_level": None,
+            "organizations": [],
+        }
     ]
 
     hostname = {"network": "internet", "name": "test2.com"}
@@ -113,6 +127,7 @@ def test_hostname_api(drf_client, xtdb):
             "root": True,
             "declared": False,
             "scan_level": None,
+            "organizations": [],
         },
         {
             "id": hn2["id"],
@@ -121,6 +136,7 @@ def test_hostname_api(drf_client, xtdb):
             "root": True,
             "declared": False,
             "scan_level": None,
+            "organizations": [],
         },
     ]
 
@@ -134,7 +150,14 @@ def test_ip_api(drf_client, xtdb):
     ip = {"network": "internet", "address": "127.0.0.1"}
     ip_res = drf_client.post("/api/v1/objects/ipaddress/", json=ip).json()
     assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
-        {"id": ip_res["id"], "network_id": net.pk, "address": "127.0.0.1", "declared": False, "scan_level": None}
+        {
+            "id": ip_res["id"],
+            "network_id": net.pk,
+            "address": "127.0.0.1",
+            "declared": False,
+            "scan_level": None,
+            "organizations": [],
+        }
     ]
 
     ipport = {"address": ip_res["address"], "protocol": "TCP", "port": 80, "service": "http"}

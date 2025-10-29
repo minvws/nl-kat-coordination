@@ -167,7 +167,6 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
-        context["findings"] = Finding.objects.filter(object_type="network", object_id=self.object.pk)
 
         return context
 
@@ -236,6 +235,7 @@ class FindingListView(OrganizationFilterMixin, FilterView):
     context_object_name = "findings"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = FindingFilter
+    ordering = ["-_valid_from"]
 
     def get_queryset(self) -> "QuerySet[Finding]":
         return super().get_queryset().prefetch_related("finding_type")
@@ -250,7 +250,7 @@ class FindingListView(OrganizationFilterMixin, FilterView):
 class FindingCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Finding
     template_name = "objects/generic_object_form.html"
-    fields = ["finding_type", "object_type", "object_id"]  # TODO: make easy
+    fields = ["finding_type", "hostname", "address"]
     success_url = reverse_lazy("objects:finding_list")
 
 
@@ -414,7 +414,7 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
-        context["findings"] = Finding.objects.filter(object_type="ipaddress", object_id=self.object.pk)
+        context["findings"] = Finding.objects.filter(address=self.object)
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context
@@ -713,7 +713,7 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["dnscnamerecord_target_set"] = self.object.dnscnamerecord_target_set.all()
         context["dnsmxrecord_mailserver"] = self.object.dnsmxrecord_mailserver.all()
         context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.all()
-        context["findings"] = Finding.objects.filter(object_type="hostname", object_id=self.object.pk)
+        context["findings"] = Finding.objects.filter(hostname=self.object)
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
 
         return context

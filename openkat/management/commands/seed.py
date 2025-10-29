@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
 from objects.models import SEVERITY_SCORE_LOOKUP, FindingType, Hostname, Network, object_type_by_name
-from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
+from openkat.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization
 from plugins.models import BusinessRule, Plugin
 from plugins.plugins.business_rules import get_rules
 from plugins.sync import sync
@@ -41,6 +41,7 @@ class Command(BaseCommand):
         self.setup_group_permissions()
         self.seed_objects()
         self.seed_finding_types()
+        self.sync_orgs()
         self.seed_business_rules()
         sync()
 
@@ -89,6 +90,10 @@ class Command(BaseCommand):
                     "score": SEVERITY_SCORE_LOOKUP.get(data.get("risk", "").lower()),
                 },
             )
+
+    def sync_orgs(self):
+        for org in Organization.objects.all():
+            org.save()
 
     def seed_business_rules(self):
         for rule_data in get_rules().values():

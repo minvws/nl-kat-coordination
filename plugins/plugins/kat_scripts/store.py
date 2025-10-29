@@ -10,7 +10,10 @@ def findings(object_type: str) -> list[dict]:
     results = []
     for line in sys.stdin.readlines():
         code, obj = line.strip().split("\t", maxsplit=1)
-        results.append({"finding_type_code": code, "object_code": obj.strip(), "object_type": object_type})
+        if object_type == "hostname":
+            results.append({"finding_type_code": code, "hostname": obj.strip()})
+        if object_type == "ipaddress":
+            results.append({"finding_type_code": code, "address": obj.strip()})
 
     return results
 

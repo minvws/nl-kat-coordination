@@ -132,15 +132,20 @@ class Organization(models.Model):
         update_fields: Iterable[str] | None = None,
     ) -> None:
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        from objects.models import XTDBOrganization  # noqa: PLC0415
 
-        # XTDB does not return the id after INSERT, so we need to tell Django
-        # that by setting db_returning_fields to empty.
-        orig = self._meta.db_returning_fields
-        self._meta.db_returning_fields = []
-        try:
-            super().save(force_insert=True, force_update=force_update, using="xtdb", update_fields=update_fields)
-        finally:
-            self._meta.db_returning_fields = orig
+        xtdb_org, created = XTDBOrganization.objects.get_or_create(id=self.id, name=self.name, code=self.code)
+        xtdb_org.tags = list(self.tags.all().values_list("name", flat=True))
+        for tag in xtdb_org.tags._tags:
+            tag.save()
+
+        xtdb_org.save(force_insert=force_insert, force_update=force_update, update_fields=update_fields)
+
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+        from objects.models import XTDBOrganization  # noqa: PLC0415
+
+        XTDBOrganization.objects.filter(pk=self.pk).delete()
 
     def get_absolute_url(self):
         return reverse("organization_settings", args=[self.pk])

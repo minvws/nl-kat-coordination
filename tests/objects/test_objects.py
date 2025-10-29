@@ -15,6 +15,7 @@ from objects.models import (
     Network,
     Protocol,
     Software,
+    XTDBOrganization,
     bulk_insert,
     to_xtdb_dict,
 )
@@ -23,7 +24,7 @@ from tasks.tasks import recalculate_scan_levels, sync_ns_scan_levels
 from tests.conftest import setup_request
 
 
-def test_query_hostname(xtdb):
+def test_query_hostname(xtdb, organization):
     network = Network.objects.create(name="internet")
     Hostname.objects.create(network=network, name="test.com")
     time.sleep(0.1)
@@ -32,6 +33,11 @@ def test_query_hostname(xtdb):
     assert networks.count() == 1
     networks = Network.objects.filter(hostname__name="none.com")
     assert networks.count() == 0
+
+    network.organizations.add(XTDBOrganization.objects.get(pk=organization.pk))
+    network.save()
+    assert Network.objects.filter(organizations__in=[]).count() == 0
+    assert Network.objects.filter(organizations__pk__in=[organization.pk]).count() == 1
 
 
 def test_recalculate_scan_levels_hostname_ip(xtdb, organization):
@@ -135,7 +141,7 @@ def test_findings(rf, superuser_member, xtdb):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     finding_type = FindingType.objects.create(code="KAT-TEST-LIST-VIEW", score=3.1)
-    Finding.objects.create(object_id=host.id, object_type="hostname", finding_type=finding_type)
+    Finding.objects.create(hostname=host, finding_type=finding_type)
 
     request = setup_request(rf.get("objects:finding_list"), superuser_member.user)
     response = FindingListView.as_view()(request)
@@ -243,8 +249,6 @@ def test_to_dict(xtdb):
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
     sw = Software.objects.create(name="openssh")
     port.software.add(sw)
-    # sw.ports.add(port)
-    # sw.save()
     port.save()
     assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id, "declared": False, "scan_level": None}
     assert to_xtdb_dict(host) == {
@@ -255,7 +259,7 @@ def test_to_dict(xtdb):
         "declared": False,
         "scan_level": None,
     }
-    assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "ports": [port.id], "version": None}
+    assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "version": None}
 
 
 def test_bulk_insert_hostnames(xtdb):
