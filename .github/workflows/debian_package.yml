@@ -7,6 +7,7 @@ on:
       - "release-*"
     tags:
       - "*"
+      - "!plugins-v*"
   pull_request:
 
 jobs:

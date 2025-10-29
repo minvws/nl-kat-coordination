@@ -8,6 +8,7 @@ on:
       - "v2"
     tags:
       - "*"
+      - "!plugins-v*"
   pull_request:
 
 jobs:
