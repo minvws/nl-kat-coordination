@@ -58,6 +58,7 @@
                                 <th>{% translate "Address" %}</th>
                                 <th>{% translate "Network" %}</th>
                                 <th>{% translate "Scan Level" %}</th>
+                                <th>{% translate "Scan type" %}</th>
                                 <th>{% translate "Last Seen" %}</th>
                                 <th></th>
                             </tr>
@@ -83,6 +84,17 @@
                                         {% if ipaddress.scan_level != None %}
                                             {% include "partials/scan_level_indicator.html" with value=ipaddress.scan_level %}
 
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ipaddress.declared != None %}
+                                            {% if ipaddress.declared %}
+                                                {% translate "Declared" %}
+                                            {% else %}
+                                                {% translate "Inherited" %}
+                                            {% endif %}
                                         {% else %}
                                             -
                                         {% endif %}
