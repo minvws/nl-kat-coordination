@@ -55,6 +55,7 @@ jobs:
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
+          platforms: linux/amd64,linux/arm64
           file: plugins/plugins/plugins.Dockerfile
           push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
