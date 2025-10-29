@@ -54,13 +54,29 @@ if TYPE_CHECKING:
 
 
 class ObjectScanLevelForm(forms.Form):
-    scan_level = forms.ChoiceField(
-        choices=[("", "-")] + list(ScanLevelEnum.choices),
-        required=False,
-        label=_("Scan Level"),
-        widget=forms.Select(attrs={"class": "scan-level-select"}),
+    declared = forms.CharField(
+        required=True,
+        label=_("Scan type"),
+        widget=forms.RadioSelect(
+            choices=[("inherited", "Inherited"), ("declared", "Declared")],
+            attrs={"class": "radio-choice", "data-choicegroup": "scan_type_selector"},
+        ),
+        initial="inherited",
     )
-    declared = forms.BooleanField(required=False, label=_("Declared"), widget=forms.CheckboxInput())
+
+    scan_level = forms.IntegerField(
+        required=False,
+        label=_("Clearance level"),
+        help_text=_(
+            "All the plugins with a scan level below or equal to the clearance level will "
+            "be allowed to scan this object."
+        ),
+        error_messages={"level": {"required": _("Please select a scan level to proceed.")}},
+        widget=forms.Select(
+            choices=ScanLevelEnum.choices,
+            attrs={"aria-describedby": _("explanation-scan-level"), "class": "scan_type_selector declared"},
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop("instance", None)
@@ -624,6 +640,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
         context["object_sets"] = ObjectSet.objects.filter(object_type=ContentType.objects.get_for_model(Hostname))
         context["scan_levels"] = ScanLevelEnum
         context["plugins"] = Plugin.objects.filter(consumes__contains=["Hostname"])
+        context["edit_scan_level_form"] = ObjectScanLevelForm
 
         return context
 
@@ -645,11 +662,12 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
-            scan_level = request.POST.get("scan-level")
-            if scan_level == "none":
+            scan_level = self.request.POST.get("scan_level")
+            scan_type = self.request.POST.get("declared")
+            if scan_type == "inherited":
                 updated_count = Hostname.objects.filter(pk__in=selected).update(scan_level=None, declared=False)
                 messages.success(request, _("Removed scan level for {} hostnames.").format(updated_count))
-            elif scan_level:
+            elif scan_type == "declared" and scan_level:
                 updated_count = Hostname.objects.filter(pk__in=selected).update(
                     scan_level=int(scan_level), declared=True
                 )

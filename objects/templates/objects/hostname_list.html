@@ -37,119 +37,120 @@
                 </form>
                 <a class="button plain" href="{% url "objects:hostname_list" %}"><span aria-hidden="true" class="icon ti-x"></span>{% translate "Clear all" %}</a>
             </div>
-            <div>
-                <form method="post"
-                      id="hostname_list_form"
-                      class="inline layout-wide checkboxes_required">
-                    {% csrf_token %}
-                </form>
-                <div class="horizontal-scroll sticky-column">
-                    <table class="nowrap">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <form>
-                                        <input class="toggle-all"
-                                               data-toggle-target="hostname"
-                                               type="checkbox"
-                                               id="hostname_list_form">
-                                    </form>
-                                </th>
-                                <th>{% translate "Hostname" %}</th>
-                                <th>{% translate "Network" %}</th>
-                                <th>{% translate "Scan Level" %}</th>
-                                <th>{% translate "Last Seen" %}</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for hostname in hostnames %}
-                                <tr>
-                                    <td>
-                                        <form>
-                                            <input type="checkbox"
-                                                   name="hostname"
-                                                   form="hostname_list_form"
-                                                   value="{{ hostname.pk }}">
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'objects:hostname_detail' hostname.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.name }}</a>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'objects:network_detail' hostname.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.network.name }}</a>
-                                    </td>
-                                    <td>
-                                        {% if hostname.scan_level != None %}
-                                            {% include "partials/scan_level_indicator.html" with value=hostname.scan_level %}
+            {% if hostnames %}
+                <div>
+                    <div class="horizontal-view toolbar">
+                        <form method="post"
+                              id="hostname_list_form"
+                              class="inline layout-wide checkboxes_required">
+                            {% csrf_token %}
+                        </form>
+                        {% include "objects/modals/delete_bulk_objects_modal.html" %}
+                        {% include "objects/modals/edit_scan_level_modal.html" %}
 
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if hostname.last_seen %}
-                                            {{ hostname.last_seen|date:"Y-m-d H:i" }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <form action="{% url 'objects:delete_hostname' hostname.pk %}"
-                                              method="post"
-                                              id="object-delete-{{ hostname.pk }}">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                    form="object-delete-{{ hostname.pk }}"
-                                                    class="icon ti-trash action-button">
-                                                {% translate "Delete" %}
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% if hostnames %}
-                    <form class="inline layout-wide">
-                        <fieldset form="hostname_list_form">
-                            <div class="horizontal-view">
-                                <select id="scan-level" name="scan-level" form="hostname_list_form">
-                                    <option value="">{% translate "Select scan level..." %}</option>
-                                    <option value="none">{% translate "Remove scan level" %}</option>
-                                    {% for level in scan_levels %}<option value="{{ level.value }}">{{ level.label }}</option>{% endfor %}
-                                </select>
-                                <button type="submit"
-                                        class="dropdown-button"
-                                        name="action"
-                                        value="set-scan-level"
-                                        form="hostname_list_form">{% translate "Set scan level" %}</button>
-                                <button type="submit"
-                                        class="ghost"
-                                        name="action"
-                                        value="create-object-set"
-                                        form="hostname_list_form">
-                                    <span class="icon ti-plus"></span>
-                                    {% translate "Create object set" %}
-                                </button>
-                                <button type="submit"
-                                        class="dropdown-button ghost destructive"
-                                        name="action"
-                                        value="delete"
-                                        form="hostname_list_form">{% translate "Delete" %}</button>
-                                <button type="submit"
-                                        class="dropdown-button"
-                                        name="action"
-                                        value="scan"
-                                        form="hostname_list_form">{% translate "Scan" %}</button>
+                        <div class="dropdown">
+                            <button aria-controls="action-dropdown"
+                                    aria-expanded="false"
+                                    class="dropdown-button ghost">
+                                {% translate "Actions" %}
+                                <span aria-hidden="true" class="icon ti-chevron-down"></span>
+                            </button>
+                            <div id="action-dropdown" class="dropdown-list left">
+                                <ul>
+                                    <li>
+                                        <button type="submit" name="action" value="scan" form="hostname_list_form">
+                                            <i class="icon ti-zoom-scan"></i>{% translate "Scan" %}
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="submit"
+                                                name="action"
+                                                value="create-object-set"
+                                                form="hostname_list_form">
+                                            <i class="icon ti-library-plus"></i>{% translate "Create object set" %}
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <a href="#edit-scan-level-modal"><i class="icon ti-paw"></i>{% translate "Set scan level" %}</a>
+                                    </li>
+                                    <li>
+                                        <a href="#delete-objects-modal" class="destructive"><i class="icon ti-trash"></i>{% translate "Delete" %}</a>
+                                    </li>
+                                </ul>
                             </div>
-                        </fieldset>
-                    </form>
-                {% endif %}
-            </div>
-            {% include "partials/list_paginator.html" %}
+                        </div>
+                    </div>
+                    <div class="horizontal-scroll sticky-column">
+                        <table class="nowrap">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <form>
+                                            <input class="toggle-all"
+                                                   data-toggle-target="hostname"
+                                                   type="checkbox"
+                                                   id="hostname_list_form">
+                                        </form>
+                                    </th>
+                                    <th>{% translate "Hostname" %}</th>
+                                    <th>{% translate "Network" %}</th>
+                                    <th>{% translate "Scan level" %}</th>
+                                    <th>{% translate "Scan type" %}</th>
+                                    <th>{% translate "Last seen" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hostname in hostnames %}
+                                    <tr>
+                                        <td>
+                                            <form>
+                                                <input type="checkbox"
+                                                       name="hostname"
+                                                       form="hostname_list_form"
+                                                       value="{{ hostname.pk }}">
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'objects:hostname_detail' hostname.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.name }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'objects:network_detail' hostname.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ hostname.network.name }}</a>
+                                        </td>
+                                        <td>
+                                            {% if hostname.scan_level != None %}
+                                                {% include "partials/scan_level_indicator.html" with value=hostname.scan_level %}
 
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hostname.scan_level != None %}
+                                                {% if hostname.declared %}
+                                                    {% translate "Declared" %}
+                                                {% else %}
+                                                    {% translate "Inherited" %}
+                                                {% endif %}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if hostname.last_seen %}
+                                                {{ hostname.last_seen|date:"Y-m-d H:i" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
         </section>
     </main>
 {% endblock content %}
@@ -157,4 +158,9 @@
     {{ block.super }}
     <script src="{% static "js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/choiceToggle.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "modal/script.js" %}"
+            nonce="{{ request.csp_nonce }}"
+            type="module"></script>
 {% endblock html_at_end_body %}

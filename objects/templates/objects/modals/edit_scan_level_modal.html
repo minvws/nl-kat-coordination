@@ -1,0 +1,58 @@
+{% load i18n %}
+{% load object_extra %}
+
+{% component "modal" modal_id="edit-scan-level-modal" size="dialog-medium" %}
+{% fill "header" %}
+{% translate "Edit clearance level settings" %}
+{% endfill %}
+{% fill "content" %}
+{% if type == "object_list" %}
+    <p>{% translate "You are editing the scan level of all the selected objects." %}</p>
+{% endif %}
+<div class="message">
+    <div class="explanation"
+         role="group"
+         aria-label="{% translate "explanation" %}">
+        <div>
+            <span>{% translate "Switching between declare and inherit" %}</span>
+            <p>
+                {% blocktranslate trimmed %}
+                    Clearance levels can be automatically inherited or you can manually
+                    declare the clearance level for an object. Switching to inherit
+                    clearance level will also recalculate the clearance levels of
+                    objects that inherit from these clearance levels.
+                {% endblocktranslate %}
+            </p>
+        </div>
+    </div>
+</div>
+<form class="help">
+    <fieldset>
+        {% for field in edit_scan_level_form %}
+            <fieldset>
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                    {% if field.field.required %}
+                        <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+                    {% endif %}
+                </label>
+                <div>
+                    {{ field|with_form_attr:"hostname_list_form" }}
+                    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                    {% include "partials/form/field_input_errors.html" %}
+
+                </div>
+            </fieldset>
+        {% endfor %}
+    </fieldset>
+</form>
+{% endfill %}
+{% fill "footer_buttons" %}
+<button type="submit"
+        name="action"
+        value="set-scan-level"
+        form="hostname_list_form">{% translate "Save changes" %}</button>
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

@@ -77,12 +77,16 @@
         padding: 0;
         width: 100%;
 
-        > a {
+        > a,
+        button {
           display: flex;
           flex-direction: row;
           align-items: center;
           justify-content: flex-start;
           gap: var(--spacing-grid-100);
+          background-color: transparent;
+          border: none;
+          font-weight: normal;
           color: var(--text-color-dark);
           margin: 0;
           min-height: 2.75rem;
@@ -97,6 +101,20 @@
 
             &::before {
               color: var(--text-color-dark);
+            }
+          }
+
+          &.destructive {
+            color: var(--color-alert-negative);
+
+            &:hover {
+              color: var(--color-alert-negative-darker);
+            }
+
+            .icon {
+              &::before {
+                color: var(--text-color-negative-darker);
+              }
             }
           }
 

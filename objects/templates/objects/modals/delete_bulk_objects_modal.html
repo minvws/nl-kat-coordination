@@ -1,0 +1,23 @@
+{% load i18n %}
+
+{% component "modal" modal_id="delete-objects-modal" size="dialog-small" %}
+{% fill "header" %}
+{% translate "Delete objects" %}
+{% endfill %}
+{% fill "content" %}
+<p>
+    {% blocktranslate trimmed %}
+        Are you sure you want to delete all the selected objects?
+    {% endblocktranslate %}
+</p>
+{% endfill %}
+{% fill "footer_buttons" %}
+<button type="submit"
+        class="destructive"
+        name="action"
+        value="delete"
+        form="hostname_list_form">{% translate "Delete" %}</button>
+<button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+{% endfill %}
+{% endcomponent %}
+{% component_css_dependencies %}

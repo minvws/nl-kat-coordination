@@ -69,3 +69,8 @@ def get_datetime(date_str: str) -> datetime:
 def get_first_seen(occurrences: dict) -> datetime:
     first_seen = min(occurrences, key=lambda occurrence: occurrence["first_seen"])["first_seen"]
     return datetime.fromisoformat(first_seen)
+
+
+@register.filter
+def with_form_attr(field, form_id):
+    return field.as_widget(attrs={"form": form_id})
