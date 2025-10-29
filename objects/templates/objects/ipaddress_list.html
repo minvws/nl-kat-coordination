@@ -41,12 +41,13 @@
                 <div>
                     <div class="horizontal-view toolbar">
                         <form method="post"
-                            id="ipaddress_list_form"
-                            class="inline checkboxes_required">
+                              id="ipaddress_list_form"
+                              class="inline checkboxes_required">
                             {% csrf_token %}
                         </form>
                         {% include "objects/modals/delete_bulk_objects_modal.html" with form="ipaddress_list_form" %}
                         {% include "objects/modals/edit_scan_level_modal.html" with form="ipaddress_list_form" type="object_list" %}
+
                         <div class="dropdown">
                             <button aria-controls="action-dropdown"
                                     aria-expanded="false"
@@ -86,9 +87,9 @@
                                     <th>
                                         <form>
                                             <input class="toggle-all"
-                                                data-toggle-target="ipaddress"
-                                                type="checkbox"
-                                                form="ipaddress_list_form">
+                                                   data-toggle-target="ipaddress"
+                                                   type="checkbox"
+                                                   form="ipaddress_list_form">
                                         </form>
                                     </th>
                                     <th>{% translate "Address" %}</th>
@@ -104,16 +105,16 @@
                                         <td>
                                             <form>
                                                 <input type="checkbox"
-                                                    name="ipaddress"
-                                                    form="ipaddress_list_form"
-                                                    value="{{ ipaddress.pk }}">
+                                                       name="ipaddress"
+                                                       form="ipaddress_list_form"
+                                                       value="{{ ipaddress.pk }}">
                                             </form>
                                         </td>
                                         <td>
                                             <a href="{% url 'objects:ipaddress_detail' ipaddress.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.address }}</a>
                                         </td>
                                         <td>
-                                            <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a>
+                                            {% comment %} <a href="{% url 'objects:network_detail' ipaddress.network.pk %}?{% for code in filtered_organization_codes %}organization={{ code }}&{% endfor %}">{{ ipaddress.network.name }}</a> {% endcomment %}
                                         </td>
                                         <td>
                                             {% if ipaddress.scan_level != None %}
@@ -148,8 +149,8 @@
                     </div>
                 </div>
                 {% include "partials/list_paginator.html" %}
-            {% endif %}
 
+            {% endif %}
         </section>
     </main>
 {% endblock content %}

@@ -38,7 +38,6 @@ from objects.views import (
     NetworkDeleteView,
     NetworkDetailView,
     NetworkListView,
-    NetworkScanLevelDetailView,
     NetworkScanLevelUpdateView,
 )
 from objects.viewsets import (
@@ -94,9 +93,6 @@ urlpatterns = [
     path("objects/network/", NetworkListView.as_view(), name="network_list"),
     path("objects/network/add/", NetworkCreateView.as_view(), name="add_network"),
     path("objects/network/<int:pk>/", NetworkDetailView.as_view(), name="network_detail"),
-    path(
-        "objects/network/<int:pk>/scan-level/", NetworkScanLevelDetailView.as_view(), name="network_scan_level_detail"
-    ),
     path("objects/network/<int:pk>/delete/", NetworkDeleteView.as_view(), name="delete_network"),
     path(
         "objects/network/<int:pk>/update-scan-level/",

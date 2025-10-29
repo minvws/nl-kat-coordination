@@ -26,32 +26,45 @@
         </div>
     </div>
 </div>
-<form class="help">
-    <fieldset>
-        {% for field in edit_scan_level_form %}
-            <fieldset>
-                <label for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                    {% if field.field.required %}
-                        <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
-                    {% endif %}
-                </label>
-                <div>
-                    {{ field|with_form_attr:form }}
-                    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
-                    {% include "partials/form/field_input_errors.html" %}
+{% if type == "object_list" %}
+    <form class="help">
+        <fieldset>
+            {% for field in scan_level_form %}
+                <fieldset>
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="nota-bene" aria-hidden>({% translate "Required" %})</span>
+                        {% endif %}
+                    </label>
+                    <div>
+                        {{ field|with_form_attr:form }}
+                        {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                        {% include "partials/form/field_input_errors.html" %}
 
-                </div>
-            </fieldset>
-        {% endfor %}
-    </fieldset>
-</form>
+                    </div>
+                </fieldset>
+            {% endfor %}
+        </fieldset>
+    </form>
+{% else %}
+    <form id="set_clearance_level"
+          action="{% url scan_level_url pk %}"
+          method="post"
+          class="help">
+        {% csrf_token %}
+        {% include "partials/form/fieldset.html" with fields=scan_level_form %}
+
+    </form>
+{% endif %}
 {% endfill %}
 {% fill "footer_buttons" %}
-<button type="submit"
-        name="action"
-        value="set-scan-level"
-        form={{ form }}>{% translate "Save changes" %}</button>
+{% if type == "object_list" %}
+    <button type="submit" name="action" value="set-scan-level" form={{ form }}>{% translate "Save changes" %}
+    </button>
+{% else %}
+    <button type="submit" form="set_clearance_level">{% translate "Save changes" %}</button>
+{% endif %}
 <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
 {% endfill %}
 {% endcomponent %}
