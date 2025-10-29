@@ -22,12 +22,16 @@ services:
       args:
         ENVIRONMENT: dev
       target: dev
-    command: sh -c "sleep 1 && pytest -n 0 tests/integration"
+    command: pytest -n 0 tests/integration
     depends_on:
-      - postgres
-      - redis
-      - xtdb
-      - openkat-test-api
+      postgres:
+        condition: service_started
+      xtdb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      openkat-test-api:
+        condition: service_started
     volumes:
       - ..:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
@@ -48,9 +52,12 @@ services:
       target: dev
     command: python3 manage.py runserver 0.0.0.0:8000
     depends_on:
-      - postgres
-      - redis
-      - xtdb
+      postgres:
+        condition: service_started
+      xtdb:
+        condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - ..:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
