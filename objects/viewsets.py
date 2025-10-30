@@ -96,7 +96,17 @@ class NetworkViewSet(ManyModelViewSet):
 
 class HostnameViewSet(ManyModelViewSet):
     serializer_class = HostnameSerializer
-    queryset = Hostname.objects.all()
+    queryset = Hostname.objects.prefetch_related(
+        "dnsarecord_set",
+        "dnsaaaarecord_set",
+        "dnscnamerecord_set",
+        "dnsmxrecord_set",
+        "dnsnsrecord_set",
+        "dnsptrrecord_set",
+        "dnscaarecord_set",
+        "dnstxtrecord_set",
+        "dnssrvrecord_set",
+    )
     filterset_fields = ("name",)
 
 

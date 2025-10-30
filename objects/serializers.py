@@ -1,5 +1,7 @@
+from typing import Any
+
 from rest_framework import serializers
-from rest_framework.fields import CharField
+from rest_framework.fields import CharField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField, SlugRelatedField
 
 from objects.models import (
@@ -77,6 +79,7 @@ class NetworkSerializer(serializers.ModelSerializer):
 class HostnameSerializer(serializers.ModelSerializer):
     network = CharField(write_only=True)
     network_id = PrimaryKeyRelatedField(source="network", read_only=True)
+    dns_records = SerializerMethodField(read_only=True)
 
     def create(self, validated_data):
         network_name = validated_data.pop("network")
@@ -87,6 +90,26 @@ class HostnameSerializer(serializers.ModelSerializer):
         net, created = Network.objects.get_or_create(name=network_name)
         hn, created = Hostname.objects.get_or_create(network=net, **validated_data)
         return hn
+
+    def get_dns_records(self, obj: Hostname) -> list[dict[str, Any]]:
+        dns = []
+
+        for field, serializer_class in [
+            (obj.dnsarecord_set, DNSARecordSerializer),
+            (obj.dnsaaaarecord_set, DNSAAAARecordSerializer),
+            (obj.dnscnamerecord_set, DNSCNAMERecordSerializer),
+            (obj.dnsmxrecord_set, DNSMXRecordSerializer),
+            (obj.dnstxtrecord_set, DNSTXTRecordSerializer),
+            (obj.dnsnsrecord_set, DNSNSRecordSerializer),
+            (obj.dnsptrrecord_set, DNSPTRRecordSerializer),
+            (obj.dnscaarecord_set, DNSCAARecordSerializer),
+            (obj.dnssrvrecord_set, DNSSRVRecordSerializer),
+        ]:
+            serializer = serializer_class(data=list(field.all()), many=True)
+            serializer.is_valid()
+            dns.extend(serializer.data)
+
+        return dns
 
     class Meta:
         model = Hostname

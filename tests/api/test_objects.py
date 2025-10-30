@@ -5,6 +5,7 @@ from objects.models import (
     DNSARecord,
     DNSCNAMERecord,
     DNSNSRecord,
+    DNSTXTRecord,
     Finding,
     FindingType,
     Hostname,
@@ -108,6 +109,7 @@ def test_hostname_api(drf_client, xtdb):
         {
             "id": hn.pk,
             "name": "test.com",
+            "dns_records": [],
             "network_id": network.pk,
             "root": True,
             "declared": False,
@@ -118,10 +120,12 @@ def test_hostname_api(drf_client, xtdb):
 
     hostname = {"network": "internet", "name": "test2.com"}
     hn2 = drf_client.post("/api/v1/objects/hostname/", json=hostname).json()
+    txt = DNSTXTRecord.objects.create(hostname=hn, value="v=spf1")
     assert drf_client.get("/api/v1/objects/hostname/?ordering=name").json()["results"] == [
         {
             "id": hn.pk,
             "name": "test.com",
+            "dns_records": [{"hostname": hn.pk, "id": txt.pk, "prefix": "", "ttl": None, "value": "v=spf1"}],
             "network_id": network.pk,
             "root": True,
             "declared": False,
@@ -131,6 +135,7 @@ def test_hostname_api(drf_client, xtdb):
         {
             "id": hn2["id"],
             "name": "test2.com",
+            "dns_records": [],
             "network_id": network.pk,
             "root": True,
             "declared": False,
