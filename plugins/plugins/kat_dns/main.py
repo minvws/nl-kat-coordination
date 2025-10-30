@@ -240,7 +240,6 @@ def main():
                 obj["name_server"] = by_name[obj["name_server"].lower()]
             if "target" in obj:
                 obj["target"] = by_name[obj["target"].lower()]
-
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]
 

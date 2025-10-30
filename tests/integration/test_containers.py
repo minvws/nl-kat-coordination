@@ -1,3 +1,5 @@
+from time import sleep
+
 import celery
 import celery.result
 import pytest
@@ -216,22 +218,28 @@ def test_process_raw_file_multiple_tasks():
     # Create input object and schedule
     Hostname.objects.get_or_create(
         name="nu.nl", network=Network.objects.get_or_create(name="internet")[0], scan_level=1
-    )[0]
+    )
 
-    schedules = plugin1.schedule()
-    schedules.extend(plugin2.schedule())
     tasks: list[Task] = []
-    for schedule in schedules:
+    plugin_2_schedules = plugin2.schedule()
+    plugin_1_schedules = plugin1.schedule()
+
+    for schedule in plugin_1_schedules:
         tasks.extend(schedule.run())
 
     group_result = celery.result.GroupResult("random-id", results=[task.async_result for task in tasks])
     group_result.join()
+    assert all(task.ended_at for task in Task.objects.all())
 
-    assert Schedule.objects.count() == 2
-    assert Task.objects.count() == len(tasks)
+    for schedule in plugin_1_schedules:
+        schedule.enabled = False  # Avoid running dns again on new hostnames
+        schedule.save()
 
-    tasks = list(Task.objects.all())
-    assert [task.ended_at for task in tasks] == sorted([task.ended_at for task in tasks])
+    while Task.objects.count() < 2:
+        sleep(1)
+
+    reverse_task = Task.objects.filter(schedule=plugin_2_schedules[0]).first()
+    reverse_task.async_result.get()
 
     files = {file.file.read().decode().strip()[::-1] for file in File.objects.filter(type="str-reverse")}
     objects = {obj.address for obj in IPAddress.objects.all()}
