@@ -111,11 +111,11 @@ class Schedule(models.Model):
     report_description = models.TextField(blank=True)
     report_finding_types = ArrayField(models.CharField(max_length=255), default=list, blank=True)
 
-    def run(self):
+    def run(self) -> list["Task"]:
         # Import here to prevent circular imports
         from tasks.tasks import run_schedule  # noqa: PLC0415
 
-        run_schedule(self)
+        return run_schedule(self)
 
 
 class Task(models.Model):

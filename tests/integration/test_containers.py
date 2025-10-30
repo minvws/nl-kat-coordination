@@ -1,5 +1,7 @@
 import time
 
+import celery
+import celery.result
 import pytest
 from django.core.files.base import ContentFile
 
@@ -236,18 +238,22 @@ def test_process_raw_file_multiple_tasks():
 
     schedules = plugin1.schedule()
     schedules.extend(plugin2.schedule())
-    print(schedules)
+    tasks: list[Task] = []
     for schedule in schedules:
-        schedule.run()
+        tasks.extend(schedule.run())
 
-    # Give the worker time to process tasks
-    time.sleep(8)
+    group_result = celery.result.GroupResult(
+        "random-id", results=[task.async_result for task in tasks]
+    )
+    group_result.join()
 
     assert Schedule.objects.count() == 2
-    assert Task.objects.count() == 2
+    assert Task.objects.count() == len(tasks)
 
-    tasks = Task.objects.all()
-    assert tasks[0].ended_at < tasks[1].ended_at
+    tasks = list(Task.objects.all())
+    assert [task.ended_at for task in tasks] == sorted(
+        [task.ended_at for task in tasks]
+    )
 
     files = set(
         (
