@@ -85,7 +85,7 @@ endif
 utest: testclean ## Run the unit tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_tests
 
-itest: testclean ## Run the integration tests.
+itest: testclean entrypoint ## Run the integration tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration
 
 bench:
