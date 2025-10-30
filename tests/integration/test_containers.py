@@ -215,7 +215,7 @@ def test_process_raw_file_multiple_tasks():
     plugin1 = Plugin.objects.create(
         name="DNS Plugin",
         plugin_id="kat_dns",
-        oci_image="openkat/plugins:latest",
+        oci_image="ghcr.io/minvws/openkat/plugins:branch-v2",
         oci_arguments=["uv", "run", "kat_dns/main.py", "{hostname}"],
         consumes=["type:Hostname"],
         scan_level=1,
