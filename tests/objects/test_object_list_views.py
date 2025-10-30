@@ -117,7 +117,12 @@ def test_ipaddress_set_scan_level_bulk_action(rf, superuser_member, xtdb):
     request = setup_request(
         rf.post(
             "objects:ipaddress_list",
-            data={"ipaddress": [str(ip1.pk), str(ip2.pk)], "action": "set-scan-level", "scan-level": "3"},
+            data={
+                "ipaddress": [str(ip1.pk), str(ip2.pk)],
+                "action": "set-scan-level",
+                "scan_level": "3",
+                "declared": "declared",
+            },
         ),
         superuser_member.user,
     )
