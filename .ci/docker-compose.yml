@@ -55,7 +55,7 @@ services:
       postgres:
         condition: service_started
       redis:
-          condition: service_started
+        condition: service_started
       xtdb:
         condition: service_healthy
       worker:
