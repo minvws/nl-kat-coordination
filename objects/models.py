@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
-from django.db.models import Case, CharField, ForeignKey, Manager, Model, OuterRef, Subquery, When
+from django.db.models import ForeignKey, Model
 from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
@@ -104,43 +104,6 @@ class Asset(XTDBModel):
     class Meta:
         managed = False
         abstract = True
-
-
-class ManagerWithGenericObjectForeignKey(Manager):
-    """Provides object_human_readable annotation for Finding model with hostname/address fields."""
-
-    def get_queryset(self):
-        hostname_ref = OuterRef("hostname_id")
-        address_ref = OuterRef("address_id")
-
-        return (
-            super()
-            .get_queryset()
-            .annotate(
-                object_human_readable=Case(
-                    When(
-                        hostname__isnull=False, then=Subquery(Hostname.objects.filter(pk=hostname_ref).values("name"))
-                    ),
-                    When(
-                        address__isnull=False, then=Subquery(IPAddress.objects.filter(pk=address_ref).values("address"))
-                    ),
-                    default=None,
-                    output_field=CharField(),
-                ),
-                object_type=Case(
-                    When(hostname__isnull=False, then=models.Value("hostname")),
-                    When(address__isnull=False, then=models.Value("ipaddress")),
-                    default=None,
-                    output_field=CharField(),
-                ),
-                object_id=Case(
-                    When(hostname__isnull=False, then=models.F("hostname_id")),
-                    When(address__isnull=False, then=models.F("address_id")),
-                    default=None,
-                    output_field=models.BigIntegerField(),
-                ),
-            )
-        )
 
 
 class Network(Asset):
@@ -279,7 +242,6 @@ class Finding(XTDBModel):
     organizations = models.ManyToManyField(
         XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
     )
-    objects = ManagerWithGenericObjectForeignKey()
 
 
 class FindingOrganization(XTDBModel):

@@ -206,7 +206,7 @@ class FindingFilter(django_filters.FilterSet):
         if not value:
             return queryset
 
-        return queryset.filter(object_human_readable__icontains=value)
+        return queryset.filter(Q(hostname__name__icontains=value) | Q(address__address__icontains=value))
 
 
 class FindingListView(OrganizationFilterMixin, FilterView):
