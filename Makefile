@@ -72,7 +72,7 @@ plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
 
 plugins:
-	docker build -f plugins/plugins/plugins.Dockerfile -t $(REGISTRY)/plugins:latest -t openkat/plugins .
+	docker build -f plugins/plugins/plugins.Dockerfile -t $(REGISTRY)/plugins:0.1.0 -t $(REGISTRY)/plugins:latest -t openkat/plugins .
 
 testclean:
 	docker compose -f .ci/docker-compose.yml down --timeout 0 --remove-orphans --volumes

@@ -7,7 +7,7 @@
     "consumes": [
       "type:hostname"
     ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
     "oci_arguments": [
       "xargs",
       "-I",
@@ -41,7 +41,7 @@
     "consumes": [
       "file:dns-sec"
     ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
     "oci_arguments": [
       "uv",
       "run",
@@ -102,7 +102,7 @@
       "file:nmap",
       "file:masscan"
     ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
     "oci_arguments": [
       "uv",
       "run",
@@ -170,7 +170,7 @@
     "consumes": [
       "file:subfinder"
     ],
-    "oci_image": "ghcr.io/minvws/openkat/plugins:latest",
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
     "oci_arguments": [
       "sh",
       "-c",
