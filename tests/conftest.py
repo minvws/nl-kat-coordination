@@ -178,9 +178,16 @@ def settings_test_setup(settings):
 
 
 @pytest.fixture(autouse=True)
-def cleanup_test_files(settings):
-    settings.MEDIA_ROOT = settings.MEDIA_ROOT / "test"
+def cleanup_test_files(request, settings):
+    xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
+
+    if xdist_suffix:
+        settings.MEDIA_ROOT = settings.MEDIA_ROOT / f"test{xdist_suffix}"
+    else:
+        settings.MEDIA_ROOT = settings.MEDIA_ROOT / "test"
+
     yield
+
     shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
 

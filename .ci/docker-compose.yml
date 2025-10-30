@@ -101,7 +101,7 @@ services:
     env_file:
       - .env.test
     ports:
-      - "6379:6379"
+      - "6378:6379"
 
   worker:
     <<: *openkat
