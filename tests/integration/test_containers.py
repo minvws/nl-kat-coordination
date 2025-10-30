@@ -1,18 +1,24 @@
+import time
+
 import pytest
 from django.core.files.base import ContentFile
 
 from files.models import File
+from objects.models import Hostname, Network, IPAddress
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
-from tasks.models import Schedule
+from tasks.models import Schedule, Task
 from tasks.tasks import process_raw_file
 
 
 @pytest.mark.django_db(transaction=True)
 def test_hello_world():
     plugin = Plugin.objects.create(
-        name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
+        name="testing plugins",
+        plugin_id="test",
+        oci_image="hello-world:linux",
+        oci_arguments=["/hello"],
     )
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -33,7 +39,10 @@ def test_hello_world():
 @pytest.mark.django_db(transaction=True)
 def test_input_output():
     plugin = Plugin.objects.create(
-        name="Test Plugin", plugin_id="cat-plugin", oci_image="alpine:latest", oci_arguments=["/bin/cat"]
+        name="Test Plugin",
+        plugin_id="cat-plugin",
+        oci_image="alpine:latest",
+        oci_arguments=["/bin/cat"],
     )
 
     output = PluginRunner().run(plugin.plugin_id, "hello world^C", output="-")
@@ -68,7 +77,11 @@ def test_with_multiple_file_inputs():
         name="Cat Two Files",
         plugin_id="cat-two-files",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", "{file/" + str(f1.pk) + "}", "{file/" + str(f2.pk) + "}"],
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
     )
 
     output = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -84,7 +97,11 @@ def test_with_multiple_file_inputs_file_output():
         name="Cat Two Files (file output)",
         plugin_id="cat-two-files-file-out",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", "{file/" + str(f1.pk) + "}", "{file/" + str(f2.pk) + "}"],
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
     )
 
     result = PluginRunner().run(plugin.plugin_id, None)
@@ -188,6 +205,69 @@ def test_process_raw_file_single_task():
     assert len(tasks) == 1
     assert tasks[0].data["plugin_id"] == plugin.plugin_id
     assert tasks[0].organization == organization
+
+
+@pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
+def test_process_raw_file_multiple_tasks():
+    # Two plugins that consume the same file type
+    plugin1 = Plugin.objects.create(
+        name="DNS Plugin",
+        plugin_id="kat_dns",
+        oci_image="openkat/plugins:latest",
+        oci_arguments=["uv", "run", "kat_dns/main.py", "{hostname}"],
+        consumes=["type:Hostname"],
+        scan_level=1,
+    )
+    plugin2 = Plugin.objects.create(
+        name="Reverse Plugin",
+        plugin_id="str-reverse",
+        oci_image="alpine:latest",
+        oci_arguments=["/bin/sh", "-c", "echo {ipaddress} | rev"],
+        consumes=["type:IPAddress"],
+        scan_level=1,
+    )
+
+    # Create input object and schedule
+    Hostname.objects.get_or_create(
+        name="nu.nl",
+        network=Network.objects.get_or_create(name="internet")[0],
+        scan_level=1,
+    )[0]
+
+    schedules = plugin1.schedule()
+    schedules.extend(plugin2.schedule())
+    print(schedules)
+    for schedule in schedules:
+        schedule.run()
+
+    # Give the worker time to process tasks
+    time.sleep(8)
+
+    assert Schedule.objects.count() == 2
+    assert Task.objects.count() == 2
+
+    tasks = Task.objects.all()
+    assert tasks[0].ended_at < tasks[1].ended_at
+
+    files = set(
+        (
+            file.file.read().decode().strip()[::-1]
+            for file in File.objects.filter(type="str-reverse")
+        )
+    )
+    objects = set((obj.address for obj in IPAddress.objects.all()))
+
+    assert files == objects
+
+
+# oci_image = openkat/plugins:latest
+# arguments = uv run dns/main.py {hostname} ...
+# create hostname with L2
+# create schedule for plugin (or plugin.schedule() of plugin.schedule_for(organization))
+# wait
+# recalculate scan profiles
+# wait
+# plugin that eats ipaddress
 
 
 # test with file input ("{file"})
