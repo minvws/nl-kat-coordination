@@ -12,7 +12,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  unit-tests:
     permissions:
       contents: read
     strategy:
@@ -28,6 +28,20 @@ jobs:
 
       - name: Run the unit tests
         run: make utest
+
+  integration-tests:
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["3.12", "3.13"]
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Run integration tests
         run: make itest

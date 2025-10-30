@@ -22,7 +22,7 @@ services:
       args:
         ENVIRONMENT: dev
       target: dev
-    command: pytest -n 0 tests/integration
+    command: sh -c "sleep 1 && pytest -n 0 tests/integration"
     depends_on:
       postgres:
         condition: service_started
