@@ -75,7 +75,7 @@ relative_files = true
 omit = ["tests/*"]
 
 [tool.pytest.ini_options]
-addopts = "--benchmark-skip --benchmark-max-time=0.5 --benchmark-columns='min, max, mean, rounds' --benchmark-min-rounds=1 --durations=10 -n auto --ignore=tests/integration"
+addopts = "--benchmark-skip --benchmark-max-time=0.5 --benchmark-columns='min, max, mean, rounds' --benchmark-min-rounds=1 --durations=10 -n auto --reuse-db --ignore=tests/integration"
 DJANGO_SETTINGS_MODULE = "openkat.settings"
 env = [
   "D:OPENKAT_DB_HOST=localhost",

@@ -164,6 +164,20 @@ def seed_groups(db):
 
 
 @pytest.fixture(autouse=True)
+def settings_test_setup(settings):
+    settings.MIDDLEWARE = [
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.locale.LocaleMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "openkat.middleware.auth_required.AuthRequiredMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "openkat.middleware.onboarding.OnboardingMiddleware",
+        "csp.middleware.CSPMiddleware",
+    ]
+    settings.PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
+
+
+@pytest.fixture(autouse=True)
 def cleanup_test_files(settings):
     settings.MEDIA_ROOT = settings.MEDIA_ROOT / "test"
     yield

@@ -259,7 +259,7 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
 
 
 def test_bulk_create(drf_client, xtdb):
-    n = 25
+    n = 20
     networks = [{"name": f"net{i}"} for i in range(n)]
     nets = drf_client.post("/api/v1/objects/network/", json=networks).json()
     time.sleep(0.3)

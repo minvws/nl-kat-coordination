@@ -264,6 +264,7 @@ except ImproperlyConfigured:
         "PASSWORD": env("OPENKAT_DB_PASSWORD", default=None),
         "HOST": env("OPENKAT_DB_HOST", default=None),
         "PORT": env.int("OPENKAT_DB_PORT", default=5432),
+        "TEST": {"MIGRATE": False},
     }
 
 XTDB_DB = {
