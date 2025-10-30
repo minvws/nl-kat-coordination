@@ -374,7 +374,8 @@ def xtdb(request: pytest.FixtureRequest, mocker):
     objects = apps.get_app_config("objects")
     object_models = list(objects.get_models())
     con = connections["xtdb"]
-    con.connect()
+    con.ensure_connection()
+    con.close = lambda: None  # Keep the connection alive to avoid the overhead
 
     xdist_suffix = getattr(request.config, "workerinput", {}).get("workerid")
 
@@ -398,8 +399,6 @@ def xtdb(request: pytest.FixtureRequest, mocker):
 
     with mocker.patch("openkat.signals.schedule_business_rule_recalculations"):  # disable this signal
         yield
-
-    con.ops.execute_sql_flush(erase)
 
 
 def _set_suffix_to_test_databases_except_xtdb(suffix: str) -> None:

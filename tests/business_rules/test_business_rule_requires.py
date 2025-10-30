@@ -143,7 +143,7 @@ def test_business_rule_requires_filters_objects_no_tasks(xtdb):
     findings = Finding.objects.filter(finding_type__code="KAT-TEST-REQUIRES")
     assert findings.count() == 2
 
-    finding_object_ids = {f.object_id for f in findings}
+    finding_object_ids = {f.hostname_id for f in findings}
     assert hn1.pk in finding_object_ids
     assert hn2.pk in finding_object_ids
     assert hn3.pk not in finding_object_ids
@@ -174,7 +174,7 @@ def test_business_rule_requires_multiple_plugins(xtdb):
     run_rules([rule])
     findings = Finding.objects.filter(finding_type__code="KAT-TEST-MULTI-REQUIRES")
     assert findings.count() == 1
-    assert findings.first().object_id == hn1.pk
+    assert findings.first().hostname_id == hn1.pk
 
 
 def test_business_rule_no_requires_creates_all_findings(xtdb):
@@ -189,7 +189,7 @@ def test_business_rule_no_requires_creates_all_findings(xtdb):
     run_rules([rule])
     findings = Finding.objects.filter(finding_type__code="KAT-NO")
     assert findings.count() == 2
-    assert {f.object_id for f in findings} == {hn1.pk, hn2.pk}
+    assert {f.hostname_id for f in findings} == {hn1.pk, hn2.pk}
 
 
 def test_business_rule_requires_with_ip_addresses(xtdb):
@@ -208,4 +208,4 @@ def test_business_rule_requires_with_ip_addresses(xtdb):
     run_rules([rule])
     findings = Finding.objects.filter(finding_type__code="KAT-TEST-IP")
     assert findings.count() == 1
-    assert findings.first().object_id == ip1.pk
+    assert findings.first().address_id == ip1.pk

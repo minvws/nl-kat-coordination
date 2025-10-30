@@ -1,4 +1,3 @@
-import time
 from collections import defaultdict
 
 from objects.models import (
@@ -262,16 +261,14 @@ def test_bulk_create(drf_client, xtdb):
     n = 20
     networks = [{"name": f"net{i}"} for i in range(n)]
     nets = drf_client.post("/api/v1/objects/network/", json=networks).json()
-    time.sleep(0.3)
     assert drf_client.get("/api/v1/objects/network/").json()["count"] == n
 
     hostnames = [{"name": f"host{i}.com", "network": nets[i % 10]["name"]} for i in range(2 * n)]
     drf_client.post("/api/v1/objects/hostname/", json=hostnames).json()
-    time.sleep(0.3)
     assert drf_client.get("/api/v1/objects/hostname/").json()["count"] == 2 * n
 
 
-def test_dns_records_are_not_duplicated(drf_client, xtdb):
+def test_dns_records_are_not_duplicated(drf_client, xtdb, settings):
     results_grouped = defaultdict(list)
     results = [
         {"object_type": "ipaddress", "network": "internet", "address": "127.0.0.1"},
@@ -308,7 +305,6 @@ def test_dns_records_are_not_duplicated(drf_client, xtdb):
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
     drf_client.post("/api/v1/objects/", json=results_grouped)
-    time.sleep(0.1)
 
     assert IPAddress.objects.count() == 1
     assert Hostname.objects.count() == 4
@@ -319,7 +315,6 @@ def test_dns_records_are_not_duplicated(drf_client, xtdb):
 
     drf_client.post("/api/v1/objects/", json=hostnames_and_ips).json()
     drf_client.post("/api/v1/objects/", json=results_grouped)
-    time.sleep(0.1)
 
     assert IPAddress.objects.count() == 1
     assert Hostname.objects.count() == 4
