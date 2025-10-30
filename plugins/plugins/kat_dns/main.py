@@ -209,10 +209,8 @@ def main():
 
     record_types = DEFAULT_RECORD_TYPES if not args.record_types else get_record_types(args.record_types)
 
-    results = generic_records(args.hostname, record_types)
-
-    if args.mail_server:
-        results.extend(mail_records(args.hostname.rstrip(".")))
+    results = generic_records(args.hostname.rstrip("."), record_types)
+    results.extend(mail_records(args.hostname.rstrip(".")))
 
     if not results:
         return
@@ -246,8 +244,7 @@ def main():
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
-    client.post("/objects/", headers=headers, json=results_grouped)
-
+    client.post("/objects/", headers=headers, json=results_grouped).raise_for_status()
     print(json.dumps(results))  # noqa: T201
 
 
