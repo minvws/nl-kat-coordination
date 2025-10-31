@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-28 19:39+0000\n"
+"POT-Creation-Date: 2025-10-31 09:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,8 @@ msgstr ""
 
 #: components/modal/template.html
 #: objects/templates/objects/generic_asset_csv_upload.html
+#: objects/templates/objects/modals/delete_bulk_objects_modal.html
+#: objects/templates/objects/modals/edit_scan_level_modal.html
 #: plugins/templates/plugin_introduction.html
 #: plugins/templates/plugin_table.html
 #: reports/templates/reports/report_form.html tasks/templates/task.html
@@ -117,7 +119,9 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: files/templates/file_list.html plugins/templates/plugin_table.html
+#: files/templates/file_list.html objects/templates/objects/hostname_list.html
+#: objects/templates/objects/ipaddress_list.html
+#: plugins/templates/plugin_table.html
 #: openkat/templates/organizations/organization_settings.html
 msgid "Actions"
 msgstr ""
@@ -279,18 +283,20 @@ msgstr ""
 
 #: objects/templates/objects/finding_list.html
 #: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_detail.html
 msgid "Last seen"
 msgstr ""
 
 #: objects/templates/objects/finding_list.html
-#: objects/templates/objects/hostname_detail.html
 #: objects/templates/objects/hostname_detail_introduction.html
 #: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
 #: objects/templates/objects/ipaddress_detail_introduction.html
 #: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/modals/delete_bulk_objects_modal.html
 #: objects/templates/objects/network_detail_introduction.html
 #: objects/templates/objects/network_list.html
 #: plugins/templates/plugins/business_rule_detail.html
@@ -481,37 +487,52 @@ msgstr ""
 #: objects/templates/objects/ipaddress_detail.html
 #: objects/templates/objects/ipaddress_detail_introduction.html
 #: objects/templates/objects/network_detail.html
-#: objects/templates/objects/network_detail_introduction.html
 #: plugins/templates/plugins/business_rule_detail.html
 msgid "Details"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
 #: objects/templates/objects/hostname_detail_introduction.html
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
 #: objects/templates/objects/ipaddress_detail_introduction.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_detail.html
-#: objects/templates/objects/network_detail_introduction.html
 #: plugins/templates/plugin_introduction.html
 #: plugins/templates/plugin_table.html plugins/templates/plugin_variants.html
 msgid "Scan level"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_detail.html
+#: objects/templates/objects/network_list.html objects/views.py
 msgid "Scan type"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/network_detail.html objects/views.py
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+#: objects/templates/objects/ipaddress_list.html
+#: objects/templates/objects/network_detail.html
+#: objects/templates/objects/network_list.html
 msgid "Declared"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_detail.html
+#: objects/templates/objects/network_list.html
 msgid "Inherited"
 msgstr ""
 
@@ -529,9 +550,7 @@ msgid "Content"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
-#: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_detail.html
-#: objects/templates/objects/ipaddress_list.html
 #: objects/templates/objects/network_list.html
 msgid "Last Seen"
 msgstr ""
@@ -598,7 +617,6 @@ msgstr ""
 
 #: objects/templates/objects/hostname_detail_introduction.html
 #: objects/templates/objects/ipaddress_detail_introduction.html
-#: objects/templates/objects/network_detail_introduction.html
 #: plugins/templates/plugin_tabs.html
 msgid "List of views for plugin detail page"
 msgstr ""
@@ -612,14 +630,39 @@ msgstr ""
 
 #: objects/templates/objects/hostname_detail_scan_level.html
 #: objects/templates/objects/ipaddress_detail_scan_level.html
-#: objects/templates/objects/network_detail_scan_level.html
+msgid ""
+"The scan level determines the level of plugin scans allowed on this object. "
+"An object inherits its scan level from neighbouring objects. This means that "
+"the scan level might stay the same, increase or decrease, depending on other "
+"declared scan levels."
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
 msgid "Edit scan level"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail_scan_level.html
 #: objects/templates/objects/ipaddress_detail_scan_level.html
-#: objects/templates/objects/network_detail_scan_level.html
-msgid "Update"
+msgid "Empty clearance level explanation"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+msgid "Empty:"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+msgid ""
+"This object has a scan level of \"None\". This means that this object has no "
+"scan level yet. If you have just changed the scan type to \"Inherited\", it "
+"may take a moment before OpenKAT sets the inherited scan level."
+msgstr ""
+
+#: objects/templates/objects/hostname_detail_scan_level.html
+#: objects/templates/objects/ipaddress_detail_scan_level.html
+msgid "Current scan level"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail_tasks.html
@@ -629,23 +672,7 @@ msgstr ""
 
 #: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_list.html
-#: objects/templates/objects/network_list.html objects/views.py
-msgid "Scan Level"
-msgstr ""
-
-#: objects/templates/objects/hostname_list.html
-#: objects/templates/objects/ipaddress_list.html
-msgid "Select scan level..."
-msgstr ""
-
-#: objects/templates/objects/hostname_list.html
-#: objects/templates/objects/ipaddress_list.html
-msgid "Remove scan level"
-msgstr ""
-
-#: objects/templates/objects/hostname_list.html
-#: objects/templates/objects/ipaddress_list.html
-msgid "Set scan level"
+msgid "Scan"
 msgstr ""
 
 #: objects/templates/objects/hostname_list.html
@@ -655,7 +682,7 @@ msgstr ""
 
 #: objects/templates/objects/hostname_list.html
 #: objects/templates/objects/ipaddress_list.html
-msgid "Scan"
+msgid "Set scan level"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_create.html
@@ -769,8 +796,61 @@ msgid ""
 "This tab shows plugin tasks that have this IP address in their input data."
 msgstr ""
 
+#: objects/templates/objects/modals/delete_bulk_objects_modal.html
+msgid "Delete objects"
+msgstr ""
+
+#: objects/templates/objects/modals/delete_bulk_objects_modal.html
+msgid "Are you sure you want to delete all the selected objects?"
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+msgid "Edit clearance level settings"
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+msgid "You are editing the scan level of all the selected objects."
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+#: openkat/templates/partials/form/field_input_help_text.html
+#: openkat/templates/partials/notifications_block.html
+#: openkat/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+msgid "Switching between declare and inherit"
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+msgid ""
+"Clearance levels can be automatically inherited or you can manually declare "
+"the clearance level for an object. Switching to inherit clearance level will "
+"also recalculate the clearance levels of objects that inherit from these "
+"clearance levels."
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+#: openkat/templates/forms/widgets/checkbox_group_table.html
+#: openkat/templates/partials/form/field_input.html
+#: openkat/templates/partials/form/field_input_checkbox.html
+#: openkat/templates/partials/form/field_input_multiselect.html
+#: openkat/templates/partials/form/field_input_radio.html
+msgid "Required"
+msgstr ""
+
+#: objects/templates/objects/modals/edit_scan_level_modal.html
+#: plugins/templates/plugin_settings.html
+msgid "Save changes"
+msgstr ""
+
 #: objects/templates/objects/network_detail_introduction.html
 msgid "Network:"
+msgstr ""
+
+#: objects/templates/objects/network_list.html
+msgid "Scan Level"
 msgstr ""
 
 #: objects/templates/objects/object_list_introduction.html
@@ -802,6 +882,24 @@ msgstr ""
 #: objects/templates/objects/object_list_tabs.html
 #: tasks/templates/object_set_list.html
 msgid "Object sets"
+msgstr ""
+
+#: objects/views.py onboarding/forms.py
+msgid "Clearance level"
+msgstr ""
+
+#: objects/views.py
+msgid ""
+"All the plugins with a scan level below or equal to the clearance level will "
+"be allowed to scan this object."
+msgstr ""
+
+#: objects/views.py
+msgid "Please select a scan level to proceed."
+msgstr ""
+
+#: objects/views.py
+msgid "explanation-scan-level"
 msgstr ""
 
 #: objects/views.py
@@ -947,10 +1045,6 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "Organization with code '{code}' not found. Skipping scan level for this row."
-msgstr ""
-
-#: onboarding/forms.py
-msgid "Clearance level"
 msgstr ""
 
 #: onboarding/forms.py
@@ -1690,10 +1784,6 @@ msgstr ""
 #: plugins/templates/plugin_settings.html
 #: plugins/templates/plugin_variants.html
 msgid "Delete plugin"
-msgstr ""
-
-#: plugins/templates/plugin_settings.html
-msgid "Save changes"
 msgstr ""
 
 #: plugins/templates/plugin_settings.html
@@ -3011,14 +3101,6 @@ msgstr ""
 msgid "Object list"
 msgstr ""
 
-#: openkat/templates/forms/widgets/checkbox_group_table.html
-#: openkat/templates/partials/form/field_input.html
-#: openkat/templates/partials/form/field_input_checkbox.html
-#: openkat/templates/partials/form/field_input_multiselect.html
-#: openkat/templates/partials/form/field_input_radio.html
-msgid "Required"
-msgstr ""
-
 #: openkat/templates/header.html
 msgid "Menu"
 msgstr ""
@@ -3339,12 +3421,6 @@ msgstr ""
 
 #: openkat/templates/partials/form/field_input_help_text.html
 msgid "Close explanation"
-msgstr ""
-
-#: openkat/templates/partials/form/field_input_help_text.html
-#: openkat/templates/partials/notifications_block.html
-#: openkat/templates/two_factor/core/login.html
-msgid "explanation"
 msgstr ""
 
 #: openkat/templates/partials/form/field_input_help_text.html
