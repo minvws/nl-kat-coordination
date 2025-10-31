@@ -27,21 +27,11 @@ jobs:
       - name: Install GNU gettext utilities
         run: sudo apt-get install -y --no-install-recommends gettext=0.23.1-2
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-        with:
-          version: "0.7.20"
-
       - name: Install requirements and activate it
-        run: uv sync
+        run: make .env && docker compose build openkat
 
       - name: Generate the .pot file if source strings changed
-        run: uv run make lang
-        env:
-          SECRET_KEY: none
-          REDIS_QUEUE_URI: redis://localhost/fake
-          REDIS_PASSWORD: fake
-          REDIS_HOST: redis://localhost/fake
+        run: docker compose run openkat make lang
 
       - name: Check if at least one source string changed
         run: |
