@@ -37,4 +37,8 @@ jobs:
             echo "More than just POT-Creation-Date changed in django.pot"
             git diff --unified=0 openkat/locale/django.pot
             exit 1
+          else
+            echo "No changes in django.pot"
+            git diff --unified=0 openkat/locale/django.pot
+            exit 0
           fi
