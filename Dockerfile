@@ -31,7 +31,7 @@ WORKDIR /app/openkat
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends gettext netcat-openbsd \
+  && apt-get install -y --no-install-recommends gettext=0.23.1-2 netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev dependencies

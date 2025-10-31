@@ -94,7 +94,7 @@ bench:
 languages:
 # Extracts strings to `.pot` file which should be translated
 # Note that the creation of `.po` files is delegated to another tool (Weblate)
-	python manage.py makemessages -i "venv/*" -i "build/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
+	python manage.py makemessages -i "venv/*" -i "build/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot --no-obsolete
 
 lang: languages
 
