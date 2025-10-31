@@ -24,9 +24,6 @@ jobs:
         with:
           python-version: 3.13
 
-      - name: Install GNU gettext utilities
-        run: sudo apt-get install -y --no-install-recommends gettext=0.23.1-2
-
       - name: Install requirements and activate it
         run: make .env && docker compose build openkat
 
