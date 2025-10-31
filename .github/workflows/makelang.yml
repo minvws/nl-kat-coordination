@@ -24,11 +24,11 @@ jobs:
         with:
           python-version: 3.13
 
-      - name: Install requirements and activate it
+      - name: Build the openkat container
         run: make .env && docker compose build openkat
 
       - name: Generate the .pot file if source strings changed
-        run: docker compose run openkat make lang
+        run: docker compose run --rm --no-deps openkat make lang
 
       - name: Check if at least one source string changed
         run: |
