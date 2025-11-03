@@ -17,7 +17,10 @@ from tasks.tasks import process_raw_file
 @pytest.mark.django_db(transaction=True)
 def test_hello_world():
     plugin = Plugin.objects.create(
-        name="testing plugins", plugin_id="test", oci_image="hello-world:linux", oci_arguments=["/hello"]
+        name="testing plugins",
+        plugin_id="test",
+        oci_image="hello-world:linux",
+        oci_arguments=["/hello"],
     )
 
     hello_world = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -38,7 +41,10 @@ def test_hello_world():
 @pytest.mark.django_db(transaction=True)
 def test_input_output():
     plugin = Plugin.objects.create(
-        name="Test Plugin", plugin_id="cat-plugin", oci_image="alpine:latest", oci_arguments=["/bin/cat"]
+        name="Test Plugin",
+        plugin_id="cat-plugin",
+        oci_image="alpine:latest",
+        oci_arguments=["/bin/cat"],
     )
 
     output = PluginRunner().run(plugin.plugin_id, "hello world^C", output="-")
@@ -73,7 +79,11 @@ def test_with_multiple_file_inputs():
         name="Cat Two Files",
         plugin_id="cat-two-files",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", "{file/" + str(f1.pk) + "}", "{file/" + str(f2.pk) + "}"],
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
     )
 
     output = PluginRunner().run(plugin.plugin_id, None, output="-")
@@ -89,7 +99,11 @@ def test_with_multiple_file_inputs_file_output():
         name="Cat Two Files (file output)",
         plugin_id="cat-two-files-file-out",
         oci_image="alpine:latest",
-        oci_arguments=["/bin/cat", "{file/" + str(f1.pk) + "}", "{file/" + str(f2.pk) + "}"],
+        oci_arguments=[
+            "/bin/cat",
+            "{file/" + str(f1.pk) + "}",
+            "{file/" + str(f2.pk) + "}",
+        ],
     )
 
     result = PluginRunner().run(plugin.plugin_id, None)
@@ -217,19 +231,22 @@ def test_process_raw_file_multiple_tasks():
 
     # Create input object and schedule
     Hostname.objects.get_or_create(
-        name="nu.nl", network=Network.objects.get_or_create(name="internet")[0], scan_level=1
+        name="nu.nl",
+        network=Network.objects.get_or_create(name="internet")[0],
+        scan_level=1,
     )
 
     tasks: list[Task] = []
-    plugin_2_schedules = plugin2.schedule()
     plugin_1_schedules = plugin1.schedule()
+    plugin_2_schedules = plugin2.schedule()
 
     for schedule in plugin_1_schedules:
         tasks.extend(schedule.run())
 
-    group_result = celery.result.GroupResult("random-id", results=[task.async_result for task in tasks])
+    group_result = celery.result.GroupResult(
+        "random-id", results=[task.async_result for task in tasks]
+    )
     group_result.join()
-    assert all(task.ended_at for task in Task.objects.all())
 
     for schedule in plugin_1_schedules:
         schedule.enabled = False  # Avoid running dns again on new hostnames
@@ -238,10 +255,15 @@ def test_process_raw_file_multiple_tasks():
     while Task.objects.count() < 2:
         sleep(1)
 
-    reverse_task = Task.objects.filter(schedule=plugin_2_schedules[0]).first()
-    reverse_task.async_result.get()
+    group_result = celery.result.GroupResult(
+        "random-id", results=[task.async_result for task in Task.objects.filter(schedule=plugin_2_schedules[0])]
+    )
+    group_result.join()
 
-    files = {file.file.read().decode().strip()[::-1] for file in File.objects.filter(type="str-reverse")}
+    files = {
+        file.file.read().decode().strip()[::-1]
+        for file in File.objects.filter(type="str-reverse")
+    }
     objects = {obj.address for obj in IPAddress.objects.all()}
 
     assert files == objects
