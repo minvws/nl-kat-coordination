@@ -42,8 +42,8 @@ class Command(BaseCommand):
         self.seed_objects()
         self.seed_finding_types()
         self.sync_orgs()
-        self.seed_business_rules()
         sync()
+        self.seed_business_rules()
 
     def seed_objects(self):
         Network.objects.get_or_create(name="internet", declared=True)
