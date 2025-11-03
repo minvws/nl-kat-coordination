@@ -1,5 +1,5 @@
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from enum import Enum
 from functools import total_ordering
 from typing import Any, ClassVar, cast
@@ -28,9 +28,13 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
     return CaseInsensitiveMapping({model.__name__: model for model in apps.get_app_config("objects").get_models()})
 
 
-def to_xtdb_dict(model: Model) -> dict:
+def to_xtdb_dict(model: "XTDBModel") -> dict:
     mod = model_to_dict(model, exclude=["id"] + [field.name for field in model._meta.many_to_many])
-    mod["_id"] = model.pk
+
+    if hasattr(model, "natural_key"):
+        mod["_id"] = model.natural_key
+    else:
+        mod["_id"] = model.pk
 
     if "_valid_from" in mod:
         del mod["_valid_from"]
@@ -55,6 +59,23 @@ class ScanLevelEnum(models.IntegerChoices):
 MAX_SCAN_LEVEL = max(scan_level.value for scan_level in cast("type[Enum]", ScanLevelEnum))
 
 
+class XTDBQuerySet(models.QuerySet):
+    def bulk_create(
+        self,
+        objs: Sequence[models.Model],
+        batch_size: int | None = None,
+        ignore_conflicts: bool = False,
+        update_conflicts: bool = False,
+        update_fields: Collection[str] | None = None,
+        unique_fields: Collection[str] | None = None,
+    ) -> list[models.Model]:
+        o = []
+        for obj in objs:
+            o.append(obj.save(force_insert=True))  # Because the pks are set, django would resolve to updates
+
+        return o
+
+
 class XTDBModel(models.Model):
     # This seems to be the only way to avoid Django trying to set the field in any instance, while still being able to
     # query the field.
@@ -65,6 +86,8 @@ class XTDBModel(models.Model):
     class Meta:
         managed = False
         abstract = True
+
+    objects = XTDBQuerySet.as_manager()
 
     @property
     def last_seen(self):
@@ -118,9 +141,12 @@ class XTDBNaturalKeyModel(XTDBModel):
             if part is None:
                 part = ""
 
+            if isinstance(part, Model):
+                part = part.pk
+
             parts.append(str(part))
 
-        return "|".join(parts)
+        return "|".join(parts).strip("|")
 
     def save(self, **kwargs: Any) -> None:
         # TODO: Make sure this also is implemented in all the necessary model methods and manager methods
@@ -157,9 +183,11 @@ class Network(Asset):
         return self.name
 
 
-class NetworkOrganization(XTDBModel):
+class NetworkOrganization(XTDBNaturalKeyModel):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
+
+    _natural_key_attrs = ["network", "organization"]
 
 
 class IPAddress(XTDBNaturalKeyModel, Asset):  # type: ignore[misc]
@@ -292,9 +320,11 @@ class Finding(XTDBNaturalKeyModel):
     _optional_key_attrs = ["hostname", "address"]
 
 
-class FindingOrganization(XTDBModel):
+class FindingOrganization(XTDBNaturalKeyModel):
     finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
+
+    _natural_key_attrs = ["finding", "organization"]
 
 
 class DNSRecordBase(XTDBNaturalKeyModel):

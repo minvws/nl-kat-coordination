@@ -35,6 +35,7 @@ class FindingTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FindingType
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class FindingSerializer(serializers.ModelSerializer):
@@ -75,6 +76,7 @@ class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Network
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class HostnameSerializer(serializers.ModelSerializer):
@@ -122,6 +124,7 @@ class SoftwareSerializer(GetOrCreateSerializer):
     class Meta:
         model = Software
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class IPAddressSerializer(serializers.ModelSerializer):
@@ -152,7 +155,6 @@ class IPPortSerializer(GetOrCreateSerializer):
 
     def create(self, validated_data):
         address = validated_data.pop("address")
-
         ip, created = IPAddress.objects.get_or_create(address=address)
 
         port = validated_data.pop("port")
@@ -176,51 +178,60 @@ class DNSARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSARecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSAAAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSAAAARecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSPTRRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSPTRRecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSCNAMERecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCNAMERecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSMXRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSMXRecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSNSRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSNSRecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSCAARecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSCAARecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSTXTRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSTXTRecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSSRVRecordSerializer(GetOrCreateSerializer):
     class Meta:
         model = DNSSRVRecord
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]

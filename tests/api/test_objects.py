@@ -1,4 +1,5 @@
 from collections import defaultdict
+from urllib.parse import quote
 
 from objects.models import (
     DNSAAAARecord,
@@ -229,7 +230,13 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
     data = {
         "ipaddress": [{"address": "134.209.85.72", "network": "internet"}],
         "ipport": [
-            {"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "mysql", "software": [{"name": "mysql"}]}
+            {
+                "address": "127.0.0.1",
+                "protocol": "TCP",
+                "port": 80,
+                "service": "mysql",
+                "software": [{"name": "mysql", "version": "0.1"}],
+            }
         ],
     }
     response = drf_client.post("/api/v1/objects/", json=data)
@@ -247,7 +254,7 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
                 "protocol": "TCP",
                 "port": 80,
                 "service": "mysql",
-                "software": [{"name": "mongodb"}],
+                "software": [{"name": "mongodb", "version": "0.2"}],
             }
         ],
     }
@@ -314,7 +321,7 @@ def test_dns_records_are_not_duplicated(drf_client, xtdb, settings):
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
     response = drf_client.post("/api/v1/objects/", json=results_grouped)
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     assert IPAddress.objects.count() == 1
     assert Hostname.objects.count() == 4
@@ -363,13 +370,12 @@ def test_ipport_delete_api(drf_client, xtdb):
     network = Network.objects.create(name="internet")
     ip_address = IPAddress.objects.create(network=network, address="192.0.2.1")
     ipport = IPPort.objects.create(address=ip_address, protocol="TCP", port=80, service="http")
-    ipport_id = ipport.pk
 
-    assert IPPort.objects.filter(pk=ipport_id).exists()
-    response = drf_client.delete(f"/api/v1/objects/ipport/{ipport_id}/")
+    assert IPPort.objects.filter(pk=ipport.pk).exists()
+    response = drf_client.delete(f"/api/v1/objects/ipport/{quote(ipport.pk)}/")
 
     assert response.status_code == 204  # No Content is the standard DRF delete response
-    assert not IPPort.objects.filter(pk=ipport_id).exists()
+    assert not IPPort.objects.filter(pk=ipport.pk).exists()
 
 
 def test_ipport_bulk_delete_multiple(drf_client, xtdb):

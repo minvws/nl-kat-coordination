@@ -10,6 +10,7 @@ from objects.models import (
     Finding,
     FindingType,
     Hostname,
+    HostnameOrganization,
     IPAddress,
     IPPort,
     Network,
@@ -262,7 +263,7 @@ def test_to_dict(xtdb):
     assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "version": None}
 
 
-def test_bulk_insert_hostnames(xtdb):
+def test_bulk_insert_hostnames(xtdb, organization):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     host1 = Hostname.objects.create(name="test1.com", network=net)
@@ -271,6 +272,13 @@ def test_bulk_insert_hostnames(xtdb):
 
     bulk_insert([host, host1, host2, host3])
     assert Hostname.objects.count() == 4
+
+    host4 = Hostname.objects.create(name="test4.com", network=net)
+    bulk_insert([host4])
+    assert Hostname.objects.count() == 5
+
+    HostnameOrganization.objects.bulk_create([HostnameOrganization(hostname=host4, organization_id=organization.pk)])
+    assert HostnameOrganization.objects.count() == 1
 
 
 def test_generate_benchmark_data(xtdb):

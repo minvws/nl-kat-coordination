@@ -62,7 +62,7 @@ from objects.viewsets import (
 
 app_name = "objects"
 
-object_router = routers.SimpleRouter()
+object_router = routers.SimpleRouter(use_regex_path=False)
 object_router.register(r"", ObjectViewSet, basename="object")
 object_router.register(r"findingtype", FindingTypeViewSet, basename="findingtype")
 object_router.register(r"finding", FindingViewSet, basename="finding")

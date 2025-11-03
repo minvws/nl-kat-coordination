@@ -36,7 +36,7 @@ from tasks.viewsets import TaskViewSet
 handler404 = "openkat.views.handler404.handler404"
 handler403 = "openkat.views.handler403.handler403"
 
-router = routers.SimpleRouter()
+router = routers.SimpleRouter(use_regex_path=False)
 router.register(r"organization", OrganizationViewSet)
 router.register(r"task", TaskViewSet, basename="task")
 router.register(r"file", FileViewSet, basename="file")
