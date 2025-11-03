@@ -107,7 +107,7 @@ class HostnameSerializer(serializers.ModelSerializer):
         ]:
             serializer = serializer_class(data=list(field.all()), many=True)
             serializer.is_valid()
-            dns.extend(serializer.data)
+            dns.extend([dns | {"object_type": serializer_class.Meta.model.__name__.lower()} for dns in serializer.data])
 
         return dns
 

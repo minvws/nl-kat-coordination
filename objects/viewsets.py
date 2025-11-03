@@ -114,7 +114,7 @@ class HostnameViewSet(ManyModelViewSet):
     @action(detail=True, methods=["delete"], url_path="dnsrecord")
     def delete_dns_records(self, request: Request, pk: str | None = None) -> Response:
         hostname_id = pk
-        record_ids = request.data.get("record_ids", [])
+        record_ids = request.GET.getlist("record_id")
         total = 0
 
         if not record_ids or not isinstance(record_ids, list):

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from urllib.parse import quote
 
 from objects.models import (
     DNSAAAARecord,
@@ -436,12 +437,18 @@ def test_hostname_delete_dns_records_integration(drf_client, xtdb):
     assert response.status_code == 201
     created_dns = response.json()
 
-    record_ids = [
+    # Test new dns records field in hostname api responses
+    hn = drf_client.get(f"/api/v1/objects/hostname/?name={quote('example.com')}").json()
+    dns_records = hn["results"][0]["dns_records"]
+    assert len(dns_records) == 4
+
+    ids = [
         created_dns["dnsarecord"][0]["id"],
         created_dns["dnsaaaarecord"][0]["id"],
         created_dns["dnstxtrecord"][0]["id"],
         created_dns["dnsnsrecord"][0]["id"],
     ]
+    assert ids == [dns["id"] for dns in dns_records]
 
     other_dns_records = {
         "dnsarecord": [{"hostname": other_hostname_id, "ip_address": other_ip_id, "ttl": 7200}],
@@ -460,7 +467,9 @@ def test_hostname_delete_dns_records_integration(drf_client, xtdb):
     assert other_hostname_a_records >= 1
     assert other_hostname_txt_records >= 1
 
-    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname_id}/dnsrecord/", json={"record_ids": record_ids})
+    response = drf_client.delete(
+        f"/api/v1/objects/hostname/{hostname_id}/dnsrecord/?record_id={'&record_id='.join([str(rec) for rec in ids])}"
+    )
 
     assert response.status_code == 200
     data = response.json()
