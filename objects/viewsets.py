@@ -2,7 +2,9 @@ from http import HTTPStatus
 from typing import Any
 
 from django.http import JsonResponse
+from rest_framework.decorators import action
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from objects.models import (
@@ -108,6 +110,32 @@ class HostnameViewSet(ManyModelViewSet):
         "dnssrvrecord_set",
     )
     filterset_fields = ("name",)
+
+    @action(detail=True, methods=["delete"], url_path="dnsrecord")
+    def delete_dns_records(self, request: Request, pk: str | None = None) -> Response:
+        hostname_id = pk
+        record_ids = request.data.get("record_ids", [])
+        total = 0
+
+        if not record_ids or not isinstance(record_ids, list):
+            return Response({"error": "record_ids should be a non-empty list"}, status=HTTPStatus.BAD_REQUEST)
+
+        for model_cls in [
+            DNSARecord,
+            DNSAAAARecord,
+            DNSCNAMERecord,
+            DNSMXRecord,
+            DNSNSRecord,
+            DNSPTRRecord,
+            DNSCAARecord,
+            DNSTXTRecord,
+            DNSSRVRecord,
+        ]:
+            qs = model_cls.objects.filter(hostname_id=hostname_id, id__in=record_ids)
+            total += qs.count()
+            qs.delete()
+
+        return Response({"deleted": total}, status=HTTPStatus.OK)
 
 
 class IPAddressViewSet(ManyModelViewSet):

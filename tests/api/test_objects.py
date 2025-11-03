@@ -327,3 +327,145 @@ def test_dns_records_are_not_duplicated(drf_client, xtdb, settings):
     assert DNSAAAARecord.objects.count() == 0
     assert DNSNSRecord.objects.count() == 3
     assert DNSCNAMERecord.objects.count() == 0
+
+
+def test_hostname_delete_dns_records_endpoint_validation(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+    hostname = Hostname.objects.create(network=network, name="example.com")
+
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/")
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": []})
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+    response = drf_client.delete(
+        f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": "not-a-list"}
+    )
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": [99999]})
+    assert response.status_code == 200
+    data = response.json()
+    assert "deleted" in data
+    assert data["deleted"] == 0
+
+
+def test_ipport_delete_api(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+    ip_address = IPAddress.objects.create(network=network, address="192.0.2.1")
+    ipport = IPPort.objects.create(address=ip_address, protocol="TCP", port=80, service="http")
+    ipport_id = ipport.pk
+
+    assert IPPort.objects.filter(pk=ipport_id).exists()
+    response = drf_client.delete(f"/api/v1/objects/ipport/{ipport_id}/")
+
+    assert response.status_code == 204  # No Content is the standard DRF delete response
+    assert not IPPort.objects.filter(pk=ipport_id).exists()
+
+
+def test_ipport_bulk_delete_multiple(drf_client, xtdb):
+    network = Network.objects.create(name="internet")
+    ip1 = IPAddress.objects.create(network=network, address="192.0.2.1")
+    ip2 = IPAddress.objects.create(network=network, address="192.0.2.2")
+    ip3 = IPAddress.objects.create(network=network, address="192.0.2.3")
+
+    port1 = IPPort.objects.create(address=ip1, protocol="TCP", port=80, service="http")
+    port2 = IPPort.objects.create(address=ip2, protocol="TCP", port=443, service="https")
+    port3 = IPPort.objects.create(address=ip3, protocol="TCP", port=22, service="ssh")
+    port4 = IPPort.objects.create(address=ip1, protocol="UDP", port=53, service="dns")
+
+    port1_id = port1.pk
+    port2_id = port2.pk
+    port3_id = port3.pk
+    port4_id = port4.pk
+
+    assert IPPort.objects.filter(pk=port1_id).exists()
+    assert IPPort.objects.filter(pk=port2_id).exists()
+    assert IPPort.objects.filter(pk=port3_id).exists()
+    assert IPPort.objects.filter(pk=port4_id).exists()
+
+    response = drf_client.delete(f"/api/v1/objects/ipport/?id={port1_id}&id={port2_id}&id={port3_id}")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "deleted" in data
+    assert data["deleted"] == 3
+
+    assert not IPPort.objects.filter(pk=port1_id).exists()
+    assert not IPPort.objects.filter(pk=port2_id).exists()
+    assert not IPPort.objects.filter(pk=port3_id).exists()
+
+    assert IPPort.objects.filter(pk=port4_id).exists()
+
+
+def test_hostname_delete_dns_records_integration(drf_client, xtdb):
+    objects_data = {
+        "ipaddress": [
+            {"network": "internet", "address": "192.0.2.1"},
+            {"network": "internet", "address": "2001:db8::1"},
+            {"network": "internet", "address": "192.0.2.2"},
+        ],
+        "hostname": [
+            {"network": "internet", "name": "example.com"},
+            {"network": "internet", "name": "ns1.example.com"},
+            {"network": "internet", "name": "other.com"},
+        ],
+    }
+    response = drf_client.post("/api/v1/objects/", json=objects_data)
+    assert response.status_code == 201
+    created = response.json()
+
+    hostname_id = created["hostname"][0]["id"]
+    ns_hostname_id = created["hostname"][1]["id"]
+    other_hostname_id = created["hostname"][2]["id"]
+    ip_id = created["ipaddress"][0]["id"]
+    ip6_id = created["ipaddress"][1]["id"]
+    other_ip_id = created["ipaddress"][2]["id"]
+
+    dns_records = {
+        "dnsarecord": [{"hostname": hostname_id, "ip_address": ip_id, "ttl": 3600}],
+        "dnsaaaarecord": [{"hostname": hostname_id, "ip_address": ip6_id, "ttl": 3600}],
+        "dnstxtrecord": [{"hostname": hostname_id, "value": "v=spf1 -all", "ttl": 3600}],
+        "dnsnsrecord": [{"hostname": hostname_id, "name_server": ns_hostname_id, "ttl": 3600}],
+    }
+    response = drf_client.post("/api/v1/objects/", json=dns_records)
+    assert response.status_code == 201
+    created_dns = response.json()
+
+    record_ids = [
+        created_dns["dnsarecord"][0]["id"],
+        created_dns["dnsaaaarecord"][0]["id"],
+        created_dns["dnstxtrecord"][0]["id"],
+        created_dns["dnsnsrecord"][0]["id"],
+    ]
+
+    other_dns_records = {
+        "dnsarecord": [{"hostname": other_hostname_id, "ip_address": other_ip_id, "ttl": 7200}],
+        "dnstxtrecord": [{"hostname": other_hostname_id, "value": "v=spf1 include:_spf.google.com ~all", "ttl": 7200}],
+    }
+    response = drf_client.post("/api/v1/objects/", json=other_dns_records)
+    assert response.status_code == 201
+
+    initial_a_records = DNSARecord.objects.count()
+    initial_txt_records = DNSTXTRecord.objects.count()
+    assert initial_a_records >= 2  # At least 2 A records (one for each hostname)
+    assert initial_txt_records >= 2  # At least 2 TXT records
+
+    other_hostname_a_records = DNSARecord.objects.filter(hostname_id=other_hostname_id).count()
+    other_hostname_txt_records = DNSTXTRecord.objects.filter(hostname_id=other_hostname_id).count()
+    assert other_hostname_a_records >= 1
+    assert other_hostname_txt_records >= 1
+
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname_id}/dnsrecord/", json={"record_ids": record_ids})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "deleted" in data
+    assert data["deleted"] == 4
+
+    assert DNSARecord.objects.filter(hostname_id=other_hostname_id).count() == other_hostname_a_records
+    assert DNSTXTRecord.objects.filter(hostname_id=other_hostname_id).count() == other_hostname_txt_records

@@ -43,7 +43,7 @@ def log_output():
 
 
 class JSONAPIClient(APIClient):
-    """Add json argument to post and patch"""
+    """Add json argument to post, patch, and delete"""
 
     def post(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):  # noqa: A002
         if json is not None and data is None and content_type is None:
@@ -56,6 +56,12 @@ class JSONAPIClient(APIClient):
             return super().patch(path, json_module.dumps(json), format, "application/json", follow, **extra)
 
         return super().patch(path, data, format, content_type, follow, **extra)
+
+    def delete(self, path, json: dict | None = None, data=None, format=None, content_type=None, follow=False, **extra):  # noqa: A002
+        if json is not None and data is None and content_type is None:
+            return super().delete(path, json_module.dumps(json), format, "application/json", follow, **extra)
+
+        return super().delete(path, data, format, content_type, follow, **extra)
 
 
 @pytest.fixture
