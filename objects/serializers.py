@@ -68,6 +68,7 @@ class FindingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Finding
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class NetworkSerializer(serializers.ModelSerializer):
@@ -114,6 +115,7 @@ class HostnameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hostname
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class SoftwareSerializer(GetOrCreateSerializer):
@@ -140,6 +142,7 @@ class IPAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = IPAddress
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class IPPortSerializer(GetOrCreateSerializer):
@@ -166,6 +169,7 @@ class IPPortSerializer(GetOrCreateSerializer):
     class Meta:
         model = IPPort
         exclude = ["_valid_from"]
+        read_only_fields = ["id"]
 
 
 class DNSARecordSerializer(GetOrCreateSerializer):

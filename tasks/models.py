@@ -49,7 +49,7 @@ class ObjectSet(models.Model):
     object_query = models.TextField(null=True, blank=True)
 
     # can hold both objects and other groups (composite pattern)
-    all_objects = ArrayField(models.BigIntegerField(), default=list, blank=True)
+    all_objects = ArrayField(models.CharField(), default=list, blank=True)
     subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
     def get_query_objects(self, **filters: Any) -> QuerySet:

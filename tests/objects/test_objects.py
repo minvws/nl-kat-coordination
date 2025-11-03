@@ -221,7 +221,7 @@ def test_bulk_create(xtdb):
     nnet3 = Network(name="internet4")
     Network.objects.bulk_create([nnet, nnet2, nnet3], unique_fields=["name"])
 
-    assert Network.objects.count() == 6  # Not working in XTDB currently
+    assert Network.objects.count() == 4
 
 
 def test_bulk_insert_networks(xtdb):
@@ -250,10 +250,10 @@ def test_to_dict(xtdb):
     sw = Software.objects.create(name="openssh")
     port.software.add(sw)
     port.save()
-    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id, "declared": False, "scan_level": None}
+    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.pk, "declared": False, "scan_level": None}
     assert to_xtdb_dict(host) == {
         "name": "test.com",
-        "network_id": net.id,
+        "network_id": net.pk,
         "_id": host.id,
         "root": True,
         "declared": False,
