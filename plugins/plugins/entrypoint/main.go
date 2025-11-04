@@ -30,22 +30,23 @@ func main() {
 		uploadURL = defaultURL
 	}
 
-	pattern := regexp.MustCompile(`^\{file/(\d+)\}$`)
+	pattern := regexp.MustCompile(`\{file/(\d+)\}`)
 
 	new_args := []string{}
 
 	for _, arg := range os.Args {
-		if matches := pattern.FindStringSubmatch(arg); matches != nil {
-			fileName, err := downloadFile(matches[1], "/tmp")
-
+		replaced := pattern.ReplaceAllStringFunc(arg, func(m string) string {
+			sub := pattern.FindStringSubmatch(m)
+			if sub == nil {
+				return m
+			}
+			fileName, err := downloadFile(sub[1], "/tmp")
 			if err != nil {
 				log.Fatalf("Failed to download file: %v", err)
 			}
-
-			new_args = append(new_args, fileName)
-		} else {
-			new_args = append(new_args, arg)
-		}
+			return fileName
+		})
+		new_args = append(new_args, replaced)
 	}
 
 	// Prepare command

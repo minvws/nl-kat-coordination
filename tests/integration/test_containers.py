@@ -4,9 +4,10 @@ import celery
 import celery.result
 import pytest
 from django.core.files.base import ContentFile
+from redis.commands.core import AsyncSetCommands
 
 from files.models import File
-from objects.models import Hostname, IPAddress, Network
+from objects.models import Hostname, IPAddress, Network, Asset
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
@@ -210,7 +211,7 @@ def test_process_raw_file_single_task():
 
 
 @pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
-def test_process_raw_file_multiple_tasks():
+def test_worker_dispatches_multiple_plugin_tasks():
     # Two plugins that consume the same file type
     plugin1 = Plugin.objects.create(
         name="DNS Plugin",
@@ -256,7 +257,11 @@ def test_process_raw_file_multiple_tasks():
         sleep(1)
 
     group_result = celery.result.GroupResult(
-        "random-id", results=[task.async_result for task in Task.objects.filter(schedule=plugin_2_schedules[0])]
+        "random-id",
+        results=[
+            task.async_result
+            for task in Task.objects.filter(schedule=plugin_2_schedules[0])
+        ],
     )
     group_result.join()
 
@@ -267,6 +272,41 @@ def test_process_raw_file_multiple_tasks():
     objects = {obj.address for obj in IPAddress.objects.all()}
 
     assert files == objects
+
+
+@pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
+def test_worker_dispatches_multiple_plugin_tasks_from_file_input():
+    file = File.objects.create(
+        file=ContentFile("nu.nl\ntweakers.net\n", "hostnames.txt"), type="txt"
+    )
+    plugin = Plugin.objects.create(
+        name="DNS Plugin from File",
+        plugin_id="dns-from-file",
+        oci_image="ghcr.io/minvws/openkat/plugins:branch-v2",
+        oci_arguments=[
+            "sh",
+            "-c",
+            "cat "
+            + "{file/"
+            + str(file.pk)
+            + "}"
+            + " | xargs -I {} uv run kat_dns/main.py {}",
+        ],
+        consumes=["file:txt"],
+        scan_level=1,
+    )
+
+    tasks: list[Task] = []
+    for schedule in plugin.schedule():
+        tasks.extend(schedule.run())
+
+    group_result = celery.result.GroupResult(
+        "random-id", results=[task.async_result for task in tasks]
+    )
+    group_result.join()
+
+    assert File.objects.count() == 2
+
 
 
 # oci_image = openkat/plugins:latest
