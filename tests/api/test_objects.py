@@ -54,8 +54,9 @@ def test_finding_api(drf_client, xtdb, organization):
     assert res.status_code == 201
 
     res = drf_client.get("/api/v1/objects/findingtype/?code=TEST2")
-    test2_id = res.json()["results"][0]["id"]
-    res = drf_client.patch(f"/api/v1/objects/findingtype/{test2_id}/", json={"code": "TEST2", "score": 6.0})
+    assert res.status_code == 200
+    test2_code = res.json()["results"][0]["code"]
+    res = drf_client.patch(f"/api/v1/objects/findingtype/{test2_code}/", json={"code": "TEST2", "score": 6.0})
 
     assert res.status_code == 200
 
@@ -74,29 +75,29 @@ def test_network_api(drf_client, xtdb):
         "results": [],
     }
 
-    net = Network.objects.create(name="internet")
-    net2 = Network.objects.create(name="internet2")
+    Network.objects.create(name="internet")
+    Network.objects.create(name="internet2")
     assert drf_client.get("/api/v1/objects/network/?ordering=name").json() == {
         "count": 2,
         "next": None,
         "previous": None,
         "results": [
-            {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
-            {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+            {"name": "internet", "declared": False, "scan_level": None, "organizations": []},
+            {"name": "internet2", "declared": False, "scan_level": None, "organizations": []},
         ],
     }
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
+        {"name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
     network = {"name": "internet3"}
-    net3 = drf_client.post("/api/v1/objects/network/", json=network).json()
+    drf_client.post("/api/v1/objects/network/", json=network).json()
 
     assert drf_client.get("/api/v1/objects/network/?ordering=-name").json()["results"] == [
-        {"id": net3["id"], "name": "internet3", "declared": False, "scan_level": None, "organizations": []},
-        {"id": net2.pk, "name": "internet2", "declared": False, "scan_level": None, "organizations": []},
-        {"id": net.pk, "name": "internet", "declared": False, "scan_level": None, "organizations": []},
+        {"name": "internet3", "declared": False, "scan_level": None, "organizations": []},
+        {"name": "internet2", "declared": False, "scan_level": None, "organizations": []},
+        {"name": "internet", "declared": False, "scan_level": None, "organizations": []},
     ]
 
 
@@ -153,7 +154,10 @@ def test_ip_api(drf_client, xtdb):
     net = Network.objects.create(name="internet")
 
     ip = {"network": "internet", "address": "127.0.0.1"}
-    ip_res = drf_client.post("/api/v1/objects/ipaddress/", json=ip).json()
+    response = drf_client.post("/api/v1/objects/ipaddress/", json=ip)
+    assert response.status_code == 201
+
+    ip_res = response.json()
     assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
         {
             "id": ip_res["id"],
@@ -226,7 +230,13 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
     data = {
         "ipaddress": [{"address": "134.209.85.72", "network": "internet"}],
         "ipport": [
-            {"address": "127.0.0.1", "protocol": "TCP", "port": 80, "service": "mysql", "software": [{"name": "mysql"}]}
+            {
+                "address": "127.0.0.1",
+                "protocol": "TCP",
+                "port": 80,
+                "service": "mysql",
+                "software": [{"name": "mysql", "version": "0.1"}],
+            }
         ],
     }
     response = drf_client.post("/api/v1/objects/", json=data)
@@ -244,7 +254,7 @@ def test_generic_api_saves_related_objects(drf_client, xtdb):
                 "protocol": "TCP",
                 "port": 80,
                 "service": "mysql",
-                "software": [{"name": "mongodb"}],
+                "software": [{"name": "mongodb", "version": "0.2"}],
             }
         ],
     }
@@ -310,7 +320,8 @@ def test_dns_records_are_not_duplicated(drf_client, xtdb, settings):
             if "ip_address" in obj:
                 obj["ip_address"] = by_address[obj["ip_address"]]
 
-    drf_client.post("/api/v1/objects/", json=results_grouped)
+    response = drf_client.post("/api/v1/objects/", json=results_grouped)
+    assert response.status_code == 201
 
     assert IPAddress.objects.count() == 1
     assert Hostname.objects.count() == 4
@@ -359,13 +370,12 @@ def test_ipport_delete_api(drf_client, xtdb):
     network = Network.objects.create(name="internet")
     ip_address = IPAddress.objects.create(network=network, address="192.0.2.1")
     ipport = IPPort.objects.create(address=ip_address, protocol="TCP", port=80, service="http")
-    ipport_id = ipport.pk
 
-    assert IPPort.objects.filter(pk=ipport_id).exists()
-    response = drf_client.delete(f"/api/v1/objects/ipport/{ipport_id}/")
+    assert IPPort.objects.filter(pk=ipport.pk).exists()
+    response = drf_client.delete(f"/api/v1/objects/ipport/{quote(ipport.pk)}/")
 
     assert response.status_code == 204  # No Content is the standard DRF delete response
-    assert not IPPort.objects.filter(pk=ipport_id).exists()
+    assert not IPPort.objects.filter(pk=ipport.pk).exists()
 
 
 def test_ipport_bulk_delete_multiple(drf_client, xtdb):

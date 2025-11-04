@@ -64,7 +64,7 @@ def test_traverse_objects_with_query(xtdb):
 
     result = object_set.traverse_objects()
     assert isinstance(result, list)
-    assert all(isinstance(pk, int) for pk in result)
+    assert all(isinstance(pk, str) for pk in result)
     if len(result) > 0:
         assert len(result) >= 2
 

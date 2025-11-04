@@ -67,7 +67,7 @@ class JSONAPIClient(APIClient):
 @pytest.fixture
 def drf_client(superuser) -> APIClient:
     _, token = create_auth_token(superuser.email, "test_key")
-    client = JSONAPIClient(raise_request_exception=False)
+    client = JSONAPIClient(raise_request_exception=True)
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
 
     return client

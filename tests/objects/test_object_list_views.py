@@ -1,4 +1,5 @@
 import time
+from urllib.parse import quote
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -21,8 +22,8 @@ def test_hostname_scan_bulk_action(rf, superuser_member, xtdb):
 
     assert response.status_code == 302
     assert "/tasks/add/" in response.url
-    assert f"input_hostnames={h1.pk}" in response.url
-    assert f"input_hostnames={h2.pk}" in response.url
+    assert f"input_hostnames={quote(h1.pk)}" in response.url
+    assert f"input_hostnames={quote(h2.pk)}" in response.url
 
 
 def test_hostname_create_object_set_bulk_action(rf, superuser_member, xtdb):
@@ -41,8 +42,8 @@ def test_hostname_create_object_set_bulk_action(rf, superuser_member, xtdb):
     assert "/object-sets/add" in response.url
     hostname_ct = ContentType.objects.get_for_model(Hostname)
     assert f"object_type={hostname_ct.pk}" in response.url
-    assert f"objects={h1.pk}" in response.url
-    assert f"objects={h2.pk}" in response.url
+    assert f"objects={quote(h1.pk)}" in response.url
+    assert f"objects={quote(h2.pk)}" in response.url
 
 
 def test_ipaddress_scan_bulk_action(rf, superuser_member, xtdb):
@@ -59,8 +60,8 @@ def test_ipaddress_scan_bulk_action(rf, superuser_member, xtdb):
 
     assert response.status_code == 302
     assert "/tasks/add/" in response.url
-    assert f"input_ips={ip1.pk}" in response.url
-    assert f"input_ips={ip2.pk}" in response.url
+    assert f"input_ips={quote(ip1.pk)}" in response.url
+    assert f"input_ips={quote(ip2.pk)}" in response.url
 
 
 def test_ipaddress_create_object_set_bulk_action(rf, superuser_member, xtdb):
@@ -81,8 +82,8 @@ def test_ipaddress_create_object_set_bulk_action(rf, superuser_member, xtdb):
     assert "/object-sets/add" in response.url
     ipaddress_ct = ContentType.objects.get_for_model(IPAddress)
     assert f"object_type={ipaddress_ct.pk}" in response.url
-    assert f"objects={ip1.pk}" in response.url
-    assert f"objects={ip2.pk}" in response.url
+    assert f"objects={quote(ip1.pk)}" in response.url
+    assert f"objects={quote(ip2.pk)}" in response.url
 
 
 def test_hostname_delete_bulk_action(rf, superuser_member, xtdb):
@@ -153,7 +154,7 @@ def test_ipport_software_delete(rf, superuser_member, xtdb):
     response = IPPortSoftwareDeleteView.as_view()(request, port_pk=str(port.pk), pk=str(software.pk))
 
     assert response.status_code == 302
-    assert f"/objects/ipaddress/{ip.pk}/" in response.url
+    assert f"/objects/ipaddress/{quote(ip.pk)}/" in response.url
     port.refresh_from_db()
     assert port.software.count() == 0
     assert software not in port.software.all()

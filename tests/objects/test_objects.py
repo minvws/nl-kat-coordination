@@ -10,6 +10,7 @@ from objects.models import (
     Finding,
     FindingType,
     Hostname,
+    HostnameOrganization,
     IPAddress,
     IPPort,
     Network,
@@ -221,7 +222,7 @@ def test_bulk_create(xtdb):
     nnet3 = Network(name="internet4")
     Network.objects.bulk_create([nnet, nnet2, nnet3], unique_fields=["name"])
 
-    assert Network.objects.count() == 6  # Not working in XTDB currently
+    assert Network.objects.count() == 4
 
 
 def test_bulk_insert_networks(xtdb):
@@ -246,23 +247,48 @@ def test_to_dict(xtdb):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     ip = IPAddress.objects.create(network=net, address="2001:ab8:d0cb::")
+    rec = DNSARecord.objects.create(hostname=host, ip_address=ip)
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
     sw = Software.objects.create(name="openssh")
     port.software.add(sw)
     port.save()
-    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.id, "declared": False, "scan_level": None}
+    assert to_xtdb_dict(net) == {"name": "internet", "_id": net.pk, "declared": False, "scan_level": None}
     assert to_xtdb_dict(host) == {
         "name": "test.com",
-        "network_id": net.id,
+        "network_id": net.pk,
         "_id": host.id,
         "root": True,
         "declared": False,
         "scan_level": None,
     }
     assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "version": None}
+    assert to_xtdb_dict(rec) == {
+        "_id": "internet|test.com|internet|2001:ab8:d0cb::",
+        "hostname_id": "internet|test.com",
+        "ip_address_id": "internet|2001:ab8:d0cb::",
+        "ttl": None,
+    }
+
+    h = Hostname(name="test2.com", network=net)
+    assert to_xtdb_dict(h) == {
+        "name": "test2.com",
+        "network_id": net.pk,
+        "_id": "internet|test2.com",
+        "root": False,  # changed upon save
+        "declared": False,
+        "scan_level": None,
+    }
+    ip = IPAddress(network=net, address="2002:ab8:d0cb::")
+    rec = DNSARecord(hostname=h, ip_address=ip)
+    assert to_xtdb_dict(rec) == {
+        "_id": "internet|test2.com|internet|2002:ab8:d0cb::",
+        "hostname_id": "internet|test2.com",
+        "ip_address_id": "internet|2002:ab8:d0cb::",
+        "ttl": None,
+    }
 
 
-def test_bulk_insert_hostnames(xtdb):
+def test_bulk_insert_hostnames(xtdb, organization):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     host1 = Hostname.objects.create(name="test1.com", network=net)
@@ -271,6 +297,13 @@ def test_bulk_insert_hostnames(xtdb):
 
     bulk_insert([host, host1, host2, host3])
     assert Hostname.objects.count() == 4
+
+    host4 = Hostname.objects.create(name="test4.com", network=net)
+    bulk_insert([host4])
+    assert Hostname.objects.count() == 5
+
+    HostnameOrganization.objects.bulk_create([HostnameOrganization(hostname=host4, organization_id=organization.pk)])
+    assert HostnameOrganization.objects.count() == 1
 
 
 def test_generate_benchmark_data(xtdb):

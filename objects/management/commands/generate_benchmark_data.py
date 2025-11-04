@@ -52,7 +52,9 @@ def generate(
     txt_records = []
     caa_records = []
     findings = []
-    finding_types = [FindingType(code=val["finding_type_code"]) for key, val in get_rules().items()]
+    finding_types = [
+        FindingType(code=val["finding_type_code"]) for key, val in get_rules().items() if val["finding_type_code"]
+    ]
     by_code = {ft.code: ft for ft in finding_types}
     software = [Software(name="old-js-lib", version="v-2.1.3"), Software(name="old-wordpress-plugin", version="0.1")]
 

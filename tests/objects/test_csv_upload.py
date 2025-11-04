@@ -30,7 +30,7 @@ def test_ipaddress_csv_upload_with_network(rf, superuser_member, xtdb):
     csv_file.name = "ip_addresses.csv"
 
     request = setup_request(
-        rf.post("objects:ipaddress_csv_upload", {"csv_file": csv_file, "network": network.id}), superuser_member.user
+        rf.post("objects:ipaddress_csv_upload", {"csv_file": csv_file, "network": network.pk}), superuser_member.user
     )
     response = IPAddressCSVUploadView.as_view()(request)
 
@@ -123,7 +123,7 @@ def test_hostname_csv_upload_with_network(rf, superuser_member, xtdb):
     csv_file.name = "hostnames.csv"
 
     request = setup_request(
-        rf.post("objects:hostname_csv_upload", {"csv_file": csv_file, "network": network.id}), superuser_member.user
+        rf.post("objects:hostname_csv_upload", {"csv_file": csv_file, "network": network.pk}), superuser_member.user
     )
     response = HostnameCSVUploadView.as_view()(request)
 

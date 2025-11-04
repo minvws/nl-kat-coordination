@@ -1,8 +1,8 @@
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from enum import Enum
 from functools import total_ordering
-from typing import cast
+from typing import Any, ClassVar, cast
 
 import structlog
 import tagulous.models
@@ -28,15 +28,21 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
     return CaseInsensitiveMapping({model.__name__: model for model in apps.get_app_config("objects").get_models()})
 
 
-def to_xtdb_dict(model: Model) -> dict:
+def to_xtdb_dict(model: "XTDBModel") -> dict:
     mod = model_to_dict(model, exclude=["id"] + [field.name for field in model._meta.many_to_many])
-    mod["_id"] = model.pk
+
+    if hasattr(model, "natural_key"):
+        mod["_id"] = model.natural_key
+    else:
+        mod["_id"] = model.pk
 
     if "_valid_from" in mod:
         del mod["_valid_from"]
 
     for field in model._meta.fields:
         if isinstance(field, ForeignKey):
+            if not mod[field.name] and issubclass(field.model, XTDBNaturalKeyModel) and getattr(model, field.name):
+                mod[field.name] = getattr(model, field.name).natural_key
             mod[field.name + "_id"] = mod[field.name]
             del mod[field.name]
             continue
@@ -55,6 +61,23 @@ class ScanLevelEnum(models.IntegerChoices):
 MAX_SCAN_LEVEL = max(scan_level.value for scan_level in cast("type[Enum]", ScanLevelEnum))
 
 
+class XTDBQuerySet(models.QuerySet):
+    def bulk_create(
+        self,
+        objs: Sequence[models.Model],
+        batch_size: int | None = None,
+        ignore_conflicts: bool = False,
+        update_conflicts: bool = False,
+        update_fields: Collection[str] | None = None,
+        unique_fields: Collection[str] | None = None,
+    ) -> list[models.Model]:
+        o = []
+        for obj in objs:
+            o.append(obj.save(force_insert=True))  # Because the pks are set, django would resolve to updates
+
+        return o
+
+
 class XTDBModel(models.Model):
     # This seems to be the only way to avoid Django trying to set the field in any instance, while still being able to
     # query the field.
@@ -65,6 +88,8 @@ class XTDBModel(models.Model):
     class Meta:
         managed = False
         abstract = True
+
+    objects = XTDBQuerySet.as_manager()
 
     @property
     def last_seen(self):
@@ -100,6 +125,48 @@ class XTDBOrganization(XTDBModel):
         return str(self.name)
 
 
+class XTDBNaturalKeyModel(XTDBModel):
+    id: models.CharField = models.CharField(primary_key=True, db_column="_id")
+
+    _natural_key_attrs: ClassVar[list[str]]
+    _optional_key_attrs: ClassVar[list[str]] = []
+
+    @property
+    def natural_key(self) -> str:
+        parts = []
+
+        for attr in self._natural_key_attrs:
+            part = getattr(self, attr)
+            if (part is None or part == "") and attr not in self._optional_key_attrs:
+                raise ValueError("All natural key attributes must be set when saving object")
+
+            if part is None:
+                part = ""
+
+            if isinstance(part, XTDBNaturalKeyModel):
+                part = part.natural_key
+            elif isinstance(part, Model):
+                part = part.pk
+
+            parts.append(str(part))
+
+        return "|".join(parts).strip("|")
+
+    def save(self, **kwargs: Any) -> None:
+        # TODO: Make sure this also is implemented in all the necessary model methods and manager methods
+        if not self.id:
+            self.id = self.natural_key
+        elif self.id != self.natural_key:
+            # We can't change the id field, so the natural key attributes should also not be changed
+            raise Exception("Can't change natural key attributes, create new object and delete the old one")
+
+        super().save(**kwargs)
+
+    class Meta(XTDBModel.Meta):
+        managed = False
+        abstract = True
+
+
 class Asset(XTDBModel):
     class Meta:
         managed = False
@@ -107,7 +174,7 @@ class Asset(XTDBModel):
 
 
 class Network(Asset):
-    name: LowerCaseCharField = LowerCaseCharField()
+    name: LowerCaseCharField = LowerCaseCharField(primary_key=True, db_column="_id")
     scan_level: models.IntegerField = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(MAX_SCAN_LEVEL)], null=True, blank=True
     )
@@ -120,12 +187,14 @@ class Network(Asset):
         return self.name
 
 
-class NetworkOrganization(XTDBModel):
+class NetworkOrganization(XTDBNaturalKeyModel):
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
+    _natural_key_attrs = ["network", "organization"]
 
-class IPAddress(Asset):
+
+class IPAddress(XTDBNaturalKeyModel, Asset):  # type: ignore[misc]
     network: models.ForeignKey = models.ForeignKey(Network, on_delete=models.CASCADE)
     address: models.GenericIPAddressField = models.GenericIPAddressField(unpack_ipv4=True)
     scan_level: models.IntegerField = models.IntegerField(
@@ -136,13 +205,17 @@ class IPAddress(Asset):
         XTDBOrganization, blank=True, related_name="ipaddresses", through="IPAddressOrganization"
     )
 
+    _natural_key_attrs = ["network", "address"]
+
     def __str__(self) -> str:
         return self.address
 
 
-class IPAddressOrganization(XTDBModel):
+class IPAddressOrganization(XTDBNaturalKeyModel):
     ipaddress: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
+
+    _natural_key_attrs = ["ipaddress", "organization"]
 
 
 class Protocol(models.TextChoices):
@@ -150,21 +223,20 @@ class Protocol(models.TextChoices):
     UDP = "UDP", "UDP"
 
 
-class IPPort(XTDBModel):
+class IPPort(XTDBNaturalKeyModel):
     address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.CASCADE)
     protocol: models.CharField = models.CharField(choices=Protocol)
     port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(65535)])
     tls: models.BooleanField = models.BooleanField(null=True)
     service: models.CharField = models.CharField()
 
-    class Meta:
-        managed = False
+    _natural_key_attrs = ["address", "protocol", "port"]
 
     def __str__(self) -> str:
         return f"[{self.address}]:{self.port}"
 
 
-class Hostname(Asset):
+class Hostname(XTDBNaturalKeyModel, Asset):  # type: ignore[misc]
     dnsarecord_set: models.Manager["DNSARecord"]
     dnsaaaarecord_set: models.Manager["DNSAAAARecord"]
     dnscnamerecord_set: models.Manager["DNSCNAMERecord"]
@@ -196,6 +268,8 @@ class Hostname(Asset):
         XTDBOrganization, blank=True, related_name="hostnames", through="HostnameOrganization"
     )
 
+    _natural_key_attrs = ["network", "name"]
+
     def __str__(self) -> str:
         return self.name
 
@@ -218,13 +292,15 @@ class Hostname(Asset):
         super().save(*args, **kwargs)
 
 
-class HostnameOrganization(XTDBModel):
+class HostnameOrganization(XTDBNaturalKeyModel):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
+    _natural_key_attrs = ["hostname", "organization"]
+
 
 class FindingType(XTDBModel):
-    code = models.CharField()
+    code = models.CharField(primary_key=True, db_column="_id")
     name = models.CharField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     source = models.CharField(null=True, blank=True)
@@ -234,7 +310,7 @@ class FindingType(XTDBModel):
     score = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], null=True)
 
 
-class Finding(XTDBModel):
+class Finding(XTDBNaturalKeyModel):
     finding_type: models.ForeignKey = models.ForeignKey(FindingType, on_delete=models.PROTECT)
     hostname: models.ForeignKey = models.ForeignKey(Hostname, null=True, on_delete=models.CASCADE)
     address: models.ForeignKey = models.ForeignKey(IPAddress, null=True, on_delete=models.CASCADE)
@@ -243,13 +319,19 @@ class Finding(XTDBModel):
         XTDBOrganization, blank=True, related_name="findings", through="FindingOrganization"
     )
 
+    _natural_key_attrs = ["finding_type", "hostname", "address"]
+    # FIXME: Check if at least one is set
+    _optional_key_attrs = ["hostname", "address"]
 
-class FindingOrganization(XTDBModel):
+
+class FindingOrganization(XTDBNaturalKeyModel):
     finding: models.ForeignKey = models.ForeignKey(Finding, on_delete=models.PROTECT)
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
+    _natural_key_attrs = ["finding", "organization"]
 
-class DNSRecordBase(XTDBModel):
+
+class DNSRecordBase(XTDBNaturalKeyModel):
     ttl: models.IntegerField = models.IntegerField()
 
     class Meta:
@@ -261,7 +343,9 @@ class DNSARecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.CASCADE)
     ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
-    hostname_id: int | None
+    hostname_id: str
+
+    _natural_key_attrs = ["hostname", "ip_address"]
 
     def __str__(self) -> str:
         return f"{self.hostname} A {self.ip_address}"
@@ -271,6 +355,8 @@ class DNSAAAARecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.CASCADE)
     ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
 
+    _natural_key_attrs = ["hostname", "ip_address"]
+
     def __str__(self) -> str:
         return f"{self.hostname} AAAA {self.ip_address}"
 
@@ -278,6 +364,8 @@ class DNSAAAARecord(DNSRecordBase):
 class DNSPTRRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.CASCADE)
     ip_address: models.ForeignKey = models.ForeignKey(IPAddress, on_delete=models.PROTECT)
+
+    _natural_key_attrs = ["hostname", "ip_address"]
 
     def __str__(self) -> str:
         return f"{self.ip_address} PTR {self.hostname}"
@@ -288,6 +376,8 @@ class DNSCNAMERecord(DNSRecordBase):
     target: models.ForeignKey = models.ForeignKey(
         Hostname, on_delete=models.PROTECT, related_name="dnscnamerecord_target_set"
     )
+
+    _natural_key_attrs = ["hostname", "target"]
 
     def __str__(self) -> str:
         return f"{self.hostname} CNAME {self.target}"
@@ -300,6 +390,8 @@ class DNSMXRecord(DNSRecordBase):
     )
     preference: models.IntegerField = models.IntegerField()
 
+    _natural_key_attrs = ["hostname", "preference", "mail_server"]
+
     def __str__(self) -> str:
         return f"{self.hostname} MX {self.preference} {self.mail_server}"
 
@@ -309,6 +401,8 @@ class DNSNSRecord(DNSRecordBase):
     name_server: models.ForeignKey = models.ForeignKey(
         Hostname, on_delete=models.PROTECT, related_name="dnsnsrecord_nameserver"
     )
+
+    _natural_key_attrs = ["hostname", "name_server"]
 
     def __str__(self) -> str:
         return f"{self.hostname} NS {self.name_server}"
@@ -330,6 +424,8 @@ class DNSCAARecord(DNSRecordBase):
     tag: models.CharField = models.CharField(choices=CAATag)
     value: models.CharField = models.CharField()
 
+    _natural_key_attrs = ["hostname", "flags", "tag", "value"]
+
     def __str__(self) -> str:
         return f"{self.hostname} CAA {self.flags} {self.tag} {self.value}"
 
@@ -338,6 +434,9 @@ class DNSTXTRecord(DNSRecordBase):
     hostname: models.ForeignKey = models.ForeignKey(Hostname, on_delete=models.CASCADE)
     prefix: models.CharField = models.CharField(blank=True)
     value: models.CharField = models.CharField()
+
+    _natural_key_attrs = ["hostname", "prefix", "value"]
+    _optional_key_attrs = ["prefix"]
 
     def __str__(self) -> str:
         prefix_part = f"{self.prefix}." if self.prefix else ""
@@ -352,15 +451,20 @@ class DNSSRVRecord(DNSRecordBase):
     weight: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
     port: models.IntegerField = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(65535)])
 
+    _natural_key_attrs = ["hostname", "proto", "service", "priority", "weight", "port"]
+
     def __str__(self) -> str:
         return f"_{self.service}._{self.proto}.{self.hostname} SRV {self.priority} {self.weight} {self.port}"
 
 
-class Software(XTDBModel):
-    name = models.CharField()
-    version = models.CharField(null=True, blank=True)
-    cpe = models.CharField(null=True, blank=True)
-    ports = models.ManyToManyField(IPPort, blank=True, related_name="software")
+class Software(XTDBNaturalKeyModel):
+    name: models.CharField = models.CharField()
+    version: models.CharField = models.CharField(null=True, blank=True)
+    cpe: models.CharField = models.CharField(null=True, blank=True)
+    ports: models.ManyToManyField = models.ManyToManyField(IPPort, blank=True, related_name="software")
+
+    _natural_key_attrs = ["name", "version"]
+    _optional_key_attrs = ["version"]
 
 
 def bulk_insert(objects: Sequence[models.Model]) -> None:

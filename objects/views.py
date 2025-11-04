@@ -124,7 +124,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NetworkFilter
-    ordering = ["-id"]
+    ordering = ["name"]
 
     def get_queryset(self) -> "QuerySet[Network]":
         queryset = super().get_queryset()

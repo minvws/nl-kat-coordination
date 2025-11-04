@@ -225,10 +225,10 @@ def organization_attribution():
 def attribute_findings() -> None:
     try:
         with connections["xtdb"].cursor() as cursor:
-            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+            cursor.execute(
                 f"""
                 INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {Hostname._meta.db_table} source
                 RIGHT JOIN {Finding._meta.db_table} target on source._id = target.hostname_id
                 RIGHT JOIN {HostnameOrganization._meta.db_table} osource ON source._id = osource.hostname_id
@@ -237,10 +237,10 @@ def attribute_findings() -> None:
                 WHERE otarget._id is null and osource._id is not null and target._id is not null;
                 """  # noqa: S608
             )
-            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+            cursor.execute(
                 f"""
                 INSERT INTO {FindingOrganization._meta.db_table} (_id, finding_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {IPAddress._meta.db_table} source
                 RIGHT JOIN {Finding._meta.db_table} target on source._id = target.address_id
                 RIGHT JOIN {IPAddressOrganization._meta.db_table} osource ON source._id = osource.ipaddress_id
@@ -256,10 +256,10 @@ def attribute_findings() -> None:
 def attribute_through_cnames() -> None:
     try:
         with connections["xtdb"].cursor() as cursor:
-            cursor.execute(  # TODO: drop ridiculous o._id + h._id once we have natural keys
+            cursor.execute(
                 f"""
                 INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {Hostname._meta.db_table} source
                 RIGHT JOIN {DNSCNAMERecord._meta.db_table} dns on source._id = dns.target_id
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
@@ -279,7 +279,7 @@ def attribute_through_ns() -> None:
             cursor.execute(
                 f"""
                 INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {Hostname._meta.db_table} source
                 RIGHT JOIN {DNSNSRecord._meta.db_table} dns on source._id = dns.hostname_id
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.name_server_id
@@ -299,7 +299,7 @@ def attribute_through_ip_hostname(db_table: str) -> None:
             cursor.execute(
                 f"""
                 INSERT INTO {IPAddressOrganization._meta.db_table} (_id, ipaddress_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {Hostname._meta.db_table} source
                 RIGHT JOIN {db_table} dns on source._id = dns.hostname_id
                 RIGHT JOIN {IPAddress._meta.db_table} target ON target._id = dns.ip_address_id
@@ -312,7 +312,7 @@ def attribute_through_ip_hostname(db_table: str) -> None:
             cursor.execute(
                 f"""
                 INSERT INTO {HostnameOrganization._meta.db_table} (_id, hostname_id, organization_id)
-                SELECT osource.organization_id + target._id, target._id, osource.organization_id
+                SELECT target._id ||'|'|| cast(osource.organization_id as varchar), target._id, osource.organization_id
                 FROM {IPAddress._meta.db_table} source
                 RIGHT JOIN {db_table} dns on source._id = dns.ip_address_id
                 RIGHT JOIN {Hostname._meta.db_table} target ON target._id = dns.hostname_id
