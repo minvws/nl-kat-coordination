@@ -106,7 +106,7 @@ def test_hostname_api(drf_client, xtdb):
     Network.objects.create(name="internet2")
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == []
 
-    hn = Hostname.objects.create(network=network, name="test.com")
+    hn = Hostname.objects.create(network=network, name="test.com", scan_level=2)
     assert drf_client.get("/api/v1/objects/hostname/").json()["results"] == [
         {
             "id": hn.pk,
@@ -115,7 +115,7 @@ def test_hostname_api(drf_client, xtdb):
             "network_id": network.pk,
             "root": True,
             "declared": False,
-            "scan_level": None,
+            "scan_level": 2,
             "organizations": [],
         }
     ]
@@ -127,11 +127,20 @@ def test_hostname_api(drf_client, xtdb):
         {
             "id": hn.pk,
             "name": "test.com",
-            "dns_records": [{"hostname": hn.pk, "id": txt.pk, "prefix": "", "ttl": None, "value": "v=spf1"}],
+            "dns_records": [
+                {
+                    "hostname": hn.pk,
+                    "id": txt.pk,
+                    "prefix": "",
+                    "ttl": None,
+                    "value": "v=spf1",
+                    "object_type": "dnstxtrecord",
+                }
+            ],
             "network_id": network.pk,
             "root": True,
             "declared": False,
-            "scan_level": None,
+            "scan_level": 2,
             "organizations": [],
         },
         {
@@ -147,7 +156,28 @@ def test_hostname_api(drf_client, xtdb):
     ]
 
     response = drf_client.post("/api/v1/objects/hostname/", json={"name": "test.com"})
-    assert response.status_code == 400
+    assert response.status_code == 400  # no network
+
+    drf_client.post("/api/v1/objects/hostname/", json={"network": "internet", "name": "test.com"}).json()  # update
+    assert drf_client.get(f"/api/v1/objects/hostname/{hn.pk}/").json() == {
+        "id": hn.pk,
+        "name": "test.com",
+        "dns_records": [
+            {
+                "hostname": "internet|test.com",
+                "id": "internet|test.com||v=spf1",
+                "object_type": "dnstxtrecord",
+                "prefix": "",
+                "ttl": None,
+                "value": "v=spf1",
+            }
+        ],
+        "network_id": network.pk,
+        "root": True,
+        "declared": False,
+        "scan_level": 2,  # Still intact
+        "organizations": [],
+    }
 
 
 def test_ip_api(drf_client, xtdb):
@@ -349,17 +379,14 @@ def test_hostname_delete_dns_records_endpoint_validation(drf_client, xtdb):
     assert response.status_code == 400
     assert "error" in response.json()
 
-    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": []})
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/")
     assert response.status_code == 400
     assert "error" in response.json()
 
-    response = drf_client.delete(
-        f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": "not-a-list"}
-    )
-    assert response.status_code == 400
-    assert "error" in response.json()
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/?record_id=")
+    assert response.status_code == 200
 
-    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/", json={"record_ids": [99999]})
+    response = drf_client.delete(f"/api/v1/objects/hostname/{hostname.pk}/dnsrecord/?record_id=99999")
     assert response.status_code == 200
     data = response.json()
     assert "deleted" in data
