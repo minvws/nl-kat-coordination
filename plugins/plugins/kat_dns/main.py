@@ -22,14 +22,6 @@ from tldextract import tldextract
 DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"}
 
 
-class TimeoutException(Exception):
-    pass
-
-
-class ZoneNotFoundException(Exception):
-    pass
-
-
 def get_record_types(records: list[str]) -> set[str]:
     parsed_requested_record_types = map(lambda x: re.sub(r"[^A-Za-z]", "", x.upper()), records)
     return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
@@ -60,7 +52,7 @@ def mail_records(hostname: str) -> list:
                     results.append(
                         {
                             "object_type": "DNSTXTRecord",
-                            "hostname": f"{domain}",
+                            "hostname": f"internet|{domain}".lower(),
                             "value": str(rr).strip('"'),
                             "prefix": "_dmarc",
                             "ttl": rrset.ttl,
@@ -104,26 +96,31 @@ def generic_records(hostname: str, record_types: set[str]) -> list:
         record_store.append(record)
         return record
 
-    # register argument hostname
-    register_hostname(hostname)
-
     results: list[dict[str, str | int]] = []
 
     for answer in answers:
         for rrset in answer.response.answer:
             for rr in rrset:
                 record_hostname = register_hostname(str(rrset.name))
-                default_args = {"hostname": record_hostname["name"], "value": str(rr), "ttl": rrset.ttl}
+                default_args = {
+                    "hostname": f"internet|{record_hostname['name']}".lower(),
+                    "value": str(rr),
+                    "ttl": rrset.ttl,
+                }
 
                 if isinstance(rr, A):
                     ipv4: dict[str, str | int] = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv4)
-                    register_record({"object_type": "DNSARecord", "ip_address": ipv4["address"], **default_args})
+                    register_record(
+                        {"object_type": "DNSARecord", "ip_address": f"internet|{ipv4['address']}", **default_args}
+                    )
 
                 if isinstance(rr, AAAA):
                     ipv6: dict[str, str | int] = {"object_type": "IPAddress", "network": "internet", "address": str(rr)}
                     results.append(ipv6)
-                    register_record({"object_type": "DNSAAAARecord", "ip_address": ipv6["address"], **default_args})
+                    register_record(
+                        {"object_type": "DNSAAAARecord", "ip_address": f"internet|{ipv6['address']}", **default_args}
+                    )
 
                 if isinstance(rr, TXT):
                     # TODO: concatenated txt records should be handled better
@@ -140,7 +137,7 @@ def generic_records(hostname: str, record_types: set[str]) -> list:
                     register_record(
                         {
                             "object_type": "DNSMXRecord",
-                            "mail_server": mail_hostname_reference,
+                            "mail_server": f"internet|{mail_hostname_reference}",
                             "preference": rr.preference,
                             **default_args,
                         }
@@ -148,11 +145,23 @@ def generic_records(hostname: str, record_types: set[str]) -> list:
 
                 if isinstance(rr, NS):
                     ns_fqdn = register_hostname(str(rr.target))
-                    register_record({"object_type": "DNSNSRecord", "name_server": ns_fqdn["name"], **default_args})
+                    register_record(
+                        {
+                            "object_type": "DNSNSRecord",
+                            "name_server": f"internet|{ns_fqdn['name']}".lower(),
+                            **default_args,
+                        }
+                    )
 
                 if isinstance(rr, CNAME):
                     target_fqdn = register_hostname(str(rr.target))
-                    register_record({"object_type": "DNSCNAMERecord", "target": target_fqdn["name"], **default_args})
+                    register_record(
+                        {
+                            "object_type": "DNSCNAMERecord",
+                            "target": f"internet|{target_fqdn['name']}".lower(),
+                            **default_args,
+                        }
+                    )
 
                 if isinstance(rr, CAA):
                     record_value = str(rr).split(" ", 2)
@@ -191,15 +200,14 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
 
 def main():
     token = os.getenv("OPENKAT_TOKEN")
+    base_url = os.getenv("OPENKAT_API")
+
     if not token:
         raise Exception("No OPENKAT_TOKEN env variable")
-
-    base_url = os.getenv("OPENKAT_API")
     if not base_url:
         raise Exception("No OPENKAT_API env variable")
 
-    headers = {"Authorization": "Token " + token}
-    client = httpx.Client(base_url=base_url, headers=headers)
+    client = httpx.Client(base_url=base_url, headers={"Authorization": "Token " + token})
 
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("hostname")
@@ -215,35 +223,13 @@ def main():
     if not results:
         return
 
-    results_grouped = defaultdict(list)
-
+    grouped = defaultdict(list)
     for result in results:
-        results_grouped[result.pop("object_type").lower()].append(result)
+        grouped[result.pop("object_type").lower()].append(result)
 
-    hostnames_and_ips = {"hostname": results_grouped.pop("hostname"), "ipaddress": []}
-
-    if "ipaddress" in results_grouped:
-        hostnames_and_ips["ipaddress"] = results_grouped.pop("ipaddress")
-
-    response = client.post("/objects/", headers=headers, json=hostnames_and_ips).json()
-
-    by_name = {h["name"]: h["id"] for h in response["hostname"]}
-    by_address = {ip["address"]: ip["id"] for ip in response["ipaddress"]}
-
-    for object_path, objects in results_grouped.items():
-        for obj in objects:
-            if "hostname" in obj:
-                obj["hostname"] = by_name[obj["hostname"].lower()]
-            if "mail_server" in obj:
-                obj["mail_server"] = by_name[obj["mail_server"].lower()]
-            if "name_server" in obj:
-                obj["name_server"] = by_name[obj["name_server"].lower()]
-            if "target" in obj:
-                obj["target"] = by_name[obj["target"].lower()]
-            if "ip_address" in obj:
-                obj["ip_address"] = by_address[obj["ip_address"]]
-
-    client.post("/objects/", headers=headers, json=results_grouped).raise_for_status()
+    hostnames_and_ips = {"hostname": grouped.pop("hostname", []), "ipaddress": grouped.pop("ipaddress", [])}
+    client.post("/objects/", json=hostnames_and_ips).raise_for_status()  # make sure these exist
+    client.post("/objects/", json=grouped).raise_for_status()
     print(json.dumps(results))  # noqa: T201
 
 

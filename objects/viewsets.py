@@ -50,6 +50,10 @@ from openkat.viewsets import ManyModelViewSet
 class ObjectViewSet(ViewSet):
     permission_classes = (KATMultiModelPermissions,)
     serializers = (
+        HostnameSerializer,
+        IPAddressSerializer,
+        IPPortSerializer,
+        NetworkSerializer,
         DNSAAAARecordSerializer,
         DNSARecordSerializer,
         DNSCAARecordSerializer,
@@ -59,18 +63,17 @@ class ObjectViewSet(ViewSet):
         DNSPTRRecordSerializer,
         DNSSRVRecordSerializer,
         DNSTXTRecordSerializer,
-        HostnameSerializer,
-        IPAddressSerializer,
-        IPPortSerializer,
-        NetworkSerializer,
     )
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> JsonResponse:
         serializers = {serializer.Meta.model.__name__.lower(): serializer for serializer in self.serializers}
         response = {}
 
-        for object_type, models in request.data.items():
-            serializer_class = serializers[object_type.lower()]
+        for object_type, serializer_class in serializers.items():
+            if object_type not in request.data:
+                continue
+
+            models = request.data[object_type]
             serializer = serializer_class(data=models, many=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()

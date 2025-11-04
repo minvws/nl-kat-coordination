@@ -216,8 +216,8 @@ class PluginRunner:  # TODO: auto-parallelism?
         if exit_status != 0:
             stderr_out = container.logs(stdout=False, stderr=True)
 
-        # if not keep:
-        #     container.remove(force=True)
+        if not keep:
+            container.remove(force=True)
 
         token.delete()
         plugin_user.delete()
