@@ -62,7 +62,7 @@ def mail_records(hostname: str) -> list:
     return results
 
 
-def generic_records(hostname: str, record_types: set[str]) -> list:
+def generic_records(hostname: str, record_types: set[str]) -> list[dict[str, str | int]]:
     resolver = dns.resolver.Resolver()
 
     # https://dnspython.readthedocs.io/en/stable/_modules/dns/edns.html
@@ -95,6 +95,8 @@ def generic_records(hostname: str, record_types: set[str]) -> list:
     def register_record(record: dict) -> dict:
         record_store.append(record)
         return record
+
+    register_hostname(hostname)
 
     results: list[dict[str, str | int]] = []
 
@@ -129,11 +131,11 @@ def generic_records(hostname: str, record_types: set[str]) -> list:
                     register_record({"object_type": "DNSTXTRecord", **default_args})
 
                 if isinstance(rr, MX):
-                    mail_hostname_reference = None
                     if str(rr.exchange) != ".":
                         mail_fqdn = register_hostname(str(rr.exchange))
                         mail_hostname_reference = mail_fqdn["name"]
-
+                    else:
+                        continue
                     register_record(
                         {
                             "object_type": "DNSMXRecord",
@@ -216,20 +218,48 @@ def main():
     args = parser.parse_args()
 
     record_types = DEFAULT_RECORD_TYPES if not args.record_types else get_record_types(args.record_types)
-
-    results = generic_records(args.hostname.rstrip("."), record_types)
-    results.extend(mail_records(args.hostname.rstrip(".")))
+    hostname = args.hostname.rstrip(".")
+    results = generic_records(hostname, record_types)
+    results.extend(mail_records(hostname))
 
     if not results:
+        response = client.get(f"/objects/hostname/?name={hostname}").json()
+        if response["results"]:
+            client.delete(
+                f"/objects/hostname/{response['results'][0]['id']}/dnsrecord/",
+                params={"record_id": [rec["id"] for rec in response["results"][0]["dns_records"]]},
+            ).raise_for_status()
         return
 
     grouped = defaultdict(list)
     for result in results:
-        grouped[result.pop("object_type").lower()].append(result)
+        object_type = result.pop("object_type")
+        if not isinstance(object_type, str):
+            continue
+
+        grouped[object_type.lower()].append(result)
 
     hostnames_and_ips = {"hostname": grouped.pop("hostname", []), "ipaddress": grouped.pop("ipaddress", [])}
-    client.post("/objects/", json=hostnames_and_ips).raise_for_status()  # make sure these exist
-    client.post("/objects/", json=grouped).raise_for_status()
+    response = client.post("/objects/", json=hostnames_and_ips).raise_for_status()  # make sure these exist
+    dns_response = client.post("/objects/", json=grouped).raise_for_status().json()
+
+    records = []
+    for host in response.json().get("hostname", []):
+        if host["name"] == hostname:
+            records = host["dns_records"]
+            break
+
+    to_be_deleted: dict[str, dict] = {dns.pop("id"): dns for dns in records}
+
+    for obj_type, recs in dns_response.items():
+        for rec in recs:
+            if rec["id"] in to_be_deleted:
+                del to_be_deleted[rec["id"]]
+
+    if to_be_deleted:
+        params = {"record_id": list(to_be_deleted.keys())}
+        client.delete(f"/objects/hostname/internet|{hostname}/dnsrecord/", params=params).raise_for_status()
+
     print(json.dumps(results))  # noqa: T201
 
 
