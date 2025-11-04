@@ -41,6 +41,8 @@ def to_xtdb_dict(model: "XTDBModel") -> dict:
 
     for field in model._meta.fields:
         if isinstance(field, ForeignKey):
+            if not mod[field.name] and issubclass(field.model, XTDBNaturalKeyModel) and getattr(model, field.name):
+                mod[field.name] = getattr(model, field.name).natural_key
             mod[field.name + "_id"] = mod[field.name]
             del mod[field.name]
             continue
@@ -141,7 +143,9 @@ class XTDBNaturalKeyModel(XTDBModel):
             if part is None:
                 part = ""
 
-            if isinstance(part, Model):
+            if isinstance(part, XTDBNaturalKeyModel):
+                part = part.natural_key
+            elif isinstance(part, Model):
                 part = part.pk
 
             parts.append(str(part))

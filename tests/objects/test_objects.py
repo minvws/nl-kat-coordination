@@ -247,6 +247,7 @@ def test_to_dict(xtdb):
     net = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=net)
     ip = IPAddress.objects.create(network=net, address="2001:ab8:d0cb::")
+    rec = DNSARecord.objects.create(hostname=host, ip_address=ip)
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
     sw = Software.objects.create(name="openssh")
     port.software.add(sw)
@@ -261,6 +262,30 @@ def test_to_dict(xtdb):
         "scan_level": None,
     }
     assert to_xtdb_dict(sw) == {"_id": sw.id, "cpe": None, "name": "openssh", "version": None}
+    assert to_xtdb_dict(rec) == {
+        "_id": "internet|test.com|internet|2001:ab8:d0cb::",
+        "hostname_id": "internet|test.com",
+        "ip_address_id": "internet|2001:ab8:d0cb::",
+        "ttl": None,
+    }
+
+    h = Hostname(name="test2.com", network=net)
+    assert to_xtdb_dict(h) == {
+        "name": "test2.com",
+        "network_id": net.pk,
+        "_id": "internet|test2.com",
+        "root": False,  # changed upon save
+        "declared": False,
+        "scan_level": None,
+    }
+    ip = IPAddress(network=net, address="2002:ab8:d0cb::")
+    rec = DNSARecord(hostname=h, ip_address=ip)
+    assert to_xtdb_dict(rec) == {
+        "_id": "internet|test2.com|internet|2002:ab8:d0cb::",
+        "hostname_id": "internet|test2.com",
+        "ip_address_id": "internet|2002:ab8:d0cb::",
+        "ttl": None,
+    }
 
 
 def test_bulk_insert_hostnames(xtdb, organization):
