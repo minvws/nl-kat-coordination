@@ -1,5 +1,3 @@
-import time
-
 from django.db import connections
 
 from objects.models import (
@@ -88,7 +86,6 @@ def test_at_least_two_ipv6_name_servers_query(xtdb):
 def test_missing_spf(xtdb):
     network = Network.objects.create(name="test")
     hn = Hostname.objects.create(network=network, name="test.com")
-    time.sleep(0.1)
 
     assert len(Hostname.objects.raw(get_rules()["missing_spf"]["query"])) == 1
     assert Hostname.objects.raw(get_rules()["missing_spf"]["query"])[0].name == "test.com"

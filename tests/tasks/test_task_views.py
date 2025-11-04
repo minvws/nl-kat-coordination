@@ -1,7 +1,5 @@
 """Tests for task views and forms"""
 
-import time
-
 from django.contrib.contenttypes.models import ContentType
 from pytest_django.asserts import assertContains
 
@@ -16,7 +14,6 @@ def test_task_create_view_with_preselected_hostnames(rf, superuser_member, xtdb,
     network = Network.objects.create(name="internet")
     h1 = Hostname.objects.create(name="test1.com", network=network)
     h2 = Hostname.objects.create(name="test2.com", network=network)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.get("tasks:add_task", query_params={"input_hostnames": [str(h1.pk), str(h2.pk)]}), superuser_member.user
@@ -39,7 +36,6 @@ def test_task_form_with_object_set(rf, superuser_member, xtdb, organization, moc
     network = Network.objects.create(name="internet")
     h1 = Hostname.objects.create(name="test1.com", network=network, scan_level=2)
     h2 = Hostname.objects.create(name="test2.com", network=network, scan_level=2)
-    time.sleep(0.1)
 
     plugin = Plugin.objects.create(
         name="test", plugin_id="test", oci_image="T", oci_arguments=["{hostname}"], scan_level=2
@@ -160,7 +156,6 @@ def test_object_set_creation_with_preselected_objects(rf, superuser_member, xtdb
     network = Network.objects.create(name="internet")
     h1 = Hostname.objects.create(name="test1.com", network=network)
     h2 = Hostname.objects.create(name="test2.com", network=network)
-    time.sleep(0.1)
 
     hostname_ct = ContentType.objects.get_for_model(Hostname)
 
@@ -199,7 +194,6 @@ def test_task_list_view(rf, superuser, organization, organization_b):
     a = Task.objects.create(organization=organization, type="plugin", data={"plugin_id": "test_plugin"})
     b = Task.objects.create(organization=organization_b, type="plugin", data={"plugin_id": "test_plugin"})
 
-    time.sleep(0.1)
     request = setup_request(rf.get("task_list"), superuser)
     response = TaskListView.as_view()(request)
 
@@ -216,7 +210,6 @@ def test_task_cancel_all_view(rf, superuser_member, xtdb, organization, organiza
     Task.objects.create(organization=organization, type="plugin", data={}, status=TaskStatus.PENDING)
     Task.objects.create(organization=organization, type="plugin", data={}, status=TaskStatus.COMPLETED)
     Task.objects.create(organization=organization_b, type="plugin", data={}, status=TaskStatus.QUEUED)
-    time.sleep(0.1)
 
     request = setup_request(rf.post("task_cancel_all"), superuser_member.user)
     response = TaskCancelAllView.as_view()(request)
