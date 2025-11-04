@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Literal
 
 import docker
-from click import command
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -105,8 +104,6 @@ class PluginRunner:  # TODO: auto-parallelism?
             ContainerError: If the plugin exits with non-zero status
             ValueError: If target type is not supported
         """
-        print('ComAmmaMAMa')
-
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
@@ -167,8 +164,6 @@ class PluginRunner:  # TODO: auto-parallelism?
         plugin_user, token = self.create_token(plugin_id)
         environment["OPENKAT_TOKEN"] = token.generate_new_token()
         token.save()
-
-        print('<<<< COMMAND', command)
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
