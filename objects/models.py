@@ -73,7 +73,7 @@ class XTDBQuerySet(models.QuerySet):
     ) -> list[models.Model]:
         o = []
         for obj in objs:
-            o.append(obj.save(force_insert=True))  # Because the pks are set, django would resolve to updates
+            o.append(obj.save())  # Because the pks are set, django would resolve to updates
 
         return o
 

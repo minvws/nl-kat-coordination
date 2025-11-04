@@ -124,7 +124,7 @@ class NetworkListView(OrganizationFilterMixin, FilterView):
     context_object_name = "networks"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = NetworkFilter
-    ordering = ["name"]
+    ordering = ["-_valid_from"]
 
     def get_queryset(self) -> "QuerySet[Network]":
         queryset = super().get_queryset()
@@ -304,7 +304,7 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
     context_object_name = "ipaddresses"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = IPAddressFilter
-    ordering = ["-id"]
+    ordering = ["-_valid_from"]
     http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[IPAddress]":
@@ -593,7 +593,7 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
     context_object_name = "hostnames"
     paginate_by = settings.VIEW_DEFAULT_PAGE_SIZE
     filterset_class = HostnameFilter
-    ordering = ["-id"]
+    ordering = ["-_valid_from"]
     http_method_names = ["get", "post"]
 
     def get_queryset(self) -> "QuerySet[Hostname]":

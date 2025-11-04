@@ -1,5 +1,3 @@
-import time
-
 from celery import Celery
 from django.conf import settings
 
@@ -32,7 +30,6 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
 
     network = Network.objects.create(name="internet")
     host = Hostname.objects.create(name="test.com", network=network)
-    time.sleep(0.1)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 0
@@ -101,7 +98,6 @@ def test_run_schedule_for_none(xtdb, celery: Celery, organization, docker, plugi
 
     network = Network.objects.create(name="internet")
     Hostname.objects.create(name="test.com", network=network, scan_level=2)
-    time.sleep(0.1)
 
     tasks = run_schedule(schedule, force=False, celery=celery)
     assert len(tasks) == 1

@@ -1,5 +1,3 @@
-import time
-
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.management.commands.generate_benchmark_data import generate
@@ -28,7 +26,6 @@ from tests.conftest import setup_request
 def test_query_hostname(xtdb, organization):
     network = Network.objects.create(name="internet")
     Hostname.objects.create(network=network, name="test.com")
-    time.sleep(0.1)
 
     networks = Network.objects.filter(hostname__name="test.com")
     assert networks.count() == 1
@@ -476,8 +473,6 @@ def test_ipaddress_create_view_post_ipv4_success(rf, superuser_member, xtdb):
     assert response.status_code == 302
     assert response.url == "/en/objects/ipaddress/"
 
-    time.sleep(0.1)  # Allow XTDB to sync
-
     assert IPAddress.objects.count() == 1
     ip = IPAddress.objects.first()
     assert ip.address == "192.0.2.1"
@@ -495,8 +490,6 @@ def test_ipaddress_create_view_post_ipv6_success(rf, superuser_member, xtdb):
     response = IPAddressCreateView.as_view()(request)
 
     assert response.status_code == 302
-
-    time.sleep(0.1)  # Allow XTDB to sync
 
     assert IPAddress.objects.count() == 1
     ip = IPAddress.objects.first()

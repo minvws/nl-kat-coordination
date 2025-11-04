@@ -1,4 +1,3 @@
-import time
 from urllib.parse import quote
 
 from django.contrib.contenttypes.models import ContentType
@@ -12,7 +11,6 @@ def test_hostname_scan_bulk_action(rf, superuser_member, xtdb):
     network = Network.objects.create(name="internet")
     h1 = Hostname.objects.create(name="test1.com", network=network, scan_level=2)
     h2 = Hostname.objects.create(name="test2.com", network=network, scan_level=2)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.post("objects:hostname_list", data={"hostname": [str(h1.pk), str(h2.pk)], "action": "scan"}),
@@ -30,7 +28,6 @@ def test_hostname_create_object_set_bulk_action(rf, superuser_member, xtdb):
     network = Network.objects.create(name="internet")
     h1 = Hostname.objects.create(name="test1.com", network=network)
     h2 = Hostname.objects.create(name="test2.com", network=network)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.post("objects:hostname_list", data={"hostname": [str(h1.pk), str(h2.pk)], "action": "create-object-set"}),
@@ -50,7 +47,6 @@ def test_ipaddress_scan_bulk_action(rf, superuser_member, xtdb):
     network = Network.objects.create(name="internet")
     ip1 = IPAddress.objects.create(address="1.1.1.1", network=network, scan_level=2)
     ip2 = IPAddress.objects.create(address="2.2.2.2", network=network, scan_level=2)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.post("objects:ipaddress_list", data={"ipaddress": [str(ip1.pk), str(ip2.pk)], "action": "scan"}),
@@ -68,7 +64,6 @@ def test_ipaddress_create_object_set_bulk_action(rf, superuser_member, xtdb):
     network = Network.objects.create(name="internet")
     ip1 = IPAddress.objects.create(address="1.1.1.1", network=network)
     ip2 = IPAddress.objects.create(address="2.2.2.2", network=network)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.post(
@@ -91,7 +86,6 @@ def test_hostname_delete_bulk_action(rf, superuser_member, xtdb):
     h1 = Hostname.objects.create(name="test1.com", network=network)
     h2 = Hostname.objects.create(name="test2.com", network=network)
     h3 = Hostname.objects.create(name="test3.com", network=network)
-    time.sleep(0.1)
 
     assert Hostname.objects.count() == 3
 
@@ -102,7 +96,7 @@ def test_hostname_delete_bulk_action(rf, superuser_member, xtdb):
     response = HostnameListView.as_view()(request)
 
     assert response.status_code == 302
-    time.sleep(0.1)
+
     assert Hostname.objects.count() == 1
     assert Hostname.objects.filter(pk=h3.pk).exists()
     assert not Hostname.objects.filter(pk=h1.pk).exists()
@@ -113,7 +107,6 @@ def test_ipaddress_set_scan_level_bulk_action(rf, superuser_member, xtdb):
     network = Network.objects.create(name="internet")
     ip1 = IPAddress.objects.create(address="1.1.1.1", network=network, scan_level=1)
     ip2 = IPAddress.objects.create(address="2.2.2.2", network=network, scan_level=1)
-    time.sleep(0.1)
 
     request = setup_request(
         rf.post(
@@ -142,7 +135,6 @@ def test_ipport_software_delete(rf, superuser_member, xtdb):
     port = IPPort.objects.create(address=ip, protocol=Protocol.TCP, port=22, tls=False, service="ssh")
     software = Software.objects.create(name="openssh", version="8.0")
     port.software.add(software)
-    time.sleep(0.1)
 
     assert port.software.count() == 1
     assert software in port.software.all()
