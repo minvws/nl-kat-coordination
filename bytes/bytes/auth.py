@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 import jwt
 import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
@@ -15,7 +15,6 @@ logger = structlog.get_logger(__name__)
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class TokenResponse(BaseModel):
@@ -27,13 +26,17 @@ class TokenResponse(BaseModel):
 def get_access_token(form_data: OAuth2PasswordRequestForm) -> tuple[str, datetime]:
     settings = get_settings()
     system_username = settings.username
-    hashed_password = pwd_context.hash(settings.password[:72])
 
     if len(settings.password) > 72:
         logger.warning("Password length exceeds bcrypt limit of 72 characters; truncating for hashing.")
-    
 
-    authenticated = form_data.username == system_username and pwd_context.verify(form_data.password, hashed_password)
+    # bcrypt works with bytes and truncates at 72 bytes; apply same truncation explicitly
+    system_pw_bytes = settings.password[:72].encode("utf-8")
+    hashed_password = bcrypt.hashpw(system_pw_bytes, bcrypt.gensalt())
+
+    # truncate incoming password the same way before verification
+    incoming_pw_bytes = form_data.password[:72].encode("utf-8")
+    authenticated = form_data.username == system_username and bcrypt.checkpw(incoming_pw_bytes, hashed_password)
 
     if not authenticated:
         raise HTTPException(
