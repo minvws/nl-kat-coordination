@@ -91,6 +91,9 @@ class XTDBModel(models.Model):
 
     objects = XTDBQuerySet.as_manager()
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=True, force_update=False, using=using, update_fields=update_fields)
+
     @property
     def last_seen(self):
         return self._valid_from
@@ -152,7 +155,7 @@ class XTDBNaturalKeyModel(XTDBModel):
 
         return "|".join(parts).strip("|")
 
-    def save(self, **kwargs: Any) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         # TODO: Make sure this also is implemented in all the necessary model methods and manager methods
         if not self.id:
             self.id = self.natural_key
@@ -160,7 +163,7 @@ class XTDBNaturalKeyModel(XTDBModel):
             # We can't change the id field, so the natural key attributes should also not be changed
             raise Exception("Can't change natural key attributes, create new object and delete the old one")
 
-        super().save(**kwargs)
+        super().save(*args, **kwargs)
 
     class Meta(XTDBModel.Meta):
         managed = False

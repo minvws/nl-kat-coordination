@@ -20,7 +20,7 @@ from objects.models import (
     bulk_insert,
     to_xtdb_dict,
 )
-from objects.views import FindingListView, NetworkListView
+from objects.views import FindingListView, HostnameCreateView, IPAddressCreateView, NetworkCreateView, NetworkListView
 from tasks.tasks import recalculate_scan_levels, sync_ns_scan_levels
 from tests.conftest import setup_request
 
@@ -316,3 +316,224 @@ def test_generate_benchmark_data(xtdb):
     assert IPAddress.objects.count() == 12
     assert DNSARecord.objects.count() == 5
     assert Software.objects.count() == 2
+
+
+def test_network_create_view_get(rf, superuser_member, xtdb):
+    request = setup_request(rf.get("objects:network_create"), superuser_member.user)
+    response = NetworkCreateView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "Add Object")
+    assertContains(response, "Name:")
+
+
+def test_network_create_view_post_success(rf, superuser_member, xtdb):
+    assert Network.objects.count() == 0
+
+    request = setup_request(rf.post("objects:network_create", data={"name": "test-network"}), superuser_member.user)
+    response = NetworkCreateView.as_view()(request)
+
+    assert response.status_code == 302
+    assert response.url == "/en/objects/network/"
+
+    assert Network.objects.count() == 1
+    network = Network.objects.first()
+    assert network.name == "test-network"
+    assert network.declared is False
+    assert network.scan_level is None
+
+
+def test_network_create_view_post_duplicate_fails(rf, superuser_member, xtdb):
+    Network.objects.create(name="existing-network")
+
+    request = setup_request(rf.post("objects:network_create", data={"name": "existing-network"}), superuser_member.user)
+    response = NetworkCreateView.as_view()(request)
+
+    assert response.status_code == 200
+    assertContains(response, "Network with this Name already exists")
+
+    assert Network.objects.count() == 1
+
+
+def test_network_create_view_post_missing_name_fails(rf, superuser_member, xtdb):
+    request = setup_request(rf.post("objects:network_create", data={}), superuser_member.user)
+    response = NetworkCreateView.as_view()(request)
+
+    assert response.status_code == 200
+    assertContains(response, "This field is required")
+
+    assert Network.objects.count() == 0
+
+
+def test_hostname_create_view_get(rf, superuser_member, xtdb):
+    request = setup_request(rf.get("objects:hostname_create"), superuser_member.user)
+    response = HostnameCreateView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "Add Hostname")
+    assertContains(response, "Network:")
+    assertContains(response, "Name:")
+
+
+def test_hostname_create_view_get_with_internet_network(rf, superuser_member, xtdb):
+    Network.objects.create(name="internet")
+
+    request = setup_request(rf.get("objects:hostname_create"), superuser_member.user)
+    response = HostnameCreateView.as_view()(request)
+    assert response.status_code == 200
+
+    assertContains(response, "selected")
+    assertContains(response, "internet")
+
+
+def test_hostname_create_view_post_success(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+    assert Hostname.objects.count() == 0
+
+    request = setup_request(
+        rf.post("objects:hostname_create", data={"network": network.pk, "name": "example.com"}), superuser_member.user
+    )
+    response = HostnameCreateView.as_view()(request)
+
+    assert response.status_code == 302
+    assert response.url == "/en/objects/hostname/"
+
+    assert Hostname.objects.count() == 1
+    hostname = Hostname.objects.first()
+    assert hostname.name == "example.com"
+    assert hostname.network == network
+    assert hostname.declared is False
+    assert hostname.scan_level is None
+
+
+def test_hostname_create_view_post_duplicate_is_idempotent(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+    Hostname.objects.create(network=network, name="existing.com")
+
+    request = setup_request(
+        rf.post("objects:hostname_create", data={"network": network.pk, "name": "existing.com"}), superuser_member.user
+    )
+    response = HostnameCreateView.as_view()(request)
+
+    assert response.status_code == 302
+    assert Hostname.objects.count() == 1
+
+
+def test_hostname_create_view_post_missing_fields_fails(rf, superuser_member, xtdb):
+    request = setup_request(rf.post("objects:hostname_create", data={}), superuser_member.user)
+    response = HostnameCreateView.as_view()(request)
+
+    assert response.status_code == 200
+    assertContains(response, "This field is required")
+    assert Hostname.objects.count() == 0
+
+
+def test_hostname_create_view_post_subdomain(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="internet")
+    parent = Hostname.objects.create(network=network, name="example.com")
+    request = setup_request(
+        rf.post("objects:hostname_create", data={"network": network.pk, "name": "sub.example.com"}),
+        superuser_member.user,
+    )
+    HostnameCreateView.as_view()(request)
+
+    assert Hostname.objects.count() == 2
+
+    parent.refresh_from_db()
+    subdomain = Hostname.objects.get(name="sub.example.com")
+
+    assert parent.root is True
+    assert subdomain.root is False
+
+
+def test_ipaddress_create_view_get(rf, superuser_member, xtdb):
+    request = setup_request(rf.get("objects:ipaddress_create"), superuser_member.user)
+    response = IPAddressCreateView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "Add IP Address")
+    assertContains(response, "Network:")
+    assertContains(response, "Address:")
+
+
+def test_ipaddress_create_view_get_with_internet_network(rf, superuser_member, xtdb):
+    Network.objects.create(name="internet")
+
+    request = setup_request(rf.get("objects:ipaddress_create"), superuser_member.user)
+    response = IPAddressCreateView.as_view()(request)
+    assert response.status_code == 200
+
+    assertContains(response, "selected")
+    assertContains(response, "internet")
+
+
+def test_ipaddress_create_view_post_ipv4_success(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+    assert IPAddress.objects.count() == 0
+
+    request = setup_request(
+        rf.post("objects:ipaddress_create", data={"network": network.pk, "address": "192.0.2.1"}), superuser_member.user
+    )
+    response = IPAddressCreateView.as_view()(request)
+
+    assert response.status_code == 302
+    assert response.url == "/en/objects/ipaddress/"
+
+    time.sleep(0.1)  # Allow XTDB to sync
+
+    assert IPAddress.objects.count() == 1
+    ip = IPAddress.objects.first()
+    assert ip.address == "192.0.2.1"
+    assert ip.network == network
+    assert ip.declared is False
+    assert ip.scan_level is None
+
+
+def test_ipaddress_create_view_post_ipv6_success(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+    request = setup_request(
+        rf.post("objects:ipaddress_create", data={"network": network.pk, "address": "2001:db8::1"}),
+        superuser_member.user,
+    )
+    response = IPAddressCreateView.as_view()(request)
+
+    assert response.status_code == 302
+
+    time.sleep(0.1)  # Allow XTDB to sync
+
+    assert IPAddress.objects.count() == 1
+    ip = IPAddress.objects.first()
+    assert ip.address == "2001:db8::1"
+
+
+def test_ipaddress_create_view_post_duplicate_is_idempotent(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+    IPAddress.objects.create(network=network, address="192.0.2.50")
+
+    request = setup_request(
+        rf.post("objects:ipaddress_create", data={"network": network.pk, "address": "192.0.2.50"}),
+        superuser_member.user,
+    )
+    response = IPAddressCreateView.as_view()(request)
+    assert response.status_code == 302
+    assert IPAddress.objects.count() == 1
+
+
+def test_ipaddress_create_view_post_missing_fields_fails(rf, superuser_member, xtdb):
+    request = setup_request(rf.post("objects:ipaddress_create", data={}), superuser_member.user)
+    response = IPAddressCreateView.as_view()(request)
+
+    assert response.status_code == 200
+    assertContains(response, "This field is required")
+
+    assert IPAddress.objects.count() == 0
+
+
+def test_ipaddress_create_view_post_invalid_ip_fails(rf, superuser_member, xtdb):
+    network = Network.objects.create(name="test-network")
+
+    request = setup_request(
+        rf.post("objects:ipaddress_create", data={"network": network.pk, "address": "not-an-ip"}), superuser_member.user
+    )
+    response = IPAddressCreateView.as_view()(request)
+
+    assert response.status_code == 200
+    assertContains(response, "Enter a valid")
+    assert IPAddress.objects.count() == 0
