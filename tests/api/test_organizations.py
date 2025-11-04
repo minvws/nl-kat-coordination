@@ -1,205 +1,208 @@
-from typing import Any
-
 import pytest
 from django.contrib.auth.models import Permission
-from django.urls import reverse
-from pytest_assert_utils import assert_model_attrs
-from pytest_common_subject import precondition_fixture
-from pytest_drf import (
-    APIViewTest,
-    Returns200,
-    Returns201,
-    Returns204,
-    Returns403,
-    Returns409,
-    UsesDeleteMethod,
-    UsesDetailEndpoint,
-    UsesGetMethod,
-    UsesListEndpoint,
-    UsesPatchMethod,
-    UsesPostMethod,
-    ViewSetTest,
-)
-from pytest_drf.util import pluralized, url_for
-from pytest_lambda import lambda_fixture, static_fixture
 
-from openkat.models import Organization
-
-pytestmark = pytest.mark.django_db(databases=["xtdb", "default"])
+from openkat.management.commands.create_authtoken import create_auth_token
+from openkat.models import Indemnification, Organization
+from tests.conftest import JSONAPIClient, create_user
 
 
-def express_organization(organization: Organization) -> dict[str, Any]:
-    return {
-        "id": organization.id,
-        "name": organization.name,
-        "code": organization.code,
-        "tags": [tag for tag in organization.tags.all()],
-    }
-
-
-express_organizations = pluralized(express_organization)
-
-
-class TestOrganizationViewSet(ViewSetTest):
-    @pytest.fixture
-    def organizations(self):
-        created_organizations = []
-        organizations = [
+@pytest.fixture
+def organizations(xtdb):
+    return [
+        Organization.objects.create(**org)
+        for org in [
             {"name": "Test Organization 1", "code": "test1", "tags": ["tag1", "tag2"]},
             {"name": "Test Organization 2", "code": "test2"},
         ]
-
-        for org in organizations:
-            created_organizations.append(Organization.objects.create(**org))
-
-        return created_organizations
-
-    organization = lambda_fixture(lambda organizations: organizations[0])
-
-    list_url = lambda_fixture(lambda: url_for("organization-list"))
-
-    detail_url = lambda_fixture(lambda organization: url_for("organization-detail", organization.pk))
-
-    client = lambda_fixture("drf_admin_client")
-
-    class TestList(UsesGetMethod, UsesListEndpoint, Returns200):
-        def test_it_returns_values(self, organizations, results):
-            expected = express_organizations(organizations)
-            actual = results
-            assert actual == expected
-
-    class TestCreate(UsesPostMethod, UsesListEndpoint, Returns201):
-        data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
-
-        initial_ids = precondition_fixture(
-            lambda organizations: set(Organization.objects.values_list("id", flat=True)), async_=False
-        )
-
-        def test_it_creates_new_organization(self, initial_ids, json):
-            expected = initial_ids | {json["id"]}
-            actual = set(Organization.objects.values_list("id", flat=True))
-            assert actual == expected
-
-        def test_it_sets_expected_attrs(self, data, json):
-            organization = Organization.objects.get(pk=json["id"])
-
-            expected = data
-            assert_model_attrs(organization, expected)
-
-        def test_it_returns_organization(self, json):
-            organization = Organization.objects.get(pk=json["id"])
-
-            expected = express_organization(organization)
-            actual = json
-            assert actual == expected
-
-    class TestRetrieve(UsesGetMethod, UsesDetailEndpoint, Returns200):
-        def test_it_returns_organization(self, organization, json):
-            expected = express_organization(organization)
-            actual = json
-            assert actual == expected
-
-    class TestUpdate(UsesPatchMethod, UsesDetailEndpoint, Returns200):
-        data = static_fixture({"name": "Changed Organization", "code": "test4", "tags": ["tag3", "tag4"]})
-
-        # Code is read only so shouldn't change
-        expected_data = {"name": "Changed Organization", "code": "test1"}
-
-        def test_it_sets_expected_attrs(self, organization):
-            # We must tell Django to grab fresh data from the database, or we'll
-            # see our stale initial data and think our endpoint is broken!
-            organization.refresh_from_db()
-
-            assert_model_attrs(organization, self.expected_data)
-            assert {str(tag) for tag in organization.tags.all()} == {"tag3", "tag4"}
-
-        def test_it_returns_organization(self, organization, json):
-            organization.refresh_from_db()
-
-            expected = express_organization(organization)
-            actual = json
-            assert actual == expected
-
-    class TestDestroy(UsesDeleteMethod, UsesDetailEndpoint, Returns204):
-        initial_ids = precondition_fixture(
-            lambda organizations: set(Organization.objects.values_list("id", flat=True)), async_=False
-        )
-
-        def test_it_deletes_organization(self, initial_ids, organization, log_output):
-            expected = initial_ids - {organization.id}
-            actual = set(Organization.objects.values_list("id", flat=True))
-            assert actual == expected
-
-            # TODO: fix
-            # organization_created_log = log_output.entries[-2]
-            # assert organization_created_log["event"] == "%s %s deleted"
-            # assert organization_created_log["object"] == "Test Organization 1"
-            # assert organization_created_log["object_type"] == "Organization"
-
-    class TestListNoPermission(UsesGetMethod, UsesListEndpoint, Returns403):
-        client = lambda_fixture("drf_redteam_client")
-
-    class TestCreateNoPermission(UsesPostMethod, UsesListEndpoint, Returns403):
-        client = lambda_fixture("drf_redteam_client")
-
-    class TestRetrieveNoPermission(UsesGetMethod, UsesDetailEndpoint, Returns403):
-        client = lambda_fixture("drf_redteam_client")
-
-    class TestDestroyNoPermission(UsesDeleteMethod, UsesDetailEndpoint, Returns403):
-        client = lambda_fixture("drf_redteam_client")
+    ]
 
 
-class TestGetIndemnification(APIViewTest, UsesGetMethod, Returns200):
-    # The superuser_member fixture creates the indemnification
-    url = lambda_fixture(
-        lambda organization, superuser_member: reverse("organization-indemnification", args=[organization.pk])
-    )
-    client = lambda_fixture("drf_admin_client")
-
-    def test_it_returns_indemnification(self, json, superuser_member):
-        expected = {"indemnification": True, "user": superuser_member.user.id}
-        assert json == expected
+@pytest.fixture
+def organization_for_indemnification(xtdb):
+    return Organization.objects.create(name="Test Org Indem", code="test_indem")
 
 
-class TestIndemnificationDoesNotExist(APIViewTest, UsesGetMethod, Returns200):
-    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-    client = lambda_fixture("drf_admin_client")
-
-    def test_it_returns_no_indemnification(self, json):
-        expected = {"indemnification": False, "user": None}
-        assert json == expected
+@pytest.fixture
+def user_with_indemnification(django_user_model, organization_for_indemnification):
+    user = create_user(django_user_model, "test@example.com", "Test123!!", "Test User", "device1")
+    Indemnification.objects.create(user=user, organization=organization_for_indemnification)
+    return user
 
 
-class TestGetIndemnificationNoPermission(APIViewTest, UsesGetMethod, Returns403):
-    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-    client = lambda_fixture("drf_redteam_client")
+@pytest.fixture
+def admin_client(adminuser):
+    _, token = create_auth_token(adminuser.email, "test_admin_key")
+    client = JSONAPIClient(raise_request_exception=False)
+    client.credentials(HTTP_AUTHORIZATION="Token " + token)
+    return client
 
 
-class TestSetIndemnification(APIViewTest, UsesPostMethod, Returns201):
-    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-
-    @pytest.fixture
-    def client(self, drf_redteam_client, redteamuser):
-        redteamuser.user_permissions.set([Permission.objects.get(codename="add_indemnification")])
-        return drf_redteam_client
-
-    def test_it_sets_indemnification(self, json, redteamuser):
-        expected = {"indemnification": True, "user": redteamuser.id}
-        assert json == expected
+@pytest.fixture
+def redteam_client(redteamuser):
+    _, token = create_auth_token(redteamuser.email, "test_redteam_key")
+    client = JSONAPIClient(raise_request_exception=False)
+    client.credentials(HTTP_AUTHORIZATION="Token " + token)
+    return client
 
 
-class TestSetIndemnificationNoPermission(APIViewTest, UsesPostMethod, Returns403):
-    url = lambda_fixture(lambda organization: reverse("organization-indemnification", args=[organization.pk]))
-    client = lambda_fixture("drf_redteam_client")
+def test_list_organizations(drf_client, organizations):
+    response = drf_client.get("/api/v1/organization/")
+    assert response.status_code == 200, f"Response: {response.content}"
+
+    data = response.json()
+
+    if isinstance(data, dict) and "results" in data:
+        orgs_list = data["results"]
+    elif isinstance(data, list):
+        orgs_list = data
+    else:
+        raise AssertionError(f"Unexpected response format: {data}")
+
+    org_map = {org["code"]: org for org in orgs_list}
+
+    assert "test1" in org_map
+    assert org_map["test1"]["name"] == "Test Organization 1"
+    assert org_map["test1"]["code"] == "test1"
+    assert sorted(org_map["test1"]["tags"]) == ["tag1", "tag2"]
+
+    assert "test2" in org_map
+    assert org_map["test2"]["name"] == "Test Organization 2"
+    assert org_map["test2"]["code"] == "test2"
 
 
-class TestIndemnificationAlreadyExists(APIViewTest, UsesPostMethod, Returns409):
-    # The superuser_member fixture creates the indemnification
-    url = lambda_fixture(
-        lambda organization, superuser_member: reverse("organization-indemnification", args=[organization.pk])
-    )
-    client = lambda_fixture("drf_admin_client")
+def test_list_organizations_no_permission(redteam_client, redteam_member, organizations):
+    response = redteam_client.get("/api/v1/organization/")
+    assert response.status_code == 403
 
-    def test_it_returns_indemnification(self, json, superuser_member):
-        expected = {"indemnification": True, "user": superuser_member.user.id}
-        assert json == expected
+
+def test_create_organization(drf_client, xtdb):
+    initial_count = Organization.objects.count()
+    data = {"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]}
+
+    response = drf_client.post("/api/v1/organization/", json=data)
+    assert response.status_code == 201
+
+    result = response.json()
+    assert result["name"] == "Test Org 3"
+    assert result["code"] == "test3"
+    assert sorted(result["tags"]) == ["tag2", "tag3"]
+
+    assert Organization.objects.count() == initial_count + 1
+    org = Organization.objects.get(pk=result["id"])
+    assert org.name == "Test Org 3"
+    assert org.code == "test3"
+    assert sorted(str(tag) for tag in org.tags.all()) == ["tag2", "tag3"]
+
+
+def test_create_organization_no_permission(redteam_client, redteam_member, xtdb):
+    data = {"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]}
+
+    response = redteam_client.post("/api/v1/organization/", json=data)
+    assert response.status_code == 403
+
+
+def test_retrieve_organization(admin_client, admin_member, organizations):
+    org = organizations[0]
+    response = admin_client.get(f"/api/v1/organization/{org.pk}/")
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["id"] == org.pk
+    assert result["name"] == "Test Organization 1"
+    assert result["code"] == "test1"
+    assert sorted(result["tags"]) == ["tag1", "tag2"]
+
+
+def test_retrieve_organization_no_permission(redteam_client, redteam_member, organizations):
+    org = organizations[0]
+    response = redteam_client.get(f"/api/v1/organization/{org.pk}/")
+    assert response.status_code == 403
+
+
+def test_update_organization(drf_client, organizations):
+    org = organizations[0]
+    data = {"name": "Changed Organization", "code": "test4", "tags": ["tag3", "tag4"]}
+
+    response = drf_client.patch(f"/api/v1/organization/{org.pk}/", json=data)
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["name"] == "Changed Organization"
+    assert result["code"] == "test1"
+    assert sorted(result["tags"]) == ["tag3", "tag4"]
+
+    org.refresh_from_db()
+    assert org.name == "Changed Organization"
+    assert org.code == "test1"
+    assert sorted(str(tag) for tag in org.tags.all()) == ["tag3", "tag4"]
+
+
+def test_destroy_organization(drf_client, organizations):
+    initial_count = Organization.objects.count()
+
+    response = drf_client.delete(f"/api/v1/organization/{organizations[0].pk}/")
+    assert response.status_code == 204
+
+    assert Organization.objects.count() == initial_count - 1
+    assert not Organization.objects.filter(pk=organizations[0].pk).exists()
+
+
+def test_destroy_organization_no_permission(redteam_client, redteam_member, organizations):
+    org = organizations[0]
+    response = redteam_client.delete(f"/api/v1/organization/{org.pk}/")
+    assert response.status_code == 403
+
+
+def test_get_indemnification(drf_client, organization_for_indemnification, user_with_indemnification):
+    response = drf_client.get(f"/api/v1/organization/{organization_for_indemnification.pk}/indemnification/")
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["indemnification"] is True
+    assert result["user"] == user_with_indemnification.id
+
+
+def test_get_indemnification_does_not_exist(drf_client, organization_for_indemnification):
+    org = Organization.objects.create(name="Test Org No Indem", code="test_no_indem")
+
+    response = drf_client.get(f"/api/v1/organization/{org.pk}/indemnification/")
+    assert response.status_code == 200
+
+    result = response.json()
+    assert result["indemnification"] is False
+    assert result["user"] is None
+
+
+def test_get_indemnification_no_permission(redteam_client, redteam_member, organization):
+    response = redteam_client.get(f"/api/v1/organization/{organization.pk}/indemnification/")
+    assert response.status_code == 403
+
+
+def test_set_indemnification(redteam_client, redteamuser, xtdb):
+    org = Organization.objects.create(name="Test Org for Set Indem", code="test_set_indem")
+    redteamuser.user_permissions.add(Permission.objects.get(codename="add_indemnification"))
+
+    response = redteam_client.post(f"/api/v1/organization/{org.pk}/indemnification/")
+    assert response.status_code == 201
+
+    result = response.json()
+    assert result["indemnification"] is True
+    assert result["user"] == redteamuser.id
+
+    assert Indemnification.objects.filter(user=redteamuser, organization=org).exists()
+
+
+def test_set_indemnification_no_permission(redteam_client, xtdb):
+    org = Organization.objects.create(name="Test Org for No Perm", code="test_no_perm")
+
+    response = redteam_client.post(f"/api/v1/organization/{org.pk}/indemnification/")
+    assert response.status_code == 403
+
+
+def test_set_indemnification_already_exists(drf_client, organization_for_indemnification, user_with_indemnification):
+    response = drf_client.post(f"/api/v1/organization/{organization_for_indemnification.pk}/indemnification/")
+    assert response.status_code == 409
+
+    result = response.json()
+    assert result["indemnification"] is True
+    assert result["user"] == user_with_indemnification.id
