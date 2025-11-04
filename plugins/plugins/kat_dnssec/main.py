@@ -27,19 +27,21 @@ def run(file_id: str) -> list[dict[str, str]]:
     else:
         raise ValueError("No status line found in drill output")
 
-    results = []
-
     # [S] self sig OK; [B] bogus; [T] trusted; [U] unsigned
     if result_line.startswith("[U]"):
         finding = {"hostname": domain, "finding_type_code": "KAT-NO-DNSSEC"}
-        results.append(finding)
+        client.post("/objects/finding/", json=[finding])
+        client.delete(f"/objects/finding/KAT-INVALID-DNSSEC|internet|{domain}/")
+
+        return [finding]
     elif result_line.startswith("[S]") or result_line.startswith("[B]"):
         finding = {"hostname": domain, "finding_type_code": "KAT-INVALID-DNSSEC"}
-        results.append(finding)
+        client.post("/objects/finding/", json=[finding])
+        client.delete(f"/objects/finding/KAT-NO-DNSSEC|internet|{domain}/")
 
-    client.post("/objects/finding/", json=results)
+        return [finding]
 
-    return results
+    return []
 
 
 if __name__ == "__main__":
