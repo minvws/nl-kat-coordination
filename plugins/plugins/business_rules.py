@@ -68,7 +68,7 @@ def get_rules():
                           LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                           LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                           LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                     select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-WEBSERVER-NO-IPV6')
+                     select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-WEBSERVER-NO-IPV6')
                      )
                  where f._id is null and dns._id is null and ns._id is null;
             """,  # noqa: S608
@@ -82,7 +82,7 @@ def get_rules():
                     LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     WHERE ns._id IS NULL
                     AND f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-WEBSERVER-NO-IPV6'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-WEBSERVER-NO-IPV6'
                     )
                 );""",  # noqa: S608
             "finding_type_code": "KAT-WEBSERVER-NO-IPV6",
@@ -98,7 +98,7 @@ def get_rules():
                    RIGHT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                    LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                    LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                      select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NAMESERVER-NO-IPV6')
+                      select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-NAMESERVER-NO-IPV6')
                   )
                 where f._id is null and dns._id is null;
                  """,  # noqa: S608
@@ -111,7 +111,7 @@ def get_rules():
                     INNER JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     INNER JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                     WHERE f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-NAMESERVER-NO-IPV6'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-NAMESERVER-NO-IPV6'
                     )
                 );
             """,  # noqa: S608
@@ -129,7 +129,7 @@ def get_rules():
                       LEFT JOIN {Hostname._meta.db_table} nshost ON hns.name_server_id = nshost._id
                       LEFT JOIN {DNSAAAARecord._meta.db_table} dns ON dns.hostname_id = nshost._id
                       LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NAMESERVER-NO-TWO-IPV6')
+                    select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-NAMESERVER-NO-TWO-IPV6')
                  )
                  where f._id is null and ns._id is null
                  having count(dns._id) < 2;
@@ -146,7 +146,7 @@ def get_rules():
                     LEFT JOIN {DNSNSRecord._meta.db_table} ns ON h."_id" = ns."name_server_id"
                     WHERE ns._id IS NULL
                     AND f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-NAMESERVER-NO-TWO-IPV6'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-NAMESERVER-NO-TWO-IPV6'
                     )
                     GROUP BY f._id
                     HAVING COUNT(DISTINCT dns._id) >= 2
@@ -168,7 +168,7 @@ def get_rules():
                                    AND dns."value"::text LIKE_REGEX 'v=spf1.*' FLAG 'i'
                                )
                      LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                        select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NO-SPF')
+                        select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-NO-SPF')
                     )
                 WHERE dns._id IS NULL AND f._id is null;
             """,  # noqa: S608
@@ -181,7 +181,7 @@ def get_rules():
                     INNER JOIN {DNSTXTRecord._meta.db_table} dns ON h."_id" = dns."hostname_id"
                     WHERE dns."value"::text LIKE_REGEX 'v=spf1.*' FLAG 'i'
                     AND f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-NO-SPF'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-NO-SPF'
                     )
                 );
             """,  # noqa: S608
@@ -196,7 +196,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-OPEN-SYSADMIN-PORT')
+                    select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-OPEN-SYSADMIN-PORT')
                 )
             where f._id is null and port.port in ({", ".join(str(x) for x in SA_TCP_PORTS)});
             """,  # noqa: S608
@@ -212,7 +212,7 @@ def get_rules():
                     )
                     WHERE port._id IS NULL
                     AND f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-OPEN-SYSADMIN-PORT'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-OPEN-SYSADMIN-PORT'
                     )
                 );
             """,  # noqa: S608
@@ -227,7 +227,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
             JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
             LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-OPEN-DATABASE-PORT')
+                select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-OPEN-DATABASE-PORT')
             )
             where f._id is null and port.port in ({", ".join(str(x) for x in DB_TCP_PORTS)});
             """,  # noqa: S608
@@ -237,7 +237,7 @@ def get_rules():
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
                     INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-OPEN-DATABASE-PORT'
+                        f.finding_type_id = ft._id AND ft._id = 'KAT-OPEN-DATABASE-PORT'
                     )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.address_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
@@ -258,7 +258,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-OPEN-DESKTOP-PORT')
+                    select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-OPEN-DESKTOP-PORT')
                 )
             where f._id is null and port.port in ({", ".join(str(x) for x in MICROSOFT_RDP_PORTS)});
             """,  # noqa: S608
@@ -268,7 +268,7 @@ def get_rules():
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
                     INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-REMOTE-DESKTOP-PORT'
+                        f.finding_type_id = ft._id AND ft._id = 'KAT-REMOTE-DESKTOP-PORT'
                     )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.address_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
@@ -289,7 +289,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-UNCOMMON-OPEN-PORT')
+                    select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-UNCOMMON-OPEN-PORT')
                 )
             where f._id is null and (
                 (port.protocol = 'TCP' and port.port not in ({", ".join(str(x) for x in ALL_COMMON_TCP)}))
@@ -303,7 +303,7 @@ def get_rules():
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
                     INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-UNCOMMON-OPEN-PORT'
+                        f.finding_type_id = ft._id AND ft._id = 'KAT-UNCOMMON-OPEN-PORT'
                     )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.address_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
@@ -328,7 +328,7 @@ def get_rules():
             FROM {IPAddress._meta.db_table} ip
                 JOIN {IPPort._meta.db_table} port ON ip."_id" = port.address_id
                 LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                    select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-OPEN-COMMON-PORT')
+                    select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-OPEN-COMMON-PORT')
                 )
             where f._id is null and (
                 (port.protocol = 'TCP' and port.port in ({", ".join(str(x) for x in ALL_COMMON_TCP)}))
@@ -342,7 +342,7 @@ def get_rules():
                     SELECT f._id
                     FROM {Finding._meta.db_table} f
                     INNER JOIN {FindingType._meta.db_table} ft ON (
-                        f.finding_type_id = ft._id AND ft.code = 'KAT-OPEN-COMMON-PORT'
+                        f.finding_type_id = ft._id AND ft._id = 'KAT-OPEN-COMMON-PORT'
                     )
                     INNER JOIN {IPAddress._meta.db_table} ip ON ip._id = f.address_id
                     LEFT JOIN {IPPort._meta.db_table} port ON (
@@ -368,7 +368,7 @@ def get_rules():
             FROM {Hostname._meta.db_table} h
                      LEFT JOIN {DNSCAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                      LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NO-CAA')
+                select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-NO-CAA')
                 )
             where f._id is null and dns._id is null;
             """,  # noqa: S608
@@ -380,7 +380,7 @@ def get_rules():
                     INNER JOIN {Hostname._meta.db_table} h ON h._id = f.hostname_id
                     INNER JOIN {DNSCAARecord._meta.db_table} dns ON dns.hostname_id = h._id
                     WHERE f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-NO-CAA'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-NO-CAA'
                     )
                 );
             """,  # noqa: S608
@@ -397,7 +397,7 @@ def get_rules():
                      select host._id, host.name, host.network_id, host.root, host.declared, host.scan_level
                         from {Hostname._meta.db_table} host
                         LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = host._id and f.finding_type_id = (
-                         select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-NO-DMARC')
+                         select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-NO-DMARC')
                          ) where f._id is null
                  ) h
                      LEFT JOIN {Hostname._meta.db_table} root_h ON
@@ -423,7 +423,7 @@ def get_rules():
                 SELECT f._id
                 FROM {Finding._meta.db_table} f
                 INNER JOIN {FindingType._meta.db_table} ft ON (
-                    f.finding_type_id = ft._id AND ft.code = 'KAT-NO-DMARC'
+                    f.finding_type_id = ft._id AND ft._id = 'KAT-NO-DMARC'
                 )
                 INNER JOIN {Hostname._meta.db_table} h ON h._id = f.hostname_id
                 LEFT JOIN {Hostname._meta.db_table} root_h ON (
@@ -456,7 +456,7 @@ def get_rules():
                   JOIN {DNSNSRecord._meta.db_table} hns ON h."_id" = hns."hostname_id"
                   JOIN {Hostname._meta.db_table} nsh ON hns.name_server_id = nsh._id
                   LEFT JOIN {Finding._meta.db_table} f on (f.hostname_id = h._id and f.finding_type_id = (
-                     select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-DOMAIN-OWNERSHIP-PENDING')
+                     select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-DOMAIN-OWNERSHIP-PENDING')
                  )
                  where f._id is null and nsh.name in ({", ".join(f"'{x}'" for x in INDICATORS)})
             """,  # noqa: S608
@@ -473,7 +473,7 @@ def get_rules():
                     )
                     WHERE nsh._id IS NULL
                     AND f.finding_type_id = (
-                        select _id from {FindingType._meta.db_table} where code = 'KAT-DOMAIN-OWNERSHIP-PENDING'
+                        select _id from {FindingType._meta.db_table} where _id = 'KAT-DOMAIN-OWNERSHIP-PENDING'
                     )
                 );
             """,  # noqa: S608
@@ -493,7 +493,7 @@ def get_rules():
                     JOIN {Software.ports.through._meta.db_table} software_port ON software_port.ipport_id = port._id
                     JOIN {Software._meta.db_table} software ON software_port.software_id = software._id
                     LEFT JOIN {Finding._meta.db_table} f on (f.address_id = ip._id and f.finding_type_id = (
-                       select ft._id from {FindingType._meta.db_table} ft where code = 'KAT-EXPOSED-SOFTWARE')
+                       select ft._id from {FindingType._meta.db_table} ft where _id = 'KAT-EXPOSED-SOFTWARE')
                     )
                 where f._id is null and lower(software.name) like '%%{software}%%';
             """,  # noqa: S608
@@ -510,7 +510,7 @@ def get_rules():
                 )
                 WHERE software._id is NULL
                 AND f.finding_type_id = (
-                    select _id from {FindingType._meta.db_table} where code = 'KAT-EXPOSED-SOFTWARE'
+                    select _id from {FindingType._meta.db_table} where _id = 'KAT-EXPOSED-SOFTWARE'
                 )
             );""",  # noqa: S608
             "finding_type_code": "KAT-EXPOSED-SOFTWARE",

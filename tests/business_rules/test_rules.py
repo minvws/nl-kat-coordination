@@ -154,10 +154,10 @@ def test_missing_caa(xtdb):
 
     assert len(IPAddress.objects.raw(get_rules()["missing_caa"]["query"])) == 2
 
-    DNSCAARecord.objects.create(hostname=hn, flags=10, tag=CAATag.ISSUE)
+    DNSCAARecord.objects.create(hostname=hn, flags=10, tag=CAATag.ISSUE, value="123")
     assert len(IPAddress.objects.raw(get_rules()["missing_caa"]["query"])) == 1
 
-    DNSCAARecord.objects.create(hostname=hn2, flags=10, tag=CAATag.CONTACTEMAIL)
+    DNSCAARecord.objects.create(hostname=hn2, flags=10, tag=CAATag.CONTACTEMAIL, value="321")
     assert len(IPAddress.objects.raw(get_rules()["missing_caa"]["query"])) == 0
 
 
@@ -445,7 +445,7 @@ def test_missing_dmarc_inverse_query(xtdb):
     network = Network.objects.create(name="test")
     h = Hostname.objects.create(network=network, name="test.com")
     hn = Hostname.objects.create(network=network, name="mx.test.com")
-    DNSMXRecord.objects.create(hostname=h, mail_server=hn)
+    DNSMXRecord.objects.create(hostname=h, preference=10, mail_server=hn)
 
     # Create finding type and finding
     finding_type, _ = FindingType.objects.get_or_create(code="KAT-NO-DMARC")
