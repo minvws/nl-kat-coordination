@@ -11,6 +11,7 @@ import os
 import socket
 import sys
 from binascii import hexlify
+from collections import defaultdict
 from json import JSONDecodeError
 
 import httpx
@@ -22,7 +23,7 @@ def ipv6_to_int(ipv6_addr):
     return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
 
 
-def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> list[dict[str, str]]:
+def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dict[str, str]], dict[str, list[str]]]:
     rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),  # parse CIDR to prefix as an integer
@@ -82,28 +83,32 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> list[dict[str,
         pl.col("intip6_right").is_null()
     )
 
-    results = []
-
     ip4s_without_rpki = ip4s_lazy.join(new_v4, on="address", how="left").filter(pl.col("prefix").is_null())
     ip6s_without_rpki = ip6s_lazy.join(new_v6, on="address", how="left").filter(pl.col("prefix").is_null())
+    results = []
+    by_ip = defaultdict(list)
 
     for address in ip4s_without_rpki.select("address").collect().iter_rows():
-        f = dict(finding_type_code="KAT-NO-RPKI", address=address[0])
+        f = dict(finding_type_code="KAT-NO-RPKI", ipaddress=address[0])
         results.append(f)
+        by_ip[address[0]].append("KAT-NO-RPKI")
 
     for address in ip6s_without_rpki.select("address").collect().iter_rows():
-        f = dict(finding_type_code="KAT-NO-RPKI", address=address[0])
+        f = dict(finding_type_code="KAT-NO-RPKI", ipaddress=address[0])
         results.append(f)
+        by_ip[address[0]].append("KAT-NO-RPKI")
 
     for address in bgp_rpki_v4.select("address").collect().iter_rows():
-        f = dict(finding_type_code="KAT-INVALID-RPKI", address=address[0])
+        f = dict(finding_type_code="KAT-INVALID-RPKI", ipaddress=address[0])
         results.append(f)
+        by_ip[address[0]].append("KAT-INVALID-RPKI")
 
     for address in bgp_rpki_v6.select("address").collect().iter_rows():
-        f = dict(finding_type_code="KAT-INVALID-RPKI", address=address[0])
+        f = dict(finding_type_code="KAT-INVALID-RPKI", ipaddress=address[0])
         results.append(f)
+        by_ip[address[0]].append("KAT-INVALID-RPKI")
 
-    return results
+    return results, by_ip
 
 
 def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
@@ -141,8 +146,26 @@ if __name__ == "__main__":
         for line in sys.stdin.readlines():
             ips.append(line.strip())
 
-    results = run(download_lazyframe(client, "rpki-download"), download_lazyframe(client, "bgp-download"), ips)
+    results, by_ip = run(download_lazyframe(client, "rpki-download"), download_lazyframe(client, "bgp-download"), ips)
+    client.post("/objects/finding/", json=results, timeout=30).raise_for_status()
 
-    client.post("/objects/finding/", json=results, timeout=30)
+    # Clean up any invalid findings
+    no_rpki = []
+    invalid_rpki = []
+    for ip in ips:
+        if ip not in by_ip:
+            no_rpki.append(f"KAT-NO-RPKI|internet|{ip}")
+            invalid_rpki.append(f"KAT-NO-RPKI|internet|{ip}")
+            continue
+
+        if "KAT-NO-RPKI" not in by_ip[ip]:
+            no_rpki.append(f"KAT-NO-RPKI|internet|{ip}")
+        if "KAT-INVALID-RPKI" not in by_ip[ip]:
+            invalid_rpki.append(f"KAT-INVALID-RPKI|internet|{ip}")
+
+    if no_rpki:
+        client.delete("/objects/finding/", params={"id": no_rpki}, timeout=30).raise_for_status()
+    if invalid_rpki:
+        client.delete("/objects/finding/", params={"id": invalid_rpki}, timeout=30).raise_for_status()
 
     print(json.dumps(results))  # noqa: T201
