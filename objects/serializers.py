@@ -79,20 +79,8 @@ class NetworkSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class HostnameSerializer(serializers.ModelSerializer):
-    network = CharField(write_only=True)
-    network_id = PrimaryKeyRelatedField(source="network", read_only=True)
+class HostnameSerializer(GetOrCreateSerializer):
     dns_records = SerializerMethodField(read_only=True)
-
-    def create(self, validated_data):
-        network_name = validated_data.pop("network")
-
-        if not network_name:
-            network_name = "internet"
-
-        net, created = Network.objects.get_or_create(name=network_name)
-        hn, created = Hostname.objects.get_or_create(network=net, **validated_data)
-        return hn
 
     def get_dns_records(self, obj: Hostname) -> list[dict[str, Any]]:
         dns = []
@@ -127,21 +115,7 @@ class SoftwareSerializer(GetOrCreateSerializer):
         read_only_fields = ["id"]
 
 
-class IPAddressSerializer(serializers.ModelSerializer):
-    network = CharField(write_only=True)
-    network_id = PrimaryKeyRelatedField(source="network", read_only=True)
-
-    def create(self, validated_data):
-        network_name = validated_data.pop("network")
-
-        if not network_name:
-            network_name = "internet"
-
-        net, created = Network.objects.get_or_create(name=network_name)
-        ip, created = IPAddress.objects.get_or_create(network=net, **validated_data)
-
-        return ip
-
+class IPAddressSerializer(GetOrCreateSerializer):
     class Meta:
         model = IPAddress
         exclude = ["_valid_from"]

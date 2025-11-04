@@ -112,7 +112,7 @@ def test_hostname_api(drf_client, xtdb):
             "id": hn.pk,
             "name": "test.com",
             "dns_records": [],
-            "network_id": network.pk,
+            "network": network.pk,
             "root": True,
             "declared": False,
             "scan_level": 2,
@@ -137,7 +137,7 @@ def test_hostname_api(drf_client, xtdb):
                     "object_type": "dnstxtrecord",
                 }
             ],
-            "network_id": network.pk,
+            "network": network.pk,
             "root": True,
             "declared": False,
             "scan_level": 2,
@@ -147,7 +147,7 @@ def test_hostname_api(drf_client, xtdb):
             "id": hn2["id"],
             "name": "test2.com",
             "dns_records": [],
-            "network_id": network.pk,
+            "network": network.pk,
             "root": True,
             "declared": False,
             "scan_level": None,
@@ -172,7 +172,7 @@ def test_hostname_api(drf_client, xtdb):
                 "value": "v=spf1",
             }
         ],
-        "network_id": network.pk,
+        "network": network.pk,
         "root": True,
         "declared": False,
         "scan_level": 2,  # Still intact
@@ -191,7 +191,7 @@ def test_ip_api(drf_client, xtdb):
     assert drf_client.get("/api/v1/objects/ipaddress/").json()["results"] == [
         {
             "id": ip_res["id"],
-            "network_id": net.pk,
+            "network": net.pk,
             "address": "127.0.0.1",
             "declared": False,
             "scan_level": None,
@@ -314,7 +314,9 @@ def test_bulk_create(drf_client, xtdb):
     assert drf_client.get("/api/v1/objects/hostname/").json()["count"] == 2 * n
 
 
-def test_dns_records_are_not_duplicated(drf_client, xtdb, settings):
+def test_dns_records_are_not_duplicated(drf_client, xtdb):
+    Network.objects.create(name="internet")
+
     results_grouped = defaultdict(list)
     results = [
         {"object_type": "ipaddress", "network": "internet", "address": "127.0.0.1"},
@@ -440,7 +442,9 @@ def test_ipport_bulk_delete_multiple(drf_client, xtdb):
     assert IPPort.objects.filter(pk=port4_id).exists()
 
 
-def test_hostname_delete_dns_records_integration(drf_client, xtdb):
+def test_hostname_delete_dns_plugin(drf_client, xtdb):
+    Network.objects.create(name="internet")
+
     objects_data = {
         "ipaddress": [
             {"network": "internet", "address": "192.0.2.1"},
