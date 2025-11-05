@@ -39,7 +39,6 @@ environ.Env.read_env(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-OPENKAT_REPORT_PERMALINKS = env.bool("OPENKAT_REPORT_PERMALINKS", True)
 HOST_MOUNT_DIR = env.str("HOST_MOUNT_DIR", default=Path(__file__).resolve().parent.parent.absolute())
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -306,8 +305,6 @@ LANGUAGE_COOKIE_NAME = "language"
 TIME_ZONE = "UTC"
 
 USE_I18N = True
-
-
 USE_TZ = True
 
 LOCALE_PATHS = (BASE_DIR / "openkat/locale",)
