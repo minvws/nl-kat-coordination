@@ -33,7 +33,6 @@ services:
     volumes:
       - xtdb-data:/var/lib/xtdb
     environment:
-      # Change to DEBUG to see which queries are executed
       - XTDB_LOGGING_LEVEL=DEBUG
 
   openkat:
