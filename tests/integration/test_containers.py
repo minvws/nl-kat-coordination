@@ -268,6 +268,7 @@ def test_worker_dispatches_multiple_plugin_tasks_from_file_input():
     group_result.join()
 
     assert File.objects.count() == 2
+    assert File.objects.last().task_result.task == tasks[0]
 
 
 # oci_image = openkat/plugins:latest
