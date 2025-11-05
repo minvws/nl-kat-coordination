@@ -2381,7 +2381,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.11.2,<5" },
     { name = "cron-descriptor", specifier = ">=2" },
-    { name = "django", specifier = ">=5.1.13,<5.2" },
+    { name = "django", specifier = ">=5.1.14,<5.2" },
     { name = "django-components", specifier = ">=0.88,<0.89" },
     { name = "django-compressor", git = "https://github.com/dekkers/django-compressor.git?rev=csp-nonce" },
     { name = "django-csp", specifier = "~=4.0" },
