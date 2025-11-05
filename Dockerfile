@@ -45,10 +45,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . .
 
+FROM golang:1.24-alpine AS entrypoint_builder
+
+WORKDIR /app
+COPY plugins/plugins/entrypoint/main.go .
+RUN go build -o main main.go
+
 FROM dev
 
 # These files need to be available when we run collectstatic
 COPY --link --from=node_builder /app/assets/dist assets/dist
+COPY --from=entrypoint_builder /app/main plugins/plugins/entrypoint/
 
 # The secret key isn't used by the commands, but Django won't work do anything
 # without it
@@ -56,7 +63,8 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" REDIS_HOST="localhost/" REDIS_PASSWORD="fake" && \
     python manage.py collectstatic -l && python manage.py compilemessages
 
-RUN rm -rf tests
+RUN mkdir media && chown -R openkat media
+RUN rm -rf tests *.lock package.json openkat.egg-info setup.py pyproject.toml
 
 USER openkat
 

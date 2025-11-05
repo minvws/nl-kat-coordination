@@ -46,6 +46,7 @@ services:
     command: web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - files:/app/openkat/media
     env_file:
       - .env
     environment:
@@ -62,6 +63,7 @@ services:
     image: "ghcr.io/minvws/nl-kat-openkat:branch-v2"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - files:/app/openkat/media
     command: worker
     env_file:
       - .env
@@ -89,3 +91,4 @@ networks:
 volumes:
   postgres-data:
   xtdb-data:
+  files:

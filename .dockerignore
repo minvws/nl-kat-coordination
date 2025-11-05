@@ -5,12 +5,23 @@
 .Python
 env
 .venv
+**/.DS_Store
 pip-log.txt
 pip-delete-this-directory.txt
 .tox
 .coverage
 .coverage.*
 .cache
+.benchmarks
+MANIFEST.in
+.claude
+.env.local
+.ruff_cache
+.idea
+node_modules
+docker-compose*
+.editorconfig
+rfd
 nosetests.xml
 coverage.xml
 *.cover
@@ -29,10 +40,13 @@ bytes-data
 .ci
 Makefile
 packaging
+debian
 README.*
 sql_migrations
 docs
 assets/dist
 static
+media
 .parcel-cache
 *.egg-info
+ .pre-commit-config.yaml
