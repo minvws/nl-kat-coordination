@@ -613,7 +613,7 @@ class ObjectSetForm(ModelForm):
         return cleaned_data
 
     def clean_all_objects(self):
-        return [int(pk) for pk in self.cleaned_data.get("all_objects", [])]
+        return self.cleaned_data.get("all_objects", [])
 
 
 class ObjectSetCreateView(KATModelPermissionRequiredMixin, CreateView):
