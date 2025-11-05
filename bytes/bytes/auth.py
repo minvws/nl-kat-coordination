@@ -27,11 +27,7 @@ class TokenResponse(BaseModel):
 def get_access_token(form_data: OAuth2PasswordRequestForm) -> tuple[str, datetime]:
     settings = get_settings()
     system_username = settings.username
-    hashed_password = pwd_context.hash(settings.password[:72])
-
-    if len(settings.password) > 72:
-        logger.warning("Password length exceeds bcrypt limit of 72 characters; truncating for hashing.")
-    
+    hashed_password = pwd_context.hash(settings.password)
 
     authenticated = form_data.username == system_username and pwd_context.verify(form_data.password, hashed_password)
 
