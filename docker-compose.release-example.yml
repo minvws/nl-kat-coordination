@@ -2,8 +2,6 @@ services:
   redis:
     restart: unless-stopped
     image: docker.io/library/redis:8.0.3-alpine
-    ports:
-      - "127.0.0.1:6379:6379"
     command:
       - /bin/sh
       - -c
@@ -19,14 +17,10 @@ services:
     restart: unless-stopped
     image: docker.io/library/postgres:15
     shm_size: 256MB
-    ports:
-      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 10s
       retries: 10
-    # Django runserver does not limit the number of threads. We need to increase
-    # the maximum number of connection to make sure that we don't hit the limit.
     command: -c max_connections=500
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -36,9 +30,6 @@ services:
   xtdb:
     image: "ghcr.io/xtdb/xtdb:nightly-20251010"
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:5433:5432"
-      - "127.0.0.1:8080:8080"
     volumes:
       - xtdb-data:/var/lib/xtdb
     environment:
@@ -50,15 +41,11 @@ services:
     depends_on:
       - postgres
       - xtdb
+    image: "ghcr.io/minvws/nl-kat-openkat:branch-v2"
     ports:
       - "127.0.0.1:8000:8000"
-    build:
-      target: dev
-      args:
-        ENVIRONMENT: dev
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: web
     volumes:
-      - ./:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
@@ -73,14 +60,10 @@ services:
     depends_on:
       - postgres
       - xtdb
-    build:
-      target: dev
-      args:
-        ENVIRONMENT: dev
+    image: "ghcr.io/minvws/nl-kat-openkat:branch-v2"
     volumes:
-      - ./:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
-    command: python manage.py celery_reload_worker "celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=INFO"
+    command: worker
     env_file:
       - .env
     environment:
