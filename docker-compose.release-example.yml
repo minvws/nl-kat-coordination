@@ -47,6 +47,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - files:/app/openkat/media
+      - plugin-entrypoint:/plugin
     env_file:
       - .env
     networks:
@@ -62,6 +63,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - files:/app/openkat/media
+      - plugin-entrypoint:/plugin
     command: worker
     env_file:
       - .env
