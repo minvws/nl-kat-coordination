@@ -84,6 +84,17 @@ class SubjectAlternativeName(OOI):
 
     _natural_key_attrs = ["certificate"]
 
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        if values.get("hostname"):
+            return SubjectAlternativeNameHostname(**values)
+        if values.get("address"):
+            return SubjectAlternativeNameIP(**values)
+        if values.get("name"):
+            return SubjectAlternativeNameQualifier(**values)
+        # raise ValueError("Falsy SubjectAlternativeName data provided.")
+
 
 class SubjectAlternativeNameHostname(SubjectAlternativeName):
     """Represents subject alternative names for hostnames in X509 Certificate objects.
@@ -113,6 +124,10 @@ class SubjectAlternativeNameHostname(SubjectAlternativeName):
             "certificate": data.certificate,
             "hostname": data.hostname,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class SubjectAlternativeNameIP(SubjectAlternativeName):
@@ -143,6 +158,10 @@ class SubjectAlternativeNameIP(SubjectAlternativeName):
             "certificate": data.certificate,
             "address": data.address,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class SubjectAlternativeNameQualifier(SubjectAlternativeName):
@@ -173,6 +192,10 @@ class SubjectAlternativeNameQualifier(SubjectAlternativeName):
             "certificate": data.certificate,
             "name": data.name,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 X509Certificate.model_rebuild()

@@ -129,7 +129,7 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
             "spf_record": data.spf_record,
             "mechanism": data.mechanism,
             "ip": data.ip,
-            "qualifier": str(data.qualifier),
+            "qualifier": data.qualifier.value,
         })
 
 class DNSSPFMechanismHostname(DNSSPFMechanism):
@@ -163,7 +163,7 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
             "spf_record": data.spf_record,
             "mechanism": data.mechanism,
             "hostname": data.hostname,
-            "qualifier": str(data.qualifier),
+            "qualifier": data.qualifier.value,
         })
 
 
@@ -199,7 +199,7 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
             "spf_record": data.spf_record,
             "mechanism": data.mechanism,
             "netblock": data.netblock,
-            "qualifier": str(data.qualifier),
+            "qualifier": data.qualifier.value,
         })
 
 

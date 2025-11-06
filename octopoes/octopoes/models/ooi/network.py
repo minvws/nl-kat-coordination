@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from ipaddress import IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv6Address, ip_network, IPv4Network
 from typing import Annotated, Literal
 
 from pydantic import Field, field_serializer
@@ -52,6 +52,15 @@ class IPAddress(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.address
+    
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        """It should be override again in child classes"""
+        values: dict = loader.construct_mapping(node)
+        ip_address_: str = values.get("address", "")
+        if isinstance(ip_network(ip_address_), IPv4Network):
+            return IPAddressV4(**values)
+        return IPAddressV6(**values)
 
 
 class IPAddressV4(IPAddress):
@@ -76,14 +85,17 @@ class IPAddressV4(IPAddress):
     _reverse_relation_names = {"network": "ip_v4_addresses", "netblock": "ip_v4_addresses"}
 
     @classmethod
-    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPAddressV6) -> yaml.Node:
-        return dumper.represent_mapping("!IPAddressV6", {
+    def yml_representer(cls, dumper: yaml.SafeDumper, data: IPAddressV4) -> yaml.Node:
+        return dumper.represent_mapping("!IPAddressV4", {
             **cls.get_ooi_yml_repr_dict(data),
             "address": data.address.exploded,
             "network": data.network,
             "netblock": data.netblock
         })
-
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 class IPAddressV6(IPAddress):
     """Represents IPv6 address objects.
@@ -114,6 +126,10 @@ class IPAddressV6(IPAddress):
             "network": data.network,
             "netblock": data.netblock
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class Protocol(Enum):
@@ -187,9 +203,9 @@ class IPPort(OOI):
         return dumper.represent_mapping("!IPPort", {
             **cls.get_ooi_yml_repr_dict(data),
             "address": data.address,
-            "protocol": str(data.protocol),
+            "protocol": data.protocol.value,
             "port": data.port,
-            "state": str(data.state) if data.state else data.state,
+            "state": data.state.value if data.state else data.state,
         })
 
 class AutonomousSystem(OOI):
@@ -237,6 +253,16 @@ class NetBlock(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.start_ip.address}/{reference.tokenized.mask}"
+    
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        """It should be override again in child classes"""
+        values: dict = loader.construct_mapping(node)
+        start_ip_: str = values.get("start_ip", "")
+        start_ip_ = Reference.from_str(start_ip_).tokenized.address if start_ip_ else start_ip_
+        if isinstance(ip_network(start_ip_), IPv4Address):
+            return IPV4NetBlock(**values)
+        return IPV6NetBlock(**values)
 
 
 class IPV6NetBlock(NetBlock):
@@ -272,6 +298,10 @@ class IPV6NetBlock(NetBlock):
             "start_ip": data.start_ip,
             "mask": data.mask,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 
@@ -309,6 +339,10 @@ class IPV4NetBlock(NetBlock):
             "start_ip": data.start_ip,
             "mask": data.mask,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 IPAddressV4.model_rebuild()

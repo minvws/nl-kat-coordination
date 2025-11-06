@@ -1,7 +1,7 @@
 from __future__ import annotations
 import hashlib
 from enum import Enum
-from typing import Literal
+from typing import Literal, TypedDict
 
 import yaml
 
@@ -31,6 +31,31 @@ class DNSRecord(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         dns_record_type = cls._get_record_type()
         return f"{reference.tokenized.hostname.name} {dns_record_type} {reference.tokenized.value}"
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        """it should be overrice again in child classes"""
+        values: dict = loader.construct_mapping(node)
+        if values.get('dns_record_type') == "A":
+            return DNSARecord(**values)
+        if values.get('dns_record_type') == "AAAA":
+            return DNSAAAARecord(**values)
+        if values.get('dns_record_type') == "CAA":
+            return DNSCAARecord(**values)
+        if values.get('dns_record_type') == "CNAME":
+            return DNSCNAMERecord(**values)
+        if values.get('dns_record_type') == "MX":
+            return DNSMXRecord(**values)
+        if values.get('dns_record_type') == "NS":
+            return DNSNSRecord(**values)
+        if values.get('dns_record_type') == "PTR":
+            return DNSPTRRecord(**values)
+        if values.get('dns_record_type') == "SOA":
+            return DNSSOARecord(**values)
+        # if values.get('dns_record_type') == "SRV":
+        #     return DNSARecord(**values)
+        if values.get('dns_record_type') == "TXT":
+            return DNSTXTRecord(**values)
+
 
 
 class DNSARecord(DNSRecord):
@@ -58,6 +83,10 @@ class DNSARecord(DNSRecord):
             "ttl": data.ttl,
             "address": data.address,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSAAAARecord(DNSRecord):
@@ -85,6 +114,10 @@ class DNSAAAARecord(DNSRecord):
             "dns_record_type": data.dns_record_type,
             "address": data.address,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSMXRecord(DNSRecord):
@@ -109,6 +142,10 @@ class DNSMXRecord(DNSRecord):
             "mail_hostname": data.mail_hostname,
             "preference": data.preference,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSTXTRecord(DNSRecord):
@@ -139,6 +176,10 @@ class DNSTXTRecord(DNSRecord):
             "ttl": data.ttl,
             "dns_record_type": data.dns_record_type,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSNSRecord(DNSRecord):
@@ -166,6 +207,10 @@ class DNSNSRecord(DNSRecord):
             "dns_record_type": data.dns_record_type,
             "name_server_hostname": data.name_server_hostname,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSCNAMERecord(DNSRecord):
@@ -188,6 +233,10 @@ class DNSCNAMERecord(DNSRecord):
             "dns_record_type": data.dns_record_type,
             "target_hostname": data.target_hostname,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class DNSSOARecord(DNSRecord):
@@ -232,6 +281,10 @@ class DNSSOARecord(DNSRecord):
             "expire": data.expire,
             "minimum": data.minimum,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class NXDOMAIN(OOI):
@@ -281,6 +334,10 @@ class DNSPTRRecord(DNSRecord):
             "dns_record_type": data.dns_record_type,
             "address": data.address,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class CAATAGS(Enum):
@@ -335,6 +392,10 @@ class DNSCAARecord(DNSRecord):
             "ttl": data.ttl,
             "dns_record_type": data.dns_record_type,
             "flags": data.flags,
-            "tag": str(data.tag),
+            "tag": data.tag.value,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
     

@@ -92,7 +92,7 @@ class ADRFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -114,7 +114,7 @@ class CVEFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -136,7 +136,7 @@ class CWEFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -158,7 +158,7 @@ class CAPECFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -178,7 +178,7 @@ class RetireJSFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -200,7 +200,7 @@ class SnykFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 
@@ -220,7 +220,7 @@ class KATFindingType(FindingType):
             "impact": data.impact,
             "recommendation": data.recommendation,
             "risk_score": data.risk_score,
-            "risk_severity": str(data.risk_severity),
+            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
         })
 
 

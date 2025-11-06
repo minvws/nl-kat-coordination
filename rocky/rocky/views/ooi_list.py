@@ -225,7 +225,7 @@ class OOIListExportView(BaseOOIListView):
         elif file_type == "yml":
             exports["oois"]=ooi_list
             response = HttpResponse(
-                yaml.safe_dump(exports, sort_keys=False),
+                yaml.safe_dump(exports, sort_keys=False, indent=4),
                 content_type="application/yaml",
                 headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(self.observed_at) + ".yml"},
             )

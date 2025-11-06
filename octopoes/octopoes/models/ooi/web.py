@@ -64,6 +64,13 @@ class WebURL(OOI):
     port: int
     path: str
 
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        name: Reference = values["netloc"]
+        if name.class_ == "HostnameHTTPURL":
+            return HostnameHTTPURL(**values)
+        return IPAddressHTTPURL(**values)
 
 class HostnameHTTPURL(WebURL):
     object_type: Literal["HostnameHTTPURL"] = "HostnameHTTPURL"
@@ -83,11 +90,16 @@ class HostnameHTTPURL(WebURL):
     def yml_representer(cls, dumper: yaml.SafeDumper, data: HostnameHTTPURL) -> yaml.Node:
         return dumper.represent_mapping("!HostnameHTTPURL", {
             **cls.get_ooi_yml_repr_dict(data),
-            "scheme": str(data.scheme),
+            "network": data.network,
+            "scheme": data.scheme.value,
             "port": data.port,
             "path": data.path,
             "netloc": data.netloc,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class IPAddressHTTPURL(WebURL):
@@ -108,11 +120,16 @@ class IPAddressHTTPURL(WebURL):
     def yml_representer(cls, dumper: yaml.SafeDumper, data: IPAddressHTTPURL) -> yaml.Node:
         return dumper.represent_mapping("!IPAddressHTTPURL", {
             **cls.get_ooi_yml_repr_dict(data),
-            "scheme": str(data.scheme),
+            "network": data.network,
+            "scheme": data.scheme.value,
             "port": data.port,
             "path": data.path,
             "netloc": data.netloc,
         })
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
 
 class HTTPResource(OOI):

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import Enum, IntEnum
 from typing import Any, ClassVar, Literal, TypeAlias, TypeVar
+from datetime import timedelta
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
@@ -56,10 +57,31 @@ class Reference(str):
     def from_str(cls, ref_str: str) -> Reference:
         return cls(ref_str)
 
-def reference_representer(dumper: yaml.SafeDumper, data: Reference) -> yaml.Node:
+def reference_yml_representer(dumper: yaml.SafeDumper, data: Reference) -> yaml.Node:
     return dumper.represent_scalar("!Reference", str(data))
+def reference_yml_constructor(loader: yaml.SafeLoader, node):
+    value = loader.construct_scalar(node)
+    return Reference.from_str(value)
+
+def timedelta_yml_representer(dumper: yaml.SafeDumper, data: timedelta) -> yaml.Node:
+    return dumper.represent_mapping("!Timedelta", {
+        "days": data.days,
+        "seconds": data.seconds,
+        "microseconds": data.microseconds,
+    })
+def timedelta_yml_constructor(loader: yaml.SafeLoader, node):
+    value = loader.construct_mapping(node)
+    return timedelta(
+        days=value.get('days'),
+        seconds=value.get('seconds'),
+        microseconds=value.get('microseconds'),
+    )
         
-yaml.SafeDumper.add_representer(Reference, reference_representer)
+yaml.SafeDumper.add_representer(Reference, reference_yml_representer)
+yaml.SafeLoader.add_constructor("!Reference", reference_yml_constructor)
+yaml.SafeDumper.add_representer(timedelta, timedelta_yml_representer)
+yaml.SafeLoader.add_constructor("!Timedelta", timedelta_yml_constructor)
+
 
 
 class ScanLevel(IntEnum):
@@ -124,6 +146,16 @@ yaml.SafeDumper.add_representer(EmptyScanProfile, scan_profile_yml_representer)
 yaml.SafeDumper.add_representer(InheritedScanProfile, scan_profile_yml_representer)
 yaml.SafeDumper.add_representer(DeclaredScanProfile, scan_profile_yml_representer)
 
+def scan_profile_yml_construstor(loader: yaml.SafeLoader, node):
+    values: dict = loader.construct_mapping(node)
+    if values.get('scan_profile_type') == ScanProfileType.EMPTY.value:
+        return EmptyScanProfile(**values)
+    if values.get('scan_profile_type') == ScanProfileType.INHERITED.value:
+        return InheritedScanProfile(**values)
+    if values.get('scan_profile_type') == ScanProfileType.DECLARED.value:
+        return DeclaredScanProfile(**values)
+
+yaml.SafeLoader.add_constructor("!ScanProfile", scan_profile_yml_construstor)
 
 class OOI(BaseModel):
     object_type: str
@@ -238,6 +270,25 @@ class OOI(BaseModel):
             "user_id": data.user_id,
             "primary_key": data.primary_key,
         }
+    
+    @classmethod
+    def get_ooi_yml_construct_dict(cls, node_values):
+        return {
+            "object_type": node_values.object_type,
+            "scan_profile": node_values.scan_profile,
+            "user_id": node_values.user_id,
+            "primary_key": node_values.primary_key,
+        }
+    
+    @classmethod
+    def yml_constructor(cls, loader: yaml.SafeLoader, node):
+        """
+            It is default ooi constructor to serialize from yml.
+            It uses loader.construct_mapping because most of ooi represented as map typed data.
+            It should be overridden for data with represented non-map typed or data with a field that should be customized.
+        """
+        values: dict = loader.construct_mapping(node)
+        return cls(**values)
 
     def serialize(self) -> SerializedOOI:
         serialized_oois = {}
