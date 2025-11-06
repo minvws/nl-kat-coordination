@@ -23,6 +23,7 @@ package-lock.json
 **/kat_rpki/rpki.json
 **/kat_rpki/rpki-meta.json
 plugins/plugins/entrypoint/main
+plugins/plugins/entrypoint/entrypoint
 **.tar
 # Translations
 *.mo

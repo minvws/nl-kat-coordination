@@ -1,9 +1,7 @@
 import datetime
 import itertools
 import shlex
-import shutil
 import signal
-import tarfile
 import uuid
 from datetime import UTC, timedelta
 from pathlib import Path
@@ -14,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from docker.errors import ContainerError
+from docker.models.containers import Container
 
 from files.models import File, TemporaryContent
 from openkat.models import AuthToken, User
@@ -23,9 +22,9 @@ from plugins.models import Plugin
 class PluginRunner:  # TODO: auto-parallelism?
     def __init__(
         self,
-        override_entrypoint: str = "/bin/runner",  # Path to the entrypoint binary inside the container.
+        override_entrypoint: Path = Path("/plugin/entrypoint"),  # Path to the entrypoint binary inside the container.
         # Path to the entrypoint binary on the host system, which will be mounted into the container.
-        entrypoint: Path = Path(settings.BASE_DIR) / "plugins" / "plugins" / "entrypoint" / "main",
+        entrypoint: Path = Path(settings.BASE_DIR) / "plugins" / "plugins" / "entrypoint" / "entrypoint",
     ):
         self.override_entrypoint = override_entrypoint
 
@@ -173,24 +172,7 @@ class PluginRunner:  # TODO: auto-parallelism?
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
-        client = docker.from_env()
-        container = client.containers.create(
-            image=plugin.oci_image,
-            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
-            command=command,
-            network=settings.DOCKER_NETWORK,
-            entrypoint=self.override_entrypoint,
-            environment=environment,
-            detach=True,
-        )
-
-        tar_name = Path(str(self.entrypoint) + ".tar")
-        with tarfile.open(tar_name, mode="w") as tar:
-            tar.add(self.entrypoint, arcname=self.override_entrypoint)
-
-        container.put_archive("/", tar_name.open("rb").read())
-        shutil.rmtree(tar_name, ignore_errors=True)
-
+        container = self.create_patched_container(plugin, command, environment)
         container.start()
 
         def handle(signalnum, stack_frame):
@@ -224,7 +206,7 @@ class PluginRunner:  # TODO: auto-parallelism?
         if logging_driver == "json-file" or logging_driver == "journald":
             out = container.logs(stdout=use_stdout, stderr=True, stream=True, follow=True)
 
-        exit_status = container.wait()["StatusCode"]
+        exit_status = container.wait(timeout=60 * settings.PLUGIN_TIMEOUT)["StatusCode"]
         if exit_status != 0:
             stderr_out = container.logs(stdout=False, stderr=True)
 
@@ -248,6 +230,22 @@ class PluginRunner:  # TODO: auto-parallelism?
         # Normalize to an iterator of byte chunks; if `out` is raw bytes, wrap it so join works uniformly.
         return b"".join(itertools.chain([out] if isinstance(out, (bytes, bytearray)) else out)).decode()
 
+    def create_patched_container(self, plugin: Plugin, command: list[str], environment: dict[str, str]) -> Container:
+        client = docker.from_env()
+
+        container = client.containers.create(
+            image=plugin.oci_image,
+            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
+            command=command,
+            network=settings.DOCKER_NETWORK,
+            entrypoint=str(self.override_entrypoint),
+            environment=environment,
+            volumes={settings.ENTRYPOINT_VOLUME: {"bind": str(self.override_entrypoint.parent), "mode": "ro"}},
+            detach=True,
+        )
+
+        return container
+
     def get_cli(self, command: list[str], environment: dict[str, str], keep: bool, plugin: Plugin) -> str:
         """
         Generate the equivalent docker run command for manual execution.
@@ -270,7 +268,7 @@ class PluginRunner:  # TODO: auto-parallelism?
         envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
         network = f"--network {settings.DOCKER_NETWORK}"
         cmd = shlex.join(command)
-        vol = f"-v {self.entrypoint}:{self.override_entrypoint}"
+        vol = f"-v {settings.ENTRYPOINT_VOLUME}:{self.override_entrypoint.parent}"
 
         return (
             f"docker run {rm} {vol} --entrypoint {self.override_entrypoint} {envs} {network} {plugin.oci_image} {cmd}"

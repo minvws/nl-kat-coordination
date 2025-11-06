@@ -514,7 +514,9 @@ SCAN_LEVEL_RECALCULATION_INTERVAL = env.int("SCAN_LEVEL_RECALCULATION_INTERVAL",
 BUSINESS_RULE_RECALCULATION_INTERVAL = env.int("BUSINESS_RULE_RECALCULATION_INTERVAL", default=600)
 ATTRIBUTION_INTERVAL = env.int("ATTRIBUTION_INTERVAL", default=600)
 SCHEDULE_INTERVAL = env.int("SCHEDULE_INTERVAL", default=60)
+# Time in minutes a plugin has to complete, after which it exits and it's token expires
 PLUGIN_TIMEOUT = env.int("PLUGIN_TIMEOUT", default=15)
+ENTRYPOINT_VOLUME = env.str("ENTRYPOINT_VOLUME", default="plugin-entrypoint")
 BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that we do not batch the task input (no max).
 
 QUEUE_NAME_RECALCULATIONS = "recalculations"

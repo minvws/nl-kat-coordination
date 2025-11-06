@@ -67,8 +67,8 @@ export REGISTRY=ghcr.io/minvws/openkat
 
 images: entrypoint plugins
 
-entrypoint: plugins/plugins/entrypoint/main
-plugins/plugins/entrypoint/main: plugins/plugins/entrypoint/main.go
+entrypoint: plugins/plugins/entrypoint/entrypoint
+plugins/plugins/entrypoint/entrypoint: plugins/plugins/entrypoint/entrypoint.go
 	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
 
 plugins:

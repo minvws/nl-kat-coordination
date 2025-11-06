@@ -13,7 +13,7 @@ import (
 	"regexp"
 )
 
-var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
+var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o entrypoint entrypoint.go
 
 func main() {
 	if len(os.Args) < 2 {

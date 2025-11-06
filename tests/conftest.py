@@ -483,7 +483,7 @@ def docker(mocker, plugin_container):
     """Fake docker in the plugin runner."""
 
     docker_mocker = mocker.patch("plugins.runner.docker.from_env")()
-    docker_mocker.containers.run.return_value = plugin_container
+    docker_mocker.containers.create.return_value = plugin_container
 
     return docker_mocker
 

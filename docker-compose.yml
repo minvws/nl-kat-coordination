@@ -60,6 +60,7 @@ services:
     volumes:
       - ./:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
+      - plugin-entrypoint:/plugin
     env_file:
       - .env
     networks:
@@ -104,3 +105,5 @@ networks:
 volumes:
   postgres-data:
   xtdb-data:
+  plugin-entrypoint:
+    name: ${ENTRYPOINT_VOLUME:-plugin-entrypoint}

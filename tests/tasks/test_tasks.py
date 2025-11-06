@@ -47,17 +47,15 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
 
     res = tasks[0].async_result.get()
     assert res == logs[0].decode()
-    kwargs = docker.containers.run.mock_calls[0].kwargs
+    kwargs = docker.containers.create.mock_calls[0].kwargs
 
     assert kwargs["image"] == "T"
     assert "test_17" in kwargs["name"]
     assert kwargs["command"] == ["test.com"]
-    assert kwargs["stdout"] is False
-    assert kwargs["stderr"] is True
     assert kwargs["network"] == settings.DOCKER_NETWORK
-    assert kwargs["entrypoint"] == "/bin/runner"
+    assert kwargs["entrypoint"] == "/plugin/entrypoint"
     assert len(kwargs["volumes"]) == 1
-    assert kwargs["volumes"][0].endswith("/plugins/plugins/entrypoint/main:/bin/runner")
+    assert kwargs["volumes"]["plugin-entrypoint"] == {"bind": "/plugin", "mode": "ro"}
     assert kwargs["environment"]["PLUGIN_ID"] == plugin.plugin_id
     assert kwargs["environment"]["OPENKAT_API"] == f"{settings.OPENKAT_HOST}/api/v1"
     assert kwargs["environment"]["UPLOAD_URL"] == f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={tasks[0].id}"
@@ -76,7 +74,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert organization in schedule.plugin.enabled_organizations()
 
     tasks = run_schedule(schedule, celery=celery)
-    kwargs = docker.containers.run.mock_calls[4].kwargs
+    kwargs = docker.containers.create.mock_calls[5].kwargs
     assert kwargs["environment"]["PLUGIN_ID"] == plugin2.plugin_id
 
     assert len(tasks) == 1

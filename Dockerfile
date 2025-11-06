@@ -10,6 +10,14 @@ COPY components components
 
 RUN yarn --ignore-engines && yarn build
 
+
+FROM golang:1.24-alpine AS entrypoint_builder
+
+WORKDIR /app
+COPY plugins/plugins/entrypoint/entrypoint.go .
+RUN go build -o entrypoint entrypoint.go
+
+
 FROM python:$PYTHON_VERSION-trixie AS dev
 
 ENV GRANIAN_WORKERS=2
@@ -34,6 +42,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
   && apt-get install -y --no-install-recommends gettext=0.23.1-2 netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
+COPY --from=entrypoint_builder /app/entrypoint /plugin/
+VOLUME /plugin
+
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev dependencies
 ARG ENVIRONMENT
 
@@ -45,20 +56,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY . .
 
-FROM golang:1.24-alpine AS entrypoint_builder
-
-WORKDIR /app
-COPY plugins/plugins/entrypoint/main.go .
-RUN go build -o main main.go
-
 FROM dev
 
 # These files need to be available when we run collectstatic
 COPY --link --from=node_builder /app/assets/dist assets/dist
-COPY --from=entrypoint_builder /app/main plugins/plugins/entrypoint/
 
-# The secret key isn't used by the commands, but Django won't work do anything
-# without it
+# The secret key isn't used by the commands, but Django won't work do anything without it
 
 RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" REDIS_HOST="localhost/" REDIS_PASSWORD="fake" && \
     python manage.py collectstatic -l && python manage.py compilemessages
