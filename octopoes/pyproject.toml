@@ -3,7 +3,7 @@ name = "octopoes"
 version = "0.0.1.dev1"
 description = "KAT's knowledge graph engine"
 authors = [{ name = "MinVWS", email = "maintainer@openkat.nl" }]
-requires-python = "~=3.10"
+requires-python = ">=3.10"
 license = { text = "EUPL-1.2" }
 dependencies = [
     "pydantic==2.11.7",
@@ -88,7 +88,7 @@ dev = [
     "robotframework-requests>=0.9.7,<0.10",
     "robotframework-httplibrary>=0.4.2,<0.5",
     "pytest>=8.3.5,<9",
-    "pytest-cov>=6.1.1,<7",
+    "pytest-cov>=7",
     "pytest-mock>=3.14.0,<4",
     "pytest-env>=1.1.5,<2",
     "pytest-timeout>=2.4.0,<3",
