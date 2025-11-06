@@ -9,6 +9,7 @@ dependencies = [
   "celery[redis]>=5.5.3",
   "django-components==0.88",
   "django-csp>=4.0",
+  "django-downloadview>=2.5.0",
   "django-environ>=0.12.0",
   "django-filter>=25.1",
   "django-password-validators>=1.7.1",
@@ -117,6 +118,7 @@ module = [
   "whitenoise.*",
   "weasyprint.*",
   "django_weasyprint.*",
+  "django_downloadview.*",
 ]
 ignore_missing_imports = true
 

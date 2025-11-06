@@ -2,16 +2,15 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
-	"strings"
 )
 
 var defaultURL = "http://openkat:8000/api/v1/file/" // To override: go build -ldflags="-X main.defaultURL=http://test:443/upload" -o main main.go
@@ -185,10 +184,10 @@ func main() {
 func downloadFile(file_pk string, destination string) (string, error) {
 	api_url := os.Getenv("OPENKAT_API")
 	var bearer = "Token " + os.Getenv("OPENKAT_TOKEN")
-
+	var furi, _ = url.Parse(api_url)
 	var body bytes.Buffer
 
-	req, err := http.NewRequest("GET", api_url+"/file/"+file_pk+"/", &body)
+	req, err := http.NewRequest("GET", furi.Scheme+"://"+furi.Host+"/files/"+file_pk+"/", &body)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to create GET request: %w", err)
@@ -204,37 +203,11 @@ func downloadFile(file_pk string, destination string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check if status is OK
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	var data map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatalf("Decode error:", err)
-	}
-
-	fileUri := data["file"].(string)
-	splitString := strings.Split(fileUri, "/")
-	fileName := destination + "/" + splitString[len(splitString)-1]
-
-	req, err = http.NewRequest("GET", fileUri, &body)
-
-	if err != nil {
-		return "", fmt.Errorf("failed to create GET request: %w", err)
-	}
-
-	req.Header.Add("Authorization", bearer)
-	resp, err = client.Do(req)
-
-	if err != nil {
-		return "", fmt.Errorf("failed to make GET request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("bad status: %s", resp.Status)
-	}
+	fileName := destination + "/" + file_pk
 
 	out, err := os.Create(fileName)
 	if err != nil {

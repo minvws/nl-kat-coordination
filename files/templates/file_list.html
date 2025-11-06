@@ -57,7 +57,7 @@
                         <tbody>
                             {% for file in file_list %}
                                 <tr data-file-id="{{ file.id }}"
-                                    data-file-url="{{ file.file.url }}"
+                                    data-file-url="{% url 'download' pk=file.pk %}"
                                     data-file-type="{{ file.type }}">
                                     <td>{{ file.id }}</td>
                                     <td>{{ file.path.name }}</td>
@@ -82,7 +82,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ file.file.url }}"><span class="icon ti-download"></span></a>
+                                        <a href="{% url 'download' pk=file.pk %}"><span class="icon ti-download"></span></a>
                                     </td>
                                     <td>
                                         <button type="button"

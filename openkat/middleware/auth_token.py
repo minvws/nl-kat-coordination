@@ -11,7 +11,7 @@ def MediaAuthTokenMiddleware(get_response):
         if (
             not request.user.is_authenticated
             and "authorization" in request.headers
-            and request.path.startswith("/media")
+            and request.path.startswith("/files/")
         ):
             authenticator = TokenAuthentication()
             try:

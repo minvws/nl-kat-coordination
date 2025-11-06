@@ -448,6 +448,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-downloadview"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fc/b2/7182dbce076e5f95105c2ef8c0f172cc1e6c09d990604cc901661d618d82/django_downloadview-2.5.0.tar.gz", hash = "sha256:3bf0b0694711cadb4a9c1173cb21055a3f3be14c092e132ec3d69f14b4d8fdfe", size = 67220, upload-time = "2025-10-28T10:35:40.374Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6a/92/4df0306aa24a1f1888bca2697475491794a5d29b070104ba823f9583e5aa/django_downloadview-2.5.0-py3-none-any.whl", hash = "sha256:b9faa2e6a24ad521d19f9c16ae99010fcb921a8e9dd4e6db4972df72bdcfe726", size = 36052, upload-time = "2025-10-28T10:35:55.268Z" },
+]
+
+[[package]]
 name = "django-environ"
 version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -921,6 +934,7 @@ dependencies = [
     { name = "django" },
     { name = "django-components" },
     { name = "django-csp" },
+    { name = "django-downloadview" },
     { name = "django-environ" },
     { name = "django-filter" },
     { name = "django-password-validators" },
@@ -969,6 +983,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.0,<6.0" },
     { name = "django-components", specifier = "==0.88" },
     { name = "django-csp", specifier = ">=4.0" },
+    { name = "django-downloadview", specifier = ">=2.5.0" },
     { name = "django-environ", specifier = ">=0.12.0" },
     { name = "django-filter", specifier = ">=25.1" },
     { name = "django-password-validators", specifier = ">=1.7.1" },

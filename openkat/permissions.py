@@ -49,7 +49,7 @@ class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
         permissions_required: list[str] = []
 
         if not issubclass(self.__class__, CreateView | UpdateView | DeleteView):
-            return permissions_required
+            return list(super().get_permission_required())
 
         kwargs = {"app_label": self.model._meta.app_label, "model_name": self.model._meta.model_name}
 
@@ -57,9 +57,9 @@ class KATModelPermissionRequiredMixin(PermissionRequiredMixin):
             permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
 
         if issubclass(self.__class__, UpdateView):
-            permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
+            permissions_required.extend([perm % kwargs for perm in self.perms_map[UpdateView.__name__]])
 
         if issubclass(self.__class__, DeleteView):
-            permissions_required.extend([perm % kwargs for perm in self.perms_map[CreateView.__name__]])
+            permissions_required.extend([perm % kwargs for perm in self.perms_map[DeleteView.__name__]])
 
         return permissions_required

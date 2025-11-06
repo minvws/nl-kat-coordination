@@ -199,6 +199,13 @@ MIDDLEWARE += [
     "openkat.middleware.onboarding.OnboardingMiddleware",
 ]
 
+if env.str("DOWNLOADVIEW_BACKEND", default=None) and env.str("DESTINATION_URL", default=None):
+    MIDDLEWARE += ["django_downloadview.SmartDownloadMiddleware"]
+    DOWNLOADVIEW_BACKEND = env.str("DOWNLOADVIEW_BACKEND")
+    DOWNLOADVIEW_RULES = [
+        {"source_url": env.str("SOURCE_URL", "/media/files/"), "destination_url": env.str("DESTINATION_URL")}
+    ]
+
 ROOT_URLCONF = "openkat.urls"
 
 CACHES = {
