@@ -49,8 +49,6 @@ services:
       - files:/app/openkat/media
     env_file:
       - .env
-    environment:
-      - HOST_MOUNT_DIR=${PWD}
     networks:
       - default
       - plugins
@@ -69,7 +67,6 @@ services:
       - .env
     environment:
       - DATABASE_MIGRATION=false
-      - HOST_MOUNT_DIR=${PWD}
 
 networks:
   default:

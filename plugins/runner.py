@@ -1,7 +1,9 @@
 import datetime
 import itertools
 import shlex
+import shutil
 import signal
+import tarfile
 import uuid
 from datetime import UTC, timedelta
 from pathlib import Path
@@ -23,10 +25,14 @@ class PluginRunner:  # TODO: auto-parallelism?
         self,
         override_entrypoint: str = "/bin/runner",  # Path to the entrypoint binary inside the container.
         # Path to the entrypoint binary on the host system, which will be mounted into the container.
-        adapter: Path = Path(settings.HOST_MOUNT_DIR) / "plugins" / "plugins" / "entrypoint" / "main",
+        entrypoint: Path = Path(settings.BASE_DIR) / "plugins" / "plugins" / "entrypoint" / "main",
     ):
-        self.entrypoint = override_entrypoint
-        self.adapter = adapter
+        self.override_entrypoint = override_entrypoint
+
+        if not entrypoint.exists():
+            raise FileNotFoundError("Missing plugin binary file.")
+
+        self.entrypoint = entrypoint
 
     def run(
         self,
@@ -168,18 +174,24 @@ class PluginRunner:  # TODO: auto-parallelism?
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
         client = docker.from_env()
-        container = client.containers.run(
+        container = client.containers.create(
             image=plugin.oci_image,
             name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
             command=command,
-            stdout=use_stdout,
-            stderr=True,
             network=settings.DOCKER_NETWORK,
-            entrypoint=self.entrypoint,
-            volumes=[f"{self.adapter}:{self.entrypoint}"],
+            entrypoint=self.override_entrypoint,
             environment=environment,
             detach=True,
         )
+
+        tar_name = Path(str(self.entrypoint) + ".tar")
+        with tarfile.open(tar_name, mode="w") as tar:
+            tar.add(self.entrypoint, arcname=self.override_entrypoint)
+
+        container.put_archive("/", tar_name.open("rb").read())
+        shutil.rmtree(tar_name, ignore_errors=True)
+
+        container.start()
 
         def handle(signalnum, stack_frame):
             container.kill(signalnum)
@@ -258,9 +270,11 @@ class PluginRunner:  # TODO: auto-parallelism?
         envs = "-e " + " -e ".join([f"{k}={v}" for k, v in environment.items()]) if environment else ""
         network = f"--network {settings.DOCKER_NETWORK}"
         cmd = shlex.join(command)
-        vol = f"-v {self.adapter}:{self.entrypoint}"
+        vol = f"-v {self.entrypoint}:{self.override_entrypoint}"
 
-        return f"docker run {rm} {vol} --entrypoint {self.entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
+        return (
+            f"docker run {rm} {vol} --entrypoint {self.override_entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
+        )
 
     @staticmethod
     def create_token(plugin_id: str) -> tuple[User, AuthToken]:
