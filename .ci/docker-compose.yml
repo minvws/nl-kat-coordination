@@ -37,7 +37,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ci-plugin-entrypoint:/plugin
     environment:
-      - HOST_MOUNT_DIR=${PWD}
       - DATABASE_MIGRATION=false
     env_file:
       - .env.test
@@ -64,9 +63,7 @@ services:
     volumes:
       - ..:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
-      - ci-plugin-entrypoint:/plugin
     environment:
-      - HOST_MOUNT_DIR=${PWD}
       - DATABASE_MIGRATION=true
       - MEDIA_ROOT_PATH=media/test
     env_file:
@@ -111,11 +108,8 @@ services:
     command: celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=INFO
     env_file:
       - .env.test
-    volumes:
-      - ci-plugin-entrypoint:/plugin
     environment:
       - DATABASE_MIGRATION=false
-      - HOST_MOUNT_DIR=${PWD}
       - MEDIA_ROOT_PATH=media/test
     depends_on:
       - postgres
