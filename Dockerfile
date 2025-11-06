@@ -14,7 +14,7 @@ RUN yarn --ignore-engines && yarn build
 FROM golang:1.24-alpine AS entrypoint_builder
 
 WORKDIR /app
-COPY plugins/plugins/entrypoint/entrypoint.go .
+COPY plugins/plugins/entrypoint.go .
 RUN go build -o entrypoint entrypoint.go
 
 
@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    if [ "$ENVIRONMENT" = "dev" ]; then uv sync --locked --group dev; else uv sync --locked; fi
+    if [ "$ENVIRONMENT" = "dev" ]; then uv sync --locked --dev; else uv sync --locked --no-dev; fi
 
 COPY . .
 

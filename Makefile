@@ -1,4 +1,4 @@
-.PHONY: build run test export_migrations debian clean entrypoint plugins up
+.PHONY: build run test export_migrations debian clean plugins up
 
 UNAME := $(shell uname)
 
@@ -65,11 +65,7 @@ frontend:
 
 export REGISTRY=ghcr.io/minvws/openkat
 
-images: entrypoint plugins
-
-entrypoint: plugins/plugins/entrypoint/entrypoint
-plugins/plugins/entrypoint/entrypoint: plugins/plugins/entrypoint/entrypoint.go
-	docker build -f plugins/plugins/entrypoint/Dockerfile plugins/plugins/entrypoint --output plugins/plugins/entrypoint/
+images: plugins
 
 plugins:
 	docker build -f plugins/plugins/plugins.Dockerfile -t $(REGISTRY)/plugins:0.1.0 -t $(REGISTRY)/plugins:latest -t openkat/plugins .
@@ -85,7 +81,7 @@ endif
 utest: testclean ## Run the unit tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_tests
 
-itest: testclean entrypoint ## Run the integration tests.
+itest: testclean ## Run the integration tests.
 	docker compose -f .ci/docker-compose.yml run --rm openkat_integration
 
 bench:

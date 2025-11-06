@@ -23,15 +23,8 @@ class PluginRunner:  # TODO: auto-parallelism?
     def __init__(
         self,
         override_entrypoint: Path = Path("/plugin/entrypoint"),  # Path to the entrypoint binary inside the container.
-        # Path to the entrypoint binary on the host system, which will be mounted into the container.
-        entrypoint: Path = Path(settings.BASE_DIR) / "plugins" / "plugins" / "entrypoint" / "entrypoint",
     ):
         self.override_entrypoint = override_entrypoint
-
-        if not entrypoint.exists():
-            raise FileNotFoundError("Missing plugin binary file.")
-
-        self.entrypoint = entrypoint
 
     def run(
         self,
