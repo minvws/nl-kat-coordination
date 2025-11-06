@@ -21,6 +21,7 @@ from objects.views import (
     HostnameDeleteView,
     HostnameDetailView,
     HostnameListView,
+    HostnameManageOrganizationsView,
     HostnameScanLevelDetailView,
     HostnameScanLevelUpdateView,
     HostnameTasksDetailView,
@@ -29,6 +30,7 @@ from objects.views import (
     IPAddressDeleteView,
     IPAddressDetailView,
     IPAddressListView,
+    IPAddressManageOrganizationsView,
     IPAddressScanLevelDetailView,
     IPAddressScanLevelUpdateView,
     IPAddressTasksDetailView,
@@ -38,6 +40,7 @@ from objects.views import (
     NetworkDeleteView,
     NetworkDetailView,
     NetworkListView,
+    NetworkManageOrganizationsView,
     NetworkScanLevelUpdateView,
 )
 from objects.viewsets import (
@@ -99,6 +102,11 @@ urlpatterns = [
         NetworkScanLevelUpdateView.as_view(),
         name="update_network_scan_level",
     ),
+    path(
+        "objects/network/<str:pk>/manage-organizations/",
+        NetworkManageOrganizationsView.as_view(),
+        name="network_manage_organizations",
+    ),
     path("objects/ipaddress/", IPAddressListView.as_view(), name="ipaddress_list"),
     path("objects/ipaddress/add/", IPAddressCreateView.as_view(), name="add_ipaddress"),
     path("objects/ipaddress/upload-csv/", IPAddressCSVUploadView.as_view(), name="ipaddress_csv_upload"),
@@ -113,6 +121,11 @@ urlpatterns = [
         "objects/ipaddress/<str:pk>/update-scan-level/",
         IPAddressScanLevelUpdateView.as_view(),
         name="update_ipaddress_scan_level",
+    ),
+    path(
+        "objects/ipaddress/<str:pk>/manage-organizations/",
+        IPAddressManageOrganizationsView.as_view(),
+        name="ipaddress_manage_organizations",
     ),
     path("objects/ipaddress/<str:pk>/tasks/", IPAddressTasksDetailView.as_view(), name="ipaddress_tasks_detail"),
     path("objects/hostname/", HostnameListView.as_view(), name="hostname_list"),
@@ -129,6 +142,11 @@ urlpatterns = [
         "objects/hostname/<str:pk>/update-scan-level/",
         HostnameScanLevelUpdateView.as_view(),
         name="update_hostname_scan_level",
+    ),
+    path(
+        "objects/hostname/<str:pk>/manage-organizations/",
+        HostnameManageOrganizationsView.as_view(),
+        name="hostname_manage_organizations",
     ),
     path("objects/hostname/<str:pk>/tasks/", HostnameTasksDetailView.as_view(), name="hostname_tasks_detail"),
     # DNS Record delete views

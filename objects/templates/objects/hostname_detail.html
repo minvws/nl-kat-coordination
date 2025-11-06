@@ -59,8 +59,43 @@
                                 {% endif %}
                             </dd>
                         </div>
+                        <div>
+                            <dt>{% translate "Organizations" %}</dt>
+                            <dd>
+                                {% with orgs=hostname.organizations.all %}
+                                    {% if orgs %}
+                                        <ul>
+                                            {% for org in orgs %}
+                                                <li>{{ org.name }} ({{ org.code }})</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                {% endwith %}
+                            </dd>
+                        </div>
                     </dl>
                 </div>
+            </div>
+
+            <div>
+                <h2>{% translate "Manage Organizations" %}</h2>
+                <form method="post" action="{% url 'objects:hostname_manage_organizations' hostname.pk %}">
+                    {% csrf_token %}
+                    <div>
+                        <label for="id_organizations">{% translate "Select Organizations" %}:</label>
+                        <select name="organizations" id="id_organizations" multiple size="5">
+                            {% for org in all_organizations %}
+                                <option value="{{ org.pk }}" {% if org in hostname.organizations.all %}selected{% endif %}>
+                                    {{ org.name }} ({{ org.code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <p><small>{% translate "Hold Ctrl (Cmd on Mac) to select multiple organizations" %}</small></p>
+                    </div>
+                    <button type="submit">{% translate "Update Organizations" %}</button>
+                </form>
             </div>
             <div class="horizontal-scroll">
                 <h2>{% translate "DNS records" %}</h2>

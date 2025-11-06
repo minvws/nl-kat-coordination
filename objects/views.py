@@ -42,6 +42,7 @@ from objects.models import (
     Network,
     ScanLevelEnum,
     Software,
+    XTDBOrganization,
 )
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
@@ -167,6 +168,7 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
             breadcrumb_url += "?" + "&".join([f"organization={code}" for code in organization_codes])
 
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("Networks")}]
+        context["all_organizations"] = Organization.objects.all()
 
         return context
 
@@ -174,7 +176,7 @@ class NetworkDetailView(OrganizationFilterMixin, DetailView):
 class NetworkCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Network
     template_name = "objects/generic_object_form.html"
-    fields = ["name"]
+    fields = ["name", "organizations"]
     success_url = reverse_lazy("objects:network_list")
 
 
@@ -189,6 +191,69 @@ class NetworkDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 class NetworkScanLevelUpdateView(BaseScanLevelUpdateView):
     model = Network
     detail_url_name = "objects:network_detail"
+
+
+class NetworkManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
+    """View to manage organizations for a network."""
+
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        network = Network.objects.get(pk=self.kwargs.get("pk"))
+        organization_ids = request.POST.getlist("organizations")
+
+        # Update the many-to-many relationship
+        if organization_ids:
+            organizations = XTDBOrganization.objects.filter(pk__in=organization_ids)
+            network.organizations.set(organizations)
+            messages.success(request, _("Organizations updated successfully."))
+        else:
+            network.organizations.clear()
+            messages.success(request, _("All organizations removed."))
+
+        return redirect(reverse("objects:network_detail", kwargs={"pk": network.pk}))
+
+
+class IPAddressManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
+    """View to manage organizations for an IP address."""
+
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
+        organization_ids = request.POST.getlist("organizations")
+
+        # Update the many-to-many relationship
+        if organization_ids:
+            organizations = XTDBOrganization.objects.filter(pk__in=organization_ids)
+            ipaddress.organizations.set(organizations)
+            messages.success(request, _("Organizations updated successfully."))
+        else:
+            ipaddress.organizations.clear()
+            messages.success(request, _("All organizations removed."))
+
+        return redirect(reverse("objects:ipaddress_detail", kwargs={"pk": ipaddress.pk}))
+
+
+class HostnameManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
+    """View to manage organizations for a hostname."""
+
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
+        organization_ids = request.POST.getlist("organizations")
+
+        # Update the many-to-many relationship
+        if organization_ids:
+            organizations = XTDBOrganization.objects.filter(pk__in=organization_ids)
+            hostname.organizations.set(organizations)
+            messages.success(request, _("Organizations updated successfully."))
+        else:
+            hostname.organizations.clear()
+            messages.success(request, _("All organizations removed."))
+
+        return redirect(reverse("objects:hostname_detail", kwargs={"pk": hostname.pk}))
 
 
 class FindingFilter(django_filters.FilterSet):
@@ -398,6 +463,7 @@ class IPAddressDetailView(OrganizationFilterMixin, DetailView):
         context["breadcrumbs"] = [{"url": breadcrumb_url, "text": _("IPAddresses")}]
         context["findings"] = Finding.objects.filter(address=self.object)
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+        context["all_organizations"] = Organization.objects.all()
 
         return context
 
@@ -457,7 +523,7 @@ class IPAddressTasksDetailView(OrganizationFilterMixin, ListView):
 class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = IPAddress
     template_name = "objects/ipaddress_create.html"
-    fields = ["network", "address"]
+    fields = ["network", "address", "organizations"]
     success_url = reverse_lazy("objects:ipaddress_list")
 
     def get_initial(self):
@@ -493,6 +559,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         created_count = 0
         error_count = 0
         skipped_count = 0
+        organizations_set = 0
 
         try:
             reader = csv.reader(csv_data, delimiter=",", quotechar='"')
@@ -501,9 +568,23 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                     continue
 
                 address = row[0].strip()
+                org_code = None
+
+                # Parse optional organization code from column 2
+                if len(row) >= 2 and row[1].strip():
+                    org_code = row[1].strip()
 
                 try:
                     ipaddress, created = IPAddress.objects.get_or_create(network=network, address=address)
+
+                    # Handle organization assignment
+                    if org_code:
+                        org = self._get_organization(org_code)
+                        if org:
+                            xtdb_org = XTDBOrganization.objects.get(pk=org.pk)
+                            ipaddress.organizations.set([xtdb_org])
+                            organizations_set += 1
+
                     if created:
                         created_count += 1
                     else:
@@ -523,6 +604,10 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 )
             if skipped_count > 0:
                 messages.info(self.request, _("{count} IP addresses already existed.").format(count=skipped_count))
+            if organizations_set > 0:
+                messages.success(
+                    self.request, _("Successfully set organizations for {count} IP addresses.").format(count=organizations_set)
+                )
             if error_count > 0:
                 messages.warning(
                     self.request, _("{count} IP addresses had errors and were not created.").format(count=error_count)
@@ -532,6 +617,19 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             messages.error(self.request, _("Error parsing CSV file: {error}").format(error=str(e)))
 
         return super().form_valid(form)
+
+    def _get_organization(self, org_code: str | None) -> Organization | None:
+        if not org_code:
+            return None
+
+        try:
+            return Organization.objects.get(code=org_code)
+        except Organization.DoesNotExist:
+            messages.warning(
+                self.request,
+                _("Organization with code '{code}' not found.").format(code=org_code),
+            )
+            return None
 
 
 class IPAddressDeleteView(KATModelPermissionRequiredMixin, DeleteView):
@@ -697,6 +795,7 @@ class HostnameDetailView(OrganizationFilterMixin, DetailView):
         context["dnsnsrecord_nameserver"] = self.object.dnsnsrecord_nameserver.all()
         context["findings"] = Finding.objects.filter(hostname=self.object)
         context["scan_level_form"] = ObjectScanLevelForm(instance=self.object)
+        context["all_organizations"] = Organization.objects.all()
 
         return context
 
@@ -768,7 +867,7 @@ class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
 class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
     model = Hostname
     template_name = "objects/hostname_create.html"
-    fields = ["network", "name"]
+    fields = ["network", "name", "organizations"]
     success_url = reverse_lazy("objects:hostname_list")
 
     def get_initial(self):
@@ -805,6 +904,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         created_count = 0
         error_count = 0
         skipped_count = 0
+        organizations_set = 0
 
         try:
             reader = csv.reader(csv_data, delimiter=",", quotechar='"')
@@ -813,9 +913,23 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                     continue  # Skip empty rows
 
                 name = row[0].strip()
+                org_code = None
+
+                # Parse optional organization code from column 2
+                if len(row) >= 2 and row[1].strip():
+                    org_code = row[1].strip()
 
                 try:
                     hostname, created = Hostname.objects.get_or_create(network=network, name=name)
+
+                    # Handle organization assignment
+                    if org_code:
+                        org = self._get_organization(org_code)
+                        if org:
+                            xtdb_org = XTDBOrganization.objects.get(pk=org.pk)
+                            hostname.organizations.set([xtdb_org])
+                            organizations_set += 1
+
                     if created:
                         created_count += 1
                     else:
@@ -833,6 +947,10 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 messages.success(self.request, _("Successfully created {count} hostnames.").format(count=created_count))
             if skipped_count > 0:
                 messages.info(self.request, _("{count} hostnames already existed.").format(count=skipped_count))
+            if organizations_set > 0:
+                messages.success(
+                    self.request, _("Successfully set organizations for {count} hostnames.").format(count=organizations_set)
+                )
             if error_count > 0:
                 messages.warning(
                     self.request, _("{count} hostnames had errors and were not created.").format(count=error_count)
@@ -842,6 +960,19 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             messages.error(self.request, _("Error parsing CSV file: {error}").format(error=str(e)))
 
         return super().form_valid(form)
+
+    def _get_organization(self, org_code: str | None) -> Organization | None:
+        if not org_code:
+            return None
+
+        try:
+            return Organization.objects.get(code=org_code)
+        except Organization.DoesNotExist:
+            messages.warning(
+                self.request,
+                _("Organization with code '{code}' not found.").format(code=org_code),
+            )
+            return None
 
 
 class DNSRecordDeleteView(KATModelPermissionRequiredMixin, DeleteView):
@@ -942,6 +1073,7 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
     def form_valid(self, form):
         assets = form.cleaned_data["assets"]
         network = form.cleaned_data.get("network")
+        organizations = form.cleaned_data.get("organizations")
 
         if not network:
             network, created = Network.objects.get_or_create(name="internet")
@@ -960,12 +1092,16 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
             try:
                 if is_valid_ip(asset):
                     ipaddress, created = IPAddress.objects.get_or_create(network=network, address=asset)
+                    if organizations:
+                        ipaddress.organizations.set(organizations)
                     if created:
                         ip_created += 1
                     else:
                         ip_skipped += 1
                 else:
                     hostname, created = Hostname.objects.get_or_create(network=network, name=asset.lower())
+                    if organizations:
+                        hostname.organizations.set(organizations)
                     if created:
                         hostname_created += 1
                     else:
@@ -1008,6 +1144,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
     def form_valid(self, form):
         csv_file = form.cleaned_data["csv_file"]
         default_network = form.cleaned_data.get("network")
+        default_organizations = form.cleaned_data.get("organizations")
 
         if not default_network:
             default_network, created = Network.objects.get_or_create(name="internet")
@@ -1020,6 +1157,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         hostname_skipped = 0
         error_count = 0
         scan_levels_set = 0
+        organizations_set = 0
 
         try:
             reader = csv.reader(csv_data, delimiter=",", quotechar='"')
@@ -1029,6 +1167,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
                 asset = row[0].strip()
                 scan_level_value = None
+                org_code = None
 
                 # Parse optional columns
                 if len(row) >= 2 and row[1].strip():
@@ -1050,6 +1189,10 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             ).format(row_num=row_num, value=row[1].strip()),
                         )
 
+                # Parse organization code from column 3
+                if len(row) >= 3 and row[2].strip():
+                    org_code = row[2].strip()
+
                 try:
                     if is_valid_ip(asset):
                         ipaddress_obj, created = IPAddress.objects.get_or_create(network=default_network, address=asset)
@@ -1063,6 +1206,20 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             ipaddress_obj.declared = True
                             ipaddress_obj.save()
                             scan_levels_set += 1
+
+                        # Handle organization assignment
+                        organizations_to_set = []
+                        if org_code:
+                            org = self._get_organization(org_code)
+                            if org:
+                                xtdb_org = XTDBOrganization.objects.get(pk=org.pk)
+                                organizations_to_set = [xtdb_org]
+                        elif default_organizations:
+                            organizations_to_set = list(default_organizations)
+
+                        if organizations_to_set:
+                            ipaddress_obj.organizations.set(organizations_to_set)
+                            organizations_set += 1
 
                     else:
                         hostname_obj, created = Hostname.objects.get_or_create(
@@ -1079,6 +1236,20 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                             hostname_obj.declared = True
                             hostname_obj.save()
                             scan_levels_set += 1
+
+                        # Handle organization assignment
+                        organizations_to_set = []
+                        if org_code:
+                            org = self._get_organization(org_code)
+                            if org:
+                                xtdb_org = XTDBOrganization.objects.get(pk=org.pk)
+                                organizations_to_set = [xtdb_org]
+                        elif default_organizations:
+                            organizations_to_set = list(default_organizations)
+
+                        if organizations_to_set:
+                            hostname_obj.organizations.set(organizations_to_set)
+                            organizations_set += 1
 
                 except Exception as e:
                     error_count += 1
@@ -1104,6 +1275,11 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
             if scan_levels_set > 0:
                 messages.success(
                     self.request, _("Successfully set scan levels for {count} assets.").format(count=scan_levels_set)
+                )
+
+            if organizations_set > 0:
+                messages.success(
+                    self.request, _("Successfully set organizations for {count} assets.").format(count=organizations_set)
                 )
 
             if error_count > 0:
