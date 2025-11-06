@@ -201,7 +201,7 @@ def test_worker_dispatches_multiple_plugin_tasks():
     plugin1 = Plugin.objects.create(
         name="DNS Plugin",
         plugin_id="kat_dns",
-        oci_image="ghcr.io/minvws/openkat/plugins:branch-v2",
+        oci_image="ghcr.io/minvws/openkat/plugins:0.1.0",
         oci_arguments=["uv", "run", "kat_dns/main.py", "{hostname}"],
         consumes=["type:Hostname"],
         scan_level=1,
@@ -254,7 +254,7 @@ def test_worker_dispatches_multiple_plugin_tasks_from_file_input():
     plugin = Plugin.objects.create(
         name="DNS Plugin from File",
         plugin_id="dns-from-file",
-        oci_image="ghcr.io/minvws/openkat/plugins:branch-v2",
+        oci_image="ghcr.io/minvws/openkat/plugins:0.1.0",
         oci_arguments=["sh", "-c", "cat {file/" + str(file.pk) + "}" + " | xargs -I {} uv run kat_dns/main.py {}"],
         consumes=["file:txt"],
         scan_level=1,
