@@ -11,7 +11,7 @@ import docker
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from docker.errors import ContainerError
+from docker.errors import ContainerError, ImageNotFound
 from docker.models.containers import Container
 
 from files.models import File, TemporaryContent
@@ -226,16 +226,29 @@ class PluginRunner:  # TODO: auto-parallelism?
     def create_patched_container(self, plugin: Plugin, command: list[str], environment: dict[str, str]) -> Container:
         client = docker.from_env()
 
-        container = client.containers.create(
-            image=plugin.oci_image,
-            name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
-            command=command,
-            network=settings.DOCKER_NETWORK,
-            entrypoint=str(self.override_entrypoint),
-            environment=environment,
-            volumes={settings.ENTRYPOINT_VOLUME: {"bind": str(self.override_entrypoint.parent), "mode": "ro"}},
-            detach=True,
-        )
+        try:
+            container = client.containers.create(
+                image=plugin.oci_image,
+                name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
+                command=command,
+                network=settings.DOCKER_NETWORK,
+                entrypoint=str(self.override_entrypoint),
+                environment=environment,
+                volumes={settings.ENTRYPOINT_VOLUME: {"bind": str(self.override_entrypoint.parent), "mode": "ro"}},
+                detach=True,
+            )
+        except ImageNotFound:
+            client.images.pull(plugin.oci_image)
+            container = client.containers.create(
+                image=plugin.oci_image,
+                name=f"{plugin.plugin_id}_{datetime.datetime.now(UTC).timestamp()}",
+                command=command,
+                network=settings.DOCKER_NETWORK,
+                entrypoint=str(self.override_entrypoint),
+                environment=environment,
+                volumes={settings.ENTRYPOINT_VOLUME: {"bind": str(self.override_entrypoint.parent), "mode": "ro"}},
+                detach=True,
+            )
 
         return container
 
