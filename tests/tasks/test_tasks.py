@@ -55,7 +55,7 @@ def test_run_schedule(organization, xtdb, celery: Celery, docker, plugin_contain
     assert kwargs["network"] == settings.DOCKER_NETWORK
     assert kwargs["entrypoint"] == "/plugin/entrypoint"
     assert len(kwargs["volumes"]) == 1
-    assert kwargs["volumes"]["plugin-entrypoint"] == {"bind": "/plugin", "mode": "ro"}
+    assert kwargs["volumes"][settings.ENTRYPOINT_VOLUME] == {"bind": "/plugin", "mode": "ro"}
     assert kwargs["environment"]["PLUGIN_ID"] == plugin.plugin_id
     assert kwargs["environment"]["OPENKAT_API"] == f"{settings.OPENKAT_HOST}/api/v1"
     assert kwargs["environment"]["UPLOAD_URL"] == f"{settings.OPENKAT_HOST}/api/v1/file/?task_id={tasks[0].id}"
