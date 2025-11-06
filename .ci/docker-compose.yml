@@ -35,6 +35,7 @@ services:
     volumes:
       - ..:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
+      - ci-plugin-entrypoint:/plugin
     environment:
       - HOST_MOUNT_DIR=${PWD}
       - DATABASE_MIGRATION=false
@@ -63,6 +64,7 @@ services:
     volumes:
       - ..:/app/openkat
       - /var/run/docker.sock:/var/run/docker.sock
+      - ci-plugin-entrypoint:/plugin
     environment:
       - HOST_MOUNT_DIR=${PWD}
       - DATABASE_MIGRATION=true
@@ -109,6 +111,8 @@ services:
     command: celery -A tasks worker -B -s /tmp/celerybeat-schedule --loglevel=INFO
     env_file:
       - .env.test
+    volumes:
+      - ci-plugin-entrypoint:/plugin
     environment:
       - DATABASE_MIGRATION=false
       - HOST_MOUNT_DIR=${PWD}
@@ -134,3 +138,7 @@ networks:
         - subnet: 2001:db8:d0cc::/64
         - subnet: 172.26.0.0/16
           gateway: 172.26.0.1
+
+volumes:
+  ci-plugin-entrypoint:
+    name: ci-plugin-entrypoint
