@@ -89,3 +89,5 @@ volumes:
   postgres-data:
   xtdb-data:
   files:
+  plugin-entrypoint:
+    name: ${ENTRYPOINT_VOLUME:-plugin-entrypoint}
