@@ -1,9 +1,9 @@
 import io
+import os
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, ClassVar
 from uuid import uuid4
-import os
-from pathlib import Path
 
 import yaml
 import yaml.composer
@@ -19,16 +19,14 @@ from pydantic import ValidationError
 from tools.forms.upload_oois import UploadOOIYMLForm
 
 from octopoes.api.models import Declaration
-
-from octopoes.models.types import OOI_TYPES, ALL_TYPES
+from octopoes.models.types import ALL_TYPES
 from rocky.bytes_client import get_bytes_client
-
 
 YML_CRITERIA = [
     _('All objects should be stored in the "oois" list at the root level.'),
     _("Objects of various types can be included in a single file."),
-    _('Each object must begin with class name with exclamation at the beginning'),
-    _('It can create an object that has a reference that actually doesn\'t exist at all!'),
+    _("Each object must begin with class name with exclamation at the beginning"),
+    _("It can create an object that has a reference that actually doesn't exist at all!"),
 ]
 
 BASE_CLS_INFO = [
@@ -48,24 +46,26 @@ BASE_CLS_INFO = [
     _("SubjectAlternativeName base type should have proper fields to define as one of child types."),
 ]
 
+
 def extract_yml_examples_in_raw_str():
     result = {}
     example_yml_file_path = Path.joinpath(Path(os.path.dirname(__file__)), "upload_yml_examples.yml")
-    with open(example_yml_file_path, "r", encoding="utf-8") as file:
+    with open(example_yml_file_path, encoding="utf-8") as file:
         raw_str_ooi = ""
         current_ooi_name = ""
         current_examples = []
         first_obj = True
         for line in file:
             l_stripped_line = line.lstrip()
-            if l_stripped_line.startswith("#") or l_stripped_line.startswith("oois:") or line.strip() == "": continue
+            if l_stripped_line.startswith("#") or l_stripped_line.startswith("oois:") or line.strip() == "":
+                continue
             if l_stripped_line.startswith("- !"):
                 ooi_name = line.strip()[3:]
                 if first_obj:
                     first_obj = False
                     current_ooi_name = ooi_name
                 else:
-                    if  ooi_name == current_ooi_name:
+                    if ooi_name == current_ooi_name:
                         current_examples.append(raw_str_ooi)
                         raw_str_ooi = ""
                     else:
@@ -74,10 +74,11 @@ def extract_yml_examples_in_raw_str():
                         current_examples = []
                         current_ooi_name = ooi_name
                         raw_str_ooi = ""
-            raw_str_ooi += line.rstrip() + '\n'
+            raw_str_ooi += line.rstrip() + "\n"
         current_examples.append(raw_str_ooi)
         result[current_ooi_name] = current_examples
     return result
+
 
 YML_EXAMPLES = extract_yml_examples_in_raw_str()
 
@@ -98,8 +99,9 @@ banned_ooi_classes = [
     "KATFindingType",
     "RetireJSFindingType",
     "SnykFindingType",
-    "OOI"
+    "OOI",
 ]
+
 
 class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_yml.html"
@@ -109,7 +111,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     #     ooi_type: {"type": OOI_TYPES[ooi_type]} for ooi_type in OOI_TYPES if ooi_type not in banned_ooi_classes
     # }
     ooi_types: ClassVar[dict[str, Any]] = {
-        ooi_type.__name__: {"type": ooi_type } for ooi_type in ALL_TYPES if ooi_type.__name__ not in banned_ooi_classes
+        ooi_type.__name__: {"type": ooi_type} for ooi_type in ALL_TYPES if ooi_type.__name__ not in banned_ooi_classes
     }
 
     def setup(self, request, *args, **kwargs):
@@ -174,8 +176,7 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         except ValidationError as err:
             return self.add_error_notification(f"Validation error: {err}")
         oois_from_yaml = refs_and_oois["oois"]
-            
-        
+
         for ooi in oois_from_yaml:
             self.octopoes_api_connector.save_declaration(
                 Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
@@ -183,4 +184,3 @@ class UploadYML(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             if ooi.scan_profile is not None:
                 self.raise_clearance_level(ooi.reference, ooi.scan_profile.level)
         self.add_success_notification(_("Object(s) successfully added."))
-

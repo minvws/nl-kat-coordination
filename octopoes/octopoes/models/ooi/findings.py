@@ -4,8 +4,8 @@ from enum import Enum
 from functools import total_ordering
 from typing import Annotated, Literal
 
-from pydantic import AnyUrl, StringConstraints
 import yaml
+from pydantic import AnyUrl, StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -83,17 +83,20 @@ class ADRFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: ADRFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!ADRFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": str(data.source),
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!ADRFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": str(data.source),
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class CVEFindingType(FindingType):
@@ -105,17 +108,20 @@ class CVEFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: CVEFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!CVEFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!CVEFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class CWEFindingType(FindingType):
@@ -127,17 +133,20 @@ class CWEFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: CWEFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!CWEFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!CWEFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class CAPECFindingType(FindingType):
@@ -149,17 +158,20 @@ class CAPECFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: CAPECFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!CAPECFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!CAPECFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class RetireJSFindingType(FindingType):
@@ -169,17 +181,20 @@ class RetireJSFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: RetireJSFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!RetireJSFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!RetireJSFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class SnykFindingType(FindingType):
@@ -191,17 +206,20 @@ class SnykFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: SnykFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!SnykFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!SnykFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class KATFindingType(FindingType):
@@ -211,17 +229,20 @@ class KATFindingType(FindingType):
 
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: KATFindingType) -> yaml.Node:
-        return dumper.represent_mapping("!KATFindingType", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "source": data.source,
-            "impact": data.impact,
-            "recommendation": data.recommendation,
-            "risk_score": data.risk_score,
-            "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
-        })
+        return dumper.represent_mapping(
+            "!KATFindingType",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "id": data.id,
+                "name": data.name,
+                "description": data.description,
+                "source": data.source,
+                "impact": data.impact,
+                "recommendation": data.recommendation,
+                "risk_score": data.risk_score,
+                "risk_severity": data.risk_severity.value if data.risk_severity else data.risk_severity,
+            },
+        )
 
 
 class Finding(OOI):
@@ -248,17 +269,20 @@ class Finding(OOI):
         finding_type = parts.pop()
         ooi_reference = Reference.from_str("|".join(parts))
         return f"{finding_type} @ {ooi_reference.human_readable}"
-    
+
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: Finding) -> yaml.Node:
-        return dumper.represent_mapping("!Finding", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "finding_type": data.finding_type,
-            "ooi": data.ooi,
-            "proof": data.proof,
-            "description": data.description,
-            "reproduce": data.reproduce,
-        })
+        return dumper.represent_mapping(
+            "!Finding",
+            {
+                **cls.get_ooi_yml_repr_dict(data),
+                "finding_type": data.finding_type,
+                "ooi": data.ooi,
+                "proof": data.proof,
+                "description": data.description,
+                "reproduce": data.reproduce,
+            },
+        )
 
 
 class MutedFinding(OOI):
@@ -282,12 +306,9 @@ class MutedFinding(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"Muted {reference.natural_key}"
-    
+
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: MutedFinding) -> yaml.Node:
-        return dumper.represent_mapping("!MutedFinding", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "finding": data.finding,
-            "reason": data.reason,
-        })
-
+        return dumper.represent_mapping(
+            "!MutedFinding", {**cls.get_ooi_yml_repr_dict(data), "finding": data.finding, "reason": data.reason}
+        )

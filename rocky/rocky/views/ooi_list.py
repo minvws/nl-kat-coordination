@@ -1,10 +1,10 @@
 import csv
 import json
-import yaml
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
+import yaml
 from crisis_room.forms import AddObjectListDashboardItemForm
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
@@ -209,13 +209,11 @@ class OOIListExportView(BaseOOIListView):
 
         queryset = self.get_queryset()
         ooi_list = queryset[: OOIList.HARD_LIMIT]
-        exports = {
-            "stats": [{"observed_at": str(self.observed_at), "filters": str(filters)}],
-            "oois": []
-        }
+        exports = {"stats": [{"observed_at": str(self.observed_at), "filters": str(filters)}], "oois": []}
 
         if file_type == "json":
-            for ooi in ooi_list: exports["oois"].append(ooi.model_dump())
+            for ooi in ooi_list:
+                exports["oois"].append(ooi.model_dump())
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
@@ -223,7 +221,7 @@ class OOIListExportView(BaseOOIListView):
             )
             return response
         elif file_type == "yml":
-            exports["oois"]=ooi_list
+            exports["oois"] = ooi_list
             response = HttpResponse(
                 yaml.safe_dump(exports, sort_keys=False, indent=4),
                 content_type="application/yaml",

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import Literal
 
 import yaml
@@ -20,13 +21,10 @@ class Service(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
-    
+
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: Service) -> yaml.Node:
-        return dumper.represent_mapping("!Service", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "name": data.name,
-        })
+        return dumper.represent_mapping("!Service", {**cls.get_ooi_yml_repr_dict(data), "name": data.name})
 
 
 class IPService(OOI):
@@ -44,14 +42,12 @@ class IPService(OOI):
         t = reference.tokenized
         ip_address = t.ip_port.address.address
         return f"{t.service.name}://{ip_address}:{t.ip_port.port}/{t.ip_port.protocol}"
-    
+
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: IPService) -> yaml.Node:
-        return dumper.represent_mapping("!IPService", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "ip_port": data.ip_port,
-            "service": data.service,
-        })
+        return dumper.represent_mapping(
+            "!IPService", {**cls.get_ooi_yml_repr_dict(data), "ip_port": data.ip_port, "service": data.service}
+        )
 
 
 class TLSCipher(OOI):
@@ -69,12 +65,9 @@ class TLSCipher(OOI):
         t = reference.tokenized
         ip_address = t.ip_service.ip_port.address.address
         return f"Ciphers of {str(ip_address)}:{t.ip_service.ip_port.port}"
-    
+
     @classmethod
     def yml_representer(cls, dumper: yaml.SafeDumper, data: TLSCipher) -> yaml.Node:
-        return dumper.represent_mapping("!TLSCipher", {
-            **cls.get_ooi_yml_repr_dict(data),
-            "ip_service": data.ip_service,
-            "suites": data.suites,
-        })
-
+        return dumper.represent_mapping(
+            "!TLSCipher", {**cls.get_ooi_yml_repr_dict(data), "ip_service": data.ip_service, "suites": data.suites}
+        )

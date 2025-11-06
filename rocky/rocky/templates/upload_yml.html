@@ -22,14 +22,14 @@
                             <details class="expandable-code">
                                 <summary>{{ ooi_type }}</summary>
                                 {% with yaml_examples=examples|get_item:ooi_type %}
-                                {% if yaml_examples %}
-                                {% for example in yaml_examples %}
-                                    <div class="code-block-container" data-expandable-code-block>
-                                        <span data-code-copy-btn>copy</span>
-                                        <pre><code>{{ example }}</code></pre>
-                                    </div>
-                                {% endfor %}
-                                {% endif %}
+                                    {% if yaml_examples %}
+                                        {% for example in yaml_examples %}
+                                            <div class="code-block-container" data-expandable-code-block>
+                                                <span data-code-copy-btn>copy</span>
+                                                <pre><code>{{ example }}</code></pre>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                 {% endwith %}
                             </details>
                         {% endfor %}
@@ -38,7 +38,7 @@
                 <details class="expandable-code">
                     <summary>About the YAML file</summary>
                     <div class="code-block-container" data-expandable-code-block>
-                        <span code-block-header >example.yml</span>
+                        <span code-block-header>example.yml</span>
                         <span data-code-copy-btn>copy</span>
                         <pre><code>
 oois:
@@ -74,7 +74,9 @@ oois:
                 <details>
                     <summary>See base object type details</summary>
                     <ul>
-                        {% for info in base_ooi_types %}<li>{{ info }}</li>{% endfor %}
+                        {% for info in base_ooi_types %}
+                            <li>{{ info }}</li>
+                        {% endfor %}
                     </ul>
                 </details>
                 <form novalidate method="post" enctype="multipart/form-data" class="help">

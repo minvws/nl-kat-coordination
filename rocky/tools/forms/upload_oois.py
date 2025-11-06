@@ -22,5 +22,5 @@ class UploadOOICSVForm(UploadCSVForm):
         required=True,
     )
 
-class UploadOOIYMLForm(UploadYMLForm): ...
 
+class UploadOOIYMLForm(UploadYMLForm): ...

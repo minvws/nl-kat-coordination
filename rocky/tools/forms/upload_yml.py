@@ -21,4 +21,3 @@ class UploadYMLForm(forms.Form):
         if not (yml_file.name.endswith(".yml") or yml_file.name.endswith("yaml")):
             self.add_error("yml_file", YML_ERRORS["only_yml"])
         return yml_file
-

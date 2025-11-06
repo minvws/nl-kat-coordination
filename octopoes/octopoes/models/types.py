@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-from pydantic.fields import FieldInfo
 import yaml
+from pydantic.fields import FieldInfo
 
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import TypeNotFound

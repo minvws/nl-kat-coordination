@@ -19,12 +19,14 @@ That also depended by expandable-code.scss for styling
 function main() {
   // attribute gives functionality here.
   // div.code-block-container[data-expandable-code-block]
-  const codeBlockDivsDivs = document.querySelectorAll("div[data-expandable-code-block]");
+  const codeBlockDivsDivs = document.querySelectorAll(
+    "div[data-expandable-code-block]",
+  );
   const copySpans = document.querySelectorAll("span[data-code-copy-btn]");
 
   codeBlockDivsDivs.forEach((divElm) => {
-    const copyBtn = divElm.querySelector("span[data-code-copy-btn]")
-    if (!copyBtn) return
+    const copyBtn = divElm.querySelector("span[data-code-copy-btn]");
+    if (!copyBtn) return;
     copyBtn.addEventListener("click", (e) => {
       const example = divElm.querySelector("pre>code").textContent;
       navigator.clipboard.writeText(example);
