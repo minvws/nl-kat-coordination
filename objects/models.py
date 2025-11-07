@@ -1,3 +1,4 @@
+import re
 import tempfile
 from collections.abc import Collection, Sequence
 from enum import Enum
@@ -8,6 +9,7 @@ import structlog
 import tagulous.models
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import connections, models
 from django.db.models import ForeignKey, Model
@@ -239,6 +241,64 @@ class IPPort(XTDBNaturalKeyModel):
         return f"[{self.address}]:{self.port}"
 
 
+def validate_hostname(hostname: str) -> None:
+    """
+    Validate hostname according to RFC 1123.
+
+    Rules:
+    - Labels separated by dots
+    - Each label must be 1-63 characters long
+    - Total hostname length must not exceed 253 characters
+    - Labels can contain letters (a-z, case-insensitive), digits (0-9), and hyphens (-)
+    - Labels cannot start or end with a hyphen
+    - At least one label is required
+
+    Args:
+        hostname: The hostname string to validate
+
+    Raises:
+        ValidationError: If the hostname does not comply with RFC 1123
+    """
+    if not hostname:
+        raise ValidationError(_("Hostname cannot be empty."))
+
+    # Check total length (RFC 1123: max 253 characters)
+    if len(hostname) > 253:
+        raise ValidationError(
+            _("Hostname is too long. Maximum length is 253 characters, got %(length)d.") % {"length": len(hostname)}
+        )
+
+    # Split into labels
+    labels = hostname.split(".")
+
+    # Check for empty labels (e.g., "example..com" or ".example.com")
+    if any(not label for label in labels):
+        raise ValidationError(_("Hostname cannot contain empty labels (consecutive dots or leading/trailing dots)."))
+
+    # Validate each label
+    # RFC 1123 allows labels to contain: letters, digits, hyphens
+    # Labels cannot start or end with hyphens
+    label_pattern = re.compile(r"^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$", re.IGNORECASE)
+
+    for label in labels:
+        # Check label length (RFC 1123: max 63 characters per label)
+        if len(label) > 63:
+            raise ValidationError(
+                _("Label '%(label)s' is too long. Maximum length per label is 63 characters, got %(length)d.")
+                % {"label": label, "length": len(label)}
+            )
+
+        # Check label format
+        if not label_pattern.match(label):
+            if label.startswith("-") or label.endswith("-"):
+                raise ValidationError(_("Label '%(label)s' cannot start or end with a hyphen.") % {"label": label})
+            else:
+                raise ValidationError(
+                    _("Label '%(label)s' contains invalid characters. Only letters, digits, and hyphens are allowed.")
+                    % {"label": label}
+                )
+
+
 class Hostname(XTDBNaturalKeyModel, Asset):  # type: ignore[misc]
     dnsarecord_set: models.Manager["DNSARecord"]
     dnsaaaarecord_set: models.Manager["DNSAAAARecord"]
@@ -276,7 +336,29 @@ class Hostname(XTDBNaturalKeyModel, Asset):  # type: ignore[misc]
     def __str__(self) -> str:
         return self.name
 
+    def clean(self) -> None:
+        """Validate and normalize the hostname."""
+        super().clean()
+
+        # Normalize: remove single trailing dot (FQDN notation)
+        # Multiple trailing dots are invalid and will be caught by validation
+        if self.name and self.name.endswith(".") and not self.name.endswith(".."):
+            self.name = self.name.rstrip(".")
+
+        # Validate hostname according to RFC 1123
+        if self.name:
+            validate_hostname(self.name)
+
     def save(self, *args, **kwargs):
+        # Normalize single trailing dot before any processing (FQDN notation)
+        # Multiple trailing dots are invalid and will be caught by validation
+        if self.name and self.name.endswith(".") and not self.name.endswith(".."):
+            self.name = self.name.rstrip(".")
+
+        # Validate hostname (but don't run full_clean which validates the entire model including id)
+        if self.name:
+            validate_hostname(self.name)
+
         if self.name:
             extracted = tldextract.extract(self.name)
             registered_domain = extracted.top_domain_under_public_suffix.rstrip(".")

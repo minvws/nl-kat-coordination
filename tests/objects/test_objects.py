@@ -1,3 +1,5 @@
+import pytest
+from django.core.exceptions import ValidationError
 from pytest_django.asserts import assertContains, assertNotContains
 
 from objects.management.commands.generate_benchmark_data import generate
@@ -530,3 +532,57 @@ def test_ipaddress_create_view_post_invalid_ip_fails(rf, superuser_member, xtdb)
     assert response.status_code == 200
     assertContains(response, "Enter a valid")
     assert IPAddress.objects.count() == 0
+
+
+def test_hostname_validation_valid_hostnames(xtdb, organization):
+    """Test that valid hostnames pass validation."""
+    network = Network.objects.create(name="internet")
+
+    # Valid subdomain
+    h3 = Hostname.objects.create(network=network, name="sub.example.com")
+    assert h3.name == "sub.example.com"
+
+
+def test_hostname_validation_trailing_dot_normalization(xtdb, organization):
+    """Test that single trailing dot is normalized (FQDN notation)."""
+    network = Network.objects.create(name="internet")
+
+    # Hostname with single trailing dot should be normalized
+    h1 = Hostname.objects.create(network=network, name="example.com.")
+    assert h1.name == "example.com"
+
+    # Multiple trailing dots should raise ValidationError
+    with pytest.raises(ValidationError, match="empty labels"):
+        Hostname.objects.create(network=network, name="test.example.com...")
+
+
+def test_hostname_validation_empty_hostname(xtdb, organization):
+    """Test that empty hostname raises error."""
+    network = Network.objects.create(name="internet")
+
+    # Empty hostname will raise ValueError from natural key validation
+    # (which happens before our hostname validation)
+    with pytest.raises(ValueError, match="natural key attributes must be set"):
+        Hostname.objects.create(network=network, name="")
+
+
+def test_hostname_validation_when_creating_object(xtdb, organization):
+    """Test that labels starting or ending with hyphens raise ValidationError."""
+    network = Network.objects.create(name="internet")
+
+    # Label starting with hyphen
+    with pytest.raises(ValidationError, match="cannot start or end with a hyphen"):
+        Hostname.objects.create(network=network, name="-example.com")
+
+    # Underscore
+    with pytest.raises(ValidationError, match="invalid characters"):
+        Hostname.objects.create(network=network, name="example_test.com")
+
+
+def test_hostname_validation_case_insensitive(xtdb, organization):
+    """Test that hostnames are case-insensitive (lowercased by LowerCaseCharField)."""
+    network = Network.objects.create(name="internet")
+
+    # Mixed case should be converted to lowercase
+    h = Hostname.objects.create(network=network, name="Example.COM")
+    assert h.name == "example.com"
