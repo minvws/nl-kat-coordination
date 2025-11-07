@@ -377,7 +377,7 @@ def test_task_status_check_many_tasks(docker, celery, bulk_data, benchmark, N):
             type="plugin",
             status="queued",
             schedule=schedule,
-            data={"plugin_id": plugin.plugin_id, "input_data": [f"test_{i}.com"]},
+            data={"plugin_id": plugin.plugin_id, "input_data": [f"test-{i}.com"]},
         )
         tasks.append(task)
 

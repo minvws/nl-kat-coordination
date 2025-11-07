@@ -68,7 +68,7 @@ def generate(
         ips.append(ip)
 
         # Hostname
-        hn = Hostname(network=network, name=f"test_{i}.com", scan_level=hostname_scan_level)
+        hn = Hostname(network=network, name=f"test-{i}.com", scan_level=hostname_scan_level)
         hostnames.append(hn)
 
         # IPv6 (every 5th host gets IPv6)

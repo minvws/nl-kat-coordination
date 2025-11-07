@@ -31,6 +31,7 @@ def object_type_by_name() -> CaseInsensitiveMapping[type[models.Model]]:
 
 
 def to_xtdb_dict(model: "XTDBModel") -> dict:
+    model.clean()
     mod = model_to_dict(model, exclude=["id"] + [field.name for field in model._meta.many_to_many])
 
     if hasattr(model, "natural_key"):
