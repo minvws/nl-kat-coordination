@@ -6,8 +6,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from objects.models import Network
+from objects.models import Network, XTDBOrganization
 from openkat.forms.upload_csv import UploadCSVForm
+from openkat.models import Organization
 
 
 def clean_asset_csv(cleaned_data: dict[str, Any], column_name: str) -> None:
@@ -21,9 +22,11 @@ def clean_asset_csv(cleaned_data: dict[str, Any], column_name: str) -> None:
                 raise ValidationError(_("CSV file is empty."))
 
             for i, row in enumerate(rows, 1):
-                if len(row) != 1:
+                if not row or not row[0].strip():
+                    continue  # Skip empty rows
+                if len(row) > 2:
                     raise ValidationError(
-                        _("Row {row_num} has {col_count} columns. Expected 1 column ({column_name}).").format(
+                        _("Row {row_num} has {col_count} columns. Expected 1-2 columns ({column_name}, organization_code).").format(
                             row_num=i, col_count=len(row), column_name=column_name
                         )
                     )
@@ -68,6 +71,13 @@ class GenericAssetBulkCreateForm(forms.Form):
         label=_("Network"),
         help_text=_("Select network for all assets. Defaults to 'internet' network."),
     )
+    organizations = forms.ModelMultipleChoiceField(
+        queryset=XTDBOrganization.objects.all(),
+        required=False,
+        label=_("Organizations"),
+        help_text=_("Select organizations for all assets (optional)."),
+        widget=forms.CheckboxSelectMultiple,
+    )
 
     def clean_assets(self):
         assets = self.cleaned_data.get("assets", "")
@@ -84,7 +94,7 @@ class GenericAssetCSVUploadForm(UploadCSVForm):
         queryset=Network.objects.all(),
         required=False,
         label=_("Network"),
-        help_text=_("Select default network for all assets. Can be overridden per row in CSV. Defaults to 'internet'."),
+        help_text=_("Select default network for all assets. Defaults to 'internet'."),
     )
 
     def clean(self):
