@@ -47,24 +47,6 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
-        <div class="action-buttons">
-            {% if not remove_action_buttons %}
-                {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
-
-            {% endif %}
-            {% if show_report_types %}
-                {% include "partials/plugin_tile_modal.html" with plugin=plugin %}
-
-            {% else %}
-                {% if plugin.type == "boefje" %}
-                    <a class="tile-detail-link"
-                       href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
-                {% else %}
-                    <a class="tile-detail-link"
-                       href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
-                {% endif %}
-            {% endif %}
-        </div>
     {% endif %}
 </div>
 {% block html_at_end_body %}

@@ -9,15 +9,10 @@
     ],
     "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
     "oci_arguments": [
-      "xargs",
-      "-I",
-      "%",
-      "-P",
-      "8",
       "uv",
       "run",
       "kat_dns/main.py",
-      "%"
+      "{hostname}"
     ]
   },
   {

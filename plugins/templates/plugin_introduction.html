@@ -5,11 +5,6 @@
     <div>
         <div class="horizontal-view">
             <h1>{{ plugin.name }}</h1>
-            {% if plugin.enabled %}
-                <span class="label system-tag color-2">{% translate "Enabled" %}</span>
-            {% else %}
-                <span class="label system-tag color-3">{% translate "Disabled" %}</span>
-            {% endif %}
         </div>
         {% if plugin.description %}<p class="emphasized">{{ plugin.description }}</p>{% endif %}
         <div class="horizontal-view scan-intensity">
