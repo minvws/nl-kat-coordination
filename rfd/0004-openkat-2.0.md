@@ -13,9 +13,9 @@ XTDB 2 has been released with a lot of big improvements over XTDB 1. XTDB 2 is n
 2 uses SQL instead of datalog and you connect over the pgwire protocol. This means that we need to rewrite big parts of
 OpenKAT. We take this opportunity to do a general review of the OpenKAT architecture.
 
-## Shortcoming of current architecture
+## Current architecture
 
-OpenKAT currently has a complex architecture. The code consists of 5 modules that were previously in separate git
+The code consists of 5 modules that were previously in separate git
 repositories and are still treated as standalone modules in the current shared git repository.
 At https://docs.openkat.nl/basics/modules.html you can see a description of the different modules. Except for one
 component, no code is shared between these modules.
@@ -47,10 +47,9 @@ by just storing the report as one object. The service that creates reports also 
 
 ## Proposal: Simplification of architecture
 
-The complexity makes development of OpenKAT difficult and time-consuming. We think it is necessary to simplify things so
-that OpenKAT becomes easier to develop, maintain and run. The migration of OpenKAT to XTDB 2 is a good moment to do this
-because a big part of OpenKAT needs to be rewritten anyway. We are currently planning for the following changes for
-OpenKAT 2.0:
+We think it is necessary to simplify things so that OpenKAT becomes easier to develop, maintain and run.
+The migration of OpenKAT to XTDB 2 is a good moment to do this because a big part of OpenKAT needs to be rewritten
+anyway. We are currently planning for the following changes for OpenKAT 2.0:
 
 - XTDB1 will be replaced with XTDB2. Because XTDB2 uses SQL instead of Datalog, we will use the Django ORM for all XTDB2
   objects.
