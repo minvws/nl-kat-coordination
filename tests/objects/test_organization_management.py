@@ -24,11 +24,7 @@ from openkat.models import Organization
 from tests.conftest import setup_request
 
 
-# CSV Upload Tests with Organization Codes
-
-
 def test_ipaddress_csv_upload_with_organization_code(rf, superuser_member, xtdb):
-    """Test CSV upload with organization code in second column."""
     org = Organization.objects.create(name="Test Org", code="test-org")
     xtdb_org = XTDBOrganization.objects.get(pk=org.pk)
     csv_content = b"192.168.1.1,test-org\n10.0.0.1,test-org"
@@ -325,11 +321,7 @@ def test_hostname_detail_view_shows_organizations(rf, superuser_member, xtdb):
     assertContains(response, "test-org")
 
 
-# Organization Management View Tests
-
-
 def test_network_manage_organizations_add(rf, superuser_member, xtdb):
-    """Test adding organizations to a network."""
     org1 = Organization.objects.create(name="Org 1", code="org-1")
     org2 = Organization.objects.create(name="Org 2", code="org-2")
     xtdb_org1 = XTDBOrganization.objects.get(pk=org1.pk)
@@ -380,7 +372,9 @@ def test_network_manage_organizations_remove_all(rf, superuser_member, xtdb):
     network = Network.objects.create(name="test-network")
     network.organizations.add(xtdb_org)
 
-    request = setup_request(rf.post("objects:network_manage_organizations", {"organizations": []}), superuser_member.user)
+    request = setup_request(
+        rf.post("objects:network_manage_organizations", {"organizations": []}), superuser_member.user
+    )
     response = NetworkManageOrganizationsView.as_view()(request, pk=network.pk)
 
     assert response.status_code == 302
@@ -465,7 +459,9 @@ def test_hostname_manage_organizations_remove_all(rf, superuser_member, xtdb):
     host = Hostname.objects.create(name="example.com", network=network)
     host.organizations.add(xtdb_org)
 
-    request = setup_request(rf.post("objects:hostname_manage_organizations", {"organizations": []}), superuser_member.user)
+    request = setup_request(
+        rf.post("objects:hostname_manage_organizations", {"organizations": []}), superuser_member.user
+    )
     response = HostnameManageOrganizationsView.as_view()(request, pk=host.pk)
 
     assert response.status_code == 302

@@ -48,9 +48,8 @@ class ObjectSet(models.Model):
     object_type: models.ForeignKey = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_query = models.TextField(null=True, blank=True)
 
-    # can hold both objects and other groups (composite pattern)
+    # concrete objects
     all_objects = ArrayField(models.CharField(), default=list, blank=True)
-    subsets = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="supersets")
 
     def get_query_objects(self, **filters: Any) -> QuerySet:
         if self.object_query is None:
@@ -66,26 +65,8 @@ class ObjectSet(models.Model):
         except DjangoQLParserError:
             return qs
 
-    def traverse_objects(self, depth: int = 0, max_depth: int = 3, **filters: Any) -> list[int]:
-        # TODO: handle cycles
-
-        all_objects = list(self.all_objects)
-
-        query_objects = self.get_query_objects(**filters)
-        all_objects.extend([x.pk for x in query_objects])
-
-        if depth < max_depth:
-            for subset in self.subsets.all():
-                all_objects.extend(subset.traverse_objects(depth + 1, max_depth))
-
-        seen = set()
-        unique_objects = []
-        for obj in all_objects:
-            if obj not in seen:
-                seen.add(obj)
-                unique_objects.append(obj)
-
-        return unique_objects
+    def traverse_objects(self, **filters: Any) -> list[int]:
+        return list(set(self.all_objects).union({x.pk for x in self.get_query_objects(**filters)}))
 
     def __str__(self):
         return self.name or super().__str__()

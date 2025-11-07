@@ -194,9 +194,10 @@ class NetworkScanLevelUpdateView(BaseScanLevelUpdateView):
 
 
 class NetworkManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
-    """View to manage organizations for a network."""
-
     http_method_names = ["post"]
+
+    def get_permission_required(self):
+        return ["openkat.change_network", "openkat.change_organization", "change_networkorganization"]
 
     def post(self, request, *args, **kwargs):
         network = Network.objects.get(pk=self.kwargs.get("pk"))
@@ -219,6 +220,9 @@ class IPAddressManageOrganizationsView(KATModelPermissionRequiredMixin, FormView
 
     http_method_names = ["post"]
 
+    def get_permission_required(self):
+        return ["openkat.change_ipaddress", "openkat.change_organization", "change_ipaddressorganization"]
+
     def post(self, request, *args, **kwargs):
         ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
         organization_ids = request.POST.getlist("organizations")
@@ -239,6 +243,9 @@ class HostnameManageOrganizationsView(KATModelPermissionRequiredMixin, FormView)
     """View to manage organizations for a hostname."""
 
     http_method_names = ["post"]
+
+    def get_permission_required(self):
+        return ["openkat.change_hostname", "openkat.change_organization", "change_hostnameorganization"]
 
     def post(self, request, *args, **kwargs):
         hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
@@ -543,7 +550,7 @@ class IPAddressCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 
 class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
-    template_name = "objects/ipaddress_csv_upload.html"
+    template_name = "objects/ipaddress_create.html"
     form_class = IPAddressCSVUploadForm
     success_url = reverse_lazy("objects:ipaddress_list")
     permission_required = "openkat.add_ipaddress"
@@ -606,7 +613,8 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 messages.info(self.request, _("{count} IP addresses already existed.").format(count=skipped_count))
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} IP addresses.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} IP addresses.").format(count=organizations_set),
                 )
             if error_count > 0:
                 messages.warning(
@@ -625,10 +633,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         try:
             return Organization.objects.get(code=org_code)
         except Organization.DoesNotExist:
-            messages.warning(
-                self.request,
-                _("Organization with code '{code}' not found.").format(code=org_code),
-            )
+            messages.warning(self.request, _("Organization with code '{code}' not found.").format(code=org_code))
             return None
 
 
@@ -887,7 +892,7 @@ class HostnameCreateView(KATModelPermissionRequiredMixin, CreateView):
 
 
 class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
-    template_name = "objects/hostname_csv_upload.html"
+    template_name = "objects/hostname_create.html"
     form_class = HostnameCSVUploadForm
     success_url = reverse_lazy("objects:hostname_list")
     permission_required = "openkat.add_hostname"
@@ -949,7 +954,8 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 messages.info(self.request, _("{count} hostnames already existed.").format(count=skipped_count))
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} hostnames.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} hostnames.").format(count=organizations_set),
                 )
             if error_count > 0:
                 messages.warning(
@@ -968,10 +974,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         try:
             return Organization.objects.get(code=org_code)
         except Organization.DoesNotExist:
-            messages.warning(
-                self.request,
-                _("Organization with code '{code}' not found.").format(code=org_code),
-            )
+            messages.warning(self.request, _("Organization with code '{code}' not found.").format(code=org_code))
             return None
 
 
@@ -1279,7 +1282,8 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} assets.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} assets.").format(count=organizations_set),
                 )
 
             if error_count > 0:
