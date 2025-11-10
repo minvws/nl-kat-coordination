@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import DatabaseError
 from django.db.models import Model, OuterRef, Q, QuerySet, Subquery
 from django.db.models.fields.json import KeyTextTransform
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -431,6 +432,9 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
+            if not self.request.user.has_perms(["openkat.change_ipaddress", "openkat.can_set_clearance_level"]):
+                raise Http404()
+
             scan_level = request.POST.get("scan_level")
             scan_type = request.POST.get("declared")
             if scan_type == "inherited":
@@ -753,8 +757,12 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
+            if not self.request.user.has_perms(["openkat.change_hostname", "openkat.can_set_clearance_level"]):
+                raise Http404()
+
             scan_level = self.request.POST.get("scan_level")
             scan_type = self.request.POST.get("declared")
+
             if scan_type == "inherited":
                 updated_count = Hostname.objects.filter(pk__in=selected).update(scan_level=None, declared=False)
                 messages.success(request, _("Removed scan level for {} hostnames.").format(updated_count))
