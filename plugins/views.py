@@ -251,7 +251,7 @@ class PluginScheduleView(DetailView):
         organization_codes = self.request.POST.getlist("organization")
         action = self.request.POST.get("action", "schedule")
 
-        if action == "unschedule":
+        if action == "cancel":
             if organization_codes:
                 organizations = Organization.objects.filter(code__in=organization_codes)
                 deleted_count = Schedule.objects.filter(plugin=self.object, organization__in=organizations).delete()[0]
