@@ -182,7 +182,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "openkat.middleware.auth_token.MediaAuthTokenMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 

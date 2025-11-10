@@ -49,9 +49,7 @@ urlpatterns = [
     path("api/v1/objects/", include(object_router.urls)),
     path("", include(tf_urls)),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path("files/<slug:pk>/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
-    # convenient url
-    path("api/v1/files/<slug:pk>/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
+    path("api/v1/file/<slug:pk>/download/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
 ]
 urlpatterns += i18n_patterns(
     path("<organization_code>/account/", AccountView.as_view(), name="account_detail"),

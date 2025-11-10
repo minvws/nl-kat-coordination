@@ -185,7 +185,7 @@ func downloadFile(file_pk string, destination string) (string, error) {
 	var bearer = "Token " + os.Getenv("OPENKAT_TOKEN")
 	var body bytes.Buffer
 
-	req, err := http.NewRequest("GET", api_url+"/files/"+file_pk+"/", &body)
+	req, err := http.NewRequest("GET", api_url+"/file/"+file_pk+"/download/", &body)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to create GET request: %w", err)
