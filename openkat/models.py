@@ -32,7 +32,6 @@ DENY_ORGANIZATION_CODES = [
     "admin",
     "api",
     "i18n",
-    "health",
     "privacy-statement",
     "account",
     "crisis-room",

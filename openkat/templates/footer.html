@@ -13,11 +13,6 @@
             <li>
                 <a href="{% url "privacy_statement" %}">{% translate "Privacy Statement" %}</a>
             </li>
-            {% if organization %}
-                <li>
-                    <a href="{% url "health_beautified" organization_code=organization.code %}">{% translate "Health" %}</a>
-                </li>
-            {% endif %}
         </ul>
     </nav>
 </footer>

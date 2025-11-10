@@ -13,7 +13,6 @@ from files.models import File
 from files.viewsets import FileViewSet
 from objects.urls import object_router
 from openkat.views.account import AccountView
-from openkat.views.health import Health
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
 from openkat.views.login import LoginOpenKATView, LogoutOpenKATView, SetupOpenKATView
@@ -48,7 +47,6 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("api/v1/", include(router.urls)),
     path("api/v1/objects/", include(object_router.urls)),
-    path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("files/<slug:pk>/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
