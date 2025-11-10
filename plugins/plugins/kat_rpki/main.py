@@ -1,11 +1,3 @@
-# /// script
-# dependencies = [
-#   "httpx==0.27.2",
-#   "polars==1.32.3",
-#   "polars-iptools==0.1.10",
-# ]
-# ///
-
 import json
 import os
 import socket
@@ -19,8 +11,11 @@ import polars as pl
 import polars_iptools as ip
 
 
-def ipv6_to_int(ipv6_addr):
-    return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
+def ipv6_to_int(ipv6_addr: str) -> int:
+    try:
+        return int(hexlify(socket.inet_pton(socket.AF_INET6, ipv6_addr)), 16)
+    except OSError as e:
+        raise ValueError(f"IPV6 {ipv6_addr} is invalid") from e
 
 
 def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dict[str, str]], dict[str, list[str]]]:
