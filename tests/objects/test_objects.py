@@ -586,3 +586,37 @@ def test_hostname_validation_case_insensitive(xtdb, organization):
     # Mixed case should be converted to lowercase
     h = Hostname.objects.create(network=network, name="Example.COM")
     assert h.name == "example.com"
+
+
+def test_hostname_validation_with_bulk_create(xtdb, organization):
+    """Test that validation works with bulk_create (which calls save() on each object)."""
+    network = Network.objects.create(name="internet")
+
+    # Valid hostnames should work with bulk_create
+    valid_hostnames = [
+        Hostname(network=network, name="example1.com"),
+        Hostname(network=network, name="example2.com"),
+        Hostname(network=network, name="sub.example3.com"),
+    ]
+    Hostname.objects.bulk_create(valid_hostnames)
+    # Verify the hostnames were created
+    assert Hostname.objects.filter(network=network, name="example1.com").exists()
+    assert Hostname.objects.filter(network=network, name="example2.com").exists()
+    assert Hostname.objects.filter(network=network, name="sub.example3.com").exists()
+
+    # Invalid hostname should raise ValidationError during bulk_create
+    invalid_hostnames = [
+        Hostname(network=network, name="valid.com"),
+        Hostname(network=network, name="invalid_hostname.com"),  # underscore is invalid
+    ]
+    with pytest.raises(ValidationError, match="invalid characters"):
+        Hostname.objects.bulk_create(invalid_hostnames)
+
+    # Trailing dot normalization should work with bulk_create
+    hostnames_with_dot = [Hostname(network=network, name="test1.com."), Hostname(network=network, name="test2.com.")]
+    Hostname.objects.bulk_create(hostnames_with_dot)
+    # Verify trailing dots were normalized
+    h1 = Hostname.objects.get(network=network, name="test1.com")
+    h2 = Hostname.objects.get(network=network, name="test2.com")
+    assert h1.name == "test1.com"
+    assert h2.name == "test2.com"
