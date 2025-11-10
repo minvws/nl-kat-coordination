@@ -13,7 +13,7 @@ from files.models import File
 from files.viewsets import FileViewSet
 from objects.urls import object_router
 from openkat.views.account import AccountView
-from openkat.views.health import Health, HealthChecks
+from openkat.views.health import Health
 from openkat.views.indemnification_add import IndemnificationAddView
 from openkat.views.landing_page import LandingPageView
 from openkat.views.login import LoginOpenKATView, LogoutOpenKATView, SetupOpenKATView
@@ -52,6 +52,8 @@ urlpatterns = [
     path("", include(tf_urls)),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("files/<slug:pk>/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
+    # convenient url
+    path("api/v1/files/<slug:pk>/", ObjectDownloadView.as_view(model=File, file_field="file"), name="download"),
 ]
 urlpatterns += i18n_patterns(
     path("<organization_code>/account/", AccountView.as_view(), name="account_detail"),
@@ -100,7 +102,6 @@ urlpatterns += i18n_patterns(
         OrganizationMemberEditView.as_view(),
         name="organization_member_edit",
     ),
-    path("<organization_code>/health/v1/", HealthChecks.as_view(), name="health_beautified"),
 )
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

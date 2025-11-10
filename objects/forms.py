@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 
 from objects.models import Network, XTDBOrganization
 from openkat.forms.upload_csv import UploadCSVForm
-from openkat.models import Organization
 
 
 def clean_asset_csv(cleaned_data: dict[str, Any], column_name: str) -> None:
@@ -26,9 +25,10 @@ def clean_asset_csv(cleaned_data: dict[str, Any], column_name: str) -> None:
                     continue  # Skip empty rows
                 if len(row) > 2:
                     raise ValidationError(
-                        _("Row {row_num} has {col_count} columns. Expected 1-2 columns ({column_name}, organization_code).").format(
-                            row_num=i, col_count=len(row), column_name=column_name
-                        )
+                        _(
+                            "Row {row_num} has {col_count} columns. "
+                            "Expected 1-2 columns ({column_name}, organization_code)."
+                        ).format(row_num=i, col_count=len(row), column_name=column_name)
                     )
         except csv.Error as e:
             raise ValidationError(_("Error parsing CSV: {error}").format(error=str(e)))
