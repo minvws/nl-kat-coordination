@@ -606,7 +606,8 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 messages.info(self.request, _("{count} IP addresses already existed.").format(count=skipped_count))
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} IP addresses.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} IP addresses.").format(count=organizations_set),
                 )
             if error_count > 0:
                 messages.warning(
@@ -625,10 +626,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         try:
             return Organization.objects.get(code=org_code)
         except Organization.DoesNotExist:
-            messages.warning(
-                self.request,
-                _("Organization with code '{code}' not found.").format(code=org_code),
-            )
+            messages.warning(self.request, _("Organization with code '{code}' not found.").format(code=org_code))
             return None
 
 
@@ -949,7 +947,8 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
                 messages.info(self.request, _("{count} hostnames already existed.").format(count=skipped_count))
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} hostnames.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} hostnames.").format(count=organizations_set),
                 )
             if error_count > 0:
                 messages.warning(
@@ -968,10 +967,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
         try:
             return Organization.objects.get(code=org_code)
         except Organization.DoesNotExist:
-            messages.warning(
-                self.request,
-                _("Organization with code '{code}' not found.").format(code=org_code),
-            )
+            messages.warning(self.request, _("Organization with code '{code}' not found.").format(code=org_code))
             return None
 
 
@@ -1279,7 +1275,8 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
 
             if organizations_set > 0:
                 messages.success(
-                    self.request, _("Successfully set organizations for {count} assets.").format(count=organizations_set)
+                    self.request,
+                    _("Successfully set organizations for {count} assets.").format(count=organizations_set),
                 )
 
             if error_count > 0:

@@ -16,6 +16,16 @@
                     </p>
                 </div>
             </div>
+            <nav class="tabs" aria-label="List of views for asset creation pages">
+                <ul>
+                    <li aria-current="page">
+                        <a href="{% url 'objects:generic_asset_create' %}">Text Input</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'objects:generic_asset_csv_upload' %}">CSV Upload</a>
+                    </li>
+                </ul>
+            </nav>
             <div>
                 <h2>{% translate "Bulk Text Input" %}</h2>
                 <p>{% translate "Enter one IP address or hostname per line. The system will automatically detect the type." %}</p>
@@ -25,46 +35,6 @@
 
                     {{ form.as_p }}
                     <button type="submit">{% translate "Add Assets" %}</button>
-                </form>
-            </div>
-            <hr>
-            <div>
-                <h2>{% translate "Upload Multiple Assets from CSV" %}</h2>
-                <p>
-                    {% translate "Upload a CSV file with IP addresses and hostnames. You can optionally include scan levels and organization codes per row." %}
-                </p>
-                <div>
-                    <h3>{% translate "CSV Format" %}</h3>
-                    <p>{% translate "The CSV file should have 1 to 3 columns:" %}</p>
-                    <ul>
-                        <li>
-                            <strong>{% translate "Column 1 (required):" %}</strong> {% translate "IP address or hostname" %}
-                        </li>
-                        <li>
-                            <strong>{% translate "Column 2 (optional):" %}</strong> {% translate "Scan level (0-4)" %}
-                        </li>
-                        <li>
-                            <strong>{% translate "Column 3 (optional):" %}</strong> {% translate "Organization code" %}
-                        </li>
-                    </ul>
-                    <h4>{% translate "Examples:" %}</h4>
-                    <pre><code>192.168.1.1
-example.com,2,org1
-10.0.0.1,4
-test.org,,org2
-2001:db8::1,3,org1</code></pre>
-                    <ul>
-                        <li>{% translate "No header row required" %}</li>
-                        <li>{% translate "Empty columns are skipped" %}</li>
-                        <li>{% translate "Organization code is required if you want to set scan levels" %}</li>
-                    </ul>
-                </div>
-                <form method="post"
-                      action="{{ csv_upload_url }}"
-                      enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ csv_form.as_p }}
-                    <button type="submit" class="button">{% translate "Upload CSV" %}</button>
                 </form>
             </div>
         </section>
