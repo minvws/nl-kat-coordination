@@ -7,7 +7,6 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -184,10 +183,9 @@ func main() {
 func downloadFile(file_pk string, destination string) (string, error) {
 	api_url := os.Getenv("OPENKAT_API")
 	var bearer = "Token " + os.Getenv("OPENKAT_TOKEN")
-	var furi, _ = url.Parse(api_url)
 	var body bytes.Buffer
 
-	req, err := http.NewRequest("GET", furi.Scheme+"://"+furi.Host+"/files/"+file_pk+"/", &body)
+	req, err := http.NewRequest("GET", api_url+"/files/"+file_pk+"/", &body)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to create GET request: %w", err)

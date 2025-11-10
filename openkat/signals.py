@@ -23,7 +23,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
 # Signal sent when a user logs out
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
-    logger.info("User logged out", userername=user.get_username())
+    logger.info("User logged out", username=user.get_username())
 
 
 # Signal sent when a user login attempt fails
