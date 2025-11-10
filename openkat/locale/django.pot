@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-10 12:11+0000\n"
+"POT-Creation-Date: 2025-11-10 12:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -801,7 +801,7 @@ msgid "Protocol"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_detail.html
-#: openkat/templates/footer.html openkat/templates/health.html
+#: openkat/templates/footer.html
 msgid "Service"
 msgstr ""
 
@@ -843,7 +843,7 @@ msgid "Name"
 msgstr ""
 
 #: objects/templates/objects/ipaddress_detail.html
-#: plugins/templates/plugin_table.html openkat/templates/health.html
+#: plugins/templates/plugin_table.html
 msgid "Version"
 msgstr ""
 
@@ -3179,10 +3179,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: openkat/templates/footer.html openkat/views/health.py
-msgid "Health"
-msgstr ""
-
 #: openkat/templates/forms/widgets/checkbox_group_table.html
 msgid "Object list"
 msgstr ""
@@ -3205,22 +3201,6 @@ msgstr ""
 
 #: openkat/templates/header.html openkat/views/login.py
 msgid "OpenKAT"
-msgstr ""
-
-#: openkat/templates/health.html
-msgid "Health Checks"
-msgstr ""
-
-#: openkat/templates/health.html
-msgid "Health checks"
-msgstr ""
-
-#: openkat/templates/health.html
-msgid "Healthy"
-msgstr ""
-
-#: openkat/templates/health.html
-msgid "Additional"
 msgstr ""
 
 #: openkat/templates/indemnification_present.html
@@ -4056,10 +4036,6 @@ msgstr ""
 
 #: openkat/validators.py
 msgid " upper case letters"
-msgstr ""
-
-#: openkat/views/health.py
-msgid "Beautified"
 msgstr ""
 
 #: openkat/views/indemnification_add.py
