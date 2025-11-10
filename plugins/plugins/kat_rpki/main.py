@@ -24,7 +24,7 @@ def ipv6_to_int(ipv6_addr):
 
 
 def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dict[str, str]], dict[str, list[str]]]:
-    rpki_v4 = rpki.filter(pl.col("prefix").str.contains(".", literal=True)).with_columns(  # filter ipv4 addresses
+    rpki_v4 = rpki.filter(~pl.col("prefix").str.contains(":", literal=True)).with_columns(  # filter ipv4 addresses
         intip=ip.ipv4_to_numeric(pl.col("prefix").str.split("/").list.get(0)),  # parse CIDR to start-ip as an integer
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),  # parse CIDR to prefix as an integer
     )
@@ -33,7 +33,7 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dic
         intprefix=pl.col("prefix").str.split("/").list.get(1).cast(pl.UInt8),
     )
 
-    bgp_v4 = bgp.filter(pl.col("CIDR").str.contains(".", literal=True)).with_columns(
+    bgp_v4 = bgp.filter(~pl.col("CIDR").str.contains(":", literal=True)).with_columns(
         bintip=ip.ipv4_to_numeric(pl.col("CIDR").str.split("/").list.get(0)),
         bintprefix=pl.col("CIDR").str.split("/").list.get(1).cast(pl.UInt8),
     )
@@ -114,14 +114,18 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dic
 def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
     """Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame"""
 
-    params = {"ordering": "created_at", "limit": "1"}
+    params = {"ordering": "-created_at", "limit": "1"}
 
     try:
-        file = client.get("/file/", params=params | {"search": file_type}).json()["results"][0]["file"]
+        files = client.get("/file/", params=params | {"search": file_type}).raise_for_status()
+        file_id = files.json()["results"][0]["id"]
     except (IndexError, JSONDecodeError):
         raise FileNotFoundError(f"No {file_type} found. Please enable the download plugin first.")
 
-    rpki_lazy = pl.scan_parquet(client.get(file).content)
+    try:
+        rpki_lazy = pl.scan_parquet(client.get(f"/files/{file_id}/").raise_for_status().content)
+    except (IndexError, JSONDecodeError):
+        raise Exception("Failed to retrieve file")
 
     return rpki_lazy
 
