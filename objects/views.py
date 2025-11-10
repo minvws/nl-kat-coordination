@@ -8,10 +8,10 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.db import DatabaseError
 from django.db.models import Model, OuterRef, Q, QuerySet, Subquery
 from django.db.models.fields.json import KeyTextTransform
-from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -194,14 +194,14 @@ class NetworkScanLevelUpdateView(BaseScanLevelUpdateView):
     detail_url_name = "objects:network_detail"
 
     def get_permission_required(self):
-        return ["openkat.change_network", "openkat.can_set_clearance_level"]
+        return ["objects.change_network", "openkat.can_set_clearance_level"]
 
 
 class NetworkManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
     http_method_names = ["post"]
 
     def get_permission_required(self):
-        return ["openkat.change_network", "openkat.change_organization", "change_networkorganization"]
+        return ["objects.change_network", "openkat.change_organization", "objects.change_networkorganization"]
 
     def post(self, request, *args, **kwargs):
         network = Network.objects.get(pk=self.kwargs.get("pk"))
@@ -225,7 +225,7 @@ class IPAddressManageOrganizationsView(KATModelPermissionRequiredMixin, FormView
     http_method_names = ["post"]
 
     def get_permission_required(self):
-        return ["openkat.change_ipaddress", "openkat.change_organization", "change_ipaddressorganization"]
+        return ["objects.change_ipaddress", "openkat.change_organization", "objects.change_ipaddressorganization"]
 
     def post(self, request, *args, **kwargs):
         ipaddress = IPAddress.objects.get(pk=self.kwargs.get("pk"))
@@ -249,7 +249,7 @@ class HostnameManageOrganizationsView(KATModelPermissionRequiredMixin, FormView)
     http_method_names = ["post"]
 
     def get_permission_required(self):
-        return ["openkat.change_hostname", "openkat.change_organization", "change_hostnameorganization"]
+        return ["objects.change_hostname", "openkat.change_organization", "objects.change_hostnameorganization"]
 
     def post(self, request, *args, **kwargs):
         hostname = Hostname.objects.get(pk=self.kwargs.get("pk"))
@@ -432,8 +432,8 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
-            if not self.request.user.has_perms(["openkat.change_ipaddress", "openkat.can_set_clearance_level"]):
-                raise Http404()
+            if not self.request.user.has_perms(["objects.change_ipaddress", "objects.can_set_clearance_level"]):
+                raise PermissionDenied()
 
             scan_level = request.POST.get("scan_level")
             scan_type = request.POST.get("declared")
@@ -448,6 +448,8 @@ class IPAddressListView(OrganizationFilterMixin, FilterView):
             else:
                 messages.warning(request, _("No scan level selected."))
         elif action_type == "delete":
+            if not self.request.user.has_perms(["objects.delete_ipaddress"]):
+                raise PermissionDenied()
             try:
                 IPAddress.objects.filter(pk__in=selected_ids).delete()
                 messages.success(request, _("Deleted {} IP addresses.").format(len(selected_ids)))
@@ -560,7 +562,7 @@ class IPAddressCSVUploadView(KATModelPermissionRequiredMixin, FormView):
     template_name = "objects/ipaddress_create.html"
     form_class = IPAddressCSVUploadForm
     success_url = reverse_lazy("objects:ipaddress_list")
-    permission_required = "openkat.add_ipaddress"
+    permission_required = "objects.add_ipaddress"
 
     def form_valid(self, form):
         network = form.cleaned_data.get("network")
@@ -657,7 +659,7 @@ class IPAddressScanLevelUpdateView(BaseScanLevelUpdateView):
     detail_url_name = "objects:ipaddress_scan_level_detail"
 
     def get_permission_required(self):
-        return ["openkat.change_ipaddress", "openkat.can_set_clearance_level"]
+        return ["objects.change_ipaddress", "objects.can_set_clearance_level"]
 
 
 class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
@@ -757,8 +759,8 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             )
             return redirect(url)
         elif action_type == "set-scan-level":
-            if not self.request.user.has_perms(["openkat.change_hostname", "openkat.can_set_clearance_level"]):
-                raise Http404()
+            if not self.request.user.has_perms(["objects.change_hostname", "objects.can_set_clearance_level"]):
+                raise PermissionDenied()
 
             scan_level = self.request.POST.get("scan_level")
             scan_type = self.request.POST.get("declared")
@@ -774,6 +776,8 @@ class HostnameListView(OrganizationFilterMixin, FilterView):
             else:
                 messages.warning(request, _("No scan level selected."))
         elif action_type == "delete":
+            if not self.request.user.has_perms(["objects.delete_hostname"]):
+                raise PermissionDenied()
             try:
                 Hostname.objects.filter(pk__in=selected).delete()
                 messages.success(request, _("Deleted {} hostnames.").format(len(selected)))
@@ -875,7 +879,7 @@ class HostnameScanLevelUpdateView(BaseScanLevelUpdateView):
     detail_url_name = "objects:hostname_scan_level_detail"
 
     def get_permission_required(self):
-        return ["openkat.change_hostname", "openkat.can_set_clearance_level"]
+        return ["objects.change_hostname", "objects.can_set_clearance_level"]
 
 
 class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
@@ -912,7 +916,7 @@ class HostnameCSVUploadView(KATModelPermissionRequiredMixin, FormView):
     template_name = "objects/hostname_create.html"
     form_class = HostnameCSVUploadForm
     success_url = reverse_lazy("objects:hostname_list")
-    permission_required = "openkat.add_hostname"
+    permission_required = "objects.add_hostname"
 
     def form_valid(self, form):
         csv_file = form.cleaned_data["csv_file"]
@@ -1082,7 +1086,7 @@ class GenericAssetCreateView(KATModelPermissionRequiredMixin, FormView):
     success_url = reverse_lazy("objects:generic_asset_create")
 
     def get_permission_required(self):
-        return ["openkat.add_ipaddress", "openkat.add_hostname"]
+        return ["objects.add_ipaddress", "objects.add_hostname"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1159,7 +1163,7 @@ class GenericAssetCSVUploadView(KATModelPermissionRequiredMixin, FormView):
     success_url = reverse_lazy("objects:generic_asset_create")
 
     def get_permission_required(self):
-        return ["openkat.add_ipaddress", "openkat.add_hostname"]
+        return ["objects.add_ipaddress", "objects.add_hostname"]
 
     def form_valid(self, form):
         csv_file = form.cleaned_data["csv_file"]

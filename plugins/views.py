@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -242,8 +243,11 @@ class PluginDeleteView(KATModelPermissionRequiredMixin, DeleteView):
         return reverse_lazy("plugin_list")
 
 
-class PluginScheduleView(DetailView):
+class PluginScheduleView(KATModelPermissionRequiredMixin, UpdateView):
     model = Plugin
+
+    def get_permission_required(self):
+        return ["tasks.add_schedule"]  # permission on the Plugin model is added in KATModelPermissionRequiredMixin
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -252,6 +256,8 @@ class PluginScheduleView(DetailView):
         action = self.request.POST.get("action", "schedule")
 
         if action == "cancel":
+            if not self.request.user.has_perms(["tasks.delete_schedule"]):
+                raise PermissionDenied()
             if organization_codes:
                 organizations = Organization.objects.filter(code__in=organization_codes)
                 deleted_count = Schedule.objects.filter(plugin=self.object, organization__in=organizations).delete()[0]
@@ -278,7 +284,10 @@ class PluginScheduleView(DetailView):
                         self.object.name, deleted_count
                     ),
                 )
-        else:
+        elif action == "schedule":
+            if not self.request.user.has_perms(["tasks.add_schedule"]):
+                raise PermissionDenied()
+
             if organization_codes:
                 # Schedule for specific organizations
                 organizations = Organization.objects.filter(code__in=organization_codes)
@@ -486,6 +495,9 @@ class BusinessRuleRunView(DetailView):
     model = BusinessRule
 
     def post(self, request, *args, **kwargs):
+        if not request.user.has_perms(["plugins.run_businessrule"]):
+            raise PermissionDenied()
+
         self.object = self.get_object()
         run_business_rules.delay([self.object.pk])
 

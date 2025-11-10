@@ -22,7 +22,7 @@
                     </p>
                 </div>
                 <div class="horizontal-view toolbar">
-                    {% if perms.openkat.add_task %}
+                    {% if perms.tasks.add_task %}
                         <a class="button ghost"
                            href="{% url 'add_plugin' %}?plugin_id={{ plugin.id }}&duplicate=true">
                             <span class="icon ti-plus"></span>{% translate "Add variant" %}

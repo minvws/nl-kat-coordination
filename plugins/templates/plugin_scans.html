@@ -23,7 +23,7 @@
                     </p>
                 </div>
                 <div class="horizontal-view toolbar">
-                    {% if perms.openkat.add_task %}
+                    {% if perms.tasks.add_task %}
                         <a class="button ghost"
                            href="{% url "add_task" %}?plugin_id={{ plugin.id }}">
                             <span class="icon ti-refresh"></span>{% translate "Rerun plugin" %}

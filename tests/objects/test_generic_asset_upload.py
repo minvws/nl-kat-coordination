@@ -116,5 +116,5 @@ def test_generic_asset_csv_upload_optional_columns(rf, superuser_member, xtdb):
 def test_generic_asset_csv_upload_requires_permission(rf, superuser_member, xtdb):
     view = GenericAssetCSVUploadView()
     permissions = view.get_permission_required()
-    assert "openkat.add_ipaddress" in permissions
-    assert "openkat.add_hostname" in permissions
+    assert "objects.add_ipaddress" in permissions
+    assert "objects.add_hostname" in permissions

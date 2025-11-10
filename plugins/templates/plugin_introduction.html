@@ -12,7 +12,7 @@
             {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
         </div>
-        {% if perms.openkat.add_enabledplugin %}
+        {% if perms.tasks.add_schedule %}
             <div class="horizontal-view">
                 <form action="{% url 'schedule_plugin' plugin.pk %}" method="post">
                     {% csrf_token %}

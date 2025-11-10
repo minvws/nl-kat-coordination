@@ -17,7 +17,7 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
-                {% if perms.openkat.add_schedule %}
+                {% if perms.tasks.add_schedule %}
                     <div class="horizontal-view toolbar">
                         <a class="button ghost" href="{% url "add_schedule" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add schedule" %}</a>
                     </div>

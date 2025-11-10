@@ -17,7 +17,7 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
-                {% if perms.openkat.add_file %}
+                {% if perms.files.add_file %}
                     <div class="horizontal-view toolbar">
                         <a class="button ghost" href="{% url "add_file" %}">
                             <span aria-hidden="true" class="icon ti-plus"></span>

@@ -18,7 +18,7 @@
                         {% endblocktranslate %}
                     </p>
                 </div>
-                {% if perms.openkat.add_finding %}
+                {% if perms.objects.add_finding %}
                     <div class="horizontal-view toolbar">
                         <a class="button ghost" href="{% url "objects:add_finding" %}"><span aria-hidden="true" class="icon ti-plus"></span>{% translate "Add finding" %}</a>
                     </div>

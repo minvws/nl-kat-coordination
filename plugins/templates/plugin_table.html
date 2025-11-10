@@ -84,7 +84,7 @@
 
                     </td>
                     <td>
-                        {% if perms.openkat.add_enabledplugin %}
+                        {% if perms.tasks.add_schedule %}
                             <form action="{% url 'schedule_plugin' plugin.pk %}"
                                   method="post"
                                   class="inline">

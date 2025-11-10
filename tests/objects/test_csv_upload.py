@@ -214,10 +214,10 @@ def test_ipaddress_csv_upload_trailing_newline(rf, superuser_member, xtdb):
 def test_ipaddress_csv_upload_requires_permission(rf, superuser_member, xtdb):
     """Test that the view requires add_ipaddress permission."""
     view = IPAddressCSVUploadView()
-    assert view.permission_required == "openkat.add_ipaddress"
+    assert view.permission_required == "objects.add_ipaddress"
 
 
 def test_hostname_csv_upload_requires_permission(rf, superuser_member, xtdb):
     """Test that the view requires add_hostname permission."""
     view = HostnameCSVUploadView()
-    assert view.permission_required == "openkat.add_hostname"
+    assert view.permission_required == "objects.add_hostname"

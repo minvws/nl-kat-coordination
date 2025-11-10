@@ -238,5 +238,8 @@ class BusinessRule(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        permissions = [("run_businessrule", "Can run a business rule")]
+
     def __str__(self) -> str:
         return self.name
