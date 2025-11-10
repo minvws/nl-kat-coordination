@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-31 13:17+0000\n"
+"POT-Creation-Date: 2025-11-10 12:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,8 @@ msgstr ""
 #: objects/forms.py
 #, python-brace-format
 msgid ""
-"Row {row_num} has {col_count} columns. Expected 1 column ({column_name})."
+"Row {row_num} has {col_count} columns. Expected 1-2 columns ({column_name}, "
+"organization_code)."
 msgstr ""
 
 #: objects/forms.py
@@ -189,14 +190,27 @@ msgstr ""
 msgid "Select network for all assets. Defaults to 'internet' network."
 msgstr ""
 
+#: objects/forms.py objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
+#: reports/templates/reports/report_detail.html
+#: reports/templates/reports/report_html.html reports/views.py
+#: openkat/forms/organization.py openkat/templates/header.html
+#: openkat/templates/organizations/organization_list.html
+#: openkat/view_helpers.py openkat/views/organization_add.py
+msgid "Organizations"
+msgstr ""
+
+#: objects/forms.py
+msgid "Select organizations for all assets (optional)."
+msgstr ""
+
 #: objects/forms.py
 msgid "Please provide at least one IP address or hostname."
 msgstr ""
 
 #: objects/forms.py
-msgid ""
-"Select default network for all assets. Can be overridden per row in CSV. "
-"Defaults to 'internet'."
+msgid "Select default network for all assets. Defaults to 'internet'."
 msgstr ""
 
 #: objects/forms.py
@@ -214,6 +228,40 @@ msgstr ""
 msgid ""
 "A slug containing only lower-case unicode letters, numbers, hyphens or "
 "underscores that will be used in URLs and paths"
+msgstr ""
+
+#: objects/models.py
+msgid "Hostname cannot be empty."
+msgstr ""
+
+#: objects/models.py
+#, python-format
+msgid "Hostname is too long. Maximum length is 253 characters, got %(length)d."
+msgstr ""
+
+#: objects/models.py
+msgid ""
+"Hostname cannot contain empty labels (consecutive dots or leading/trailing "
+"dots)."
+msgstr ""
+
+#: objects/models.py
+#, python-format
+msgid ""
+"Label '%(label)s' is too long. Maximum length per label is 63 characters, "
+"got %(length)d."
+msgstr ""
+
+#: objects/models.py
+#, python-format
+msgid "Label '%(label)s' cannot start or end with a hyphen."
+msgstr ""
+
+#: objects/models.py
+#, python-format
+msgid ""
+"Label '%(label)s' contains invalid characters. Only letters, digits, and "
+"hyphens are allowed."
 msgstr ""
 
 #: objects/templates/objects/add_object.html
@@ -534,6 +582,30 @@ msgstr ""
 #: objects/templates/objects/network_detail.html
 #: objects/templates/objects/network_list.html
 msgid "Inherited"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
+msgid "Manage Organizations"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
+msgid "Select Organizations"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
+msgid "Hold Ctrl (Cmd on Mac) to select multiple organizations"
+msgstr ""
+
+#: objects/templates/objects/hostname_detail.html
+#: objects/templates/objects/ipaddress_detail.html
+#: objects/templates/objects/network_detail.html
+msgid "Update Organizations"
 msgstr ""
 
 #: objects/templates/objects/hostname_detail.html
@@ -911,6 +983,14 @@ msgid "\"{}\" has static objects that are ignored. Only the query is applied."
 msgstr ""
 
 #: objects/views.py
+msgid "Organizations updated successfully."
+msgstr ""
+
+#: objects/views.py
+msgid "All organizations removed."
+msgstr ""
+
+#: objects/views.py
 msgid "IPAddresses"
 msgstr ""
 
@@ -960,12 +1040,22 @@ msgstr ""
 
 #: objects/views.py
 #, python-brace-format
+msgid "Successfully set organizations for {count} IP addresses."
+msgstr ""
+
+#: objects/views.py
+#, python-brace-format
 msgid "{count} IP addresses had errors and were not created."
 msgstr ""
 
 #: objects/views.py
 #, python-brace-format
 msgid "Error parsing CSV file: {error}"
+msgstr ""
+
+#: objects/views.py
+#, python-brace-format
+msgid "Organization with code '{code}' not found."
 msgstr ""
 
 #: objects/views.py
@@ -1005,6 +1095,11 @@ msgstr ""
 
 #: objects/views.py
 #, python-brace-format
+msgid "Successfully set organizations for {count} hostnames."
+msgstr ""
+
+#: objects/views.py
+#, python-brace-format
 msgid "{count} hostnames had errors and were not created."
 msgstr ""
 
@@ -1039,6 +1134,11 @@ msgstr ""
 #: objects/views.py
 #, python-brace-format
 msgid "Successfully set scan levels for {count} assets."
+msgstr ""
+
+#: objects/views.py
+#, python-brace-format
+msgid "Successfully set organizations for {count} assets."
 msgstr ""
 
 #: objects/views.py
@@ -1658,7 +1758,6 @@ msgid "Disable"
 msgstr ""
 
 #: plugins/templates/enable_disable_plugin.html
-#: plugins/templates/plugin_introduction.html
 #: plugins/templates/plugin_variants.html
 #: plugins/templates/plugins/business_rule_detail.html
 #: plugins/templates/plugins/business_rule_list.html
@@ -1667,7 +1766,6 @@ msgid "Enabled"
 msgstr ""
 
 #: plugins/templates/enable_disable_plugin.html
-#: plugins/templates/plugin_introduction.html
 #: plugins/templates/plugin_variants.html
 #: plugins/templates/plugins/business_rule_detail.html
 #: tasks/templates/schedule_list.html
@@ -1676,10 +1774,6 @@ msgstr ""
 
 #: plugins/templates/partials/plugin_tile.html
 msgid "Required for:"
-msgstr ""
-
-#: plugins/templates/partials/plugin_tile.html
-msgid "See details"
 msgstr ""
 
 #: plugins/templates/plugin.html plugins/templates/plugin_tabs.html
@@ -1988,14 +2082,6 @@ msgstr ""
 
 #: reports/templates/reports/report_detail.html
 msgid "Created By"
-msgstr ""
-
-#: reports/templates/reports/report_detail.html
-#: reports/templates/reports/report_html.html reports/views.py
-#: openkat/forms/organization.py openkat/templates/header.html
-#: openkat/templates/organizations/organization_list.html
-#: openkat/view_helpers.py openkat/views/organization_add.py
-msgid "Organizations"
 msgstr ""
 
 #: reports/templates/reports/report_detail.html tasks/views.py
