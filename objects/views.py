@@ -192,6 +192,9 @@ class NetworkScanLevelUpdateView(BaseScanLevelUpdateView):
     model = Network
     detail_url_name = "objects:network_detail"
 
+    def get_permission_required(self):
+        return ["openkat.change_network", "openkat.can_set_clearance_level"]
+
 
 class NetworkManageOrganizationsView(KATModelPermissionRequiredMixin, FormView):
     http_method_names = ["post"]
@@ -649,6 +652,9 @@ class IPAddressScanLevelUpdateView(BaseScanLevelUpdateView):
     model = IPAddress
     detail_url_name = "objects:ipaddress_scan_level_detail"
 
+    def get_permission_required(self):
+        return ["openkat.change_ipaddress", "openkat.can_set_clearance_level"]
+
 
 class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
     name = django_filters.CharFilter(label="Hostname", lookup_expr="icontains")
@@ -859,6 +865,9 @@ class HostnameTasksDetailView(OrganizationFilterMixin, ListView):
 class HostnameScanLevelUpdateView(BaseScanLevelUpdateView):
     model = Hostname
     detail_url_name = "objects:hostname_scan_level_detail"
+
+    def get_permission_required(self):
+        return ["openkat.change_hostname", "openkat.can_set_clearance_level"]
 
 
 class HostnameDeleteView(KATModelPermissionRequiredMixin, DeleteView):
