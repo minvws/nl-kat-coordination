@@ -421,9 +421,12 @@ if CSP_HEADER:
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
+JWT_KEY = env.str("JWT_KEY")
+JWT_ALGORITHM = env.str("JWT_ALGORITHM", "ES256")
 
 if BROWSABLE_API:
     DEFAULT_AUTHENTICATION_CLASSES = [
+        "openkat.middleware.jwt_auth.JWTTokenAuthentication",
         "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ]
@@ -432,7 +435,10 @@ if BROWSABLE_API:
         "rest_framework.renderers.BrowsableAPIRenderer",
     ]
 else:
-    DEFAULT_AUTHENTICATION_CLASSES = ["knox.auth.TokenAuthentication"]
+    DEFAULT_AUTHENTICATION_CLASSES = [
+        "openkat.middleware.jwt_auth.JWTTokenAuthentication",
+        "knox.auth.TokenAuthentication",
+    ]
     DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {

@@ -50,3 +50,5 @@ media
 .parcel-cache
 *.egg-info
  .pre-commit-config.yaml
+plugins/private.plugin.ec.key
+plugins/public.plugin.pem

@@ -1,4 +1,5 @@
 .PHONY: build run test export_migrations debian clean plugins up
+HIDE:=$(if $(VERBOSE),,@)
 
 UNAME := $(shell uname)
 
@@ -105,4 +106,19 @@ ifeq ($(UNAME), Darwin)  # Different sed on MacOS
 	$(HIDE) grep -o "{%\([_A-Z]*\)}" .env-dist | sort -u | while read v; do sed -i '' "s/$$v/$$(openssl rand -hex 25)/g" .env; done
 else
 	$(HIDE) grep -o "{%\([_A-Z]*\)}" .env-dist | sort -u | while read v; do sed -i "s/$$v/$$(openssl rand -hex 25)/g" .env; done
+endif
+	make key
+
+oldkey: .env
+	$(HIDE) JWT_KEY=$$(openssl ecparam -name prime256v1 -genkey) ;\
+    echo JWT_KEY=\"$$JWT_KEY\" >> .env
+
+ENV=$(shell cat .env)
+
+key: .env
+ifneq (,$(findstring JWT_KEY,$(ENV)))
+	$(HIDE) echo "Warning: key already present. Remove the JWT_KEY from your .env to generate a new one."
+else
+	$(HIDE) JWT_KEY=$$(openssl ecparam -name prime256v1 -genkey) ;\
+    echo JWT_KEY=\"$$JWT_KEY\" >> .env
 endif

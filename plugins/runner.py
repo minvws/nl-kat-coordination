@@ -3,19 +3,17 @@ import itertools
 import shlex
 import signal
 import uuid
-from datetime import UTC, timedelta
+from datetime import UTC
 from pathlib import Path
 from typing import Literal
 
 import docker
+import jwt
 from django.conf import settings
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from docker.errors import ContainerError, ImageNotFound
 from docker.models.containers import Container
 
 from files.models import File, TemporaryContent
-from openkat.models import AuthToken, User
 from plugins.models import Plugin
 
 
@@ -158,10 +156,14 @@ class PluginRunner:  # TODO: auto-parallelism?
         if cli:
             return self.get_cli(command, environment, keep, plugin)
 
-        # Temporary user with limited access rights
-        plugin_user, token = self.create_token(plugin_id)
-        environment["OPENKAT_TOKEN"] = token.generate_new_token()
-        token.save()
+        # JWT token for the container
+        now = datetime.datetime.now()
+        token_data = {
+            "permissions": ["files.view_file", "files.add_file", "objects.*"],
+            "iat": now.timestamp(),
+            "exp": (now + datetime.timedelta(minutes=settings.PLUGIN_TIMEOUT)).timestamp(),
+        }
+        environment["OPENKAT_TOKEN"] = jwt.encode(token_data, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
@@ -171,9 +173,6 @@ class PluginRunner:  # TODO: auto-parallelism?
         def handle(signalnum, stack_frame):
             container.kill(signalnum)
             container.remove(force=True)
-
-            token.delete()
-            plugin_user.delete()
 
             if tmp_file:
                 tmp_file.delete()
@@ -205,9 +204,6 @@ class PluginRunner:  # TODO: auto-parallelism?
 
         if not keep:
             container.remove(force=True)
-
-        token.delete()
-        plugin_user.delete()
 
         if tmp_file:
             tmp_file.delete()
@@ -279,43 +275,6 @@ class PluginRunner:  # TODO: auto-parallelism?
         return (
             f"docker run {rm} {vol} --entrypoint {self.override_entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
         )
-
-    @staticmethod
-    def create_token(plugin_id: str) -> tuple[User, AuthToken]:
-        """
-        Create a temporary user and auth token for the plugin to use.
-
-        The plugin gets limited permissions:
-        - Can view and add files (for uploading results)
-        - Can view/add/change/delete all object types (Network, Hostname, IPAddress, etc.)
-
-        The token expires after PLUGIN_TIMEOUT minutes and is deleted after the plugin completes.
-
-        Args:
-            plugin_id: Identifier of the plugin (used as the user's full_name)
-
-        Returns:
-            Tuple of (temporary_user, auth_token)
-        """
-
-        plugin_user = User(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
-        plugin_user.set_unusable_password()
-        plugin_user.save()
-
-        plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
-
-        content_types = ContentType.objects.filter(app_label="objects")
-        permissions = Permission.objects.filter(content_type__in=content_types)
-        plugin_user.user_permissions.add(*permissions)
-
-        token = AuthToken(
-            user=plugin_user,
-            name=plugin_id,
-            expiry=datetime.datetime.now(UTC) + timedelta(minutes=settings.PLUGIN_TIMEOUT),
-        )
-
-        return plugin_user, token
 
     @staticmethod
     def create_command(args: list[str], target: str) -> list[str]:

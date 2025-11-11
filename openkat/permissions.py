@@ -6,8 +6,7 @@ from objects.models import object_type_by_name
 
 
 class KATModelPermissions(DjangoModelPermissions):
-    # We change the permissions map to include the view permissions for
-    # GET/OPTIONS/HEAD.
+    # We change the permissions map to include the view permissions for GET/OPTIONS/HEAD.
     perms_map = {
         "GET": ["%(app_label)s.view_%(model_name)s"],
         "OPTIONS": ["%(app_label)s.view_%(model_name)s"],
@@ -17,6 +16,23 @@ class KATModelPermissions(DjangoModelPermissions):
         "PATCH": ["%(app_label)s.change_%(model_name)s"],
         "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
+
+    def has_permission(self, request, view):
+        if not hasattr(request, "auth") or not isinstance(request.auth, dict):
+            return super().has_permission(request, view)
+
+        perms = request.auth.get("permissions", []) or []
+
+        queryset = self._queryset(view)
+        view_perms = self.get_required_permissions(request.method, queryset.model)
+
+        for view_perm in view_perms:
+            if view_perm not in perms:
+                return super().has_permission(request, view)
+
+        # The auth token has all required permissions
+
+        return True
 
 
 class KATMultiModelPermissions(KATModelPermissions):
