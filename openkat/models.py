@@ -355,9 +355,8 @@ class AuthToken(AbstractAuthToken):
         return f"{self.name} ({self.user})"
 
     def generate_new_token(self) -> str:
-        """
-        Updates token_key and digest with and returns the new token"
-        """
+        """Updates token_key and digest with and returns the new token"""
+
         # Code copied from rest-knox AuthTokenManager
         token = crypto.create_token_string()
         self.token_key = token[: CONSTANTS.TOKEN_KEY_LENGTH]

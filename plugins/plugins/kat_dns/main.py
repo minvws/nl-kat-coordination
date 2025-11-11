@@ -209,8 +209,6 @@ def main():
     if not base_url:
         raise Exception("No OPENKAT_API env variable")
 
-    client = httpx.Client(base_url=base_url, headers={"Authorization": "Token " + token})
-
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("hostname")
     parser.add_argument("record_types", nargs="*")
@@ -221,6 +219,8 @@ def main():
     hostname = args.hostname.rstrip(".")
     results = generic_records(hostname, record_types)
     results.extend(mail_records(hostname))
+
+    client = httpx.Client(base_url=base_url, headers={"Authorization": "Token " + token})
 
     if not results:
         response = client.get(f"/objects/hostname/?name={hostname}").json()
