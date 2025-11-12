@@ -174,7 +174,7 @@ class PluginRunner:
 
                 perms["files.view_file"]["pks"].append(file_pk)
 
-        perms |= {
+        perms |= {  # TODO
             f"{ct}.{name}": {}
             for ct, name in Permission.objects.filter(content_type__app_label="objects").values_list(
                 "content_type__app_label", "codename"

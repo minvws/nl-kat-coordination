@@ -114,3 +114,24 @@ def test_jwt_object_permission(organization):
 
     response = client.post("/api/v1/file/", json={})
     assert response.status_code == 403
+
+
+def test_jwt_file_search_permission(organization):
+    f1 = File.objects.create(file=ContentFile("first\n", "f1.txt"), type="abc")
+    File.objects.create(file=ContentFile("second\n", "f2.txt"), type="def")
+
+    client = JSONAPIClient(raise_request_exception=True)
+    token = JWTTokenAuthentication.generate({"files.view_file": {"pks": [f1.pk], "search": ["ab"]}})
+    client.credentials(HTTP_AUTHORIZATION="Token " + token)
+
+    response = client.get("/api/v1/file/", data={"ordering": "-created_at", "limit": "1", "search": "ab"})
+    assert response.status_code == 200
+
+    response = client.get("/api/v1/file/", data={"ordering": "-created_at", "limit": "1", "search": "ef"})
+    assert response.status_code == 403
+    assert response.json() == {
+        "errors": [
+            {"attr": None, "code": "permission_denied", "detail": "You do not have permission to perform this action."}
+        ],
+        "type": "client_error",
+    }
