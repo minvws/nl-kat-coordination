@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Any
 
 import jwt
 from django.conf import settings
@@ -17,7 +18,9 @@ class JWTTokenAuthentication(TokenAuthentication):
             return None
 
     @classmethod
-    def generate(cls, permissions: list[str] | None = None, timeout: int = settings.PLUGIN_TIMEOUT) -> str:
+    def generate(
+        cls, permissions: dict[str, dict[str, Any]] | None = None, timeout: int = settings.PLUGIN_TIMEOUT
+    ) -> str:
         now = datetime.now()
         token_data = {
             "permissions": permissions,

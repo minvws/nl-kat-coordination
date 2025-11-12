@@ -23,16 +23,28 @@ class KATModelPermissions(DjangoModelPermissions):
         if not hasattr(request, "auth") or not isinstance(request.auth, dict):
             return super().has_permission(request, view)
 
-        token_perms = request.auth.get("permissions", []) or []
+        token_perms = request.auth.get("permissions", {}) or {}
+        view_perms = self.get_required_permissions(request.method, self._queryset(view).model)
 
-        queryset = self._queryset(view)
-        view_perms = self.get_required_permissions(request.method, queryset.model)
+        return all(view_perm in token_perms for view_perm in view_perms)
+
+    def has_object_permission(self, request, view, obj):
+        if not hasattr(request, "auth") or not isinstance(request.auth, dict):
+            return super().has_permission(request, view)
+
+        token_perms = request.auth.get("permissions", {}) or {}
+        view_perms = self.get_required_permissions(request.method, self._queryset(view).model)
 
         for view_perm in view_perms:
             if view_perm not in token_perms:
-                return super().has_permission(request, view)
+                return False
 
-        # The auth token has all required permissions
+            if not isinstance(token_perms[view_perm], dict) or token_perms[view_perm] == {}:
+                continue
+
+            if "pks" in token_perms[view_perm] and obj.pk not in token_perms[view_perm]["pks"]:
+                return False
+
         return True
 
 

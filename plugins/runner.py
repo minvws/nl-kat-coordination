@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import re
 import shlex
 import signal
 import uuid
@@ -103,7 +104,7 @@ class PluginRunner:
             ContainerError: If the plugin exits with non-zero status
             ValueError: If target type is not supported
         """
-        if not isinstance(target, (str, list, type(None))):
+        if not isinstance(target, str | list | None):
             raise ValueError(f"Unsupported target type: {type(target)}")
 
         use_stdout = str(output) == "-"
@@ -147,7 +148,6 @@ class PluginRunner:
             # MODE 4: NO placeholders = bulk stdin mode
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
-                environment["IN_FILE"] = str(tmp_file.pk)
 
         # Configure where plugin output should go
         if use_stdout:
@@ -160,15 +160,28 @@ class PluginRunner:
         if cli:
             return self.get_cli(command, environment, keep, plugin)
 
-        # JWT token for the container
-        perms = [
-            f"{ct}.{name}"
+        # JWT token for the container.
+        perms: dict[str, dict] = {"files.add_file": {}}  # Plugins always create a file
+
+        if tmp_file:
+            environment["IN_FILE"] = str(tmp_file.pk)
+            perms["files.view_file"] = {"pks": [tmp_file.pk]}  # This plugin has access to one file
+
+        for cmd in command:
+            for file_pk in re.findall(r"\{file/(\d+)\}", cmd):
+                if "files.view_file" not in perms:
+                    perms["files.view_file"] = {"pks": []}
+
+                perms["files.view_file"]["pks"].append(file_pk)
+
+        perms |= {
+            f"{ct}.{name}": {}
             for ct, name in Permission.objects.filter(content_type__app_label="objects").values_list(
                 "content_type__app_label", "codename"
             )
-        ]
+        }
 
-        environment["OPENKAT_TOKEN"] = JWTTokenAuthentication.generate(["files.view_file", "files.add_file"] + perms)
+        environment["OPENKAT_TOKEN"] = JWTTokenAuthentication.generate(perms)
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
@@ -192,9 +205,6 @@ class PluginRunner:
                 pass
 
         signal.signal(signal.SIGTERM, handle)
-
-        # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
-        #   after the container has gone.
 
         # Below is a copy of the implementation of container.run() after the check if detach equals True.
         logging_driver = container.attrs["HostConfig"]["LogConfig"]["Type"]
