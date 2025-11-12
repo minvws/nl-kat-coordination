@@ -22,7 +22,7 @@ from plugins.models import Plugin
 logger = structlog.get_logger(__name__)
 
 
-class PluginRunner:  # TODO: auto-parallelism?
+class PluginRunner:
     def __init__(
         self,
         override_entrypoint: Path = Path("/plugin/entrypoint"),  # Path to the entrypoint binary inside the container.
@@ -96,7 +96,6 @@ class PluginRunner:  # TODO: auto-parallelism?
             task_id: Optional task UUID to associate uploaded files with
             keep: If True, don't remove container after execution (for debugging)
             cli: If True, return the docker command instead of running it
-            parallelism: Intended for parallel execution of list targets (currently disabled)
 
         Returns:
             Plugin output as string (stdout if output="-", otherwise container logs)
@@ -126,16 +125,20 @@ class PluginRunner:  # TODO: auto-parallelism?
         if isinstance(target, list):
             # MODE 3: Has placeholders = sequential execution mode
             if has_placeholder:
-                # TODO: auto-parallelism has hit an edge case, so it has been now turned off until the go binary
-                #  supports handling auto-parallelism:
-                #  parallelism = settings.AUTO_PARALLELISM if parallelism is None else parallelism
-
                 logs = []
+                failed = False
+                exc = ""
+
                 for t in target:  # Run the targets sequentially
                     try:
                         logs.append(self.run(plugin_id, t, output, task_id, keep, cli))
-                    except ContainerError:
-                        logs.append(f"Failed to process target: {t}")
+                    except ContainerError as e:
+                        logs.append(f"Failed to process target {t}: {str(e)}")
+                        failed = True
+                        exc += "\n" + str(e)
+
+                if failed:
+                    raise RuntimeError(exc)
 
                 return "\n".join(logs)  # Return the output merged
 
