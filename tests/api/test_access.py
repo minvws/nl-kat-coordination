@@ -4,6 +4,8 @@ import jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives._serialization import Encoding, NoEncryption, PrivateFormat
 from cryptography.hazmat.primitives.asymmetric import rsa
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 from openkat.auth.jwt_auth import JWTTokenAuthentication
 from tests.conftest import JSONAPIClient
@@ -27,6 +29,22 @@ def test_api_access(organization):
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
 
     response = client.get("/api/v1/file/")
+    assert response.status_code == 200
+
+    response = client.get("/api/v1/objects/network/")
+    assert response.status_code == 403
+
+    perms = [
+        f"{ct}.{name}"
+        for ct, name in Permission.objects.filter(
+            ~Q(codename__contains="organization"), Q(content_type__app_label="objects")
+        ).values_list("content_type__app_label", "codename")
+    ]
+
+    token = JWTTokenAuthentication.generate(["files.view_file", "files.add_file"] + perms)
+    client.credentials(HTTP_AUTHORIZATION="Token " + token)
+
+    response = client.get("/api/v1/objects/network/")
     assert response.status_code == 200
 
     now = datetime.now()

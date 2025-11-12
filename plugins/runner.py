@@ -8,12 +8,13 @@ from pathlib import Path
 from typing import Literal
 
 import docker
-import jwt
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from docker.errors import ContainerError, ImageNotFound
 from docker.models.containers import Container
 
 from files.models import File, TemporaryContent
+from openkat.auth.jwt_auth import JWTTokenAuthentication
 from plugins.models import Plugin
 
 
@@ -157,13 +158,14 @@ class PluginRunner:  # TODO: auto-parallelism?
             return self.get_cli(command, environment, keep, plugin)
 
         # JWT token for the container
-        now = datetime.datetime.now()
-        token_data = {
-            "permissions": ["files.view_file", "files.add_file", "objects.*"],
-            "iat": now.timestamp(),
-            "exp": (now + datetime.timedelta(minutes=settings.PLUGIN_TIMEOUT)).timestamp(),
-        }
-        environment["OPENKAT_TOKEN"] = jwt.encode(token_data, settings.JWT_KEY, algorithm=settings.JWT_ALGORITHM)
+        perms = [
+            f"{ct}.{name}"
+            for ct, name in Permission.objects.filter(content_type__app_label="objects").values_list(
+                "content_type__app_label", "codename"
+            )
+        ]
+
+        environment["OPENKAT_TOKEN"] = JWTTokenAuthentication.generate(["files.view_file", "files.add_file"] + perms)
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
