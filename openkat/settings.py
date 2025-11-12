@@ -426,7 +426,7 @@ JWT_ALGORITHM = env.str("JWT_ALGORITHM", "ES256")
 
 if BROWSABLE_API:
     DEFAULT_AUTHENTICATION_CLASSES = [
-        "openkat.middleware.jwt_auth.JWTTokenAuthentication",
+        "openkat.auth.jwt_auth.JWTTokenAuthentication",
         "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ]
@@ -435,10 +435,7 @@ if BROWSABLE_API:
         "rest_framework.renderers.BrowsableAPIRenderer",
     ]
 else:
-    DEFAULT_AUTHENTICATION_CLASSES = [
-        "openkat.middleware.jwt_auth.JWTTokenAuthentication",
-        "knox.auth.TokenAuthentication",
-    ]
+    DEFAULT_AUTHENTICATION_CLASSES = ["openkat.auth.jwt_auth.JWTTokenAuthentication", "knox.auth.TokenAuthentication"]
     DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {

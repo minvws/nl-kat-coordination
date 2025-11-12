@@ -18,20 +18,21 @@ class KATModelPermissions(DjangoModelPermissions):
     }
 
     def has_permission(self, request, view):
+        """Support for stateless JWT auth permissions"""
+
         if not hasattr(request, "auth") or not isinstance(request.auth, dict):
             return super().has_permission(request, view)
 
-        perms = request.auth.get("permissions", []) or []
+        token_perms = request.auth.get("permissions", []) or []
 
         queryset = self._queryset(view)
         view_perms = self.get_required_permissions(request.method, queryset.model)
 
         for view_perm in view_perms:
-            if view_perm not in perms:
+            if view_perm not in token_perms:
                 return super().has_permission(request, view)
 
         # The auth token has all required permissions
-
         return True
 
 
