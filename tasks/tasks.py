@@ -579,7 +579,8 @@ def run_plugin(
         task.status = TaskStatus.COMPLETED
         task.ended_at = datetime.now(UTC)
         task.save()
-    except:
+    except Exception as e:
+        logger.error("Plugin failed: %s", str(e))
         task.refresh_from_db(fields=["status"])
 
         if task.status != TaskStatus.CANCELLED:
