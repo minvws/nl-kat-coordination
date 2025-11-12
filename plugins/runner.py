@@ -101,6 +101,9 @@ class PluginRunner:  # TODO: auto-parallelism?
             ContainerError: If the plugin exits with non-zero status
             ValueError: If target type is not supported
         """
+        if not isinstance(target, (str, list, type(None))):
+            raise ValueError(f"Unsupported target type: {type(target)}")
+
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
@@ -138,13 +141,7 @@ class PluginRunner:  # TODO: auto-parallelism?
             # MODE 4: NO placeholders = bulk stdin mode
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
-
-        if not isinstance(target, (str, list, type(None))):
-            raise ValueError(f"Unsupported target type: {type(target)}")
-
-        # Set IN_FILE for stdin modes (entrypoint reads this file and pipes to plugin)
-        if tmp_file:
-            environment["IN_FILE"] = str(tmp_file.pk)
+                environment["IN_FILE"] = str(tmp_file.pk)
 
         # Configure where plugin output should go
         if use_stdout:
