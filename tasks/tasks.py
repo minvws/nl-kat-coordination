@@ -8,6 +8,7 @@ from celery import Celery
 from django.conf import settings
 from django.core.cache import caches
 from django.db import OperationalError, connections
+from docker.errors import ContainerError
 from redis.exceptions import LockError  # type: ignore
 
 from files.models import File
@@ -579,7 +580,8 @@ def run_plugin(
         task.status = TaskStatus.COMPLETED
         task.ended_at = datetime.now(UTC)
         task.save()
-    except:
+    except ContainerError as e:
+        logger.error("Plugin failed: %s", str(e))
         task.refresh_from_db(fields=["status"])
 
         if task.status != TaskStatus.CANCELLED:

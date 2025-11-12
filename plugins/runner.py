@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Literal
 
 import docker
+import structlog
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -17,6 +18,8 @@ from docker.models.containers import Container
 from files.models import File, TemporaryContent
 from openkat.models import AuthToken, User
 from plugins.models import Plugin
+
+logger = structlog.get_logger(__name__)
 
 
 class PluginRunner:  # TODO: auto-parallelism?
@@ -201,6 +204,7 @@ class PluginRunner:  # TODO: auto-parallelism?
 
         exit_status = container.wait(timeout=60 * settings.PLUGIN_TIMEOUT)["StatusCode"]
         if exit_status != 0:
+            logger.debug("Container returned non-zero exit code %s", exit_status)
             stderr_out = container.logs(stdout=False, stderr=True)
 
         if not keep:
