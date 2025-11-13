@@ -116,7 +116,7 @@ def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
         raise FileNotFoundError(f"No {file_type} found. Please enable the download plugin first.")
 
     try:
-        rpki_lazy = pl.scan_parquet(client.get(f"/files/{file_id}/").raise_for_status().content)
+        rpki_lazy = pl.scan_parquet(client.get(f"/file/{file_id}/download/").raise_for_status().content)
     except (IndexError, JSONDecodeError):
         raise Exception("Failed to retrieve file")
 

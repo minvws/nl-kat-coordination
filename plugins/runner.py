@@ -11,7 +11,6 @@ from typing import Literal
 import docker
 import structlog
 from django.conf import settings
-from django.contrib.auth.models import Permission
 from docker.errors import ContainerError, ImageNotFound
 from docker.models.containers import Container
 
@@ -158,6 +157,9 @@ class PluginRunner:
             environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/"
 
         if cli:
+            if tmp_file:
+                tmp_file.delete()
+
             return self.get_cli(command, environment, keep, plugin)
 
         # JWT token for the container.
@@ -174,13 +176,7 @@ class PluginRunner:
 
                 perms["files.view_file"]["pks"].append(file_pk)
 
-        perms |= {  # TODO
-            f"{ct}.{name}": {}
-            for ct, name in Permission.objects.filter(content_type__app_label="objects").values_list(
-                "content_type__app_label", "codename"
-            )
-        }
-
+        perms |= plugin.permissions  # Plugins can define extra permissions
         environment["OPENKAT_TOKEN"] = JWTTokenAuthentication.generate(perms)
 
         # Add signal handler to kill the container as well (for cancelling tasks)

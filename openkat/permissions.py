@@ -55,7 +55,9 @@ class KATModelPermissions(DjangoModelPermissions):
             if "search" in token_perms[view_perm] and request.GET.get("search") not in token_perms[view_perm]["search"]:
                 return False
 
-            if "limit" in token_perms[view_perm] and request.GET.get("limit") != token_perms[view_perm]["limit"]:
+            if "limit" in token_perms[view_perm] and int(request.GET.get("limit")) != int(
+                token_perms[view_perm]["limit"]
+            ):
                 return False
 
         # The auth token has all required permissions
