@@ -206,8 +206,14 @@ class OrganizationFilterMixin:
     def get_queryset(self):
         queryset = super().get_queryset()  # type: ignore[misc]
         selected_codes = set(self.request.GET.getlist("organization"))
-
         user = self.request.user
+
+        can_access_all_orgs_and_unassigned_objs = not selected_codes and user.can_access_all_organizations
+
+        if not selected_codes and can_access_all_orgs_and_unassigned_objs:
+            # If we may see all organizations and did not filter on any, we do not have to change the original queryset
+            return queryset
+
         allowed_organizations = {org.code for org in user.organizations}
 
         if selected_codes:

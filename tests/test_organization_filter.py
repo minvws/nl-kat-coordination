@@ -32,8 +32,7 @@ def test_task_list_filtered_by_organization(client, client_user_two_organization
 
     # Filter by non-existent organization
     response = client.get(reverse("task_list") + "?organization=nonexistent")
-    assert response.status_code == 200
-    assert len(response.context["object_list"]) == 0
+    assert response.status_code == 403
 
 
 def test_task_list_filtered_by_multiple_organizations(
