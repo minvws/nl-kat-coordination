@@ -141,6 +141,31 @@
     ]
   },
   {
+    "plugin_id": "rpki",
+    "name": "RPKI",
+    "description": "Parses RPKI data into findings.",
+    "consumes": [
+      "type:ipaddress"
+    ],
+    "batch_size": 500,
+    "permissions": {
+      "files.view_file": {
+        "search": [
+          "bgp-download",
+          "rpki-download"
+        ],
+        "limit": 1
+      }
+    },
+    "scan_level": 1,
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_rpki/main.py"
+    ]
+  },
+  {
     "plugin_id": "subfinder",
     "name": "Subfinder",
     "description": "A subdomain discovery tool. (projectdiscovery.io). Returns valid subdomains for websites using passive online sources. Beware that many of the online sources require their own API key to get more accurate data.",

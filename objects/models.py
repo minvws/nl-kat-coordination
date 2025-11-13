@@ -95,7 +95,7 @@ class XTDBModel(models.Model):
     objects = XTDBQuerySet.as_manager()
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert=True, force_update=False, using=using, update_fields=update_fields)
+        super().save(force_insert=True, force_update=False, using=using, update_fields=None)
 
     @property
     def last_seen(self):

@@ -50,6 +50,9 @@ def test_jwt_access(organization):
     response = client.get("/api/v1/objects/network/")
     assert response.status_code == 200
 
+    response = client.post("/api/v1/objects/")
+    assert response.status_code == 201
+
 
 def test_jwt_malicious_token(organization):
     client = JSONAPIClient(raise_request_exception=True)
@@ -96,7 +99,7 @@ def test_jwt_object_permission(organization):
     assert response.status_code == 200
     assert response.json() == {
         "created_at": f1.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-        "file": "http://testserver/media/files/2025-11-12/txt/f1.txt",
+        "file": "http://testserver/media/" + str(f1.file),
         "id": f1.pk,
         "organizations": [],
         "task_result": None,
@@ -121,11 +124,23 @@ def test_jwt_file_search_permission(organization):
     File.objects.create(file=ContentFile("second\n", "f2.txt"), type="def")
 
     client = JSONAPIClient(raise_request_exception=True)
-    token = JWTTokenAuthentication.generate({"files.view_file": {"pks": [f1.pk], "search": ["ab"]}})
+    token = JWTTokenAuthentication.generate({"files.view_file": {"pks": [f1.pk], "search": ["ab"], "limit": "1"}})
     client.credentials(HTTP_AUTHORIZATION="Token " + token)
 
     response = client.get("/api/v1/file/", data={"ordering": "-created_at", "limit": "1", "search": "ab"})
     assert response.status_code == 200
+
+    response = client.get(f"/api/v1/file/{f1.pk}/")
+    assert response.status_code == 200
+
+    response = client.get("/api/v1/file/", data={"ordering": "-created_at", "limit": "2", "search": "ab"})
+    assert response.status_code == 403
+    assert response.json() == {
+        "errors": [
+            {"attr": None, "code": "permission_denied", "detail": "You do not have permission to perform this action."}
+        ],
+        "type": "client_error",
+    }
 
     response = client.get("/api/v1/file/", data={"ordering": "-created_at", "limit": "1", "search": "ef"})
     assert response.status_code == 403
