@@ -35,6 +35,8 @@ class FileListView(OrganizationFilterMixin, FilterView):
     filterset_class = FileFilter
 
     def get_queryset(self):
+        super().get_queryset()  # Call to ensure any mixin logic is applied
+
         # Get base queryset without organization filtering
         queryset = File.objects.all()
 

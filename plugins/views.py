@@ -53,6 +53,8 @@ class PluginListView(OrganizationFilterMixin, FilterView):
     filterset_class = PluginFilter
 
     def get_queryset(self) -> QuerySet:
+        super().get_queryset()  # Call to ensure any mixin logic is applied
+
         plugins = Plugin.objects.all()
         order_by = self.request.GET.get("order_by", "name")
         sorting_order = self.request.GET.get("sorting_order", "asc")

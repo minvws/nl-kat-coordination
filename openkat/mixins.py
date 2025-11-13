@@ -212,6 +212,10 @@ class OrganizationFilterMixin:
 
         if selected_codes:
             organization_codes = allowed_organizations & selected_codes
+
+            # If the user selected organizations they don't have access to, raise PermissionDenied
+            if organization_codes != selected_codes:
+                raise PermissionDenied
         else:
             organization_codes = allowed_organizations
 
