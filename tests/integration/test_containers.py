@@ -10,6 +10,7 @@ from objects.models import Hostname, IPAddress, Network
 from openkat.models import Organization
 from plugins.models import Plugin
 from plugins.runner import PluginRunner
+from plugins.sync import sync
 from tasks.models import Schedule, Task
 from tasks.tasks import process_raw_file
 
@@ -198,14 +199,8 @@ def test_process_raw_file_single_task():
 @pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
 def test_worker_dispatches_multiple_plugin_tasks():
     # Two plugins that consume the same file type
-    plugin1 = Plugin.objects.create(
-        name="DNS Plugin",
-        plugin_id="kat_dns",
-        oci_image="ghcr.io/minvws/openkat/plugins:0.1.0",
-        oci_arguments=["uv", "run", "kat_dns/main.py", "{hostname}"],
-        consumes=["type:Hostname"],
-        scan_level=1,
-    )
+    sync()  # Add our local plugins
+    plugin1 = Plugin.objects.get(plugin_id="dns")
     plugin2 = Plugin.objects.create(
         name="Reverse Plugin",
         plugin_id="str-reverse",
@@ -251,14 +246,11 @@ def test_worker_dispatches_multiple_plugin_tasks():
 @pytest.mark.django_db(transaction=True, databases=["default", "xtdb"])
 def test_worker_dispatches_multiple_plugin_tasks_from_file_input():
     file = File.objects.create(file=ContentFile("nu.nl\ntweakers.net\n", "hostnames.txt"), type="txt")
-    plugin = Plugin.objects.create(
-        name="DNS Plugin from File",
-        plugin_id="dns-from-file",
-        oci_image="ghcr.io/minvws/openkat/plugins:0.1.0",
-        oci_arguments=["sh", "-c", "cat {file/" + str(file.pk) + "}" + " | xargs -I {} uv run kat_dns/main.py {}"],
-        consumes=["file:txt"],
-        scan_level=1,
-    )
+    sync()  # Add our local plugins
+    plugin = Plugin.objects.get(plugin_id="dns")
+    plugin.oci_arguments = ["sh", "-c", "cat {file/" + str(file.pk) + "}" + " | xargs -I {} uv run kat_dns/main.py {}"]
+    plugin.consumes = ["file:txt"]
+    plugin.save()
 
     tasks: list[Task] = []
     for schedule in plugin.schedule():
