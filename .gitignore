@@ -24,8 +24,6 @@ package-lock.json
 **/kat_rpki/rpki-meta.json
 plugins/plugins/entrypoint/main
 plugins/plugins/entrypoint/entrypoint
-plugins/private.plugin.ec.key
-plugins/public.plugin.pem
 **.tar
 # Translations
 *.mo
