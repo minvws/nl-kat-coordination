@@ -326,7 +326,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Superusers and users with the permission can_access_all_organizations are considered to be members
         of all organizations.
         """
-        if self.has_perm("openkat.can_access_all_organizations"):
+        if self.can_access_all_organizations:
             return self.all_organizations
         return [m.organization for m in self.organization_members if not m.blocked]
 

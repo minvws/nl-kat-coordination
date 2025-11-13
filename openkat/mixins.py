@@ -5,7 +5,8 @@ import structlog.contextvars
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.db.models import Q
+from django.http import Http404, HttpRequest
 from django.views import View
 from django.views.generic.base import ContextMixin
 from rest_framework.exceptions import ValidationError
@@ -200,22 +201,47 @@ class OrganizationFilterMixin:
     to filter objects by one or multiple organizations. Works with both ListView and DetailView.
     """
 
+    request: HttpRequest
+
     def get_queryset(self):
         queryset = super().get_queryset()  # type: ignore[misc]
-        organization_codes = self.request.GET.getlist("organization")  # type: ignore[attr-defined]
+        selected_codes = set(self.request.GET.getlist("organization"))  # type: ignore[attr-defined]
 
-        if organization_codes:
-            organizations = Organization.objects.filter(code__in=organization_codes)
+        user = self.request.user
+        allowed_organizations = {org.code for org in user.organizations}
 
-            if organizations.exists():
-                if hasattr(queryset.model, "organization"):
-                    queryset = queryset.filter(organization__in=organizations)
-                if hasattr(queryset.model, "organizations"):
-                    queryset = queryset.filter(organizations__pk__in=[org.id for org in organizations]).distinct()
-                elif hasattr(queryset.model, "organization_id"):
-                    queryset = queryset.filter(organization_id__in=[org.id for org in organizations])
-            else:
-                queryset = queryset.none()
+        if selected_codes:
+            organization_codes = allowed_organizations & selected_codes
+
+            # If the user selected organizations they don't have access to, raise PermissionDenied
+            if organization_codes != selected_codes:
+                raise PermissionDenied
+        else:
+            organization_codes = allowed_organizations
+
+        organizations = Organization.objects.filter(code__in=organization_codes)
+
+        if organizations.exists():
+            org_pks = [org.pk for org in organizations]
+
+            can_access_all_orgs_and_unassigned_objs = not selected_codes and user.can_access_all_organizations
+            if hasattr(queryset.model, "organization"):
+                q = Q(organization__in=organizations)
+                if can_access_all_orgs_and_unassigned_objs:
+                    q |= Q(organization__isnull=True)
+                queryset = queryset.filter(q)
+            elif hasattr(queryset.model, "organizations"):
+                q = Q(organizations__pk__in=org_pks)
+                if can_access_all_orgs_and_unassigned_objs:
+                    q |= Q(organizations__isnull=True)
+                queryset = queryset.filter(q).distinct()
+            elif hasattr(queryset.model, "organization_id"):
+                q = Q(organization_id__in=org_pks)
+                if can_access_all_orgs_and_unassigned_objs:
+                    q |= Q(organization_id__isnull=True)
+                queryset = queryset.filter(q)
+        else:
+            queryset = queryset.none()
 
         return queryset
 

@@ -26,69 +26,51 @@
             <div class="collapsing-element">
                 <ul>
                     {% if request.user.is_authenticated %}
-                        {% if perms.openkat.view_organization %}
-                            <li>
-                                {% url "organization_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.plugins.view_plugin %}
-                            <li>
-                                {% url "plugin_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.plugins.view_finding %}
-                            <li>
-                                {% url "objects:finding_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.objects.view_hostname %}
-                            <li>
-                                {% url "objects:hostname_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.tasks.view_task %}
-                            <li>
-                                {% url "task_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.tasks.view_schedule %}
-                            <li>
-                                {% url "schedule_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.files.view_file %}
-                            <li>
-                                {% url "file_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Files" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.plugins.view_businessrule %}
-                            <li>
-                                {% url "business_rule_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Business rules" %}</a>
-                            </li>
-                        {% endif %}
-                        {% if perms.reports.view_report %}
-                            <li>
-                                {% url "report_list" as index_url %}
-                                <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
-                            </li>
-                        {% endif %}
+                        <li>
+                            {% url "organization_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
+                        </li>
+                        <li>
+                            {% url "plugin_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Plugins" %}</a>
+                        </li>
+                        <li>
+                            {% url "objects:finding_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                        </li>
+                        <li>
+                            {% url "objects:hostname_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
+                        </li>
+                        <li>
+                            {% url "task_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
+                        </li>
+                        <li>
+                            {% url "schedule_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Schedules" %}</a>
+                        </li>
+                        <li>
+                            {% url "file_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Files" %}</a>
+                        </li>
+                        <li>
+                            {% url "business_rule_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Business rules" %}</a>
+                        </li>
+                        <li>
+                            {% url "report_list" as index_url %}
+                            <a href="{{ index_url }}{% if organization_query_string %}?{{ organization_query_string }}{% endif %}"
+                               {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
+                        </li>
                     {% endif %}
                 </ul>
                 <div>
