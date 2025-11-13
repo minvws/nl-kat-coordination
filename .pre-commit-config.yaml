@@ -6,7 +6,7 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
       - id: detect-private-key
-        exclude: ^katalogus/boefjes/kat_cve_2023_34039/keys/
+        exclude: ^.ci/.env.test
       - id: check-case-conflict
       - id: check-yaml
       - id: check-json

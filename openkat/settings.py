@@ -205,10 +205,11 @@ if env.str("DOWNLOADVIEW_BACKEND", default=None) and env.str("DESTINATION_URL", 
 
 ROOT_URLCONF = "openkat.urls"
 
+REDIS_PASSWORD = env.str("REDIS_PASSWORD", default=None)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{env.str('REDIS_PASSWORD')}@{env.str('REDIS_HOST')}:6379/1",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{env.str('REDIS_HOST', 'localhost')}:6379/1",
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     }
 }
@@ -421,7 +422,7 @@ if CSP_HEADER:
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
-JWT_KEY = env.str("JWT_KEY")
+JWT_KEY = env.str("JWT_KEY", "")
 JWT_ALGORITHM = env.str("JWT_ALGORITHM", "ES256")
 
 if BROWSABLE_API:
@@ -523,11 +524,10 @@ BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that w
 
 QUEUE_NAME_RECALCULATIONS = "recalculations"
 QUEUE_NAME_SCHEDULE = "schedule"
-REDIS_PASSWORD = env.str("REDIS_PASSWORD")
 
 CELERY = {
-    "broker_url": env.str("REDIS_QUEUE_URI"),
-    "result_backend": env.str("REDIS_QUEUE_URI"),
+    "broker_url": env.str("REDIS_QUEUE_URI", "memory://"),
+    "result_backend": env.str("REDIS_QUEUE_URI", "file://"),
     "task_serializer": "json",
     "result_serializer": "json",
     "event_serializer": "json",

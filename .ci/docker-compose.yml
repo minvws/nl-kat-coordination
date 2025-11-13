@@ -11,8 +11,6 @@ services:
         condition: service_started
       xtdb:
         condition: service_healthy
-    volumes:
-      - ..:/app/openkat
     env_file:
       - .env.test
 
@@ -33,7 +31,7 @@ services:
       openkat-test-api:
         condition: service_started
     volumes:
-      - ..:/app/openkat
+      - media:/app/openkat/media
       - /var/run/docker.sock:/var/run/docker.sock
       - ci-plugin-entrypoint:/plugin
     environment:
@@ -61,7 +59,7 @@ services:
       worker:
         condition: service_started
     volumes:
-      - ..:/app/openkat
+      - media:/app/openkat/media
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DATABASE_MIGRATION=true
@@ -136,3 +134,4 @@ networks:
 volumes:
   ci-plugin-entrypoint:
     name: ci-plugin-entrypoint
+  media:

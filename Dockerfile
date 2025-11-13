@@ -61,10 +61,9 @@ FROM dev
 # These files need to be available when we run collectstatic
 COPY --link --from=node_builder /app/assets/dist assets/dist
 
-# The secret key isn't used by the commands, but Django won't work do anything without it
+# The secret key isn't used by the commands, but Django won't work without it
 
-RUN export SECRET_KEY="secret" REDIS_QUEUE_URI="redis://localhost/fake" REDIS_HOST="localhost/" REDIS_PASSWORD="fake" && \
-    python manage.py collectstatic -l && python manage.py compilemessages
+RUN export SECRET_KEY="secret" && python manage.py collectstatic -l && python manage.py compilemessages
 
 RUN mkdir media && chown -R openkat media
 RUN rm -rf tests *.lock package.json openkat.egg-info setup.py pyproject.toml
