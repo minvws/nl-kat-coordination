@@ -1,3 +1,5 @@
+@use "../variables" as theme;
+
 .introduction {
   flex-direction: row;
   justify-content: space-between;
@@ -8,6 +10,6 @@
   }
 
   .tabs {
-    margin-top: calc(var(--section-gap) * -1);
+    margin-top: theme.$section-gap * -1;
   }
 }
