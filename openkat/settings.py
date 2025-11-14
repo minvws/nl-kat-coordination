@@ -423,8 +423,8 @@ if CSP_HEADER:
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
-JWT_KEY = env.str("JWT_KEY", "")
-JWT_ALGORITHM = env.str("JWT_ALGORITHM", "ES256")
+JWT_KEY = env.str("JWT_KEY", SECRET_KEY)
+JWT_ALGORITHM = env.str("JWT_ALGORITHM", "HS256")
 
 if BROWSABLE_API:
     DEFAULT_AUTHENTICATION_CLASSES = [
