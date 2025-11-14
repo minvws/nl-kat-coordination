@@ -17,7 +17,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView
 from django_filters.views import FilterView
-from djangoql.exceptions import DjangoQLParserError
+from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
 
 from objects.forms import (
@@ -371,7 +371,8 @@ class IPAddressFilter(ScanLevelFilterMixin, django_filters.FilterSet):
 
         try:
             return apply_search(queryset, value, NoOrgQLSchema)
-        except DjangoQLParserError:
+        except DjangoQLError as e:
+            messages.warning(self.request, f"DjangoQL query invalid: {e}")
             return queryset
 
 
@@ -699,7 +700,8 @@ class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
 
         try:
             return apply_search(queryset, value, NoOrgQLSchema)
-        except DjangoQLParserError:
+        except DjangoQLError as e:
+            messages.warning(self.request, f"DjangoQL query invalid: {e}")
             return queryset
 
 

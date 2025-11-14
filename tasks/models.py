@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import QuerySet
-from djangoql.exceptions import DjangoQLParserError
+from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
 
 from files.models import File
@@ -63,7 +63,7 @@ class ObjectSet(models.Model):
 
         try:
             return apply_search(qs, self.object_query, NoOrgQLSchema)
-        except DjangoQLParserError:
+        except DjangoQLError:
             return qs
 
     def traverse_objects(self, **filters: Any) -> list[int]:

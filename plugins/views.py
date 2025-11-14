@@ -13,7 +13,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
 from django_filters.views import FilterView
-from djangoql.exceptions import DjangoQLParserError
+from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
 
 from objects.models import FindingType, NoOrgQLSchema
@@ -376,7 +376,9 @@ class BusinessRuleDetailView(DetailView):
         try:
             queryset = model_class.objects.all()
             context["matching_objects"] = apply_search(queryset, self.object.query, NoOrgQLSchema)[:20]
-        except DjangoQLParserError:
+        except DjangoQLError as e:
+            messages.warning(self.request, f"The DjangoQL query in this rule is invalid: {e}")
+
             try:
                 context["matching_objects"] = queryset.raw(self.object.query)[:20]
             except Exception as e:
