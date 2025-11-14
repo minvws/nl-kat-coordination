@@ -387,7 +387,7 @@ class HostnameOrganization(XTDBNaturalKeyModel):
 
 
 class NoOrgQLSchema(DjangoQLSchema):
-    exclude = (XTDBOrganization,)
+    exclude = (XTDBOrganization, XTDBOrganizationTag)
 
 
 class HostnameQLSchema(NoOrgQLSchema):

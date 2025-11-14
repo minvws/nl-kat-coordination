@@ -4,7 +4,7 @@ from collections.abc import Sequence
 import structlog
 from django.db import DatabaseError, connections
 from django.db.models import Case, Count, F, QuerySet, When
-from djangoql.exceptions import DjangoQLParserError
+from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
 
 from objects.models import (
@@ -231,7 +231,7 @@ def get_rules():
                         port.address_id = ip._id AND
                         port.port IN ({", ".join(str(x) for x in DB_TCP_PORTS)})
                     )
-                    WHERE f.finding_type_id 'KAT-OPEN-DATABASE-PORT' AND port._id IS NULL
+                    WHERE f.finding_type_id = 'KAT-OPEN-DATABASE-PORT' AND port._id IS NULL
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-OPEN-DATABASE-PORT",
@@ -259,7 +259,7 @@ def get_rules():
                         port.address_id = ip._id AND
                         port.port IN ({", ".join(str(x) for x in MICROSOFT_RDP_PORTS)})
                     )
-                     WHERE f.finding_type_id 'KAT-REMOTE-DESKTOP-PORT' AND  port._id IS NULL
+                     WHERE f.finding_type_id = 'KAT-REMOTE-DESKTOP-PORT' AND  port._id IS NULL
                 );
             """,  # noqa: S608
             "finding_type_code": "KAT-REMOTE-DESKTOP-PORT",
@@ -538,7 +538,7 @@ def run_rules(rules: Sequence[BusinessRule] | QuerySet[BusinessRule], dry_run: b
                 try:
                     matching_objects = apply_search(queryset, rule.query, schema)
                     match_count = matching_objects.count()
-                except DjangoQLParserError:
+                except DjangoQLError:
                     matching_objects = queryset.raw(rule.query)
                     match_count = len(matching_objects)
 
