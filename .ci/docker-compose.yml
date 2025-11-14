@@ -80,7 +80,7 @@ services:
       - "127.0.0.1:5434:5432"
 
   xtdb:
-    image: "ghcr.io/xtdb/xtdb:nightly-20250912"
+    image: "ghcr.io/xtdb/xtdb:nightly-20251112"
     environment:
       - XTDB_LOGGING_LEVEL=DEBUG
     ports:
