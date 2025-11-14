@@ -17,6 +17,7 @@ from django.db.models.expressions import RawSQL
 from django.forms.models import model_to_dict
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.translation import gettext_lazy as _
+from djangoql.schema import DjangoQLSchema, IntField
 from psycopg import sql
 from tldextract import tldextract
 from transit.writer import Writer
@@ -383,6 +384,20 @@ class HostnameOrganization(XTDBNaturalKeyModel):
     organization: models.ForeignKey = models.ForeignKey(XTDBOrganization, on_delete=models.PROTECT)
 
     _natural_key_attrs = ["hostname", "organization"]
+
+
+class NoOrgQLSchema(DjangoQLSchema):
+    exclude = (XTDBOrganization,)
+
+
+class HostnameQLSchema(NoOrgQLSchema):
+    """Custom schema to support nameservers_with_ipv6_count field for Hostname queries"""
+
+    def get_fields(self, model):
+        fields = super().get_fields(model)
+        if model == Hostname:
+            fields += [IntField(name="nameservers_with_ipv6_count")]
+        return fields
 
 
 class FindingType(XTDBModel):

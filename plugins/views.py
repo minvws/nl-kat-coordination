@@ -16,7 +16,7 @@ from django_filters.views import FilterView
 from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
 
-from objects.models import FindingType
+from objects.models import FindingType, NoOrgQLSchema
 from openkat.mixins import OrganizationFilterMixin
 from openkat.models import Organization
 from openkat.permissions import KATModelPermissionRequiredMixin
@@ -375,7 +375,7 @@ class BusinessRuleDetailView(DetailView):
 
         try:
             queryset = model_class.objects.all()
-            context["matching_objects"] = apply_search(queryset, self.object.query)[:20]
+            context["matching_objects"] = apply_search(queryset, self.object.query, NoOrgQLSchema)[:20]
         except DjangoQLParserError:
             try:
                 context["matching_objects"] = queryset.raw(self.object.query)[:20]
