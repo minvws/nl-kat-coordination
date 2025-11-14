@@ -1,3 +1,5 @@
+@use "../variables" as theme;
+
 .dropdown {
   max-width: 100%;
   width: auto;
@@ -21,7 +23,7 @@
 
     button,
     a.button {
-      padding: var(--spacing-grid-150);
+      padding: theme.$spacing-grid-150;
       background: transparent;
       border-radius: unset;
       border: 0;
@@ -51,9 +53,9 @@
     margin-block-start: 0;
     padding-inline-start: 0;
     gap: 0;
-    border-radius: var(--border-radius-s);
-    border: 1px solid var(--colors-grey-200);
-    background-color: var(--colors-white);
+    border-radius: theme.$border-radius-s;
+    border: 1px solid theme.$colors-grey-200;
+    background-color: theme.$colors-white;
     max-height: 90vh;
     overflow-x: auto;
 
@@ -61,13 +63,13 @@
       margin: 0;
       width: 100%;
       padding: 0;
-      background-color: var(--colors-white);
+      background-color: theme.$colors-white;
       list-style-type: disc;
       gap: 0;
-      border-radius: var(--border-radius-s);
+      border-radius: theme.$border-radius-s;
 
       &:not(:last-child) {
-        border-bottom: 1px solid var(--colors-grey-200);
+        border-bottom: 1px solid theme.$colors-grey-200;
       }
 
       li {
@@ -82,11 +84,11 @@
           flex-direction: row;
           align-items: center;
           justify-content: flex-start;
-          gap: var(--spacing-grid-100);
-          color: var(--text-color-dark);
+          gap: theme.$spacing-grid-100;
+          color: theme.$text-color-dark;
           margin: 0;
           min-height: 2.75rem;
-          padding: var(--spacing-grid-150);
+          padding: theme.$spacing-grid-150;
           text-decoration: none;
           width: 100%;
 
@@ -96,40 +98,40 @@
             max-height: $icon-width;
 
             &::before {
-              color: var(--text-color-dark);
+              color: theme.$text-color-dark;
             }
           }
 
           &:hover {
-            color: var(--text-color-dark);
+            color: theme.$text-color-dark;
           }
 
           /* Styling with subtitle */
           &:has(> div) {
             flex-direction: column;
             align-items: flex-start;
-            gap: var(--spacing-grid-0);
+            gap: theme.$spacing-grid-0;
           }
 
           > div {
             display: flex;
             flex-direction: row;
-            gap: var(--spacing-grid-100);
+            gap: theme.$spacing-grid-100;
             align-items: center;
           }
 
           .nota-bene {
-            padding-left: calc($icon-width + var(--spacing-grid-100));
+            padding-left: calc($icon-width + theme.$spacing-grid-100);
           }
         }
 
         &[aria-current="true"] {
           a::before {
             content: "\ea5e";
-            font-family: var(--language-selector-list-button-icon-font-family);
-            margin-left: var(--language-selector-list-button-icon-margin-left);
-            font-size: var(--language-selector-list-button-icon-font-size);
-            color: var(--language-selector-list-button-icon-text-color);
+            font-family: theme.$language-selector-list-button-icon-font-family;
+            margin-left: theme.$language-selector-list-button-icon-margin-left;
+            font-size: theme.$language-selector-list-button-icon-font-size;
+            color: theme.$language-selector-list-button-icon-text-color;
             margin-right: 0.5rem;
             width: 1.25rem;
           }
