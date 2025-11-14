@@ -40,7 +40,10 @@ class KATModelPermissions(DjangoModelPermissions):
         if not hasattr(request, "auth") or not isinstance(request.auth, dict):
             return False
 
-        token_perms = request.auth.get("permissions", {}) or {}
+        token_perms = request.auth.get("permissions", {})
+
+        if not isinstance(token_perms, dict):
+            return False
 
         for view_perm in self.view_perms(request, view):
             if view_perm not in token_perms:
@@ -71,7 +74,10 @@ class KATModelPermissions(DjangoModelPermissions):
             return super().has_permission(request, view)
 
         view_perms = self.view_perms(request, view)
-        token_perms = request.auth.get("permissions", {}) or {}
+        token_perms = request.auth.get("permissions", {})
+
+        if not isinstance(token_perms, dict):
+            return False
 
         for view_perm in view_perms:
             if view_perm not in token_perms:

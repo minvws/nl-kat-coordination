@@ -206,10 +206,11 @@ if env.str("DOWNLOADVIEW_BACKEND", default=None) and env.str("DESTINATION_URL", 
 ROOT_URLCONF = "openkat.urls"
 
 REDIS_PASSWORD = env.str("REDIS_PASSWORD", default=None)
+REDIS_HOST = env.str("REDIS_HOST", "localhost")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{REDIS_PASSWORD}@{env.str('REDIS_HOST', 'localhost')}:6379/1",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/1",
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     }
 }

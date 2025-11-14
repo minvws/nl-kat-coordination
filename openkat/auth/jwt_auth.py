@@ -17,10 +17,8 @@ class JWTTokenAuthentication(TokenAuthentication):
         except PyJWTError:
             return None
 
-    @classmethod
-    def generate(
-        cls, permissions: dict[str, dict[str, Any]] | None = None, timeout: int = settings.PLUGIN_TIMEOUT
-    ) -> str:
+    @staticmethod
+    def generate(permissions: dict[str, dict[str, Any]] | None = None, timeout: int = settings.PLUGIN_TIMEOUT) -> str:
         if not settings.JWT_KEY:
             raise InvalidTokenError("No JWT key set in settings")
 
