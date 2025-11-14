@@ -12,6 +12,7 @@ from djangoql.exceptions import DjangoQLParserError
 from djangoql.queryset import apply_search
 
 from files.models import File
+from objects.models import NoOrgQLSchema
 
 
 class TaskStatus(models.TextChoices):
@@ -61,7 +62,7 @@ class ObjectSet(models.Model):
             return qs
 
         try:
-            return apply_search(qs, self.object_query)
+            return apply_search(qs, self.object_query, NoOrgQLSchema)
         except DjangoQLParserError:
             return qs
 

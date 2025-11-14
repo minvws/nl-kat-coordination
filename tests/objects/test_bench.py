@@ -5,7 +5,6 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.color import no_style
 from django.db import connections
-from djangoql.schema import DjangoQLSchema, IntField, StrField
 from psycopg.errors import FeatureNotSupported
 
 from objects.management.commands.generate_benchmark_data import generate
@@ -247,14 +246,6 @@ def test_object_set(bulk_data, benchmark, N):
 def test_scan_level_recalculation(benchmark, bulk_data, N):
     # The ipaddresses van scan level 1 and all hostnames 2
     benchmark.pedantic(recalculate_scan_levels, rounds=1)  # Subsequent rounds have no updates
-
-
-class HostnameQLSchema(DjangoQLSchema):
-    def get_fields(self, model):
-        fields = super().get_fields(model)
-        if model == Hostname:
-            fields += [IntField(name="nameservers_with_ipv6_count"), StrField(name="dnstxtrecord_value")]
-        return fields
 
 
 def test_business_rule_ipv6_webservers(bulk_data, benchmark):

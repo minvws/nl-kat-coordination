@@ -205,9 +205,15 @@ class OrganizationFilterMixin:
 
     def get_queryset(self):
         queryset = super().get_queryset()  # type: ignore[misc]
-        selected_codes = set(self.request.GET.getlist("organization"))  # type: ignore[attr-defined]
-
+        selected_codes = set(self.request.GET.getlist("organization"))
         user = self.request.user
+
+        can_access_all_orgs_and_unassigned_objs = not selected_codes and user.can_access_all_organizations
+
+        if not selected_codes and can_access_all_orgs_and_unassigned_objs:
+            # If we may see all organizations and did not filter on any, we do not have to change the original queryset
+            return queryset
+
         allowed_organizations = {org.code for org in user.organizations}
 
         if selected_codes:
@@ -247,7 +253,7 @@ class OrganizationFilterMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # type: ignore[misc]
-        organization_codes = self.request.GET.getlist("organization")  # type: ignore[attr-defined]
+        organization_codes = self.request.GET.getlist("organization")
 
         if organization_codes:
             filtered_organizations = list(Organization.objects.filter(code__in=organization_codes))
@@ -258,7 +264,7 @@ class OrganizationFilterMixin:
                 context["organization"] = filtered_organizations[0]
 
         # Always build query string without organization params for URL building in template
-        query_params = self.request.GET.copy()  # type: ignore[attr-defined]
+        query_params = self.request.GET.copy()
         query_params.pop("organization", None)
         context["query_string_without_organization"] = query_params.urlencode()
 

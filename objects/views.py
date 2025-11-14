@@ -41,6 +41,7 @@ from objects.models import (
     IPAddress,
     IPPort,
     Network,
+    NoOrgQLSchema,
     ScanLevelEnum,
     Software,
     XTDBOrganization,
@@ -369,7 +370,7 @@ class IPAddressFilter(ScanLevelFilterMixin, django_filters.FilterSet):
             return queryset
 
         try:
-            return apply_search(queryset, value)
+            return apply_search(queryset, value, NoOrgQLSchema)
         except DjangoQLParserError:
             return queryset
 
@@ -697,7 +698,7 @@ class HostnameFilter(ScanLevelFilterMixin, django_filters.FilterSet):
             return queryset
 
         try:
-            return apply_search(queryset, value)
+            return apply_search(queryset, value, NoOrgQLSchema)
         except DjangoQLParserError:
             return queryset
 
