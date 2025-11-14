@@ -109,16 +109,14 @@ def run(rpki: pl.LazyFrame, bgp: pl.LazyFrame, ips: list[str]) -> tuple[list[dic
 def download_lazyframe(client: httpx.Client, file_type: str) -> pl.LazyFrame:
     """Download the most recent version of a parquet file with type file_type and read this into a pl.LazyFrame"""
 
-    params = {"ordering": "-created_at", "limit": "1"}
-
     try:
-        files = client.get("/file/", params=params | {"search": file_type}).raise_for_status()
-        file_id = files.json()["results"][0]["id"]
+        files = client.get("/file/", params={"ordering": "-created_at", "limit": "1", "search": file_type})
+        file_id = files.raise_for_status().json()["results"][0]["id"]
     except (IndexError, JSONDecodeError):
         raise FileNotFoundError(f"No {file_type} found. Please enable the download plugin first.")
 
     try:
-        rpki_lazy = pl.scan_parquet(client.get(f"/files/{file_id}/").raise_for_status().content)
+        rpki_lazy = pl.scan_parquet(client.get(f"/file/{file_id}/download/").raise_for_status().content)
     except (IndexError, JSONDecodeError):
         raise Exception("Failed to retrieve file")
 

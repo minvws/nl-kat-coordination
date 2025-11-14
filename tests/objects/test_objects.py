@@ -195,10 +195,10 @@ def test_update_get_or_create(xtdb):
     net = Network.objects.create(name="internet")
     assert Network.objects.count() == 1
 
-    Network.objects.update_or_create(name="internet")
+    Network.objects.create(name="internet")
     assert Network.objects.count() == 1
 
-    Network.objects.update_or_create(name="internet")
+    Network.objects.create(name="internet")
     assert Network.objects.count() == 1
 
     other, created = Network.objects.get_or_create(name="internet")

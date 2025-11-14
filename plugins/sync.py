@@ -4,27 +4,10 @@ from pathlib import Path
 
 import structlog
 from django.conf import settings
-from pydantic import BaseModel, Field, TypeAdapter
 
 from plugins.models import Plugin
 
 logger = structlog.get_logger(__name__)
-
-
-class NewPlugin(BaseModel):
-    plugin_id: str
-    name: str
-    description: str | None = None
-    scan_level: int = 1
-    consumes: set[str] = Field(default_factory=set)
-    recurrences: str | None = None
-    batch_size: int | None = None
-    oci_image: str | None = None
-    oci_arguments: list[str] = Field(default_factory=list)
-    version: str | None = None
-
-
-plugins_type_adapter = TypeAdapter(list[NewPlugin])
 
 
 def _find_packages_in_path_containing_files(path: Path, required_files: tuple[str, ...]) -> list[tuple[Path, str]]:
@@ -55,26 +38,28 @@ def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
 
 
 def sync() -> list[Plugin]:
+    raw_plugins = []
     plugins = []
 
-    for path, _ in _find_packages_in_path_containing_files(settings.BASE_DIR / "plugins/plugins", ("plugin.json",)):
-        definition = json.loads(path.joinpath("plugin.json").read_text())
+    raw_plugins.extend(json.loads(Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json").read_text()))
+    raw_plugins.extend(json.loads(Path(settings.BASE_DIR / "plugins" / "plugins" / "nuclei_plugins.json").read_text()))
+
+    for raw_plugin in raw_plugins:
         plugin = Plugin(
-            plugin_id=definition.get("plugin_id"),
-            name=definition.get("name"),
-            scan_level=definition.get("scan_level", 1),
-            description=definition.get("description"),
-            consumes=definition.get("consumes", []),
-            recurrences=definition.get("recurrences"),
-            batch_size=definition.get("batch_size"),
-            oci_image=definition.get("oci_image"),
-            oci_arguments=definition.get("oci_arguments", []),
-            version=definition.get("version"),
+            plugin_id=raw_plugin.get("plugin_id"),
+            name=raw_plugin.get("name"),
+            scan_level=raw_plugin.get("scan_level", 1),
+            description=raw_plugin.get("description"),
+            consumes=raw_plugin.get("consumes", []),
+            recurrences=raw_plugin.get("recurrences"),
+            batch_size=raw_plugin.get("batch_size"),
+            oci_image=raw_plugin.get("oci_image"),
+            oci_arguments=raw_plugin.get("oci_arguments", []),
+            version=raw_plugin.get("version"),
+            permissions=raw_plugin.get("permissions", {}),
         )
         plugins.append(plugin)
 
-    plugins.extend(get_plugins_from_json(Path(settings.BASE_DIR / "plugins" / "plugins" / "plugins.json")))
-    plugins.extend(get_plugins_from_json(Path(settings.BASE_DIR / "plugins" / "plugins" / "nuclei_plugins.json")))
     return Plugin.objects.bulk_create(
         plugins,
         update_conflicts=True,
@@ -89,23 +74,6 @@ def sync() -> list[Plugin]:
             "oci_image",
             "oci_arguments",
             "version",
+            "permissions",
         ],
     )
-
-
-def get_plugins_from_json(nuclei_plugins_path: Path) -> list[Plugin]:
-    return [
-        Plugin(
-            plugin_id=parsed_plugin.plugin_id,
-            name=parsed_plugin.name,
-            scan_level=parsed_plugin.scan_level,
-            description=parsed_plugin.description,
-            consumes=list(parsed_plugin.consumes),
-            recurrences=parsed_plugin.recurrences,
-            batch_size=parsed_plugin.batch_size,
-            oci_image=parsed_plugin.oci_image,
-            oci_arguments=parsed_plugin.oci_arguments,
-            version=parsed_plugin.version,
-        )
-        for parsed_plugin in plugins_type_adapter.validate_json(nuclei_plugins_path.read_text())
-    ]

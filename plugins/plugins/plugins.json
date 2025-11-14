@@ -13,7 +13,42 @@
       "run",
       "kat_dns/main.py",
       "{hostname}"
-    ]
+    ],
+    "permissions": {
+      "objects.view_hostname": {},
+      "objects.add_hostname": {},
+      "objects.change_hostname": {},
+      "objects.add_ipaddress": {},
+      "objects.change_ipaddress": {},
+      "objects.view_ipaddress": {},
+      "objects.add_dnsaaaarecord": {},
+      "objects.delete_dnsaaaarecord": {},
+      "objects.view_dnsaaaarecord": {},
+      "objects.add_dnsarecord": {},
+      "objects.delete_dnsarecord": {},
+      "objects.view_dnsarecord": {},
+      "objects.add_dnscaarecord": {},
+      "objects.delete_dnscaarecord": {},
+      "objects.view_dnscaarecord": {},
+      "objects.add_dnscnamerecord": {},
+      "objects.delete_dnscnamerecord": {},
+      "objects.view_dnscnamerecord": {},
+      "objects.add_dnsmxrecord": {},
+      "objects.delete_dnsmxrecord": {},
+      "objects.view_dnsmxrecord": {},
+      "objects.add_dnsnsrecord": {},
+      "objects.delete_dnsnsrecord": {},
+      "objects.view_dnsnsrecord": {},
+      "objects.add_dnsptrrecord": {},
+      "objects.delete_dnsptrrecord": {},
+      "objects.view_dnsptrrecord": {},
+      "objects.add_dnssrvrecord": {},
+      "objects.delete_dnssrvrecord": {},
+      "objects.view_dnssrvrecord": {},
+      "objects.add_dnstxtrecord": {},
+      "objects.delete_dnstxtrecord": {},
+      "objects.view_dnstxtrecord": {}
+    }
   },
   {
     "plugin_id": "dns-sec",
@@ -138,6 +173,33 @@
       "/duckdb",
       "-c",
       "copy(select CIDR, ASN from read_json('https://bgp.tools/table.jsonl', maximum_object_size=100000000)) to '/dev/stdout' (format parquet);"
+    ]
+  },
+  {
+    "plugin_id": "rpki",
+    "name": "RPKI",
+    "description": "Parses RPKI data into findings.",
+    "consumes": [
+      "type:ipaddress"
+    ],
+    "batch_size": 500,
+    "permissions": {
+      "files.view_file": {
+        "search": [
+          "bgp-download",
+          "rpki-download"
+        ],
+        "limit": 1
+      },
+      "objects.add_finding": {},
+      "objects.delete_finding": {}
+    },
+    "scan_level": 1,
+    "oci_image": "ghcr.io/minvws/openkat/plugins:0.1.0",
+    "oci_arguments": [
+      "uv",
+      "run",
+      "kat_rpki/main.py"
     ]
   },
   {

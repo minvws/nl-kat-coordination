@@ -78,17 +78,15 @@ class Command(BaseCommand):
             finding_types_data = json.load(f)
 
         for code, data in finding_types_data.items():
-            FindingType.objects.update_or_create(
+            FindingType.objects.create(
                 code=code,
-                defaults={
-                    "name": data.get("name"),
-                    "description": data.get("description"),
-                    "source": data.get("source"),
-                    "risk": data.get("risk"),
-                    "impact": data.get("impact"),
-                    "recommendation": data.get("recommendation"),
-                    "score": SEVERITY_SCORE_LOOKUP.get(data.get("risk", "").lower()),
-                },
+                name=data.get("name"),
+                description=data.get("description"),
+                source=data.get("source"),
+                risk=data.get("risk"),
+                impact=data.get("impact"),
+                recommendation=data.get("recommendation"),
+                score=SEVERITY_SCORE_LOOKUP.get(data.get("risk", "").lower()),
             )
 
     def sync_orgs(self):

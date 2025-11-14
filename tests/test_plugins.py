@@ -88,12 +88,9 @@ def test_plugin_runner_mode_4_stdin_single_and_multiple():
 
     result = runner.run("test-no-placeholders", "example.com", cli=True)
     assert "docker run" in result
-    assert "IN_FILE=" in result
 
     result = runner.run("test-no-placeholders", ["example.com", "test.org"], cli=True)
     assert "docker run" in result
-    assert "IN_FILE=" in result
 
     result = runner.run("test-no-placeholders", None, cli=True)
     assert "docker run" in result
-    assert "IN_FILE=" not in result

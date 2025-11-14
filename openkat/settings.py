@@ -205,10 +205,12 @@ if env.str("DOWNLOADVIEW_BACKEND", default=None) and env.str("DESTINATION_URL", 
 
 ROOT_URLCONF = "openkat.urls"
 
+REDIS_PASSWORD = env.str("REDIS_PASSWORD", default=None)
+REDIS_HOST = env.str("REDIS_HOST", "localhost")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{env.str('REDIS_PASSWORD')}@{env.str('REDIS_HOST')}:6379/1",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:6379/1",
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     }
 }
@@ -421,9 +423,12 @@ if CSP_HEADER:
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
 BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
+JWT_KEY = env.str("JWT_KEY", SECRET_KEY)
+JWT_ALGORITHM = env.str("JWT_ALGORITHM", "HS256")
 
 if BROWSABLE_API:
     DEFAULT_AUTHENTICATION_CLASSES = [
+        "openkat.auth.jwt_auth.JWTTokenAuthentication",
         "knox.auth.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ]
@@ -432,7 +437,7 @@ if BROWSABLE_API:
         "rest_framework.renderers.BrowsableAPIRenderer",
     ]
 else:
-    DEFAULT_AUTHENTICATION_CLASSES = ["knox.auth.TokenAuthentication"]
+    DEFAULT_AUTHENTICATION_CLASSES = ["openkat.auth.jwt_auth.JWTTokenAuthentication", "knox.auth.TokenAuthentication"]
     DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 REST_FRAMEWORK = {
@@ -520,11 +525,10 @@ BATCH_SIZE = env.int("BATCH_SIZE", default=50)  # A batch size of 0 means that w
 
 QUEUE_NAME_RECALCULATIONS = "recalculations"
 QUEUE_NAME_SCHEDULE = "schedule"
-REDIS_PASSWORD = env.str("REDIS_PASSWORD")
 
 CELERY = {
-    "broker_url": env.str("REDIS_QUEUE_URI"),
-    "result_backend": env.str("REDIS_QUEUE_URI"),
+    "broker_url": env.str("REDIS_QUEUE_URI", "memory://"),
+    "result_backend": env.str("REDIS_QUEUE_URI", "file://"),
     "task_serializer": "json",
     "result_serializer": "json",
     "event_serializer": "json",

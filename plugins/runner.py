@@ -1,22 +1,21 @@
 import datetime
 import itertools
+import re
 import shlex
 import signal
 import uuid
-from datetime import UTC, timedelta
+from datetime import UTC
 from pathlib import Path
 from typing import Literal
 
 import docker
 import structlog
 from django.conf import settings
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from docker.errors import ContainerError, ImageNotFound
 from docker.models.containers import Container
 
 from files.models import File, TemporaryContent
-from openkat.models import AuthToken, User
+from openkat.auth.jwt_auth import JWTTokenAuthentication
 from plugins.models import Plugin
 
 logger = structlog.get_logger(__name__)
@@ -104,6 +103,9 @@ class PluginRunner:
             ContainerError: If the plugin exits with non-zero status
             ValueError: If target type is not supported
         """
+        if not isinstance(target, str | list | None):
+            raise ValueError(f"Unsupported target type: {type(target)}")
+
         use_stdout = str(output) == "-"
         plugin = Plugin.objects.get(plugin_id=plugin_id)
         environment = {"PLUGIN_ID": plugin.plugin_id, "OPENKAT_API": f"{settings.OPENKAT_HOST}/api/v1"}
@@ -146,13 +148,6 @@ class PluginRunner:
             else:
                 tmp_file = File.objects.create(file=TemporaryContent("\n".join(target)))
 
-        if not isinstance(target, (str, list, type(None))):
-            raise ValueError(f"Unsupported target type: {type(target)}")
-
-        # Set IN_FILE for stdin modes (entrypoint reads this file and pipes to plugin)
-        if tmp_file:
-            environment["IN_FILE"] = str(tmp_file.pk)
-
         # Configure where plugin output should go
         if use_stdout:
             environment["UPLOAD_URL"] = "/dev/null"  # CLI mode: don't upload
@@ -162,12 +157,27 @@ class PluginRunner:
             environment["UPLOAD_URL"] = f"{settings.OPENKAT_HOST}/api/v1/file/"
 
         if cli:
+            if tmp_file:
+                tmp_file.delete()
+
             return self.get_cli(command, environment, keep, plugin)
 
-        # Temporary user with limited access rights
-        plugin_user, token = self.create_token(plugin_id)
-        environment["OPENKAT_TOKEN"] = token.generate_new_token()
-        token.save()
+        # JWT token for the container.
+        perms: dict[str, dict] = {"files.add_file": {}}  # Plugins always create a file
+
+        if tmp_file:
+            environment["IN_FILE"] = str(tmp_file.pk)
+            perms["files.view_file"] = {"pks": [tmp_file.pk]}  # This plugin has access to one file
+
+        for cmd in command:
+            for file_pk in re.findall(r"\{file/(\d+)\}", cmd):
+                if "files.view_file" not in perms:
+                    perms["files.view_file"] = {"pks": []}
+
+                perms["files.view_file"]["pks"].append(file_pk)
+
+        perms |= plugin.permissions  # Plugins can define extra permissions
+        environment["OPENKAT_TOKEN"] = JWTTokenAuthentication.generate(perms)
 
         # Add signal handler to kill the container as well (for cancelling tasks)
         original_handler = signal.getsignal(signal.SIGTERM)
@@ -177,9 +187,6 @@ class PluginRunner:
         def handle(signalnum, stack_frame):
             container.kill(signalnum)
             container.remove(force=True)
-
-            token.delete()
-            plugin_user.delete()
 
             if tmp_file:
                 tmp_file.delete()
@@ -195,9 +202,6 @@ class PluginRunner:
 
         signal.signal(signal.SIGTERM, handle)
 
-        # TODO: consider asynchronous handling. We only need to figure out how to handle dropping authorization rights
-        #   after the container has gone.
-
         # Below is a copy of the implementation of container.run() after the check if detach equals True.
         logging_driver = container.attrs["HostConfig"]["LogConfig"]["Type"]
 
@@ -212,9 +216,6 @@ class PluginRunner:
 
         if not keep:
             container.remove(force=True)
-
-        token.delete()
-        plugin_user.delete()
 
         if tmp_file:
             tmp_file.delete()
@@ -286,43 +287,6 @@ class PluginRunner:
         return (
             f"docker run {rm} {vol} --entrypoint {self.override_entrypoint} {envs} {network} {plugin.oci_image} {cmd}"
         )
-
-    @staticmethod
-    def create_token(plugin_id: str) -> tuple[User, AuthToken]:
-        """
-        Create a temporary user and auth token for the plugin to use.
-
-        The plugin gets limited permissions:
-        - Can view and add files (for uploading results)
-        - Can view/add/change/delete all object types (Network, Hostname, IPAddress, etc.)
-
-        The token expires after PLUGIN_TIMEOUT minutes and is deleted after the plugin completes.
-
-        Args:
-            plugin_id: Identifier of the plugin (used as the user's full_name)
-
-        Returns:
-            Tuple of (temporary_user, auth_token)
-        """
-
-        plugin_user = User(full_name=plugin_id, email=f"{uuid.uuid4()}@openkat.nl")
-        plugin_user.set_unusable_password()
-        plugin_user.save()
-
-        plugin_user.user_permissions.add(Permission.objects.get(codename="view_file"))
-        plugin_user.user_permissions.add(Permission.objects.get(codename="add_file"))
-
-        content_types = ContentType.objects.filter(app_label="objects")
-        permissions = Permission.objects.filter(content_type__in=content_types)
-        plugin_user.user_permissions.add(*permissions)
-
-        token = AuthToken(
-            user=plugin_user,
-            name=plugin_id,
-            expiry=datetime.datetime.now(UTC) + timedelta(minutes=settings.PLUGIN_TIMEOUT),
-        )
-
-        return plugin_user, token
 
     @staticmethod
     def create_command(args: list[str], target: str) -> list[str]:

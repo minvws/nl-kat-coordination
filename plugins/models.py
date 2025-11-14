@@ -46,7 +46,8 @@ class Plugin(models.Model):
     # Image specifications
     oci_image = models.CharField(max_length=256, null=True)
     oci_arguments = ArrayField(models.CharField(max_length=256, blank=True), default=list)
-    version = models.CharField(max_length=16, null=True)
+    version = models.CharField(max_length=16, null=True)  # TODO: drop or use
+    permissions = models.JSONField(default=dict)
 
     objects = models.Manager()
 

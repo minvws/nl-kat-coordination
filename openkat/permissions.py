@@ -6,8 +6,7 @@ from objects.models import object_type_by_name
 
 
 class KATModelPermissions(DjangoModelPermissions):
-    # We change the permissions map to include the view permissions for
-    # GET/OPTIONS/HEAD.
+    # We change the permissions map to include the view permissions for GET/OPTIONS/HEAD.
     perms_map = {
         "GET": ["%(app_label)s.view_%(model_name)s"],
         "OPTIONS": ["%(app_label)s.view_%(model_name)s"],
@@ -18,22 +17,90 @@ class KATModelPermissions(DjangoModelPermissions):
         "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
 
-
-class KATMultiModelPermissions(KATModelPermissions):
     def has_permission(self, request, view):
+        """
+        Generic endpoints determine the permissions from the request.data provided, so we override this method
+        without a super() call because we call self.view_perms() instead of assuming we determine permissions through
+        a queryset and request.method only, meaning it is a lot cleaner to extend this class in
+        KATMultiModelPermissions
+        """
+
+        if self.has_token_permission(request, view):
+            return True
+
         if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
             return False
 
         if getattr(view, "_ignore_model_permissions", False):
             return True
 
+        return request.user.has_perms(self.view_perms(request, view))
+
+    def has_token_permission(self, request, view):
+        if not hasattr(request, "auth") or not isinstance(request.auth, dict):
+            return False
+
+        token_perms = request.auth.get("permissions", {})
+
+        if not isinstance(token_perms, dict):
+            return False
+
+        for view_perm in self.view_perms(request, view):
+            if view_perm not in token_perms:
+                return False
+
+            if not isinstance(token_perms[view_perm], dict) or token_perms[view_perm] == {}:
+                continue
+
+            if view.action == "retrieve":
+                continue  # The checks below apply to the "list" action only
+
+            if "search" in token_perms[view_perm] and request.GET.get("search") not in token_perms[view_perm]["search"]:
+                return False
+
+            if "limit" in token_perms[view_perm] and int(request.GET.get("limit")) != int(
+                token_perms[view_perm]["limit"]
+            ):
+                return False
+
+        # The auth token has all required permissions
+        return True
+
+    def view_perms(self, request, view):
+        return self.get_required_permissions(request.method, self._queryset(view).model)
+
+    def has_object_permission(self, request, view, obj):
+        if not hasattr(request, "auth") or not isinstance(request.auth, dict):
+            return super().has_permission(request, view)
+
+        view_perms = self.view_perms(request, view)
+        token_perms = request.auth.get("permissions", {})
+
+        if not isinstance(token_perms, dict):
+            return False
+
+        for view_perm in view_perms:
+            if view_perm not in token_perms:
+                return False
+
+            if not isinstance(token_perms[view_perm], dict) or token_perms[view_perm] == {}:
+                continue
+
+            if "pks" in token_perms[view_perm] and obj.pk not in token_perms[view_perm]["pks"]:
+                return False
+
+        return True
+
+
+class KATMultiModelPermissions(KATModelPermissions):
+    def view_perms(self, request, view):
         perms: list[str] = []
         models = {key.lower(): model for key, model in object_type_by_name().items()}
 
         for key in request.data:
             perms.extend(self.get_required_permissions(request.method, models[key]))
 
-        return request.user.has_perms(perms)
+        return perms
 
 
 class KATModelPermissionRequiredMixin(PermissionRequiredMixin):

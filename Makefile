@@ -1,4 +1,5 @@
 .PHONY: build run test export_migrations debian clean plugins up
+HIDE:=$(if $(VERBOSE),,@)
 
 UNAME := $(shell uname)
 
