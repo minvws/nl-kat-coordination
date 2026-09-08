@@ -11,7 +11,7 @@ from rocky.views.bytes_raw import BytesRawView
 from rocky.views.finding_add import FindingAddView
 from rocky.views.finding_list import FindingListView
 from rocky.views.finding_type_add import FindingTypeAddView
-from rocky.views.health import GlobalHealthView, Health, HealthChecks
+from rocky.views.health import GlobalHealthChecks, GlobalHealthView, Health, HealthChecks
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.landing_page import LandingPageView
 from rocky.views.ooi_add import OOIAddTypeSelectView, OOIAddView
@@ -75,6 +75,7 @@ urlpatterns += i18n_patterns(
     path("crisis-room/", include("crisis_room.urls"), name="crisis_room"),
     path("<organization_code>/crisis-room/", include("crisis_room.urls_org"), name="crisis_room_org"),
     path("privacy-statement/", PrivacyStatementView.as_view(), name="privacy_statement"),
+    path("health/v1/", GlobalHealthChecks.as_view(), name="global_health_beautified"),
     path("tasks/", AllBoefjesTaskListView.as_view(), name="all_task_list"),
     path("tasks/boefjes", AllBoefjesTaskListView.as_view(), name="all_boefjes_task_list"),
     path("tasks/normalizers", AllNormalizersTaskListView.as_view(), name="all_normalizers_task_list"),

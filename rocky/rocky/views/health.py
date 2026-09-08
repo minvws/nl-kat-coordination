@@ -123,6 +123,26 @@ def flatten_health(health_: ServiceHealth) -> list[ServiceHealth]:
     return results
 
 
+class GlobalHealthChecks(TemplateView):
+    """Non-org-scoped human-readable health page (#4231).
+
+    Renders the same template as the org-scoped HealthChecks view but
+    uses get_rocky_health_global() so it works without an organization.
+    """
+
+    template_name = "health.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("global_health"), "text": _("Health")},
+            {"url": reverse("global_health_beautified"), "text": _("Beautified")},
+        ]
+        rocky_health = get_rocky_health_global()
+        context["health_checks"] = flatten_health(rocky_health)
+        return context
+
+
 class HealthChecks(OrganizationView, TemplateView):
     template_name = "health.html"
 
