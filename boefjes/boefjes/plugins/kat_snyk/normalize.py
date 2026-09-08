@@ -34,19 +34,18 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     if not vulnerabilities:
         if not latest_version:
-            logger.warning("Couldn't find software %s in the SNYK vulnerability database", software_name)
+            logger.debug("Couldn't find software %s in the SNYK vulnerability database", software_name)
         return
 
     if software_version:
         for vuln in vulnerabilities:
             severity = _SEVERITY_MAP.get(vuln.get("severity", "").lower())
-            cvss_score = vuln.get("cvss_score")
 
             cve = vuln.get("cve")
             if cve and cve.startswith("CVE-"):
-                ft = CVEFindingType(id=cve, risk_severity=severity, risk_score=cvss_score)
+                ft = CVEFindingType(id=cve)
             else:
-                ft = SnykFindingType(id=vuln["id"], risk_severity=severity, risk_score=cvss_score)
+                ft = SnykFindingType(id=vuln["id"], risk_severity=severity)
             yield ft
             yield Finding(finding_type=ft.reference, ooi=pk_ooi, description=vuln["title"])
     else:
