@@ -27,6 +27,22 @@ from reports.report_types.findings_report.report import FindingsReport
 from tools.enums import SCAN_LEVEL
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
+
+@pytest.fixture(scope="session", autouse=True)
+def _compile_translations():
+    """Compile .mo files so translation tests work in CI.
+
+    The CI volume mount (..:/app/rocky) overwrites .mo files from the
+    Docker build because .mo files are gitignored. Without recompiling,
+    gettext_lazy strings render as English even inside override("nl").
+    """
+    try:
+        from django.core.management import call_command
+
+        call_command("compilemessages", verbosity=0)
+    except Exception:
+        pass  # gettext not installed — translation tests will fail
+
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
