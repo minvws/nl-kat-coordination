@@ -1,4 +1,5 @@
 import binascii
+import contextlib
 import json
 import logging
 import uuid
@@ -18,31 +19,12 @@ from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.management import call_command
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
 from katalogus.client import Boefje, parse_plugin
-from reports.report_types.findings_report.report import FindingsReport
-from tools.enums import SCAN_LEVEL
-from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
-
-
-@pytest.fixture(scope="session", autouse=True)
-def _compile_translations():
-    """Compile .mo files so translation tests work in CI.
-
-    The CI volume mount (..:/app/rocky) overwrites .mo files from the
-    Docker build because .mo files are gitignored. Without recompiling,
-    gettext_lazy strings render as English even inside override("nl").
-    """
-    try:
-        from django.core.management import call_command
-
-        call_command("compilemessages", verbosity=0)
-    except Exception:
-        pass  # gettext not installed — translation tests will fail
-
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -62,13 +44,28 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from reports.report_types.findings_report.report import FindingsReport
 from rocky.health import ServiceHealth
 from rocky.scheduler import PaginatedTasksResponse, ReportTask, ScheduleResponse, Task, TaskStatus
+from tools.enums import SCAN_LEVEL
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _compile_translations():
+    """Compile .mo files so translation tests work in CI.
+
+    The CI volume mount (..:/app/rocky) overwrites .mo files from the
+    Docker build because .mo files are gitignored. Without recompiling,
+    gettext_lazy strings render as English even inside override("nl").
+    """
+    with contextlib.suppress(Exception):  # gettext not installed, translation tests will fail
+        call_command("compilemessages", verbosity=0)
 
 
 # Copied from https://www.structlog.org/en/stable/testing.html
