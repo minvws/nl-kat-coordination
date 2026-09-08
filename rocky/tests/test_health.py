@@ -64,6 +64,7 @@ def test_global_health_beautified(rf, client_member):
     ):
         request = setup_request(rf.get("global_health_beautified"), client_member.user)
         response = GlobalHealthChecks.as_view()(request)
+        response.render()
 
     assert response.status_code == 200
     assert b"Health Checks" in response.content
