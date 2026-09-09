@@ -7,11 +7,17 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.ooi.software import SoftwareInstance
 from octopoes.models.ooi.web import URL
 from reports.report_types.definitions import Report, ReportPlugins
 
 TREE_DEPTH = 9
 SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
+
+# A CVE is a property of a software version, so its finding hangs on the Software OOI rather than
+# on the asset (#5321). Software is not traversable, so the object tree stops at the
+# SoftwareInstance; walk the last two hops with a query instead.
+SOFTWARE_FINDINGS_PATH = "SoftwareInstance.software.<ooi[is Finding]"
 
 
 class FindingsReport(Report):
@@ -34,6 +40,21 @@ class FindingsReport(Report):
     template_path = "findings_report/report.html"
     label_style = "3-light"
 
+    def get_software_findings(
+        self, software_instances: list[Reference], seen: set[Reference], valid_time: datetime
+    ) -> list[Finding]:
+        """Findings on the software behind the given instances, which the object tree cannot reach."""
+        findings = []
+
+        for _source, ooi in self.octopoes_api_connector.query_many(
+            SOFTWARE_FINDINGS_PATH, valid_time, software_instances
+        ):
+            if isinstance(ooi, Finding) and ooi.reference not in seen:
+                seen.add(ooi.reference)
+                findings.append(ooi)
+
+        return findings
+
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
@@ -47,10 +68,15 @@ class FindingsReport(Report):
             total_by_severity_per_finding_type[severity] = 0
 
         tree = self.octopoes_api_connector.get_tree(
-            reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
+            reference, depth=TREE_DEPTH, types={Finding, SoftwareInstance}, valid_time=valid_time
         ).store
 
         findings = [ooi for ooi in tree.values() if ooi.ooi_type == "Finding"]
+        findings += self.get_software_findings(
+            [ooi.reference for ooi in tree.values() if ooi.ooi_type == "SoftwareInstance"],
+            {finding.reference for finding in findings},
+            valid_time,
+        )
         all_finding_types = self.octopoes_api_connector.list_objects(types={FindingType}, valid_time=valid_time).items
 
         for finding in findings:

@@ -2,7 +2,8 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
-from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.findings import CVEFindingType, Finding, RiskLevelSeverity
+from octopoes.models.ooi.software import Software
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from rocky.views.finding_list import FindingListView
@@ -349,3 +350,49 @@ def test_findings_list_filtering(
     FindingListView.as_view()(request_filtering, organization_code=member.organization.code)
 
     assert mock_organization_view_octopoes().list_findings.mock_calls[1].kwargs["severities"] == {RiskLevelSeverity.LOW}
+
+
+SOFTWARE_TREE_DATA = {
+    "root": {"reference": "Hostname|internet|example.com", "children": {}},
+    "store": {
+        "Hostname|internet|example.com": {
+            "object_type": "Hostname",
+            "primary_key": "Hostname|internet|example.com",
+            "name": "example.com",
+            "network": "Network|internet",
+        }
+    },
+}
+
+
+def test_ooi_findings_include_cve_bound_to_software(rf, client_member, mock_organization_view_octopoes):
+    """A CVE bound to the Software OOI must surface on the asset that runs it (#5321).
+
+    Software is not traversable, so the object tree never reaches such a finding: it is only
+    found by walking asset -> SoftwareInstance -> Software -> Finding.
+    """
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(SOFTWARE_TREE_DATA)
+
+    software = Software(name="nginx", version="1.0")
+    finding_type = CVEFindingType(
+        id="CVE-2024-0001",
+        description="nginx has a known vulnerability",
+        risk_score=9.8,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+    mock_organization_view_octopoes().query.return_value = [
+        Finding(finding_type=finding_type.reference, ooi=software.reference, description="")
+    ]
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {finding_type.reference: finding_type}
+
+    request = setup_request(rf.get("ooi_findings", {"ooi_id": "Hostname|internet|example.com"}), client_member.user)
+    response = OOIFindingListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assertContains(response, "CVE-2024-0001")
+
+    # reached through the software the asset runs, not through the object tree
+    assert (
+        mock_organization_view_octopoes().query.call_args.args[0]
+        == "Hostname.<ooi[is SoftwareInstance].software.<ooi[is Finding]"
+    )
