@@ -221,7 +221,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
             end_valid_time = form.cleaned_data.pop("end_valid_time", None)
             if end_valid_time is not None:
                 end_valid_time = end_valid_time.replace(tzinfo=timezone.utc)
-            new_ooi = self.ooi_class.model_validate(form.cleaned_data)
+            new_ooi = self.get_ooi_class().model_validate(form.cleaned_data)
             create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi, self.observed_at, end_valid_time)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:

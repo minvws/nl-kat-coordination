@@ -149,7 +149,11 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def form_valid(self, form):
         if not self.process_csv(form):
-            return redirect("upload_csv", organization_code=self.organization.code)
+            return redirect(
+                "upload_csv",
+                organization_code=self.organization.code,
+                temporal_context=self.kwargs.get("temporal_context"),
+            )
         return super().form_valid(form)
 
     def add_error_notification(self, error_message):

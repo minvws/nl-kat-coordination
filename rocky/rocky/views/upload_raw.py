@@ -62,7 +62,11 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def form_valid(self, form):
         if not self.process_raw(form):
-            return redirect("upload_raw", organization_code=self.organization.code)
+            return redirect(
+                "upload_raw",
+                organization_code=self.organization.code,
+                temporal_context=self.kwargs.get("temporal_context"),
+            )
         return super().form_valid(form)
 
     def add_error_notification(self, error_message):
