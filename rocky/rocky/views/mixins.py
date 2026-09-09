@@ -131,6 +131,11 @@ class ObservedAtMixin(ContextMixin, View):
         return self.get_temporal_url(None)
 
     def get_temporal_url(self, observed_at: datetime | None) -> str:
+        # resolver_match is set by Django's URL dispatcher; it is only absent when the view is
+        # reached without going through URL resolution (e.g. an unresolved request). In that case
+        # there is no current route to rebuild, so fall back to an empty temporal link.
+        if self.request.resolver_match is None:
+            return ""
         kwargs = self.request.resolver_match.kwargs.copy()
         kwargs["temporal_context"] = observed_at
         return reverse(self.request.resolver_match.view_name, kwargs=kwargs)
@@ -515,11 +520,14 @@ class ReportList:
 
 
 class SingleOOIMixin(OctopoesView):
-    ooi_id: str
+    ooi_id: str | None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi_id = kwargs["ooi"]
+        # Not every route that uses this mixin carries an <ooi> segment (e.g. OOIAddView,
+        # MuteFindingsBulkView, onboarding). Fetch lazily via self.ooi; a missing id only matters
+        # for the views that actually read the OOI.
+        self.ooi_id = kwargs.get("ooi")
 
     @cached_property
     def ooi(self):
