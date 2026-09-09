@@ -23,6 +23,8 @@ class BytesRawView(OrganizationView):
         boefje_meta_id = kwargs["boefje_meta_id"]
         try:
             raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
+            for raw_meta in raw_metas:
+                raw_meta["boefje_meta"].pop("environment", None)
             is_json_format = request.GET.get("format") == "json"
             if is_json_format:
                 size_limit = int(request.GET.get("size_limit", RAW_FILE_LIMIT))

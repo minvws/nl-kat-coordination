@@ -1,3 +1,6 @@
+import json
+import zipfile
+
 import pytest
 from django.http import Http404
 from django.utils.translation import override
@@ -131,3 +134,22 @@ def test_download_task_no_raw(rf, client_member, mock_bytes_client, bytes_raw_me
 
     assert response.status_code == 302
     assert list(request._messages)[0].message == "The task does not have any raw data."
+
+
+def test_download_task_strips_environment_secrets(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+    """#4508: boefje meta environment may contain secrets and must not leak via raw download."""
+    mock_bytes_client().get_raw.return_value = bytes_get_raw
+    mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+
+    request = setup_request(rf.get("bytes_raw"), client_member.user)
+
+    response = BytesRawView.as_view()(
+        request, organization_code=client_member.organization.code, boefje_meta_id=bytes_raw_metas[0]["id"]
+    )
+
+    assert response.status_code == 200
+    with zipfile.ZipFile(response.file_to_stream) as zf:
+        meta_files = [n for n in zf.namelist() if n.startswith("raw_meta_")]
+        for meta_file in meta_files:
+            meta = json.loads(zf.read(meta_file))
+            assert "environment" not in meta["boefje_meta"]
