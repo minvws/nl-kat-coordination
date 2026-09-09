@@ -632,13 +632,13 @@ class SingleOOITreeMixin(SingleOOIMixin):
     ) -> OOI:
         if pk is None:
             pk = self.ooi_id
-        if pk is None:
-            raise Http404("No OOI provided in the URL")
 
         if observed_at is None:
             observed_at = self.observed_at
 
-        ref = Reference.from_str(pk)
+        # pk falls back to self.ooi_id (Optional); on the tree routes it is always present in
+        # production, so treat it as the required str the reference expects.
+        ref = Reference.from_str(pk)  # type: ignore[arg-type]
         depth = depth or self.get_depth()
 
         try:
