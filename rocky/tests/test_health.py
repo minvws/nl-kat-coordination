@@ -1,6 +1,8 @@
 import json
 from unittest.mock import patch
 
+import pytest
+from django.core.exceptions import PermissionDenied
 from django.test import Client
 
 from rocky.health import ServiceHealth
@@ -35,7 +37,7 @@ def test_global_health_endpoint_healthy(rf, client_member):
         ServiceHealth(service="bytes", healthy=True, version="1.0"),
     ]
     with (
-        patch("rocky.views.health.get_octopoes_organizations_health", return_value=mock_services[0]),
+        patch("rocky.views.health.get_octopoes_root_health", return_value=mock_services[0]),
         patch("rocky.views.health.get_katalogus_health", return_value=mock_services[1]),
         patch("rocky.views.health.get_scheduler_health", return_value=mock_services[2]),
         patch("rocky.views.health.get_bytes_health", return_value=mock_services[3]),
@@ -62,7 +64,7 @@ def test_global_health_endpoint_unhealthy_returns_503(rf, client_member):
         ServiceHealth(service="bytes", healthy=True),
     ]
     with (
-        patch("rocky.views.health.get_octopoes_organizations_health", return_value=mock_services[0]),
+        patch("rocky.views.health.get_octopoes_root_health", return_value=mock_services[0]),
         patch("rocky.views.health.get_katalogus_health", return_value=mock_services[1]),
         patch("rocky.views.health.get_scheduler_health", return_value=mock_services[2]),
         patch("rocky.views.health.get_bytes_health", return_value=mock_services[3]),
@@ -80,8 +82,7 @@ def test_global_health_endpoint_anonymous_via_url(db):
     """The endpoint is reachable anonymously through the real URL — pins routing, auth, and trailing slash (#4231)."""
     with (
         patch(
-            "rocky.views.health.get_octopoes_organizations_health",
-            return_value=ServiceHealth(service="octopoes", healthy=True),
+            "rocky.views.health.get_octopoes_root_health", return_value=ServiceHealth(service="octopoes", healthy=True)
         ),
         patch("rocky.views.health.get_katalogus_health", return_value=ServiceHealth(service="katalogus", healthy=True)),
         patch("rocky.views.health.get_scheduler_health", return_value=ServiceHealth(service="scheduler", healthy=True)),
@@ -94,14 +95,16 @@ def test_global_health_endpoint_anonymous_via_url(db):
     assert data["service"] == "rocky"
     assert data["healthy"] is True
     assert data["version"] is None
+    # Finding A: public endpoint must not leak additional/results that fingerprint
+    assert all(s["additional"] is None for s in data["results"])
+    assert all(s["results"] == [] for s in data["results"])
 
 
 def test_global_health_endpoint_trailing_slash(db):
     """Both /api/v1/health and /api/v1/health/ resolve — no 404 on the slashed form (#4231)."""
     with (
         patch(
-            "rocky.views.health.get_octopoes_organizations_health",
-            return_value=ServiceHealth(service="octopoes", healthy=True),
+            "rocky.views.health.get_octopoes_root_health", return_value=ServiceHealth(service="octopoes", healthy=True)
         ),
         patch("rocky.views.health.get_katalogus_health", return_value=ServiceHealth(service="katalogus", healthy=True)),
         patch("rocky.views.health.get_scheduler_health", return_value=ServiceHealth(service="scheduler", healthy=True)),
@@ -116,7 +119,7 @@ def test_global_health_endpoint_unhealthy_via_url(db):
     """The real URL returns 503 when Octopoes is down — pins finding #2 through routing (#4231)."""
     with (
         patch(
-            "rocky.views.health.get_octopoes_organizations_health",
+            "rocky.views.health.get_octopoes_root_health",
             return_value=ServiceHealth(service="octopoes", healthy=False, additional="down"),
         ),
         patch("rocky.views.health.get_katalogus_health", return_value=ServiceHealth(service="katalogus", healthy=True)),
@@ -138,7 +141,7 @@ def test_global_health_beautified(rf, superuser):
         ServiceHealth(service="bytes", healthy=True, version="1.0"),
     ]
     with (
-        patch("rocky.views.health.get_octopoes_organizations_health", return_value=mock_services[0]),
+        patch("rocky.views.health.get_octopoes_root_health", return_value=mock_services[0]),
         patch("rocky.views.health.get_katalogus_health", return_value=mock_services[1]),
         patch("rocky.views.health.get_scheduler_health", return_value=mock_services[2]),
         patch("rocky.views.health.get_bytes_health", return_value=mock_services[3]),
@@ -149,3 +152,11 @@ def test_global_health_beautified(rf, superuser):
 
     assert response.status_code == 200
     assert b"Health Checks" in response.content
+
+
+def test_global_health_beautified_denied_for_non_superuser(rf, client_member):
+    """The beautified page is superuser-only (#4231) — a plain member must not reach it."""
+    request = setup_request(rf.get("global_health_beautified"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        GlobalHealthChecks.as_view()(request)

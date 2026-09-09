@@ -39,8 +39,9 @@ class GlobalHealthView(APIView):
 
     Public endpoint: checks all backing services without requiring an
     organization context. Returns 503 when any service is unhealthy so load
-    balancers can take the instance out of rotation. Version numbers are
-    stripped from the response to avoid fingerprinting.
+    balancers can take the instance out of rotation. The response is redacted
+    to service + healthy only — no versions, additional, or per-org details
+    that could fingerprint the installation.
     """
 
     permission_classes = [AllowAny]
@@ -48,7 +49,7 @@ class GlobalHealthView(APIView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
         rocky_health = get_rocky_health_global()
-        _strip_versions(rocky_health)
+        _redact_for_public(rocky_health)
         http_status = status.HTTP_200_OK if rocky_health.healthy else status.HTTP_503_SERVICE_UNAVAILABLE
         return Response(rocky_health.model_dump(), status=http_status)
 
@@ -79,10 +80,18 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
     return _get_octopoes_health(octopoes_api_connector.health)
 
 
-def get_octopoes_organizations_health() -> ServiceHealth:
-    """Probe Octopoes via /health/organizations — actually checks XTDB per node (#4231)."""
+def get_octopoes_root_health() -> ServiceHealth:
+    """Probe Octopoes reachability via /health — thin verdict, no per-org XTDB probe (#4231).
+
+    Does not check per-organization XTDB health: an installation with hundreds of
+    orgs would otherwise drive hundreds of XTDB probes per request. The global
+    health page explains this thin verdict to operators.
+    """
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, "", timeout=settings.ROCKY_OUTGOING_REQUEST_TIMEOUT)
-    return _get_octopoes_health(connector.organizations_health)
+    health = _get_octopoes_health(connector.root_health)
+    if health.healthy:
+        health.additional = "Reachability check only — does not probe per-organization XTDB health."
+    return health
 
 
 def get_scheduler_health(organization_code: str | None = None) -> ServiceHealth:
@@ -118,16 +127,16 @@ def get_rocky_health(organization_code: str, octopoes_api_connector: OctopoesAPI
 
 
 def get_rocky_health_global() -> ServiceHealth:
-    return _aggregate(
-        [get_octopoes_organizations_health(), get_katalogus_health(), get_scheduler_health(), get_bytes_health()]
-    )
+    return _aggregate([get_octopoes_root_health(), get_katalogus_health(), get_scheduler_health(), get_bytes_health()])
 
 
-def _strip_versions(health_: ServiceHealth) -> None:
-    """Remove version numbers from a ServiceHealth tree (public endpoint anti-fingerprinting)."""
+def _redact_for_public(health_: ServiceHealth) -> None:
+    """Public endpoint: keep service + healthy, drop everything that fingerprints (#4231)."""
     health_.version = None
     for sub_result in health_.results:
-        _strip_versions(sub_result)
+        sub_result.version = None
+        sub_result.additional = None
+        sub_result.results = []
 
 
 def flatten_health(health_: ServiceHealth) -> list[ServiceHealth]:
