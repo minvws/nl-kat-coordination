@@ -17,7 +17,7 @@
                 <li>
                     <a href="{% url "health_beautified" organization_code=organization.code %}">{% translate "Health" %}</a>
                 </li>
-            {% else %}
+            {% elif request.user.is_authenticated %}
                 <li>
                     <a href="{% url "global_health_beautified" %}">{% translate "Health" %}</a>
                 </li>

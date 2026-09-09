@@ -63,6 +63,7 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("api/v1/", include(router.urls)),
     path("api/v1/health", GlobalHealthView.as_view(), name="global_health"),
+    path("api/v1/health/", GlobalHealthView.as_view()),
     path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
