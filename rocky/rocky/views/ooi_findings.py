@@ -1,4 +1,3 @@
-from urllib.parse import quote
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -26,7 +25,7 @@ class OOIFindingListView(OOIFindingManager, BaseOOIDetailView, TemplateView):
                 kwargs={
                     "organization_code": self.organization.code,
                     "temporal_context": self.temporal_context,
-                    "ooi": quote(self.ooi.primary_key, safe=""),
+                    "ooi": self.ooi.primary_key,
                 },
             ),
             "text": _("Object findings"),

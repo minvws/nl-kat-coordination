@@ -1,5 +1,4 @@
 from collections import Counter
-from urllib.parse import quote
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -38,7 +37,7 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
             kwargs={
                 "organization_code": self.organization.code,
                 "temporal_context": self.temporal_context,
-                "ooi": quote(self.ooi.primary_key, safe=""),
+                "ooi": self.ooi.primary_key,
                 "ooi_type": ooi_type,
             },
         )
@@ -50,7 +49,7 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
                 kwargs={
                     "organization_code": self.organization.code,
                     "temporal_context": self.temporal_context,
-                    "ooi": quote(self.ooi.primary_key, safe=""),
+                    "ooi": self.ooi.primary_key,
                 },
             )
 
