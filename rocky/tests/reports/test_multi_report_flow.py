@@ -121,7 +121,7 @@ def test_multi_report_report_types_selection(
     assert response.status_code == 307  # if all plugins are enabled the view will auto redirect to generate report
 
     # Redirect to export setup
-    assert response.headers["Location"] == "/en/test/reports/multi-report/export-setup/?"
+    assert response.headers["Location"] == "/en/test/now/reports/multi-report/export-setup/?"
 
 
 def test_save_multi_report(

@@ -56,7 +56,9 @@ def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     request = setup_request(rf.get("ooi_findings", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response = OOIFindingListView.as_view()(request, organization_code=client_member.organization.code)
+    response = OOIFindingListView.as_view()(
+        request, organization_code=client_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
+    )
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
@@ -100,9 +102,12 @@ def test_mute_finding_button_is_not_visible_without_perms(
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_mute_finding_form_view(request, member, rf, mock_organization_view_octopoes):
     member = request.getfixturevalue(member)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     response = MuteFindingView.as_view()(
         setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
         organization_code=member.organization.code,
+        temporal_context=None,
+        ooi="Finding|Network|testnetwork|KAT-000",
     )
 
     assert response.status_code == 200
