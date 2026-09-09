@@ -1,4 +1,5 @@
 from copy import deepcopy
+
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -94,7 +95,7 @@ class OOIGraphView(OOITreeView):
         # Only the graph template needs the hydrated fields (display_name, overlay_data,
         # graph_url), so build them on a dedicated, deep-copied tree. The shared `tree`
         # context used by the tree/summary tabs stays filter-only and unhydrated.
-        context["graph_tree"] = hydrate_tree(deepcopy(context["tree"]), self.organization.code)
+        context["graph_tree"] = hydrate_branch(deepcopy(context["tree"]), self.organization.code, self.temporal_context)
         return context
 
     def get_last_breadcrumb(self):
@@ -109,10 +110,6 @@ class OOIGraphView(OOITreeView):
             ),
             "text": _("Graph Visualisation"),
         }
-
-
-def hydrate_tree(tree: dict, organization_code: str, temporal_context) -> dict:
-    return hydrate_branch(tree, organization_code, temporal_context)
 
 
 def hydrate_branch(branch: dict, organization_code: str, temporal_context) -> dict:
