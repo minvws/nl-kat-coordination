@@ -130,7 +130,12 @@ class ScheduledReportsView(BreadcrumbsReportOverviewView, SchedulerView, ListVie
         else:
             messages.error(self.request, _("No schedule or recipe selected"))
 
-        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+        return redirect(
+            reverse(
+                "scheduled_reports",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

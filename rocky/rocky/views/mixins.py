@@ -523,11 +523,12 @@ class SingleOOIMixin(OctopoesView):
     ooi_id: str | None
 
     def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        # Not every route that uses this mixin carries an <ooi> segment (e.g. OOIAddView,
-        # MuteFindingsBulkView, onboarding). Fetch lazily via self.ooi; a missing id only matters
-        # for the views that actually read the OOI.
+        # Set ooi_id before super().setup() so it is available to mixins further down the chain
+        # that read self.ooi during their own setup (e.g. BaseReportView). Not every route that
+        # uses this mixin carries an <ooi> segment (OOIAddView, MuteFindingsBulkView, onboarding),
+        # so a missing id is None and only matters for the views that actually read the OOI.
         self.ooi_id = kwargs.get("ooi")
+        super().setup(request, *args, **kwargs)
 
     @cached_property
     def ooi(self):

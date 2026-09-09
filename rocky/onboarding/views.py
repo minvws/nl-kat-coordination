@@ -430,7 +430,12 @@ class OnboardingReportView(
                 "In the meantime get familiar with OpenKAT and visit the Reports History tab later."
             ),
         )
-        return redirect(reverse("report_history", kwargs={"organization_code": self.organization.code}))
+        return redirect(
+            reverse(
+                "report_history",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)

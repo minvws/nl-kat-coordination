@@ -536,7 +536,12 @@ class SaveReportView(BaseReportView, SchedulerView, FormView):
 
         self.create_report_schedule(report_recipe, start_datetime)
 
-        return redirect(reverse("scheduled_reports", kwargs={"organization_code": self.organization.code}))
+        return redirect(
+            reverse(
+                "scheduled_reports",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
 
 class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView, AddDashboardItemFormMixin):

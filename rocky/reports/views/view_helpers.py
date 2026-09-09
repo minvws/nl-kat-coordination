@@ -14,25 +14,25 @@ class GenerateReportStepsMixin(StepsMixin):
         steps = [
             {
                 "text": _("1: Select objects"),
-                "url": reverse_lazy("generate_report_select_oois", kwargs={"organization_code": self.organization.code})
+                "url": reverse_lazy("generate_report_select_oois", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context})
                 + selection,
             },
             {
                 "text": _("2: Choose report types"),
                 "url": reverse_lazy(
-                    "generate_report_select_report_types", kwargs={"organization_code": self.organization.code}
+                    "generate_report_select_report_types", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
             {
                 "text": _("3: Configuration"),
-                "url": reverse_lazy("generate_report_setup_scan", kwargs={"organization_code": self.organization.code})
+                "url": reverse_lazy("generate_report_setup_scan", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context})
                 + selection,
             },
             {
                 "text": _("4: Export setup"),
                 "url": reverse_lazy(
-                    "generate_report_export_setup", kwargs={"organization_code": self.organization.code}
+                    "generate_report_export_setup", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
@@ -49,26 +49,26 @@ class AggregateReportStepsMixin(StepsMixin):
             {
                 "text": _("1: Select objects"),
                 "url": reverse_lazy(
-                    "aggregate_report_select_oois", kwargs={"organization_code": self.organization.code}
+                    "aggregate_report_select_oois", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
             {
                 "text": _("2: Choose report types"),
                 "url": reverse_lazy(
-                    "aggregate_report_select_report_types", kwargs={"organization_code": self.organization.code}
+                    "aggregate_report_select_report_types", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
             {
                 "text": _("3: Configuration"),
-                "url": reverse_lazy("aggregate_report_setup_scan", kwargs={"organization_code": self.organization.code})
+                "url": reverse_lazy("aggregate_report_setup_scan", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context})
                 + selection,
             },
             {
                 "text": _("4: Export setup"),
                 "url": reverse_lazy(
-                    "aggregate_report_export_setup", kwargs={"organization_code": self.organization.code}
+                    "aggregate_report_export_setup", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
@@ -84,19 +84,19 @@ class MultiReportStepsMixin(StepsMixin):
         steps = [
             {
                 "text": _("1: Select objects"),
-                "url": reverse_lazy("multi_report_select_oois", kwargs={"organization_code": self.organization.code})
+                "url": reverse_lazy("multi_report_select_oois", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context})
                 + selection,
             },
             {
                 "text": _("2: Choose report types"),
                 "url": reverse_lazy(
-                    "multi_report_select_report_types", kwargs={"organization_code": self.organization.code}
+                    "multi_report_select_report_types", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
                 )
                 + selection,
             },
             {
                 "text": _("3: Export setup"),
-                "url": reverse_lazy("multi_report_export_setup", kwargs={"organization_code": self.organization.code})
+                "url": reverse_lazy("multi_report_export_setup", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context})
                 + selection,
             },
         ]
