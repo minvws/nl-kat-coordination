@@ -632,6 +632,8 @@ class SingleOOITreeMixin(SingleOOIMixin):
     ) -> OOI:
         if pk is None:
             pk = self.ooi_id
+        if pk is None:
+            raise Http404("No OOI provided in the URL")
 
         if observed_at is None:
             observed_at = self.observed_at
