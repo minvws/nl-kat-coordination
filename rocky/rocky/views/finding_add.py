@@ -56,7 +56,7 @@ class FindingAddView(BaseOOIFormView):
                     kwargs={
                         "organization_code": self.organization.code,
                         "temporal_context": self.temporal_context,
-                        "ooi": self.initial.get("ooi_id"),
+                        "ooi": self.ooi_id,
                     },
                 ),
                 "text": "Findings",
@@ -67,7 +67,7 @@ class FindingAddView(BaseOOIFormView):
                     kwargs={
                         "organization_code": self.organization.code,
                         "temporal_context": self.temporal_context,
-                        "ooi": self.initial.get("ooi_id"),
+                        "ooi": self.ooi_id,
                     },
                 ),
                 "text": _("Add finding"),

@@ -197,7 +197,10 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     form_class: type[BaseRockyForm] = OOIForm
 
     def get_ooi_class(self):
-        return self.ooi.__class__ if hasattr(self, "ooi") else None
+        # self.ooi is a cached_property that fetches from Octopoes, so guard on ooi_id
+        # rather than hasattr(self, "ooi") (which would trigger a fetch, and a connector
+        # error there is not an AttributeError so hasattr would not swallow it).
+        return self.ooi.__class__ if self.ooi_id is not None else None
 
     def get_form(self, form_class: type[Form] | None = None) -> BaseRockyForm:
         form = super().get_form(form_class)
@@ -239,7 +242,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         )
 
     def get_readonly_fields(self) -> list:
-        if not hasattr(self, "ooi"):
+        if self.ooi_id is None:
             return []
 
         return self.ooi._natural_key_attrs
