@@ -5,11 +5,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
-from tools.ooi_helpers import format_attr_name
+from tools.ooi_helpers import collect_software_instances, findings_on_software, format_attr_name
 from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.software import SoftwareInstance
 from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
 from rocky.views.mixins import SingleOOITreeMixin
 
@@ -89,10 +90,14 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
 
 
 class OOIFindingManager(SingleOOITreeMixin):
-    # A CVE is a property of a software version, so it is bound to the Software OOI rather than to
-    # the asset or its SoftwareInstance (#5321). Software is not traversable, so the object tree
-    # cannot reach those findings; walk asset -> SoftwareInstance -> Software -> Finding instead.
-    SOFTWARE_FINDINGS_PATH = "<ooi[is SoftwareInstance].software.<ooi[is Finding]"
+    # The detail page shows a two-deep tree, but software is bound to whatever the boefje observed
+    # -- an IPPort, IPService, IPAddress or HostnameHTTPURL -- so from a Hostname a SoftwareInstance
+    # sits up to four hops away. Fetch those separately, filtered to the one type we need.
+    SOFTWARE_TREE_DEPTH = 5
+
+    # That is a second graph call, so only the pages that are about findings pay for it. Every
+    # object detail page fetches its tree exactly once and should keep doing so.
+    include_software_findings = False
 
     def get_findings(self) -> list[Finding]:
         findings = self.get_direct_findings()
@@ -113,10 +118,23 @@ class OOIFindingManager(SingleOOITreeMixin):
     @cached_property
     def software_findings(self) -> list[Finding]:
         """Findings carried by the software this OOI runs, reached through its SoftwareInstances."""
-        path = f"{self.ooi.get_ooi_type()}.{self.SOFTWARE_FINDINGS_PATH}"
-        results = self.octopoes_api_connector.query(path, valid_time=self.observed_at, source=self.ooi.reference)
+        if not self.include_software_findings:
+            return []
 
-        return [ooi for ooi in results if isinstance(ooi, Finding)]
+        tree = self.octopoes_api_connector.get_tree(
+            self.ooi.reference, valid_time=self.observed_at, depth=self.SOFTWARE_TREE_DEPTH, types={SoftwareInstance}
+        )
+        software_instances = collect_software_instances(tree)
+
+        if not software_instances:
+            return []
+
+        return [
+            finding
+            for finding, _asset in findings_on_software(
+                self.octopoes_api_connector, software_instances, self.observed_at
+            )
+        ]
 
     def get_finding_types(self, findings: list[Finding]) -> dict[str, FindingType]:
         """Finding types by reference; the tree only holds the ones of the direct findings."""
