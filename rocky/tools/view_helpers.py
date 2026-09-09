@@ -138,7 +138,13 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
-                "url": reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy(
+                    "ooi_list",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "temporal_context": self.kwargs.get("temporal_context"),
+                    },
+                ),
                 "text": _("Objects"),
             }
         ]

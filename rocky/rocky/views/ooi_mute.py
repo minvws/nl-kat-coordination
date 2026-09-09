@@ -50,13 +50,29 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
 
         if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
-            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+            return redirect(
+                reverse(
+                    "finding_list",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "temporal_context": self.temporal_context,
+                    },
+                )
+            )
         if unmute:
             mutes_finding_refs = [MutedFinding(finding=finding).reference for finding in selected_findings]
             self.octopoes_api_connector.delete_many(mutes_finding_refs, datetime.now(timezone.utc))
 
             messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully unmuted."))
-            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+            return redirect(
+                reverse(
+                    "finding_list",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "temporal_context": self.temporal_context,
+                    },
+                )
+            )
         else:
             oois = [
                 self.ooi_class.model_validate({"finding": finding, "reason": reason}) for finding in selected_findings
@@ -67,4 +83,12 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             )
 
             messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
-            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+            return redirect(
+                reverse(
+                    "finding_list",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "temporal_context": self.temporal_context,
+                    },
+                )
+            )

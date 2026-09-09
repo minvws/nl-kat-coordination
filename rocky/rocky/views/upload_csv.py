@@ -65,14 +65,30 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             self.add_error_notification(CSV_ERRORS["no_org"])
 
     def get_success_url(self):
-        return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy(
+            "ooi_list",
+            kwargs={
+                "organization_code": self.organization.code,
+                "temporal_context": self.kwargs.get("temporal_context"),
+            },
+        )
 
     def get_context_data(self, **kwargs):
+        temporal_context = self.kwargs.get("temporal_context")
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
             {
-                "url": reverse("upload_csv", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "ooi_list",
+                    kwargs={"organization_code": self.organization.code, "temporal_context": temporal_context},
+                ),
+                "text": _("Objects"),
+            },
+            {
+                "url": reverse(
+                    "upload_csv",
+                    kwargs={"organization_code": self.organization.code, "temporal_context": temporal_context},
+                ),
                 "text": _("Upload CSV"),
             },
         ]
