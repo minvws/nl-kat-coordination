@@ -41,7 +41,7 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
     mocker.patch("account.mixins.OrganizationView.katalogus_client")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(rf.get("scan_profile_detail"), redteam_member.user)
     response = ScanProfileDetailView.as_view()(
         request, organization_code=redteam_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
     )
@@ -107,7 +107,7 @@ def test_scan_profile_no_permissions_acknowledged(
     redteam_member.acknowledged_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(rf.get("scan_profile_detail"), redteam_member.user)
     response = ScanProfileDetailView.as_view()(
         request, organization_code=redteam_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
     )
@@ -127,7 +127,7 @@ def test_scan_profile_no_permissions_trusted(
     redteam_member.trusted_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(rf.get("scan_profile_detail"), redteam_member.user)
     response = ScanProfileDetailView.as_view()(
         request, organization_code=redteam_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
     )

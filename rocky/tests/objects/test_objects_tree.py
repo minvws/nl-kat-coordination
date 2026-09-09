@@ -29,7 +29,7 @@ TREE_DATA = {
 def test_ooi_tree(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_tree", {"ooi_id": "Network|testnetwork", "view": "table"}), client_member.user)
+    request = setup_request(rf.get("ooi_tree", {"view": "table"}), client_member.user)
     kwargs = {
         "organization_code": client_member.organization.code,
         "temporal_context": "now",

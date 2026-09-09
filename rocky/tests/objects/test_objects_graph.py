@@ -35,7 +35,7 @@ def _url_kwargs(organization_code):
 def test_ooi_graph(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_graph", {"ooi_id": OOI_ID}), client_member.user)
+    request = setup_request(rf.get("ooi_graph"), client_member.user)
     request.resolver_match = resolve(unquote(reverse("ooi_graph", kwargs=_url_kwargs(client_member.organization.code))))
     response = OOIGraphView.as_view()(
         request, organization_code=client_member.organization.code, temporal_context=None, ooi=OOI_ID
@@ -59,7 +59,7 @@ def test_ooi_graph_tree_is_hydrated_with_display_name(rf, client_member, mock_or
     # and the d3 render crashes in truncateText(undefined).
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_graph", {"ooi_id": OOI_ID}), client_member.user)
+    request = setup_request(rf.get("ooi_graph"), client_member.user)
     request.resolver_match = resolve(unquote(reverse("ooi_graph", kwargs=_url_kwargs(client_member.organization.code))))
     response = OOIGraphView.as_view()(
         request, organization_code=client_member.organization.code, temporal_context=None, ooi=OOI_ID

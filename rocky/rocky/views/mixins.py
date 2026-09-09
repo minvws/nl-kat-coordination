@@ -638,7 +638,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
 
         # pk falls back to self.ooi_id (Optional); on the tree routes it is always present in
         # production, so treat it as the required str the reference expects.
-        ref = Reference.from_str(pk)  # type: ignore[arg-type]
+        ref = Reference.from_str(cast(str, pk))
         depth = depth or self.get_depth()
 
         try:

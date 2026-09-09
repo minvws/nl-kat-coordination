@@ -10,7 +10,7 @@ from tests.conftest import setup_request
 def test_ooi_edit(rf, client_member, mock_organization_view_octopoes, network):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(rf.get("ooi_edit", {"ooi_id": "Network|testnetwork"}), client_member.user)
+    request = setup_request(rf.get("ooi_edit"), client_member.user)
     response = OOIEditView.as_view()(
         request, organization_code=client_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
     )
@@ -24,7 +24,7 @@ def test_ooi_edit_report_recipe_get(rf, client_member, mock_organization_view_oc
     mock_organization_view_octopoes().get.return_value = report_recipe
     ooi_id = f"ReportRecipe|{report_recipe.recipe_id}"
 
-    request = setup_request(rf.get("ooi_edit", {"ooi_id": ooi_id}), client_member.user)
+    request = setup_request(rf.get("ooi_edit"), client_member.user)
     response = OOIEditView.as_view()(
         request, organization_code=client_member.organization.code, temporal_context=None, ooi=ooi_id
     )
