@@ -150,7 +150,12 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView, OctopoesView, AddDashboardI
             messages.SUCCESS,
             _("Successfully set scan profile to %s for %d OOIs.") % (level.name, len(selected_oois)),
         )
-        return redirect(self.self.breadcrumbs[0]["url"])
+        return redirect(
+            reverse(
+                "ooi_list",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
     def _set_oois_to_inherit(
         self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any
@@ -175,7 +180,12 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView, OctopoesView, AddDashboardI
         messages.add_message(
             request, messages.SUCCESS, _("Successfully set %d OOI(s) clearance level to inherit.") % len(selected_oois)
         )
-        return redirect(self.self.breadcrumbs[0]["url"])
+        return redirect(
+            reverse(
+                "ooi_list",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
     def _delete_oois(self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         connector = self.octopoes_api_connector
@@ -198,7 +208,12 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView, OctopoesView, AddDashboardI
             _("Successfully deleted %d ooi(s). Note: Bits can recreate objects automatically.") % len(selected_oois),
         )
 
-        return redirect(self.self.breadcrumbs[0]["url"])
+        return redirect(
+            reverse(
+                "ooi_list",
+                kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+            )
+        )
 
 
 class OOIListExportView(BaseOOIListView):

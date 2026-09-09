@@ -5,7 +5,7 @@ from typing import Any
 from account.models import KATUser
 from django import template
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI, Reference, ScanLevel
@@ -29,17 +29,21 @@ def app_url(context, viewname, *args, **kwargs):
         if organization is not None:
             kwargs.setdefault("organization_code", organization.code)
 
-    temporal_context = context.get("temporal_context")
-    if "temporal_context" in kwargs:
-        if kwargs["temporal_context"] is None:
-            # explicit removal requested
-            del kwargs["temporal_context"]
-    elif temporal_context is not None:
-        kwargs.setdefault("temporal_context", temporal_context)
+    # Default the temporal context to the current one. None is a valid value: the converter
+    # renders it as "now", which is the required segment for the present. An explicit
+    # temporal_context in kwargs (including None) overrides the context value.
+    kwargs.setdefault("temporal_context", context.get("temporal_context"))
 
     if "ooi" in kwargs and not isinstance(kwargs["ooi"], str):
         kwargs["ooi"] = str(kwargs["ooi"])
-    return reverse(viewname, args=args, kwargs=kwargs)
+
+    try:
+        return reverse(viewname, args=args, kwargs=kwargs)
+    except NoReverseMatch:
+        # This tag is also used for routes without a <temporal_context> segment; those reject
+        # the extra kwarg, so retry without it.
+        kwargs.pop("temporal_context", None)
+        return reverse(viewname, args=args, kwargs=kwargs)
 
 
 def parse_observed_at(observed_at):
