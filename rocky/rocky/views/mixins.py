@@ -600,7 +600,10 @@ class SingleOOIMixin(OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["ooi_id"] = self.ooi_id
-        context["ooi"] = self.ooi
+        # Only fetch the OOI for routes that actually carry one; ooi-less views that reuse this
+        # mixin (OOIAddView, MuteFindingsBulkView, onboarding) would otherwise fetch OOI "None".
+        if self.ooi_id is not None:
+            context["ooi"] = self.ooi
         return context
 
 
