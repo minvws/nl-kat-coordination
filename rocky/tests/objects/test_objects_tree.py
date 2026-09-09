@@ -1,5 +1,7 @@
 from unittest.mock import ANY, call
 
+from urllib.parse import unquote
+
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 
@@ -29,8 +31,15 @@ def test_ooi_tree(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     request = setup_request(rf.get("ooi_tree", {"ooi_id": "Network|testnetwork", "view": "table"}), client_member.user)
-    request.resolver_match = resolve(reverse("ooi_tree", kwargs={"organization_code": client_member.organization.code}))
-    response = OOITreeView.as_view()(request, organization_code=client_member.organization.code)
+    kwargs = {
+        "organization_code": client_member.organization.code,
+        "temporal_context": "now",
+        "ooi": "Network|testnetwork",
+    }
+    request.resolver_match = resolve(unquote(reverse("ooi_tree", kwargs=kwargs)))
+    response = OOITreeView.as_view()(
+        request, organization_code=client_member.organization.code, temporal_context=None, ooi="Network|testnetwork"
+    )
 
     assert response.status_code == 200
     mock_organization_view_octopoes().get_tree.assert_has_calls(
