@@ -98,9 +98,7 @@ def test_report_history_more_than_five_asset_reports_one_input_object(
     parent_report = report_list_six_asset_reports[0]
     assertContains(response, parent_report.name)
     assertContains(
-        response,
-        '<a href="/en/test/now/objects/Hostname%7Cinternet%7Cexample.com">example.com</a>',
-        html=True,
+        response, '<a href="/en/test/now/objects/Hostname%7Cinternet%7Cexample.com">example.com</a>', html=True
     )
     assertContains(response, "Close asset report object details")
 

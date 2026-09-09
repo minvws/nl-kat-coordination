@@ -146,6 +146,8 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin):
         """
         if not self.is_historic_view:
             return self.ooi
+        if self.ooi_id is None:
+            return None
         try:
             return self.get_single_ooi(self.ooi_id, observed_at=datetime.now(timezone.utc))
         except Http404:

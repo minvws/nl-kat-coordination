@@ -134,6 +134,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
 
 class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
+    kwargs: dict[str, Any]
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [

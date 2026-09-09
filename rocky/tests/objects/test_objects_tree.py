@@ -1,5 +1,4 @@
 from unittest.mock import ANY, call
-
 from urllib.parse import unquote
 
 from django.urls import resolve, reverse

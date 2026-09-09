@@ -53,10 +53,7 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             return redirect(
                 reverse(
                     "finding_list",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "temporal_context": self.temporal_context,
-                    },
+                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
                 )
             )
         if unmute:
@@ -67,10 +64,7 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             return redirect(
                 reverse(
                     "finding_list",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "temporal_context": self.temporal_context,
-                    },
+                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
                 )
             )
         else:
@@ -86,9 +80,6 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             return redirect(
                 reverse(
                     "finding_list",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "temporal_context": self.temporal_context,
-                    },
+                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
                 )
             )

@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from django.urls import resolve, reverse
+from tools.urlconverters import TemporalContextConverter
 
 from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
@@ -8,7 +9,6 @@ from octopoes.models.types import OOIType
 from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_list import OOIListView
 from tests.conftest import setup_request
-from tools.urlconverters import TemporalContextConverter
 
 
 def test_observed_at_defaults_to_now(mocker):

@@ -386,7 +386,9 @@ def test_step_9a_onboarding_ooi_detail_scan_create_report_schedule(
     )
 
     response = OnboardingCreateReportRecipe.as_view()(
-        setup_request(rf.post(request_url), member.user), organization_code=member.organization.code, ooi=url.primary_key
+        setup_request(rf.post(request_url), member.user),
+        organization_code=member.organization.code,
+        ooi=url.primary_key,
     )
 
     assert response.status_code == 302

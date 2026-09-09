@@ -533,12 +533,16 @@ class SingleOOIMixin(OctopoesView):
     @cached_property
     def ooi(self):
         """Property of the OOI as requested in the url"""
+        if self.ooi_id is None:
+            raise Http404("No OOI provided in the URL")
         return self.get_single_ooi(self.ooi_id)
 
     def get_ooi(self, pk: str | None = None) -> OOI:
         """Helper method to fetch a single OOI by its PK"""
         if pk is None:
             pk = self.ooi_id
+        if pk is None:
+            raise Http404("No OOI provided in the URL")
 
         return self.get_single_ooi(pk)
 
