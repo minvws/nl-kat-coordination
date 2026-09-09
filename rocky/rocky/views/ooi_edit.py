@@ -53,12 +53,9 @@ class OOIEditView(BaseOOIFormView, SchedulerView):
 
         return super().form_valid(form)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Construct breadcrumbs
-        breadcrumb_list = self.get_breadcrumb_list()
-        breadcrumb_list.append(
+    def build_breadcrumbs(self):
+        return [
+            *super().build_breadcrumbs(),
             {
                 "url": reverse_lazy(
                     "ooi_edit",
@@ -69,11 +66,13 @@ class OOIEditView(BaseOOIFormView, SchedulerView):
                     },
                 ),
                 "text": _("Edit"),
-            }
-        )
+            },
+        ]
 
-        context["type"] = self.get_ooi_class().get_ooi_type()
-        context["ooi_human_readable"] = self.ooi.human_readable
-        context["breadcrumbs"] = breadcrumb_list
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["type"] = self.ooi_type
+        context["breadcrumbs"] = self.build_breadcrumbs()
 
         return context

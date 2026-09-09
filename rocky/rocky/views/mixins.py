@@ -546,37 +546,29 @@ class SingleOOIMixin(OctopoesView):
 
         return self.get_single_ooi(pk)
 
-    def get_breadcrumb_list(self):
+    @property
+    def ooi_type(self) -> str:
+        """The object type of the OOI this view operates on."""
+        return self.ooi.get_ooi_type()
+
+    def build_breadcrumbs(self):
+        """Breadcrumbs up to and including the OOI itself; subclasses append their own leaf."""
+        if self.ooi_id is None:
+            # Views that reuse this mixin on a route without an <ooi> segment (onboarding, the
+            # report views) have no OOI to point at; let the breadcrumb builder they mix in
+            # next take over.
+            return super().build_breadcrumbs()
+
+        kwargs = {"organization_code": self.organization.code, "temporal_context": self.temporal_context}
+
         if isinstance(self.ooi, Finding):
-            start = {
-                "url": reverse(
-                    "finding_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
-                ),
-                "text": "Findings",
-            }
+            list_route, list_text = "finding_list", _("Findings")
         else:
-            start = {
-                "url": reverse(
-                    "ooi_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
-                ),
-                "text": "Objects",
-            }
+            list_route, list_text = "ooi_list", _("Objects")
 
         return [
-            start,
-            {
-                "url": reverse(
-                    "ooi_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "temporal_context": self.temporal_context,
-                        "ooi": self.ooi,
-                    },
-                ),
-                "text": self.ooi.human_readable,
-            },
+            {"url": reverse(list_route, kwargs=kwargs), "text": list_text},
+            {"url": reverse("ooi_detail", kwargs={**kwargs, "ooi": self.ooi}), "text": self.ooi.human_readable},
         ]
 
     def get_ooi_properties(self, ooi: OOI) -> dict:

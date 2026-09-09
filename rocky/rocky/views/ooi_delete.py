@@ -26,12 +26,9 @@ class OOIDeleteView(OrganizationPermissionRequiredMixin, SingleOOIMixin, Templat
             "ooi_list", kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context}
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Construct breadcrumbs
-        breadcrumb_list = self.get_breadcrumb_list()
-        breadcrumb_list.append(
+    def build_breadcrumbs(self):
+        return [
+            *super().build_breadcrumbs(),
             {
                 "url": reverse_lazy(
                     "ooi_delete",
@@ -42,10 +39,13 @@ class OOIDeleteView(OrganizationPermissionRequiredMixin, SingleOOIMixin, Templat
                     },
                 ),
                 "text": _("Delete"),
-            }
-        )
+            },
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
         context["props"] = self.ooi.model_dump()
-        context["breadcrumbs"] = breadcrumb_list
+        context["breadcrumbs"] = self.build_breadcrumbs()
 
         return context

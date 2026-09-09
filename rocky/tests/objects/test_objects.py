@@ -17,9 +17,14 @@ from rocky.views.ooi_list import OOIListExportView, OOIListView
 from tests.conftest import setup_request
 
 
-def test_ooi_list(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+@pytest.fixture
+def url_kwargs(client_member):
+    """Reverse kwargs shared by the temporal object routes."""
+    return {"organization_code": client_member.organization.code, "temporal_context": "now"}
+
+
+def test_ooi_list(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
     request = rf.get(url)
     request.resolver_match = resolve(url)
 
@@ -37,10 +42,9 @@ def test_ooi_list(rf, client_member, mock_organization_view_octopoes):
 
 
 def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
-    rf, client_member, mock_organization_view_octopoes
+    rf, client_member, mock_organization_view_octopoes, url_kwargs
 ):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+    url = reverse("ooi_list", kwargs=url_kwargs)
     request = rf.get(url, {"clearance_level": [0, 1], "clearance_type": ["declared", "inherited"]})
     request.resolver_match = resolve(url)
 
@@ -64,9 +68,8 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
     assertContains(response, "Showing 150 of 200 objects")
 
 
-def test_ooi_list_search(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_ooi_list_search(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
     request = rf.get(url, {"search": "testnetwork"})
     request.resolver_match = resolve(url)
 
@@ -88,9 +91,8 @@ def test_ooi_list_search(rf, client_member, mock_organization_view_octopoes):
     assertContains(response, "Showing 2 of 2 objects")
 
 
-def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
     client_member.trusted_clearance_level = 0
     client_member.acknowledged_clearance_level = 0
     client_member.save()
@@ -106,9 +108,8 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
     assert mock_organization_view_octopoes().delete_many.call_count == 1
 
 
-def test_ooi_list_delete_none(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_ooi_list_delete_none(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(url, data={"ooi": [], "scan-profile": "L0", "action": "delete"})
     setup_request(request, client_member.user)
@@ -120,9 +121,8 @@ def test_ooi_list_delete_none(rf, client_member, mock_organization_view_octopoes
     assert response.status_code == 422
 
 
-def test_ooi_list_unknown_action(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_ooi_list_unknown_action(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(url, data={"ooi": ["Network|internet"], "scan-profile": "L0", "action": "None"})
     setup_request(request, client_member.user)
@@ -134,9 +134,8 @@ def test_ooi_list_unknown_action(rf, client_member, mock_organization_view_octop
     assert response.status_code == 404
 
 
-def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
     client_member.trusted_clearance_level = 1
     client_member.acknowledged_clearance_level = 1
     client_member.save()
@@ -156,9 +155,8 @@ def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
-def test_update_scan_profile_single(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_update_scan_profile_single(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
     client_member.trusted_clearance_level = 4
     client_member.acknowledged_clearance_level = 4
     client_member.save()
@@ -180,9 +178,8 @@ def test_update_scan_profile_single(rf, client_member, mock_organization_view_oc
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
-def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(
         url,
@@ -195,10 +192,11 @@ def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_vie
     assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
-def test_update_scan_profile_to_inherit_connection_error(rf, client_member, mock_organization_view_octopoes):
+def test_update_scan_profile_to_inherit_connection_error(
+    rf, client_member, mock_organization_view_octopoes, url_kwargs
+):
     mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ConnectionError
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(
         url,
@@ -210,10 +208,11 @@ def test_update_scan_profile_to_inherit_connection_error(rf, client_member, mock
     assert response.status_code == 500
 
 
-def test_update_scan_profile_to_inherit_object_not_found(rf, client_member, mock_organization_view_octopoes):
+def test_update_scan_profile_to_inherit_object_not_found(
+    rf, client_member, mock_organization_view_octopoes, url_kwargs
+):
     mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ObjectNotFoundException("nothing found")
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(
         url,
@@ -225,9 +224,8 @@ def test_update_scan_profile_to_inherit_object_not_found(rf, client_member, mock
     assert response.status_code == 404
 
 
-def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(
         url,
@@ -255,9 +253,8 @@ def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_org
     )
 
 
-def test_update_scan_profiles_forbidden_trusted(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list", kwargs=kwargs)
+def test_update_scan_profiles_forbidden_trusted(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list", kwargs=url_kwargs)
 
     request = rf.post(
         url,
@@ -384,9 +381,8 @@ def test_delete_object_not_found(rf, client_member, mock_organization_view_octop
     assert response.status_code == 404
 
 
-def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list_export", kwargs=kwargs)
+def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list_export", kwargs=url_kwargs)
     request = rf.get(url, {"file_type": "json"})
     request.resolver_match = resolve(url)
 
@@ -411,9 +407,8 @@ def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes
     assert exported_objects[2] == {"key": "Network|testnetwork", "name": "testnetwork", "ooi_type": "Network"}
 
 
-def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list_export", kwargs=kwargs)
+def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list_export", kwargs=url_kwargs)
     request = rf.get(url, {"file_type": "csv"})
     request.resolver_match = resolve(url)
 
@@ -436,9 +431,8 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
     assert "filters" in exported_objects[0]
 
 
-def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_octopoes):
-    kwargs = {"organization_code": client_member.organization.code, "temporal_context": "now"}
-    url = reverse("ooi_list_export", kwargs=kwargs)
+def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    url = reverse("ooi_list_export", kwargs=url_kwargs)
     request = rf.get(
         url, {"file_type": "csv", "ooi_type": "Network", "clearance_type": "inherited", "clearance_level": 3}
     )

@@ -48,38 +48,25 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
         else:
             end_valid_time = None
 
+        finding_list_url = reverse(
+            "finding_list",
+            kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
+        )
+
         if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
-            return redirect(
-                reverse(
-                    "finding_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
-                )
-            )
+            return redirect(finding_list_url)
+
         if unmute:
             mutes_finding_refs = [MutedFinding(finding=finding).reference for finding in selected_findings]
             self.octopoes_api_connector.delete_many(mutes_finding_refs, datetime.now(timezone.utc))
 
             messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully unmuted."))
-            return redirect(
-                reverse(
-                    "finding_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
-                )
-            )
-        else:
-            oois = [
-                self.ooi_class.model_validate({"finding": finding, "reason": reason}) for finding in selected_findings
-            ]
+            return redirect(finding_list_url)
 
-            create_oois(
-                self.octopoes_api_connector, self.bytes_client, oois, datetime.now(timezone.utc), end_valid_time
-            )
+        oois = [self.ooi_class.model_validate({"finding": finding, "reason": reason}) for finding in selected_findings]
 
-            messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
-            return redirect(
-                reverse(
-                    "finding_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": self.temporal_context},
-                )
-            )
+        create_oois(self.octopoes_api_connector, self.bytes_client, oois, datetime.now(timezone.utc), end_valid_time)
+
+        messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
+        return redirect(finding_list_url)

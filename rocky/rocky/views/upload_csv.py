@@ -8,13 +8,13 @@ from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from httpx import HTTPError
 from pydantic import ValidationError
 from tools.forms.upload_csv import CSV_ERRORS
 from tools.forms.upload_oois import UploadOOICSVForm
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.api.models import Declaration
 from octopoes.models import OOI, Reference
@@ -45,7 +45,7 @@ CSV_CRITERIA = [
 CLEARANCE_VALUES = ["0", "1", "2", "3", "4"]
 
 
-class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class UploadCSV(OrganizationPermissionRequiredMixin, BreadcrumbsMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadOOICSVForm
     permission_required = "tools.can_scan_organization"
@@ -64,34 +64,18 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         if not self.organization:
             self.add_error_notification(CSV_ERRORS["no_org"])
 
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
+        kwargs = {"organization_code": self.organization.code, "temporal_context": self.kwargs.get("temporal_context")}
+        return [
+            {"url": reverse("ooi_list", kwargs=kwargs), "text": _("Objects")},
+            {"url": reverse("upload_csv", kwargs=kwargs), "text": _("Upload CSV")},
+        ]
+
     def get_success_url(self):
-        return reverse_lazy(
-            "ooi_list",
-            kwargs={
-                "organization_code": self.organization.code,
-                "temporal_context": self.kwargs.get("temporal_context"),
-            },
-        )
+        return self.build_breadcrumbs()[0]["url"]
 
     def get_context_data(self, **kwargs):
-        temporal_context = self.kwargs.get("temporal_context")
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {
-                "url": reverse(
-                    "ooi_list",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": temporal_context},
-                ),
-                "text": _("Objects"),
-            },
-            {
-                "url": reverse(
-                    "upload_csv",
-                    kwargs={"organization_code": self.organization.code, "temporal_context": temporal_context},
-                ),
-                "text": _("Upload CSV"),
-            },
-        ]
         context["criteria"] = CSV_CRITERIA
         return context
 
@@ -149,11 +133,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
     def form_valid(self, form):
         if not self.process_csv(form):
-            return redirect(
-                "upload_csv",
-                organization_code=self.organization.code,
-                temporal_context=self.kwargs.get("temporal_context"),
-            )
+            return redirect(self.build_breadcrumbs()[1]["url"])
         return super().form_valid(form)
 
     def add_error_notification(self, error_message):
