@@ -5,7 +5,7 @@
     {% csrf_token %}
     <fieldset class="indented">
         <input type="hidden" name="action" value="submit_answer">
-        <textarea name="schema" class="JsonSchemaForm">
+        <textarea name="schema" class="JsonSchemaForm"{% if original_config %} data-original="{{ original_config }}"{% endif %}>
       {{ json_schema }}
     </textarea>
         <legend>{% translate "Fill out this form to answer the Question (again):" %}</legend>
