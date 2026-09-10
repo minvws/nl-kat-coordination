@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -50,7 +49,7 @@ class ScanProfileDetailView(FormView, OOIDetailView):
             super().post(request, *args, **kwargs)
             if clearance_type == ScanProfileType.INHERITED.value:
                 self.octopoes_api_connector.save_scan_profile(
-                    EmptyScanProfile(reference=self.ooi.reference), valid_time=datetime.now(timezone.utc), sync=True
+                    EmptyScanProfile(reference=self.ooi.reference), valid_time=self.observed_at, sync=True
                 )
                 logger.info("Scan profiles set to empty", event_code="800011", ooi=self.ooi.reference)
         except (ValueError, KeyError):

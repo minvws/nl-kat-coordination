@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+from datetime import datetime, timezone
 
 import pytest
 from django.urls import resolve, reverse
@@ -489,3 +490,63 @@ def test_delete_perms_object_list_clients(rf, client_member, mock_organization_v
     assert response.status_code == 200
 
     assertNotContains(response, "Delete")
+
+
+HISTORIC_MOMENT = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+
+
+def test_set_clearance_level_at_the_viewed_time(rf, client_member, mock_organization_view_octopoes, url_kwargs):
+    """Setting a clearance level while viewing the past records it at that moment (#5227).
+
+    Both the transaction time and the valid time are kept, so a boefje run after the fact is
+    still explainable -- see underdarknl on the PR.
+    """
+    client_member.trusted_clearance_level = 4
+    client_member.acknowledged_clearance_level = 4
+    client_member.save()
+
+    request = rf.post(
+        reverse("ooi_list", kwargs=url_kwargs),
+        data={"ooi": ["Network|internet"], "clearance_type": "declared", "level": "1", "action": "update-scan-profile"},
+    )
+    setup_request(request, client_member.user)
+    response = OOIListView.as_view()(
+        request, organization_code=client_member.organization.code, temporal_context=HISTORIC_MOMENT
+    )
+
+    assert response.status_code == 302
+    assert mock_organization_view_octopoes().save_many_scan_profiles.call_args.args[1] == HISTORIC_MOMENT
+
+
+def test_set_clearance_level_to_inherit_at_the_viewed_time(
+    rf, client_member, mock_organization_view_octopoes, url_kwargs
+):
+    """Resetting a clearance level to inherited follows the viewed time as well."""
+    client_member.trusted_clearance_level = 4
+    client_member.acknowledged_clearance_level = 4
+    client_member.save()
+
+    request = rf.post(
+        reverse("ooi_list", kwargs=url_kwargs),
+        data={"ooi": ["Network|internet"], "clearance_type": "inherited", "action": "update-scan-profile"},
+    )
+    setup_request(request, client_member.user)
+    response = OOIListView.as_view()(
+        request, organization_code=client_member.organization.code, temporal_context=HISTORIC_MOMENT
+    )
+
+    assert response.status_code == 302
+    assert mock_organization_view_octopoes().save_many_scan_profiles.call_args.kwargs["valid_time"] == HISTORIC_MOMENT
+
+
+def test_delete_oois_at_the_viewed_time(rf, redteam_member, mock_organization_view_octopoes):
+    """Deleting objects in bulk deletes them at the viewed moment, like the single delete does."""
+    url_kwargs = {"organization_code": redteam_member.organization.code, "temporal_context": "now"}
+    request = rf.post(reverse("ooi_list", kwargs=url_kwargs), data={"ooi": ["Network|internet"], "action": "delete"})
+    setup_request(request, redteam_member.user)
+    response = OOIListView.as_view()(
+        request, organization_code=redteam_member.organization.code, temporal_context=HISTORIC_MOMENT
+    )
+
+    assert response.status_code == 302
+    assert mock_organization_view_octopoes().delete_many.call_args.args[1] == HISTORIC_MOMENT

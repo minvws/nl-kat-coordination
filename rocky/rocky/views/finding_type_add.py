@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from uuid import uuid4
 
 from account.mixins import OrganizationView
@@ -12,9 +11,10 @@ from tools.models import OOIInformation
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.findings import KATFindingType
 from rocky.bytes_client import BytesClient
+from rocky.views.mixins import ObservedAtMixin
 
 
-class FindingTypeAddView(OrganizationView, FormView):
+class FindingTypeAddView(ObservedAtMixin, OrganizationView, FormView):
     template_name = "finding_type_add.html"
     form_class = FindingTypeAddForm
 
@@ -61,7 +61,7 @@ class FindingTypeAddView(OrganizationView, FormView):
         info.save()
 
         task_id = uuid4()
-        declaration = Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+        declaration = Declaration(ooi=finding_type, valid_time=self.observed_at, task_id=str(task_id))
 
         self.bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
         self.api_connector.save_declaration(declaration, sync=True)

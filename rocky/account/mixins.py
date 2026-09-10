@@ -170,7 +170,7 @@ class OrganizationView(ContextMixin, View):
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_scan_profile(
             DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level), user_id=self.request.user.id),
-            datetime.now(timezone.utc),
+            self.observed_at,
             sync=True,
         )
         logger.info("Declared scan profile created", event_code="800010", ooi=ooi_reference, level=level)
@@ -184,7 +184,7 @@ class OrganizationView(ContextMixin, View):
                 DeclaredScanProfile(reference=reference, level=ScanLevel(level), user_id=self.request.user.id)
                 for reference in ooi_references
             ],
-            datetime.now(timezone.utc),
+            self.observed_at,
             sync=True,
         )
         logger.info("Declared scan profiles created", event_code="800010", ooi_count=len(ooi_references), level=level)

@@ -1,6 +1,5 @@
 import csv
 import json
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
@@ -158,7 +157,7 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView, OctopoesView, AddDashboardI
         scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
 
         try:
-            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
+            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=self.observed_at)
         except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(
                 request, messages.ERROR, _("An error occurred while setting clearance levels to inherit.")
@@ -179,7 +178,7 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView, OctopoesView, AddDashboardI
 
     def _delete_oois(self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         connector = self.octopoes_api_connector
-        valid_time = datetime.now(timezone.utc)
+        valid_time = self.observed_at
 
         try:
             connector.delete_many([Reference.from_str(ooi) for ooi in selected_oois], valid_time)

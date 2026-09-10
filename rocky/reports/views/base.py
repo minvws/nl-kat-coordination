@@ -304,7 +304,7 @@ class BaseReportView(OOIFilterView, ReportBreadcrumbs):
             api_connector=self.octopoes_api_connector,
             bytes_client=self.bytes_client,
             ooi=report_recipe,
-            observed_at=datetime.now(timezone.utc),
+            observed_at=self.observed_at,
         )
         logger.info("ReportRecipe created", event_code=800091, report_recipe=report_recipe)
         return report_recipe
