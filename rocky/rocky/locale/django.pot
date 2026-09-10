@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-19 13:43+0000\n"
+"POT-Creation-Date: 2026-09-10 09:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4163,7 +4163,8 @@ msgid "Low"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Pending"
 msgstr ""
 
@@ -4940,27 +4941,33 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Cancelled"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Completed"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Dispatched"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Failed"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Queued"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Running"
 msgstr ""
 
@@ -5832,7 +5839,7 @@ msgstr ""
 #: rocky/templates/oois/ooi_add_type_select.html
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
-#: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
+#: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add object"
 msgstr ""
 
@@ -7604,6 +7611,13 @@ msgstr ""
 #: rocky/views/organization_member_superuser.py
 #, python-format
 msgid "%(email)s is inactive and cannot be granted superuser access."
+msgstr ""
+
+#: rocky/views/organization_member_superuser.py
+#, python-format
+msgid ""
+"%(email)s is blocked in this organization and cannot be granted superuser "
+"access."
 msgstr ""
 
 #: rocky/views/organization_member_superuser.py

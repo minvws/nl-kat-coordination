@@ -330,6 +330,24 @@ def test_inactive_user_cannot_be_granted_superuser_access(rf, superuser_member, 
     ]
 
 
+def test_blocked_member_cannot_be_granted_superuser_access(rf, superuser_member, admin_member):
+    admin_member.blocked = True
+    admin_member.save(update_fields=["blocked"])
+    request = setup_request(rf.post("organization_member_grant_superuser"), superuser_member.user)
+
+    response = GrantSuperuserAccessView.as_view()(
+        request, organization_code=admin_member.organization.code, pk=admin_member.id
+    )
+
+    assert response.status_code == 302
+    admin_member.user.refresh_from_db()
+    assert admin_member.user.is_superuser is False
+    assert admin_member.user.is_staff is False
+    assert [str(message) for message in get_messages(request)] == [
+        f"{admin_member.user.email} is blocked in this organization and cannot be granted superuser access."
+    ]
+
+
 def test_grant_superuser_access_requires_csrf(superuser_member, client_member):
     superuser_member.onboarded = True
     superuser_member.save(update_fields=["onboarded"])
@@ -416,6 +434,25 @@ def test_superuser_can_revoke_superuser_access(
     assert audit_log["is_superuser"] is False
     assert audit_log["is_staff"] is False
     assert audit_log["changed_at"]
+
+
+def test_revoke_preserves_independently_set_staff_access(
+    rf, superuser_member, superuser_member_b, django_capture_on_commit_callbacks
+):
+    """Revoke only clears is_superuser — is_staff set independently via Django
+    admin must survive the revoke (hasecon round-2, finding 2)."""
+    superuser_member_b.user.is_staff = True
+    superuser_member_b.user.save(update_fields=["is_staff"])
+    request = setup_request(rf.post("organization_member_revoke_superuser"), superuser_member.user)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        RevokeSuperuserAccessView.as_view()(
+            request, organization_code=superuser_member_b.organization.code, pk=superuser_member_b.id
+        )
+
+    superuser_member_b.user.refresh_from_db()
+    assert superuser_member_b.user.is_superuser is False
+    assert superuser_member_b.user.is_staff is True
 
 
 def test_revoke_superuser_access_does_not_log_a_rolled_back_change(

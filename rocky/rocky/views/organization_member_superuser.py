@@ -86,6 +86,14 @@ class GrantSuperuserAccessView(SuperuserAccessView):
                 )
                 return HttpResponseRedirect(self.get_success_url())
 
+            if target_member.blocked:
+                messages.warning(
+                    request,
+                    _("%(email)s is blocked in this organization and cannot be granted superuser access.")
+                    % {"email": target_user.email},
+                )
+                return HttpResponseRedirect(self.get_success_url())
+
             if previous_is_superuser and previous_is_staff:
                 messages.warning(request, _("%(email)s already has superuser access.") % {"email": target_user.email})
                 return HttpResponseRedirect(self.get_success_url())
@@ -162,8 +170,7 @@ class RevokeSuperuserAccessView(SuperuserAccessView):
                 return HttpResponseRedirect(self.get_success_url())
 
             target_user.is_superuser = False
-            target_user.is_staff = False
-            target_user.save(update_fields=["is_superuser", "is_staff"])
+            target_user.save(update_fields=["is_superuser"])
 
             audit_event = {
                 "event_code": SUPERUSER_ACCESS_REVOKED_EVENT_CODE,
@@ -180,4 +187,6 @@ class RevokeSuperuserAccessView(SuperuserAccessView):
             transaction.on_commit(lambda: logger.info("Superuser access revoked", **audit_event))
 
         messages.success(request, _("Superuser access revoked from %(email)s.") % {"email": target_user.email})
+        if target_user.pk == request.user.pk:
+            return HttpResponseRedirect(reverse("crisis_room"))
         return HttpResponseRedirect(self.get_success_url())
