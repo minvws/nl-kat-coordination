@@ -4,7 +4,9 @@ import zipfile
 import pytest
 from django.http import Http404
 from django.utils.translation import override
+from katalogus.client import Boefje
 from pytest_django.asserts import assertContains, assertNotContains
+from tools.enums import SCAN_LEVEL
 
 from rocky.scheduler import SchedulerTooManyRequestError
 from rocky.views.bytes_raw import BytesRawView
@@ -136,10 +138,25 @@ def test_download_task_no_raw(rf, client_member, mock_bytes_client, bytes_raw_me
     assert list(request._messages)[0].message == "The task does not have any raw data."
 
 
-def test_download_task_strips_environment_secrets(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
-    """#4508: boefje meta environment may contain secrets and must not leak via raw download."""
+def test_download_task_strips_environment_secrets(
+    rf, client_member, mock_bytes_client, mock_mixins_katalogus, bytes_raw_metas, bytes_get_raw
+):
+    """#4508: only secret-marked fields are stripped from the boefje environment,
+    not the entire environment. Non-secret fields remain visible."""
     mock_bytes_client().get_raw.return_value = bytes_get_raw
     mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+    mock_mixins_katalogus.get_plugin.return_value = Boefje(
+        id="dns-sec",
+        name="dns-sec",
+        type="boefje",
+        enabled=True,
+        scan_level=SCAN_LEVEL.L0,
+        boefje_schema={
+            "type": "object",
+            "properties": {"SECRET_TOKEN": {"type": "string"}, "NON_SECRET": {"type": "string"}},
+            "secret": ["SECRET_TOKEN"],
+        },
+    )
 
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 
@@ -152,4 +169,6 @@ def test_download_task_strips_environment_secrets(rf, client_member, mock_bytes_
         meta_files = [n for n in zf.namelist() if n.startswith("raw_meta_")]
         for meta_file in meta_files:
             meta = json.loads(zf.read(meta_file))
-            assert "environment" not in meta["boefje_meta"]
+            env = meta["boefje_meta"]["environment"]
+            assert "SECRET_TOKEN" not in env
+            assert env["NON_SECRET"] == "visible"
