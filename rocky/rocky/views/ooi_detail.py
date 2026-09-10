@@ -145,6 +145,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
                 context["current_config"] = self.get_ooi(self.ooi.config_pk).config
             except Exception:
                 context["current_config"] = None
+            context["current_config_json"] = json.dumps(context["current_config"]) if context["current_config"] else ""
 
         context["related"] = self.get_related_objects(self.observed_at)
 
