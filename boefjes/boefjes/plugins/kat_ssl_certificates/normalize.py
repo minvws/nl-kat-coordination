@@ -85,12 +85,18 @@ def _certificate_is_signed_by(certificate: x509.Certificate, issuer: x509.Certif
     try:
         issuer_public_key = issuer.public_key()
 
-        if isinstance(issuer_public_key, rsa.RSAPublicKey | ec.EllipticCurvePublicKey):
+        if isinstance(issuer_public_key, rsa.RSAPublicKey):
             issuer_public_key.verify(
                 certificate.signature,
                 certificate.tbs_certificate_bytes,
                 certificate.signature_algorithm_parameters,
                 certificate.signature_hash_algorithm,
+            )
+        elif isinstance(issuer_public_key, ec.EllipticCurvePublicKey):
+            issuer_public_key.verify(
+                certificate.signature,
+                certificate.tbs_certificate_bytes,
+                ec.ECDSA(certificate.signature_hash_algorithm),
             )
         elif isinstance(issuer_public_key, ed25519.Ed25519PublicKey | ed448.Ed448PublicKey):
             issuer_public_key.verify(certificate.signature, certificate.tbs_certificate_bytes)
