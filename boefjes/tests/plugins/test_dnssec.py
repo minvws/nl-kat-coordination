@@ -10,7 +10,7 @@ from tests.loading import get_dummy_data
 
 
 def fake_drill(returncode: int, stdout: bytes = b"", stderr: bytes = b""):
-    def fake_run(cmd, capture_output):
+    def fake_run(cmd, capture_output, timeout):
         return subprocess.CompletedProcess(cmd, returncode, stdout=stdout, stderr=stderr)
 
     return fake_run
@@ -79,3 +79,57 @@ def test_dnssec_signed_domain_with_unsigned_cname_target():
     output = list(run(input_ooi.serialize(), get_dummy_data("inputs/dnssec-cname-to-unsigned.txt")))
 
     assert len(output) == 0
+
+
+def test_dnssec_missing_domain_section_rejected():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    with pytest.raises(ValueError, match="No DNSSEC answer status"):
+        list(run(input_ooi.serialize(), b";; Domain: other.org.\n[U] other.org. 300 IN A 192.0.2.1\n"))
+
+
+def test_dnssec_ignores_dnskey_and_other_owner():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = (
+        b";; Domain: example.org.\n[B] example.org. 300 IN DNSKEY 257 3 8 xyz\n"
+        b"[U] other.org. 300 IN A 192.0.2.1\n[T] example.org. 300 IN A 192.0.2.2\n"
+    )
+    assert list(run(input_ooi.serialize(), raw)) == []
+
+
+def test_dnssec_case_insensitive_domain_and_trailing_dot():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = b";; Domain: EXAMPLE.ORG.\n[U] Example.Org. 300 IN AAAA 2001:db8::1\n"
+    assert list(run(input_ooi.serialize(), raw))[1].primary_key == "Finding|Hostname|internet|example.org|KAT-NO-DNSSEC"
+
+
+def test_dnssec_timeout(monkeypatch):
+    def timeout(cmd, capture_output, timeout):
+        raise subprocess.TimeoutExpired(cmd, timeout)
+
+    monkeypatch.setattr(dnssec_main.subprocess, "run", timeout)
+    with pytest.raises(RuntimeError, match="timed out"):
+        dnssec_main.run({"arguments": {"input": {"name": "example.org"}}})
+
+
+@pytest.mark.parametrize("domain", ["bad_name.org", "-bad.org", "bad-.org", "example..org", "https://example.org"])
+def test_dnssec_invalid_hostname(domain):
+    with pytest.raises(ValueError):
+        dnssec_main.normalize_hostname(domain)
+
+
+def test_dnssec_idna_hostname():
+    assert dnssec_main.normalize_hostname("Bücher.de.") == "xn--bcher-kva.de"
+
+
+def test_dnssec_signed_nodata_falls_back_to_aaaa(monkeypatch):
+    calls = []
+
+    def fake_run(domain, record_type):
+        calls.append(record_type)
+        if record_type != "AAAA":
+            return f"[T] No data found for: {domain}. type {record_type}".encode()
+        return b";; Domain: example.org.\n[T] example.org. 300 IN AAAA 2001:db8::1\n"
+
+    monkeypatch.setattr(dnssec_main, "run_drill", fake_run)
+    dnssec_main.run({"arguments": {"input": {"name": "example.org"}}})
+    assert calls == ["A", "CNAME", "AAAA"]
