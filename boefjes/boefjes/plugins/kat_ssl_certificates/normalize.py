@@ -2,6 +2,7 @@ import datetime
 import ipaddress
 import logging
 import re
+from collections import defaultdict
 from collections.abc import Iterable
 
 from cryptography import x509
@@ -15,6 +16,8 @@ from boefjes.normalizer_models import NormalizerAffirmation, NormalizerOutput
 from octopoes.models import Reference
 from octopoes.models.ooi.certificate import (
     AlgorithmType,
+    CertificateIssuerCandidate,
+    SignatureVerificationStatus,
     SubjectAlternativeName,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
@@ -36,7 +39,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     pk = input_ooi["primary_key"]
 
     # extract all certificates
-    certificates, certificate_subject_alternative_names, hostnames = read_certificates(contents, Reference.from_str(pk))
+    certificates, certificate_subject_alternative_names, hostnames, issuer_candidates = read_certificates(
+        contents, Reference.from_str(pk)
+    )
 
     # connect server certificate to website
     if certificates:
@@ -67,7 +72,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         # update website
         yield NormalizerAffirmation(ooi=website)
 
-    certificates, certificate_subject_alternative_names, hostnames = read_certificates(contents, Reference.from_str(pk))
     # Yield certificates after their chain relationships have been resolved.
     yield from certificates
 
@@ -77,12 +81,20 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # add all subject alternative names
     yield from certificate_subject_alternative_names
 
+    # add all issuer candidates, both verified and invalid signatures
+    yield from issuer_candidates
 
-def _certificate_is_signed_by(certificate: x509.Certificate, issuer: x509.Certificate) -> bool:
-    if certificate.issuer != issuer.subject:
-        return False
 
+# The caller should check the issuer claim first, and only attempt cryptographic verification for
+# candidates whose subject matches.
+def _verify_certificate_signature(
+    certificate: x509.Certificate, issuer: x509.Certificate
+) -> SignatureVerificationStatus:
     try:
+        # Keep mismatched certificates out of the candidate relationships.
+        if certificate.issuer != issuer.subject:
+            return SignatureVerificationStatus.ISSUER_NAME_MISMATCH
+
         issuer_public_key = issuer.public_key()
 
         if isinstance(issuer_public_key, rsa.RSAPublicKey):
@@ -92,26 +104,31 @@ def _certificate_is_signed_by(certificate: x509.Certificate, issuer: x509.Certif
                 certificate.signature_algorithm_parameters,
                 certificate.signature_hash_algorithm,
             )
+
         elif isinstance(issuer_public_key, ec.EllipticCurvePublicKey):
             issuer_public_key.verify(
-                certificate.signature,
-                certificate.tbs_certificate_bytes,
-                ec.ECDSA(certificate.signature_hash_algorithm),
+                certificate.signature, certificate.tbs_certificate_bytes, ec.ECDSA(certificate.signature_hash_algorithm)
             )
+
         elif isinstance(issuer_public_key, ed25519.Ed25519PublicKey | ed448.Ed448PublicKey):
             issuer_public_key.verify(certificate.signature, certificate.tbs_certificate_bytes)
+
         else:
-            return False
+            return SignatureVerificationStatus.UNSUPPORTED_KEY_TYPE
 
-    except (InvalidSignature, UnsupportedAlgorithm, ValueError):
-        return False
+    except InvalidSignature:
+        return SignatureVerificationStatus.INVALID_SIGNATURE
+    except UnsupportedAlgorithm:
+        return SignatureVerificationStatus.UNSUPPORTED_ALGORITHM
+    except (TypeError, ValueError):
+        return SignatureVerificationStatus.INVALID_PARAMETERS
 
-    return True
+    return SignatureVerificationStatus.VERIFIED
 
 
 def read_certificates(
     contents: str, website_reference: Reference
-) -> tuple[list[X509Certificate], list[SubjectAlternativeName], list[Hostname]]:
+) -> tuple[list[X509Certificate], list[SubjectAlternativeName], list[Hostname], list[CertificateIssuerCandidate]]:
     # iterate through the PEM certificates and decode them
     certificates = []
     parsed_certificates = []
@@ -180,6 +197,7 @@ def read_certificates(
         certificate = X509Certificate(
             subject=subject,
             issuer=issuer,
+            issuer_distinguished_name=cert.issuer.rfc4514_string(),
             valid_from=valid_from,
             valid_until=valid_until,
             pk_algorithm=pk_algorithm,
@@ -221,22 +239,51 @@ def read_certificates(
             if san is not None:
                 certificate_subject_alternative_names.append(san)
 
-    # Link certificates using the actual issuer/subject relationship
-    # instead of relying on the order returned by OpenSSL.
-    for certificate, cert in parsed_certificates:
-        if cert.issuer == cert.subject:
-            continue
+    # Detect different certificates that share the same OpenKAT reference.
+    # The current natural key uses issuer organization + serial number,
+    # which does not always uniquely identify an X.509 certificate.
+    references_to_der = defaultdict(set)
 
-        issuer_certificate = next(
-            (
-                candidate
-                for candidate, candidate_cert in parsed_certificates
-                if _certificate_is_signed_by(cert, candidate_cert)
-            ),
-            None,
+    for certificate, parsed_certificate in parsed_certificates:
+        references_to_der[certificate.reference].add(parsed_certificate.public_bytes(serialization.Encoding.DER))
+
+    ambiguous_references = {reference for reference, der_values in references_to_der.items() if len(der_values) > 1}
+
+    for reference in ambiguous_references:
+        logging.warning(
+            "Multiple distinct X.509 certificates share reference %s; skipping ambiguous issuer relationships",
+            reference,
         )
 
-        if issuer_certificate is not None:
-            certificate.signed_by = issuer_certificate.reference
+    # Link certificates using the claimed issuer name and independently
+    # verify each matching issuer candidate.
+    issuer_candidates = []
 
-    return certificates, certificate_subject_alternative_names, hostnames
+    for certificate, cert in parsed_certificates:
+        for candidate, candidate_cert in parsed_certificates:
+            # Matching distinguished names establish candidacy, not proof.
+            if cert.issuer != candidate_cert.subject:
+                continue
+
+            # We cannot reliably represent this relationship when either
+            # certificate reference identifies multiple distinct certificates.
+            if certificate.reference in ambiguous_references or candidate.reference in ambiguous_references:
+                continue
+
+            status = _verify_certificate_signature(cert, candidate_cert)
+
+            issuer_candidates.append(
+                CertificateIssuerCandidate(
+                    certificate=certificate.reference, candidate_issuer=candidate.reference, verification_status=status
+                )
+            )
+
+            # A self-signed certificate must not reference itself via signed_by.
+            if (
+                status == SignatureVerificationStatus.VERIFIED
+                and certificate.reference != candidate.reference
+                and certificate.signed_by is None
+            ):
+                certificate.signed_by = candidate.reference
+
+    return certificates, certificate_subject_alternative_names, hostnames, issuer_candidates

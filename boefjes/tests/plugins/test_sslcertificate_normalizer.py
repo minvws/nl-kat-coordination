@@ -8,6 +8,7 @@ from cryptography.x509.oid import NameOID
 
 from boefjes.plugins.kat_ssl_certificates.normalize import read_certificates, run
 from octopoes.models import Reference
+from octopoes.models.ooi.certificate import SignatureVerificationStatus
 from tests.loading import get_dummy_data
 
 input_ooi = {
@@ -44,7 +45,7 @@ def test_ssl_certificates_normalizer_skips_invalid_pem_certificate():
 
     reference = Reference.from_str(input_ooi["primary_key"])
 
-    certificates, sans, hostnames = read_certificates(invalid_pem + valid_pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(invalid_pem + valid_pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -73,7 +74,7 @@ def test_ssl_certificates_normalizer_without_issuer_organization():
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem, reference)
+    certificates, _, _, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert certificates[0].issuer is None
@@ -108,7 +109,7 @@ def test_ssl_certificates_normalizer_ed25519():
     pem = _create_ed_certificate(private_key)
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem, reference)
+    certificates, _, _, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert certificates[0].pk_algorithm == "AlgorithmType.EDDSA"
@@ -121,7 +122,7 @@ def test_ssl_certificates_normalizer_ed448():
     pem = _create_ed_certificate(private_key)
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem, reference)
+    certificates, _, _, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert certificates[0].pk_algorithm == "AlgorithmType.EDDSA"
@@ -174,7 +175,7 @@ def test_ssl_certificates_normalizer_without_san():
 
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert sans == []
@@ -185,7 +186,7 @@ def test_ssl_certificates_normalizer_dns_san():
     pem = _create_certificate_with_sans([x509.DNSName("www.example.com")])
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -197,7 +198,7 @@ def test_ssl_certificates_normalizer_wildcard_san():
     pem = _create_certificate_with_sans([x509.DNSName("*.example.com")])
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -209,7 +210,7 @@ def test_ssl_certificates_normalizer_ipv4_san():
     pem = _create_certificate_with_sans([x509.IPAddress(ipaddress.IPv4Address("192.0.2.1"))])
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -221,7 +222,7 @@ def test_ssl_certificates_normalizer_ipv6_san():
     pem = _create_certificate_with_sans([x509.IPAddress(ipaddress.IPv6Address("2001:db8::1"))])
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -235,7 +236,7 @@ def test_ssl_certificates_normalizer_non_dns_sans_are_not_hostnames():
     )
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 0
@@ -261,11 +262,18 @@ def test_ssl_certificates_normalizer_self_signed_certificate():
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem, reference)
+    certificates, _, _, issuer_candidates = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert certificates[0].subject == "test.example"
     assert certificates[0].issuer is None
+
+    assert certificates[0].signed_by is None
+
+    assert len(issuer_candidates) == 1
+    assert issuer_candidates[0].certificate == certificates[0].reference
+    assert issuer_candidates[0].candidate_issuer == certificates[0].reference
+    assert issuer_candidates[0].verification_status == SignatureVerificationStatus.VERIFIED
 
 
 def test_ssl_certificates_normalizer_unsupported_san_types_are_ignored():
@@ -297,7 +305,7 @@ def test_ssl_certificates_normalizer_unsupported_san_types_are_ignored():
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert sans == []
@@ -327,7 +335,7 @@ def test_ssl_certificates_normalizer_san_uses_certificate_network():
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
 
     reference = Reference.from_str("Website|internal|192.0.2.0|tcp|443|https|internal|example.com")
-    certificates, sans, hostnames = read_certificates(pem, reference)
+    certificates, sans, hostnames, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert len(sans) == 1
@@ -356,7 +364,7 @@ def test_ssl_certificates_normalizer_without_common_name():
     pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem, reference)
+    certificates, _, _, _ = read_certificates(pem, reference)
 
     assert len(certificates) == 1
     assert certificates[0].subject is None
@@ -507,10 +515,135 @@ def test_ssl_certificates_normalizer_does_not_link_certificate_with_invalid_sign
     )
 
     reference = Reference.from_str(input_ooi["primary_key"])
-    certificates, _, _ = read_certificates(pem.decode(), reference)
+    certificates, _, _, issuer_candidates = read_certificates(pem.decode(), reference)
 
     leaf = next(c for c in certificates if c.subject == "test.example")
     intermediate = next(c for c in certificates if c.subject == "Intermediate CA")
 
     assert leaf.signed_by is None
     assert intermediate.signed_by is None
+
+    leaf_candidates = [candidate for candidate in issuer_candidates if candidate.certificate == leaf.reference]
+
+    assert len(leaf_candidates) == 1
+    assert leaf_candidates[0].candidate_issuer == intermediate.reference
+    assert leaf_candidates[0].verification_status == SignatureVerificationStatus.INVALID_SIGNATURE
+
+
+# Prevent incorrect issuer relationships, but doesn't prevent two colliding certificate
+# objects from being emitted with the same reference.
+def test_certificate_reference_collision_skips_issuer_relationships():
+    now = datetime.datetime.now(datetime.timezone.utc)
+
+    key_a = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    key_b = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+    subject_a = x509.Name(
+        [
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Shared Organization"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "Issuer A"),
+        ]
+    )
+    subject_b = x509.Name(
+        [
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Shared Organization"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "Issuer B"),
+        ]
+    )
+
+    # Both certificates have the same issuer organization and serial number.
+    serial_number = 123456
+
+    certificate_a = (
+        x509.CertificateBuilder()
+        .subject_name(subject_a)
+        .issuer_name(subject_a)
+        .public_key(key_a.public_key())
+        .serial_number(serial_number)
+        .not_valid_before(now)
+        .not_valid_after(now + datetime.timedelta(days=1))
+        .sign(key_a, hashes.SHA256())
+    )
+
+    certificate_b = (
+        x509.CertificateBuilder()
+        .subject_name(subject_b)
+        .issuer_name(subject_b)
+        .public_key(key_b.public_key())
+        .serial_number(serial_number)
+        .not_valid_before(now)
+        .not_valid_after(now + datetime.timedelta(days=1))
+        .sign(key_b, hashes.SHA256())
+    )
+
+    pem = (
+        certificate_a.public_bytes(serialization.Encoding.PEM) + certificate_b.public_bytes(serialization.Encoding.PEM)
+    ).decode()
+
+    reference = Reference.from_str(input_ooi["primary_key"])
+
+    certificates, _, _, issuer_candidates = read_certificates(pem, reference)
+
+    assert len(certificates) == 2
+    assert certificates[0].reference == certificates[1].reference
+
+    # Neither self-signature relationship can be represented unambiguously.
+    assert issuer_candidates == []
+    assert all(certificate.signed_by is None for certificate in certificates)
+
+
+# Self-issued certificate with an invalid self-signature, to distinguish between self-issued vs self-signed
+def test_multiple_issuer_candidates_only_links_verified_issuer():
+    valid_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    invalid_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    leaf_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+    valid_issuer = _create_signed_certificate("Shared CA", None, valid_key, valid_key.public_key())
+    invalid_issuer = _create_signed_certificate("Shared CA", None, invalid_key, invalid_key.public_key())
+    leaf = _create_signed_certificate("test.example", valid_issuer, valid_key, leaf_key.public_key())
+
+    # Put the invalid candidate first to catch order-dependent linking.
+    pem = b"".join(cert.public_bytes(serialization.Encoding.PEM) for cert in (leaf, invalid_issuer, valid_issuer))
+
+    reference = Reference.from_str(input_ooi["primary_key"])
+    certificates, _, _, candidates = read_certificates(pem.decode(), reference)
+
+    leaf_ooi = next(c for c in certificates if c.subject == "test.example")
+    valid_ooi = next(
+        c
+        for c in certificates
+        if c.subject == "Shared CA" and c.serial_number == valid_issuer.serial_number.to_bytes(20, "big").hex()
+    )
+    invalid_ooi = next(
+        c
+        for c in certificates
+        if c.subject == "Shared CA" and c.serial_number == invalid_issuer.serial_number.to_bytes(20, "big").hex()
+    )
+
+    leaf_candidates = [candidate for candidate in candidates if candidate.certificate == leaf_ooi.reference]
+
+    assert len(leaf_candidates) == 2
+    assert {(candidate.candidate_issuer, candidate.verification_status) for candidate in leaf_candidates} == {
+        (valid_ooi.reference, SignatureVerificationStatus.VERIFIED),
+        (invalid_ooi.reference, SignatureVerificationStatus.INVALID_SIGNATURE),
+    }
+
+    assert leaf_ooi.signed_by == valid_ooi.reference
+
+
+# No issuer certificates supplied
+def test_certificate_without_supplied_issuer_has_no_candidates():
+    issuer_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    leaf_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+
+    issuer = _create_signed_certificate("Missing CA", None, issuer_key, issuer_key.public_key())
+    leaf = _create_signed_certificate("test.example", issuer, issuer_key, leaf_key.public_key())
+
+    pem = leaf.public_bytes(serialization.Encoding.PEM).decode()
+    reference = Reference.from_str(input_ooi["primary_key"])
+
+    certificates, _, _, candidates = read_certificates(pem, reference)
+
+    assert len(certificates) == 1
+    assert certificates[0].signed_by is None
+    assert candidates == []
