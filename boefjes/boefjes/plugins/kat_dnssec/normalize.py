@@ -35,10 +35,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         finding_id = "KAT-INVALID-DNSSEC"
         reason = "DNSSEC validation failed (bogus answer)"
     elif "S" in states:
-        # Preserve the existing finding ID; self-signed is distinct from bogus.
-        # Do not invent a new finding type without corresponding type metadata.
-        finding_id = "KAT-INVALID-DNSSEC"
-        reason = "DNSSEC signature is self-signed but not trusted by the chain of trust"
+        # A self-signed answer is not the same diagnostic as a bogus signature.
+        finding_id = "KAT-UNTRUSTED-DNSSEC"
+        reason = "DNSSEC answer is self-signed and not authenticated by a trusted chain"
     elif "U" in states:
         finding_id = "KAT-NO-DNSSEC"
         reason = "DNS answer is unsigned or has no authenticated chain of trust"

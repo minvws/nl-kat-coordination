@@ -53,7 +53,7 @@ def test_dnssec_invalid():
     input_ooi = Hostname(network=Network(name="internet").reference, name="dnssec-failed.org")
     output = list(run(input_ooi.serialize(), get_dummy_data("inputs/dnssec-self-signed.txt")))
 
-    assert output[1].primary_key == "Finding|Hostname|internet|dnssec-failed.org|KAT-INVALID-DNSSEC"
+    assert output[1].primary_key == "Finding|Hostname|internet|dnssec-failed.org|KAT-UNTRUSTED-DNSSEC"
 
 
 def test_dnssec_valid():
@@ -140,3 +140,28 @@ def test_dnssec_answer_outside_matching_drill_section():
     raw = b";; Domain: org.\n[T] org. 300 IN DNSKEY 257 3 8 xyz\n[U] example.org. 300 IN A 192.0.2.1\n"
     output = list(run(input_ooi.serialize(), raw))
     assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-NO-DNSSEC"
+
+
+def test_dnssec_bogus_uses_invalid_finding_type():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = b"[B] example.org. 300 IN A 192.0.2.1\n"
+    output = list(run(input_ooi.serialize(), raw))
+    assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-INVALID-DNSSEC"
+
+
+def test_dnssec_self_signed_uses_untrusted_finding_type():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = b"[S] example.org. 300 IN A 192.0.2.1\n"
+    output = list(run(input_ooi.serialize(), raw))
+    assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-UNTRUSTED-DNSSEC"
+
+
+def test_dnssec_finding_types_present_in_catalog():
+    import json
+    from pathlib import Path
+
+    catalog = Path(__file__).resolve().parents[2] / "boefjes/plugins/kat_kat_finding_types/kat_finding_types.json"
+    types = json.loads(catalog.read_text())
+    for finding_id in ("KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC", "KAT-UNTRUSTED-DNSSEC"):
+        assert finding_id in types
+        assert all(types[finding_id].get(key) for key in ("name", "description", "risk", "impact", "recommendation"))
