@@ -449,7 +449,7 @@ def test_dns_email_security_servfail_without_ede_is_not_dnssec():
 
     resolver = Mock()
     resolver.resolve.side_effect = dns.resolver.NoNameservers(
-        errors=[("1.1.1.1", False, 53, "SERVFAIL", Mock(options=[]))]
+        request=Mock(), errors=[("1.1.1.1", False, 53, "SERVFAIL", Mock(options=[]))]
     )
     with pytest.raises(dns.resolver.NoNameservers):
         get_email_security_records(resolver, "example.org", "_dmarc")
@@ -610,7 +610,7 @@ def test_dns_email_security_refused_not_dnssec():
 
     resolver = Mock()
     resolver.resolve.side_effect = dns.resolver.NoNameservers(
-        errors=[("1.1.1.1", False, 53, "REFUSED", Mock(options=[]))]
+        request=Mock(), errors=[("1.1.1.1", False, 53, "REFUSED", Mock(options=[]))]
     )
     with pytest.raises(dns.resolver.NoNameservers):
         get_email_security_records(resolver, "example.org", "_dmarc")
@@ -624,7 +624,9 @@ def test_dns_email_security_servfail_with_missing_response_not_dnssec():
     from boefjes.plugins.kat_dns.main import get_email_security_records
 
     resolver = Mock()
-    resolver.resolve.side_effect = dns.resolver.NoNameservers(errors=[("1.1.1.1", False, 53, "SERVFAIL", None)])
+    resolver.resolve.side_effect = dns.resolver.NoNameservers(
+        request=Mock(), errors=[("1.1.1.1", False, 53, "SERVFAIL", None)]
+    )
     with pytest.raises(dns.resolver.NoNameservers):
         get_email_security_records(resolver, "example.org", "_dmarc")
 
