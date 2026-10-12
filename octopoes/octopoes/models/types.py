@@ -9,6 +9,7 @@ from pydantic.fields import FieldInfo
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.certificate import (
+    CertificateIssuerCandidate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
@@ -91,7 +92,11 @@ from octopoes.models.ooi.web import (
 )
 
 CertificateType: TypeAlias = (
-    X509Certificate | SubjectAlternativeNameHostname | SubjectAlternativeNameIP | SubjectAlternativeNameQualifier
+    X509Certificate
+    | SubjectAlternativeNameHostname
+    | SubjectAlternativeNameIP
+    | SubjectAlternativeNameQualifier
+    | CertificateIssuerCandidate
 )
 DnsType: TypeAlias = DNSZone | Hostname
 DnsRecordType: TypeAlias = (
