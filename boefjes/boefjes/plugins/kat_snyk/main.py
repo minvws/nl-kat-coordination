@@ -4,6 +4,8 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
+from boefjes.plugins.kat_snyk.check_version import check_version_in
+
 logger = logging.getLogger(__name__)
 
 # CPE target_sw values that map to a Snyk ecosystem prefix.
@@ -109,6 +111,8 @@ def _fetch_package_data(software_name: str, version: str | None, cpe: str | None
     probe in order and disambiguate same-named packages across ecosystems by checking
     whether the installed version exists in the package's version list — otherwise
     e.g. npm:django (a JS package) would mask pip:django (the actual framework).
+    snyk.io only embeds the newest ~100 versions, so an older install is in no
+    list; then the ecosystem whose vulnerability ranges cover it wins.
     Parse errors propagate: a snyk.io layout change must surface as a failed task,
     not as a successful scan with zero findings (#5301).
     """
@@ -117,6 +121,7 @@ def _fetch_package_data(software_name: str, version: str | None, cpe: str | None
     slug = software_name.lower().replace(" ", "-")
 
     first_parseable = None
+    range_match = None
     for ecosystem in ecosystems:
         page = requests.get(f"https://snyk.io/vuln/{ecosystem}:{slug}", timeout=30)
         if page.status_code == 404:
@@ -127,7 +132,12 @@ def _fetch_package_data(software_name: str, version: str | None, cpe: str | None
             return pkg
         if first_parseable is None:
             first_parseable = pkg
-    return first_parseable
+        if range_match is None and any(
+            check_version_in(version, _affected_versions_to_string(v.get("affectedVersions", [])))
+            for v in pkg.get("vulnerabilities") or []
+        ):
+            range_match = pkg
+    return range_match or first_parseable
 
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:

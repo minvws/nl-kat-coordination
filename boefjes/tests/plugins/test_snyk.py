@@ -147,3 +147,29 @@ def test_snyk_fetch_skips_404_and_returns_none_when_nothing_parses(mocker):
 
     mocker.patch("boefjes.plugins.kat_snyk.main.requests.get", return_value=mock.Mock(status_code=404))
     assert _fetch_package_data("does-not-exist", "1.0", None) is None
+
+
+def test_snyk_fetch_prefers_ecosystem_whose_ranges_cover_an_unlisted_version(mocker):
+    """snyk.io embeds only the newest ~100 versions, so an old install (django 3.2.0)
+    is in no ecosystem's version list. npm:django (a squat, no vulns) must not win
+    over pip:django, whose vulnerability ranges do cover the installed version."""
+    from boefjes.plugins.kat_snyk.main import _fetch_package_data
+
+    npm_pkg = {"vulnerabilities": [], "versions": [{"name": "99.99.99"}]}
+    pip_pkg = {
+        "vulnerabilities": [
+            {
+                "id": "SNYK-PYTHON-DJANGO-1",
+                "affectedVersions": [
+                    {"min": {"version": "3.0", "inclusive": True}, "max": {"version": "3.2.25", "inclusive": False}}
+                ],
+            }
+        ],
+        "versions": [{"name": "4.2.9"}],  # oldest version snyk.io still embeds
+    }
+    page = mock.Mock(status_code=200, text="")
+    page.raise_for_status = mock.Mock()
+    mocker.patch("boefjes.plugins.kat_snyk.main.requests.get", return_value=page)
+    mocker.patch("boefjes.plugins.kat_snyk.main._parse_nuxt_data", side_effect=[npm_pkg, pip_pkg] + [npm_pkg] * 6)
+
+    assert _fetch_package_data("django", "3.2.0", None) is pip_pkg
