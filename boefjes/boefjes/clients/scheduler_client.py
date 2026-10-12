@@ -171,12 +171,17 @@ def _coerce_value(value: Any, schema_type: str) -> Any:
     """
     if not isinstance(value, str):
         return value
-    if schema_type == "integer":
-        return int(value)
-    if schema_type == "number":
-        return float(value)
+    try:
+        if schema_type == "integer":
+            return int(value)
+        if schema_type == "number":
+            return float(value)
+    except ValueError:
+        return value  # let jsonschema report the bad value
     if schema_type == "boolean":
-        return value.lower() in ("true", "1", "yes")
+        return {"true": True, "1": True, "yes": True, "false": False, "0": False, "no": False}.get(
+            value.strip().lower(), value
+        )
     return value
 
 
