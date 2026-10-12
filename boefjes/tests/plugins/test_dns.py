@@ -423,3 +423,42 @@ def test_dkim_unparsable_response_does_not_crash():
 
     # No DKIMExists finding should be yielded for an unparsable response
     assert not any(ooi.object_type == "DKIMExists" for ooi in output)
+
+
+def test_dns_record_types_reject_unsupported(monkeypatch):
+    from boefjes.plugins.kat_dns.main import get_record_types
+
+    monkeypatch.setenv("RECORD_TYPES", "A,INVALID")
+    with pytest.raises(ValueError, match="INVALID"):
+        get_record_types()
+
+
+def test_dns_record_types_strip_whitespace(monkeypatch):
+    from boefjes.plugins.kat_dns.main import get_record_types
+
+    monkeypatch.setenv("RECORD_TYPES", " a , aaaa ")
+    assert get_record_types() == {"A", "AAAA"}
+
+
+def test_dns_email_security_servfail_without_ede_is_not_dnssec():
+    from unittest.mock import Mock
+
+    import dns.resolver
+
+    from boefjes.plugins.kat_dns.main import get_email_security_records
+
+    resolver = Mock()
+    resolver.resolve.side_effect = dns.resolver.NoNameservers(
+        errors=[("1.1.1.1", False, 53, "SERVFAIL", Mock(options=[]))]
+    )
+    with pytest.raises(dns.resolver.NoNameservers):
+        get_email_security_records(resolver, "example.org", "_dmarc")
+
+
+def test_dns_dmarc_unparsable_response_does_not_crash():
+    import json
+
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = json.dumps({"dns_records": "", "dkim_response": "NXDOMAIN", "dmarc_response": "invalid"}).encode()
+    output = list(dns_normalize_run(input_ooi.serialize(), raw))
+    assert not any(ooi.object_type == "DMARCTXTRecord" for ooi in output)
