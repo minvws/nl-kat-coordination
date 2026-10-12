@@ -8,7 +8,6 @@ from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 STATUS = re.compile(r"^\[([USTB])\]\s+(\S+)\s+\d+\s+IN\s+(A|AAAA|CNAME)\s+", re.I)
-SECTION = re.compile(r"^;; Domain:\s+(\S+)", re.I)
 
 
 def canonical(name: str) -> str:
@@ -20,17 +19,12 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     ooi_ref = Reference.from_str(input_ooi["primary_key"])
     domain = canonical(input_ooi["name"])
 
-    # Only answer records belonging to the requested hostname count. In particular,
-    # DNSKEY/DS lines and CNAME target sections cannot determine its finding.
-    section = None
+    # Match answer record owners, not drill traversal section headers.
+    # DNSKEY/DS records and unrelated CNAME targets must not determine the finding.
     candidates = []
     for line in result.splitlines():
-        header = SECTION.match(line)
-        if header:
-            section = canonical(header.group(1))
-            continue
         match = STATUS.match(line)
-        if match and section == domain and canonical(match.group(2)) == domain:
+        if match and canonical(match.group(2)) == domain:
             candidates.append((match.group(1).upper(), match.group(3).upper(), line))
 
     if not candidates:

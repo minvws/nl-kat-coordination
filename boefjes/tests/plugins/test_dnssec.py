@@ -43,21 +43,21 @@ def test_boefje_drill_failure_includes_stderr(monkeypatch):
 
 
 def test_dnssec_unsigned():
-    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    input_ooi = Hostname(network=Network(name="internet").reference, name="google.com")
     output = list(run(input_ooi.serialize(), get_dummy_data("inputs/dnssec-unsigned.txt")))
 
-    assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-NO-DNSSEC"
+    assert output[1].primary_key == "Finding|Hostname|internet|google.com|KAT-NO-DNSSEC"
 
 
 def test_dnssec_invalid():
-    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    input_ooi = Hostname(network=Network(name="internet").reference, name="dnssec-failed.org")
     output = list(run(input_ooi.serialize(), get_dummy_data("inputs/dnssec-self-signed.txt")))
 
-    assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-INVALID-DNSSEC"
+    assert output[1].primary_key == "Finding|Hostname|internet|dnssec-failed.org|KAT-INVALID-DNSSEC"
 
 
 def test_dnssec_valid():
-    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    input_ooi = Hostname(network=Network(name="internet").reference, name="ok.ok.ok.bad-dnssec.wb.sidnlabs.nl")
     output = list(run(input_ooi.serialize(), get_dummy_data("inputs/dnssec-valid.txt")))
 
     assert len(output) == 0
@@ -133,3 +133,10 @@ def test_dnssec_signed_nodata_falls_back_to_aaaa(monkeypatch):
     monkeypatch.setattr(dnssec_main, "run_drill", fake_run)
     dnssec_main.run({"arguments": {"input": {"name": "example.org"}}})
     assert calls == ["A", "CNAME", "AAAA"]
+
+
+def test_dnssec_answer_outside_matching_drill_section():
+    input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
+    raw = b";; Domain: org.\n[T] org. 300 IN DNSKEY 257 3 8 xyz\n[U] example.org. 300 IN A 192.0.2.1\n"
+    output = list(run(input_ooi.serialize(), raw))
+    assert output[1].primary_key == "Finding|Hostname|internet|example.org|KAT-NO-DNSSEC"
