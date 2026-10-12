@@ -264,7 +264,13 @@ class BoefjeScheduler(Scheduler):
     @tracer.start_as_current_span("BoefjeScheduler.process_rescheduling")
     def process_rescheduling(self):
         try:
-            schedules = self.ctx.datastores.schedule_store.get_due_schedules(scheduler_id=self.scheduler_id)
+            # Cap the batch so the downstream octopoes lookup
+            # (`get_objects`, references via query string) cannot grow large
+            # enough to trip a 414. Remaining due schedules are picked up on
+            # the next 60s tick.
+            schedules = self.ctx.datastores.schedule_store.get_due_schedules(
+                scheduler_id=self.scheduler_id, limit=50
+            )
             if not schedules:
                 self.logger.debug(
                     "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
