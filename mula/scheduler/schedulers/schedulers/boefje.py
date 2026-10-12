@@ -268,9 +268,7 @@ class BoefjeScheduler(Scheduler):
             # (`get_objects`, references via query string) cannot grow large
             # enough to trip a 414. Remaining due schedules are picked up on
             # the next 60s tick.
-            schedules = self.ctx.datastores.schedule_store.get_due_schedules(
-                scheduler_id=self.scheduler_id, limit=50
-            )
+            schedules = self.ctx.datastores.schedule_store.get_due_schedules(scheduler_id=self.scheduler_id, limit=50)
             if not schedules:
                 self.logger.debug(
                     "No schedules tasks found for scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
