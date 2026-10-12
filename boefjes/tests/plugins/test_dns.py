@@ -462,3 +462,49 @@ def test_dns_dmarc_unparsable_response_does_not_crash():
     raw = json.dumps({"dns_records": "", "dkim_response": "NXDOMAIN", "dmarc_response": "invalid"}).encode()
     output = list(dns_normalize_run(input_ooi.serialize(), raw))
     assert not any(ooi.object_type == "DMARCTXTRecord" for ooi in output)
+
+
+def test_dns_normalizer_canonicalizes_hostname_case():
+    import json
+
+    input_ooi = Hostname(network=Network(name="internet").reference, name="Example.ORG")
+    raw = json.dumps({"dns_records": "", "dkim_response": "NXDOMAIN", "dmarc_response": "NXDOMAIN"}).encode()
+    output = list(dns_normalize_run(input_ooi.serialize(), raw))
+    assert any(isinstance(ooi, Hostname) and ooi.name == "example.org" for ooi in output)
+
+
+def test_dns_run_preserves_answers_on_later_nxdomain(monkeypatch):
+    import json
+    from unittest.mock import Mock
+
+    import dns.resolver
+
+    from boefjes.plugins.kat_dns import main
+
+    resolver = Mock()
+    answer = Mock(nameserver="1.1.1.1", response="valid response")
+    resolver.resolve.side_effect = [answer, dns.resolver.NXDOMAIN()]
+    monkeypatch.setattr(main.dns.resolver, "Resolver", lambda: resolver)
+    monkeypatch.setattr(main, "get_record_types", lambda: {"A", "AAAA"})
+    monkeypatch.setattr(main, "get_email_security_records", lambda *args: "NXDOMAIN")
+    output = main.run({"arguments": {"input": {"name": "example.org"}}})
+    result = json.loads(output[0][1])
+    assert "valid response" in result["dns_records"]
+    assert result["query_errors"] == {"AAAA": "NXDOMAIN"}
+
+
+def test_dns_run_preserves_no_nameservers_diagnostic(monkeypatch):
+    import json
+    from unittest.mock import Mock
+
+    import dns.resolver
+
+    from boefjes.plugins.kat_dns import main
+
+    resolver = Mock()
+    resolver.resolve.side_effect = dns.resolver.NoNameservers()
+    monkeypatch.setattr(main.dns.resolver, "Resolver", lambda: resolver)
+    monkeypatch.setattr(main, "get_record_types", lambda: {"A"})
+    monkeypatch.setattr(main, "get_email_security_records", lambda *args: "NXDOMAIN")
+    output = main.run({"arguments": {"input": {"name": "example.org"}}})
+    assert json.loads(output[0][1])["query_errors"] == {"A": "NO_NAMESERVERS"}

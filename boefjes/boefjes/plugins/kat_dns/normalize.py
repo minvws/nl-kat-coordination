@@ -46,7 +46,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     record_store: dict[str, DNSRecord] = {}
 
     def register_hostname(name: str) -> Hostname:
-        hostname = Hostname(network=internet.reference, name=name.rstrip("."))
+        hostname = Hostname(network=internet.reference, name=name.rstrip(".").lower())
         hostname_store[hostname.name] = hostname
         return hostname
 
@@ -112,7 +112,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                 if isinstance(rr, TXT):
                     # Concatenate TXT character-strings per RFC 1035 3.3.14:
                     # multiple strings are concatenated without separators.
-                    default_args["value"] = "".join(s.decode() if isinstance(s, bytes) else s for s in rr.strings)
+                    default_args["value"] = "".join(
+                        s.decode("utf-8", errors="replace") if isinstance(s, bytes) else s for s in rr.strings
+                    )
                     register_record(DNSTXTRecord(**default_args))
 
                 if isinstance(rr, MX):

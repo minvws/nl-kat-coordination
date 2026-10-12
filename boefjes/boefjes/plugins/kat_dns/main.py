@@ -61,6 +61,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     record_types = get_record_types()
     answers = []
     timed_out = False
+    query_errors: dict[str, str] = {}
     if "SOA" in record_types:
         try:
             answers.append(get_parent_zone_soa(resolver, requested_dns_name))
@@ -73,18 +74,26 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
         except dns.resolver.NoAnswer:
-            pass
+            query_errors[type_] = "NOANSWER"
         except dns.resolver.Timeout:
             timed_out = True
+            query_errors[type_] = "TIMEOUT"
         except dns.resolver.NoNameservers as error:
+            query_errors[type_] = "NO_NAMESERVERS"
             logger.warning("DNS query for %s (%s) failed: %s", hostname, type_, error)
         except dns.resolver.NXDOMAIN:
-            return [(set(), "NXDOMAIN")]
+            query_errors[type_] = "NXDOMAIN"
+            # Only emit the legacy NXDOMAIN marker when there are no successful
+            # answers or transient errors to preserve. An isolated negative
+            # response must not discard records already collected.
+            if not answers and all(status == "NXDOMAIN" for status in query_errors.values()):
+                return [(set(), "NXDOMAIN")]
 
     answers_formatted = [f"RESOLVER: {answer.nameserver}\n{answer.response}" for answer in answers]
 
     results = {
         "dns_records": "\n\n".join(answers_formatted),
+        "query_errors": query_errors,
         "dmarc_response": get_email_security_records(resolver, hostname, "_dmarc"),
         "dkim_response": get_email_security_records(resolver, hostname, "_domainkey"),
     }
