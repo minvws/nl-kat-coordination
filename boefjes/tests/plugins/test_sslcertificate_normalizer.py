@@ -661,6 +661,6 @@ def test_ssl_certificates_output_is_a_valid_observation():
         source=Reference.from_str(input_ooi["primary_key"]),
         source_method="ssl-certificates",
         task_id=uuid.uuid4(),
-        valid_time=datetime.now(timezone.utc),
+        valid_time=datetime.datetime.now(timezone.utc),
         result=oois,
     )
