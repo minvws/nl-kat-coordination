@@ -105,23 +105,38 @@ class ObservedAtMixin(ContextMixin, View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.temporal_context: datetime | None = kwargs.get("temporal_context")
+        self.now: datetime = datetime.now(timezone.utc)
+
+    @cached_property
+    def is_temporal_view(self) -> bool:
+        """Are we dealing with a temporal view? or are we looking at the 'now'"""
+        return self.temporal_context is not None
 
     @cached_property
     def is_historic_view(self) -> bool:
-        """Are we dealing with a historic view? or are we looking at the 'now'"""
-        return self.temporal_context is not None
+        """Are we dealing with a historic view? or now or in the future?"""
+        if self.temporal_context is None:
+            return False
+        return self.temporal_context < self.now
+
+    @cached_property
+    def is_future_view(self) -> bool:
+        """Are we dealing with a future view? or now or in the history?"""
+        if self.temporal_context is None:
+            return False
+        return self.temporal_context > self.now
 
     @cached_property
     def observed_at(self) -> datetime:
         """Property that holds the datetime, useful when constructing queries"""
         if self.temporal_context is not None:
             return self.temporal_context
-        return datetime.now(timezone.utc)
+        return self.now
 
     @cached_property
     def temporal_string(self) -> str:
         """Property that holds the temporal context as a string"""
-        if self.is_historic_view:
+        if self.is_temporal_view:
             return str(self.temporal_context)
         return "now"
 
@@ -160,7 +175,7 @@ class ObservedAtMixin(ContextMixin, View):
         return urls
 
     def get_connector_form_kwargs(self) -> dict:
-        if self.is_historic_view:
+        if self.is_temporal_view:
             return {"data": self.request.GET}
         else:
             return {}
@@ -172,14 +187,16 @@ class ObservedAtMixin(ContextMixin, View):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.observed_at
         context["temporal_context"] = self.temporal_context
+        context["temporal_view"] = self.is_temporal_view
         context["historic_view"] = self.is_historic_view
+        context["future_view"] = self.is_future_view
         context["temporal_navigation"] = self.temporal_navigation
         context["now_url"] = self.now_url
         return context
 
     def count_observed_at_filter(self) -> int:
         """Count the temporal filter when dealing with forms, only counts if not 'now'"""
-        return int(self.is_historic_view)
+        return int(self.temporal_view)
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):

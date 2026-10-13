@@ -21,7 +21,9 @@ def test_observed_at_defaults_to_now(mocker):
     mixin.temporal_context = None
 
     assert mixin.observed_at == now
+    assert mixin.is_temporal_view is False
     assert mixin.is_historic_view is False
+    assert mixin.is_future_view is False
     assert mixin.temporal_string == "now"
 
 
@@ -33,7 +35,9 @@ def test_observed_at_uses_temporal_context():
     mixin.temporal_context = moment
 
     assert mixin.observed_at == moment
+    assert mixin.is_temporal_view is True
     assert mixin.is_historic_view is True
+    assert mixin.is_future_view is False
     assert mixin.temporal_string == str(moment)
 
 
@@ -72,4 +76,6 @@ def test_observed_at_historic_view_through_url(rf, client_member, mock_organizat
 
     assert response.status_code == 200
     assert response.context_data["observed_at"] == moment
+    assert response.context_data["future_view"] is False
+    assert response.context_data["temporal_view"] is True
     assert response.context_data["historic_view"] is True

@@ -7,9 +7,9 @@
             <button type="button"
                     aria-controls="temporal-selector"
                     aria-expanded="false"
-                    {% if historic_view %}title="{{ observed_at }}"{% endif %}
+                    {% if temporal_view %}title="{{ observed_at }}"{% endif %}
                     class="dropdown-button ghost">
-                {% if historic_view %}
+                {% if temporal_view %}
                     {{ observed_at|naturaltime }}
                 {% else %}
                     Now

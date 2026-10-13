@@ -43,7 +43,7 @@ class OOIFilterView(OctopoesView):
 
     def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
-        if self.is_historic_view:
+        if self.is_temporal_view:
             active_filters[_("Observed_at: ")] = self.observed_at.strftime("%Y-%m-%d")
         if self.filtered_ooi_types:
             active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
@@ -144,7 +144,7 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin):
         """
         Some OOIs have an old valid time, this will fetch the latest OOI for today.
         """
-        if not self.is_historic_view:
+        if not self.is_temporal_view:
             return self.ooi
         if self.ooi_id is None:
             return None

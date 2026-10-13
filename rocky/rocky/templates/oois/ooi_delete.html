@@ -13,7 +13,7 @@
                 <h1>{% blocktranslate with primary_key=ooi.primary_key %}Delete {{ primary_key }}{% endblocktranslate %}</h1>
                 <p>{% translate "Are you sure?" %}</p>
                 <p>{% blocktranslate %}Here you can delete the {{ display_type }}.{% endblocktranslate %}</p>
-                {% if historic_view %}
+                {% if temporal_view %}
                     <p class="info">
                         {% blocktranslate %}
                         Deletion will take place at the current timestamp ({{ observed_at}}). If the object has been observed at a later date, it will still exists from that point on.

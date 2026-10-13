@@ -27,18 +27,16 @@
             </ul>
         </div>
     {% endif %}
-    {% if not historic_view %}
-        {% if ooi|is_finding and perms.tools.can_mute_findings %}
-            <a href="{% app_url 'finding_mute' ooi=ooi_id %}"
-               class="button ghost nowrap">{% translate "Mute finding" %}</a>
-        {% endif %}
-        {% if not ooi|is_finding and not ooi|is_finding_type %}
-            <a href="{% app_url 'ooi_edit' ooi=ooi_id %}"
-               class="button ghost nowrap">{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</a>
-        {% endif %}
-        {% if not ooi|is_finding_type and perms.tools.can_delete_oois %}
-            <a href="{% app_url 'ooi_delete' ooi=ooi_id %}"
-               class="button ghost destructive nowrap">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
-        {% endif %}
+    {% if ooi|is_finding and perms.tools.can_mute_findings %}
+        <a href="{% app_url 'finding_mute' ooi=ooi_id %}"
+           class="button ghost nowrap">{% translate "Mute finding" %}</a>
+    {% endif %}
+    {% if not ooi|is_finding and not ooi|is_finding_type %}
+        <a href="{% app_url 'ooi_edit' ooi=ooi_id %}"
+           class="button ghost nowrap">{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</a>
+    {% endif %}
+    {% if not ooi|is_finding_type and perms.tools.can_delete_oois %}
+        <a href="{% app_url 'ooi_delete' ooi=ooi_id %}"
+           class="button ghost destructive nowrap">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}
 </div>

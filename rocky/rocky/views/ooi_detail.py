@@ -32,6 +32,9 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         return super().post(request, *args, **kwargs)
 
     def set_clearance_level(self) -> None:
+        if self.is_historic_view:
+            messages.error(self.request, _("Clearance levels cannot be set on historic views."))
+            return
         if not self.indemnification_present:
             self.indemnification_error()
             return
@@ -64,6 +67,9 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectManager, OOIFindingManage
         messages.success(self.request, _("Question has been answered."))
 
     def start_boefje_scan(self) -> None:
+        if self.is_historic_view:
+            messages.error(self.request, _("Boefje tasks cannot be started from historic views."))
+            return
         boefje_id = self.request.POST.get("boefje_id")
         boefje = self.katalogus_client.get_plugin(boefje_id)
         self.run_boefje(boefje, self.ooi)
