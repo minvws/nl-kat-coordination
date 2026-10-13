@@ -6,8 +6,8 @@
     "risk": "medium",
     "impact": "Absence of the HSTS header allows clients to connect insecurely to the website. This may result in eavesdropping of (sensitive) data by an attacker. Enabling the HSTS header forces the web browser to choose HTTPS instead of HTTP.",
     "recommendation": "Configure the Strict-Transport-Security HTTP header for all websites.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-CSP": {
     "name":"Missing Content Security Policy (CSP) header",
@@ -16,8 +16,8 @@
     "risk": "medium",
     "impact": "The usage possibility of JavaScript is not limited by the website. If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page. This code is then executed by the browser of the victim. If a well-established Content Security Policy is active, the attacker can inject JavaScript code into the browser of the victim, but then the code will not get executed by the browser. A good configured Content Security Policy is a strong protection against cross-site scripting vulnerabilities.",
     "recommendation": "Set the Content-Security-Policy HTTP header in all HTTP answers. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. Implement a process that periodically analyses these logs for programming errors and hack attacks.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
     "name":"Non-standard X-Permitted-Cross-Domain-Policies header detected",
@@ -46,8 +46,8 @@
     "risk": "recommendation",
     "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
     "recommendation": "1. Set the HTTP header <c>X-Frame- Options</c> with value deny (safest) or sameorigin in every HTTP answer for older browsers. 2. Set the frame-ancestors variable in the Content-Security-Policy header for modern browsers. 3. Add JavaScript code to all pages to ensure that these web pages may not be loaded within an <iframe>. In this manner also very old browsers are protected that do not support the HTTP header X-Frame-Options.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-X-DNS-PREFETCH-CONTROL": {
     "name":"Non-standard X-DNS-Prefetch-Control header detected",
@@ -76,8 +76,8 @@
     "risk": "recommendation",
     "impact": "When the website has a cross-site scripting vulnerability, then the attacker exploiting this vulnerability can use all the capabilities of the victim's browser.",
     "recommendation": "Set the Permissions-Policy HTTP header in all HTTP answers.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-REFERRER-POLICY": {
     "name":"Missing Referrer-Policy header",
@@ -86,8 +86,8 @@
     "risk": "recommendation",
     "impact": "When a website visitor clicks on a link to another website, the browser sends the Referer HTTP header (a part of the URL) to the other website. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
     "recommendation": "Set the header to 'Referrer-Policy: no-referrer' in every HTTP answer.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-X-CONTENT-TYPE-OPTIONS": {
     "name":"Missing X-Content-Type-Options header",
@@ -96,8 +96,8 @@
     "risk": "recommendation",
     "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as '.jpg' or '.png'. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as 'Content-Type: image/jpeg'. This may include a cross-site scripting vulnerability.",
     "recommendation": "Set the HTTP header 'X-Content-Type- Options: nosniff' in at least all web pages that contain user input (and uploads).",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-SSL-2-SUPPORT": {
     "name":"SSL version 2 protocol detected",
@@ -156,8 +156,8 @@
     "risk": "medium",
     "impact": "Lack of support for TLS 1.2 could impact backwards compatibility for older devices. Ensure that only safe ciphers are used for encryption.",
     "recommendation": "Enable support for TLS version 1.2.",
-    "groups": ["tls-certificates"]
-
+    "groups": ["tls-certificates"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-TLS-1.3": {
     "name":"TLS version 1.3 is not supported",
@@ -166,8 +166,8 @@
     "risk": "medium",
     "impact": "TLS 1.3 must be enabled to support the newest devices and in order to offer Perfect Forward Secrecy.",
     "recommendation": "Enable support for TLS version 1.3.",
-    "groups": ["tls-certificates"]
-
+    "groups": ["tls-certificates"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-TLS-FALLBACK-SCSV": {
     "name":"No TLS downgrade attack protection (Fallback SCSV)",
@@ -176,8 +176,8 @@
     "risk": "low",
     "impact": "An attacker, who can perform a man-in-the-middle attack, can weaken the session between the client and server. This could result in loss of confidentiality and integrity of data.",
     "recommendation": "Implement TLS_FALLBACK_SCSV.",
-    "groups": ["tls-certificates"]
-
+    "groups": ["tls-certificates"],
+    "tags": ["misconfiguration"]
   },
   "KAT-OPEN-SYSADMIN-PORT": {
     "name":"Open system administrator port(s) detected",
@@ -276,8 +276,8 @@
     "risk": "medium",
     "impact": "DNS requests are not authenticated, thus there is no protection against DNS poisoning or manipulation.",
     "recommendation": "Enable DNSSEC on your name servers.",
-    "groups": ["dns-security"]
-
+    "groups": ["dns-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-INVALID-DNSSEC": {
     "name":"DNSSEC config is invalid",
@@ -286,8 +286,8 @@
     "risk": "medium",
     "impact": "Invalid DNS requests may not provide the wanted protection against DNS poisoning or manipulation attacks.",
     "recommendation": "Reconfigure DNSSEC on your name servers.",
-    "groups": ["dns-security"]
-
+    "groups": ["dns-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-HSTS-VULNERABILITIES": {
     "name":"HTTP Strict Transport Security vulnerabilities found",
@@ -296,8 +296,8 @@
     "risk": "medium",
     "impact": "Impact depends on the HSTS misconfiguration. Determine what is wrong.",
     "recommendation": "Adjust the HSTS header to make it as strict as possible in order to reduce the attack surface.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-CSP-VULNERABILITIES": {
     "name":"Content Security Policy header vulnerabilities",
@@ -306,8 +306,8 @@
     "risk": "medium",
     "impact": "A too naive CSP policy allows attackers to perform attacks from/to external locations.",
     "recommendation": "Adjust the CSP header to make it as strict as possible in order to reduce the attack surface.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-CSP-INVALID": {
     "name":"Content Security Policy header is malformed",
@@ -316,8 +316,8 @@
     "risk": "recommendation",
     "impact": "A malformed CSP directive is ignored by the browser, so the intended protection is silently not applied.",
     "recommendation": "Correct the CSP header so every directive is well-formed and appears once.",
-    "groups": ["web-security", "http-security-headers"]
-
+    "groups": ["web-security", "http-security-headers"],
+    "tags": ["misconfiguration"]
   },
   "KAT-POTENTIAL-MALWARE": {
     "name":"Software identified with potential malware",
@@ -516,8 +516,8 @@
     "risk": "low",
     "impact": "Users may not connect over a secured connection to your server.",
     "recommendation": "Check if redirection is setup properly.",
-    "groups": ["web-security", "http-exposure"]
-
+    "groups": ["web-security", "http-exposure"],
+    "tags": ["misconfiguration"]
   },
   "KAT-CERTIFICATE-EXPIRING-SOON": {
     "name":"SSL/TLS certificate expiring soon",
@@ -546,8 +546,8 @@
     "risk": "medium",
     "impact": "E-mail from this domain can potentially be spoofed if DMARC is not (properly) implemented in combination with DKIM and SPF. Not having DMARC setup will also limit this domains ability to deliver mail to various popular mail recipient domains.",
     "recommendation": "Set a DMARC record to protect your domain.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-DKIM": {
     "name":"No DKIM records found",
@@ -556,8 +556,8 @@
     "risk": "medium",
     "impact": "E-mail from this domain can potentially be spoofed if DKIM is not (properly) implemented in combination with DMARC and SPF.  Not having DKIM setup will also limit this domains ability to deliver mail to various popular mail recipient domains.",
     "recommendation": "Set a DKIM record to protect your domain, and Sign outgoing mails accordingly.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-SECURITY-TXT": {
     "name":"Security.txt file missing",
@@ -566,8 +566,8 @@
     "risk": "recommendation",
     "impact": "Security researchers and/or bounty hunter may not be able to properly disclose vulnerabilities for your website.",
     "recommendation": "Make sure there is a security.txt available.",
-    "groups": ["web-security"]
-
+    "groups": ["web-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-INVALID-SECURITY-TXT": {
     "name":"Security.txt file is incomplete",
@@ -576,8 +576,8 @@
     "risk": "recommendation",
     "impact": "Security researchers and/or bounty hunter may not be able to properly disclose vulnerabilities for your website.",
     "recommendation": "Make sure the security.txt is in line with the requirements.",
-    "groups": ["web-security"]
-
+    "groups": ["web-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-BAD-FORMAT-SECURITY-TXT": {
     "name":"Security.txt file contains bad format",
@@ -586,8 +586,8 @@
     "risk": "recommendation",
     "impact": "Security researchers and/or bounty hunter may not be able to properly disclose vulnerabilities for your website.",
     "recommendation": "Make sure the security.txt is correctly formatted.",
-    "groups": ["web-security"]
-
+    "groups": ["web-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-SPF": {
     "name":"No SPF records found",
@@ -596,8 +596,8 @@
     "risk": "medium",
     "impact": "E-mail from this domain can potentially be spoofed if SPF is not (properly) implemented in combination with DKIM and DMARC. Not having SPF setup will also limit this domains ability to deliver mail to various popular mail recipient domains.",
     "recommendation": "Set an SPF record to protect your domain.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-INVALID-SPF": {
     "name":"Invalid SPF records found",
@@ -606,8 +606,8 @@
     "risk": "low",
     "impact": "E-mail from this domain can potentially be spoofed if SPF is not (properly) implemented in combination with DKIM and DMARC. Not having SPF setup will also limit this domains ability to deliver mail to various popular mail recipient domains.",
     "recommendation": "Fix the syntax of the SPF record.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-EXPENSIVE-SPF": {
     "name":"SPF record contains expensive construction",
@@ -616,8 +616,8 @@
     "risk": "low",
     "impact": "Various recipient mailservers might not perform all requested lookups and bounce email because of missed allowed addresses, or bounce mail entirely due to too many dns lookups.",
     "recommendation": "Consolidate the SPF record, remove unneeded lookups and mechanisms.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-DEPRECATED-SPF-MECHANISM": {
     "name":"SPF record contains deprecated mechanism",
@@ -626,8 +626,8 @@
     "risk": "low",
     "impact": "Deprecated mechanism is used. It should not be used.",
     "recommendation": "Fix the SPF record, remove deprecated mechanisms.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "SUB-DOMAIN-TAKEOVER": {
     "name":"Possible sub-domain takeover",
@@ -706,8 +706,8 @@
     "risk": "low",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses.",
-    "groups": ["internet-standards"]
-
+    "groups": ["internet-standards"],
+    "tags": ["misconfiguration"]
   },
   "KAT-EXPIRED-RPKI": {
     "name":"Expired RPKI route announcement",
@@ -716,8 +716,8 @@
     "risk": "low",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
-    "groups": ["internet-standards"]
-
+    "groups": ["internet-standards"],
+    "tags": ["misconfiguration"]
   },
   "KAT-INVALID-RPKI": {
     "name":"Invalid RPKI route announcement",
@@ -726,8 +726,8 @@
     "risk": "medium",
     "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
     "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired.",
-    "groups": ["internet-standards"]
-
+    "groups": ["internet-standards"],
+    "tags": ["misconfiguration"]
   },
   "KAT-NO-CAA": {
     "name":"Missing CAA record",
@@ -736,8 +736,8 @@
     "risk": "low",
     "impact": "All Certificate Authorities may issue certificates for you domain.",
     "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs.",
-    "groups": ["dns-security"]
-
+    "groups": ["dns-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-DISALLOWED-DOMAIN-IN-CSP": {
     "name":"Disallowed domain(s) in CSP header",
@@ -786,8 +786,8 @@
     "source": "Check the nameservers of the host or iprange manually.",
     "impact": "No resolving can be done for this IP or host. This might cause problems for mailservers or slow down connections.",
     "recommendation": "Verify that the listed nameservers are reachable and have valid hostnames.",
-    "groups": ["dns-security"]
-
+    "groups": ["dns-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-OUTDATED-SOFTWARE": {
     "name":"Outdated software identified",
@@ -855,8 +855,8 @@
     "risk": "low",
     "impact": "SPF governs which email senders are allowed for each hostname, having multiple SPF records might introduce partial or ignored senders causing delivery problems.",
     "recommendation": "Combine the SPF records into 1 record.",
-    "groups": ["email-security"]
-
+    "groups": ["email-security"],
+    "tags": ["misconfiguration"]
   },
   "KAT-MALFORMED-COOKIE": {
     "name": "Malformed cookie",
@@ -865,8 +865,8 @@
     "risk": "low",
     "impact": "Ambiguous cookie parsing can mask security attributes or allow smuggling of unintended values; the cookie may behave differently across browsers, proxies and security tooling.",
     "recommendation": "Emit syntactically valid Set-Cookie headers: a named cookie whose Domain matches the origin, with a valid Expires date, an integer Max-Age, a Path starting with '/', and a SameSite of Strict, Lax or None.",
-    "groups": ["web-security", "http-cookies"]
-
+    "groups": ["web-security", "http-cookies"],
+    "tags": ["misconfiguration"]
   },
   "KAT-INSECURE-COOKIE": {
     "name": "Insecure cookie configuration",
@@ -875,7 +875,7 @@
     "risk": "medium",
     "impact": "A cookie without the Secure attribute may be sent over an unencrypted connection and intercepted. Without HttpOnly the cookie is readable by client-side scripts, so an XSS flaw can steal it. Without a restrictive SameSite value the cookie is sent with cross-site requests, enabling CSRF. For session cookies this can lead to session hijacking.",
     "recommendation": "Set the Secure and HttpOnly attributes on all cookies, and set SameSite to Strict or Lax (use None only together with Secure when cross-site use is required).",
-    "groups": ["web-security", "http-cookies"]
-
+    "groups": ["web-security", "http-cookies"],
+    "tags": ["misconfiguration"]
   }
 }

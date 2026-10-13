@@ -4,7 +4,7 @@ from enum import Enum
 from functools import total_ordering
 from typing import Annotated, Literal
 
-from pydantic import AnyUrl, StringConstraints
+from pydantic import AnyUrl, Field, StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -124,7 +124,8 @@ class KATFindingType(FindingType):
 
     object_type: Literal["KATFindingType"] = "KATFindingType"
 
-    groups: list[str] = []
+    groups: list[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
 
 
 class Finding(OOI):

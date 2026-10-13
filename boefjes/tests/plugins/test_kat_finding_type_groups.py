@@ -29,3 +29,27 @@ def test_invalid_assignment():
     registry = {"web-security": {"name": "Web", "description": "Web security", "parent": None}}
     with pytest.raises(ValueError):
         validate_groups(registry, {"KAT-EXAMPLE": {"groups": ["unknown"]}})
+
+
+def test_catalog_optional_misconfiguration_tags():
+    catalog = json.loads((CATALOG_DIR / "kat_finding_types.json").read_text())
+
+    tagged = [identifier for identifier, entry in catalog.items() if "misconfiguration" in entry.get("tags", [])]
+    assert len(tagged) == 32
+    assert catalog["KAT-NO-DNSSEC"]["tags"] == ["misconfiguration"]
+    assert catalog["KAT-INSECURE-COOKIE"]["tags"] == ["misconfiguration"]
+    assert "tags" not in catalog["KAT-LEAKIX-MEDIUM"]
+
+
+@pytest.mark.parametrize("tags", ["misconfiguration", [""], [1], ["misconfiguration", "misconfiguration"], None])
+def test_invalid_tags(tags):
+    registry = {"dns-security": {"name": "DNS", "description": "DNS security", "parent": None}}
+    with pytest.raises(ValueError, match="Invalid tags"):
+        validate_groups(registry, {"KAT-EXAMPLE": {"groups": ["dns-security"], "tags": tags}})
+
+
+def test_optional_tags_are_valid():
+    registry = {"dns-security": {"name": "DNS", "description": "DNS security", "parent": None}}
+    validate_groups(registry, {"KAT-EXAMPLE": {"groups": ["dns-security"]}})
+    validate_groups(registry, {"KAT-EXAMPLE": {"groups": ["dns-security"], "tags": []}})
+    validate_groups(registry, {"KAT-EXAMPLE": {"groups": ["dns-security"], "tags": ["misconfiguration", "custom"]}})
