@@ -4,13 +4,13 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
-from tools.ooi_helpers import format_attr_name
-from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
 from rocky.views.mixins import SingleOOITreeMixin
+from tools.ooi_helpers import format_attr_name
+from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):
