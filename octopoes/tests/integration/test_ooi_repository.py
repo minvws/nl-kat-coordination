@@ -5,7 +5,7 @@ import pytest
 
 from octopoes.models import DeclaredScanProfile, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.findings import Finding, KATFindingType, MutedFinding, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, Network
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path
@@ -168,3 +168,57 @@ def test_kat_finding_type_backfill_existing_xtdb_ooi(xtdb_ooi_repository: XTDBOO
     assert stored.name == legacy.name
     assert stored.groups == refreshed.groups
     assert stored.tags == refreshed.tags
+
+
+def test_findings_group_and_tag_filters_before_pagination(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime):
+    """XTDB matches individual array elements in both paginated and count queries."""
+    network = Network(name="finding-filter-test")
+    xtdb_ooi_repository.save(network, valid_time)
+    cases = [
+        ("WEB-BOTH-LOW", ["web-security", "http-security-headers"], ["misconfiguration"], 4.0),
+        ("WEB-ONLY", ["web-security"], [], 5.0),
+        ("DNS-BOTH", ["dns-security"], ["misconfiguration"], 6.0),
+        ("WEB-BOTH-HIGH", ["web-security"], ["misconfiguration"], 8.0),
+        ("UNCLASSIFIED", [], [], 9.0),
+    ]
+    created = {}
+    for i, (identifier, groups, tags, score) in enumerate(cases):
+        hostname = Hostname(network=network.reference, name=f"filter{i}.example")
+        finding_type = KATFindingType(
+            id=f"KAT-{identifier}", groups=groups, tags=tags, risk_score=score, risk_severity=RiskLevelSeverity.HIGH
+        )
+        finding = Finding(ooi=hostname.reference, finding_type=finding_type.reference)
+        for ooi in (hostname, finding_type, finding):
+            xtdb_ooi_repository.save(ooi, valid_time)
+        created[identifier] = finding
+    xtdb_ooi_repository.session.commit()
+
+    severities = {RiskLevelSeverity.HIGH}
+
+    def query(**kwargs):
+        return xtdb_ooi_repository.list_findings(severities, valid_time, **kwargs)
+
+    assert query(limit=0).count == 5
+    assert query(group="web-security", limit=0).count == 3
+    assert query(tag="misconfiguration", limit=0).count == 3
+    assert query(group="web-security", tag="misconfiguration", limit=0).count == 2
+    assert query(group="tls-certificates", limit=0).count == 0
+    assert query(group="web-security", tag="misconfiguration", limit=1).items == [created["WEB-BOTH-HIGH"]]
+    second_page = query(group="web-security", tag="misconfiguration", offset=1, limit=1)
+    assert second_page.count == 2
+    assert second_page.items == [created["WEB-BOTH-LOW"]]
+    empty_page = query(group="web-security", tag="misconfiguration", offset=3, limit=1)
+    assert empty_page.count == 2
+    assert empty_page.items == []
+    assert query(group="web-security", tag="misconfiguration", search_string="filter0", limit=0).count == 1
+    assert (
+        xtdb_ooi_repository.list_findings(
+            set(), valid_time, group="web-security", tag="misconfiguration", limit=0
+        ).count
+        == 0
+    )
+
+    xtdb_ooi_repository.save(MutedFinding(finding=created["WEB-BOTH-HIGH"].reference), valid_time)
+    xtdb_ooi_repository.session.commit()
+    assert query(group="web-security", tag="misconfiguration", exclude_muted=True, limit=0).count == 1
+    assert query(group="web-security", tag="misconfiguration", only_muted=True, limit=0).count == 1
