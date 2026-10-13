@@ -73,19 +73,28 @@ def test_group_validation():
         validate_groups({"web": {"parent": "headers"}, "headers": {"parent": "web"}}, {})
 
 
-def test_group_validation_rejects_malformed_parent():
+def test_misconfiguration_tag_propagates():
+    raw = json.dumps(
+        {"KAT-EXAMPLE": {"risk": "medium", "groups": ["http-security-headers"], "tags": ["misconfiguration"]}}
+    ).encode()
+    ooi = list(run({"id": "KAT-EXAMPLE"}, raw))[0].ooi
+    assert ooi.groups == ["http-security-headers"]
+    assert ooi.tags == ["misconfiguration"]
+
+
+def test_untagged_finding_remains_backward_compatible():
+    raw = json.dumps({"KAT-EXAMPLE": {"risk": "medium"}}).encode()
+    ooi = list(run({"id": "KAT-EXAMPLE"}, raw))[0].ooi
+    assert ooi.tags == []
+
+
+def test_reject_unknown_and_duplicate_tags():
     import pytest
 
     from boefjes.plugins.kat_kat_finding_types.main import validate_groups
 
-    with pytest.raises(ValueError):
-        validate_groups({"web": {"name": "Web", "parent": ["bad"]}}, {})
-
-
-def test_group_validation_rejects_duplicate_membership():
-    import pytest
-
-    from boefjes.plugins.kat_kat_finding_types.main import validate_groups
-
-    with pytest.raises(ValueError):
-        validate_groups({"web": {"name": "Web"}}, {"KAT-A": {"groups": ["web", "web"]}})
+    groups = {"web": {"parent": None}}
+    validate_groups(groups, {"KAT-A": {"groups": ["web"], "tags": ["misconfiguration"]}})
+    for tags in (["unknown"], ["misconfiguration", "misconfiguration"], "misconfiguration"):
+        with pytest.raises(ValueError, match="Invalid tags"):
+            validate_groups(groups, {"KAT-A": {"tags": tags}})

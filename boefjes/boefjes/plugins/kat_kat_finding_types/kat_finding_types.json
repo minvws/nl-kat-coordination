@@ -8,6 +8,9 @@
     "recommendation": "Configure the Strict-Transport-Security HTTP header for all websites.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NO-CSP": {
@@ -19,6 +22,9 @@
     "recommendation": "Set the Content-Security-Policy HTTP header in all HTTP answers. Make sure that when the Content Security Policy is violated by a browser, that this violation is logged and monitored. Point the content security violation variable report-uri to a server-side log script. Implement a process that periodically analyses these logs for programming errors and hack attacks.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
@@ -52,6 +58,9 @@
     "recommendation": "1. Set the HTTP header <c>X-Frame- Options</c> with value deny (safest) or sameorigin in every HTTP answer for older browsers. 2. Set the frame-ancestors variable in the Content-Security-Policy header for modern browsers. 3. Add JavaScript code to all pages to ensure that these web pages may not be loaded within an <iframe>. In this manner also very old browsers are protected that do not support the HTTP header X-Frame-Options.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-X-DNS-PREFETCH-CONTROL": {
@@ -85,6 +94,9 @@
     "recommendation": "Set the Permissions-Policy HTTP header in all HTTP answers.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NO-REFERRER-POLICY": {
@@ -96,6 +108,9 @@
     "recommendation": "Set the header to 'Referrer-Policy: no-referrer' in every HTTP answer.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NO-X-CONTENT-TYPE-OPTIONS": {
@@ -107,6 +122,9 @@
     "recommendation": "Set the HTTP header 'X-Content-Type- Options: nosniff' in at least all web pages that contain user input (and uploads).",
     "groups": [
       "other"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-SSL-2-SUPPORT": {
@@ -118,6 +136,9 @@
     "recommendation": "Disable support for SSL version 2.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-SSL-3-SUPPORT": {
@@ -129,6 +150,9 @@
     "recommendation": "Disable support for SSL version 3.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-TLS-1.0-SUPPORT": {
@@ -140,6 +164,9 @@
     "recommendation": "Disable support for TLS version 1.1, unless it is required for backwards compatibility of devices. To reduce the attack surface ensure that only secure ciphers are used.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-TLS-1.1-SUPPORT": {
@@ -151,6 +178,9 @@
     "recommendation": "Disable support for TLS version 1.1, unless it is required for backwards compatibility of devices. To reduce the attack surface ensure that only secure ciphers are used.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-TLS-1.0-AND-1.1-SUPPORT": {
@@ -162,6 +192,9 @@
     "recommendation": "Disable support for TLS version 1.0 and 1.1, unless it is required for backwards compatibility of devices. To reduce the attack surface ensure that only secure ciphers are used.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NO-TLS-1.2": {
@@ -195,6 +228,9 @@
     "recommendation": "Implement TLS_FALLBACK_SCSV.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-OPEN-SYSADMIN-PORT": {
@@ -305,6 +341,9 @@
     "recommendation": "Enable DNSSEC on your name servers.",
     "groups": [
       "dns-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-INVALID-DNSSEC": {
@@ -316,6 +355,9 @@
     "recommendation": "Reconfigure DNSSEC on your name servers.",
     "groups": [
       "dns-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-HSTS-VULNERABILITIES": {
@@ -327,6 +369,9 @@
     "recommendation": "Adjust the HSTS header to make it as strict as possible in order to reduce the attack surface.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-CSP-VULNERABILITIES": {
@@ -338,6 +383,9 @@
     "recommendation": "Adjust the CSP header to make it as strict as possible in order to reduce the attack surface.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-CSP-INVALID": {
@@ -349,6 +397,9 @@
     "recommendation": "Correct the CSP header so every directive is well-formed and appears once.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-POTENTIAL-MALWARE": {
@@ -569,6 +620,9 @@
     "recommendation": "Check if redirection is setup properly.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-CERTIFICATE-EXPIRING-SOON": {
@@ -635,6 +689,9 @@
     "recommendation": "Make sure the security.txt is in line with the requirements.",
     "groups": [
       "internet-standards"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-BAD-FORMAT-SECURITY-TXT": {
@@ -646,6 +703,9 @@
     "recommendation": "Make sure the security.txt is correctly formatted.",
     "groups": [
       "internet-standards"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NO-SPF": {
@@ -668,6 +728,9 @@
     "recommendation": "Fix the syntax of the SPF record.",
     "groups": [
       "email-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-EXPENSIVE-SPF": {
@@ -679,6 +742,9 @@
     "recommendation": "Consolidate the SPF record, remove unneeded lookups and mechanisms.",
     "groups": [
       "email-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-DEPRECATED-SPF-MECHANISM": {
@@ -690,6 +756,9 @@
     "recommendation": "Fix the SPF record, remove deprecated mechanisms.",
     "groups": [
       "email-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "SUB-DOMAIN-TAKEOVER": {
@@ -723,6 +792,9 @@
     "recommendation": "Disable insecure ciphers as much as possible. Enable ciphers that are labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers. If this is not possible make sure that systems using these ciphers are segmented and additionally secured.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-MEDIUM-BAD-CIPHER": {
@@ -734,6 +806,9 @@
     "recommendation": "Disable phase out ciphers as much as possible. Enable ciphers that are labeled as 'Good' by the NCSC. Check https://cipherlist.eu/ for safe ciphers.",
     "groups": [
       "tls-certificates"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-RECOMMENDATION-BAD-CIPHER": {
@@ -800,6 +875,9 @@
     "recommendation": "Remove the offending hostname from the CSP header.",
     "groups": [
       "http-security-headers"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-NONSTANDARD-HEADERS": {
@@ -887,6 +965,9 @@
     "recommendation": "Disable the TRACE method on the web server. For Apache: TraceEnable off. For Nginx: do not forward TRACE. For IIS: disable the verb in request filtering.",
     "groups": [
       "http-exposure"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-WILDCARD-CERTIFICATE": {
@@ -920,6 +1001,9 @@
     "recommendation": "Combine the SPF records into 1 record.",
     "groups": [
       "email-security"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-MALFORMED-COOKIE": {
@@ -931,6 +1015,9 @@
     "recommendation": "Emit syntactically valid Set-Cookie headers: a named cookie whose Domain matches the origin, with a valid Expires date, an integer Max-Age, a Path starting with '/', and a SameSite of Strict, Lax or None.",
     "groups": [
       "http-cookies"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   },
   "KAT-INSECURE-COOKIE": {
@@ -942,6 +1029,9 @@
     "recommendation": "Set the Secure and HttpOnly attributes on all cookies, and set SameSite to Strict or Lax (use None only together with Secure when cross-site use is required).",
     "groups": [
       "http-cookies"
+    ],
+    "tags": [
+      "misconfiguration"
     ]
   }
 }

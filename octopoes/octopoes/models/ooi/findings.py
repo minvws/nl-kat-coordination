@@ -124,6 +124,7 @@ class KATFindingType(FindingType):
 
     object_type: Literal["KATFindingType"] = "KATFindingType"
     groups: list[str] = []
+    tags: list[str] = []
 
 
 class Finding(OOI):
