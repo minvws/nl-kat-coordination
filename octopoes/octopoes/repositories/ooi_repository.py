@@ -45,7 +45,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
 
     changed = False
     for key, value in clean_new.items():
-        if key in data_old and data_old[key] != value:
+        if key not in data_old or data_old[key] != value:
             changed = True
             break
 

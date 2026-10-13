@@ -105,3 +105,12 @@ def test_kat_finding_types_unknown_id_has_no_tags():
     finding_type = list(run({"id": "KAT-UNKNOWN"}, b"{}"))[0].ooi
 
     assert finding_type.tags == []
+
+
+def test_kat_finding_types_normalizer_explicit_empty_classification_is_serialized():
+    """The catalog can intentionally clear old assignments on rehydration."""
+    raw = json.dumps({"KAT-EXAMPLE": {"risk": "low"}}).encode()
+    finding_type = list(run({"id": "KAT-EXAMPLE"}, raw))[0].ooi
+
+    assert finding_type.model_dump()["groups"] == []
+    assert finding_type.model_dump()["tags"] == []

@@ -125,3 +125,46 @@ def test_complex_query(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datet
     result = xtdb_ooi_repository.query(query, valid_time)
 
     assert len(result) == 1
+
+
+def test_kat_finding_type_metadata_persists_on_partial_save(
+    xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime
+):
+    """Classification must persist through XTDB and remain intentionally editable."""
+    stored = KATFindingType(
+        id="KAT-CLASSIFICATION-PERSISTENCE", groups=["web-security", "http-security-headers"], tags=["misconfiguration"]
+    )
+    xtdb_ooi_repository.save(stored, valid_time)
+    xtdb_ooi_repository.session.commit()
+
+    xtdb_ooi_repository.save(KATFindingType(id=stored.id), valid_time)
+    xtdb_ooi_repository.session.commit()
+
+    hydrated = xtdb_ooi_repository.get(stored.reference, valid_time)
+    assert hydrated.groups == stored.groups
+    assert hydrated.tags == stored.tags
+
+    xtdb_ooi_repository.save(KATFindingType(id=stored.id, groups=[], tags=[]), valid_time)
+    xtdb_ooi_repository.session.commit()
+
+    cleared = xtdb_ooi_repository.get(stored.reference, valid_time)
+    assert cleared.groups == []
+    assert cleared.tags == []
+
+
+def test_kat_finding_type_backfill_existing_xtdb_ooi(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime):
+    """An older OOI lacking attributes receives groups and tags after rehydration."""
+    legacy = KATFindingType(id="KAT-CLASSIFICATION-BACKFILL", name="Legacy finding type")
+    xtdb_ooi_repository.save(legacy, valid_time)
+    xtdb_ooi_repository.session.commit()
+
+    refreshed = KATFindingType(
+        id=legacy.id, groups=["web-security", "http-security-headers"], tags=["misconfiguration"]
+    )
+    xtdb_ooi_repository.save(refreshed, valid_time)
+    xtdb_ooi_repository.session.commit()
+
+    stored = xtdb_ooi_repository.get(legacy.reference, valid_time)
+    assert stored.name == legacy.name
+    assert stored.groups == refreshed.groups
+    assert stored.tags == refreshed.tags
