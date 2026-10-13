@@ -124,6 +124,8 @@ class KATFindingType(FindingType):
 
     object_type: Literal["KATFindingType"] = "KATFindingType"
 
+    groups: list[str] = []
+
 
 class Finding(OOI):
     """Represents all OpenKAT Findings, including CVE's and CWE's.
