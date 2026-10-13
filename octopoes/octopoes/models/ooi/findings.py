@@ -123,6 +123,7 @@ class KATFindingType(FindingType):
     """Represents the OpenKAT Finding Types"""
 
     object_type: Literal["KATFindingType"] = "KATFindingType"
+    groups: list[str] = []
 
 
 class Finding(OOI):

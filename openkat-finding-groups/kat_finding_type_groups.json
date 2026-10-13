@@ -1,0 +1,18 @@
+{
+  "web-security": {"name": "Web Security", "description": "Website and HTTP-related security findings.", "parent": null},
+  "http-security-headers": {"name": "HTTP Security Headers", "description": "Missing or insecure HTTP response security headers.", "parent": "web-security"},
+  "http-cookies": {"name": "HTTP Cookies", "description": "Cookie security attributes and scope.", "parent": "web-security"},
+  "http-exposure": {"name": "HTTP Exposure", "description": "Exposed web resources, interfaces and endpoints.", "parent": "web-security"},
+  "tls-certificates": {"name": "TLS & Certificates", "description": "TLS protocols, cryptography and certificate configuration.", "parent": null},
+  "dns-security": {"name": "DNS Security", "description": "DNS records, DNSSEC and DNS configuration.", "parent": null},
+  "email-security": {"name": "Email Security", "description": "Email transport and domain authentication controls.", "parent": null},
+  "network-exposure": {"name": "Network Exposure", "description": "Exposed network services and ports.", "parent": null},
+  "software-security": {"name": "Software Security", "description": "Software lifecycle and insecure versions.", "parent": null},
+  "known-vulnerabilities": {"name": "Known Vulnerabilities", "description": "Identified vulnerabilities and CVE-related findings.", "parent": null},
+  "information-disclosure": {"name": "Information Disclosure", "description": "Unintended disclosure of sensitive information.", "parent": null},
+  "authentication": {"name": "Authentication & Access Control", "description": "Authentication, authorization and administrative access.", "parent": null},
+  "cloud-infrastructure": {"name": "Cloud & Infrastructure", "description": "Cloud resources and infrastructure configuration.", "parent": null},
+  "privacy": {"name": "Privacy", "description": "Privacy and data protection findings.", "parent": null},
+  "availability": {"name": "Availability", "description": "Reliability and service availability findings.", "parent": null},
+  "other": {"name": "Other", "description": "Finding Types awaiting a more specific classification.", "parent": null}
+}

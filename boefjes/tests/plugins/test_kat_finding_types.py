@@ -52,3 +52,40 @@ def test_kat_finding_types_unrecognised_risk_falls_back_to_unknown(caplog):
     assert oois[0].ooi.risk_severity == RiskLevelSeverity.UNKNOWN
     assert oois[0].ooi.risk_score is None
     assert any("Unknown risk level" in record.message for record in caplog.records)
+
+
+def test_kat_finding_types_groups():
+    raw = json.dumps({"KAT-EXAMPLE": {"risk": "medium", "groups": ["http-security-headers"]}}).encode()
+    ooi = list(run({"id": "KAT-EXAMPLE"}, raw))[0].ooi
+    assert ooi.groups == ["http-security-headers"]
+
+
+def test_group_validation():
+    import pytest
+
+    from boefjes.plugins.kat_kat_finding_types.main import validate_groups
+
+    groups = {"web": {"parent": None}, "headers": {"parent": "web"}}
+    validate_groups(groups, {"KAT-A": {"groups": ["headers"]}})
+    with pytest.raises(ValueError):
+        validate_groups(groups, {"KAT-A": {"groups": ["missing"]}})
+    with pytest.raises(ValueError):
+        validate_groups({"web": {"parent": "headers"}, "headers": {"parent": "web"}}, {})
+
+
+def test_group_validation_rejects_malformed_parent():
+    import pytest
+
+    from boefjes.plugins.kat_kat_finding_types.main import validate_groups
+
+    with pytest.raises(ValueError):
+        validate_groups({"web": {"name": "Web", "parent": ["bad"]}}, {})
+
+
+def test_group_validation_rejects_duplicate_membership():
+    import pytest
+
+    from boefjes.plugins.kat_kat_finding_types.main import validate_groups
+
+    with pytest.raises(ValueError):
+        validate_groups({"web": {"name": "Web"}}, {"KAT-A": {"groups": ["web", "web"]}})

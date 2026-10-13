@@ -1,0 +1,12 @@
+{
+  "KAT-NO-HSTS": {
+    "name": "Missing HSTS",
+    "risk": "medium",
+    "groups": [
+      "http-security-headers"
+    ]
+  },
+  "KAT-OTHER": {
+    "name": "Example"
+  }
+}
