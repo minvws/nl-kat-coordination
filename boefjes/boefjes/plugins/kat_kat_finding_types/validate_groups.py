@@ -26,6 +26,14 @@ def validate_groups(registry: dict, finding_types: dict) -> None:
             current = registry[current]["parent"]
 
     for identifier, finding_type in finding_types.items():
+        tags = finding_type.get("tags", [])
+        if (
+            not isinstance(tags, list)
+            or any(not isinstance(tag, str) or not tag.strip() for tag in tags)
+            or len(tags) != len(set(tags))
+        ):
+            raise ValueError(f"Invalid tags for finding type: {identifier}")
+
         groups = finding_type.get("groups")
         if (
             not isinstance(groups, list)
