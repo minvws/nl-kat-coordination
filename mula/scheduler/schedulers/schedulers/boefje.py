@@ -297,13 +297,15 @@ class BoefjeScheduler(Scheduler):
             failed_orgs = set()
             # collect ooi's from octopoes.
             for org, org_oois in oois.items():
-                # do one call to octopoes to collect all ooi's ready for rescheduling for that orga
+                # collect the ooi's ready for rescheduling for that orga from octopoes
                 try:
-                    octopoes_oois = self.ctx.services.octopoes.get_objects(org, references=list(org_oois.keys()))
-                    if not octopoes_oois:
-                        continue
-                    for ooi in octopoes_oois:
-                        org_oois[ooi.primary_key] = ooi
+                    # Chunk the lookup: references go in the query string, and
+                    # an unbounded list trips the URL length limit (#5437).
+                    references = list(org_oois.keys())
+                    for i in range(0, len(references), 50):
+                        octopoes_oois = self.ctx.services.octopoes.get_objects(org, references=references[i : i + 50])
+                        for ooi in octopoes_oois or []:
+                            org_oois[ooi.primary_key] = ooi
                 except ReadTimeout:
                     self.logger.error(
                         "Could not fetch objects from octopoes for rescheduling due to ReadTimeout",
