@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 16:49+0000\n"
+"POT-Creation-Date: 2026-10-02 12:30+0000\n"
 "PO-Revision-Date: 2026-10-07 13:51+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -2357,6 +2357,12 @@ msgstr "taljochting-frijwarrings-nivo"
 #: onboarding/forms.py
 msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr "Fier in jildige URL yn begjinnend mei ‘http://’ of ‘https://’."
+
+#: onboarding/forms.py onboarding/views.py
+msgid ""
+"The onboarding DNS report requires a hostname, not an IP address or "
+"localhost."
+msgstr ""
 
 #: onboarding/templates/partials/onboarding_header.html
 msgid "Onboarding"
