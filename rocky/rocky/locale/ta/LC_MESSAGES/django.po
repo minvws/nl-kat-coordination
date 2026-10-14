@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 16:49+0000\n"
+"POT-Creation-Date: 2026-10-02 12:30+0000\n"
 "PO-Revision-Date: 2026-09-30 19:12+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -2291,6 +2291,12 @@ msgstr "விளக்கம்-புத்துணர்ச்சி நி�
 msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 "'Http: //' அல்லது 'https: //' உடன் தொடங்கும் செல்லுபடியாகும் முகவரி ஐ உள்ளிடவும்."
+
+#: onboarding/forms.py onboarding/views.py
+msgid ""
+"The onboarding DNS report requires a hostname, not an IP address or "
+"localhost."
+msgstr ""
 
 #: onboarding/templates/partials/onboarding_header.html
 msgid "Onboarding"
