@@ -65,7 +65,7 @@ def test_add_config_ooi_with_empty_dict(rf, client_member, mock_organization_vie
     response = OOIAddView.as_view()(request, organization_code=client_member.organization.code, ooi_type="Config")
 
     assert response.status_code == 302
-    assert response.url == "/en/test/objects/detail/?ooi_id=Config%7Cinternet%7Ctest-bit"
+    assert response.url == "/en/test/now/objects/Config%7Cinternet%7Ctest-bit"
     mock_bytes_client().add_manual_proof.assert_called_once()
 
 
