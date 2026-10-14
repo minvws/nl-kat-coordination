@@ -397,7 +397,6 @@ class OnboardingCreateReportRecipe(
         )
 
     def get_ooi_pks(self) -> list[str]:
-        ooi = self.get_ooi(self.request.GET.get("ooi"))
         if self.ooi.web_url is not None:
             netloc = self.ooi.web_url.tokenized["netloc"]
             try:
