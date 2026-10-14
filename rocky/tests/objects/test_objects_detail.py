@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from tools.enums import SCAN_LEVEL
 from tools.models import Indemnification
 
+from octopoes.connector import RemoteException
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.tree import ReferenceTree
@@ -137,6 +138,22 @@ def test_question_detail_empty_config_still_loads_saved_answer(
     assert response.status_code == 200
     assertContains(response, "Using config from")
     assertContains(response, 'data-original="{}"')
+
+
+def test_question_detail_config_lookup_error_is_not_shown_as_unanswered(
+    rf, client_member, mock_organization_view_octopoes, mock_scheduler, paginated_task_list, mocker
+):
+    """Only a missing Config means "unanswered"; an Octopoes failure must not be rendered as one."""
+    mocker.patch("katalogus.client.KATalogusClient")
+
+    question_data = deepcopy(QUESTION_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(question_data)
+    mock_organization_view_octopoes().get.side_effect = RemoteException("Octopoes unavailable")
+
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
+
+    with pytest.raises(RemoteException):
+        OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
 
 def test_answer_question(

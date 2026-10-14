@@ -433,12 +433,15 @@ function ContentFromPostObject(wrapper, identifier, path, schema) {
 
     // A saved empty string is an answer too — keep it. Untouched optional
     // fields have no hadOriginal marker and keep dropping "" as before.
+    // When the schema pattern rejects "", clearing resets to the default
+    // instead of storing a value that can never validate.
     let keepEmpty =
       data === "" &&
       element &&
       element.dataset.hadOriginal &&
       fieldtype !== "number" &&
-      fieldtype !== "integer";
+      fieldtype !== "integer" &&
+      !(childschema["pattern"] && !new RegExp(childschema["pattern"]).test(""));
     if (data || fieldtype == "boolean" || keepEmpty) {
       if (schema["properties"][fieldname]["type"] == "number") {
         data = parseFloat(data);
@@ -485,7 +488,11 @@ function ContentFromPostArray(wrapper, identifier, path, fieldname, schema) {
       element &&
       element.dataset.hadOriginal &&
       schema["items"]["type"] !== "number" &&
-      schema["items"]["type"] !== "integer";
+      schema["items"]["type"] !== "integer" &&
+      !(
+        schema["items"]["pattern"] &&
+        !new RegExp(schema["items"]["pattern"]).test("")
+      );
     if (!data && !keepEmpty) {
       break;
     }

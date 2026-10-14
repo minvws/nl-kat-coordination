@@ -17,5 +17,10 @@
         </textarea>
         <legend>{% translate "Fill out this form to answer the Question (again):" %}</legend>
     </fieldset>
+    {% if current_config %}
+        <p class="explanation">
+            {% translate "Note: an emptied field is stored as an empty answer, not reset to its default value." %}
+        </p>
+    {% endif %}
     <button type="submit">{% translate "Submit" %}</button>
 </form>
