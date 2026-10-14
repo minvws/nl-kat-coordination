@@ -24,7 +24,6 @@ from django.views.generic.edit import FormMixin
 from httpx import HTTPError
 from katalogus.client import Boefje
 from pydantic import BaseModel
-from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization, OrganizationMember
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
@@ -100,8 +99,6 @@ class OOIAttributeError(AttributeError):
 
 
 class ObservedAtMixin(ContextMixin, View):
-    connector_form_class: type[ObservedAtForm] = ObservedAtForm
-
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.temporal_context: datetime | None = kwargs.get("temporal_context")
@@ -174,15 +171,6 @@ class ObservedAtMixin(ContextMixin, View):
             urls.append({"timestamp": timestamp, "url": self.get_temporal_url(timestamp)})
         return urls
 
-    def get_connector_form_kwargs(self) -> dict:
-        if self.is_temporal_view:
-            return {"data": self.request.GET}
-        else:
-            return {}
-
-    def get_connector_form(self) -> ObservedAtForm:
-        return self.connector_form_class(**self.get_connector_form_kwargs())
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.observed_at
@@ -196,7 +184,7 @@ class ObservedAtMixin(ContextMixin, View):
 
     def count_observed_at_filter(self) -> int:
         """Count the temporal filter when dealing with forms, only counts if not 'now'"""
-        return int(self.temporal_view)
+        return int(self.is_temporal_view)
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):

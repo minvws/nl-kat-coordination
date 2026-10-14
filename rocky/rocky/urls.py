@@ -92,12 +92,12 @@ urlpatterns += i18n_patterns(
         name="finding_mute_bulk",
     ),
     path(
-        "<organization_code>/<tc:temporal_context>/findings/<ooi:ooi>", FindingListView.as_view(), name="finding_list"
-    ),
-    path(
         "<organization_code>/<tc:temporal_context>/findings/<ooi:ooi>/add/",
         FindingAddView.as_view(),
         name="finding_add",
+    ),
+    path(
+        "<organization_code>/<tc:temporal_context>/findings/<ooi:ooi>", FindingListView.as_view(), name="finding_list"
     ),
     path(
         "<organization_code>/<tc:temporal_context>/findings/<ooi:ooi>/mute/",

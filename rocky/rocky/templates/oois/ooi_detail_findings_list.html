@@ -8,7 +8,6 @@
             {% if not ooi|is_finding and not ooi|is_finding_type %}
                 <div class="horizontal-view toolbar">
                     <a href="{% app_url 'finding_add' ooi=ooi.primary_key %}" class="button">{% translate "Add finding" %}</a>
-                    <a href="{% app_url 'finding_add' ooi=ooi.primary_key %}" class="button">{% translate "Add finding" %}</a>
                 </div>
             {% endif %}
         </div>
