@@ -102,7 +102,10 @@ class ObservedAtMixin(ContextMixin, View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.temporal_context: datetime | None = kwargs.get("temporal_context")
-        self.now: datetime = datetime.now(timezone.utc)
+
+    @cached_property
+    def now(sef) -> datetime:
+        return datetime.now(timezone.utc)
 
     @cached_property
     def is_temporal_view(self) -> bool:
