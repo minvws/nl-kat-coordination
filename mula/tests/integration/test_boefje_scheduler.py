@@ -2446,3 +2446,59 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: schedule should be disabled
         schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule(schedule.id)
         self.assertFalse(schedule_db_disabled.enabled)
+
+    def _create_due_schedules(self, n: int, deadline_at: datetime) -> list:
+        plugins = {}
+        oois = []
+        for _ in range(n):
+            ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
+            plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+            boefje_task = models.BoefjeTask(
+                boefje=models.Boefje.model_validate(plugin.model_dump()),
+                input_ooi=ooi.primary_key,
+                organization=self.organisation.id,
+            )
+            self.mock_ctx.datastores.schedule_store.create_schedule(
+                models.Schedule(
+                    scheduler_id=self.scheduler.scheduler_id,
+                    organisation=self.organisation.id,
+                    hash=boefje_task.hash,
+                    data=boefje_task.model_dump(),
+                    deadline_at=deadline_at,
+                )
+            )
+            plugins[plugin.id] = plugin
+            oois.append(ooi)
+        return plugins, oois
+
+    def test_process_rescheduling_skipped_schedules_do_not_block_due_ones(self):
+        """Schedules that are skipped without moving their deadline must not
+        starve schedules that are due later."""
+        now = datetime.now(timezone.utc)
+        skipped_plugins, skipped_oois = self._create_due_schedules(50, now - timedelta(hours=2))
+        for plugin in skipped_plugins.values():
+            plugin.type = "normalizer"  # skipped, deadline untouched
+        due_plugins, due_oois = self._create_due_schedules(1, now - timedelta(hours=1))
+        plugins = {**skipped_plugins, **due_plugins}
+
+        self.mock_get_objects.side_effect = lambda org, references: [
+            o for o in skipped_oois + due_oois if o.primary_key in references
+        ]
+        self.mock_get_plugin.side_effect = lambda boefje_id, org_id: plugins[boefje_id]
+
+        self.scheduler.process_rescheduling()
+
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+    def test_process_rescheduling_chunks_octopoes_lookup(self):
+        """All due schedules are processed, but octopoes is never asked for
+        more than 50 references in one request (#5437)."""
+        now = datetime.now(timezone.utc)
+        plugins, oois = self._create_due_schedules(120, now - timedelta(hours=1))
+        self.mock_get_objects.side_effect = lambda org, references: [o for o in oois if o.primary_key in references]
+        self.mock_get_plugin.side_effect = lambda boefje_id, org_id: plugins[boefje_id]
+
+        self.scheduler.process_rescheduling()
+
+        self.assertEqual(120, self.scheduler.queue.qsize())
+        self.assertTrue(all(len(c.kwargs["references"]) <= 50 for c in self.mock_get_objects.call_args_list))
