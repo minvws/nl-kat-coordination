@@ -4,14 +4,15 @@
 # jan klopper <jan@underdark.nl>, 2023, 2026.
 # Wim Benes <fryskefirefox@gmail.com>, 2024, 2025, 2026.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2024, 2025, 2026.
+# Wim Benes <fryskefirefox@users.noreply.hosted.weblate.org>, 2026.
 #: reports/forms.py
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-02 12:30+0000\n"
-"PO-Revision-Date: 2026-10-07 13:51+0000\n"
-"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
+"PO-Revision-Date: 2026-10-14 15:51+0000\n"
+"Last-Translator: Wim Benes <fryskefirefox@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/fy/>\n"
 "Language: fy\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 2026.10.1.dev0\n"
+"X-Generator: Weblate 2026.11.dev0\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -2363,6 +2364,7 @@ msgid ""
 "The onboarding DNS report requires a hostname, not an IP address or "
 "localhost."
 msgstr ""
+"It onboarding DNS-rapport hat in hostname nedich, gjin IP-adres of localhost."
 
 #: onboarding/templates/partials/onboarding_header.html
 msgid "Onboarding"
