@@ -1,12 +1,12 @@
-# Brenno de Winter <brenno@dewinter.com>, 2023, 2025.
-# Luca Racchetti <razzo1987@gmail.com>, 2023, 2025.
+# Brenno de Winter <brenno@dewinter.com>, 2023, 2025, 2026.
+# Luca Racchetti <razzo1987@gmail.com>, 2023, 2025, 2026.
 #: reports/forms.py
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-24 13:47+0000\n"
-"PO-Revision-Date: 2025-08-22 09:39+0000\n"
+"POT-Creation-Date: 2026-10-02 12:30+0000\n"
+"PO-Revision-Date: 2026-09-30 19:10+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/it/>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -363,7 +363,6 @@ msgstr "Tipo di membro"
 
 #: account/templates/account_detail.html
 #: crisis_room/templates/partials/crisis_room_findings_table.html
-#: onboarding/forms.py onboarding/templates/step_2a_organization_select.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr "Organizzazione"
@@ -2276,20 +2275,11 @@ msgstr "Spiegazione del livello di autorizzazione"
 msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 
-#: onboarding/forms.py
-#, fuzzy
-msgid "--- Select an organization ---"
-msgstr "--- Seleziona un'opzione ----"
-
-#: onboarding/forms.py
-#, fuzzy
-msgid "Please select an organization to proceed."
-msgstr "Seleziona un tipo di account per procedere."
-
-#: onboarding/forms.py
-#, fuzzy
-msgid "explanation-organization-select"
-msgstr "spiegazione-nome-organizzazione"
+#: onboarding/forms.py onboarding/views.py
+msgid ""
+"The onboarding DNS report requires a hostname, not an IP address or "
+"localhost."
+msgstr ""
 
 #: onboarding/templates/partials/onboarding_header.html
 msgid "Onboarding"
@@ -2357,30 +2347,6 @@ msgstr ""
 msgid "Let's get started"
 msgstr "Cominciamo"
 
-#: onboarding/templates/step_2a_organization_select.html
-#, fuzzy
-msgid "Select an organization"
-msgstr "Seleziona organizzazione"
-
-#: onboarding/templates/step_2a_organization_select.html
-msgid ""
-"You are already a member of one or more organizations. Select an existing "
-"organization to continue the onboarding in."
-msgstr ""
-
-#: onboarding/templates/step_2a_organization_select.html
-#: onboarding/templates/step_2b_organization_update.html
-#: onboarding/templates/step_3_indemnification_setup.html
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_7_clearance_level_introduction.html
-msgid "Continue"
-msgstr "Continua"
-
-#: onboarding/templates/step_2a_organization_select.html
-#, fuzzy
-msgid "Or create a new organization"
-msgstr "Aggiungi nuova organizzazione"
-
 #: onboarding/templates/step_2a_organization_setup.html
 #: onboarding/templates/step_2b_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -2401,14 +2367,16 @@ msgstr "Dettagli dell'organizzazione"
 msgid "Submit"
 msgstr "Invia"
 
-#: onboarding/templates/step_2a_organization_setup.html
-#, fuzzy
-msgid "Or select an existing organization"
-msgstr "Seleziona organizzazione"
-
 #: onboarding/templates/step_2b_organization_update.html
 msgid "Submit changes"
 msgstr "Invia modifiche"
+
+#: onboarding/templates/step_2b_organization_update.html
+#: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
+msgid "Continue"
+msgstr "Continua"
 
 #: onboarding/templates/step_3_indemnification_setup.html
 msgid "Indemnification setup"
@@ -4285,7 +4253,8 @@ msgid "Low"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Pending"
 msgstr "In attesa"
 
@@ -4711,8 +4680,8 @@ msgstr ""
 
 #: reports/views/mixins.py
 msgid ""
-"No data could be found for %(report_types). Object(s) did not exist on "
-"%(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on %"
+"(date)s."
 msgstr ""
 
 #: reports/views/multi_report.py
@@ -4737,13 +4706,13 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Schedule disabled successfully. '{}' will not be generated automatically "
-"until the schedule is enabled again."
+"Schedule enabled successfully. '{}' will be generated according to schedule."
 msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Schedule enabled successfully. '{}' will be generated according to schedule."
+"Schedule disabled successfully. '{}' will not be generated automatically "
+"until the schedule is enabled again."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -5035,6 +5004,11 @@ msgid "Expires by (UTC)"
 msgstr ""
 
 #: tools/forms/ooi_form.py
+#, python-format
+msgid "Invalid cron expression: %(error)s"
+msgstr ""
+
+#: tools/forms/ooi_form.py
 msgid "option"
 msgstr "opzione"
 
@@ -5066,63 +5040,63 @@ msgstr "Da"
 msgid "To"
 msgstr "A"
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Cancelled"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Completed"
 msgstr "Completato"
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Dispatched"
 msgstr "Spedito"
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Failed"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Queued"
 msgstr "In coda"
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Running"
 msgstr ""
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Search (in OOI)"
-msgstr "Scansione OOI"
+msgstr ""
 
 #: tools/forms/scheduler.py
 msgid "Search by object name"
 msgstr "Cerca per nome oggetto"
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Input OOI"
-msgstr "Nessun OOI di input"
+msgstr ""
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Select specific object"
-msgstr "Elimina oggetto(i)"
+msgstr ""
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Search by plugin"
-msgstr "Opzioni di filtro"
+msgstr ""
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Task id"
-msgstr "ID Attività"
+msgstr ""
 
 #: tools/forms/scheduler.py
-#, fuzzy
 msgid "Search by task ID"
-msgstr "Cerca per nome oggetto"
+msgstr ""
 
 #: tools/forms/scheduler.py
 #, python-format
@@ -5232,9 +5206,9 @@ msgid ""
 "used as the basis for a form for the user. When the user enables this Boefje "
 "they can get the option to give extra information. For example, it can "
 "contain an API key that the script requires.</p> <p>More information about "
-"what the schema.json file looks like can be found <a href='https://docs."
-"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
-"html'> here</a>.</p> "
+"what the schema.json file looks like can be found <a href='https://"
+"docs.openkat.nl/developer_documentation/development_tutorial/"
+"creating_a_boefje.html'> here</a>.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
@@ -5767,9 +5741,8 @@ msgid "Add finding"
 msgstr "Aggiungi rilevamento"
 
 #: rocky/templates/findings/finding_list.html
-#, fuzzy
 msgid "Findings "
-msgstr "Rilevamenti"
+msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #, python-format
@@ -6255,9 +6228,8 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/tasks/partials/task_actions.html
-#, fuzzy
 msgid "Normalizer task"
-msgstr "Normalizzatori"
+msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/tasks/partials/task_actions.html
@@ -6282,9 +6254,8 @@ msgstr "Scarica dati meta e raw"
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/tasks/partials/task_actions.html
-#, fuzzy
 msgid "Origin boefje task"
-msgstr "usando boefjes"
+msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/tasks/partials/task_actions.html
@@ -6676,18 +6647,16 @@ msgid "OOI"
 msgstr "OOI"
 
 #: rocky/templates/partials/explanations.html
-#, fuzzy
 msgid "This OOI"
-msgstr "Questo"
+msgstr ""
 
 #: rocky/templates/partials/explanations.html
 msgid "Origin"
 msgstr "Origine"
 
 #: rocky/templates/partials/explanations.html
-#, fuzzy
 msgid "declared"
-msgstr "Dichiarato"
+msgstr ""
 
 #: rocky/templates/partials/explanations.html
 msgid "inherited from ↓"
@@ -6951,6 +6920,16 @@ msgstr "successivo"
 msgid "last"
 msgstr "ultimo"
 
+#: rocky/templates/partials/scan_level_indicator.html
+#, python-format
+msgid "Scan level %(level)s"
+msgstr ""
+
+#: rocky/templates/partials/scan_level_indicator.html
+#, python-format
+msgid "Clearance level %(level)s"
+msgstr ""
+
 #: rocky/templates/partials/secondary-menu.html
 msgid "User navigation"
 msgstr "Navigazione utente"
@@ -7086,33 +7065,28 @@ msgid "Modified date"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#, fuzzy
 msgid "Filter on this plugin"
-msgstr "Opzioni di filtro"
+msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#, fuzzy
 msgid "Add filter on this plugin"
-msgstr "Opzioni di filtro"
+msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/partials/stats.html
-#, fuzzy
 msgid "Filter on this status"
-msgstr "Opzioni di filtro"
+msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/partials/stats.html
 msgid "Add filter on this status"
 msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#, fuzzy
 msgid "Filter on this ooi"
-msgstr "Opzioni di filtro"
+msgstr ""
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#, fuzzy
 msgid "Add filter on this ooi"
-msgstr "Nascondi opzioni di filtro"
+msgstr ""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers."
@@ -7163,9 +7137,8 @@ msgid "Reschedule"
 msgstr "Ripianifica"
 
 #: rocky/templates/tasks/partials/task_actions.html
-#, fuzzy
 msgid "Related Normalizer tasks"
-msgstr "Normalizzatori"
+msgstr ""
 
 #: rocky/templates/tasks/partials/task_actions.html
 msgid "Download task data"
@@ -7940,6 +7913,9 @@ msgstr "File raw aggiunto con successo."
 #~ "I Boefjes che hanno un livello di scansione inferiore o uguale al livello "
 #~ "di autorizzazione sono autorizzati a eseguire la scansione di un oggetto."
 
+#~ msgid "Delete object(s)"
+#~ msgstr "Elimina oggetto(i)"
+
 #~ msgid "Set clearance level to inherit"
 #~ msgstr "Imposta il livello di autorizzazione su eredità"
 
@@ -8194,10 +8170,10 @@ msgstr "File raw aggiunto con successo."
 #~ "Tool). An Open-Source-project developed by the Ministry of Health, "
 #~ "Welfare and Sport to make your and our world a safer place."
 #~ msgstr ""
-#~ "OpenKAT è lo \"Strumento di Analisi delle "
-#~ "Vulnerabilità\" (Vulnerabilities Analysis Tool). Un progetto open source "
-#~ "sviluppato dal Ministero della Salute, del Benessere e dello Sport per "
-#~ "rendere il nostro mondo e il vostro un luogo più sicuro."
+#~ "OpenKAT è lo \"Strumento di Analisi delle Vulnerabilità\" "
+#~ "(Vulnerabilities Analysis Tool). Un progetto open source sviluppato dal "
+#~ "Ministero della Salute, del Benessere e dello Sport per rendere il nostro "
+#~ "mondo e il vostro un luogo più sicuro."
 
 #~ msgid ""
 #~ "OpenKAT is able to give insight into security risks on your online "
@@ -9886,6 +9862,9 @@ msgstr "File raw aggiunto con successo."
 #~ msgid "Heatmap"
 #~ msgstr "Mappa termica"
 
+#~ msgid "--- Select an option ----"
+#~ msgstr "--- Seleziona un'opzione ----"
+
 #~ msgid "Failure mode affected objects successfully created."
 #~ msgstr "Oggetti interessati dalla modalità di guasto creati con successo."
 
@@ -9955,6 +9934,9 @@ msgstr "File raw aggiunto con successo."
 #~ msgstr ""
 #~ "Il codice organizzazione(i) per il file raw non esiste nel nostro database"
 
+#~ msgid "Scan OOI"
+#~ msgstr "Scansione OOI"
+
 #~ msgid "Selected OOIs:"
 #~ msgstr "OOI selezionati:"
 
@@ -10004,6 +9986,9 @@ msgstr "File raw aggiunto con successo."
 
 #~ msgid "List of tasks for "
 #~ msgstr "Elenco dei compiti per"
+
+#~ msgid "No input OOI"
+#~ msgstr "Nessun OOI di input"
 
 #~ msgid ""
 #~ "Can not parse observed_at parameter, falling back to showing current "

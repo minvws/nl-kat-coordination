@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-24 13:47+0000\n"
-"PO-Revision-Date: 2025-08-22 09:39+0000\n"
+"POT-Creation-Date: 2026-10-02 12:30+0000\n"
+"PO-Revision-Date: 2026-09-30 19:11+0000\n"
 "Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/fr/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.13\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -348,7 +348,6 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #: crisis_room/templates/partials/crisis_room_findings_table.html
-#: onboarding/forms.py onboarding/templates/step_2a_organization_select.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Organization"
 msgstr ""
@@ -2190,16 +2189,10 @@ msgstr ""
 msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 
-#: onboarding/forms.py
-msgid "--- Select an organization ---"
-msgstr ""
-
-#: onboarding/forms.py
-msgid "Please select an organization to proceed."
-msgstr ""
-
-#: onboarding/forms.py
-msgid "explanation-organization-select"
+#: onboarding/forms.py onboarding/views.py
+msgid ""
+"The onboarding DNS report requires a hostname, not an IP address or "
+"localhost."
 msgstr ""
 
 #: onboarding/templates/partials/onboarding_header.html
@@ -2268,28 +2261,6 @@ msgstr ""
 msgid "Let's get started"
 msgstr ""
 
-#: onboarding/templates/step_2a_organization_select.html
-msgid "Select an organization"
-msgstr ""
-
-#: onboarding/templates/step_2a_organization_select.html
-msgid ""
-"You are already a member of one or more organizations. Select an existing "
-"organization to continue the onboarding in."
-msgstr ""
-
-#: onboarding/templates/step_2a_organization_select.html
-#: onboarding/templates/step_2b_organization_update.html
-#: onboarding/templates/step_3_indemnification_setup.html
-#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
-#: onboarding/templates/step_7_clearance_level_introduction.html
-msgid "Continue"
-msgstr ""
-
-#: onboarding/templates/step_2a_organization_select.html
-msgid "Or create a new organization"
-msgstr ""
-
 #: onboarding/templates/step_2a_organization_setup.html
 #: onboarding/templates/step_2b_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -2310,12 +2281,15 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: onboarding/templates/step_2a_organization_setup.html
-msgid "Or select an existing organization"
+#: onboarding/templates/step_2b_organization_update.html
+msgid "Submit changes"
 msgstr ""
 
 #: onboarding/templates/step_2b_organization_update.html
-msgid "Submit changes"
+#: onboarding/templates/step_3_indemnification_setup.html
+#: onboarding/templates/step_4_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_7_clearance_level_introduction.html
+msgid "Continue"
 msgstr ""
 
 #: onboarding/templates/step_3_indemnification_setup.html
@@ -4193,7 +4167,8 @@ msgid "Low"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Pending"
 msgstr ""
 
@@ -4619,8 +4594,8 @@ msgstr ""
 
 #: reports/views/mixins.py
 msgid ""
-"No data could be found for %(report_types). Object(s) did not exist on "
-"%(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on %"
+"(date)s."
 msgstr ""
 
 #: reports/views/multi_report.py
@@ -4645,13 +4620,13 @@ msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Schedule disabled successfully. '{}' will not be generated automatically "
-"until the schedule is enabled again."
+"Schedule enabled successfully. '{}' will be generated according to schedule."
 msgstr ""
 
 #: reports/views/report_overview.py
 msgid ""
-"Schedule enabled successfully. '{}' will be generated according to schedule."
+"Schedule disabled successfully. '{}' will not be generated automatically "
+"until the schedule is enabled again."
 msgstr ""
 
 #: reports/views/report_overview.py
@@ -4941,6 +4916,11 @@ msgid "Expires by (UTC)"
 msgstr ""
 
 #: tools/forms/ooi_form.py
+#, python-format
+msgid "Invalid cron expression: %(error)s"
+msgstr ""
+
+#: tools/forms/ooi_form.py
 msgid "option"
 msgstr ""
 
@@ -4970,27 +4950,33 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Cancelled"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Completed"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Dispatched"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Failed"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Queued"
 msgstr ""
 
-#: tools/forms/scheduler.py rocky/templates/tasks/partials/stats.html
+#: tools/forms/scheduler.py rocky/scheduler.py
+#: rocky/templates/tasks/partials/stats.html
 msgid "Running"
 msgstr ""
 
@@ -5127,9 +5113,9 @@ msgid ""
 "used as the basis for a form for the user. When the user enables this Boefje "
 "they can get the option to give extra information. For example, it can "
 "contain an API key that the script requires.</p> <p>More information about "
-"what the schema.json file looks like can be found <a href='https://docs."
-"openkat.nl/developer_documentation/development_tutorial/creating_a_boefje."
-"html'> here</a>.</p> "
+"what the schema.json file looks like can be found <a href='https://"
+"docs.openkat.nl/developer_documentation/development_tutorial/"
+"creating_a_boefje.html'> here</a>.</p> "
 msgstr ""
 
 #: tools/forms/settings.py
@@ -6770,6 +6756,16 @@ msgstr ""
 
 #: rocky/templates/partials/pagination.html
 msgid "last"
+msgstr ""
+
+#: rocky/templates/partials/scan_level_indicator.html
+#, python-format
+msgid "Scan level %(level)s"
+msgstr ""
+
+#: rocky/templates/partials/scan_level_indicator.html
+#, python-format
+msgid "Clearance level %(level)s"
 msgstr ""
 
 #: rocky/templates/partials/secondary-menu.html
