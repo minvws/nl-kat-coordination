@@ -1,5 +1,7 @@
 """Regression tests for the Rocky findings classification filters."""
 
+from datetime import datetime, timezone
+
 import pytest
 from pytest_django.asserts import assertContains
 from tools.forms.findings import FindingClassificationForm
@@ -7,6 +9,7 @@ from tools.forms.findings import FindingClassificationForm
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from rocky.views.finding_list import FindingListView
+from rocky.views.mixins import FindingList
 from tests.conftest import setup_request
 
 
@@ -45,11 +48,41 @@ def test_findings_filters_reach_count_and_page(
     assert response.status_code == 200
     assert response.context_data["paginator"].count == 0
     calls = connector.list_findings.call_args_list
-    assert len(calls) == 2
-    assert {call.kwargs["limit"] for call in calls} == {0, 150}
+    # The paginated response already contains the total count. Rocky reuses it
+    # rather than issuing a separate count-only request.
+    assert len(calls) == 1
+    assert calls[0].kwargs["limit"] == 150
     for call in calls:
         assert call.kwargs["group"] == expected_group
         assert call.kwargs["tag"] == expected_tag
+
+
+@pytest.mark.parametrize(
+    ("group", "tag"),
+    [(None, None), ("dns-security", None), (None, "misconfiguration"), ("dns-security", "misconfiguration")],
+)
+def test_finding_list_count_first_forwards_classification_filters(mock_organization_view_octopoes, group, tag):
+    connector = mock_organization_view_octopoes()
+    connector.list_findings.return_value = Paginated[Finding](count=0, items=[])
+    findings = FindingList(
+        octopoes_connector=connector, valid_time=datetime.now(timezone.utc), severities=set(), group=group, tag=tag
+    )
+
+    # Counting before retrieving a page uses the count-only query.
+    assert len(findings) == 0
+    assert connector.list_findings.call_count == 1
+    count_call = connector.list_findings.call_args
+    assert count_call.kwargs["limit"] == 0
+    assert count_call.kwargs["group"] == group
+    assert count_call.kwargs["tag"] == tag
+
+    # Retrieving the page still forwards the same filters.
+    assert findings[:150] == []
+    assert connector.list_findings.call_count == 2
+    page_call = connector.list_findings.call_args
+    assert page_call.kwargs["limit"] == 150
+    assert page_call.kwargs["group"] == group
+    assert page_call.kwargs["tag"] == tag
 
 
 def test_classification_combines_with_existing_findings_filters(rf, client_member, mock_organization_view_octopoes):
