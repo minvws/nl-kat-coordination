@@ -82,7 +82,7 @@ def test_ooi_edit_report_recipe_invalid_cron(
     ooi_id = f"ReportRecipe|{report_recipe.recipe_id}"
 
     request_url = (
-        reverse("ooi_edit", kwargs={"organization_code": client_member.organization.code}) + f"?ooi_id={ooi_id}"
+        reverse("ooi_edit", kwargs={"organization_code": client_member.organization.code, ooi:ooi_id})
     )
 
     request = setup_request(
@@ -101,7 +101,7 @@ def test_ooi_edit_report_recipe_invalid_cron(
         ),
         client_member.user,
     )
-    response = OOIEditView.as_view()(request, organization_code=client_member.organization.code)
+    response = OOIEditView.as_view()(request, organization_code=client_member.organization.code, ooi=ooi_id)
 
     assert response.status_code == 200
     assertContains(response, "Invalid cron expression")
