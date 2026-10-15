@@ -104,7 +104,7 @@ class ObservedAtMixin(ContextMixin, View):
         self.temporal_context: datetime | None = kwargs.get("temporal_context")
 
     @cached_property
-    def now(sef) -> datetime:
+    def now(self) -> datetime:
         return datetime.now(timezone.utc)
 
     @cached_property
