@@ -401,7 +401,7 @@ def test_step_9a_onboarding_ooi_detail_scan_create_report_schedule(
             "step_9a_setup_scan_ooi_detail",
             kwargs={"organization_code": member.organization.code, "ooi": url.primary_key},
         )
-        + f"?report_type=dns-report"
+        + "?report_type=dns-report"
     )
 
     response = OnboardingCreateReportRecipe.as_view()(
@@ -443,11 +443,14 @@ def test_step_9a_onboarding_ip_address_url_no_crash(
             "step_9a_setup_scan_ooi_detail",
             kwargs={"organization_code": member.organization.code, "ooi": ip_url.primary_key},
         )
-        + f"?report_type=dns-report"
+        + "?report_type=dns-report"
     )
 
+
     response = OnboardingCreateReportRecipe.as_view()(
-        setup_request(rf.post(request_url), redteam_member.user), organization_code=redteam_member.organization.code
+        setup_request(rf.post(request_url), member.user),
+        organization_code=member.organization.code,
+        ooi=ip_url.primary_key,
     )
 
     assert response.status_code == 200  # re-renders the page, no 500 crash
