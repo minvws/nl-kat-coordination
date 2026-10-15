@@ -441,15 +441,15 @@ def test_step_9a_onboarding_ip_address_url_no_crash(
     request_url = (
         reverse(
             "step_9a_setup_scan_ooi_detail",
-            kwargs={"organization_code": member.organization.code, "ooi": ip_url.primary_key},
+            kwargs={"organization_code": redteam_member.organization.code, "ooi": ip_url.primary_key},
         )
         + "?report_type=dns-report"
     )
 
 
     response = OnboardingCreateReportRecipe.as_view()(
-        setup_request(rf.post(request_url), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.post(request_url), redteam_member.user),
+        organization_code=redteam_member.organization.code,
         ooi=ip_url.primary_key,
     )
 
