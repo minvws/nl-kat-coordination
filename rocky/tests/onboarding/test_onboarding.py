@@ -401,7 +401,7 @@ def test_step_9a_onboarding_ooi_detail_scan_create_report_schedule(
             "step_9a_setup_scan_ooi_detail",
             kwargs={"organization_code": member.organization.code, "ooi": url.primary_key},
         )
-        + f"?report_type=dns-report&ooi={url.primary_key}"
+        + f"?report_type=dns-report"
     )
 
     response = OnboardingCreateReportRecipe.as_view()(
@@ -439,8 +439,10 @@ def test_step_9a_onboarding_ip_address_url_no_crash(
     mock_bytes_client().upload_raw.return_value = "raw_id"
 
     request_url = (
-        reverse("step_9a_setup_scan_ooi_detail", 
-                kwargs={"organization_code": redteam_member.organization.code, ooi=ip_url.primary_key})
+        reverse(
+            "step_9a_setup_scan_ooi_detail",
+            kwargs={"organization_code": member.organization.code, "ooi": ip_url.primary_key},
+        )
         + f"?report_type=dns-report"
     )
 
