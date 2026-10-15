@@ -446,7 +446,6 @@ def test_step_9a_onboarding_ip_address_url_no_crash(
         + "?report_type=dns-report"
     )
 
-
     response = OnboardingCreateReportRecipe.as_view()(
         setup_request(rf.post(request_url), redteam_member.user),
         organization_code=redteam_member.organization.code,
