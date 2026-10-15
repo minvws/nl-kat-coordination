@@ -81,9 +81,7 @@ def test_ooi_edit_report_recipe_invalid_cron(
     mocker.patch("rocky.views.ooi_view.create_ooi")
     ooi_id = f"ReportRecipe|{report_recipe.recipe_id}"
 
-    request_url = (
-        reverse("ooi_edit", kwargs={"organization_code": client_member.organization.code, "ooi": ooi_id})
-    )
+    request_url = reverse("ooi_edit", kwargs={"organization_code": client_member.organization.code, "ooi": ooi_id})
 
     request = setup_request(
         rf.post(
