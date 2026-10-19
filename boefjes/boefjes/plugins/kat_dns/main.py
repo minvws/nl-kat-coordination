@@ -106,6 +106,7 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
             if len(failure) < 5 or failure[3] != "SERVFAIL" or failure[4] is None:
                 continue
             for option in getattr(failure[4], "options", ()):
+                # DNSSEC error codes defined in RFC 8914
                 if isinstance(option, EDEOption) and int(option.code) in (1, 2, 5, 6, 7, 8, 9, 10, 11, 12): # DNSSEC error codes defined in RFC 8914
                     return "DNSSECFAIL"
         # Keep the rest of the scan usable when a query fails without EDE.
