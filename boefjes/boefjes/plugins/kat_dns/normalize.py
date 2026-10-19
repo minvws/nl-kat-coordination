@@ -4,6 +4,7 @@ import re
 from collections.abc import Iterable
 from ipaddress import IPv4Address, IPv6Address
 
+from dns.exception import DNSException
 from dns.message import Message, from_text
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
@@ -38,6 +39,37 @@ from octopoes.models.ooi.geography import GeographicPoint
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
+def parse_response(text: str) -> Message:
+    """Read a dnspython text response, ignoring unsupported EDNS EDE header lines.
+
+    EDE options are diagnostics, not answer records; dnspython's ``from_text``
+    does not recognise ``option EDE <code> (...)`` in message headers.
+    """
+    return from_text("\n".join(line for line in text.splitlines() if not line.startswith("option EDE ")))
+
+
+def txt_value(record: TXT) -> str:
+    """Concatenate TXT chunks and preserve arbitrary octets without invalid Unicode.
+
+    Valid UTF-8 stays readable; non-UTF-8 bytes and control characters are
+    represented by backslash-octal escapes. Escaping literal backslashes keeps
+    the representation unambiguous.
+    """
+    decoded = b"".join(record.strings).decode("utf-8", errors="surrogateescape")
+    result = []
+    for char in decoded:
+        code = ord(char)
+        if 0xDC80 <= code <= 0xDCFF:
+            result.append(f"\\{code - 0xDC00:03o}")
+        elif code < 32 or code == 127:
+            result.append(f"\\{code:03o}")
+        elif char == "\\":
+            result.append("\\\\")
+        else:
+            result.append(char)
+    return "".join(result)
+
+
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     internet = Network(name="internet")
 
@@ -70,7 +102,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         if ";QUESTION" not in lines:
             continue  # nothing parseable in this block
         start = lines.index(";QUESTION")  # skip everything before the question block
-        responses.append(from_text("\n".join(lines[start:])))
+        responses.append(parse_response("\n".join(lines[start:])))
 
     # keep track of discovered zones
     zone_links: dict[str, DNSZone] = {}
@@ -112,7 +144,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                 if isinstance(rr, TXT):
                     # Concatenate TXT character-strings per RFC 1035 3.3.14:
                     # multiple strings are concatenated without separators.
-                    default_args["value"] = "".join(s.decode() if isinstance(s, bytes) else s for s in rr.strings)
+                    default_args["value"] = txt_value(rr)
                     register_record(DNSTXTRecord(**default_args))
 
                 if isinstance(rr, MX):
@@ -176,9 +208,9 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     # DKIM
     dkim_results = results["dkim_response"]
-    if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL"]:
+    if dkim_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL", "SERVFAIL"]:
         try:
-            dkim_response = from_text(dkim_results)
+            dkim_response = parse_response(dkim_results)
             if dkim_response.rcode() == 0:  # NOERROR
                 yield DKIMExists(hostname=input_hostname.reference)
         except Exception:
@@ -188,8 +220,15 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     # DMARC
     dmarc_results = results["dmarc_response"]
-    if dmarc_results not in ["NXDOMAIN", "Timeout"]:
-        for rrset in from_text(dmarc_results).answer:
-            for rr in rrset:
-                if isinstance(rr, TXT):
-                    yield DMARCTXTRecord(hostname=input_hostname.reference, value=str(rr).strip('"'), ttl=rrset.ttl)
+    if dmarc_results not in ["NXDOMAIN", "Timeout", "DNSSECFAIL", "SERVFAIL"]:
+        try:
+            dmarc_response = parse_response(dmarc_results)
+        except (DNSException, ValueError):
+            logging.getLogger(__name__).warning(
+                "Could not parse DMARC response for %s", input_hostname.name, exc_info=True
+            )
+        else:
+            for rrset in dmarc_response.answer:
+                for rr in rrset:
+                    if isinstance(rr, TXT):
+                        yield DMARCTXTRecord(hostname=input_hostname.reference, value=txt_value(rr), ttl=rrset.ttl)

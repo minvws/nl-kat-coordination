@@ -77,7 +77,7 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
         "dmarc_response": get_email_security_records(resolver, hostname, "_dmarc"),
         "dkim_response": get_email_security_records(resolver, hostname, "_domainkey"),
     }
-    if not answers_formatted and results["dmarc_response"] == "Timeout" and results["dmarc_response"] == "Timeout":
+    if not answers_formatted and results["dmarc_response"] == "Timeout" and results["dkim_response"] == "Timeout":
         raise TimeoutException("No answers from DNS-Server due to timeouts.")
     return [(set(), json.dumps(results))]
 
@@ -100,15 +100,17 @@ def get_email_security_records(resolver: dns.resolver.Resolver, hostname: str, r
         answer = resolver.resolve(f"{record_subdomain}.{hostname}", "TXT", raise_on_no_answer=False)
         return answer.response.to_text()
     except dns.resolver.NoNameservers as error:
-        # no servers responded happily, we'll check the response from the first
-        # https://dnspython.readthedocs.io/en/latest/_modules/dns/rcode.html
-        # https://www.rfc-editor.org/rfc/rfc8914#name-extended-dns-error-code-6-d
-        firsterror = error.kwargs["errors"][0]
-        if firsterror[3] == "SERVFAIL":
-            edeerror = int(firsterror[4].options[0].code)
-            if edeerror in (1, 2, 5, 6, 7, 8, 9, 10, 11, 12):  # DNSSEC error codes defined in RFC 8914
-                return "DNSSECFAIL"  # returned when the resolver indicates a DNSSEC failure.
-        raise  # Not dnssec related, unhandled, raise.
+        # dnspython stores (server, tcp, port, reason, response) tuples.
+        # A SERVFAIL response is not required to contain an EDE option (RFC 8914).
+        for failure in error.kwargs.get("errors", []):
+            if len(failure) < 5 or failure[3] != "SERVFAIL" or failure[4] is None:
+                continue
+            for option in getattr(failure[4], "options", ()):
+                if isinstance(option, EDEOption) and int(option.code) in (1, 2, 5, 6, 7, 8, 9, 10, 11, 12):
+                    return "DNSSECFAIL"
+        # Keep the rest of the scan usable when a query fails without EDE.
+        logger.warning("No DNS nameserver could answer %s.%s", record_subdomain, hostname)
+        return "SERVFAIL"
     except dns.resolver.NXDOMAIN:
         return "NXDOMAIN"
     except dns.resolver.Timeout:

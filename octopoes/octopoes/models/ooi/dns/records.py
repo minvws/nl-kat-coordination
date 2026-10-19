@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Literal
 
+from pydantic import Field
+
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
@@ -214,7 +216,7 @@ class DNSCAARecord(DNSRecord):
     flags: int | None = None
 
     # A non-zero-length sequence of ASCII letters and numbers in lowercase.
-    tag: CAATAGS
+    tag: str = Field(min_length=1, pattern=r"^[a-z0-9]+$")
 
     # The Value field, expressed as either (1) a contiguous set of characters
     # without interior spaces or (2) a quoted string.
