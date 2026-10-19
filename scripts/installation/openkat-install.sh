@@ -13,8 +13,8 @@ if [ "$ID" != "debian" ]; then
 fi
 
 # Check Debian version
-if [ "$VERSION_ID" != "12" ]; then
-    echo "Only Debian version 12 is supported"
+if [ "$VERSION_ID" != "12" ] && [ "$VERSION_ID" != "13" ]; then
+    echo "Only Debian versions 12 and 13 are supported"
     exit 1
 fi
 
@@ -29,7 +29,7 @@ debian_version=$VERSION_ID
 echo "Step 0 - Preparations"
 
 echo "Step 0.1 - Removing old install/upgrade files, update system and install curl & sudo when needed..."
-rm -f kat-*.deb kat-debian1[12]-*.tar.gz xtdb-*.deb
+rm -f kat-*.deb kat-debian1[123]-*.tar.gz xtdb-*.deb
 
 echo "Step 0.2 - Update OS and get needed tools"
 if ! command -v sudo; then
