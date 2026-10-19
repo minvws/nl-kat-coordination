@@ -59,7 +59,13 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     resolver.nameservers = [nameserver]
 
     record_types = get_record_types()
-    answers = [get_parent_zone_soa(resolver, requested_dns_name)] if "SOA" in record_types else []
+    answers = []
+    if "SOA" in record_types:
+        try:
+            answers.append(get_parent_zone_soa(resolver, requested_dns_name))
+        except ZoneNotFoundException:
+            # Parent-zone discovery is optional: keep querying other RR types.
+            logger.warning("Could not determine the parent DNS zone for %s", hostname)
 
     for type_ in record_types:
         try:
@@ -67,6 +73,9 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
             answers.append(answer)
         except (dns.resolver.NoAnswer, dns.resolver.Timeout):
             pass
+        except dns.resolver.NoNameservers as error:
+            # SERVFAIL for one RR type must not discard successful lookups.
+            logger.warning("No DNS nameservers answered %s for %s: %s", type_, hostname, error)
         except dns.resolver.NXDOMAIN:
             return [(set(), "NXDOMAIN")]
 
@@ -86,7 +95,8 @@ def get_parent_zone_soa(resolver: dns.resolver.Resolver, name: Name) -> Answer:
     while True:
         try:
             return resolver.resolve(name, dns.rdatatype.SOA)
-        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.resolver.Timeout, dns.resolver.NoNameservers):
+            # A child lookup may fail while the parent zone still has an SOA.
             pass
 
         try:

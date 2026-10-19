@@ -1,9 +1,18 @@
+import json
 import uuid
 from ipaddress import IPv4Address, IPv6Address
+from types import SimpleNamespace
 
+import dns.message
+import dns.name
+import dns.rcode
+import dns.rdatatype
+import dns.resolver
+import dns.rrset
 import pytest
 from pydantic import BaseModel
 
+from boefjes.plugins.kat_dns import main as dns_boefje
 from boefjes.plugins.kat_dns.normalize import run as dns_normalize_run
 from boefjes.worker.job_models import (
     Boefje,
@@ -423,3 +432,80 @@ def test_dkim_unparsable_response_does_not_crash():
 
     # No DKIMExists finding should be yielded for an unparsable response
     assert not any(ooi.object_type == "DKIMExists" for ooi in output)
+
+
+# Query-error regressions for kat_dns: a failed lookup must not stop unrelated ones.
+def _dns_servfail_error(name: str, record_type: str) -> dns.resolver.NoNameservers:
+    request = dns.message.make_query(name, record_type)
+    response = dns.message.make_response(request)
+    response.set_rcode(dns.rcode.SERVFAIL)
+    return dns.resolver.NoNameservers(request=request, errors=[("1.1.1.1", False, 53, "SERVFAIL", response)])
+
+
+def _dns_mock_answer(name: str, record_type: str, record: str) -> SimpleNamespace:
+    response = dns.message.make_response(dns.message.make_query(name, record_type))
+    response.answer.append(dns.rrset.from_text(name.rstrip(".") + ".", 60, "IN", record_type, record))
+    return SimpleNamespace(nameserver="1.1.1.1", response=response, rrset=response.answer[0])
+
+
+def test_dns_servfail_for_one_type_does_not_abort_scan(monkeypatch):
+    """A SERVFAIL must not prevent a successful MX lookup from being returned."""
+
+    def fake_resolve(self, name, record_type, **kwargs):
+        if record_type == "A":
+            raise _dns_servfail_error(str(name), "A")
+        return _dns_mock_answer("example.org", "MX", "10 mail.example.org.")
+
+    monkeypatch.setattr(dns_boefje, "get_record_types", lambda: {"A", "MX"})
+    monkeypatch.setattr(dns.resolver.Resolver, "resolve", fake_resolve)
+    monkeypatch.setattr(dns_boefje, "get_email_security_records", lambda *args: "NXDOMAIN")
+
+    result = json.loads(dns_boefje.run({"arguments": {"input": {"name": "example.org"}}})[0][1])
+    assert " IN MX " in result["dns_records"]
+    assert " IN A " not in result["dns_records"]
+
+
+def test_dns_soa_servfail_on_child_falls_back_to_parent(monkeypatch):
+    """Discover the parent's SOA even when the child's SOA query SERVFAILs."""
+
+    def fake_resolve(self, name, record_type, **kwargs):
+        assert record_type == dns.rdatatype.SOA
+        if str(name) == "www.example.org.":
+            raise _dns_servfail_error(str(name), "SOA")
+        return _dns_mock_answer("example.org", "SOA", "ns.example.org. admin.example.org. 1 7200 3600 1209600 3600")
+
+    monkeypatch.setattr(dns.resolver.Resolver, "resolve", fake_resolve)
+
+    answer = dns_boefje.get_parent_zone_soa(dns.resolver.Resolver(), dns.name.from_text("www.example.org."))
+    assert answer.rrset.name == dns.name.from_text("example.org.")
+
+
+def test_dns_missing_soa_does_not_prevent_other_queries(monkeypatch):
+    """Complete SOA-discovery failure must not discard a successful A record."""
+
+    def fake_resolve(self, name, record_type, **kwargs):
+        if record_type in ("SOA", dns.rdatatype.SOA):
+            raise _dns_servfail_error(str(name), "SOA")
+        return _dns_mock_answer("example.org", "A", "192.0.2.15")
+
+    monkeypatch.setattr(dns_boefje, "get_record_types", lambda: {"SOA", "A"})
+    monkeypatch.setattr(dns.resolver.Resolver, "resolve", fake_resolve)
+    monkeypatch.setattr(dns_boefje, "get_email_security_records", lambda *args: "NXDOMAIN")
+
+    result = json.loads(dns_boefje.run({"arguments": {"input": {"name": "example.org"}}})[0][1])
+    assert "example.org. 60 IN A 192.0.2.15" in result["dns_records"]
+
+
+def test_dns_soa_timeout_on_child_falls_back_to_parent(monkeypatch):
+    """SOA-discovery timeout must not prevent checking the next suffix."""
+
+    def fake_resolve(self, name, record_type, **kwargs):
+        assert record_type == dns.rdatatype.SOA
+        if str(name) == "www.example.org.":
+            raise dns.resolver.Timeout()
+        return _dns_mock_answer("example.org", "SOA", "ns.example.org. admin.example.org. 1 7200 3600 1209600 3600")
+
+    monkeypatch.setattr(dns.resolver.Resolver, "resolve", fake_resolve)
+
+    answer = dns_boefje.get_parent_zone_soa(dns.resolver.Resolver(), dns.name.from_text("www.example.org."))
+    assert answer.rrset.name == dns.name.from_text("example.org.")
