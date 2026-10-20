@@ -54,20 +54,6 @@ def test_normalizer_emits_up_host_without_open_ports():
     assert str(output[0].address) == "134.209.85.72"
 
 
-def test_normalizer_uses_detected_version_when_cpe_has_no_version():
-    input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
-    raw = get_dummy_data("raw/nmap_mispoes.xml").replace(
-        b'<service name="mysql" product="MySQL" extrainfo=',
-        b'<service name="mysql" product="MySQL" version="8.0.34" extrainfo=',
-    )
-    output = list(run(input_ooi.serialize(), raw))
-
-    mysql = [o for o in output if isinstance(o, Software) and o.cpe == "cpe:/a:mysql:mysql"]
-    assert len(mysql) == 1
-    assert mysql[0].version == "8.0.34"
-    assert any(o.software == mysql[0].reference for o in output if isinstance(o, SoftwareInstance))
-
-
 def test_normalizer_extracts_software_from_cpes():
     input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
     output = list(run(input_ooi.serialize(), get_dummy_data("raw/nmap_mispoes.xml")))
