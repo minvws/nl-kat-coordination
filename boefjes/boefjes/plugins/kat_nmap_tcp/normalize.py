@@ -28,8 +28,7 @@ def get_software(service: NmapService, ip_service: IPService) -> Iterator[OOI]:
             name, version = cpe_to_name_version(cpe=cpe)
             if not name:
                 continue
-            # Nmap can detect a version even when the application CPE omits it.
-            version = version or service.service_dict.get("version") or None
+
             software = Software(name=name, version=version, cpe=cpe)
             yield software
             yield SoftwareInstance(ooi=ip_service.reference, software=software.reference)
