@@ -5,7 +5,7 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 
 from boefjes.plugins.kat_nmap_tcp.normalize import run
-from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.ooi.network import IPAddressV4, IPPort, IPV4NetBlock, Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from tests.loading import get_dummy_data
 
@@ -13,7 +13,7 @@ from tests.loading import get_dummy_data
 def test_normalizer():
     input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
     output = list(run(input_ooi.serialize(), get_dummy_data("raw/nmap_mispoes.xml")))
-    assert len(output) == 25
+    assert len(output) == 26
     for i, out in enumerate(output[:-1]):
         if out.object_type == "IPPort" and output[i + 1].object_type == "Service":
             name = output[i + 1].name
@@ -24,6 +24,48 @@ def test_normalizer():
             else:
                 assert name != "http"
                 assert name != "https"
+
+
+def test_normalizer_emits_ip_with_netblock_relation():
+    network = Network(name="internet")
+    netblock = IPV4NetBlock(
+        network=network.reference,
+        start_ip=IPAddressV4(network=network.reference, address="134.209.85.0").reference,
+        mask=24,
+    )
+    output = list(run(netblock.serialize(), get_dummy_data("raw/nmap_mispoes.xml")))
+
+    discovered_ips = [o for o in output if isinstance(o, IPAddressV4)]
+    assert len(discovered_ips) == 1
+    discovered_ip = discovered_ips[0]
+    assert str(discovered_ip.address) == "134.209.85.72"
+    assert discovered_ip.netblock == netblock.reference
+    assert all(port.address == discovered_ip.reference for port in output if isinstance(port, IPPort))
+
+
+def test_normalizer_emits_up_host_without_open_ports():
+    input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
+    raw = re.sub(rb"<ports>.*?</ports>", b"<ports/>", get_dummy_data("raw/nmap_mispoes.xml"), flags=re.DOTALL)
+
+    output = list(run(input_ooi.serialize(), raw))
+
+    assert len(output) == 1
+    assert isinstance(output[0], IPAddressV4)
+    assert str(output[0].address) == "134.209.85.72"
+
+
+def test_normalizer_uses_detected_version_when_cpe_has_no_version():
+    input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
+    raw = get_dummy_data("raw/nmap_mispoes.xml").replace(
+        b'<service name="mysql" product="MySQL" extrainfo=',
+        b'<service name="mysql" product="MySQL" version="8.0.34" extrainfo=',
+    )
+    output = list(run(input_ooi.serialize(), raw))
+
+    mysql = [o for o in output if isinstance(o, Software) and o.cpe == "cpe:/a:mysql:mysql"]
+    assert len(mysql) == 1
+    assert mysql[0].version == "8.0.34"
+    assert any(o.software == mysql[0].reference for o in output if isinstance(o, SoftwareInstance))
 
 
 def test_normalizer_extracts_software_from_cpes():

@@ -28,6 +28,8 @@ def get_software(service: NmapService, ip_service: IPService) -> Iterator[OOI]:
             name, version = cpe_to_name_version(cpe=cpe)
             if not name:
                 continue
+            # Nmap can detect a version even when the application CPE omits it.
+            version = version or service.service_dict.get("version") or None
             software = Software(name=name, version=version, cpe=cpe)
             yield software
             yield SoftwareInstance(ooi=ip_service.reference, software=software.reference)
@@ -41,47 +43,47 @@ def get_software(service: NmapService, ip_service: IPService) -> Iterator[OOI]:
 
 
 def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Reference | None) -> Iterator[OOI]:
-    """Yields IPs, open ports and services if any ports are open on this host."""
-    open_ports = host.get_open_ports()
-    if open_ports:
-        ip = (
-            IPAddressV4(network=network.reference, address=host.address, netblock=netblock)
-            if host.ipv4
-            else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
-        )
+    """Yield discovered IPs and any open ports and services on each up host."""
+    if not host.is_up():
+        return
 
-        for port, protocol in open_ports:
-            service: NmapService = host.get_service(port, protocol)
+    ip = (
+        IPAddressV4(network=network.reference, address=host.address, netblock=netblock)
+        if host.ipv4
+        else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
+    )
+    yield ip
 
-            # If service is tcpwrapped we should consider the port closed
-            if service.service == "tcpwrapped":
-                continue
+    for port, protocol in host.get_open_ports():
+        service: NmapService = host.get_service(port, protocol)
 
-            ip_port = IPPort(
-                address=ip.reference, protocol=Protocol(protocol), port=port, state=PortState(service.state)
-            )
-            yield ip_port
+        # If service is tcpwrapped we should consider the port closed
+        if service.service == "tcpwrapped":
+            continue
 
-            service_name = service.service
-            if service.tunnel == "ssl":
-                if service_name == "http":
-                    service_name = "https"
-                elif service_name == "smtp":
-                    service_name = "smtps"
-                elif service_name == "imap":
-                    service_name = "imaps"
-                elif service_name == "pop3":
-                    service_name = "pop3s"
-                elif service_name == "ftp":
-                    service_name = "ftps"
+        ip_port = IPPort(address=ip.reference, protocol=Protocol(protocol), port=port, state=PortState(service.state))
+        yield ip_port
 
-            port_service = Service(name=service_name)
-            yield port_service
+        service_name = service.service
+        if service.tunnel == "ssl":
+            if service_name == "http":
+                service_name = "https"
+            elif service_name == "smtp":
+                service_name = "smtps"
+            elif service_name == "imap":
+                service_name = "imaps"
+            elif service_name == "pop3":
+                service_name = "pop3s"
+            elif service_name == "ftp":
+                service_name = "ftps"
 
-            ip_service = IPService(ip_port=ip_port.reference, service=port_service.reference)
-            yield ip_service
+        port_service = Service(name=service_name)
+        yield port_service
 
-            yield from get_software(service, ip_service)
+        ip_service = IPService(ip_port=ip_port.reference, service=port_service.reference)
+        yield ip_service
+
+        yield from get_software(service, ip_service)
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
