@@ -41,19 +41,22 @@ def get_software(service: NmapService, ip_service: IPService) -> Iterator[OOI]:
         yield SoftwareInstance(ooi=ip_service.reference, software=software.reference)
 
 
-def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Reference | None) -> Iterator[OOI]:
-    """Yield discovered IPs and any open ports and services on each up host."""
-    if not host.is_up():
-        return
+def get_ip_ports_and_service(
+    host: NmapHost, network: Network, netblock: Reference | None, input_ref: Reference | None
+) -> Iterator[OOI]:
+    open_ports = host.get_open_ports()
 
     ip = (
         IPAddressV4(network=network.reference, address=host.address, netblock=netblock)
         if host.ipv4
         else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
     )
-    yield ip
 
-    for port, protocol in host.get_open_ports():
+    # Yield IP only when it isn't the input OOI itself, to prevent introduction of bug #2310
+    if input_ref is None or ip.reference != input_ref:
+        yield ip
+
+    for port, protocol in open_ports():
         service: NmapService = host.get_service(port, protocol)
 
         # If service is tcpwrapped we should consider the port closed
@@ -64,9 +67,8 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
         yield ip_port
 
         service_name = service.service
-        if service.tunnel == "ssl":
-            if service_name in ("http", "smtp", "imap", "pop3", "ftp"):
-                service_name = f"{service_name}s"
+        if service.tunnel == "ssl" and service_name in ("http", "smtp", "imap", "pop3", "ftp"):
+            service_name = f"{service_name}s"
 
         port_service = Service(name=service_name)
         yield port_service
@@ -85,6 +87,10 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # Relevant network object is received from the normalizer_meta.
     network = Network(name=input_ooi["network"]["name"])
 
+    input_ref = None
+    if "IPAddress" in input_ooi["object_type"]:
+        input_ref = Reference.from_str(input_ooi["primary_key"])
+
     netblock_ref = None
     if "NetBlock" in input_ooi["object_type"]:
         netblock_ref = Reference.from_str(input_ooi["primary_key"])
@@ -92,4 +98,4 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     logging.info("Parsing %d Nmap-xml(s) for %s.", len(raw_splitted), network)
     for r in raw_splitted:
         for host in NmapParser.parse_fromstring(r).hosts:
-            yield from get_ip_ports_and_service(host=host, network=network, netblock=netblock_ref)
+            yield from get_ip_ports_and_service(host=host, network=network, netblock=netblock_ref, input_ref=input_ref)
