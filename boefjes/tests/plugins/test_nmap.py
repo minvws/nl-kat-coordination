@@ -13,7 +13,7 @@ from tests.loading import get_dummy_data
 def test_normalizer():
     input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
     output = list(run(input_ooi.serialize(), get_dummy_data("raw/nmap_mispoes.xml")))
-    assert len(output) == 26
+    assert len(output) == 25
     for i, out in enumerate(output[:-1]):
         if out.object_type == "IPPort" and output[i + 1].object_type == "Service":
             name = output[i + 1].name
@@ -44,14 +44,21 @@ def test_normalizer_emits_ip_with_netblock_relation():
 
 
 def test_normalizer_emits_up_host_without_open_ports():
-    input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
+    network = Network(name="internet")
+    netblock = IPV4NetBlock(
+        network=network.reference,
+        start_ip=IPAddressV4(network=network.reference, address="134.209.85.0").reference,
+        mask=24,
+    )
+
     raw = re.sub(rb"<ports>.*?</ports>", b"<ports/>", get_dummy_data("raw/nmap_mispoes.xml"), flags=re.DOTALL)
 
-    output = list(run(input_ooi.serialize(), raw))
+    output = list(run(netblock.serialize(), raw))
 
     assert len(output) == 1
     assert isinstance(output[0], IPAddressV4)
     assert str(output[0].address) == "134.209.85.72"
+    assert output[0].netblock == netblock.reference
 
 
 def test_normalizer_extracts_software_from_cpes():
