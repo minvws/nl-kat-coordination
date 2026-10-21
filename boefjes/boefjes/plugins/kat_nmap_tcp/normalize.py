@@ -56,7 +56,7 @@ def get_ip_ports_and_service(
     if input_ref is None or ip.reference != input_ref:
         yield ip
 
-    for port, protocol in open_ports():
+    for port, protocol in open_ports:
         service: NmapService = host.get_service(port, protocol)
 
         # If service is tcpwrapped we should consider the port closed
