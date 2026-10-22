@@ -89,4 +89,9 @@ if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
     sudo systemctl restart kat-rocky-worker
 fi
 
+# Kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
+if [ -f /usr/lib/systemd/system/kat-octopoes-scanlevels.service ]; then
+    sudo systemctl restart kat-octopoes-scanlevels
+fi
+
 echo "End of OpenKAT update script"
