@@ -135,6 +135,16 @@ def test_dnssec_signed_nodata_falls_back_to_aaaa(monkeypatch):
     assert calls == ["A", "CNAME", "AAAA"]
 
 
+def test_dnssec_signed_nodata_without_address_records_is_trusted():
+    raw = (
+        b";; Domain: nl.\n"
+        b"[T] nl. 3600 IN DNSKEY 256 3 13 ;{id = 60847 (zsk), size = 256b}\n"
+        b"[T] Existence denied: nl. A\n"
+    )
+    input_ooi = Hostname(network=Network(name="internet").reference, name="nl")
+    assert list(run(input_ooi.serialize(), raw)) == []
+
+
 def test_dnssec_answer_outside_matching_drill_section():
     input_ooi = Hostname(network=Network(name="internet").reference, name="example.org")
     raw = b";; Domain: org.\n[T] org. 300 IN DNSKEY 257 3 8 xyz\n[U] example.org. 300 IN A 192.0.2.1\n"

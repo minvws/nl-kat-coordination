@@ -9,6 +9,12 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 STATUS = re.compile(r"^\[([USTB])\]\s+(\S+)\s+\d+\s+IN\s+(A|AAAA|CNAME)\s+", re.I)
 
+# Signed or unsigned "no such record" answers for the name itself, e.g.
+# "[T] Existence denied: nl. A" or "[U] No data found for: example.org. type A".
+NO_DATA = re.compile(
+    r"^\[([USTB])\]\s+(?:Existence denied:|No data found for:)\s+(\S+)\s+(?:type\s+)?(A|AAAA|CNAME)\b", re.I
+)
+
 
 def canonical(name: str) -> str:
     return name.rstrip(".").lower()
@@ -23,7 +29,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # DNSKEY/DS records and unrelated CNAME targets must not determine the finding.
     candidates = []
     for line in result.splitlines():
-        match = STATUS.match(line)
+        match = STATUS.match(line) or NO_DATA.match(line)
         if match and canonical(match.group(2)) == domain:
             candidates.append((match.group(1).upper(), match.group(3).upper(), line))
 
@@ -35,9 +41,10 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         finding_id = "KAT-INVALID-DNSSEC"
         reason = "DNSSEC validation failed (bogus answer)"
     elif "S" in states:
-        # A self-signed answer is not the same diagnostic as a bogus signature.
-        finding_id = "KAT-UNTRUSTED-DNSSEC"
-        reason = "DNSSEC answer is self-signed and not authenticated by a trusted chain"
+        # drill -T marks an answer [S] when it is signed but cannot be chained to the trust
+        # anchor, e.g. a DS at the parent that matches no DNSKEY (dnssec-failed.org).
+        finding_id = "KAT-INVALID-DNSSEC"
+        reason = "DNSSEC answer is signed but not authenticated by the chain of trust"
     elif "U" in states:
         finding_id = "KAT-NO-DNSSEC"
         reason = "DNS answer is unsigned or has no authenticated chain of trust"
