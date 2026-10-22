@@ -292,12 +292,22 @@ if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
     sudo systemctl enable kat-rocky-worker
 fi
 
+# Kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
+if [ -f /usr/lib/systemd/system/kat-octopoes-scanlevels.service ]; then
+    sudo systemctl enable kat-octopoes-scanlevels
+fi
+
 echo "Step 8 - Restart OpenKAT"
 sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-octopoes kat-octopoes-worker
 
 # Kat-rocky-worker service was introduced in OpenKAT 1.18
 if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
     sudo systemctl restart kat-rocky-worker
+fi
+
+# Kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
+if [ -f /usr/lib/systemd/system/kat-octopoes-scanlevels.service ]; then
+    sudo systemctl restart kat-octopoes-scanlevels
 fi
 
 echo "Step 9 - End of OpenKAT install script"
