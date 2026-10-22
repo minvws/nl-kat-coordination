@@ -10,8 +10,8 @@ if [ "$ID" != "debian" ]; then
 fi
 
 # Check Debian version
-if [ "$VERSION_ID" != "12" ]; then
-    echo "Only Debian version 12 is supported"
+if [ "$VERSION_ID" != "12" ] && [ "$VERSION_ID" != "13" ]; then
+    echo "Only Debian versions 12 and 13 are supported"
     exit 1
 fi
 

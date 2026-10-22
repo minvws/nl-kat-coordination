@@ -13,8 +13,8 @@ if [ "$ID" != "debian" ]; then
 fi
 
 # Check Debian version
-if [ "$VERSION_ID" != "12" ]; then
-    echo "Only Debian version 12 is supported"
+if [ "$VERSION_ID" != "12" ] && [ "$VERSION_ID" != "13" ]; then
+    echo "Only Debian versions 12 and 13 are supported"
     exit 1
 fi
 
@@ -40,7 +40,7 @@ fi
 sudo apt-get -y update
 sudo apt-get -y install curl
 
-rm -f kat-*.deb kat-debian1[12]-*.tar.gz xtdb-*.deb
+rm -f kat-*.deb kat-debian1[123]-*.tar.gz xtdb-*.deb
 
 echo "Step 1 - Get latest release of OpenKAT"
 
