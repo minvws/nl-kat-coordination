@@ -36,8 +36,8 @@ if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
     sudo systemctl stop kat-rocky-worker
 fi
 
-# kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
-if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
+# Kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
+if [ -f /usr/lib/systemd/system/kat-octopoes-scanlevels.service ]; then
     sudo systemctl stop kat-octopoes-scanlevels
 fi
 
@@ -104,7 +104,7 @@ if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
 fi
 
 # Kat-octopoes-scanlevels service was introduced in OpenKAT 1.23
-if [ -f /usr/lib/systemd/system/kat-rocky-worker.service ]; then
+if [ -f /usr/lib/systemd/system/kat-octopoes-scanlevels.service ]; then
     sudo systemctl start kat-octopoes-scanlevels
 fi
 
