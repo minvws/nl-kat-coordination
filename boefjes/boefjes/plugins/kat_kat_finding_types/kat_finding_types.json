@@ -701,13 +701,5 @@
     "risk": "medium",
     "impact": "A cookie without the Secure attribute may be sent over an unencrypted connection and intercepted. Without HttpOnly the cookie is readable by client-side scripts, so an XSS flaw can steal it. Without a restrictive SameSite value the cookie is sent with cross-site requests, enabling CSRF. For session cookies this can lead to session hijacking.",
     "recommendation": "Set the Secure and HttpOnly attributes on all cookies, and set SameSite to Strict or Lax (use None only together with Secure when cross-site use is required)."
-  },
-  "KAT-UNTRUSTED-DNSSEC": {
-    "name": "DNSSEC answer is self-signed or untrusted",
-    "description": "The DNS answer is classified as self-signed by the DNSSEC validation tool; the answer is not authenticated by an established chain of trust. This status alone does not prove a broken signed delegation.",
-    "source": "https://www.rfc-editor.org/rfc/rfc4035",
-    "risk": "medium",
-    "impact": "DNSSEC validation does not establish an authenticated chain of trust for this answer. Whether this is a misconfiguration depends on the delegation and trust-anchor configuration.",
-    "recommendation": "Check the parent delegation, DS and DNSKEY records, and applicable trust anchors. If the zone is intentionally unsigned, do not treat this status alone as a broken signature."
   }
 }
