@@ -8,6 +8,8 @@ requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.28.1",
     "idna>=3.15",
+    "anyio>=4.14.2",
+    "certifi>=2026.10.19",
 ]
 
 [project.scripts]
@@ -20,5 +22,7 @@ package = false
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-exclude = ["debian*", "packaging*"]
+[tool.setuptools]
+# cveapi is a single module, not a package: packages.find never picks it up,
+# so without this the .deb ships /usr/bin/cveapi without the code it imports.
+py-modules = ["cveapi"]
